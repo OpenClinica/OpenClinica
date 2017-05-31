@@ -3,7 +3,11 @@ package org.akaza.openclinica.service.crfdata.xform;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.List;
 
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
@@ -94,7 +98,9 @@ public class EnketoAPI {
         return null;
     }
 
-    public EnketoURLResponse getEditURL(String crfOid, String instance, String ecid, String redirect, boolean markComplete) {
+    public EnketoURLResponse getEditURL(FormLayout formLayout, String flavor, String instance, String ecid, String redirect, boolean markComplete,
+            String studyOid, List<FormLayoutMedia> mediaList, String goTo) {
+        String crfOid = formLayout.getOcOid() + flavor;
         if (enketoURL == null)
             return null;
 
@@ -107,15 +113,24 @@ public class EnketoAPI {
             String instanceId = encoder.encodePassword(hashString, null);
 
             URL eURL = new URL(enketoURL + "/api/v2/instance/fieldsubmission/iframe");
-            // URL eURL = new URL(enketoURL + "/api/v1/instance/iframe");
+            // URL eURL = new URL(enketoURL + "/api/v2/instance/iframe");
 
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
+
+            InstanceAttachment attachment = new InstanceAttachment();
+
+            for (FormLayoutMedia media : mediaList) {
+                String fileName = media.getName();
+                String baseUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
+                String downLoadUrl = baseUrl + "/downloadMedia?formLayoutMediaId=" + media.getFormLayoutMediaId();
+                attachment.setAdditionalProperty(fileName, downLoadUrl);
+            }
 
             HttpHeaders headers = new HttpHeaders();
             headers.setContentType(MediaType.APPLICATION_JSON);
             headers.add("Authorization", "Basic " + userPasswdCombo);
             headers.add("Accept-Charset", "UTF-8");
-            EnketoEditURLRequest body = new EnketoEditURLRequest(ocURL, crfOid, instanceId, redirect, instance, markComplete);
+            EnketoEditURLRequest body = new EnketoEditURLRequest(ocURL, crfOid, instanceId, redirect, instance, String.valueOf(markComplete), attachment, goTo);
             HttpEntity<EnketoEditURLRequest> request = new HttpEntity<EnketoEditURLRequest>(body, headers);
             RestTemplate rest = new RestTemplate();
             ResponseEntity<EnketoURLResponse> response = rest.postForEntity(eURL.toString(), request, EnketoURLResponse.class);

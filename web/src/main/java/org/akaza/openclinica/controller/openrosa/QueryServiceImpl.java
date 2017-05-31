@@ -125,6 +125,7 @@ public class QueryServiceImpl implements QueryService {
                 childDN = discrepancyNoteDao.saveOrUpdate(childDN);
 
                 parentDN.setUserAccount(childDN.getUserAccount());
+                setResolutionStatus(queryBean, parentDN);
                 parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
 
                 helperBean.setDn(childDN);
@@ -149,25 +150,16 @@ public class QueryServiceImpl implements QueryService {
             UserAccount userAccountByOwnerId = userAccountDao.findByUserName(user);
             dn.setUserAccountByOwnerId(userAccountByOwnerId);
         }
-        if (queryBean.getStatus().equals("new")) {
-            dn.setResolutionStatus(resolutionStatusDao.findById(1));
-        } else if (queryBean.getStatus().equals("updated")) {
-            dn.setResolutionStatus(resolutionStatusDao.findById(2));
-        } else if (queryBean.getStatus().equals("closed")) {
-            dn.setResolutionStatus(resolutionStatusDao.findById(4));
-        }
+        setResolutionStatus(queryBean, dn);
 
         String assignedTo = "";
         if (queryBean.getComment().startsWith("Automatic query for:")) {
-            assignedTo = "(" + helperBean.getContainer().getUser().getUserName() + ")";
+            assignedTo = helperBean.getContainer().getUser().getUserName();
         } else {
             assignedTo = queryBean.getAssigned_to();
         }
         if (!StringUtils.isEmpty(assignedTo)) {
-            int endIndex = assignedTo.indexOf(")");
-            int begIndex = assignedTo.indexOf("(");
-            String userName = assignedTo.substring(begIndex + 1, endIndex);
-            UserAccount userAccount = userAccountDao.findByUserName(userName);
+            UserAccount userAccount = userAccountDao.findByUserName(assignedTo);
             helperBean.setUserAccount(userAccount);
             dn.setUserAccount(userAccount);
         }
@@ -341,5 +333,17 @@ public class QueryServiceImpl implements QueryService {
 
         return addressTo;
 
+    }
+
+    private void setResolutionStatus(QueryBean queryBean, DiscrepancyNote dn) {
+        if (queryBean.getStatus().equals("new")) {
+            dn.setResolutionStatus(resolutionStatusDao.findById(1));
+        } else if (queryBean.getStatus().equals("updated")) {
+            dn.setResolutionStatus(resolutionStatusDao.findById(2));
+        } else if (queryBean.getStatus().equals("closed")) {
+            dn.setResolutionStatus(resolutionStatusDao.findById(4));
+        } else if (queryBean.getStatus().equals("closed-modified")) {
+            dn.setResolutionStatus(resolutionStatusDao.findById(6));
+        }
     }
 }

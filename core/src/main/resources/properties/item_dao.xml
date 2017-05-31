@@ -116,6 +116,12 @@
 		where v.item_id =i.item_id and v.crf_version_id=? order by i.item_id
 		</sql>
 	</query>
+	<query>
+		<name>findAllItemsByLayoutId</name>
+		<sql>select distinct i.* from versioning_map v, item i 
+		where v.item_id =i.item_id and v.form_layout_id=? order by i.item_id
+		</sql>
+	</query>
     <query>
        <name>findAllVersionsByItemId</name>
        <sql>

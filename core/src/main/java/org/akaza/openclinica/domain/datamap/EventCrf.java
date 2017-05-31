@@ -65,6 +65,10 @@ public class EventCrf extends DataMapDomainObject {
     public EventCrf() {
     }
 
+    public EventCrf(int eventCrfId) {
+        this.eventCrfId = eventCrfId;
+    }
+
     public EventCrf(int eventCrfId, boolean sdvStatus) {
         this.eventCrfId = eventCrfId;
         this.sdvStatus = sdvStatus;

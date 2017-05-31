@@ -7,20 +7,6 @@
  */
 package org.akaza.openclinica.dao.admin;
 
-import org.akaza.openclinica.bean.admin.AuditBean;
-import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
-import org.akaza.openclinica.bean.core.ApplicationConstants;
-import org.akaza.openclinica.bean.core.EntityBean;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.EntityDAO;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
-import org.akaza.openclinica.i18n.util.I18nFormatUtil;
-
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -31,6 +17,19 @@ import java.util.List;
 import java.util.Locale;
 
 import javax.sql.DataSource;
+
+import org.akaza.openclinica.bean.admin.AuditBean;
+import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
+import org.akaza.openclinica.bean.core.ApplicationConstants;
+import org.akaza.openclinica.bean.core.EntityBean;
+import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.EntityDAO;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 
 /**
  * @author Krikor Krumlian 2/10/2007
@@ -125,8 +124,7 @@ public class AuditDAO extends EntityDAO {
         eb.setAuditEventTypeId(((Integer) hm.get("audit_log_event_type_id")).intValue());
         eb.setUserName((String) hm.get("user_name"));
         eb.setAuditEventTypeName((String) hm.get("name"));
-        
-        
+
         return eb;
     }
 
@@ -138,20 +136,19 @@ public class AuditDAO extends EntityDAO {
 
     public Object getEntityFromHashMapWithItemDataTypeUpdated(HashMap hm) {
         AuditBean eb = (AuditBean) this.getEntityFromHashMap(hm);
-        eb.setItemDataTypeId((Integer) hm.get("item_data_type_id"));       
+        eb.setItemDataTypeId((Integer) hm.get("item_data_type_id"));
         eb.setEventCrfVersionId((Integer) hm.get("event_crf_version_id"));
-        eb.setCrfVersionName((String) hm.get("crf_version_name"));
-        eb.setCrfName((String) hm.get("crf_name"));       
+        eb.setFormLayoutName((String) hm.get("crf_version_name"));
+        eb.setCrfName((String) hm.get("crf_name"));
         eb.setStudyEventId((Integer) hm.get("study_event_id"));
         eb.setOrdinal((Integer) hm.get("ordinal"));
         eb.setDateInterviewed((java.util.Date) hm.get("date_interviewed"));
-        eb.setInterviewerName((String) hm.get("interviewer_name"));          
-        if (  ((Integer) hm.get("item_data_repeat_key")) != null)
-          eb.setItemDataRepeatKey(((Integer) hm.get("item_data_repeat_key")));
+        eb.setInterviewerName((String) hm.get("interviewer_name"));
+        if (((Integer) hm.get("item_data_repeat_key")) != null)
+            eb.setItemDataRepeatKey(((Integer) hm.get("item_data_repeat_key")));
         return eb;
     }
 
-    
     /*
      * Find By Primary Key
      *
@@ -276,9 +273,9 @@ public class AuditDAO extends EntityDAO {
     }
 
     /*
-    * Find audit log events type for an EventCrf
-    *
-    */
+     * Find audit log events type for an EventCrf
+     *
+     */
     public Collection findEventCRFAudit(int eventCRFId) {
         this.setTypesExpectedWithItemDataType();
 
@@ -296,7 +293,6 @@ public class AuditDAO extends EntityDAO {
         return al;
 
     }
-    
 
     public Collection findAllEventCRFAuditEvents(int studyEventId) {
         this.setTypesExpectedWithItemDataType();
@@ -333,9 +329,7 @@ public class AuditDAO extends EntityDAO {
         return al;
 
     }
-    
-    
-    
+
     /*
      * Find audit log events type for an Study Event
      *
@@ -365,7 +359,7 @@ public class AuditDAO extends EntityDAO {
     public List findDeletedEventCRFsFromAuditEvent(int studyEventId) {
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT); // study_event_id
-        //this.setTypeExpected(2, TypeNames.INT); // study_event_id
+        // this.setTypeExpected(2, TypeNames.INT); // study_event_id
         this.setTypeExpected(2, TypeNames.STRING); // crf name
         this.setTypeExpected(3, TypeNames.STRING); // crf version
         this.setTypeExpected(4, TypeNames.STRING); // user name
@@ -388,11 +382,11 @@ public class AuditDAO extends EntityDAO {
             HashMap map = (HashMap) it.next();
             bean.setStudyEventId(studyEventId);
             bean.setCrfName((String) map.get("crf_name"));
-            bean.setCrfVersion((String) map.get("crf_version_name"));
+            bean.setFormLayout((String) map.get("crf_version_name"));
             bean.setDeletedBy((String) map.get("user_name"));
             bean.setDeletedDate((Date) map.get("audit_date"));
             bean.setDeletedEventCrfId((Integer) map.get("event_crf_id"));
-            
+
             al.add(bean);
         }
         return al;
@@ -402,7 +396,7 @@ public class AuditDAO extends EntityDAO {
     public List findDeletedEventCRFsFromAuditEventByEventCRFStatus(int studyEventId) {
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT); // study_event_id
-        //this.setTypeExpected(2, TypeNames.INT); // study_event_id
+        // this.setTypeExpected(2, TypeNames.INT); // study_event_id
         this.setTypeExpected(2, TypeNames.STRING); // crf name
         this.setTypeExpected(3, TypeNames.STRING); // crf version
         this.setTypeExpected(4, TypeNames.STRING); // user name
@@ -425,17 +419,16 @@ public class AuditDAO extends EntityDAO {
             HashMap map = (HashMap) it.next();
             bean.setStudyEventId(studyEventId);
             bean.setCrfName((String) map.get("crf_name"));
-            bean.setCrfVersion((String) map.get("crf_version_name"));
+            bean.setFormLayout((String) map.get("crf_version_name"));
             bean.setDeletedBy((String) map.get("user_name"));
             bean.setDeletedDate((Date) map.get("audit_date"));
             bean.setDeletedEventCrfId((Integer) map.get("event_crf_id"));
-            
+
             al.add(bean);
         }
         return al;
 
     }
-
 
     // ///////////////////////////////////////////////////////////////////////////////////////////////////
     // TODO: This method not fully implemented
@@ -507,7 +500,7 @@ public class AuditDAO extends EntityDAO {
     }
 
     /*
-        Find audit events for a single Item
+     * Find audit events for a single Item
      */
 
     public ArrayList findItemAuditEvents(int entityId, String auditTable) {
@@ -523,8 +516,8 @@ public class AuditDAO extends EntityDAO {
         Iterator it = alist.iterator();
         while (it.hasNext()) {
             AuditBean eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
-            //3 6 12 32
-            if(eb.getAuditEventTypeId()==3 || eb.getAuditEventTypeId()==6 || eb.getAuditEventTypeId()==12 ){
+            // 3 6 12 32
+            if (eb.getAuditEventTypeId() == 3 || eb.getAuditEventTypeId() == 6 || eb.getAuditEventTypeId() == 12) {
                 eb.setOldValue(Status.get(new Integer(eb.getOldValue())).getName());
                 eb.setNewValue(Status.get(new Integer(eb.getNewValue())).getName());
             }
@@ -535,7 +528,7 @@ public class AuditDAO extends EntityDAO {
 
     }
 
-    public ArrayList checkItemAuditEventsExist(int itemId, String auditTable,int ecbId) {
+    public ArrayList checkItemAuditEventsExist(int itemId, String auditTable, int ecbId) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(itemId));
@@ -548,7 +541,7 @@ public class AuditDAO extends EntityDAO {
         Iterator it = alist.iterator();
         while (it.hasNext()) {
             AuditBean eb = (AuditBean) this.getEntityFromHashMap((HashMap) it.next());
-            if(eb.getAuditEventTypeId()==3 || eb.getAuditEventTypeId()==6 || eb.getAuditEventTypeId()==12){
+            if (eb.getAuditEventTypeId() == 3 || eb.getAuditEventTypeId() == 6 || eb.getAuditEventTypeId() == 12) {
                 eb.setOldValue(Status.get(new Integer(eb.getOldValue())).getName());
                 eb.setNewValue(Status.get(new Integer(eb.getNewValue())).getName());
             }
@@ -562,31 +555,30 @@ public class AuditDAO extends EntityDAO {
         String yearMonthFormat = I18nFormatUtil.yearMonthFormatString(locale);
         String yearFormat = I18nFormatUtil.yearFormatString();
         String dateFormat = I18nFormatUtil.dateFormatString(locale);
-        try{
+        try {
             if (StringUtil.isFormatDate(itemValue, oc_df_string, locale)) {
                 temp = Utils.convertedItemDateValue(itemValue, oc_df_string, local_df_string, locale);
             } else if (StringUtil.isPartialYear(itemValue, yearFormat, locale)) {
                 temp = itemValue;
             } else if (StringUtil.isPartialYearMonth(itemValue, ApplicationConstants.getPDateFormatInSavedData(), locale)) {
-                temp = new SimpleDateFormat(yearMonthFormat, locale).format(
-                        new SimpleDateFormat(ApplicationConstants.getPDateFormatInSavedData(), locale).parse(itemValue));
+                temp = new SimpleDateFormat(yearMonthFormat, locale)
+                        .format(new SimpleDateFormat(ApplicationConstants.getPDateFormatInSavedData(), locale).parse(itemValue));
             }
         } catch (Exception ex) {
             logger.warn("Parsial Date Parsing Exception........");
         }
         return temp;
     }
-    //      SELECT old_value FROM audit_log_event
-//	where   audit_table=? and entity_id=? 
-    //and new_value=? order by audit_date LIMIT 1
+    // SELECT old_value FROM audit_log_event
+    // where audit_table=? and entity_id=?
+    // and new_value=? order by audit_date LIMIT 1
 
-    public String findLastStatus(String audit_table,  int entity_id, String new_value) {
-    	this.setTypesExpected();
-    	this.setTypeExpected(1, TypeNames.STRING); // crf name
-    	this.setTypeExpected(2, TypeNames.INT); // crf name
-    	this.setTypeExpected(3, TypeNames.STRING); // crf name
-        
-    	
+    public String findLastStatus(String audit_table, int entity_id, String new_value) {
+        this.setTypesExpected();
+        this.setTypeExpected(1, TypeNames.STRING); // crf name
+        this.setTypeExpected(2, TypeNames.INT); // crf name
+        this.setTypeExpected(3, TypeNames.STRING); // crf name
+
         HashMap variables = new HashMap();
         variables.put(1, audit_table);
         variables.put(2, entity_id);
@@ -595,12 +587,12 @@ public class AuditDAO extends EntityDAO {
         String sql = digester.getQuery("findLastStatus");
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
- 
+
         if (it.hasNext()) {
             return (String) ((HashMap) it.next()).get("old_value");
         } else {
             return null;
         }
     }
-  
+
 }

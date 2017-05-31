@@ -18,6 +18,7 @@ import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
@@ -26,13 +27,13 @@ import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -66,6 +67,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private CrfVersionDao crfVersionDao;
     @Autowired
     private XformParserHelper xformParserHelper;
+    @Autowired
+    FormLayoutMediaDao formLayoutMediaDao;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -100,11 +103,12 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 ItemGroup itemGroup = null;
                 if (container.getRequestType() == FieldRequestTypeEnum.DELETE_FIELD) {
                     List<String> instanceItemsPath = new ArrayList<>();
-                    instanceItemsPath = xformParserHelper.instanceItemPaths(instanceNode, instanceItemsPath, "");
-                    int idx = StringUtils.ordinalIndexOf(instanceItemsPath.get(0), "/", 2);
+                    instanceItemsPath = xformParserHelper.instanceItemPaths(instanceNode, instanceItemsPath, "", null);
                     List<ItemGroup> itemGroups = itemGroupDao.findByCrfVersionId(container.getCrfVersion().getCrfVersionId());
+                    int idx = instanceItemsPath.get(0).lastIndexOf("/");
+                    String rPath = instanceItemsPath.get(0).substring(idx + 1);
                     for (ItemGroup ig : itemGroups) {
-                        if (ig.getLayoutGroupPath() != null && ig.getLayoutGroupPath().equals(instanceItemsPath.get(0).substring(idx))) {
+                        if (ig.getLayoutGroupPath() != null && ig.getLayoutGroupPath().equals(rPath)) {
                             itemGroup = ig;
                             break;
                         }
@@ -200,12 +204,23 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 itemValue = itemValue.replaceAll(" ", ",");
             }
             if (responseTypeId == 4) {
-                for (HashMap uploadFilePath : listOfUploadFilePaths) {
-                    if ((boolean) uploadFilePath.containsKey(itemValue) && itemValue != "") {
-                        itemValue = (String) uploadFilePath.get(itemValue);
-                        break;
-                    }
+                /*
+                 * for (HashMap uploadFilePath : listOfUploadFilePaths) {
+                 * if ((boolean) uploadFilePath.containsKey(itemValue) && itemValue != "") {
+                 * itemValue = (String) uploadFilePath.get(itemValue);
+                 * break;
+                 * }
+                 * }
+                 */ FormLayoutMedia media = formLayoutMediaDao.findByEventCrfIdAndFileName(container.getEventCrf().getEventCrfId(), itemValue);
+                if (media == null) {
+                    media = new FormLayoutMedia();
                 }
+                media.setName(itemValue);
+                media.setFormLayout(formLayout);
+                media.setEventCrfId(container.getEventCrf().getEventCrfId());
+                media.setPath("/" + container.getStudy().getOc_oid() + "/");
+
+                formLayoutMediaDao.saveOrUpdate(media);
             }
 
             ItemData newItemData = createItemData(item, itemValue, itemOrdinal, container);

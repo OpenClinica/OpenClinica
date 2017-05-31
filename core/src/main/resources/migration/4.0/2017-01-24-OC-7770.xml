@@ -54,6 +54,9 @@
             <column name="form_layout_id" type="int">
                 <constraints nullable="false"/>
             </column>
+            <column name="event_crf_id" type="int">
+                <constraints nullable="false"/>
+            </column>
             <column name="name" type="VARCHAR(255)">
                 <constraints nullable="false"/>
             </column>

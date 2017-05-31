@@ -27,8 +27,11 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -41,8 +44,11 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
@@ -67,6 +73,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String RESOLVING_NOTE = "resolving_note";
     private static final String RETURN_FROM_PROCESS_REQUEST = "returnFromProcess";
     private static final String QUERY_FLAVOR = "-query";
+    private static final String COMMENT = "_comment";
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -137,7 +144,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // this is for item data
         else if ("itemdata".equalsIgnoreCase(entityType)) {
             ItemDataDAO iddao = new ItemDataDAO(ds);
+            ItemDAO idao = new ItemDAO(ds);
             ItemDataBean idb = (ItemDataBean) iddao.findByPK(id);
+            ItemBean item = (ItemBean) idao.findByPK(idb.getItemId());
+            ItemGroupMetadataDAO igmdao = new ItemGroupMetadataDAO<>(ds);
 
             EventCRFDAO ecdao = new EventCRFDAO(ds);
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
@@ -153,6 +163,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
             ItemFormMetadataDAO ifmdao = new ItemFormMetadataDAO(ds);
             ItemFormMetadataBean ifmb = ifmdao.findByItemIdAndCRFVersionId(idb.getItemId(), ecb.getFormLayoutId());
 
+            ItemGroupMetadataBean igmBean = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(idb.getItemId(), ecb.getCRFVersionId());
+            ItemGroupDAO igdao = new ItemGroupDAO<>(ds);
+            ItemGroupBean igBean = (ItemGroupBean) igdao.findByPK(igmBean.getItemGroupId());
+
             EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
             StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 
@@ -164,6 +178,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setOrdinal(seb.getSampleOrdinal());
             subjectContext.setFormLayoutOid(formLayout.getOid());
             subjectContext.setUserAccountId(ub.getId());
+            subjectContext.setItemName(item.getName() + COMMENT);
+            subjectContext.setItemRepeatOrdinal(idb.getOrdinal());
+            subjectContext.setItemInRepeatingGroup(igmBean.isRepeatingGroup());
+            subjectContext.setItemRepeatGroupName(igBean.getLayoutGroupPath());
             String contextHash = cache.putSubjectContext(subjectContext);
 
             String formUrl = null;
@@ -172,12 +190,17 @@ public class ResolveDiscrepancyServlet extends SecureController {
             } else {
                 formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), QUERY_FLAVOR);
             }
-
-            request.setAttribute(EnketoFormServlet.FORM_URL, formUrl);
+            int hashIndex = formUrl.lastIndexOf("#");
+            String part1 = formUrl;
+            String part2 = "";
+            if (hashIndex != -1) {
+                part1 = formUrl.substring(0, hashIndex);
+                part2 = formUrl.substring(hashIndex);
+            }
+            request.setAttribute(EnketoFormServlet.FORM_URL1, part1);
+            request.setAttribute(EnketoFormServlet.FORM_URL2, part2);
         }
-
         return true;
-
     }
 
     /*

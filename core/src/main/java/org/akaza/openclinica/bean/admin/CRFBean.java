@@ -8,15 +8,16 @@
 
 package org.akaza.openclinica.bean.admin;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.oid.CrfOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 
-import java.util.ArrayList;
-
 /**
  * <P>
- * CRFBean.java, the object for instruments in the database. Each one of these is linked to a version, and are associated with studies through study events.
+ * CRFBean.java, the object for instruments in the database. Each one of these is linked to a version, and are
+ * associated with studies through study events.
  * 
  * @author thickerson
  * 
@@ -26,6 +27,7 @@ public class CRFBean extends AuditableEntityBean {
     private int statusId = 1;
     private String description = "";
     private ArrayList versions;// not in DB
+    private ArrayList formLayouts;
     private boolean selected = false; // not in DB
 
     private String oid;
@@ -124,4 +126,13 @@ public class CRFBean extends AuditableEntityBean {
     public void setStudyId(int studyId) {
         this.studyId = studyId;
     }
+
+    public ArrayList getFormLayouts() {
+        return formLayouts;
+    }
+
+    public void setFormLayouts(ArrayList formLayouts) {
+        this.formLayouts = formLayouts;
+    }
+
 }

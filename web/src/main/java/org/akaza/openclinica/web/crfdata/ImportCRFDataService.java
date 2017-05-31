@@ -32,6 +32,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
@@ -57,6 +58,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
@@ -125,13 +127,14 @@ public class ImportCRFDataService {
                     return null;
                 }
                 for (FormDataBean formDataBean : formDataBeans) {
-
+                    FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
 
-                    ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
-                    for (CRFVersionBean crfVersionBean : crfVersionBeans) {
-
-                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID());
+                    for (FormLayoutBean formLayoutBean : formLayoutBeans) {
+                        ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByCRFId(formLayoutBean.getCrfId());
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
+                        CRFVersionBean crfVersionBean = crfVersionBeans.get(0);
                         // what if we have begun with creating a study
                         // event, but haven't entered data yet? this would
                         // have us with a study event, but no corresponding
@@ -141,12 +144,13 @@ public class ImportCRFDataService {
                             // spell out criteria and create a bean if
                             // necessary, avoiding false-positives
                             if ((studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
-                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED) || studyEventBean
-                                    .getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) && upsert.isNotStarted()) {
+                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
+                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) && upsert.isNotStarted()) {
                                 EventCRFBean newEventCrfBean = new EventCRFBean();
                                 newEventCrfBean.setStudyEventId(studyEventBean.getId());
                                 newEventCrfBean.setStudySubjectId(studySubjectBean.getId());
                                 newEventCrfBean.setCRFVersionId(crfVersionBean.getId());
+                                newEventCrfBean.setFormLayoutId(formLayoutBean.getId());
                                 newEventCrfBean.setDateInterviewed(new Date());
                                 newEventCrfBean.setOwner(ub);
                                 newEventCrfBean.setInterviewerName(ub.getName());
@@ -231,12 +235,12 @@ public class ImportCRFDataService {
                 }
                 for (FormDataBean formDataBean : formDataBeans) {
 
-                    CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+                    FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
 
-                    ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
-                    for (CRFVersionBean crfVersionBean : crfVersionBeans) {
+                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID());
+                    for (FormLayoutBean formLayoutBean : formLayoutBeans) {
 
-                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
                         // what if we have begun with creating a study
                         // event, but haven't entered data yet? this would
                         // have us with a study event, but no corresponding
@@ -244,8 +248,8 @@ public class ImportCRFDataService {
                         if (eventCrfBeans.isEmpty()) {
                             logger.debug("   found no event crfs from Study Event id " + studyEventBean.getId() + ", location " + studyEventBean.getLocation());
                             if ((studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
-                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED) || studyEventBean
-                                    .getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED))) {
+                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
+                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED))) {
 
                                 if (!upsert.isNotStarted())
                                     return false;
@@ -300,12 +304,12 @@ public class ImportCRFDataService {
                         studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
 
                 for (FormDataBean formDataBean : formDataBeans) {
+                    FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
 
-                    CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID());
+                    for (FormLayoutBean formLayoutBean : formLayoutBeans) {
 
-                    ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
-                    for (CRFVersionBean crfVersionBean : crfVersionBeans) {
-                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
                         for (EventCRFBean ecb : eventCrfBeans) {
                             Integer ecbId = new Integer(ecb.getId());
 
@@ -405,35 +409,36 @@ public class ImportCRFDataService {
                 displayItemBeans = new ArrayList<DisplayItemBean>();
 
                 for (FormDataBean formDataBean : formDataBeans) {
-                    Map<String,Integer> groupMaxOrdinals = new HashMap<String,Integer>();
+                    Map<String, Integer> groupMaxOrdinals = new HashMap<String, Integer>();
                     displayItemBeanWrapper = null;
-                    CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
-                    EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
-                    ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
-                    ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
+                    FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
 
-                    if ((crfVersionBeans == null) || (crfVersionBeans.size() == 0)) {
+                    EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
+                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID());
+                    FormLayoutBean formLayoutBean = formLayoutBeans.get(0);
+                    ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
+                    if ((formLayoutBeans == null) || (formLayoutBeans.size() == 0)) {
                         MessageFormat mf = new MessageFormat("");
                         mf.applyPattern(respage.getString("your_crf_version_oid_did_not_generate"));
                         Object[] arguments = { formDataBean.getFormOID() };
 
                         throw new OpenClinicaException(mf.format(arguments), "");
                     }
-                    CRFVersionBean crfVersion = crfVersionBeans.get(0);
                     // if you have a mispelled form oid you get an error here
                     // need to error out gracefully and post an error
-                    logger.debug("iterating through form beans: found " + crfVersion.getOid());
+                    logger.debug("iterating through form beans: found " + formLayoutBean.getOid());
                     // may be the point where we cut off item groups etc and
                     // instead work on sections
-                    EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
+                    EventCRFBean eventCRFBean = eventCRFDAO.findByEventFormLayout(studyEvent, formLayoutBean);
+
                     EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
-                    EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(),
-                            crfVersion.getId());
+                    EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findByStudyEventIdAndFormLayoutId(studyBean, studyEvent.getId(),
+                            formLayoutBean.getId());
                     if (eventCRFBean != null) {
                         if (permittedEventCRFIds.contains(new Integer(eventCRFBean.getId()))) {
-                            
+
                             for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
-                                groupMaxOrdinals.put(itemGroupDataBean.getItemGroupOID(),1);
+                                groupMaxOrdinals.put(itemGroupDataBean.getItemGroupOID(), 1);
                             }
                             // if and only if it's in the correct status do we need
                             // to generate the beans
@@ -480,7 +485,7 @@ public class ImportCRFDataService {
                                             try {
                                                 groupOrdinal = new Integer(itemGroupDataBean.getItemGroupRepeatKey()).intValue();
                                                 if (groupOrdinal > groupMaxOrdinals.get(itemGroupDataBean.getItemGroupOID())) {
-                                                    groupMaxOrdinals.put(itemGroupDataBean.getItemGroupOID(),groupOrdinal);
+                                                    groupMaxOrdinals.put(itemGroupDataBean.getItemGroupOID(), groupOrdinal);
                                                 }
                                             } catch (Exception e) {
                                                 // do nothing here currently, we are
@@ -528,7 +533,7 @@ public class ImportCRFDataService {
 
                                         throw new OpenClinicaException(mf.format(arguments), "");
                                     }
-                                }// end item data beans
+                                } // end item data beans
                                 logger.debug(".. found blank check: " + blankCheck.toString());
                                 // >> TBH #5548 did we create any repeated blank spots? If so, fill them in with an Item
                                 // Data Bean
@@ -567,12 +572,12 @@ public class ImportCRFDataService {
                                     }
                                 }
                                 blankCheckItems = new ArrayList<ItemBean>();
-                            }// end item group data beans
+                            } // end item group data beans
 
-                        }// matches if on permittedCRFIDs
+                        } // matches if on permittedCRFIDs
 
                         CRFDAO crfDAO = new CRFDAO(ds);
-                        CRFBean crfBean = crfDAO.findByVersionId(crfVersion.getCrfId());
+                        CRFBean crfBean = crfDAO.findByLayoutId(formLayoutBean.getCrfId());
                         // seems like an extravagance, but is not contained in crf
                         // version or event crf bean
                         validationErrors = discValidator.validate();
@@ -597,7 +602,7 @@ public class ImportCRFDataService {
                         }
 
                         String studyEventId = studyEvent.getId() + "";
-                        String crfVersionId = crfVersion.getId() + "";
+                        String crfVersionId = formLayoutBean.getId() + "";
 
                         logger.debug("creation of wrapper: original count of display item beans " + displayItemBeans.size() + ", count of item data beans "
                                 + totalItemDataBeanCount + " count of validation errors " + validationErrors.size() + " count of study subjects "
@@ -630,7 +635,7 @@ public class ImportCRFDataService {
                         // the
                         displayItemBeanWrapper = new DisplayItemBeanWrapper(displayItemBeans, true, overwrite, validationErrors, studyEventId, crfVersionId,
                                 studyEventDataBean.getStudyEventOID(), studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(),
-                                crfVersion.getName(), studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey());
+                                formLayoutBean.getName(), studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey());
 
                         // JN: Commenting out the following code, since we shouldn't re-initialize at this point, as
                         // validationErrors would get overwritten and the
@@ -640,12 +645,12 @@ public class ImportCRFDataService {
                         discValidator = new DiscrepancyValidator(request, discNotes);
                         // reset to allow for new errors...
                     }
-                }// after forms
-                 // validationErrors = new HashMap();
-                 // discValidator = new DiscrepancyValidator(request, discNotes);
+                } // after forms
+                  // validationErrors = new HashMap();
+                  // discValidator = new DiscrepancyValidator(request, discNotes);
                 if (displayItemBeanWrapper != null && displayItemBeans.size() > 0)
                     wrappers.add(displayItemBeanWrapper);
-            }// after study events
+            } // after study events
 
             // remove repeats here? remove them below by only forwarding the
             // first
@@ -654,7 +659,7 @@ public class ImportCRFDataService {
             // need to not add a wrapper for every event + form combination,
             // but instead for every event + form combination which is present
             // look at the hack below and see what happens
-        }// after study subjects
+        } // after study subjects
 
         // throw the OC exception here at the end, if hard edit checks are not
         // empty
@@ -789,8 +794,8 @@ public class ImportCRFDataService {
             // logger.info(itemOid + "is a RADIO or
             // a SELECT ");
             // adding a new hard edit check here; response_option mismatch
-            String theValue = matchValueWithOptions(displayItemBean, displayItemBean.getData().getValue(), displayItemBean.getMetadata().getResponseSet()
-                    .getOptions());
+            String theValue = matchValueWithOptions(displayItemBean, displayItemBean.getData().getValue(),
+                    displayItemBean.getMetadata().getResponseSet().getOptions());
             request.setAttribute(itemOid, theValue);
             logger.debug("        found the value for radio/single: " + theValue);
             if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
@@ -807,13 +812,13 @@ public class ImportCRFDataService {
         } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
             // logger.info(itemOid + "is a CHECKBOX
             // or a SELECTMULTI ");
-            String theValue = matchValueWithManyOptions(displayItemBean, displayItemBean.getData().getValue(), displayItemBean.getMetadata().getResponseSet()
-                    .getOptions());
+            String theValue = matchValueWithManyOptions(displayItemBean, displayItemBean.getData().getValue(),
+                    displayItemBean.getMetadata().getResponseSet().getOptions());
             request.setAttribute(itemOid, theValue);
-            // logger.debug("        found the value for checkbx/multi: " + theValue);
+            // logger.debug(" found the value for checkbx/multi: " + theValue);
             if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
                 // fail it here? found an 0,1 in the place of a NULL
-                // logger.debug("--  theValue was NULL, the real value was " + displayItemBean.getData().getValue());
+                // logger.debug("-- theValue was NULL, the real value was " + displayItemBean.getData().getValue());
                 hardv.put(itemOid, "This is not in the correct response set.");
             }
             displayItemBean = importHelper.validateDisplayItemBeanMultipleCV(v, displayItemBean, itemOid);
@@ -941,7 +946,7 @@ public class ImportCRFDataService {
 
             StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
             StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
-            CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+            FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
             ItemGroupDAO itemGroupDAO = new ItemGroupDAO(ds);
             ItemDAO itemDAO = new ItemDAO(ds);
 
@@ -982,14 +987,14 @@ public class ImportCRFDataService {
                             if (formDataBeans != null) {
                                 for (FormDataBean formDataBean : formDataBeans) {
                                     String formOid = formDataBean.getFormOID();
-                                    ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formOid);
+                                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formOid);
                                     // ideally we should look to compare
                                     // versions within
                                     // seds;
                                     // right now just check nulls
-                                    if (crfVersionBeans != null && crfVersionBeans.size() > 0) {
-                                        for (CRFVersionBean crfVersionBean : crfVersionBeans) {
-                                            if (crfVersionBean == null) {
+                                    if (formLayoutBeans != null && formLayoutBeans.size() > 0) {
+                                        for (FormLayoutBean formLayoutBean : formLayoutBeans) {
+                                            if (formLayoutBean == null) {
                                                 mf.applyPattern(respage.getString("your_crf_version_oid_for_study_event_oid"));
                                                 Object[] arguments = { formOid, sedOid };
                                                 errors.add(mf.format(arguments));

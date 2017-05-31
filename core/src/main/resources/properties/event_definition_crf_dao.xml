@@ -199,6 +199,18 @@
 		</sql>
 	</query>
 	<query>
+		<name>findForStudyByStudyEventIdAndFormLayoutId</name>
+		<sql>
+			SELECT EDC.*
+			FROM EVENT_DEFINITION_CRF EDC, STUDY_EVENT SE, Form_Layout fl
+			WHERE EDC.study_event_definition_id=SE.study_event_definition_id
+				AND EDC.crf_id = fl.crf_id
+				AND SE.study_event_id = ?
+				AND fl.form_layout_id = ?
+				AND EDC.parent_id is null
+		</sql>
+	</query>
+	<query>
 		<name>findByStudyEventIdAndCRFVersionIdAndSiteIdAndParentStudyId</name>
 		<sql>
 			SELECT EDC.*
@@ -207,6 +219,20 @@
 				AND EDC.crf_id = CV.crf_id
 				AND SE.study_event_id = ?
 				AND CV.crf_version_id = ?
+				AND (EDC.study_id = ? or EDC.study_id = ?)
+				AND EDC.event_definition_crf_id not in
+				(select parent_id from event_definition_crf where study_id=?)
+		</sql>
+	</query>
+	<query>
+		<name>findByStudyEventIdAndFormLayoutIdAndSiteIdAndParentStudyId</name>
+		<sql>
+			SELECT EDC.*
+			FROM EVENT_DEFINITION_CRF EDC, STUDY_EVENT SE, Form_layout fl
+			WHERE EDC.study_event_definition_id=SE.study_event_definition_id
+				AND EDC.crf_id = fl.crf_id
+				AND SE.study_event_id = ?
+				AND fl.form_layout_id = ?
 				AND (EDC.study_id = ? or EDC.study_id = ?)
 				AND EDC.event_definition_crf_id not in
 				(select parent_id from event_definition_crf where study_id=?)
@@ -321,13 +347,13 @@
 			select distinct edc.* from event_crf ec
 			JOIN study_subject ss on ss.study_subject_id = ec.study_subject_id
 			JOIN study_event se on se.study_event_id = ec.study_event_id
-			JOIN crf_version cv on cv.crf_version_id = ec.crf_version_id
+			JOIN form_layout fl on fl.form_layout_id = ec.form_layout_id
 			JOIN study_event_definition sed on sed.study_event_definition_id= se.study_event_definition_id
             JOIN study s on s.study_id=ss.study_id			
-			LEFT JOIN event_definition_crf edc on (edc.crf_id = cv.crf_id and
+			LEFT JOIN event_definition_crf edc on (edc.crf_id = fl.crf_id and
 			edc.study_id = ss.study_id and edc.study_event_definition_id=
 			se.study_event_definition_id)
-			where ec.crf_version_id=? 
+			where ec.form_layout_id=? 
 						and
             (sed.oc_oid = ANY(string_to_array(?,',')))  
                   and    

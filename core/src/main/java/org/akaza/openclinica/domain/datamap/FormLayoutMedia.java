@@ -29,15 +29,17 @@ public class FormLayoutMedia extends DataMapDomainObject {
 
     private int formLayoutMediaId;
     private FormLayout formLayout;
+    private int eventCrfId;
     private String name;
     private String path;
 
     public FormLayoutMedia() {
     }
 
-    public FormLayoutMedia(int formLayoutMediaId, FormLayout formLayout, String name, String path) {
+    public FormLayoutMedia(int formLayoutMediaId, FormLayout formLayout, String name, String path, int eventCrfId) {
         this.formLayoutMediaId = formLayoutMediaId;
         this.formLayout = formLayout;
+        this.eventCrfId = eventCrfId;
         this.name = name;
         this.path = path;
     }
@@ -79,6 +81,15 @@ public class FormLayoutMedia extends DataMapDomainObject {
 
     public void setFormLayout(FormLayout formLayout) {
         this.formLayout = formLayout;
+    }
+
+    @Column(name = "event_crf_id", nullable = false, length = 4000)
+    public int getEventCrfId() {
+        return eventCrfId;
+    }
+
+    public void setEventCrfId(int eventCrfId) {
+        this.eventCrfId = eventCrfId;
     }
 
 }

@@ -12,7 +12,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties
-public class Version {
+public class FormVersion {
 
     @JsonProperty("artifactURL")
     private String artifactURL;

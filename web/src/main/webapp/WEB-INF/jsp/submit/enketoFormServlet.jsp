@@ -17,7 +17,7 @@
     <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
     <script type="text/javascript" language="javascript">
     $(document).ready(function(){
-    	var fullEnketoURL = "${formURL}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host);
+    	var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) + "${formURL2}";
     	iframe = document.getElementById("enketo");
         iframe.setAttribute('src', fullEnketoURL);
     });

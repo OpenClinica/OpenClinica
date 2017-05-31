@@ -1,23 +1,12 @@
 package org.akaza.openclinica.service.crfdata;
 
-import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
-import java.io.InputStream;
-import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
-import java.util.HashSet;
 import java.util.List;
-import java.util.Set;
-
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.xpath.XPath;
-import javax.xml.xpath.XPathConstants;
-import javax.xml.xpath.XPathExpression;
-import javax.xml.xpath.XPathFactory;
 
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -55,17 +44,10 @@ import org.akaza.openclinica.domain.xform.XformGroup;
 import org.akaza.openclinica.domain.xform.XformItem;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
-import org.akaza.openclinica.domain.xform.XformUtils;
-import org.akaza.openclinica.domain.xform.dto.Bind;
-import org.akaza.openclinica.domain.xform.dto.Group;
-import org.akaza.openclinica.domain.xform.dto.Html;
-import org.akaza.openclinica.domain.xform.dto.UserControl;
-import org.akaza.openclinica.service.dto.Version;
-import org.akaza.openclinica.validator.xform.ItemValidator;
+import org.akaza.openclinica.service.dto.FormVersion;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
-import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutDef;
 import org.slf4j.Logger;
@@ -80,13 +62,13 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.web.client.RestTemplate;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+
+import com.fasterxml.jackson.core.JsonParseException;
+import com.fasterxml.jackson.core.type.TypeReference;
+import com.fasterxml.jackson.databind.JsonMappingException;
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Service
 public class XformMetaDataService {
@@ -97,6 +79,14 @@ public class XformMetaDataService {
     public static final String INSTANCEQUERIES_SUFFIX = "instance-queries.tpl";
     public static final String FORMQUERIES_SUFFIX = "form-queries.xml";
     public static final String XLS_SUFFIX = ".xls";
+
+    public static final String GEOPOINT_DATATYPE = "geopoint";
+    public static final String GEOTRACE_DATATYPE = "geotrace";
+    public static final String GEOSHAPE_DATATYPE = "geoshape";
+    public static final String BARCODE_DATATYPE = "barcode";
+    public static final String TIME_DATATYPE = "time";
+    public static final String DATETIME_DATATYPE = "dateTime";
+    public static String VERSION = "data_group.json";
 
     @Autowired
     private StudyDao studyDao;
@@ -201,7 +191,7 @@ public class XformMetaDataService {
                 section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
             }
         }
-        createGroups(cmdObject.container, cmdObject.html, cmdObject.xform, crfBean, crfVersion, formLayout, section, cmdObject.ub, cmdObject.errors);
+        createGroups(cmdObject.container, crfBean, crfVersion, formLayout, section, cmdObject.ub, cmdObject.errors);
 
         if (cmdObject.errors.hasErrors()) {
             logger.error("Encounter validation errors while saving CRF.  Rolling back transaction.");
@@ -210,12 +200,11 @@ public class XformMetaDataService {
         return formLayout;
     }
 
-    private void createGroups(XformContainer container, Html html, String submittedXformText, CrfBean crf, CrfVersion crfVersion, FormLayout formLayout,
-            Section section, UserAccountBean ub, Errors errors) throws Exception {
+    private void createGroups(XformContainer container, CrfBean crf, CrfVersion crfVersion, FormLayout formLayout, Section section, UserAccountBean ub,
+            Errors errors) throws Exception {
         Integer itemOrdinal = 1;
         ArrayList<String> usedGroupOids = new ArrayList<String>();
         ArrayList<String> usedItemOids = new ArrayList<String>();
-        List<Group> htmlGroups = html.getBody().getGroup();
 
         // for (Group htmlGroup : htmlGroups) {
         for (XformGroup xformGroup : container.getGroups()) {
@@ -230,61 +219,55 @@ public class XformMetaDataService {
                 itemGroup.setCrf(crf);
                 itemGroup.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
                 itemGroup.setUserAccount(userDao.findById(ub.getId()));
-                itemGroup.setOcOid(itemGroupDao.getValidOid(new ItemGroup(), crf.getName(), xformGroup.getGroupName(), usedGroupOids));
+                itemGroup.setOcOid(xformGroup.getGroupOid());
                 usedGroupOids.add(itemGroup.getOcOid());
-                Integer itemGroupId = (Integer) itemGroupDao.save(itemGroup);
-                itemGroup.setItemGroupId(itemGroupId);
+                itemGroup = itemGroupDao.saveOrUpdate(itemGroup);
+            } else {
+                itemGroup.setName(xformGroup.getGroupName());
+                itemGroup = itemGroupDao.saveOrUpdate(itemGroup);
             }
-            List<UserControl> widgets = null;
             boolean isRepeating = xformGroup.isRepeating();
             // Create Item specific DB entries: item,
             // response_set,item_form_metadata,versioning_map,item_group_metadata
             // for (UserControl widget : widgets) {
 
             for (XformItem xformItem : xformGroup.getItems()) {
-                // Skip reserved name and read-only items here
-                // XformItem xformItem = container.findItemByGroupAndRef(xformGroup, widget.getRef());
-                String readonly = xformItem.getReadonly();
-                boolean calculate = xformItem.isCalculate();
 
-                if (!xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID") && !xformItem.getItemName().equals("OC.STUDY_SUBJECT_ID_CONFIRM")
-                        && (readonly == null || !readonly.trim().equals("true()") || (readonly.trim().equals("true()") && calculate))) {
-                    Item item = createItem(html, xformGroup, xformItem, crf, ub, usedItemOids, errors);
-                    if (item != null) {
-                        ResponseType responseType = null;
-                        if (calculate) {
-                            responseType = responseTypeDao.findByResponseTypeName("calculation");
-                        } else {
-                            responseType = getResponseType(html, xformItem);
-                        }
-                        ResponseSet responseSet = responseSetService.getResponseSet(html, submittedXformText, xformItem, crfVersion, responseType, item,
-                                errors);
-                        // add if statement
-                        ItemFormMetadata ifmd = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-                        if (ifmd == null) {
-                            ifmd = createItemFormMetadata(html, xformItem, item, responseSet, section, crfVersion, itemOrdinal);
-                        }
-                        ArrayList<VersioningMap> vm = versioningMapDao.findByVersionIdFormLayoutIdAndItemId(crfVersion.getCrfVersionId(),
-                                formLayout.getFormLayoutId(), item.getItemId(), itemOrdinal);
-                        if (vm.size() == 0) {
-                            createVersioningMap(crfVersion, item, formLayout, xformItem.getItemOrderInForm());
-                        }
-                        //
-                        ItemGroupMetadata igmd = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-                        if (igmd == null) {
-                            igmd = createItemGroupMetadata(html, item, crfVersion, itemGroup, isRepeating, itemOrdinal);
-                        }
-                        itemOrdinal++;
-
+                Item item = createItem(xformGroup, xformItem, crf, ub, usedItemOids, errors);
+                if (item != null) {
+                    ResponseType responseType = getResponseType(xformItem);
+                    ResponseSet responseSet = responseSetService.getResponseSet(xformItem, crfVersion, responseType, item, errors);
+                    // add if statement
+                    ItemFormMetadata ifmd = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                    if (ifmd == null) {
+                        ifmd = createItemFormMetadata(xformItem, item, responseSet, section, crfVersion, itemOrdinal);
+                    } else {
+                        ifmd.setRequired(xformItem.isRequired());
+                        ifmd.setLeftItemText(xformItem.getLeftItemText());
+                        ifmd.setItem(item);
+                        ifmd.setResponseSet(responseSet);
+                        ifmd = itemFormMetadataDao.saveOrUpdate(ifmd);
                     }
+                    ArrayList<VersioningMap> vm = versioningMapDao.findByVersionIdFormLayoutIdAndItemId(crfVersion.getCrfVersionId(),
+                            formLayout.getFormLayoutId(), item.getItemId(), itemOrdinal);
+                    if (vm.size() == 0) {
+                        createVersioningMap(crfVersion, item, formLayout, xformItem.getItemOrderInForm());
+                    }
+                    //
+                    ItemGroupMetadata igmd = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                    if (igmd == null) {
+                        igmd = createItemGroupMetadata(item, crfVersion, itemGroup, isRepeating, itemOrdinal);
+                    }
+                    itemOrdinal++;
+
                 }
+
             }
         }
 
     }
 
-    private ItemGroupMetadata createItemGroupMetadata(Html html, Item item, CrfVersion crfVersion, ItemGroup itemGroup, boolean isRepeating,
-            Integer itemOrdinal) {
+    private ItemGroupMetadata createItemGroupMetadata(Item item, CrfVersion crfVersion, ItemGroup itemGroup, boolean isRepeating, Integer itemOrdinal) {
         ItemGroupMetadata itemGroupMetadata = new ItemGroupMetadata();
         itemGroupMetadata.setItemGroup(itemGroup);
         itemGroupMetadata.setHeader("");
@@ -321,7 +304,7 @@ public class XformMetaDataService {
         versioningMapDao.saveOrUpdate(versioningMap);
     }
 
-    private ItemFormMetadata createItemFormMetadata(Html html, XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion crfVersion,
+    private ItemFormMetadata createItemFormMetadata(XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion crfVersion,
             Integer itemOrdinal) {
         ItemFormMetadata itemFormMetadata = new ItemFormMetadata();
         itemFormMetadata.setCrfVersionId(crfVersion.getCrfVersionId());
@@ -329,7 +312,7 @@ public class XformMetaDataService {
         itemFormMetadata.setItem(item);
         itemFormMetadata.setSubheader("");
         itemFormMetadata.setHeader("");
-        itemFormMetadata.setLeftItemText(getLeftItemText(html, xformItem));
+        itemFormMetadata.setLeftItemText(xformItem.getLeftItemText());
         itemFormMetadata.setRightItemText("");
         itemFormMetadata.setParentId(0);
         itemFormMetadata.setSection(section);
@@ -340,10 +323,7 @@ public class XformMetaDataService {
         itemFormMetadata.setQuestionNumberLabel("");
         itemFormMetadata.setRegexp("");
         itemFormMetadata.setRegexpErrorMsg("");
-        if (getItemFormMetadataRequired(html, xformItem))
-            itemFormMetadata.setRequired(true);
-        else
-            itemFormMetadata.setRequired(false);
+        itemFormMetadata.setRequired(xformItem.isRequired());
         itemFormMetadata.setDefaultValue("");
         itemFormMetadata.setResponseLayout("Vertical");
         itemFormMetadata.setWidthDecimal("");
@@ -352,359 +332,73 @@ public class XformMetaDataService {
         return itemFormMetadata;
     }
 
-    private Item createItem(Html html, XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub, ArrayList<String> usedItemOids,
-            Errors errors) throws Exception {
-        ItemDataType newDataType = getItemDataType(html, xformItem);
-
-        if (newDataType == null) {
-            logger.error("Found unsupported item type for item: " + xformItem.getItemName());
-            return null;
-        }
+    private Item createItem(XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub, ArrayList<String> usedItemOids, Errors errors)
+            throws Exception {
+        ItemDataType newDataType = getItemDataType(xformItem);
 
         Item item = itemDao.findByNameCrfId(xformItem.getItemName(), crf.getCrfId());
-        ItemDataType oldDataType = null;
         if (item != null) {
-            oldDataType = itemDataTypeDao.findByItemDataTypeId(itemDao.getItemDataTypeId(item));
+            item.setDescription(xformItem.getItemDescription());
+            item = itemDao.saveOrUpdate(item);
         } else {
             item = new Item();
             item.setName(xformItem.getItemName());
-            item.setDescription("");
+            item.setDescription(xformItem.getItemDescription());
             item.setUnits("");
             item.setPhiStatus(false);
             item.setItemDataType(newDataType);
             item.setItemReferenceType(itemRefTypeDao.findByItemReferenceTypeId(1));
             item.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             item.setUserAccount(userDao.findById(ub.getId()));
-            item.setOcOid(itemDao.getValidOid(new Item(), crf.getName(), xformItem.getItemName(), usedItemOids));
+            item.setOcOid(xformItem.getItemOid());
             usedItemOids.add(item.getOcOid());
             item = itemDao.saveOrUpdate(item);
         }
-        ItemValidator validator = new ItemValidator(itemDao, oldDataType, newDataType);
-        DataBinder dataBinder = new DataBinder(item);
-        Errors itemErrors = dataBinder.getBindingResult();
-        validator.validate(item, itemErrors);
-        errors.addAllErrors(itemErrors);
 
-        return itemDao.findByOcOID(item.getOcOid());
+        return item;
     }
 
-    private String getLeftItemText(Html html, XformItem xformItem) {
-        List<UserControl> controls = responseSetService.getUserControl(html);
+    private ItemDataType getItemDataType(XformItem xformItem) {
+        String dataType = xformItem.getItemDataType();
 
-        for (UserControl control : controls) {
-            if (control.getRef().equals(xformItem.getItemPath())) {
-                if (control.getLabel() != null && control.getLabel().getLabel() != null)
-                    return control.getLabel().getLabel();
-                else if (control.getLabel() != null && control.getLabel().getRef() != null && !control.getLabel().getRef().equals("")) {
-                    String ref = control.getLabel().getRef();
-                    String itextKey = ref.substring(ref.indexOf("'") + 1, ref.lastIndexOf("'"));
-                    return XformUtils.getDefaultTranslation(html, itextKey);
-                } else
-                    return "";
-            }
-        }
-        return "";
-    }
-
-    private ItemDataType getItemDataType(Html html, XformItem xformItem) {
-        String dataType = "";
-
-        for (Bind bind : html.getHead().getModel().getBind()) {
-            if (bind.getNodeSet().equals(xformItem.getItemPath()) && bind.getType() != null && !bind.getType().equals("")) {
-                dataType = bind.getType();
-
-                if (dataType.equals("string"))
-                    return itemDataTypeDao.findByItemDataTypeCode("ST");
-                else if (dataType.equals("int"))
-                    return itemDataTypeDao.findByItemDataTypeCode("INT");
-                else if (dataType.equals("decimal"))
-                    return itemDataTypeDao.findByItemDataTypeCode("REAL");
-                else if (dataType.equals("select") || dataType.equals("select1"))
-                    return itemDataTypeDao.findByItemDataTypeCode("ST");
-                else if (dataType.equals("binary"))
-                    return itemDataTypeDao.findByItemDataTypeCode("FILE");
-                else if (dataType.equals("date"))
-                    return itemDataTypeDao.findByItemDataTypeCode("DATE");
-            }
-        }
-        return null;
-    }
-
-    private boolean getItemFormMetadataRequired(Html html, XformItem xformItem) {
-        boolean required = false;
-
-        for (Bind bind : html.getHead().getModel().getBind()) {
-            if (bind.getNodeSet().equals(xformItem.getItemPath()) && bind.getRequired() != null && !bind.getRequired().equals("")) {
-                if (bind.getRequired().equals("true()"))
-                    required = true;
-                else if (bind.getRequired().equals("false()"))
-                    required = false;
-            }
-        }
-        return required;
-    }
-
-    private ResponseType getResponseType(Html html, XformItem xformItem) {
-        String responseType = "";
-
-        for (Bind bind : html.getHead().getModel().getBind()) {
-            if (bind.getNodeSet().equals(xformItem.getItemPath()) && bind.getType() != null && !bind.getType().equals("")) {
-                responseType = bind.getType();
-
-                if (responseType.equals("string"))
-                    return responseTypeDao.findByResponseTypeName("text");
-                else if (responseType.equals("int"))
-                    return responseTypeDao.findByResponseTypeName("text");
-                else if (responseType.equals("decimal"))
-                    return responseTypeDao.findByResponseTypeName("text");
-                else if (responseType.equals("date"))
-                    return responseTypeDao.findByResponseTypeName("text");
-                else if (responseType.equals("select"))
-                    return responseTypeDao.findByResponseTypeName("checkbox");
-                else if (responseType.equals("select1"))
-                    return responseTypeDao.findByResponseTypeName("radio");
-                else if (responseType.equals("binary"))
-                    return responseTypeDao.findByResponseTypeName("file");
-                else
-                    return null;
-            }
-        }
-        return null;
-    }
-
-    public XformContainer parseInstance(String xform, Errors errors, Html html, String crfName) throws Exception {
-
-        // Could use the following xpath to get all leaf nodes in the case
-        // of multiple levels of groups: //*[count(./*) = 0]
-        // For now will assume a structure of /form/item or /form/group/item
-        Document doc = null;
-        try {
-            InputStream stream = new ByteArrayInputStream(xform.getBytes(StandardCharsets.UTF_8));
-            doc = DocumentBuilderFactory.newInstance().newDocumentBuilder().parse(stream);
-
-            NodeList instances = doc.getElementsByTagName("instance");
-
-            // All whitespace outside tags gets parsed as Text objects and returned
-            // by the various Node methods. We need to ignore these and
-            // focus on actual Elements
-
-            Element instance = null;
-            // List<XformItem> items = new ArrayList<XformItem>();
-            List<XformGroup> groups = new ArrayList<XformGroup>();
-
-            // Get the primary instance
-            for (int i = 0; i < instances.getLength(); i++) {
-                Element curInstance = (Element) instances.item(i);
-                if (curInstance instanceof Element) {
-                    instance = curInstance;
-                    break;
-                }
-            }
-
-            // Get the form element
-            Node form = null;
-            String path = "";
-            List<String> instanceItemsPath = new ArrayList<>();
-            for (int i = 0; i < instance.getChildNodes().getLength(); i++) {
-                Node curNode = instance.getChildNodes().item(i);
-                if (curNode instanceof Element) {
-                    form = curNode;
-                    path = "/" + form.getNodeName();
-                    for (int j = 0; j < form.getChildNodes().getLength(); j++) {
-                        Node node = form.getChildNodes().item(j);
-                        if (node instanceof Element && !node.getNodeName().equals("meta") && !node.getNodeName().equals("formhub")) {
-                            instanceItemsPath = xformParserHelper.instanceItemPaths(node, instanceItemsPath, path + "/" + node.getNodeName());
-                        }
-                    }
-                    logger.info("list size: " + instanceItemsPath.size());
-                }
-            }
-
-            XPathFactory xPathfactory = XPathFactory.newInstance();
-            XPath xpath = xPathfactory.newXPath();
-            XPathExpression expr = xpath.compile("/html/body");
-
-            Node bodyNode = (Node) expr.evaluate(doc, XPathConstants.NODE);
-            List<String> bodyGroupPaths = new ArrayList<>();
-            bodyGroupPaths = xformParserHelper.bodyGroupNodePaths(bodyNode, bodyGroupPaths);
-
-            List<XformItem> xformItems = new ArrayList<>();
-            int itemOrderInForm = 0;
-            for (Bind bd : html.getHead().getModel().getBind()) {
-                // OC-7690 AC1: CRF elements can be defined as read-only = yes and calculation attribute = non-null to
-                // make them read-only calculated elements.
-                if (!bd.getNodeSet().endsWith("/meta/instanceID") && !bodyGroupPaths.contains(bd.getNodeSet()) && (bd.getReadOnly() == null
-                        || bd.getReadOnly().equals("false()") || (bd.getReadOnly().equals("true()") && bd.getCalculate() != null))) {
-                    itemOrderInForm++;
-                    XformItem xformItem = new XformItem();
-                    xformItem.setItemGroup(bd.getItemGroup());
-                    String itemPath = bd.getNodeSet();
-                    xformItem.setItemPath(itemPath);
-                    int index = itemPath.lastIndexOf("/");
-                    String itemName = itemPath.substring(index + 1);
-                    xformItem.setItemName(itemName);
-                    xformItem.setItemOrderInForm(itemOrderInForm);
-                    if (bd.getReadOnly() != null) {
-                        xformItem.setReadonly(bd.getReadOnly());
-                    }
-                    if (bd.getCalculate() != null) {
-                        xformItem.setCalculate(true);
-                    } else {
-                    }
-                    xformItems.add(xformItem);
-                }
-            }
-
-            List<String> repeatGroupPathList = new ArrayList<>();
-            repeatGroupPathList = xformParserHelper.bodyRepeatNodePaths(bodyNode, repeatGroupPathList);
-
-            List<XformGroup> repeatingXformGroups = new ArrayList();
-
-            for (String repeatGroupPath : repeatGroupPathList) {
-                XformGroup repeatingXformGroup = null;
-                for (XformItem xformItem : xformItems) {
-                    String ipath = xformItem.getItemPath();
-                    int index = -1;
-                    while (index != 0) {
-                        index = ipath.lastIndexOf("/");
-                        ipath = ipath.substring(0, index);
-                        if (repeatGroupPath.equals(ipath)) {
-                            if (repeatingXformGroup == null) {
-                                repeatingXformGroup = new XformGroup();
-                                repeatingXformGroup.setGroupName(xformItem.getItemGroup());
-                                int idx = StringUtils.ordinalIndexOf(repeatGroupPath, "/", 2);
-                                repeatingXformGroup.setGroupPath(repeatGroupPath.substring(idx));
-                                repeatingXformGroup.setRepeating(true);
-                                repeatingXformGroup.getItems().add(xformItem);
-                            } else {
-                                if (repeatingXformGroup.getGroupName().equals(xformItem.getItemGroup())) {
-                                    repeatingXformGroup.getItems().add(xformItem);
-                                } else {
-                                    // AC13: All items located directly or indirectly in a repeating layout group must
-                                    // be assigned
-                                    // to the same
-                                    // data group.
-                                    // AC14: The data group assigned to an Item in a repeating layout group must not be
-                                    // assigned to
-                                    // any Item
-                                    // that is not directly or indirectly in the same repeating layout group.
-                                    errors.rejectValue("", "repeating_layout_group_item_assigned_to_wrong_group",
-                                            "Group Name:  " + xformItem.getItemGroup() + "  --- ItemPath:  " + xformItem.getItemPath());
-                                }
-                            }
-                            index = 0;
-                            if (!repeatingXformGroups.contains(repeatingXformGroup))
-                                repeatingXformGroups.add(repeatingXformGroup);
-                        }
-                    }
-
-                }
-            }
-
-            List<XformGroup> xformGroups = new ArrayList<>();
-            Set<String> groupSet = new HashSet<>();
-            for (XformItem xformItem : xformItems) {
-                groupSet.add(xformItem.getItemGroup());
-            }
-            for (String group : groupSet) {
-                XformGroup xformGroup = new XformGroup();
-                xformGroup.setGroupName(group);
-                xformGroups.add(xformGroup);
-            }
-
-            for (XformItem xformItem : xformItems) {
-                if (xformItem.getItemGroup() != null) {
-                    for (XformGroup xformGroup : xformGroups) {
-                        if (xformItem.getItemGroup().equals(xformGroup.getGroupName())) {
-                            xformGroup.getItems().add(xformItem);
-                        }
-                    }
-                }
-            }
-
-            List<XformGroup> nonRepeatingXformGroups = new ArrayList<>();
-            for (XformGroup xformGroup : xformGroups) {
-                if (!repeatingXformGroups.contains(xformGroup)) {
-                    nonRepeatingXformGroups.add(xformGroup);
-                }
-            }
-
-            List<XformGroup> allGroups = new ArrayList<>();
-            for (XformGroup repeatingXformGroup : repeatingXformGroups) {
-                allGroups.add(repeatingXformGroup);
-            }
-            for (XformGroup nonRepeatingXformGroup : nonRepeatingXformGroups) {
-                allGroups.add(nonRepeatingXformGroup);
-            }
-
-            // Repeating layout groups can be included at most one time in a nested layout groups structure
-            validateNestedRepeats(repeatGroupPathList, errors);
-
-            // itemName is unique within crf
-            validateItemUniquenessInCRF(instanceItemsPath, errors);
-
-            // AC11: CRFs must have a data group defined for every Item (i.e., no "ungrouped" Items allowed).
-            validateOcGroupNotNull(xformItems, errors);
-
-            // verify group names compatible with group naming convention
-
-            // AC15: Items that are not directly or indirectly in a repeating layout group can be assigned to the same
-            // data group as each other.
-
-            XformContainer container = new XformContainer();
-            container.setGroups(allGroups);
-            container.setInstanceName(crfName);
-            return container;
-        } catch (
-
-        Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-            throw new Exception(e);
-        }
-    }
-
-    // nested repeating groups not allowed more than once
-    private void validateNestedRepeats(List<String> repeatGroupList, Errors errors) {
-        for (String repeatGroup : repeatGroupList) {
-            int index = -1;
-            String parentPath = repeatGroup;
-            while (index != 0) {
-                index = parentPath.lastIndexOf("/");
-                parentPath = parentPath.substring(0, index);
-                if (repeatGroupList.contains(parentPath)) {
-                    errors.rejectValue("name", "nested_repeat_group_not_allowed", "Repeat GroupPath:  " + repeatGroup);
-                    // errors.rejectValue("name", repeatGroup, resword.getString("nested_repeat_group_not_allowed"));
-                }
-            }
-
-        }
-    }
-
-    public void validateItemUniquenessInCRF(List<String> instanceItemsPath, Errors errors) {
-        List<String> itemNames = new ArrayList<>();
-        for (String itemPath : instanceItemsPath) {
-            int index = itemPath.lastIndexOf("/");
-            String item = itemPath.substring(index + 1);
-            if (itemNames.contains(item)) {
-                errors.rejectValue("name", "duplicate_item_name", "ItemName:  " + item);
-                // errors.rejectValue("name", item, resword.getString("duplicate_item_name"));
-            } else {
-                itemNames.add(item);
-            }
-        }
+        if (dataType.equals("string"))
+            return itemDataTypeDao.findByItemDataTypeCode("ST");
+        else if (dataType.equals("int"))
+            return itemDataTypeDao.findByItemDataTypeCode("INT");
+        else if (dataType.equals("decimal"))
+            return itemDataTypeDao.findByItemDataTypeCode("REAL");
+        else if (dataType.equals("select") || dataType.equals("select1"))
+            return itemDataTypeDao.findByItemDataTypeCode("ST");
+        else if (dataType.equals("binary"))
+            return itemDataTypeDao.findByItemDataTypeCode("FILE");
+        else if (dataType.equals("date"))
+            return itemDataTypeDao.findByItemDataTypeCode("DATE");
+        else
+            return null;
 
     }
 
-    public void validateOcGroupNotNull(List<XformItem> xformItems, Errors errors) {
-        for (XformItem xformItem : xformItems) {
-            if (xformItem.getItemGroup() == null) {
-                errors.rejectValue("name", "group_name_missing_for_this_item", "ItemName:  " + xformItem.getItemName());
-                // errors.rejectValue("name", xformItem.getItemName(),
-                // resword.getString("group_name_missing_for_this_item"));
-            }
-        }
+    private ResponseType getResponseType(XformItem xformItem) {
+        String responseType = xformItem.getItemDataType();
 
+        if (responseType.equals("string"))
+            return responseTypeDao.findByResponseTypeName("text");
+        else if (responseType.equals("int"))
+            return responseTypeDao.findByResponseTypeName("text");
+        else if (responseType.equals("decimal"))
+            return responseTypeDao.findByResponseTypeName("text");
+        else if (responseType.equals("date"))
+            return responseTypeDao.findByResponseTypeName("text");
+        else if (responseType.equals("select"))
+            return responseTypeDao.findByResponseTypeName("checkbox");
+        else if (responseType.equals("select1"))
+            return responseTypeDao.findByResponseTypeName("radio");
+        else if (responseType.equals("binary"))
+            return responseTypeDao.findByResponseTypeName("file");
+        else if (responseType.equals("calculate"))
+            return responseTypeDao.findByResponseTypeName("calculation");
+        else
+            return null;
     }
 
     public FileItem getMediaFileItemFromFormManager(String fileLink, String crfOid, String formLayoutOid) {
@@ -747,65 +441,74 @@ public class XformMetaDataService {
 
     public void executeIndividualCrf(ExecuteIndividualCrfObject eicObject) {
         for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : eicObject.formLayoutDefs) {
-            FormLayout formLayout;
-            List<FileItem> items = eicObject.items;
-            if (items == null) {
-                items = new ArrayList();
-            }
 
             List<String> fileLinks = null;
-            String xform = "";
+            String vForm = "";
             RestTemplate rest = new RestTemplate();
-            if (eicObject.crf != null) {
-                List<Version> versions = eicObject.crf.getVersions();
-                for (Version version : versions) {
+            if (eicObject.form != null) {
+                List<FormVersion> versions = eicObject.form.getVersions();
+                for (FormVersion version : versions) {
                     if (version.getName().equals(formLayoutDef.getOID())) {
                         fileLinks = version.getFileLinks();
                         for (String fileLink : fileLinks) {
-                            if (fileLink.endsWith(FORM_SUFFIX)) {
-                                xform = rest.getForObject(fileLink, String.class);
+                            if (fileLink.endsWith(VERSION)) {
+                                vForm = rest.getForObject(fileLink, String.class);
+                                break;
                             }
                         }
 
                         if (!eicObject.errors.hasErrors()) {
-                            // Parse instance and xform
-                            Html html = null;
+                            ObjectMapper mapper = new ObjectMapper();
+                            TypeReference<List<XformGroup>> mapType = new TypeReference<List<XformGroup>>() {
+                            };
+                            List<XformGroup> jsonList = null;
                             try {
-                                html = xformParser.unMarshall(xform);
-                            } catch (Exception e1) {
+                                jsonList = mapper.readValue(vForm, mapType);
+                            } catch (JsonParseException e) {
                                 // TODO Auto-generated catch block
-                                e1.printStackTrace();
-                            }
-                            XformContainer container = null;
-                            try {
-                                container = parseInstance(xform, eicObject.errors, html, eicObject.crf.getName());
-                            } catch (Exception e1) {
+                                e.printStackTrace();
+                            } catch (JsonMappingException e) {
                                 // TODO Auto-generated catch block
-                                e1.printStackTrace();
+                                e.printStackTrace();
+                            } catch (IOException e) {
+                                // TODO Auto-generated catch block
+                                e.printStackTrace();
                             }
+                            XformContainer xformContainer = new XformContainer();
+                            xformContainer.setGroups(jsonList);
+                            eicObject.setContainer(xformContainer);
 
-                            // Save meta-data in database
-                            try {
-                                try {
-                                    formLayout = createCRFMetaData(
-                                            new CrfMetaDataObject(eicObject.crf, version, container, eicObject.currentStudy, eicObject.ub, html, xform, items,
-                                                    eicObject.errors, formLayoutDef.getURL(), eicObject.crfName, eicObject.crfDescription));
-                                    saveFormArtifactsInOCDataDirectory(fileLinks, eicObject.crf.getOcoid(), version.getOcoid());
-                                    saveMediaFiles(fileLinks, eicObject.crf.getOcoid(), formLayout);
-                                } catch (Exception e) {
-                                    // TODO Auto-generated catch block
-                                    e.printStackTrace();
-                                }
-                            } catch (RuntimeException e) {
-                                logger.error("Error encountered while saving CRF: " + e.getMessage());
-                                logger.error(ExceptionUtils.getStackTrace(e));
-                                if (!eicObject.errors.hasErrors())
-                                    throw e;
+                            if (eicObject.errors.hasErrors()) {
+                                return;
                             }
+                            // Save meta-data in database
+                            saveFormMetadata(eicObject, version, eicObject.container, formLayoutDef, fileLinks);
                         }
                     }
                 }
             }
+        }
+
+    }
+
+    public void saveFormMetadata(ExecuteIndividualCrfObject eicObj, FormVersion version, XformContainer container,
+            OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef, List<String> fileLinks) {
+
+        try {
+            try {
+                FormLayout formLayout = createCRFMetaData(
+                        new CrfMetaDataObject(eicObj.form, version, container, eicObj.getCurrentStudy(), eicObj.ub, eicObj.errors, formLayoutDef.getURL()));
+                saveFormArtifactsInOCDataDirectory(fileLinks, eicObj.form.getOcoid(), version.getOcoid());
+                saveMediaFiles(fileLinks, eicObj.form.getOcoid(), formLayout);
+            } catch (Exception e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        } catch (RuntimeException e) {
+            logger.error("Error encountered while saving CRF: " + e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+            if (!eicObj.errors.hasErrors())
+                throw e;
         }
     }
 
@@ -849,8 +552,8 @@ public class XformMetaDataService {
         formLayout.setUserAccount(userDao.findById(cmdObject.ub.getId()));
         formLayout.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
         formLayout.setRevisionNotes(cmdObject.version.getDescription());
-        formLayout.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crfBean.getOcOid(), formLayout.getName()));
-        formLayout.setXform(cmdObject.xform);
+        formLayout.setOcOid(cmdObject.version.getOcoid());
+        formLayout.setXform(null);
         formLayout.setXformName(cmdObject.container.getInstanceName());
         formLayout.setUrl(cmdObject.formLayoutUrl);
         return formLayout;
@@ -858,8 +561,8 @@ public class XformMetaDataService {
     }
 
     private CrfBean populateCrf(CrfBean crfBean, CrfMetaDataObject cmdObject) {
-        crfBean.setName(cmdObject.crfName);
-        crfBean.setDescription(cmdObject.crfDescription);
+        crfBean.setName(cmdObject.crf.getName());
+        crfBean.setDescription(cmdObject.crf.getDescription());
         crfBean.setUserAccount(userDao.findById(cmdObject.ub.getId()));
         crfBean.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
         crfBean.setStudy(studyDao.findById(cmdObject.currentStudy.getId()));
@@ -905,12 +608,13 @@ public class XformMetaDataService {
             if (!fileLink.endsWith(FORM_SUFFIX) && !fileLink.endsWith(INSTANCEQUERIES_SUFFIX) && !fileLink.endsWith(FORMQUERIES_SUFFIX)
                     && !fileLink.endsWith(XLS_SUFFIX) && !fileLink.endsWith(INSTANCE_SUFFIX)) {
 
-                FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutIdAndFilePath(formLayout.getFormLayoutId(), dir);
+                FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutIdFileNameForNoteTypeMedia(formLayout.getFormLayoutId(), fileName, dir);
                 if (media == null) {
                     media = new FormLayoutMedia();
                     media.setFormLayout(formLayout);
                     media.setName(fileName);
                     media.setPath(dir);
+                    media.setEventCrfId(0);
                     formLayoutMediaDao.saveOrUpdate(media);
                 }
             }
