@@ -1,0 +1,54 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="sdibona" id="2017-05-23-OC-8124-1">
+        <preConditions onFail="MARK_RAN" onError="WARN">
+            <not>
+                <indexExists indexName="i_digm_item_group_metadata_id"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="i_digm_item_group_metadata_id"
+                     tableName="dyn_item_group_metadata"
+                     unique="false">
+            <column name="item_group_metadata_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="sdibona" id="2017-05-23-OC-8124-2">
+        <preConditions onFail="MARK_RAN" onError="WARN">
+            <not>
+                <indexExists indexName="i_digm_item_group_id"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="i_digm_item_group_id"
+                     tableName="dyn_item_group_metadata"
+                     unique="false">
+            <column name="item_group_id"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="sdibona" id="2017-05-23-OC-8124-3">
+        <preConditions onFail="MARK_RAN" onError="WARN">
+            <not>
+                <indexExists indexName="i_digm_show_group"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="i_digm_show_group"
+                     tableName="dyn_item_group_metadata"
+                     unique="false">
+            <column name="show_group"/>
+        </createIndex>
+    </changeSet>
+    <changeSet author="sdibona" id="2017-05-23-OC-8124-4">
+        <preConditions onFail="MARK_RAN" onError="WARN">
+            <not>
+                <indexExists indexName="i_digm_event_crf_id"/>
+            </not>
+        </preConditions>
+        <createIndex indexName="i_digm_event_crf_id"
+                     tableName="dyn_item_group_metadata"
+                     unique="false">
+            <column name="event_crf_id"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>
