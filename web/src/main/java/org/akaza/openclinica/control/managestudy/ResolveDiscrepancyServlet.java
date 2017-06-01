@@ -169,7 +169,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             ItemGroupBean igBean = (ItemGroupBean) igdao.findByPK(igmBean.getItemGroupId());
             int repeatOrdinal = idb.getOrdinal();
             ItemDataBean idata = null;
-            if (idb.isDeleted()) {
+            if (idb != null && idb.isDeleted()) {
                 return false;
             }
             if (igmBean.isRepeatingGroup() && repeatOrdinal > 1) {
