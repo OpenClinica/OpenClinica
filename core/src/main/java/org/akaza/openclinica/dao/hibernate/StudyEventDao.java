@@ -31,6 +31,8 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 
 
 	}
+	
+	@Transactional
 	public StudyEvent fetchByStudyEventDefOIDAndOrdinal(String oid,Integer ordinal,Integer studySubjectId){
 		String query = " from StudyEvent se where se.studySubject.studySubjectId = :studySubjectId and se.studyEventDefinition.oc_oid = :oid and se.sampleOrdinal = :ordinal order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
 		 org.hibernate.Query q = getCurrentSession().createQuery(query);
@@ -63,7 +65,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
     }
 
 
-
+    @Transactional
 	public List<StudyEvent> fetchListByStudyEventDefOID(String oid,Integer studySubjectId){
 		List<StudyEvent> eventList = null;
 
@@ -77,7 +79,7 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 
 	}
 
-	@Transactional(propagation = Propagation.NEVER)
+	@Transactional
     public StudyEvent saveOrUpdate(StudyEventContainer container) {
         StudyEvent event = saveOrUpdate(container.getEvent());
         this.eventPublisher.publishEvent(new OnStudyEventUpdated(container));
@@ -90,13 +92,6 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         return event;
     }
 
-     @Override
-	 public StudyEvent saveOrUpdate(StudyEvent domainObject) {
-	 super.saveOrUpdate(domainObject);
-	        getCurrentSession().flush();
-	        return domainObject;
-	    }
-
 	@Override
 	public void setApplicationEventPublisher(
 			ApplicationEventPublisher applicationEventPublisher) {
@@ -106,5 +101,13 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 	public void setChangeDetails(StudyEventChangeDetails changeDetails) {
 		this.changeDetails = changeDetails;
 	}
+	
+	@Transactional
+    public StudyEvent findByStudyEventId(int studyEventId) {
+        String query = "from " + getDomainClassName() + " study_event  where study_event.studyEventId = :studyeventid ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyeventid", studyEventId);
+        return (StudyEvent) q.uniqueResult();
+    }
 
 }

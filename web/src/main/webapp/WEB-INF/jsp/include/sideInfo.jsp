@@ -177,7 +177,7 @@
   </c:when>
   
   <c:when test="${panel.submitDataModule}">      
-     <c:import url="/WEB-INF/jsp/include/submitDataSide.jsp"/>
+     <c:import url="../include/submitDataSide.jsp"/>
   </c:when> 
 	
   </c:choose>	

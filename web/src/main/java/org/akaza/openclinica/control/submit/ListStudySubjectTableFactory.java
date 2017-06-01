@@ -1,5 +1,19 @@
 package org.akaza.openclinica.control.submit;
 
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -17,7 +31,6 @@ import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
-import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
 import org.akaza.openclinica.dao.managestudy.FindSubjectsSort;
@@ -48,28 +61,6 @@ import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
-
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-import java.util.Properties;
-import java.lang.Exception;
-import java.io.InputStream;
-import java.sql.Connection;
-import java.sql.DriverManager;
-import java.sql.ResultSet;
-import java.sql.SQLException;
-import java.sql.Statement;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
@@ -841,12 +832,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         StudyBean study = (StudyBean) studyDAO.findByPK(studySubject.getStudyId());
         StudyBean pStudy = getParentStudy(study.getOid());
         String url = participantPortalRegistrar.getStudyHost(pStudy.getOid());
-        System.out.println("URL:  " + url);
 
         HtmlBuilder actionLink = new HtmlBuilder();
         // actionLink.a().href("url?id=" + studySubject.getId());
-        actionLink.a().href(url + "?ssid=" + studySubject.getLabel());
-        actionLink.append("target=\"_blank\"");
+        actionLink.a().href(url + "?ssid=" + URLEncoder.encode(studySubject.getLabel(),"UTF-8"));
         actionLink.append("onMouseDown=\"javascript:setImage('bt_Participate1','images/bt_Ocui_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_Participate1','images/bt_Ocui.gif');\"").close();
         actionLink.img().name("bt_Participate1").src("images/bt_Ocui.gif").border("0").alt(resword.getString("connect_participant"))

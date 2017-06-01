@@ -120,7 +120,7 @@ public class ParticipantPortalRegistrar {
     }
 
     public String sendEmailThruMandrillViaOcui(ParticipantDTO participantDTO, String hostname) {
-    	String host = hostname.substring(0,hostname.indexOf("/#/login"));
+    	String host = hostname.substring(0,hostname.indexOf("/app/oauth2"));
        	String pManageUrl =host + "/app/rest/oc/email";
 
         CommonsClientHttpRequestFactory requestFactory = new CommonsClientHttpRequestFactory();
@@ -180,7 +180,7 @@ public class ParticipantPortalRegistrar {
                 String port = "";
                 if (url.getPort() > 0)
                     port = ":" + String.valueOf(url.getPort());
-                return url.getProtocol() + "://" + response[0].getStudy().getHost() + "." + url.getHost() + port + "/#/login";
+                return url.getProtocol() + "://" + response[0].getStudy().getHost() + "." + url.getHost() + port + "/app/oauth2";
             }
         } catch (Exception e) {
             logger.error(e.getMessage());

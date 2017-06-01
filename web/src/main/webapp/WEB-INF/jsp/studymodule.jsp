@@ -617,9 +617,6 @@
                   <td>
                       <span id="participateURL">
                           <c:choose>
-                              <c:when test="${!empty participateURLDisplay && !empty participateStatus && participateStatus == 'ACTIVE'}">
-                                  <a href="<c:url value="${participateURLFull}"/>" target="_blank">${participateURLDisplay}</a>
-                              </c:when>
                               <c:when test="${!empty participateURLDisplay}">${participateURLDisplay}</c:when>
                               <c:otherwise>&nbsp;</c:otherwise>
                           </c:choose>
