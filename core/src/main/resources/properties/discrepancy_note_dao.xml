@@ -764,7 +764,8 @@
             description =?,
             discrepancy_note_type_id =? ,
             resolution_status_id =? ,
-            detailed_notes =?
+            detailed_notes =?,
+            owner_id =?
             where discrepancy_note_id=?
 
         </sql>
