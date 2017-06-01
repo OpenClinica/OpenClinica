@@ -35,7 +35,7 @@
     <bean class="org.springframework.web.servlet.mvc.SimpleControllerHandlerAdapter" />
 
     <!-- Scans the classpath of this application for @Components to deploy as beans -->
-    <context:component-scan base-package="org.akaza.openclinica.controller" />
+    <context:component-scan base-package="org.akaza.openclinica.controller,es.ssib.otic.epona.openclinica.restful" />
 
     <bean class="org.akaza.openclinica.controller.SidebarInit" name="sidebarInit">
         <property name="alertsBoxSetup" value="OPENALERTS" />

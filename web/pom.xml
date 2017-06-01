@@ -347,6 +347,12 @@
     <artifactId>jackson-mapper-lgpl</artifactId>
     <version>1.8.1</version>
 </dependency>
+
+        <dependency>
+            <groupId>es.ssib.otic.reghepatc</groupId>
+            <artifactId>carga_proxy</artifactId>
+            <version>0.0.1</version>
+        </dependency>
     </dependencies>
 
     <build>

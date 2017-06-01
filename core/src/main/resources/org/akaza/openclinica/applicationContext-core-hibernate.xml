@@ -247,4 +247,7 @@
   <bean id="userDaoDomain" class="org.akaza.openclinica.dao.hibernate.UserAccountDao" parent="abstractDomainDao" autowire="byName"/>
   <bean id="userTypeDao" class="org.akaza.openclinica.dao.hibernate.UserTypeDao" parent="abstractDomainDao" autowire="byName"/>
   <bean id="studyEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDao" parent="abstractDomainDao" autowire="byName"></bean> 
+
+  <bean id="studySubjectDaoSsibDomain" class="org.akaza.openclinica.dao.hibernate.StudySubjectDaoSsib" parent="abstractDomainDao" autowire="byName"></bean>
+  <bean id="studyDaoSsibDomain" class="org.akaza.openclinica.dao.hibernate.StudyDaoSsib" parent="abstractDomainDao" autowire="byName"></bean>
 </beans>
