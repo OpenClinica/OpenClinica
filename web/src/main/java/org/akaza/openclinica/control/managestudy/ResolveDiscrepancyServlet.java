@@ -11,6 +11,7 @@ package org.akaza.openclinica.control.managestudy;
 
 import java.io.IOException;
 import java.util.ArrayList;
+import java.util.List;
 
 import javax.servlet.RequestDispatcher;
 import javax.servlet.ServletException;
@@ -166,6 +167,25 @@ public class ResolveDiscrepancyServlet extends SecureController {
             ItemGroupMetadataBean igmBean = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(idb.getItemId(), ecb.getCRFVersionId());
             ItemGroupDAO igdao = new ItemGroupDAO<>(ds);
             ItemGroupBean igBean = (ItemGroupBean) igdao.findByPK(igmBean.getItemGroupId());
+            int repeatOrdinal = idb.getOrdinal();
+            ItemDataBean idata = null;
+            if (idb.isDeleted()) {
+                return false;
+            }
+            if (igmBean.isRepeatingGroup() && repeatOrdinal > 1) {
+                List<ItemGroupMetadataBean> igms = igmdao.findMetaByGroupAndCrfVersion(igBean.getId(), ecb.getCRFVersionId());
+
+                for (int i = 0; i < idb.getOrdinal(); i++) {
+                    for (ItemGroupMetadataBean igm : igms) {
+                        idata = iddao.findByItemIdAndEventCRFIdAndOrdinal(igm.getItemId(), ecb.getId(), i + 1);
+                        if (idata != null && idata.isDeleted()) {
+                            repeatOrdinal--;
+                            break;
+                        }
+                    }
+
+                }
+            }
 
             EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
             StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
@@ -179,7 +199,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setFormLayoutOid(formLayout.getOid());
             subjectContext.setUserAccountId(ub.getId());
             subjectContext.setItemName(item.getName() + COMMENT);
-            subjectContext.setItemRepeatOrdinal(idb.getOrdinal());
+            subjectContext.setItemRepeatOrdinal(repeatOrdinal);
             subjectContext.setItemInRepeatingGroup(igmBean.isRepeatingGroup());
             subjectContext.setItemRepeatGroupName(igBean.getLayoutGroupPath());
             String contextHash = cache.putSubjectContext(subjectContext);
