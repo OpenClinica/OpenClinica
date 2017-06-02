@@ -92,7 +92,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private final TypeDroplistFilterEditor discrepancyNoteTypeDropdown = new TypeDroplistFilterEditor();
     private final ResolutionStatusDroplistFilterEditor resolutionStatusDropdown = new ResolutionStatusDroplistFilterEditor();
 
-    public ListNotesTableFactory(boolean showMoreLink){
+    public ListNotesTableFactory(boolean showMoreLink) {
         this.showMoreLink = showMoreLink;
     }
 
@@ -104,14 +104,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType",
- "discrepancyNoteBean.resolutionStatus", "siteId",
-                "discrepancyNoteBean.createdDate",
-                "discrepancyNoteBean.updatedDate", "age", "days", "eventName",
-                "eventStartDate", "crfName","crfStatus", "entityName", "entityValue", "discrepancyNoteBean.entityType",
-                "discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes",
-                "numberOfNotes", "discrepancyNoteBean.user",
-                 "discrepancyNoteBean.owner", "actions");
+        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "discrepancyNoteBean.resolutionStatus", "siteId",
+                "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus",
+                "entityName", "entityValue", "discrepancyNoteBean.entityType", "discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes",
+                "numberOfNotes", "discrepancyNoteBean.user", "discrepancyNoteBean.owner", "actions");
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
         configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, false);
@@ -157,16 +153,11 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     }
 
     public List<DiscrepancyNoteBean> findAllNotes(TableFacade tableFacade) {
-    	Limit limit = tableFacade.getLimit();
-    	limit.setRowSelect(null);
-    	ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(
-    			limit,
-    			getDateFormat(),
-                discrepancyNoteTypeDropdown.getDecoder(),
+        Limit limit = tableFacade.getLimit();
+        limit.setRowSelect(null);
+        ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(), discrepancyNoteTypeDropdown.getDecoder(),
                 resolutionStatusDropdown.getDecoder());
-        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(
-        		getCurrentStudy(),
-        		filter,
+        List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
                 ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
         return items;
     }
@@ -176,13 +167,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         // initialize i18n
         resword = ResourceBundleProvider.getWordsBundle(getLocale());
         resformat = ResourceBundleProvider.getFormatBundle(getLocale());
-        int parentStudyId=0;
+        int parentStudyId = 0;
 
         Limit limit = tableFacade.getLimit();
         if (!limit.isComplete()) {
             parentStudyId = currentStudy.getId();
 
-            //Build row count of various DN types
+            // Build row count of various DN types
             int totalRows = getDiscrepancyNoteDao().getSubjectDNCountWithFilter(getListNoteFilter(limit), parentStudyId);
             totalRows += getDiscrepancyNoteDao().getStudySubjectDNCountWithFilter(getListNoteFilter(limit), parentStudyId);
             totalRows += getDiscrepancyNoteDao().getStudyEventDNCountWithFilter(getListNoteFilter(limit), parentStudyId);
@@ -191,18 +182,19 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             tableFacade.setTotalRows(totalRows);
         }
 
-        ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
-                discrepancyNoteTypeDropdown.getDecoder(), resolutionStatusDropdown.getDecoder());
+        ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(), discrepancyNoteTypeDropdown.getDecoder(),
+                resolutionStatusDropdown.getDecoder());
 
         notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter);
 
         int pageSize = limit.getRowSelect().getMaxRows();
         int firstRecordShown = (limit.getRowSelect().getPage() - 1) * pageSize;
-        if (firstRecordShown > notesSummary.getTotal() && notesSummary.getTotal()!=0) { // The page selected goes beyond the dataset size
+        if (firstRecordShown > notesSummary.getTotal() && notesSummary.getTotal() != 0) { // The page selected goes
+                                                                                          // beyond the dataset size
             // Move to the last page
             limit.getRowSelect().setPage((int) Math.ceil((double) notesSummary.getTotal() / pageSize));
-            filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(),
-                    discrepancyNoteTypeDropdown.getDecoder(), resolutionStatusDropdown.getDecoder());
+            filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(), discrepancyNoteTypeDropdown.getDecoder(),
+                    resolutionStatusDropdown.getDecoder());
         }
 
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
@@ -254,7 +246,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     }
 
     /**
-     * A very custom way to filter the items. The AuditUserLoginFilter acts as a command for the Hibernate criteria object. Take the Limit information and
+     * A very custom way to filter the items. The AuditUserLoginFilter acts as a command for the Hibernate criteria
+     * object. Take the Limit information and
      * filter the rows.
      *
      * @param limit
@@ -267,28 +260,27 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         for (Filter filter : filters) {
             String property = filter.getProperty();
             String value = filter.getValue();
-            //Checking if the given date format is valid
-            if("discrepancyNoteBean.createdDate".equalsIgnoreCase(property)
-                    || "discrepancyNoteBean.updatedDate".equalsIgnoreCase(property)){
-                 try{
+            // Checking if the given date format is valid
+            if ("discrepancyNoteBean.createdDate".equalsIgnoreCase(property) || "discrepancyNoteBean.updatedDate".equalsIgnoreCase(property)) {
+                try {
                     String date = formatDate(new Date(value));
-                     value = date;
-                   }catch(Exception ex){
-                     value = "01-Jan-1700";
-                   }
-            }else if("discrepancyNoteBean.disType".equalsIgnoreCase(property)) {
+                    value = date;
+                } catch (Exception ex) {
+                    value = "01-Jan-1700";
+                }
+            } else if ("discrepancyNoteBean.disType".equalsIgnoreCase(property)) {
                 ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
-                if(reterm.getString("Query_and_Failed_Validation_Check").equals(value)) {
+                if (reterm.getString("Query_and_Failed_Validation_Check").equals(value)) {
                     value = 31 + "";
                 } else {
-                    value = DiscrepancyNoteType.getByName(value).getId()+"";
+                    value = DiscrepancyNoteType.getByName(value).getId() + "";
                 }
-            }else if("discrepancyNoteBean.resolutionStatus".equalsIgnoreCase(property)) {
+            } else if ("discrepancyNoteBean.resolutionStatus".equalsIgnoreCase(property)) {
                 ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
-                if(reterm.getString("New_and_Updated").equalsIgnoreCase(value)){
+                if (reterm.getString("New_and_Updated").equalsIgnoreCase(value)) {
                     value = 21 + "";
                 } else {
-                    value = ResolutionStatus.getByName(value).getId()+"";
+                    value = ResolutionStatus.getByName(value).getId() + "";
                 }
             }
             //
@@ -299,7 +291,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     }
 
     /**
-     * A very custom way to sort the items. The AuditUserLoginSort acts as a command for the Hibernate criteria object. Take the Limit information and sort the
+     * A very custom way to sort the items. The AuditUserLoginSort acts as a command for the Hibernate criteria object.
+     * Take the Limit information and sort the
      * rows.
      *
      * @param limit
@@ -317,8 +310,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         return listNotesSort;
     }
-
-
 
     public AuditUserLoginDao getAuditUserLoginDao() {
         return auditUserLoginDao;
@@ -358,7 +349,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             ResolutionStatus status = (ResolutionStatus) ((HashMap<Object, Object>) item).get("discrepancyNoteBean.resolutionStatus");
 
             if (status != null) {
-                value = "<img src=\""+status.getIconFilePath() +"\" border=\"0\" align=\"left\"> &nbsp;&nbsp;" + status.getName() ;
+                value = "<img src=\"" + status.getIconFilePath() + "\" border=\"0\" align=\"left\"> &nbsp;&nbsp;" + status.getName();
             }
             return value;
         }
@@ -408,16 +399,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     private class EntityNameCellEditor implements CellEditor {
 
-
-
-
         @Override
         @SuppressWarnings("rawtypes")
         public Object getValue(Object item, String property, int rowcount) {
             DiscrepancyNoteBean bean = (DiscrepancyNoteBean) ((Map) item).get("discrepancyNoteBean");
             String entityName = "";
             if (bean.getEntityType().equals("itemData")) {
-                entityName =  bean.getEntityName();
+                entityName = bean.getEntityName();
             } else {
                 try {
                     entityName = resword.getString(bean.getEntityName());
@@ -439,18 +427,17 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             String value = "";
             DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) ((HashMap<Object, Object>) item).get("discrepancyNoteBean");
             HtmlBuilder builder = new HtmlBuilder();
-            //for "view" as action
-            //This createNoteURL uses the same method as in ResolveDiscrepancyServlet
+            // for "view" as action
+            // This createNoteURL uses the same method as in ResolveDiscrepancyServlet
             String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
             builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
             builder.close();
-            builder.img().name("bt_View1").src("images/bt_View_d.gif").border("0").alt(resword.getString("view")).title(resword.getString("view"))
-                    .align("left").append("hspace=\"6\"").close();
+            builder.img().name("bt_View1").src("images/bt_View_d.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).align("left")
+                    .append("hspace=\"6\"").close();
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
                 if (dnb.getEntityType() != "eventCrf") {
                     builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
-                    if (dnb.getEntityType().equals("itemData")) builder.append(" target=\"_blank\" ");
                     builder.close();
                     builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0").alt(resword.getString("view_within_crf"))
                             .title(resword.getString("view_within_crf")).align("left").append("hspace=\"6\"").close();
@@ -474,7 +461,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 value = url.toString();
             }
 
-
             return builder.toString();
         }
     }
@@ -483,18 +469,16 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         HtmlBuilder actionLink = new HtmlBuilder();
         if (this.isStudyHasDiscNotes()) {
             if (this.getResolutionStatus() >= 1 && this.getResolutionStatus() <= 5) {
-                actionLink.a().href(
-                        "javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
-                            + "&resolutionStatus=" + resolutionStatus + "')");
-                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes")).title(
-                        resword.getString("download_discrepancy_notes")).append("hspace=\"4\" width=\"24 \" height=\"15\"").end().aEnd();
+                actionLink.a().href("javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
+                        + "&resolutionStatus=" + resolutionStatus + "')");
+                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes"))
+                        .title(resword.getString("download_discrepancy_notes")).append("hspace=\"4\" width=\"24 \" height=\"15\"").end().aEnd();
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             } else {
-                actionLink.a().href(
-                        "javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType + "&module="
-                            + module + "')");
-                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes")).title(
-                        resword.getString("download_discrepancy_notes")).append("hspace=\"2\" width=\"24 \" height=\"15\"").end().aEnd();
+                actionLink.a().href("javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
+                        + "&module=" + module + "')");
+                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes"))
+                        .title(resword.getString("download_discrepancy_notes")).append("hspace=\"2\" width=\"24 \" height=\"15\"").end().aEnd();
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             }
         }
