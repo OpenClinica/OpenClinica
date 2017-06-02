@@ -867,7 +867,7 @@
         </repository>
         <repository>
             <snapshots>
-                <enabled>false</enabled>
+                <enabled>true</enabled>
             </snapshots>
             <id>openclinica.jfrog.io-libs-release</id>
             <name>openclinica.jfrog.io-libs-release</name>
