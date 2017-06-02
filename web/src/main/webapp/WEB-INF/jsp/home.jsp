@@ -54,8 +54,7 @@
                 console.log("SSO Session but NOT locally authenticated ");
                 auth0.login({
                     scope: 'openid name email picture',
-                    state: '${state}',
-                    connection: '${connection}'
+                    state: '${state}'
                 }, function (err) {
                     // this only gets called if there was a login error
                     console.error('Error logging in: ' + err);

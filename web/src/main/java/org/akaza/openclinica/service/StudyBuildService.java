@@ -13,5 +13,6 @@ import javax.servlet.http.HttpServletRequest;
  */
 public interface StudyBuildService {
     Logger logger = LoggerFactory.getLogger(StudyBuildService.class);
-    public StudyInfoObject process(HttpServletRequest request, Study study, UserAccountBean ub) throws Exception ;
+    StudyInfoObject process(HttpServletRequest request, Study study, UserAccountBean ub) throws Exception ;
+    void saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub) throws Exception;
 }

@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service;
 
 import com.auth0.Auth0User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import com.google.gson.internal.LinkedTreeMap;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -35,7 +36,8 @@ public class CallbackServiceImpl implements CallbackService {
     private StudyUserRoleDao studyUserRoleDao;
     @Autowired DataSource dataSource;
     @Autowired UserAccountController userAccountController;
-
+    @Autowired private StudyBuildService studyBuildService;
+    private ObjectMapper objectMapper = new ObjectMapper();
     @Override
     public UserAccountBean isCallbackSuccessful(HttpServletRequest request, Auth0User user) throws Exception {
         UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
@@ -49,22 +51,33 @@ public class CallbackServiceImpl implements CallbackService {
         } else {
             ub.setName(_username);
             userAccountDAO.update(ub);
-            updateStudyUsedRoles(ub, user);
+            updateStudyUsername(ub, user);
         }
-        if (ub.getId() != 0)
-            return ub;
-        else {
-            return createUserAccount(request, user);
+        if (ub.getId() == 0) {
+            ub = createUserAccount(request, user);
         }
+        updateStudyUserRoles(request, ub, user);
+        return ub;
     }
 
     @Modifying
-    private void updateStudyUsedRoles(UserAccountBean ub, Auth0User user) {
+    private void updateStudyUsername(UserAccountBean ub, Auth0User user) {
+        Map<String, Object> appMetadata = user.getAppMetadata();
         Query query=studyUserRoleDao.getCurrentSession().createQuery("update StudyUserRole set id.userName=:userName where id.userName=:prevUser");
         query.setParameter("userName", user.getNickname());
         query.setParameter("prevUser", user.getUserId());
         int modifications=query.executeUpdate();
         logger.info(modifications + " studyUserRole rows have been updated from user:" + ub.getName() + " to user:" + user.getNickname());
+    }
+
+    @Modifying
+    private void updateStudyUserRoles(HttpServletRequest request, UserAccountBean ub, Auth0User user) throws Exception {
+        Map<String, Object> appMetadata = user.getAppMetadata();
+        Object userContext = appMetadata.get("userContext");
+        String toJson = objectMapper.writeValueAsString(userContext);
+        Map<String, Object> userContextMap = objectMapper.readValue(toJson, Map.class);
+        request.getSession().setAttribute("userContextMap", userContextMap);
+        studyBuildService.saveStudyEnvRoles(request, ub);
     }
 
     private UserAccountBean createUserAccount(HttpServletRequest request, Auth0User user) throws Exception {
@@ -73,6 +86,7 @@ public class CallbackServiceImpl implements CallbackService {
         map.put("fName", "first");
         map.put("lName", "last");
         map.put("role_name", "Data Manager");
+        map.put("api_key", user.getUserId());
         Map<String, Object> appMetadata = user.getAppMetadata();
         Object userType = appMetadata.get("userContext");
         LinkedTreeMap<String, String> userTypeMap = (LinkedTreeMap<String, String>) userType;

@@ -87,7 +87,7 @@ public class MainMenuServlet extends SecureController {
         // have to actually set the above to a timestamp? tbh
         ub1.setOwner(ub1);
         ub1.setUpdater(ub1);
-        udao.update(ub1);
+         udao.update(ub1);
 
         // Use study Id in JSPs
         if (currentStudy != null) {

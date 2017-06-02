@@ -60,7 +60,6 @@ public class HomeController {
         model.put("state", SessionUtils.getState(req));
         // sso config specific
         model.put("logoutEndpoint", ssoConfig.getLogoutEndpoint());
-        model.put("connection", ssoConfig.getConnection());
         model.put("partnerLoginUrl", ssoConfig.getPartnerLoginUrl());
     }
 }

@@ -1,5 +1,6 @@
 package org.akaza.openclinica.service;
 
+import com.auth0.Auth0User;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
@@ -13,9 +14,11 @@ import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.apache.commons.lang.StringUtils;
+import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -44,8 +47,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
         try {
             int schemaId = schemaServiceDao.getProtocolSchemaSeq();
-            // generate OC id
-            StudyOidGenerator studyOidGenerator = new StudyOidGenerator();
             study.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             study.setDateCreated(new Date());
             schemaName = CoreResources.getField("schemaPrefix")+ schemaId;
@@ -100,7 +101,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         }
         return null;
     }
-    private void saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub) throws Exception {
+    public void saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub) throws Exception {
         LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>)request.getSession().getAttribute("userContextMap");
         if (userContextMap == null)
             return;
@@ -133,15 +134,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 studyUserRoleDao.saveOrUpdate(studyUserRole);
             } else {
                 for (StudyUserRole sur : byUserAccount) {
-                    if (sur == null)
-                        continue;
                     if (sur.getRoleName().equals(ocRole))
                         continue;
                     else {
                         sur.setRoleName(ocRole);
+                        sur.setDateUpdated(new Date());
                         StudyUserRole studyUserRole = studyUserRoleDao.saveOrUpdate(sur);
-                        System.out.println("StudyUserRole:" + studyUserRole);
-
                     }
                 }
             }

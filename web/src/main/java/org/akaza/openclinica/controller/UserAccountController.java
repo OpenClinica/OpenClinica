@@ -115,6 +115,7 @@ public class UserAccountController {
 		String email = map.get("email");
 		String roleName = map.get("role_name");
 		String userType = map.get("user_type");
+		String apiKey = map.get("api_key");
 		String authorizeSoap = map.get("authorize_soap"); // true or false
 
 		request.setAttribute("username", username);
@@ -177,6 +178,7 @@ public class UserAccountController {
 		// build UserName
 
 		uBean = buildUserAccount(username, fName, lName, password, institution, ownerUserAccount, email, passwordHash, Boolean.valueOf(authorizeSoap), role, uType);
+		uBean.setApiKey(apiKey);
 		HashMap<String, Object> userDTO = new HashMap<String, Object>();
 		UserAccountBean uaBean = getUserAccount(uBean.getName());
 		if (!uaBean.isActive()) {

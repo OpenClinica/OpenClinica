@@ -25,27 +25,15 @@ import org.springframework.stereotype.Component;
 @ConfigurationProperties("sso")
 @PropertySources({@PropertySource("classpath:sso.properties")})
 public class SsoConfig {
-
     @Value(value = "${sso.logoutEndpoint}")
     protected String logoutEndpoint;
-
-    @Value(value = "${sso.connection}")
-    protected String connection;
-
     @Value(value = "${sso.partnerLoginUrl}")
     protected String partnerLoginUrl;
-
 
     public String getLogoutEndpoint() {
         return logoutEndpoint;
     }
-
-    public String getConnection() {
-        return connection;
-    }
-
     public String getPartnerLoginUrl() {
         return partnerLoginUrl;
     }
-
 }
