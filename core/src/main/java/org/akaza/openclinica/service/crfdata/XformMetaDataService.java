@@ -143,39 +143,40 @@ public class XformMetaDataService {
     private XformParser xformParser;
 
     @Transactional
-    public CrfVersion createCRFMetaData(CRFVersionBean version, XformContainer container, StudyBean currentStudy, UserAccountBean ub, Html html,
-            String submittedCrfName, String submittedCrfVersionName, String submittedCrfVersionDescription, String submittedRevisionNotes,
-            String submittedXformText, List<FileItem> formItems, Errors errors) throws Exception {
+    public FormLayout createCRFMetaData(CrfMetaDataObject cmdObject) throws Exception {
 
-        // Retrieve CrfBean. Create one if it doesn't exist yet.
-        CrfBean crf = null;
-        if (version.getCrfId() > 0) {
-            crf = (CrfBean) crfDao.findById(version.getCrfId());
-            crf.setUpdateId(ub.getId());
-            crf.setDateUpdated(new Date());
-            crfDao.saveOrUpdate(crf);
-
-        } else {
-            crf = new CrfBean();
-            crf.setName(submittedCrfName);
-            crf.setDescription(submittedCrfVersionDescription);
-            crf.setUserAccount(userDao.findById(ub.getId()));
-            crf.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-            crf.setStudy(studyDao.findById(currentStudy.getId()));
-            crf.setOcOid(crfDao.getValidOid(new CrfBean(), submittedCrfName));
-            crf.setUpdateId(ub.getId());
-            crf.setDateUpdated(new Date());
-            Integer crfId = (Integer) crfDao.save(crf);
-            crf.setCrfId(crfId);
-        }
         CrfVersion crfVersion = null;
-        if (version.getOid() != null) {
-            crfVersion = crfVersionDao.findByOcOID(version.getOid());
-            // crfVersion.setXform(submittedXformText);
-            crfVersion.setXformName(container.getInstanceName());
-            crfVersion = crfVersionDao.saveOrUpdate(crfVersion);
+        FormLayout formLayout = null;
+        CrfBean crfBean = null;
+        Section section = null;
+
+        crfBean = (CrfBean) crfDao.findByOcOID(cmdObject.crf.getOcoid());
+        if (crfBean != null) {
+            crfBean.setUpdateId(cmdObject.ub.getId());
+            crfBean.setDateUpdated(new Date());
+            crfBean = crfDao.saveOrUpdate(crfBean);
+
+            formLayout = formLayoutDao.findByOcOID(cmdObject.version.getOcoid());
+            if (formLayout == null) {
+                formLayout = new FormLayout();
+                formLayout = populateFormLayout(formLayout, crfBean, cmdObject);
+                formLayout = formLayoutDao.saveOrUpdate(formLayout);
+            }
+
+            crfVersion = crfVersionDao.findAllByCrfId(crfBean.getCrfId()).get(0);
+            section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
 
         } else {
+            crfBean = new CrfBean();
+            crfBean = populateCrf(crfBean, cmdObject);
+            Integer crfId = (Integer) crfDao.save(crfBean);
+            crfBean.setCrfId(crfId);
+
+            // Create new Form Layout
+            formLayout = new FormLayout();
+            formLayout = populateFormLayout(formLayout, crfBean, cmdObject);
+            formLayout = formLayoutDao.saveOrUpdate(formLayout);
+
             // Create new CRF Version
             crfVersion = new CrfVersion();
             crfVersion = populateCrfVersion(crfBean, crfVersion, cmdObject);
