@@ -34,12 +34,18 @@
 
     jQuery(document).ready(function() {
         jQuery('#addSubject').click(function() {
-			jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
+            jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px", cursor: "default" }, overlayCSS:{cursor: "default"} });
         });
 
         jQuery('#cancel').click(function() {
             jQuery.unblockUI();
             return false;
+        });
+
+        jQuery('#addSubjectForm').keyup(function(e) {
+            if (e.keyCode === 27) {
+                jQuery('#cancel').trigger( "click" );
+            }
         });
     });
 </script>
