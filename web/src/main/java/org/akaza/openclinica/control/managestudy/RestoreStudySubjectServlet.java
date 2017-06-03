@@ -109,6 +109,12 @@ public class RestoreStudySubjectServlet extends SecureController {
                 studySub.setUpdatedDate(new Date());
                 subdao.update(studySub);
 
+                // update status subject
+                subject.setStatus(Status.AVAILABLE);
+                subject.setUpdater(ub);
+                subject.setUpdatedDate(new Date());
+                sdao.update(subject);
+
                 // restore all study events
                 // restore all event crfs
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());

@@ -88,7 +88,7 @@ public class RestoreSubjectServlet extends SecureController {
                 // remove subject references from study
                 for (int i = 0; i < studySubs.size(); i++) {
                     StudySubjectBean studySub = (StudySubjectBean) studySubs.get(i);
-                    if (studySub.getStatus().equals(Status.AUTO_DELETED)) {
+                    if (studySub.getStatus().equals(Status.AUTO_DELETED) || studySub.getStatus().equals(Status.DELETED)) {
                         studySub.setStatus(Status.AVAILABLE);
                         studySub.setUpdater(ub);
                         studySub.setUpdatedDate(new Date());
