@@ -217,7 +217,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         pageMessages.add(message);
         logger.debug(message);
-        request.setAttribute(PAGE_MESSAGE, pageMessages);
+//        request.setAttribute(PAGE_MESSAGE, pageMessages);
+        session.setAttribute(PAGE_MESSAGE, pageMessages);
     }
 
     protected void resetPanel() {
