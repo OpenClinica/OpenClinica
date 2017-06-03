@@ -4,6 +4,9 @@
 
  * For details see: http://www.openclinica.org/license
  * copyright 2003-2010 Akaza Research
+
+ * fileSizeMax set to Long.MAX_VALUE : derivitive work (under orig license) by Nor Consult, LLC in 2015
+
  */
 package org.akaza.openclinica.bean.rule;
 
@@ -24,7 +27,7 @@ public class FileProperties {
 	private String extensions;
     private ExtensionSettings extensionSettings;
     private final Integer MB = 1024 * 1024;
-    private final Long fileSizeMax;
+    private final Long fileSizeMax = Long.MAX_VALUE;
 
     enum ExtensionSettings {
         VALID, INVALID
@@ -33,19 +36,16 @@ public class FileProperties {
     public FileProperties() {
         setExtensions("");
         setExtensionSettings(ExtensionSettings.VALID);
-        fileSizeMax = Long.valueOf(MB * 10);
     }
 
     public FileProperties(String extensions) {
         setExtensions(extensions);
         setExtensionSettings(ExtensionSettings.VALID);
-        fileSizeMax = Long.valueOf(MB * 10);
     }
 	
 	public FileProperties(String extensions, String extensionSettings) {
         setExtensions(extensions);
 		this.extensionSettings = getExtensionSettings(extensionSettings);
-        fileSizeMax = Long.valueOf(MB * 10);
 	}
 
 	public void isValidExtension(String uploadedFileExtension){
