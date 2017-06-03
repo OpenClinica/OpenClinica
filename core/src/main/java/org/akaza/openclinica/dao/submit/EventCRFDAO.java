@@ -691,7 +691,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         String sql = digester.getQuery("getWithFilterAndSort");
         sql = sql + filter.execute("");
         // sql = sql + sort.execute("");
-        sql = sql + " order By  ec.date_created ASC "; // major hack
+        sql = sql + " order By  se.date_start ASC "; // major hack
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
             // sql += " ) where rownum <= " + rowEnd + " and rownum >" + rowStart + " ";
             sql += " )x)where r between " + (rowStart + 1) + " and " + rowEnd;
