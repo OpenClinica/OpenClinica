@@ -90,6 +90,13 @@ public class CreateSubStudyServlet extends SecureController {
 
                 forwardPage(Page.SITE_LIST_SERVLET);
             } else {
+                StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+                List<StudyParamsConfig> parentConfigs = spvdao.findParamConfigByStudy(currentStudy);
+
+                if (parentConfigs.size() == 0) {
+                    response.sendRedirect(request.getContextPath() + Page.UPDATE_STUDY_SERVLET_NEW.getFileName() + "?id=" +currentStudy.getId() + "&insufficientdata=true");
+                }
+
                 StudyBean newStudy = new StudyBean();
                 newStudy.setParentStudyId(currentStudy.getId());
                 // get default facility info from property file
@@ -103,7 +110,6 @@ public class CreateSubStudyServlet extends SecureController {
                 newStudy.setFacilityContactPhone(SQLInitServlet.getField(CreateStudyServlet.FAC_CONTACT_PHONE));
                 newStudy.setFacilityZip(SQLInitServlet.getField(CreateStudyServlet.FAC_ZIP));
 
-                List<StudyParamsConfig> parentConfigs = currentStudy.getStudyParameters();
                 // logger.info("parentConfigs size:" + parentConfigs.size());
                 ArrayList configs = new ArrayList();
 

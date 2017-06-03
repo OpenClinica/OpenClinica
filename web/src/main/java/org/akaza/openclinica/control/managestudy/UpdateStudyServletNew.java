@@ -63,6 +63,9 @@ public class UpdateStudyServletNew extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         Validator v = new Validator(request);
         int studyId = fp.getInt("id");
+        if (fp.getString("insufficientdata").equals("true")) {
+            addPageMessage(respage.getString("update_study_detail_before_create_site"));
+        }
         studyId = studyId == 0 ? fp.getInt("studyId") : studyId;
         String action = fp.getString("action");
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
