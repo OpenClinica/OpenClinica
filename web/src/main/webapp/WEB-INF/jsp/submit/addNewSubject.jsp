@@ -229,7 +229,7 @@
 	</tr>
 
 	<tr valign="top">
-        <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
+        <c:if test="${study.studyParameterConfig.genderRequired !='false'}">
         <td class="formlabel"><fmt:message key="gender" bundle="${resword}"/>:</td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
@@ -258,11 +258,11 @@
 	                        </select>
 	            </td>
 	<td align="left">
-        <c:choose>
-        <c:when test="${study.studyParameterConfig.genderRequired !='false'}">
+<!--        <c:choose>
+        <c:when test="${study.studyParameterConfig.genderRequired !='false'}"> -->
            <span class="formlabel">*</span>
-        </c:when>
-        </c:choose>
+<!--        </c:when>
+        </c:choose>  -->
         <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 	        <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
 	        <img name="flag_gender" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
