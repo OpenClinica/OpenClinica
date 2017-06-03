@@ -75,7 +75,7 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${newStudy.name}"/>
   </td></tr>  
-  <tr valign="top"><td class="table_header_column"><b><fmt:message key="unique_protocol_ID" bundle="${resword}"/></b>:</td><td class="table_cell">
+  <tr valign="top"><td class="table_header_column"><b><fmt:message key="unique_site_protocol_ID" bundle="${resword}"/></b>:</td><td class="table_cell">
   <c:out value="${newStudy.identifier}"/>
   </td></tr>
   
