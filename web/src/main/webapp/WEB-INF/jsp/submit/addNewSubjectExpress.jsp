@@ -33,17 +33,17 @@
 			<c:set var="tabCount" value="${tabCount+1}"/>
 
 			<td valign="top" class="table_cell" nowrap>
-            <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
+            <c:if test="${study.studyParameterConfig.genderRequired !='false'}">
             <select name="gender" class="formfield" tabindex="<c:out value="${tabCount}"/>">
 				<option value=""><fmt:message key="gender" bundle="${resword}"/>:</option>
 				<option value="m"><fmt:message key="male" bundle="${resword}"/></option>
 				<option value="f"><fmt:message key="female" bundle="${resword}"/></option>
 			</select>
-             <c:choose>
-             <c:when test="${study.studyParameterConfig.genderRequired !='false'}">
+<!--             <c:choose>
+             <c:when test="${study.studyParameterConfig.genderRequired !='false'}"> -->
                 <span class="formlabel">*</span>
-             </c:when>
-             </c:choose>
+<!--             </c:when>
+             </c:choose> -->
             </c:if>
             </td>
 			 <c:set var="tabCount" value="${tabCount+1}"/>
