@@ -70,6 +70,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String CAN_ADMIN_EDIT = "canAdminEdit";
     private static final String EVENT_CRF_ID = "ecId";
     private static final String STUDY_SUB_ID = "studySubjectId";
+    public static final String ORIGINATING_PAGE = "originatingPage";
 
     private static final String RESOLVING_NOTE = "resolving_note";
     private static final String RETURN_FROM_PROCESS_REQUEST = "returnFromProcess";
@@ -108,8 +109,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
         return null;
     }
 
-    public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy, DiscrepancyNoteBean note, boolean isCompleted)
-            throws Exception {
+    public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy, DiscrepancyNoteBean note, boolean isCompleted,
+            String module) throws Exception {
         String entityType = note.getEntityType().toLowerCase();
         int id = note.getEntityId();
         if ("subject".equalsIgnoreCase(entityType)) {
@@ -219,6 +220,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
             }
             request.setAttribute(EnketoFormServlet.FORM_URL1, part1);
             request.setAttribute(EnketoFormServlet.FORM_URL2, part2);
+            request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module);
+
         }
         return true;
     }
@@ -297,7 +300,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         }
         // logger.info("set up pop up url: " + createNoteURL);
         // System.out.println("set up pop up url: " + createNoteURL);
-        boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted);
+        boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted, module);
 
         Page p = getPageForForwarding(discrepancyNoteBean, isCompleted);
 
@@ -372,9 +375,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
          * lost); so I had to comment it out if(subjectId != null){
          * session.removeAttribute("subjectId"); }
          */
-        if (module != null) {
-            session.removeAttribute("module");
-        }
 
         // BWP 11/03/2008 3029: redirect monitor user to ViewStudySubject if
         // they click "add note to thread" link>>
