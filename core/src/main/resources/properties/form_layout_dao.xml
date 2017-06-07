@@ -12,8 +12,8 @@
     </query>
 	<query>
 		<name>findByFullName</name>
-		<sql>SELECT cv.* FROM form_layout cv, CRF c WHERE 
-		cv.CRF_ID = c.CRF_ID AND cv.NAME = ? AND c.NAME = ?</sql>
+		<sql>SELECT fl.* FROM form_layout fl, CRF c WHERE 
+		fl.CRF_ID = c.CRF_ID AND fl.NAME = ? AND c.NAME = ?</sql>
 	</query>
 	<query>
 		<name>findAll</name>
