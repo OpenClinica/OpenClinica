@@ -1,5 +1,10 @@
 package org.akaza.openclinica.logic.importdata;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -12,6 +17,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -21,13 +27,10 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 
 /**
  * ImportDataHelper the entire focus of this piece of code is to generate the
@@ -60,13 +63,13 @@ public class ImportDataHelper {
         String crfVersionName = importedObject.get("crf_version_name") == null ? "" : importedObject.get("crf_version_name").toString();
         String crfName = importedObject.get("crf_name") == null ? "" : importedObject.get("crf_name").toString();
 
-        String eventDefinitionCRFName =
-            importedObject.get("event_definition_crf_name") == null ? "" : importedObject.get("event_definition_crf_name").toString();
+        String eventDefinitionCRFName = importedObject.get("event_definition_crf_name") == null ? ""
+                : importedObject.get("event_definition_crf_name").toString();
         String subjectName = importedObject.get("subject_name") == null ? "" : importedObject.get("subject_name").toString();
         String studyName = importedObject.get("study_name") == null ? "" : importedObject.get("study_name").toString();
 
         logger.info("found the following: study event id " + studyEventId + ", crf version name " + crfVersionName + ", crf name " + crfName
-            + ", event def crf name " + eventDefinitionCRFName + ", subject name " + subjectName + ", study name " + studyName);
+                + ", event def crf name " + eventDefinitionCRFName + ", subject name " + subjectName + ", study name " + studyName);
         // << tbh
         int eventCRFId = 0;
 
@@ -75,6 +78,7 @@ public class ImportDataHelper {
         StudySubjectDAO studySubjectDao = new StudySubjectDAO(sm.getDataSource());
         StudyEventDefinitionDAO studyEventDefinistionDao = new StudyEventDefinitionDAO(sm.getDataSource());
         CRFVersionDAO crfVersionDao = new CRFVersionDAO(sm.getDataSource());
+        FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         StudyEventDAO studyEventDao = new StudyEventDAO(sm.getDataSource());
         CRFDAO crfdao = new CRFDAO(sm.getDataSource());
         SubjectDAO subjectDao = new SubjectDAO(sm.getDataSource());
@@ -91,7 +95,7 @@ public class ImportDataHelper {
         StudySubjectBean studySubjectBean = studySubjectDao.findBySubjectIdAndStudy(subjectBean.getId(), studyBean);
         // .findByLabelAndStudy(subjectName, studyBean);
         logger.info("::: found study subject id here: " + studySubjectBean.getId() + " with the following: subject ID " + subjectBean.getId()
-            + " study bean name " + studyBean.getName());
+                + " study bean name " + studyBean.getName());
 
         StudyEventBean studyEventBean = (StudyEventBean) studyEventDao.findByPK(studyEventId);
         // TODO need to replace, can't really replace
@@ -100,7 +104,9 @@ public class ImportDataHelper {
 
         // [study] event should be scheduled, event crf should be not started
 
-        CRFVersionBean crfVersion = (CRFVersionBean) crfVersionDao.findByFullName(crfVersionName, crfName);
+        FormLayoutBean formLayout = (FormLayoutBean) fldao.findByFullName(crfVersionName, crfName);
+        List<CRFVersionBean> crfVersions = crfVersionDao.findAllByCRFId(formLayout.getCrfId());
+        CRFVersionBean crfVersion = crfVersions.get(0);
         // .findByPK(crfVersionId);
         // replaced by findByName(name, version)
 
@@ -116,7 +122,7 @@ public class ImportDataHelper {
         // replaced by findbyname
 
         if (studySubjectBean.getId() <= 0 && studyEventBean.getId() <= 0 && crfVersion.getId() <= 0 && studyBean.getId() <= 0
-            && studyEventDefinitionBean.getId() <= 0) {
+                && studyEventDefinitionBean.getId() <= 0) {
             logger.info("Throw an Exception, One of the provided ids is not valid");
         }
 
@@ -187,6 +193,7 @@ public class ImportDataHelper {
                 eventCrfBean.setStudyEventId(studyEventId);
                 eventCrfBean.setValidateString("");
                 eventCrfBean.setValidatorAnnotations("");
+                eventCrfBean.setFormLayout(formLayout);
 
                 try {
                     eventCrfBean = (EventCRFBean) eventCrfDao.create(eventCrfBean);
@@ -196,7 +203,7 @@ public class ImportDataHelper {
                 } catch (Exception ee) {
                     logger.info(ee.getMessage());
                     logger.info("throws with crf version id " + crfVersion.getId() + " and study event id " + studyEventId + " study subject id "
-                        + studySubjectBean.getId());
+                            + studySubjectBean.getId());
                 }
                 // note that you need to catch an exception if the numbers are
                 // bogus, ie you can throw an error here
