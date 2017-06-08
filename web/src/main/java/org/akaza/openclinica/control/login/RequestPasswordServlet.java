@@ -71,6 +71,7 @@ public class RequestPasswordServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         v.addValidation("name", Validator.NO_BLANKS);
         v.addValidation("email", Validator.IS_A_EMAIL);
+        v.addValidation("email", Validator.NO_LEADING_OR_TRAILING_SPACES);
         v.addValidation("passwdChallengeQuestion", Validator.NO_BLANKS);
         v.addValidation("passwdChallengeAnswer", Validator.NO_BLANKS);
 
