@@ -11,6 +11,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
+import org.akaza.openclinica.service.dto.Bucket;
 import org.akaza.openclinica.service.dto.Form;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.cdisc.ns.odm.v130.EventType;
@@ -35,12 +36,13 @@ import org.springframework.validation.Errors;
 import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.List;
 
 public class OdmImportServiceImpl implements OdmImportService {
-    public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/protocol/";
+    public final String FM_BASEURL = "http://fm2.openclinica.info:8080/api/buckets?boardUuid={0}";
     // public final String FM_BASEURL = "http://oc.local:8090/api/protocol/";
 
     private UserAccountDao userAccountDao;
@@ -91,7 +93,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         StudyUserRole studyUserRole = null;
         StudyUserRoleId studyUserRoleId = null;
 
-        Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(study);
+        Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(boardId);
 
 
 /*        ArrayList<StudyUserRole> surRoles = getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, study.getStudyId(), study.getStudyId());
@@ -514,19 +516,31 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.formLayoutDao = formLayoutDao;
     }
 
-    public Form[] getAllCrfsByProtIdFromFormManager(Study study) {
+    public Form[] getAllCrfsByProtIdFromFormManager(String boardId) {
         // String protocolId = study.getUniqueIdentifier();
-        String protocolId = study.getOc_oid();
+        // String protocolId = study.getOc_oid();
+        // String url = FM_BASEURL + protocolId + "/forms";
 
-        String url = FM_BASEURL + protocolId + "/forms";
+        String url = MessageFormat.format(FM_BASEURL, boardId);
+        Bucket[] buckets = null;
         RestTemplate restTemplate = new RestTemplate();
-        Form[] crfs = null;
+        ArrayList<Form> forms = null;
+
         try {
-            crfs = (Form[]) restTemplate.getForObject(url, Form[].class);
+            buckets = (Bucket[]) restTemplate.getForObject(url, Bucket[].class);
         } catch (Exception e) {
             logger.info(e.getMessage());
+            throw new RuntimeException("Something went wrong !!");
         }
-        return crfs;
+
+
+        if (buckets != null && buckets.length == 1){
+            forms = buckets[0].getForms();
+        }else{
+            throw new RuntimeException("No forms found for this board");
+        }
+
+        return forms.toArray(new Form[forms.size()]);
     }
 
 }

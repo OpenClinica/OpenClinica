@@ -34,7 +34,7 @@ public class AppConfig extends Auth0Config {
                         "/pages/callback",
                         "/pages/home",
                         "/pages/auth/api/**",
-                        "/pages/protocolversion/**",
+                        "/pages/studyversion/**",
                         "/rest2/openrosa/**",
                         "/pages/odmk/**",
                         "/pages/openrosa/**",
