@@ -217,7 +217,7 @@ public class EnketoUrlService {
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
 
         // Build redirect url
-        String redirectUrl = getRedirectUrl(subject.getOcOid(), studyOid);
+        String redirectUrl = CoreResources.getField("sysURL");
 
         boolean markComplete = true;
         if (eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
@@ -226,7 +226,7 @@ public class EnketoUrlService {
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
 
-        EnketoURLResponse eur = enketo.getEditURL(formLayout, flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
+        EnketoURLResponse eur = enketo.registerAndGetEditURL(formLayout, flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
                 goTo);
         editURL = eur.getEdit_url();
         int hashIndex = editURL.lastIndexOf("#");
@@ -244,31 +244,6 @@ public class EnketoUrlService {
 
         return editURL;
 
-    }
-
-    private String getRedirectUrl(String studySubjectOid, String studyOid) {
-        String portalURL = CoreResources.getField("portalURL");
-        String url = "";
-        if (portalURL != null && !portalURL.equals("")) {
-            ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-            Authorization pManageAuthorization = registrar.getAuthorization(studyOid);
-            try {
-                URL pManageUrl = new URL(portalURL);
-
-                if (pManageAuthorization != null && pManageAuthorization.getStudy() != null && pManageAuthorization.getStudy().getHost() != null
-                        && !pManageAuthorization.getStudy().getHost().equals("")) {
-                    url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
-                            + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-                }
-            } catch (MalformedURLException e) {
-                logger.error("Error building redirect URL: " + e.getMessage());
-                logger.error(ExceptionUtils.getStackTrace(e));
-                return "";
-            }
-        }
-        if (!url.equals(""))
-            url = url + "/#/event/" + studySubjectOid + "/dashboard";
-        return url;
     }
 
     public QueriesBean buildQueryElement(ItemData itemdata) {

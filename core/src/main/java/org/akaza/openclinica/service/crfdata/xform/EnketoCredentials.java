@@ -5,8 +5,6 @@ import java.io.Serializable;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.service.pmanage.Authorization;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -35,22 +33,10 @@ public class EnketoCredentials implements Serializable {
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
         RestTemplate rest = new RestTemplate();
 
-        try {
-            Authorization[] response = rest.getForObject(pManageUrl + "?studyoid=" + studyOid + "&instanceurl=" + ocUrl, Authorization[].class);
 
-            if (response.length > 0) {
-                credentials.setServerUrl(response[0].getPformUrl());
-                credentials.setApiKey(response[0].getPformApiKey());
-                credentials.setOcInstanceUrl(ocUrl);
-            } else {
-                logger.error("Unexpected response received from Participant Portal while retrieving PForm credentials.  Returning empty credentials.");
-            }
-        } catch (Exception e) {
-            logger.error(e.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(e));
-            logger.error("Unexpected Exception received from Participant Portal while retrieving PForm credentials: " + e.getMessage()
-                    + ".  Returning empty credentials.");
-        }
+        credentials.setServerUrl(CoreResources.getField("form.engine.url"));
+        credentials.setApiKey(study.getStudyEnvUuid());
+        credentials.setOcInstanceUrl(ocUrl);
         return credentials;
     }
 
@@ -79,14 +65,14 @@ public class EnketoCredentials implements Serializable {
     }
 
     public static Study getParentStudy(String studyOid) {
-        Study study = studyDao.findByOcOID(studyOid);
+        Study study = studyDao.findPublicStudy(studyOid);
         if (study.getStudy() == null) {
             logger.debug("The Study Oid: " + studyOid + " is a Study level Oid");
             return study;
         } else {
             logger.debug("The Study Oid: " + studyOid + " is a Site level Oid");
             int parentStudyId = study.getStudy().getStudyId();
-            Study parentStudy = studyDao.findById(parentStudyId);
+            Study parentStudy = studyDao.findPublicStudyById(parentStudyId);
             return parentStudy;
         }
     }

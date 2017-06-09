@@ -59,4 +59,17 @@ public class StudyDao extends AbstractDomainDao<Study> {
         CoreResources.setRequestSchema(schema);
         return study;
     }
+    public Study findPublicStudyById(int studyId) {
+        String schema = CoreResources.getRequestSchema();
+        if (StringUtils.isEmpty(schema))
+            return null;
+        CoreResources.setRequestSchema("public");
+        getSessionFactory().getStatistics().logSummary();
+        String query = " from Study do  where do.studyId = :studyId";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("studyId", studyId);
+        Study study =   (Study) q.uniqueResult();
+        CoreResources.setRequestSchema(schema);
+        return study;
+    }
 }
