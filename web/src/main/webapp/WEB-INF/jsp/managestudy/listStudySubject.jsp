@@ -8,7 +8,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 
 
-<jsp:include page="../include/managestudy-header.jsp"/>
 
 
 <!-- move the alert message to the sidebar-->
@@ -216,6 +215,4 @@
 <c:import url="../include/workflow.jsp">
     <c:param name="module" value="manage"/>
 </c:import>
-
-<jsp:include page="../include/footer.jsp"/>
 

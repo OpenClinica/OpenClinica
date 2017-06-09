@@ -46,7 +46,7 @@
  <%-- I removed this include because you cannot have both
  	"onLoad" tests: <jsp:include page="../include/showPopUp.jsp"/> --%>
  	<%-- --%>
-<body style="width:1024px;" class="main_BG"
+<body style="width:100%;" class="main_BG"
 <c:choose>
 <c:when test="${tabId != null && tabId>0}">
 onload="TabsForwardByNum(<c:out value="${tabId}"/>);<jsp:include page="../include/showPopUp2.jsp"/>"
@@ -70,10 +70,6 @@ onload="<jsp:include page="../include/showPopUp.jsp"/>"
 <table border="0" cellpadding="0" cellspacing="0" class="header">
 			<tr>
 				<td valign="top">
-
-<!-- Logo -->
-
-	<div class="logo"><img src="images/Logo.gif"></div>
 
 <!-- Main Navigation -->
 

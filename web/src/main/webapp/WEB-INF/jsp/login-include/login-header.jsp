@@ -48,7 +48,7 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/effects.js"></script>--%></head>
 
 
-<body style="width:1024px;" class="main_BG"
+<body style="width:100%;" class="main_BG"
 
 <c:choose>
 
@@ -79,7 +79,7 @@ onload="TabsForwardByNum(<c:out value="${tabId}"/>);<jsp:include page="../includ
                     <td valign="top">
                         <div class="disabled_header"><img src="images/spacer.gif"/></div>
                         <!-- Logo -->
-                        <div class="logo"><img src="images/Logo.gif"></div>
+                        <div class="logo"><img src="images/logo-color-on-dark.svg"></div>
                         <!-- Main Navigation -->
                         <%-- <jsp:include page="../include/navBar.jsp"/> --%>
 

@@ -30,7 +30,7 @@
 <body>
 <div id="headerDiv">
     <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-    <div id="logoDiv"><img src="../images/Logo.gif" alt="Akaza logo"/></div>
+    
     <!-- the sub-menu, or alternative menu, displays if JavaScript is disabled-->
     <div id="menuContainer">
         <noscript>

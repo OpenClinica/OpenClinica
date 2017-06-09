@@ -17,7 +17,7 @@
 
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="${pageContext.request.contextPath}/images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
         <div class="sidebar_tab_content">
 
@@ -33,7 +33,7 @@
 
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="${pageContext.request.contextPath}/images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
     </td>
 </tr>

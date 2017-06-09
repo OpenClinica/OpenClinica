@@ -10,80 +10,81 @@ View
   Restore
   Reassigned
   Sign--%>
+  <link rel="stylesheet" href="includes/css/icomoon-style.css">
 
 <tr id="sidebar_IconKey_open">
-    <td class="sidebar_tab">
+    <td class="sidebar_tab" >
 
-        <a href="javascript:leftnavExpand('sidebar_IconKey_open'); leftnavExpand('sidebar_IconKey_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_IconKey_open'); leftnavExpand('sidebar_IconKey_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-        <b><fmt:message key="icon_key" bundle="${reswords}"/></b><br clear="all"><br>
+        <fmt:message key="icon_key" bundle="${reswords}"/><br clear="all"><br>
 
-        <table border="0" cellpadding="4" cellspacing="0" width="100%">
+        <table border="0" cellpadding="4" cellspacing="0" width="100%" >
             <tr>
-                <td><strong><u><fmt:message key="statuses" bundle="${reswords}"/></u></strong></td>
+                <td><fmt:message key="statuses" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<img src="images/icon_NotStarted.gif"></td>
+                <td>&nbsp;<span class="icon icon-doc"></span></td>
                 <td><fmt:message key="not_started" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<img src="images/icon_Scheduled.gif"></td>
+                <td>&nbsp;<span class="icon icon-clock2"></span></td>
                 <td><fmt:message key="scheduled" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<img src="images/icon_InitialDE.gif"></td>
+                <td>&nbsp;<span class="icon icon-pencil-squared orange"></span></td>
                 <td><fmt:message key="data_entry_started" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<img src="images/icon_Stopped.gif"></td>
+                <td>&nbsp;<span class="icon icon-stop-circle red"></span></td>
                 <td><fmt:message key="stopped" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<img src="images/icon_Skipped.gif"></td>
+                <td>&nbsp;<span class="icon icon-redo"></span></td>
                 <td><fmt:message key="skipped" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<img src="images/icon_DEcomplete.gif"></td>
+                <td>&nbsp;<span class="icon icon-checkbox-checked green"></span></td>
                 <td><fmt:message key="completed" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<img src="images/icon_Signed.gif"></td>
+                <td>&nbsp;<span class="icon icon-icon-sign green"></span></td>
                 <td><fmt:message key="signed" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<img src="images/icon_Locked.gif"></td>
+                <td>&nbsp;<span class="icon icon-lock"></span></td>
                 <td><fmt:message key="locked" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<img src="images/icon_Invalid.gif"></td>
+                <td>&nbsp;<span class="icon icon-file-excel red"></span></td>
                 <td><fmt:message key="invalid" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td><strong><u><fmt:message key="actions" bundle="${reswords}"/></u></strong></td>
+                <td><fmt:message key="actions" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<img src="images/bt_View.gif"></td>
+                <td>&nbsp;<span class="icon icon-search"></span></td>
                 <td><fmt:message key="view" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<img src="images/bt_Edit.gif"></td>
+                <td>&nbsp;<span class="icon icon-pencil"></span></td>
                 <td><fmt:message key="edit" bundle="${reswords}"/></td>
             </tr>
             <c:if test="${userRole.manageStudy}">
                 <tr>
-                    <td>&nbsp;<img src="images/bt_Remove.gif"></td>
+                    <td>&nbsp;<span class="icon icon-cancel"></span></td>
                     <td><fmt:message key="remove" bundle="${reswords}"/></td>
                 </tr>
                 <tr>
-                    <td>&nbsp;<img src="images/bt_Restore.gif"></td>
+                    <td>&nbsp;<span class="icon icon-ccw"></span></td>
                     <td><fmt:message key="restore" bundle="${reswords}"/></td>
                 </tr>
                 <tr>
-                    <td>&nbsp;<img src="images/bt_Reassign.gif"></td>
+                    <td>&nbsp;<span class="icon icon-icon-reassign2"></span></td>
                     <td><fmt:message key="reassign" bundle="${reswords}"/></td>
                 </tr>
                 <tr>
-                    <td>&nbsp;<img src="images/icon_Signed.gif"></td>
+                    <td>&nbsp;<span class="icon icon-icon-sign green"></span></td>
                     <td><fmt:message key="sign" bundle="${reswords}"/></td>
                 </tr>
             </c:if>
@@ -91,7 +92,7 @@ View
 
         <div class="sidebar_tab_content">
 
-            <a href="#" onClick="openDefWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/overview-openclinica/home-page#content-title-3610'); return false;"><fmt:message key="view_all_icons" bundle="${reswords}"/></a>
+            <u><a href="#" onClick="openDefWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/overview-openclinica/home-page#content-title-3610'); return false;"><fmt:message key="view_all_icons" bundle="${reswords}"/></a></u>
 
         </div>
 
@@ -101,7 +102,7 @@ View
 <tr id="sidebar_IconKey_closed" style="display: none">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_IconKey_open'); leftnavExpand('sidebar_IconKey_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_IconKey_open'); leftnavExpand('sidebar_IconKey_closed');"><span class="icon icon-caret-right gray"></span></a>
 
         <b><fmt:message key="icon_key" bundle="${reswords}"/></b>
 

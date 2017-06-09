@@ -21,11 +21,6 @@
     padding-left: 5px;
 }
 
-.jmesa .table {
-    border: 1px solid silver;
-    padding: 2px;
-}
-
 .toolbar table {
     margin-right: auto;
     margin-left: 0px;
@@ -33,11 +28,6 @@
 
 .jmesa .toolbar td {
     padding: 0px 1px 0px 1px;
-}
-
-.jmesa .toolbar select {
-    font-size: 11px;
-    border: solid 1px #c4c3c2;
 }
 
 .jmesa .toolbar .pageNumber {
@@ -63,20 +53,6 @@
 .jmesa .tbody input {
     padding: 0;
     margin: 0;
-}
-
-.jmesa .filter .dynFilter {
-    position: relative;
-    font-family: verdana, arial, helvetica, sans-serif;
-    font-size: 11px;
-    padding: 0;
-    margin: 0;
-    border: 1px solid #c0c0c0;
-    background-color: #efebe7;
-    height: 15px;
-    white-space: nowrap;
-    cursor: pointer;
-    z-index: 4; 
 }
 
 .jmesa .filter #dynFilterDiv {
@@ -117,24 +93,6 @@
     margin: 0;
     border: 1px solid #c0c0c0;
     background-color: #e1ebf4;
-}
-
-.jmesa .header {
-	height: 15px;
-	max-height:30px
-}
-
-.jmesa .header td {
-    white-space: nowrap;
-    background-color: #729fcf;
-    color: white;
-    font-size: 11px;
-    font-weight: bold;
-    padding: 4px 3px 4px 3px;
-    border-right-style: solid;
-    border-right-width: 1px;
-    border-color: white;
-    background-image: none;
 }
 
 .jmesa .odd a,.jmesa .even a {
@@ -178,13 +136,6 @@
     color: black;
 }
 
-.jmesa .statusBar td {
-    font-family: verdana, arial, helvetica, sans-serif;
-    font-size: 11px;
-    border-top: 1px solid silver;
-    background-color: #efebe7;
-    padding: 2px;
-}
 
 .jmesa .dropShadow {
     padding: 10px 14px 14px 10px;
@@ -255,7 +206,7 @@
  */
 
 .jmesa .ViewSubjectsPopup td, .jmesa .highlight .ViewSubjectsPopup td { 
-	background-color: #FFFFE5;
+    background-color: #FFFFE5;
     border-style: solid;
     border-width: 0px 0px 0px 0px;
     border-color: #CCCCCC;
@@ -263,7 +214,7 @@
     }
 
 .jmesa .ViewSubjectsPopup td.table_header_row_left, .jmesa .highlight .ViewSubjectsPopup td.table_header_row_left { 
-	padding: 3px 1px 3px 6px;
+    padding: 3px 1px 3px 6px;
     border-style: solid;
     border-width: 0px 0px 1px 0px;
     border-color: #CCCCCC;
@@ -273,7 +224,7 @@
     }
 
 .jmesa .ViewSubjectsPopup td.table_header_row, .jmesa .highlight .ViewSubjectsPopup td.table_header_row { 
-	padding: 3px 1px 3px 2px;
+    padding: 3px 1px 3px 2px;
     border-style: solid;
     border-width: 0px 0px 1px 1px;  
     border-color: #CCCCCC;
@@ -283,7 +234,7 @@
     }
 
 .jmesa .ViewSubjectsPopup td.table_cell_left, .jmesa .highlight .ViewSubjectsPopup td.table_cell_left, .jmesa .ViewSubjectsPopup td.table_cell, .jmesa .highlight .ViewSubjectsPopup td.table_cell { 
-	padding: 3px 1px 3px 2px;  
+    padding: 3px 1px 3px 2px;  
     border-style: solid;
     border-width: 1px 0px 0px 1px;
     border-top-color: #E6E6E6;
@@ -292,13 +243,13 @@
     }
 
 .jmesa .ViewSubjectsPopup td.statusbox_scroll_R_dis, .jmesa .highlight td.ViewSubjectsPopup.statusbox_scroll_R_dis { 
-	border-style: solid;
+    border-style: solid;
     border-width: 0px 0px 0px 1px;  
     border-color: #CCCCCC;
     }
 
 .jmesa .ViewSubjectsPopup td a, .jmesa .highlight .ViewSubjectsPopup td a { 
-	color: #789EC5; 
-	}
+    color: #789EC5; 
+    }
 
 

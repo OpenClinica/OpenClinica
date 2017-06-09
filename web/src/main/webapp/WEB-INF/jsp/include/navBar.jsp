@@ -40,18 +40,18 @@
         function confirmCancelAction( pageName, contextPath){
             var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
             if(confirm1){
-            	 var tform = document.forms["fr_cancel_button"];
-            	tform.action=contextPath+"/"+pageName;
-            	tform.submit();
+                 var tform = document.forms["fr_cancel_button"];
+                tform.action=contextPath+"/"+pageName;
+                tform.submit();
 
             }
         }
         function confirmExitAction( pageName, contextPath){
             var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
             if(confirm1){
-            	 var tform = document.forms["fr_cancel_button"];
-            	tform.action=contextPath+"/"+pageName;
-            	tform.submit();
+                 var tform = document.forms["fr_cancel_button"];
+                tform.action=contextPath+"/"+pageName;
+                tform.submit();
 
             }
         }
@@ -70,28 +70,35 @@
 </c:if>
 
 <!-- Main Navigation -->
+    <link rel="stylesheet" href="includes/css/icomoon-style.css">
      <div class="oc_nav">
-        <div id="StudyInfo">
-            <c:choose>
-                <c:when test='${study.parentStudyId > 0}'>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes" title="<c:out value='${study.parentStudyName}'/>" alt="<c:out value='${study.parentStudyName}'/>" ><c:out value="${study.abbreviatedParentStudyName}" /></a>
-                    :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.id}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
-                </c:when>
-                <c:otherwise>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
-                </c:otherwise>
-            </c:choose>
-            (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
-        </div>
-        <div id="UserInfo">
-            <a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)&nbsp;
-				<c:out value="<%=ResourceBundleProvider.getLocale().toString()%>"/>
-            </a>&nbsp;|&nbsp;
-            <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a>
-        </div>
-        <br/><br style="line-height: 4px;"/>
-        <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+        <div class="nav-top-bar">
+        <!-- Logo -->
+            <div class="logo"><img src="images/logo-color-on-dark.svg" alt="OpenClinica Logo" /></div>
+            <div id="StudyInfo">           
+                <b><a href="ViewStudy?id=1&viewFull=yes" title="Default Study" alt="Default Study">Default Study</a></b>
+                (default-study)|
+                <a href="ChangeStudy">Change</a>
+            </div>
+
+            <div id="UserInfo">
+                <div id="userDropdown">
+                    <ul>
+                        <li><a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="Data Manager" /> )<span class="icon icon-caret-down white"></span></a></a>
+                        <!-- First Tier Drop Down -->
+                        <ul class="dropdown_BG">
+                            <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a></li>
+                            <li><a href="#">Account</a></li>
+                            <li><a href="#">Billing</a></li>
+                            <li> <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
+                        </ul>        
+                        </li>
+                    </ul>
+                </div>
+            </div>
+        </div>   
+            
+         <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
             <div class="navbox_center">
                 <!-- Top Navigation Row -->
@@ -102,58 +109,31 @@
                             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tr>
                                     <td>
-                                        <ul>
-                                        <c:if test="${userRole.coordinator || userRole.director}">
-                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                        </c:if>
-                                        <c:if test="${userRole.researchAssistant ||userRole.researchAssistant2}">
-                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <c:if test="${study.status.available}">
-                                                <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            </c:if>
-                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                        </c:if>
-                                        <c:if test="${userRole.investigator}">
-                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <c:if test="${study.status.available}">
-                                                <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            </c:if>
-                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                        </c:if>
-                                        <c:if test="${userRole.monitor }">
-                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_sdv" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
-                                        </c:if>
+                                      <form METHOD="GET" action="ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == 'Study Subject ID') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
+                                                                    <!--<a href="javascript:reportBug()">Report Issue</a>|-->                              
+                                            <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = 'Study Subject ID'" onfocus="if (this.value == 'Study Subject ID') this.value = ''" value="Enter Study Subject ID" class="navSearch"/>
+                                            <input type="hidden" name="navBar" value="yes"/>
+                                            <input type="submit" value="View &#8594;"  class="navSearchButton"/>
+                                        </form>                                        
+                                    </td>
+                                    <td align="right" style="font-weight: normal;">                                  
+                                    <ul>
+                                        <li><a href="MainMenu">Home</a></li>
+                                        <li><a href="ListStudySubjects">Subject Matrix</a></li>
+                                        <li><a href="ViewNotes">Notes &amp; Discrepancies</a></li>
+                                        <li><a href="StudyAuditLog">Study Audit Log</a></li>
                                         <li id="nav_Tasks" style="position: relative; z-index: 3;">
-                                            <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link"><fmt:message key="nav_tasks" bundle="${resword}"/>
-                                                <img src="${urlPrefix}images/bt_Tasks_pulldown.gif" alt="Tasks" border="0"/></a>
+                                            <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link">Tasks
+                                               <span class="icon icon-caret-down white"></span></a>
                                         </li>
                                         </ul>
-                                    </td>
-                                    <td align="right" style="font-weight: normal;">
-
-                                        <form METHOD="GET" action="${urlPrefix}ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
-                                            <!--<a href="javascript:reportBug()"><fmt:message key="openclinica_report_issue" bundle="${resword}"/></a>&nbsp;|&nbsp;-->
-                                            <a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a>&nbsp;&nbsp;
-                                            <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = '<fmt:message key="study_subject_ID" bundle="${resword}"/>'" onfocus="if (this.value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') this.value = ''" value="<fmt:message key="study_subject_ID" bundle="${resword}"/>" class="navSearch"/>
-                                            <input type="hidden" name="navBar" value="yes"/>
-                                            <input type="submit" value="<fmt:message key="go" bundle="${resword}"/>"  class="navSearchButton"/>
-                                        </form>
-
                                     </td>
                                 </tr>
                             </table>
                             </div></div></div></div>
                         </td>
-                    </tr>
-                                    </table>
+                    </tr>                 
+                </table>
             </div>
             <!-- End shaded box border DIVs -->
         </div></div></div></div></div></div></div></div></div>
@@ -165,9 +145,10 @@
     <!-- NAVIGATION DROP-DOWN -->
 
 
+
 <div id="nav_hide" style="position: absolute; left: 0px; top: 0px; visibility: hidden; z-index: 2; width: 100%; height: 400px;">
 
-<a href="#" onmouseover="hideSubnavs();"><img src="${urlPrefix}images/spacer.gif" alt="" width="1000" height="400" border="0"/></a>
+<a href="#" onmouseover="hideSubnavs();"><img src="http://dev40.openclinica.info:8080/OpenClinica/images/spacer.gif" alt="" width="1000" height="400" border="0"/></a>
 </div>
 
 

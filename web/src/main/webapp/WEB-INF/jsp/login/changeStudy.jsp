@@ -152,4 +152,3 @@
   <p><i><fmt:message key="no_other_studies_and_roles_available" bundle="${restext}"/></i> <a href="MainMenu"><fmt:message key="go_back" bundle="${restext}"/></a></p>
 </c:otherwise>
 </c:choose>
-<jsp:include page="../include/footer.jsp"/>
