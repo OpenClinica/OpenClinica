@@ -114,6 +114,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.setTypeExpected(57, TypeNames.STRING);// schema name
         this.setTypeExpected(58, TypeNames.STRING);// uuid
         this.setTypeExpected(59, TypeNames.STRING);// env type
+        this.setTypeExpected(60, TypeNames.STRING);// study env uuid
     }
 
     /**
@@ -582,6 +583,8 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         eb.setOldStatus(Status.get(oldStatusId));
         eb.setSchemaName((String) hm.get("schema_name"));
         eb.setEnvType(StudyEnvEnum.valueOf((String)hm.get("env_type")));
+        eb.setUuid((String) hm.get("uuid"));
+        eb.setStudyEnvUuid((String)hm.get("study_env_uuid"));
         return eb;
     }
 

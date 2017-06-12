@@ -76,6 +76,16 @@ public class StudyBean extends AuditableEntityBean {
     private String schemaName = "";
     private StudyEnvEnum envType;
     private String uuid;
+    private String studyEnvUuid;
+
+    public String getStudyEnvUuid() {
+        return studyEnvUuid;
+    }
+
+    public void setStudyEnvUuid(String studyEnvUuid) {
+        this.studyEnvUuid = studyEnvUuid;
+    }
+
     // private boolean usingDOB = false;
     // private boolean discrepancyManagement = false;
     private String oid;

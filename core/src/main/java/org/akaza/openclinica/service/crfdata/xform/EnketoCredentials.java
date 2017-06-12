@@ -26,14 +26,8 @@ public class EnketoCredentials implements Serializable {
     public static EnketoCredentials getInstance(String studyOid) {
         Study study = getParentStudy(studyOid);
         studyOid = study.getOc_oid();
-
         EnketoCredentials credentials = new EnketoCredentials();
-
-        String pManageUrl = CoreResources.getField("portalURL") + "/app/rest/oc/authorizations";
         String ocUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-        RestTemplate rest = new RestTemplate();
-
-
         credentials.setServerUrl(CoreResources.getField("form.engine.url"));
         credentials.setApiKey(study.getStudyEnvUuid());
         credentials.setOcInstanceUrl(ocUrl);
