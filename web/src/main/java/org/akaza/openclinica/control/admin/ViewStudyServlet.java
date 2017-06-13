@@ -85,19 +85,13 @@ public class ViewStudyServlet extends SecureController {
 
             if (seRandomizationDTO!=null && seRandomizationDTO.getStatus().equalsIgnoreCase("ACTIVE") && randomizationStatusInOC.equalsIgnoreCase("enabled")){
                 study.getStudyParameterConfig().setRandomization("enabled");
-            }else{
+            } else {
                 study.getStudyParameterConfig().setRandomization("disabled");
-             };
-
+            };
 
              ParticipantPortalRegistrar  participantPortalRegistrar = new ParticipantPortalRegistrar();
              String pStatus = participantPortalRegistrar.getCachedRegistrationStatus(study.getOid(), session);
-             if (participantPortalRegistrar!=null && pStatus.equalsIgnoreCase("ACTIVE") && participantStatusInOC.equalsIgnoreCase("enabled")){
-                 study.getStudyParameterConfig().setParticipantPortal("enabled");
-             }else{
-                 study.getStudyParameterConfig().setParticipantPortal("disabled");
-              };
-
+             study.getStudyParameterConfig().setParticipantPortal("enabled");
 
             request.setAttribute("studyToView", study);
             if ("yes".equalsIgnoreCase(viewFullRecords)) {

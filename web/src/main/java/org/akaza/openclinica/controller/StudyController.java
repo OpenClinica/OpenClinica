@@ -144,19 +144,17 @@ import java.util.regex.Pattern;
 
         String uniqueStudyID = (String) map.get("uniqueStudyID");
         String name = (String) map.get("briefTitle");
-        String studyEnvOid = (String) map.get("studyEnvOid");
+        String studyOid = (String) map.get("studyEnvOid");
         String studyEnvUuid = (String) map.get("studyEnvUuid");
         String uuid = (String) map.get("uuid");
 
-        Matcher m = Pattern.compile("(.+)\\((.+)\\)").matcher(studyEnvOid);
+        Matcher m = Pattern.compile("(.+)\\((.+)\\)").matcher(studyOid);
         String envType = "";
-        String oid = "";
         if (m.find()) {
             if (m.groupCount() != 2) {
                 ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "envType");
                 errorObjects.add(errorOBject);
             } else {
-                oid = m.group(1);
                 envType = m.group(2);
             }
         }
@@ -183,11 +181,11 @@ import java.util.regex.Pattern;
         } else {
             name = name.trim();
         }
-        if (StringUtils.isEmpty(oid)) {
+        if (StringUtils.isEmpty(studyOid)) {
             ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "oid");
             errorObjects.add(errorOBject);
         } else {
-            oid = oid.trim();
+            studyOid = studyOid.trim();
         }
         if (StringUtils.isEmpty(uuid)) {
             ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "uuid");
@@ -207,7 +205,7 @@ import java.util.regex.Pattern;
         ResourceBundleProvider.updateLocale(locale);
         request.setAttribute("uniqueProId", uniqueStudyID);
         request.setAttribute("name", name); // Brief Title
-        request.setAttribute("oid", oid);
+        request.setAttribute("oid", studyOid);
         request.setAttribute("uuid", uuid);
         request.setAttribute("envType", envType);
         request.setAttribute("studyEnvUuid", studyEnvUuid);
@@ -263,11 +261,11 @@ import java.util.regex.Pattern;
         Study study = new Study();
         study.setUniqueIdentifier(uniqueStudyID);
         study.setName(name);
-        study.setOc_oid(oid);
+        study.setOc_oid(studyOid);
         study.setEnvType(StudyEnvEnum.valueOf(envType));
         study.setStudyEnvUuid(studyEnvUuid);
         study.setUuid(uuid);
-        Study byOidEnvType = studyDao.findByOidEnvType(oid, StudyEnvEnum.valueOf(envType));
+        Study byOidEnvType = studyDao.findByOidEnvType(studyOid, StudyEnvEnum.valueOf(envType));
         if (byOidEnvType != null && byOidEnvType.getOc_oid() != null) {
             return getResponseSuccess(byOidEnvType);
         }

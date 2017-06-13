@@ -125,19 +125,19 @@ public class EnketoAPI {
     }
 
     private EnketoURLResponse getURL(URL url, String crfOID) throws Exception {
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.add("Authorization", "Basic " +
-                    new String(Base64.encodeBase64((token + ":").getBytes())));
-            headers.add("Accept-Charset", "UTF-8");
-            EnketoURLRequest body = new EnketoURLRequest(ocURL, crfOID);
-            HttpEntity<EnketoURLRequest> request = new HttpEntity<EnketoURLRequest>(body, headers);
-            RestTemplate rest = new RestTemplate();
-            ResponseEntity<EnketoURLResponse> response = rest.postForEntity(url.toString(), request, EnketoURLResponse.class);
-            if (response != null)
-                return response.getBody();
-            else
-                return null;
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Authorization", "Basic " +
+                new String(Base64.encodeBase64((token + ":").getBytes())));
+        headers.add("Accept-Charset", "UTF-8");
+        EnketoURLRequest body = new EnketoURLRequest(ocURL, crfOID);
+        HttpEntity<EnketoURLRequest> request = new HttpEntity<EnketoURLRequest>(body, headers);
+        RestTemplate rest = new RestTemplate();
+        ResponseEntity<EnketoURLResponse> response = rest.postForEntity(url.toString(), request, EnketoURLResponse.class);
+        if (response != null)
+            return response.getBody();
+        else
+            return null;
 
     }
 
