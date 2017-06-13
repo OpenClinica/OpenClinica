@@ -95,6 +95,8 @@ public class ImportCRFDataService {
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
         StudyDAO studyDAO = new StudyDAO(ds);
         StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+        CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+    	FormLayoutDAO fldao= new FormLayoutDAO<>(ds);
 
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
         // If Upsert bean is not present, create one with default settings
@@ -119,8 +121,6 @@ public class ImportCRFDataService {
 
                 for (FormDataBean formDataBean : formDataBeans) {
 
-                    CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
-                	FormLayoutDAO fldao= new FormLayoutDAO<>(ds);
 
                     ArrayList<FormLayoutBean> formLayoutBeans = fldao.findAllByOid(formDataBean.getFormOID());                    
                     // StudyEventBean studyEventBean = (StudyEventBean)
