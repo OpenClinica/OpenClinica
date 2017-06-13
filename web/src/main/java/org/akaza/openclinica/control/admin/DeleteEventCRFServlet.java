@@ -252,6 +252,7 @@ public class DeleteEventCRFServlet extends SecureController {
         DiscrepancyNoteBean itemParentNote = (DiscrepancyNoteBean) getDnDao().findByPK(dnb.getParentDnId());
         itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
         itemParentNote.setAssignedUserId(ub.getId());
+        itemParentNote.setOwner(ub);
         getDnDao().update(itemParentNote); // update parent DN
         getDnDao().updateAssignedUser(itemParentNote); // update parent DN assigned user
 

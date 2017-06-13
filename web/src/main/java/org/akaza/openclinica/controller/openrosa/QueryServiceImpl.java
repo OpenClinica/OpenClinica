@@ -126,6 +126,9 @@ public class QueryServiceImpl implements QueryService {
 
                 parentDN.setUserAccount(childDN.getUserAccount());
                 setResolutionStatus(queryBean, parentDN);
+                parentDN.setUserAccountByOwnerId(helperBean.getContainer().getUser());
+                parentDN.setDetailedNotes(childDN.getDetailedNotes());
+                parentDN.setDiscrepancyNoteType(childDN.getDiscrepancyNoteType());
                 parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
 
                 helperBean.setDn(childDN);
