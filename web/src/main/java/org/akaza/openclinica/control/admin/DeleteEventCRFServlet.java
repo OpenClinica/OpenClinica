@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -236,7 +237,7 @@ public class DeleteEventCRFServlet extends SecureController {
         dnb.setDescription(description);
         dnb.setDetailedNotes(detailedNotes);
         dnb.setDiscrepancyNoteTypeId(parentDiscrepancyNote.getDiscrepancyNoteTypeId()); // set to parent DN Type Id
-        dnb.setResolutionStatusId(6); // set to closed-modified
+        dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
         dnb.setColumn("value"); // this is needed for DN Map object
         dnb.setAssignedUser(null);
         dnb.setOwner(ub);
@@ -246,7 +247,7 @@ public class DeleteEventCRFServlet extends SecureController {
         getDnDao().createMapping(dnb); // create DN mapping
 
         DiscrepancyNoteBean itemParentNote = (DiscrepancyNoteBean) getDnDao().findByPK(dnb.getParentDnId());
-        itemParentNote.setResolutionStatusId(6); // set to closed-modified
+        itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
         itemParentNote.setAssignedUser(null);
         itemParentNote.setOwner(ub);
         getDnDao().update(itemParentNote); // update parent DN
