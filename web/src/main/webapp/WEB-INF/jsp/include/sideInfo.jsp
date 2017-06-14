@@ -23,7 +23,7 @@
                <span class="icon icon-caret-down gray"></span>
 </a>
 
-		<b><fmt:message key="info" bundle="${restext}"/></b>
+		<fmt:message key="info" bundle="${restext}"/>
 
 		<div class="sidebar_tab_content">
 

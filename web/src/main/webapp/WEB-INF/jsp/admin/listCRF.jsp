@@ -23,9 +23,9 @@
 <tr id="sidebar_Instructions_open" style="display: all">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-		<b><fmt:message key="instructions" bundle="${restext}"/></b>
+		<fmt:message key="instructions" bundle="${restext}"/>
 
 		<div class="sidebar_tab_content">
         <fmt:message key="CRF_library_shows_all_CRFs" bundle="${restext}"/>
@@ -38,9 +38,9 @@
 	<tr id="sidebar_Instructions_closed" style="display: none">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
 
-		<b><fmt:message key="instructions" bundle="${restext}"/></b>
+		<fmt:message key="instructions" bundle="${restext}"/>
 
 		</td>
   </tr>
@@ -68,7 +68,7 @@
 <%--
 <p><fmt:message key="also_download_set_example_CRFs" bundle="${restext}"/> <a href="http://www.openclinica.org/entities/entity_details.php?eid=151" target="_blank"><fmt:message key="here" bundle="${resword}"/></a>.</p>
 --%>
-
+<br/>
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showCRFRow.jsp" /></c:import>
 
 

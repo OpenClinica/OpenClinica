@@ -104,7 +104,7 @@ View
 
         <a href="javascript:leftnavExpand('sidebar_IconKey_open'); leftnavExpand('sidebar_IconKey_closed');"><span class="icon icon-caret-right gray"></span></a>
 
-        <b><fmt:message key="icon_key" bundle="${reswords}"/></b>
+        <fmt:message key="icon_key" bundle="${reswords}"/>
 
     </td>
 </tr>

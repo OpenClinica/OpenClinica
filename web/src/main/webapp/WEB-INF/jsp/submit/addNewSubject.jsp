@@ -17,9 +17,9 @@
 <tr id="sidebar_Instructions_open" style="display: none">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
 
-		<b><fmt:message key="instructions" bundle="${restext}"/></b>
+		<fmt:message key="instructions" bundle="${restext}"/>
 
 		<div class="sidebar_tab_content">
 			<fmt:message key="fill_to_add_click_help" bundle="${restext}"/>
@@ -31,9 +31,9 @@
 	<tr id="sidebar_Instructions_closed" style="display: all">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-		<b><fmt:message key="instructions" bundle="${restext}"/></b>
+		<fmt:message key="instructions" bundle="${restext}"/>
 
 		</td>
   </tr>
@@ -101,7 +101,7 @@
 <div class="textbox_center">
 <table border="0" cellpadding="5">
 	<tr valign="top">
-		<td class="formlabel"><fmt:message key="study_subject_ID" bundle="${resword}"/>:</td>
+		<td class="formlabel"><fmt:message key="study_subject_ID" bundle="${resword}"/></td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
@@ -112,11 +112,11 @@
 					  <input type="hidden" name="label" value="<c:out value="${label}"/>">
 					 </c:when>
 					 <c:otherwise>
-					   <input onfocus="this.select()" type="text" name="label" value="<c:out value="${label}"/>" size="50" class="formfieldXL">
+					   <input onfocus="this.select()" type="text" name="label" value="<c:out value="${label}"/>" size="30" class="formfieldXL">
 					 </c:otherwise>
 					</c:choose>
 					</div></td>
-					<td>*</td>
+					<td>&nbsp;*</td>
 				</tr>
 				<tr>
 					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
@@ -127,14 +127,14 @@
 	<c:choose>
 	<c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
 	<tr valign="top">
-	  	<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
+	  	<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/></td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldXL_BG">
-						<input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" size="50" class="formfieldXL">
+						<input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" size="30" class="formfieldXL">
 					</div></td>
-					<td>* <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+					<td>&nbsp;* <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
 					<img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 				</tr>
 				<tr>
@@ -146,12 +146,12 @@
 	</c:when>
 	<c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='optional'}">
 	<tr valign="top">
-	  	<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
+	  	<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/></td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldXL_BG">
-						<input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" size="50" class="formfieldXL">
+						<input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" size="30" class="formfieldXL">
 					</div></td>
 					<td>&nbsp;</td>
 				</tr>
@@ -173,7 +173,7 @@
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldXL_BG">
-						<input onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" size="50" class="formfieldXL">
+						<input onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" size="30" class="formfieldXL">
 					</div></td>
 					<td>&nbsp;</td>
 				</tr>
@@ -188,11 +188,11 @@
 		<td class="formlabel">
             <c:if test="${study.parentStudyId == 0}">
                 <fmt:message key="date_of_enrollment_for_study" bundle="${resword}"/>'
-                <c:out value="${study.name}" /> ' :
+                <c:out value="${study.name}" /> ' 
             </c:if>
             <c:if test="${study.parentStudyId > 0}">
                 <fmt:message key="date_of_enrollment_for_study" bundle="${resword}"/>'
-                <c:out value="${study.parentStudyName}" /> ' :
+                <c:out value="${study.parentStudyName}" /> ' 
             </c:if>
 
         </td>
@@ -206,7 +206,7 @@
             <div class="formfieldM_BG">
 						<input onfocus="this.select()" type="text" name="enrollmentDate" size="15" value="<c:out value="${enrollmentDate}" />" class="formfieldM" id="enrollmentDateField" />
 					</td>
-					<td><span class="formlabel">*</span>
+					<td>&nbsp;<span class="formlabel">&nbsp;*</span>
 					<A HREF="#">
   					  <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
                         <script type="text/javascript">
@@ -230,7 +230,7 @@
 
 	<tr valign="top">
         <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
-        <td class="formlabel"><fmt:message key="gender" bundle="${resword}"/>:</td>
+        <td class="formlabel"><fmt:message key="gender" bundle="${resword}"/></td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
@@ -260,7 +260,7 @@
 	<td align="left">
         <c:choose>
         <c:when test="${study.studyParameterConfig.genderRequired !='false'}">
-           <span class="formlabel">*</span>
+           <span class="formlabel">&nbsp;*</span>
         </c:when>
         </c:choose>
         <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
@@ -280,14 +280,14 @@
 	<c:choose>
 	<c:when test="${study.studyParameterConfig.collectDob == '1'}">
 	<tr valign="top">
-		<td class="formlabel"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
+		<td class="formlabel"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
 	  	<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
 						<input onfocus="this.select()" type="text" name="dob" size="15" value="<c:out value="${dob}" />" class="formfieldM" id="dobField" />
 					</td>
-					<td>
+					<td>&nbsp;
 					<A HREF="#">
   					  <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
                         <script type="text/javascript">
@@ -297,7 +297,7 @@
                     </a>
                     </td>
 					<td>
-					<%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%> * <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+					<%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%> &nbsp;* <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
 					<img name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 				</tr>
 				<tr>
@@ -309,7 +309,7 @@
 	</c:when>
 	<c:when test="${study.studyParameterConfig.collectDob == '2'}">
 	<tr valign="top">
-		<td class="formlabel"><fmt:message key="year_of_birth" bundle="${resword}"/>:</td>
+		<td class="formlabel"><fmt:message key="year_of_birth" bundle="${resword}"/></td>
 	  	<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
@@ -374,7 +374,7 @@
 
 	    	</td>
 	    	<c:if test="${group.subjectAssignment=='Required'}">
-	    	  <td align="left">*</td>
+	    	  <td align="left">&nbsp;*</td>
 	    	</c:if>
 	    	</tr>
 	    	<tr valign="top">

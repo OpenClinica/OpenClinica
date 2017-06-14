@@ -43,19 +43,10 @@
 </style>
 
 <!-- then instructions-->
-<div id="box" class="dialog">
-<span id="mbm">
-    <br>
-     <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
-   </span><br>
-    <div style="text-align:center; width:100%;">
-        <button onclick="hm('box');">OK</button>
-    </div>
-</div>
 <tr id="sidebar_Instructions_open" style="display: all">
         <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></a>
 
         <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -69,7 +60,7 @@
     <tr id="sidebar_Instructions_closed" style="display: none">
         <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></a>
 
         <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -80,7 +71,7 @@
 
 
 <h1> 
-    <span class="title_manage" style="line-height:5px;">
+    <span class="title_manage" style="line-height:35px;">
         <fmt:message key="welcome_to" bundle="${restext}"/>
             <c:choose>
                 <c:when test='${study.parentStudyId > 0}'>
@@ -119,7 +110,7 @@
 
 </c:if>
 <span class="table_title_Admin" style="line-height:15px;">
-<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />"><fmt:message key="notes_assigned_to_me" bundle="${restext}"/><span>${assignedDiscrepancies}</span>&nbsp;</a><br /><br />
+<a style="text-decoration: none;" href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />"><p style="padding-left:10px;">Notes & Discrepancies Assigned to Me: 0</p></a><br /><br />
 </span>
 
 <c:if test="${userRole.investigator || userRole.researchAssistant || userRole.researchAssistant2}">

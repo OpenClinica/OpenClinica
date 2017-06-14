@@ -6,9 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
-
 <jsp:include page="../include/submit-header.jsp"/>
-
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -119,7 +117,7 @@
 <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 	</c:otherwise>
 </c:choose>
-</span></h1>
+</span></h1><br/>
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
 <script type="text/JavaScript" language="JavaScript">
   <!--

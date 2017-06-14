@@ -74,7 +74,8 @@
      <div class="oc_nav">
         <div class="nav-top-bar">
         <!-- Logo -->
-            <div class="logo"><img src="images/logo-color-on-dark.svg" alt="OpenClinica Logo" /></div>
+            <div class="logo"><a href="MainMenu"><img src="images/logo-color-on-dark.svg" alt="OpenClinica Logo" /></a></div>
+          
             <div id="StudyInfo">           
                 <b><a href="ViewStudy?id=1&viewFull=yes" title="Default Study" alt="Default Study">Default Study</a></b>
                 (default-study)|

@@ -6,6 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
+<link rel="stylesheet" href="../includes/css/icomoon-style.css">
 
 
 <jsp:include page="include/managestudy_top_pages.jsp"/>
@@ -17,9 +18,9 @@
 <tr id="sidebar_Instructions_open">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
         <div class="sidebar_tab_content">
 
@@ -33,9 +34,9 @@
 <tr id="sidebar_Instructions_closed" style="display: none">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
 
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
     </td>
 </tr>
@@ -62,7 +63,7 @@
 <fmt:message key="sdv_sdv_for" bundle="${resword}"/> <c:out value="${study.name}"/>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data')">
         <img src="../images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
-</span></h1>
+</span></h1><br/>
 
 <jsp:useBean scope='session' id='sSdvRestore' class='java.lang.String' />
 <c:set var="restore" value="true"/>
@@ -77,7 +78,7 @@
                 <div id="Tab1Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_event_CRF" bundle="${resword}"/></span></div></div></div></div></td>
               
             <td valign="bottom" id="Tab2'">
-				<div id="Tab2Selected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
+                <div id="Tab2Selected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
                     <a class="tabtext" title="<fmt:message key="view_by_studysubjectID" bundle="${resword}"/>" href='viewSubjectAggregate?s_sdv_restore=${restore}&studyId=${studyId}' onclick="javascript:HighlightTab(2);"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></a></div></div></div></div>
                 <div id="Tab2NotSelected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></span></div></div></div></div></td>
 

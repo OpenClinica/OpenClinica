@@ -9,7 +9,7 @@
 <jsp:include page="include/managestudy_top_pages.jsp"/>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
-
+<link rel="stylesheet" href="../includes/css/icomoon-style.css">
 
 
 <!-- move the alert message to the sidebar-->
@@ -18,9 +18,9 @@
 <tr id="sidebar_Instructions_open">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="${pageContext.request.contextPath}/images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
         <div class="sidebar_tab_content">
 
@@ -34,9 +34,9 @@
 <tr id="sidebar_Instructions_closed" style="display: none">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="${pageContext.request.contextPath}/images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
 
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
     </td>
 </tr>
@@ -94,7 +94,7 @@
             // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
             var warnings = "${regMessages}";
             if (warnings.length > 0) {
-            	jQuery.blockUI({ message: jQuery('#requestRandomizationForm'), css:{left: "300px", top:"10px" } });
+              jQuery.blockUI({ message: jQuery('#requestRandomizationForm'), css:{left: "300px", top:"10px" } });
             }
         });
 
@@ -123,7 +123,7 @@
             // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
             var warnings = "${regMessages}";
             if (warnings.length > 0) {
-            	jQuery.blockUI({ message: jQuery('#requestParticipateForm'), css:{left: "300px", top:"10px" } });
+              jQuery.blockUI({ message: jQuery('#requestParticipateForm'), css:{left: "300px", top:"10px" } });
             }
         });
 
@@ -142,7 +142,7 @@
   <div>
       <h1><span class="title_manage"><c:out value="${currentStudy.name}"/>&nbsp;
         <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/></a>
-      </span></h1>
+      </span></h1><br/>
   </div>
   <div style="border: 1px solid #ccc; width:70%; padding-left:5px">
       <p>
@@ -445,24 +445,24 @@
             <td>
                 <c:url var="createRule" value="/ImportRule"/>
                 <c:url var="viewRule" value="/ViewRuleAssignment"/>
-				<c:url var="ruleDesignerURL" value="${ruleDesignerURL}"/>
+        <c:url var="ruleDesignerURL" value="${ruleDesignerURL}"/>
 
                 <c:choose>
                     <c:when test="${studyModuleStatus.rule == 1}">
                         <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.rule == 2}">
                         <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:when>
                     <c:otherwise>
                         <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:otherwise>
