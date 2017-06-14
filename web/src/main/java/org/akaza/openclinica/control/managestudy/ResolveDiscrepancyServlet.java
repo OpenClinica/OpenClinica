@@ -170,9 +170,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
             ItemGroupBean igBean = (ItemGroupBean) igdao.findByPK(igmBean.getItemGroupId());
             int repeatOrdinal = idb.getOrdinal();
             ItemDataBean idata = null;
-            if (idb != null && idb.isDeleted()) {
-                return false;
-            }
             if (igmBean.isRepeatingGroup() && repeatOrdinal > 1) {
                 List<ItemGroupMetadataBean> igms = igmdao.findMetaByGroupAndCrfVersion(igBean.getId(), ecb.getCRFVersionId());
 
