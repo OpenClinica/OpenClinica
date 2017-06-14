@@ -23,6 +23,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyType;
 import org.akaza.openclinica.dao.core.*;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
+import org.apache.commons.lang.StringUtils;
 
 import javax.sql.DataSource;
 import java.sql.Types;
@@ -448,8 +449,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         variables.put(new Integer(19), new Boolean(sb.getHealthyVolunteerAccepted()));
         variables.put(new Integer(20), sb.getSchemaName());
         variables.put(new Integer(21), sb.getUuid());
-        variables.put(new Integer(22), sb.getEnvType());
-        variables.put(new Integer(23), new Integer(sb.getId()));
+        variables.put(new Integer(22), new Integer(sb.getId()));
         this.execute(digester.getQuery("createStepTwo"), variables, nullVars);
         return sb;
     }
@@ -582,7 +582,8 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         Integer oldStatusId = (Integer) hm.get("old_status_id");
         eb.setOldStatus(Status.get(oldStatusId));
         eb.setSchemaName((String) hm.get("schema_name"));
-        eb.setEnvType(StudyEnvEnum.valueOf((String)hm.get("env_type")));
+        if (StringUtils.isNotEmpty((String)hm.get("env_type")))
+            eb.setEnvType(StudyEnvEnum.valueOf((String)hm.get("env_type")));
         eb.setUuid((String) hm.get("uuid"));
         eb.setStudyEnvUuid((String)hm.get("study_env_uuid"));
         return eb;

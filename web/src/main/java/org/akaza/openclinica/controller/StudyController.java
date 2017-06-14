@@ -17,7 +17,6 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
-import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.LiquibaseOnDemandService;
@@ -600,9 +599,9 @@ import java.util.regex.Pattern;
      * }
      */
 
-    @RequestMapping(value = "/{uniqueStudyID}/sites", method = RequestMethod.POST) public ResponseEntity<Object> createNewSites(HttpServletRequest request,
-            @RequestBody HashMap<String, Object> map, @PathVariable("uniqueStudyID") String uniqueStudyID) throws Exception {
-        logger.debug("Creating site(s) for study:" + uniqueStudyID);
+    @RequestMapping(value = "/{parentStudyID}/sites", method = RequestMethod.POST) public ResponseEntity<Object> createNewSites(HttpServletRequest request,
+            @RequestBody HashMap<String, Object> map, @PathVariable("parentStudyID") String parentStudyID) throws Exception {
+        logger.debug("Creating site(s) for study:" + parentStudyID);
         ArrayList<ErrorObject> errorObjects = new ArrayList();
         StudyBean siteBean = null;
         ResponseEntity<Object> response = null;
@@ -619,6 +618,8 @@ import java.util.regex.Pattern;
         String startDate = (String) map.get("startDate");
         String studyDateVerification = (String) map.get("studyDateVerification");
         String secondaryProId = (String) map.get("secondaryStudyID");
+        String studyEnvUuid = (String) map.get("studyEnvUuid");
+        String uuid = (String) map.get("uuid");
         ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("assignUserRoles");
 
         ArrayList<UserRole> userList = new ArrayList<>();
@@ -741,7 +742,7 @@ import java.util.regex.Pattern;
             }
         }
 
-        StudyBean parentStudy = getStudyByUniqId(uniqueStudyID);
+        StudyBean parentStudy = getStudyByUniqId(parentStudyID);
         if (parentStudy == null) {
             ErrorObject errorOBject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Id",
                     "Unique Study Study Id");
@@ -785,15 +786,6 @@ import java.util.regex.Pattern;
             errorObjects.add(errorOBject);
         }
 
-        Validator v6 = new Validator(request);
-        HashMap vError6 = v6.validate();
-        if (uniqueStudyID != null)
-            validateUniqueProId(request, vError6);
-        if (!vError6.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Unique Study Id exist in the System", "UniqueStudyId");
-            errorObjects.add(errorOBject);
-        }
-
         Validator v7 = new Validator(request);
         v7.addValidation("expectedTotalEnrollment", Validator.NO_BLANKS);
         HashMap vError7 = v7.validate();
@@ -828,10 +820,12 @@ import java.util.regex.Pattern;
             siteBean = buildSiteBean(uniqueSiteStudyID, name, principalInvestigator, Integer.valueOf(expectedTotalEnrollment), formattedStartDate,
                     formattedStudyDate, secondaryProId, ownerUserAccount, parentStudy.getId());
             siteBean.setSchemaName(parentStudy.getSchemaName());
+            siteBean.setUuid(uuid);
+            siteBean.setStudyEnvUuid(parentStudy.getStudyEnvUuid());
             StudyBean sBean = createStudy(siteBean, ownerUserAccount);
             // get the schema study
             request.setAttribute("requestSchema", parentStudy.getSchemaName());
-            StudyBean schemaStudy = getStudyByUniqId(uniqueStudyID);
+            StudyBean schemaStudy = getStudyByUniqId(parentStudyID);
             siteBuildService.process(schemaStudy, sBean, ownerUserAccount, userList);
             siteDTO.setSiteOid(sBean.getOid());
             siteDTO.setMessage(validation_passed_message);

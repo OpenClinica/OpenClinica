@@ -13,15 +13,4 @@
             <column name="env_type" type="VARCHAR(32)"/>
         </addColumn>
     </changeSet>
-    <changeSet author="yshridhare" id="2017-04-27-OC-8046-03">
-        <addUniqueConstraint columnNames="oc_oid, env_type"
-                             constraintName="oid_env_type_constraint"
-                             tableName="study"/>
-    </changeSet>
-    <changeSet author="yshridhare" id="2017-04-27-OC-8046-04">
-        <addUniqueConstraint columnNames="unique_identifier, env_type"
-                         constraintName="uid_env_type_constraint"
-                         tableName="study"/>
-
-    </changeSet>
 </databaseChangeLog>

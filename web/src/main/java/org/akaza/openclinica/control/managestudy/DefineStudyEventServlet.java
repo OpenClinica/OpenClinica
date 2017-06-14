@@ -371,7 +371,7 @@ public class DefineStudyEventServlet extends SecureController {
             }
 
             edcBean.setNullValues(nullString);
-            edcBean.setStudyId(ub.getActiveStudyId());
+            edcBean.setStudyId(currentStudy.getId());
             eventDefinitionCRFs.add(edcBean);
         }
 
