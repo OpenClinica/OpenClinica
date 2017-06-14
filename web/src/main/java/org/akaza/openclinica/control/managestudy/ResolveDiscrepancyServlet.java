@@ -170,21 +170,24 @@ public class ResolveDiscrepancyServlet extends SecureController {
             ItemGroupBean igBean = (ItemGroupBean) igdao.findByPK(igmBean.getItemGroupId());
             int repeatOrdinal = idb.getOrdinal();
             ItemDataBean idata = null;
-            if (igmBean.isRepeatingGroup() && repeatOrdinal > 1) {
-                List<ItemGroupMetadataBean> igms = igmdao.findMetaByGroupAndCrfVersion(igBean.getId(), ecb.getCRFVersionId());
 
-                for (int i = 0; i < idb.getOrdinal(); i++) {
-                    for (ItemGroupMetadataBean igm : igms) {
-                        idata = iddao.findByItemIdAndEventCRFIdAndOrdinal(igm.getItemId(), ecb.getId(), i + 1);
-                        if (idata != null && idata.isDeleted()) {
-                            repeatOrdinal--;
-                            break;
+            if (igmBean.isRepeatingGroup() && repeatOrdinal > 1) {
+                if (idb.isDeleted()) {
+                    repeatOrdinal = 0;
+                } else {
+                    List<ItemGroupMetadataBean> igms = igmdao.findMetaByGroupAndCrfVersion(igBean.getId(), ecb.getCRFVersionId());
+
+                    for (int i = 0; i < idb.getOrdinal(); i++) {
+                        for (ItemGroupMetadataBean igm : igms) {
+                            idata = iddao.findByItemIdAndEventCRFIdAndOrdinal(igm.getItemId(), ecb.getId(), i + 1);
+                            if (idata != null && idata.isDeleted()) {
+                                repeatOrdinal--;
+                                break;
+                            }
                         }
                     }
-
                 }
             }
-
             EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
             StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 
