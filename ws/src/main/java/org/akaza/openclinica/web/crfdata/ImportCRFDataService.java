@@ -32,6 +32,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
@@ -56,6 +57,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
@@ -93,6 +95,8 @@ public class ImportCRFDataService {
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
         StudyDAO studyDAO = new StudyDAO(ds);
         StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+        CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+    	FormLayoutDAO fldao= new FormLayoutDAO<>(ds);
 
         UpsertOnBean upsert = odmContainer.getCrfDataPostImportContainer().getUpsertOn();
         // If Upsert bean is not present, create one with default settings
@@ -117,17 +121,15 @@ public class ImportCRFDataService {
 
                 for (FormDataBean formDataBean : formDataBeans) {
 
-                    CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
 
-                    ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
+                    ArrayList<FormLayoutBean> formLayoutBeans = fldao.findAllByOid(formDataBean.getFormOID());                    
                     // StudyEventBean studyEventBean = (StudyEventBean)
                     // studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studyEventDefinitionBean.getId(),
                     // studySubjectBean.getId(),Integer.parseInt(sampleOrdinal));
-                    for (CRFVersionBean crfVersionBean : crfVersionBeans) {
+                        for (FormLayoutBean formLayoutBean : formLayoutBeans) {
 
-                        // iterate the studyeventbeans here
+                        	// iterate the studyeventbeans here
                         // for (StudyEventBean studyEventBean : studyEventBeans) {
-
                         StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
                                 studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
                         // ArrayList<StudyEventBean> studyEventBeans =
@@ -140,7 +142,9 @@ public class ImportCRFDataService {
                                 || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.STOPPED)) {
                             return null;
                         }
-                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
+                        List<CRFVersionBean> crfVersions= (List<CRFVersionBean>) crfVersionDAO.findAllByCRF(formLayoutBean.getCrfId());
+                        CRFVersionBean crfVersionBean= crfVersions.get(0);
                         // what if we have begun with creating a study
                         // event, but haven't entered data yet? this would
                         // have us with a study event, but no corresponding
@@ -163,6 +167,7 @@ public class ImportCRFDataService {
                                 // filler
                                 newEventCrfBean.setStatus(Status.AVAILABLE);
                                 newEventCrfBean.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
+                                newEventCrfBean.setFormLayoutId(formLayoutBean.getId());
                                 // these will be updated later in the
                                 // workflow
                                 newEventCrfBean = (EventCRFBean) eventCrfDAO.create(newEventCrfBean);
@@ -230,12 +235,11 @@ public class ImportCRFDataService {
                         studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
 
                 for (FormDataBean formDataBean : formDataBeans) {
+                    FormLayoutDAO fldao = new FormLayoutDAO(ds);
 
-                    CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
-
-                    ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByOid(formDataBean.getFormOID());
-                    for (CRFVersionBean crfVersionBean : crfVersionBeans) {
-                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                    ArrayList<FormLayoutBean> formLayoutBeans = fldao.findAllByOid(formDataBean.getFormOID());
+                   for (FormLayoutBean formLayoutBean : formLayoutBeans) {
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
                         for (EventCRFBean ecb : eventCrfBeans) {
                             Integer ecbId = new Integer(ecb.getId());
 
