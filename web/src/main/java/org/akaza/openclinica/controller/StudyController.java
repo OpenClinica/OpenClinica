@@ -270,6 +270,20 @@ import java.util.regex.Pattern;
             return getResponseSuccess(byOidEnvType);
         }
 
+
+        // TODO: refactor this post DIA17
+        LinkedHashMap<String,String> role = new LinkedHashMap<>();
+        role.put("roleName","Data Manager");
+        role.put("studyEnvUuid",study.getStudyEnvUuid());
+        ArrayList<LinkedHashMap<String, String>> roles = new ArrayList<>();
+        roles.add(role);
+
+        LinkedHashMap<String, Object> userContextMap = new LinkedHashMap<>();
+        userContextMap.put("roles",roles);
+        // Overwriting the userContextMap attribute
+        request.getSession().setAttribute("userContextMap",userContextMap);
+
+
         StudyInfoObject studyInfoObject = null;
         Study schemaStudy = null;
         try {
