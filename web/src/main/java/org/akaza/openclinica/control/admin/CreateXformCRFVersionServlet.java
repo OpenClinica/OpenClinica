@@ -37,7 +37,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
     Locale locale;
     FileUploadHelper uploadHelper = new FileUploadHelper();
     // public final String FM_BASEURL = "http://fm2.openclinica.info/api/protocol/";
-    public final String FM_BASEURL = "http://fm.openclinica.info/api/protocol/";
+    public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/protocol/";
     // public final String FM_BASEURL = "http://oc.local:8090/api/protocol/";
 
     @Override
