@@ -95,6 +95,9 @@
             <column name="event_crf_id" type="int"/>
             <column name="study_event_id" type="int"/>
             <column name="event_crf_version_id" type="int"/>
+            <column name="instance_id" type="varchar(4000)"/>
+            <column name="details" type="VARCHAR(255)"/>
+            <column name="item_data_repeat_key" type="varchar(4000)"/>
         </createTable>
     </changeSet>
     <changeSet author="kkrumlian" id="235684743487-5-1">
@@ -140,6 +143,7 @@
             <column name="oc_oid" type="VARCHAR(40)">
                 <constraints nullable="false"/>
             </column>
+            <column name="study_id" type="integer"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-9">
@@ -161,6 +165,9 @@
             <column name="oc_oid" type="VARCHAR(40)">
                 <constraints nullable="false"/>
             </column>
+            <column name="xform" type="text"/>
+            <column name="xform_name" type="VARCHAR(255)"/>
+            <column name="url" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
    <changeSet author="pgawade (generated)" id="1235684743487-10">
@@ -202,6 +209,7 @@
             <column name="odm_prior_study_oid" type="VARCHAR(255)"/>
             <column name="odm_prior_metadataversion_oid" type="VARCHAR(255)"/>
             <column defaultValueBoolean="false" name="show_secondary_id" type="BOOLEAN"/>
+            <column name="dataset_item_status_id" type="int"/>
         </createTable>
     </changeSet>        
     <changeSet author="kkrumlian" id="235684743487-10-3">
@@ -351,6 +359,7 @@
             <column name="parent_dn_id" type="int"/>
             <column name="entity_type" type="VARCHAR(30)"/>
             <column name="study_id" type="int"/>
+            <column name="assigned_user_id" type="integer"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-23">
@@ -374,6 +383,8 @@
             <column name="item_data_id" type="int"/>
             <column name="discrepancy_note_id" type="int"/>
             <column name="column_name" type="VARCHAR(255)"/>
+            <column name="activated" defaultValueBoolean="true" type="boolean"/>
+            <column name="study_subject_id" type="INT"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-26">
@@ -418,10 +429,17 @@
             <column name="owner_id" type="int"/>
             <column name="date_created" type="DATE"/>
             <column name="study_subject_id" type="int"/>
+            <column name="sdv_update_id" type="int" defaultValue="0"/>
+            <column name="prev_status" type="int"/>
+            <column name="form_layout_id" type="int"/>
+            <column name="sdv_status" defaultValueBoolean="false" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
             <column name="date_updated" type="DATE"/>
             <column name="update_id" type="int"/>           
-           <column defaultValueBoolean="false" name="electronic_signature_status" type="BOOLEAN"/>           
+            <column defaultValueBoolean="false" name="electronic_signature_status" type="BOOLEAN"/>
         </createTable>
+        <addUniqueConstraint tableName="event_crf" constraintName="duplicate_event_crf_uniqueness_key" columnNames="study_event_id, study_subject_id, form_layout_id"/>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-30">
         <createTable tableName="event_definition_crf">
@@ -442,8 +460,15 @@
             <column name="date_created" type="DATE"/>
             <column name="date_updated" type="DATE"/>
             <column name="update_id" type="int"/>
-            <column name="ordinal" type="int"/>                        
+            <column name="ordinal" type="int"/>
+            <column name="allow_anonymous_submission" defaultValueBoolean="false" type="boolean"/>
+            <column name="submission_url" type="VARCHAR(255)"/>
             <column defaultValueBoolean="false" name="electronic_signature" type="BOOLEAN" defaultValue="0"/>
+            <column name="source_data_verification_code" type="int"/>
+            <column name="selected_version_ids" type="VARCHAR(150)"/>
+            <column name="parent_id" type="int"/>
+            <column name="participant_form" defaultValueBoolean="false" type="boolean"/>
+            <column name="hide_crf" type="BOOLEAN" defaultValueBoolean="false"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-31">
@@ -530,6 +555,9 @@
             <column name="owner_id" type="int"/>
             <column name="update_id" type="int"/>
             <column name="ordinal" type="int"/>
+            <column name="instance_id" type="VARCHAR(255)"/>
+            <column name="deleted" type="boolean" defaultValueBoolean="false"/>
+            <column name="old_status_id" type="int"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-37">
@@ -576,6 +604,8 @@
             <column name="required" type="BOOLEAN"/>
             <column name="default_value" type="VARCHAR(4000)"/>
             <column name="response_layout" type="VARCHAR(255)"/>
+            <column name="show_item" type="boolean" defaultValueBoolean="true"/>
+            <column name="width_decimal" type="VARCHAR(10)"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-39">
@@ -595,6 +625,7 @@
             <column name="oc_oid" type="VARCHAR(40)">
                 <constraints nullable="false"/>
             </column>
+            <column name="layout_group_path" type="VARCHAR(2000)"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-40">
@@ -622,6 +653,10 @@
                 <constraints nullable="false"/>
             </column>
             <column name="borders" type="int"/>
+            <column name="show_group" type="boolean" defaultValueBoolean="true"/>
+            <column name="repeating_group" defaultValueBoolean="true" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-41">
@@ -716,7 +751,7 @@
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-49">
         <createTable tableName="rule">
-            <column autoIncrement="true" name="rule_id" type="int">
+            <column autoIncrement="true" name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="name" type="VARCHAR(255)"/>
@@ -731,11 +766,13 @@
             <column name="date_updated" type="DATE"/>
             <column name="update_id" type="int"/>
             <column name="status_id" type="int"/>
+            <column name="version" type="int" defaultValue="0"/>
+            <column name="study_id" type="int" />
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-50">
         <createTable tableName="rule_action">
-            <column autoIncrement="true" name="rule_action_id" type="int">
+            <column autoIncrement="true" name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="rule_set_rule_id" type="int">
@@ -754,11 +791,15 @@
             <column name="date_updated" type="DATE"/>
             <column name="update_id" type="int"/>
             <column name="status_id" type="int"/>
+            <column name="version" type="int" defaultValue="0"/>
+            <column name="oc_oid_reference" type="varchar(4000)"/>
+            <column name="rule_action_run_id" type="INT"/>
+            <column name="email_subject" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-51">
         <createTable tableName="rule_expression">
-            <column autoIncrement="true" name="rule_expression_id" type="int">
+            <column autoIncrement="true" name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="value" type="VARCHAR(1025)">
@@ -772,11 +813,12 @@
             <column name="date_updated" type="DATE"/>
             <column name="update_id" type="int"/>
             <column name="status_id" type="int"/>
+            <column name="version" type="int" defaultValue="0"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-52">
         <createTable tableName="rule_set">
-            <column autoIncrement="true" name="rule_set_id" type="int">
+            <column autoIncrement="true" name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="rule_expression_id" type="int">
@@ -795,11 +837,16 @@
             <column name="date_updated" type="DATE"/>
             <column name="update_id" type="int"/>
             <column name="status_id" type="int"/>
+            <column name="version" type="int" defaultValue="0"/>
+            <column name="item_id" type="INT"/>
+            <column name="item_group_id" type="INT"/>
+            <column name="run_schedule" defaultValueBoolean="false" type="boolean"/>
+            <column name="run_time"  type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-53">
         <createTable tableName="rule_set_audit">
-            <column autoIncrement="true" name="rule_set_audit_id" type="int">
+            <column autoIncrement="true" name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="rule_set_id" type="int">
@@ -808,11 +855,12 @@
             <column name="date_updated" type="DATE"/>
             <column name="updater_id" type="int"/>
             <column name="status_id" type="int"/>
+            <column name="version" type="int" defaultValue="0"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-54">
         <createTable tableName="rule_set_rule">
-            <column autoIncrement="true" name="rule_set_rule_id" type="int">
+            <column autoIncrement="true" name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="rule_set_id" type="int">
@@ -826,11 +874,12 @@
             <column name="date_updated" type="DATE"/>
             <column name="update_id" type="int"/>
             <column name="status_id" type="int"/>
+            <column name="version" type="int" defaultValue="0"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-55">
         <createTable tableName="rule_set_rule_audit">
-            <column autoIncrement="true" name="rule_set_rule_audit_id" type="int">
+            <column autoIncrement="true" name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="rule_set_rule_id" type="int">
@@ -839,6 +888,7 @@
             <column name="date_updated" type="DATE"/>
             <column name="updater_id" type="int"/>
             <column name="status_id" type="int"/>
+            <column name="version" type="int" defaultValue="0"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-56">
@@ -977,6 +1027,7 @@
             <column name="oc_oid" type="VARCHAR(40)">
                 <constraints nullable="false"/>
             </column>
+            <column name="time_zone"  type="VARCHAR(255)" defaultValue=""/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-66">
@@ -1037,6 +1088,8 @@
         <createTable tableName="versioning_map">
             <column name="crf_version_id" type="int"/>
             <column name="item_id" type="int"/>
+            <column name="form_layout_id" type="int"/>
+            <column name="item_order_in_form" type="int"/>
         </createTable>
     </changeSet>  
 <!-- Unique key constraints -->
@@ -1299,9 +1352,6 @@
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-146">
                 <addForeignKeyConstraint baseColumnNames="crf_id" baseTableName="event_definition_crf" constraintName="fk_study_inst_reference" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="crf_id" referencedTableName="crf" />
-            </changeSet>
-            <changeSet author="pgawade (generated)" id="1236014212860-147">
-                <addForeignKeyConstraint baseColumnNames="default_version_id" baseTableName="event_definition_crf" constraintName="fk_versioning_study_inst" deferrable="false" initiallyDeferred="false" onDelete="SET NULL" onUpdate="RESTRICT" referencedColumnNames="crf_version_id" referencedTableName="crf_version" />
             </changeSet>
             <changeSet author="pgawade (generated)" id="1236014212860-148">
                 <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="event_definition_crf" constraintName="fk_event_de_study_crf_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />

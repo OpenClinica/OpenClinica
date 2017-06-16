@@ -9,9 +9,7 @@
         </insert>
     </changeSet>
     <changeSet author="ahamid" id="2010-12-22-6573-2">
-         <preConditions onFail="MARK_RAN">
-         <dbms type="postgresql" />
-     </preConditions> 
+
      <sql splitStatements="false">
         CREATE OR REPLACE FUNCTION study_event_trigger() RETURNS "trigger"
             AS 'DECLARE

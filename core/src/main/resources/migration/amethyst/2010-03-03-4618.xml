@@ -12,6 +12,8 @@
             <column name="show_item" type="boolean" defaultValueBoolean="true"/>
             <column name="event_crf_id" type="int"/>
             <column name="version" type="int"/>
+            <column name="item_data_id" type="int"/>
+            <column name="passed_dde" type="int" defaultValue="0"/>
         </createTable>
 	</changeSet>
 	<changeSet author="thickerson" id="2010-03-03-4618-2">

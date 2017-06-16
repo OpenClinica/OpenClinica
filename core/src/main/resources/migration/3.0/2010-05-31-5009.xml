@@ -2,12 +2,7 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-	<changeSet author="ahamid" id="2010-05-31-5009-1" dbms="postgresql">
-		<comment>study (old_status)</comment>
-		<addColumn tableName="study">
-			<column name="old_status_id" type="int" defaultValueNumeric="1"/>
-		</addColumn>
-	</changeSet>
+
     <changeSet author="ahamid" id="2010-05-31-5009-3">
         <addForeignKeyConstraint constraintName="fk_old_status_id"
                                  referencedTableName="status" referencedTableSchemaName="public"
@@ -15,9 +10,5 @@
                                  baseTableName="study"
                                  referencedColumnNames="status_id"/>
     </changeSet>
-    <changeSet author="ahamid" id="2010-05-31-5009-4">
-        <sql>
-            update study set old_status_id=status_id;
-        </sql>
-    </changeSet>
+
 </databaseChangeLog>

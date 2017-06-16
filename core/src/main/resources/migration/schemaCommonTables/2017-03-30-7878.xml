@@ -65,6 +65,11 @@
             <column name="oc_oid" type="VARCHAR(40)">
                 <constraints nullable="false"/>
             </column>
+            <column name="old_status_id" type="int" defaultValueNumeric="1"/>
+            <column name="study_env_uuid" type="VARCHAR(64)"/>
+            <column name="uuid" type="VARCHAR(64)"/>
+            <column name="env_type" type="VARCHAR(32)"/>
+            <column name="schema_name" type="VARCHAR(64)"/>
         </createTable>
     </changeSet>
 </databaseChangeLog>

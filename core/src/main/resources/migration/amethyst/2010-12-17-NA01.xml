@@ -2,9 +2,7 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
     <changeSet author="kkrumlian" id="2010-12-17-NA01-1">
-         <preConditions onFail="MARK_RAN">
-         <dbms type="postgresql" />
-     </preConditions> 
+
      <sql splitStatements="false">
         CREATE OR REPLACE FUNCTION study_event_trigger() RETURNS "trigger"
             AS 'DECLARE
@@ -75,9 +73,7 @@
     </changeSet>
     
     <changeSet author="pgawade (generated)" id="2010-12-17-NA01-3" runOnChange="true">
-        <preConditions onFail="MARK_RAN">
-        <dbms type="postgresql" />
-    </preConditions>
+
          <sql splitStatements="false">
             CREATE OR REPLACE FUNCTION item_data_trigger() RETURNS "trigger"
             AS 'DECLARE

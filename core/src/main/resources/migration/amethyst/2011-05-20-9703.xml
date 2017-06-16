@@ -4,9 +4,7 @@
   
     
     <changeSet author="pgawade (generated)" id="2010-12-17-NA01-3" runOnChange="true">
-        <preConditions onFail="MARK_RAN">
-        <dbms type="postgresql" />
-    </preConditions>
+
          <sql splitStatements="false">
             CREATE OR REPLACE FUNCTION item_data_trigger() RETURNS "trigger"
             AS 'DECLARE

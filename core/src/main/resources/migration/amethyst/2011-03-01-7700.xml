@@ -3,13 +3,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
 
-    <changeSet author="ahamid" id="2011-03-01-7700-1">
-        <comment>update event_crf add sdv_update_id column</comment>
-        <addColumn tableName="event_crf">
-            <column name="sdv_update_id" type="int" defaultValue="0"/>
-        </addColumn>
-    </changeSet>
-
     <changeSet author="ahamid" id="2011-03-01-7700-2" dbms="postgresql">
 	    <comment>create or replace event_crf_trigger for event crf sdv status</comment>
     	<sql splitStatements="false">

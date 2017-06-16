@@ -2,74 +2,8 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    <changeSet author="yshridhare" id="2016-06-28-7285-1">
-        <comment>Drop table oc_qrtz_job_listeners</comment>
-        <dropTable tableName="oc_qrtz_job_listeners" />
-    </changeSet>
-    <changeSet author="yshridhare" id="2016-06-28-7285-2">
-        <comment>Drop table oc_qrtz_trigger_listeners</comment>
-        <dropTable tableName="oc_qrtz_trigger_listeners" />
-    </changeSet>
-    <changeSet author="yshridhare" id="2016-06-28-7285-3">
-        <comment>Drop columns that are no longer used</comment>
-        <dropColumn tableName="oc_qrtz_job_details" columnName="is_volatile"/>
-        <dropColumn tableName="oc_qrtz_triggers" columnName="is_volatile"/>
-        <dropColumn tableName="oc_qrtz_fired_triggers" columnName="is_volatile"/>
-    </changeSet>
-    <changeSet author="yshridhare" id="2016-06-28-7285-4">
-        <comment>Add new columns that replace the 'is_stateful' column</comment>
-        <addColumn tableName="oc_qrtz_job_details">
-            <column name="is_nonconcurrent" type="BOOLEAN" ></column>
-        </addColumn>
-        <sql>update oc_qrtz_job_details set is_nonconcurrent = is_stateful</sql>
-        <addColumn tableName="oc_qrtz_job_details">
-            <column name="is_update_data" type="BOOLEAN"></column>
-        </addColumn>
-        <sql>update oc_qrtz_job_details set is_update_data = is_stateful</sql>
-        <dropColumn tableName="oc_qrtz_job_details" columnName="is_stateful"/>
-
-        <addColumn tableName="oc_qrtz_fired_triggers">
-            <column name="is_nonconcurrent" type="BOOLEAN" ></column>
-        </addColumn>
-        <sql>update oc_qrtz_fired_triggers set is_nonconcurrent = is_stateful</sql>
-        <addColumn tableName="oc_qrtz_fired_triggers">
-            <column name="is_update_data" type="BOOLEAN"></column>
-        </addColumn>
-        <sql>update oc_qrtz_fired_triggers set is_update_data = is_stateful</sql>
-        <dropColumn tableName="oc_qrtz_fired_triggers" columnName="is_stateful"/>
-    </changeSet>
     <changeSet author="yshridhare" id="2016-06-28-7285-5">
         <comment>Add new 'sched_name' column to all tables</comment>
-        <addColumn tableName="oc_qrtz_blob_triggers">
-            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
-        </addColumn>
-        <addColumn tableName="oc_qrtz_calendars">
-            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
-        </addColumn>
-        <addColumn tableName="oc_qrtz_cron_triggers">
-            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
-        </addColumn>
-        <addColumn tableName="oc_qrtz_fired_triggers">
-            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
-        </addColumn>
-        <addColumn tableName="oc_qrtz_job_details">
-            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
-        </addColumn>
-        <addColumn tableName="oc_qrtz_locks">
-            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
-        </addColumn>
-        <addColumn tableName="oc_qrtz_paused_trigger_grps">
-            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
-        </addColumn>
-        <addColumn tableName="oc_qrtz_scheduler_state">
-            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
-        </addColumn>
-        <addColumn tableName="oc_qrtz_simple_triggers">
-            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
-        </addColumn>
-        <addColumn tableName="oc_qrtz_triggers">
-            <column name="sched_name" type="VARCHAR(120)" defaultValue="TestScheduler"></column>
-        </addColumn>
         <addNotNullConstraint tableName="oc_qrtz_blob_triggers" columnName="sched_name"/>
         <addNotNullConstraint tableName="oc_qrtz_calendars" columnName="sched_name"/>
         <addNotNullConstraint tableName="oc_qrtz_cron_triggers" columnName="sched_name"/>
@@ -252,11 +186,5 @@
             <column name="SCHED_NAME"></column>
             <column name="TRIGGER_GROUP"></column>
         </createIndex>
-    </changeSet>
-    <changeSet id="2016-06-28-7285-10" author="kkrumlian">
-        <addColumn tableName="OC_QRTZ_FIRED_TRIGGERS">
-            <column name="SCHED_TIME" type="BIGINT"></column>
-        </addColumn>
-        <addNotNullConstraint tableName="OC_QRTZ_FIRED_TRIGGERS" columnName="SCHED_TIME"/>
     </changeSet>
 </databaseChangeLog>

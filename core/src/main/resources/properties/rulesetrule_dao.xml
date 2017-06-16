@@ -17,7 +17,7 @@
     </query>
 	<query>
 		<name>getCurrentPK</name>
-		<sql> select currval('rule_set_rule_rule_set_rule_id_seq') as key</sql>
+		<sql> select currval('rule_set_rule_id_seq') as key</sql>
 	</query>
 	<query>
 		<name>findAll</name>

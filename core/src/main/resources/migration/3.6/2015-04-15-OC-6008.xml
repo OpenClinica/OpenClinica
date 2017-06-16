@@ -3,16 +3,6 @@
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     
-    <changeSet author="jkeremian" id="2015-4-15-6008-1">
-        <comment>Add Column item_data_repeat_key in audit_log_event table</comment>
-        <addColumn tableName="audit_log_event">
-            <column name="item_data_repeat_key" type="varchar(4000)"/>
-            
-        </addColumn>
-    </changeSet>
-    
-    
-    
      <changeSet author="jkeremian" id="2015-4-15-6008-2" runOnChange="true">
     	<preConditions onFail="MARK_RAN">
 	 	<dbms type="postgresql" />

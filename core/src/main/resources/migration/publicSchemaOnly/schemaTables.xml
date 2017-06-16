@@ -164,9 +164,7 @@
         </insert>
     </changeSet>
     <changeSet author="kkrumlian" id="2017-03-15-7878-7">
-        <preConditions onFail="MARK_RAN">
-            <dbms type="postgresql"/>
-        </preConditions>
+
         <sql splitStatements="false">
             SELECT nextval('user_account_user_id_seq')
         </sql>

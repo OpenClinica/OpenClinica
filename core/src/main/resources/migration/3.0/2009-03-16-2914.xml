@@ -30,11 +30,6 @@
 		<column name="description" value="Completed and Non-Completed Items"/>
 	    </insert>
 	</changeSet>
-    <changeSet author="ywang" id="2009-03-16-2914-5">
-    	<addColumn tableName="dataset">
-    		<column name="dataset_item_status_id" type="int"/>
-    	</addColumn>
-    </changeSet>
     <changeSet author="ywang" id="2009-03-16-2914-6">
     	<addForeignKeyConstraint baseColumnNames="dataset_item_status_id" baseTableName="dataset" constraintName="dataset_fk_dataset_item_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="dataset_item_status_id" referencedTableName="dataset_item_status"/>
     </changeSet>

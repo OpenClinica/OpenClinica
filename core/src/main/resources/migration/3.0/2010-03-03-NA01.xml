@@ -2,12 +2,6 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
     xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
     xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-	<changeSet author="kkrumlian" id="2010-03-03-NA01-1">
-		<comment>Add Study Subject Id column to </comment>
-		<addColumn tableName="dn_item_data_map">
-		  <column name="study_subject_id" type="INT"/>
-		</addColumn>
-	</changeSet>
 	<changeSet author="kkrumlian" id="2010-03-03-NA01-2">
         <comment>Update Study Subject Id column </comment>
         <sql splitStatements="true">
@@ -19,9 +13,7 @@
         </sql>
     </changeSet>
     <changeSet author="kkrumlian" id="2010-03-03-NA01-3">
-        <preConditions onFail="MARK_RAN">
-            <dbms type="postgresql" />
-        </preConditions>
+
         <sql splitStatements="false">
                     CREATE OR REPLACE FUNCTION populate_ssid_in_didm_trigger() RETURNS "trigger"
             AS '
@@ -38,9 +30,7 @@
         </sql>
     </changeSet>
     <changeSet author="kkrumlian" id="2010-03-03-NA01-4">
-        <preConditions onFail="MARK_RAN">
-            <dbms type="postgresql" />
-        </preConditions>
+
         <sql splitStatements="false">
             CREATE TRIGGER didm_update
             AFTER INSERT ON dn_item_data_map

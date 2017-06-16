@@ -30,9 +30,7 @@
     	</sql>
     </changeSet>
     <changeSet author="sshamim" id="2009-03-03-4768-2">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
-	</preConditions>
+
     	 <sql splitStatements="false">
     	 	CREATE TRIGGER event_definition_crf_update
 		    AFTER UPDATE ON event_definition_crf

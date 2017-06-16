@@ -4,14 +4,11 @@
 	<include file="migration/amethyst/changeLogCreateFunctions.xml"/>
     <include file="migration/amethyst/2010-01-13-4575.xml"/>
     <include file="migration/amethyst/2011-03-01-4575.xml"/>
-    <include file="migration/amethyst/2010-02-03-4593.xml"/>
     <include file="migration/amethyst/2010-03-03-4618.xml"/>
-    <include file="migration/amethyst/2010-03-30-4618.xml"/>
     <include file="migration/amethyst/2010-05-27-5095.xml"/>
     <include file="migration/amethyst/2010-07-01-5245.xml"/>
     <include file="migration/amethyst/2011-05-28-9305.xml"/>
     <include file="migration/amethyst/2010-07-07-5429.xml"/>
-    <include file="migration/amethyst/2010-07-14-5265.xml"/>
     <include file="migration/amethyst/2010-08-24-5724.xml"/>
     <include file="migration/amethyst/2010-08-26-5724.xml"/>
     <include file="migration/amethyst/2010-08-26-5732.xml"/>
