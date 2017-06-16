@@ -247,7 +247,7 @@ public class ItemProcessor implements Processor, Ordered {
         for (ItemData itemData: itemDataList) {
             if (itemData.getItem().getItemId() == itemId && 
                     itemData.getEventCrf().getEventCrfId() == eventCrfId && 
-                    itemData.getOrdinal() == itemOrdinal) return itemData;
+                    itemData.getOrdinal() == itemOrdinal.intValue()) return itemData;
         }
         return null;
     }
