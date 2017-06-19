@@ -10,20 +10,6 @@
 	</insert>
     </changeSet>
 	
-	<changeSet author="htaycher " id="2011-11-16-11950-3">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
-		<!--fixing restore study event trigger-->
-	</preConditions>     	 
-    	 <sql splitStatements="false">
-  
-    	DROP TRIGGER  IF EXISTS  STUDY_EVENT_INSERT_UPDATE ON study_event; 
-    </sql>
-    </changeSet>
-			
-	
-	
-	
 <changeSet author="htaycher " id="2011-11-16-11950-4" runOnChange="true">
     	<preConditions onFail="MARK_RAN">
 	 	<dbms type="postgresql" />

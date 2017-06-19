@@ -16,17 +16,4 @@
 			<column name="version" type="int"/>
 		</createTable>
 	</changeSet>
-	<changeSet author="ywang" id="2009-05-15-3624-3"  runOnChange="true" dbms="postgresql">
-		<comment>mapping item.units to measurement_unit.name and oc_oid</comment>
-		<sql splitStatements="false">
-             INSERT INTO measurement_unit (name, oc_oid)
-             select  DISTINCT on (upper(units)) (upper(units)),
-             (case when length(units)>37 then 'MU_'||substring(upper(regexp_replace((substr(units, 0, 31) ||item_id), E'\\s+', '_','g')),0,36)
-             else 'MU_'||substring(upper(regexp_replace(units, E'\\s+', '_','g')),0,36) end)
-             from item where length(units) >0 and not exists (select name from measurement_unit where upper(name) = upper(item.units));
-    	</sql>
-		<rollback>
-			delete from measurement_unit;
-		</rollback>
-	</changeSet>
 </databaseChangeLog>

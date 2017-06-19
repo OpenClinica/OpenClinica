@@ -53,6 +53,7 @@
 			pk_event_definition_crf_item_tag PRIMARY KEY (id)
 			)
 		</sql>
+		<addUniqueConstraint tableName="event_definition_crf_item_tag" columnNames="path, tag_id" constraintName="duplicate_itempath_tag_uniqueness_key"/>
 	</changeSet>
 
 
@@ -77,6 +78,7 @@
 			)
 
 		</sql>
+		<addUniqueConstraint tableName="event_definition_crf_tag" columnNames="path, tag_id" constraintName="duplicate_crfpath_tag_uniqueness_key"/>
 	</changeSet>
 
 	<changeSet author="jkeremian" id="2016-02-05-OC-6963-04">

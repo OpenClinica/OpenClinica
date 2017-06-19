@@ -15,14 +15,4 @@
             <column name="overridable" valueBoolean="false"/>
         </insert>
     </changeSet>
-    <changeSet author="ahamid" id="2010-08-26-5237-2">
-        <comment>Change study_parameter values</comment>
-        <sql>Update study_parameter_value set value = 'yes' where
-            parameter in('interviewerNameRequired', 'interviewDateRequired') and value = 'true'</sql>
-    </changeSet>
-    <changeSet author="ahamid" id="2010-08-26-5237-3">
-        <comment>Change study_parameter values</comment>
-        <sql>Update study_parameter_value set value = 'no' where
-            parameter in('interviewerNameRequired', 'interviewDateRequired') and value = 'false'</sql>
-    </changeSet>
 </databaseChangeLog>

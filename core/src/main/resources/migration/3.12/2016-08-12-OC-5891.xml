@@ -2,35 +2,6 @@
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
 	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-
-	<changeSet author="jkeremian" id="2016-08-12-OC-5891-01" dbms="postgresql" runOnChange="true">
-		<comment>Before Changing data type of description field in discrepancy_note, we need to drop all Views</comment>
-		<sql> DROP VIEW IF EXISTS dn_age_days;
-			DROP VIEW IF EXISTS	view_site_hidden_event_definition_crf;
-			DROP VIEW IF EXISTS	view_study_hidden_event_definition_crf;
-			DROP VIEW IF EXISTS	view_discrepancy_note;
-			DROP VIEW IF EXISTS view_dn_item_data;
-			DROP VIEW IF EXISTS	view_dn_event_crf;
-			DROP VIEW IF EXISTS view_dn_study_event;
-			DROP VIEW IF EXISTS	view_dn_study_subject;
-			DROP VIEW IF EXISTS view_dn_subject;
-			DROP VIEW IF EXISTS	view_dn_stats;
-		</sql>
-		<rollback>
-			<sql></sql>
-		</rollback>
-	</changeSet>
-	
-	<changeSet author="jkeremian" id="2016-08-12-OC-5891-02" dbms="postgresql">
-		<comment>Change character width for Description column of Discrepancy Note Table</comment>
-		<sql>
-        ALTER TABLE discrepancy_note ALTER COLUMN description TYPE varchar(2040);
- </sql>
-		<rollback>
-			<sql></sql>
-		</rollback>
-	</changeSet>
-
 	
 	<changeSet author="jkeremian" id="2016-08-12-OC-5891-03" dbms="postgresql" runOnChange="true">
 		<comment>Create All Reviews back by updating date data types</comment>

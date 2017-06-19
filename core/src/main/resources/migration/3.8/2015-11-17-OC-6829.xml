@@ -89,4 +89,16 @@
 
     	 </sql>
     </changeSet>
+	<changeSet author="pgawade (generated)" id="1235684743487-365">
+		<preConditions onFail="MARK_RAN">
+			<dbms type="postgresql"/>
+			<!--<runningAs username="clinica" />-->
+		</preConditions>
+		<sql splitStatements="false">
+			CREATE TRIGGER event_crf_update
+			AFTER UPDATE ON event_crf
+			FOR EACH ROW
+			EXECUTE PROCEDURE event_crf_trigger();
+		</sql>
+	</changeSet>
 </databaseChangeLog>

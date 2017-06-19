@@ -3,7 +3,6 @@
        <include file="migration/3.2/2013-07-31-OC-1403.xml"/> 
         <include file="migration/3.2/2013-10-21-OC-3399.xml"/> 
 	    <include file="migration/3.2/2014-01-03-OC-3442.xml"/>
-        <include file="migration/3.2/2014-01-15-OC-1276.xml"/>
         <include file="migration/3.2/2014-01-30-OC-4168.xml"/>
 
 </databaseChangeLog>

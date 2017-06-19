@@ -7,84 +7,9 @@
          http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
 
 <!-- Postgres database specific functions -->
-    <changeSet author="pgawade (generated)" id="1235684743487-358">
-    	<preConditions onFail="MARK_RAN">
-		<dbms type="postgresql" />
-		<!--<runningAs username="clinica" />-->
-	</preConditions>
-    	<sql splitStatements="false">
-    	            SET search_path = ${database.defaultSchemaName};
-    	
-    		CREATE OR REPLACE FUNCTION event_crf_trigger() RETURNS "trigger"
-		    AS 'DECLARE
-			pk INTEGER;
-			entity_name_value TEXT;
-		BEGIN
-			IF (TG_OP = ''UPDATE'') THEN
-				IF(OLD.status_id <![CDATA[<>]]> NEW.status_id) THEN
-				/*---------------*/
-				/*Event CRF status changed*/
-				SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
-				SELECT INTO entity_name_value ''Status'';
-				IF(OLD.status_id = ''1'' AND NEW.status_id = ''2'') THEN
-				    IF (NEW.electronic_signature_status) THEN
-		                INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
-		                    VALUES (pk, ''14'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
-		            ELSE                    
-		                INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
-		                    VALUES (pk, ''8'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
-		            END IF;                    
-				ELSIF (OLD.status_id = ''1'' AND NEW.status_id = ''4'') THEN
-				    IF (NEW.electronic_signature_status) THEN
-		                INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
-		                    VALUES (pk, ''15'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
-		            ELSE
-		                INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
-		                    VALUES (pk, ''10'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
-		            END IF;
-				ELSIF (OLD.status_id = ''4'' AND NEW.status_id = ''2'') THEN
-		    		IF (NEW.electronic_signature_status) THEN
-		                INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
-		                    VALUES (pk, ''16'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
-				    ELSE
-		                INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
-		                    VALUES (pk, ''11'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.status_id, NEW.status_id, NEW.event_crf_id);
-				    END IF;
-				END IF;
-				/*---------------*/
-				END IF;
-		
-				IF(OLD.date_interviewed <![CDATA[<>]]> NEW.date_interviewed) THEN
-				/*---------------*/
-				/*Event CRF date interviewed*/
-				SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
-				SELECT INTO entity_name_value ''Date interviewed'';
-				INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
-					VALUES (pk, ''9'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.date_interviewed, NEW.date_interviewed, NEW.event_crf_id);
-				/*---------------*/
-				END IF;
-		
-				IF((OLD.interviewer_name <![CDATA[<>]]> NEW.interviewer_name) AND (OLD.interviewer_name <![CDATA[<>]]> '''')) THEN		
-				/*---------------*/
-				/*Event CRF interviewer name*/
-				SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
-				SELECT INTO entity_name_value ''Interviewer Name'';
-				INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
-					VALUES (pk, ''9'', now(), NEW.update_id, ''event_crf'', NEW.event_crf_id, entity_name_value, OLD.interviewer_name, NEW.interviewer_name, NEW.event_crf_id);
-				/*---------------*/
-				END IF;
-			RETURN NULL;  /*return values ignored for ''after'' triggers*/
-			END IF;
-		END;
-		'
-		    LANGUAGE plpgsql;
-    	</sql>
-    </changeSet>
+
     <changeSet author="pgawade (generated)" id="1235684743487-359">
-    	<preConditions onFail="MARK_RAN">
-    		<dbms type="postgresql" />
-    		<!--<runningAs username="clinica" />-->
-	</preConditions>
+
     	<sql splitStatements="false">
     		CREATE OR REPLACE FUNCTION global_subject_trigger() RETURNS "trigger"
 		    AS 'DECLARE
@@ -147,64 +72,9 @@
 		    LANGUAGE plpgsql;
     	</sql>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-360" runOnChange="true">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
-		<!--<runningAs username="clinica" />-->
-	</preConditions>
-    	 <sql splitStatements="false">
-    	 	CREATE OR REPLACE FUNCTION item_data_trigger() RETURNS "trigger"
-		    AS 'DECLARE
-			pk INTEGER;
-			entity_name_value TEXT;
-			std_evnt_id INTEGER;
-			form_layout_id INTEGER;
-		BEGIN
-			IF (TG_OP = ''DELETE'') THEN
-				/*---------------*/
-				 /*Item data deleted (by deleting an event crf)*/
-				SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
-				SELECT INTO entity_name_value item.name FROM item WHERE item.item_id = OLD.item_id;
-		        SELECT INTO std_evnt_id ec.study_event_id FROM event_crf ec WHERE ec.event_crf_id = OLD.event_crf_id;
-		        SELECT INTO form_layout_id ec.form_layout_id FROM event_crf ec WHERE ec.event_crf_id = OLD.event_crf_id;
-		        INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, event_crf_id, study_event_id, event_crf_version_id)
-		                VALUES (pk, ''13'', now(), OLD.update_id, ''item_data'', OLD.item_data_id, entity_name_value, OLD.value, OLD.event_crf_id, std_evnt_id, form_layout_id);
-				RETURN NULL; --return values ignored for ''after'' triggers
-			ELSIF (TG_OP = ''UPDATE'') THEN
-				IF(OLD.status_id <![CDATA[<>]]> NEW.status_id) THEN
-				 /*---------------*/
-				 /*Item data status changed (by removing an event crf)*/
-				SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
-				SELECT INTO entity_name_value item.name FROM item WHERE item.item_id = NEW.item_id;
-			
-				/*---------------*/
-				END IF;
-		
-				IF(OLD.value <![CDATA[<>]]> NEW.value) THEN
-				/*---------------*/
-				 /*Item data updated*/
-				SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
-				SELECT INTO entity_name_value item.name FROM item WHERE item.item_id = NEW.item_id;
-				INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value, event_crf_id)
-					VALUES (pk, ''1'', now(), NEW.update_id, ''item_data'', NEW.item_data_id, entity_name_value, OLD.value, NEW.value, NEW.event_crf_id);
-				/*---------------*/
-				END IF;
-				RETURN NULL;  /*return values ignored for ''after'' triggers*/
-			END IF;
-		RETURN NULL;  /*return values ignored for ''after'' triggers*/
-		END;
-		'
-		    LANGUAGE plpgsql;
-    	 </sql>
-    </changeSet>
-    
-    
     
     <changeSet author="pgawade (generated)" id="1235684743487-361">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
-		<!--<runningAs username="clinica" />-->
-	</preConditions>    
+
 	 <sql splitStatements="false">
 	 	CREATE OR REPLACE FUNCTION study_subject_trigger() RETURNS "trigger"
 		    AS 'DECLARE
@@ -283,10 +153,8 @@
 	 </sql>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-362" runOnChange="true">
-    	 <preConditions onFail="MARK_RAN">
-	 	 <dbms type="postgresql" />
-		 <!--<runningAs username="clinica" />-->
-	 </preConditions> 
+
+
 	 <sql splitStatements="false">
 	 	CREATE OR REPLACE FUNCTION study_event_trigger() RETURNS "trigger"
 		    AS 'DECLARE
@@ -356,10 +224,8 @@
 	 </sql>
     </changeSet>    
     <changeSet author="pgawade (generated)" id="1235684743487-363">
-    	 <preConditions onFail="MARK_RAN">
-	 	 <dbms type="postgresql" />
-		 <!--<runningAs username="clinica" />-->
-	 </preConditions> 	 
+
+
 	 <sql splitStatements="false">
 	 	/*group assignment trigger*/
 		CREATE OR REPLACE FUNCTION subject_group_assignment_trigger() RETURNS "trigger"
@@ -391,10 +257,8 @@
 	 </sql>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-364">
-	 <preConditions onFail="MARK_RAN">
-		 <dbms type="postgresql" />
-		 <!--<runningAs username="clinica" />-->
-	 </preConditions> 
+
+
     	 <sql splitStatements="false">
     	 	CREATE OR REPLACE FUNCTION repeating_item_data_trigger()
 		  RETURNS "trigger" AS
@@ -437,23 +301,9 @@
     
     
     
-    <changeSet author="pgawade (generated)" id="1235684743487-365">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql"/>
-		<!--<runningAs username="clinica" />-->
-	</preConditions>     	 
-    	 <sql splitStatements="false">
-    	 	CREATE TRIGGER event_crf_update
-		    AFTER UPDATE ON event_crf
-		    FOR EACH ROW
-		    EXECUTE PROCEDURE event_crf_trigger();
-    	 </sql>
-    </changeSet>
+
     <changeSet author="pgawade (generated)" id="1235684743487-366">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
-		<!--<runningAs username="clinica" />-->
-	</preConditions>     
+
 	 <sql splitStatements="false">
 	 	CREATE TRIGGER global_subject_insert_update
 		    AFTER INSERT OR UPDATE ON subject
@@ -461,23 +311,9 @@
 		    EXECUTE PROCEDURE global_subject_trigger();
 	 </sql>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-367">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
-		<!--<runningAs username="clinica" />-->
-	</preConditions>     
-	 <sql splitStatements="false">
-	 	CREATE TRIGGER item_data_update
-		    AFTER DELETE OR UPDATE ON item_data
-		    FOR EACH ROW
-		    EXECUTE PROCEDURE item_data_trigger();
-	 </sql>
-    </changeSet>
+
     <changeSet author="pgawade (generated)" id="1235684743487-368">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
-		<!--<runningAs username="clinica" />-->
-	</preConditions>     
+
 	 <sql splitStatements="false">
 	 	CREATE TRIGGER study_subject_insert_updare
 		    AFTER INSERT OR UPDATE ON study_subject
@@ -485,23 +321,8 @@
 		    EXECUTE PROCEDURE study_subject_trigger();
 	 </sql>
     </changeSet>
-    <changeSet author="pgawade (generated)" id="1235684743487-369">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
-		<!--<runningAs username="clinica" />-->
-	</preConditions>     
-	 <sql splitStatements="false">
-	 	CREATE TRIGGER study_event_insert_update
-		    AFTER INSERT OR UPDATE ON study_event
-		    FOR EACH ROW
-		    EXECUTE PROCEDURE study_event_trigger();
-	 </sql>
-    </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-370">
-    	<preConditions onFail="MARK_RAN">
-	 	<dbms type="postgresql" />
-		<!--<runningAs username="clinica" />-->
-	</preConditions>     
+
 	 <sql splitStatements="false">
 	 	CREATE TRIGGER subject_group_map_insert_update
 		    AFTER INSERT OR UPDATE ON subject_group_map
@@ -510,10 +331,7 @@
 	 </sql>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-371">
-    	 <preConditions onFail="MARK_RAN">
-	 	 <dbms type="postgresql" />
-		 <!--<runningAs username="clinica" />-->
-	 </preConditions>     
+
 	 <sql splitStatements="false">
 	 	CREATE TRIGGER repeating_data_insert
 		  AFTER INSERT

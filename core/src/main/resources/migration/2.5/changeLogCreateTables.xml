@@ -179,7 +179,7 @@
             <column name="status_id" type="int"/>
             <column name="name" type="VARCHAR(255)"/>
             <column name="description" type="VARCHAR(2000)"/>
-            <column name="sql_statement" type="CLOB"/>
+            <column name="sql_statement" type="text"/>
             <column name="num_runs" type="int"/>
             <column name="date_start" type="DATE"/>
             <column name="date_end" type="DATE"/>
@@ -350,11 +350,11 @@
             <column autoIncrement="true" name="discrepancy_note_id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="description" type="VARCHAR(255)"/>
+            <column name="description" type="VARCHAR(2040)"/>
             <column name="discrepancy_note_type_id" type="int"/>
             <column name="resolution_status_id" type="int"/>
             <column name="detailed_notes" type="VARCHAR(1000)"/>
-            <column name="date_created" type="DATE"/>
+            <column name="date_created" type="timestamp with time zone"/>
             <column name="owner_id" type="int"/>
             <column name="parent_dn_id" type="int"/>
             <column name="entity_type" type="VARCHAR(30)"/>
@@ -427,15 +427,15 @@
             <column name="validator_annotations" type="VARCHAR(4000)"/>
             <column name="validate_string" type="VARCHAR(256)"/>
             <column name="owner_id" type="int"/>
-            <column name="date_created" type="DATE"/>
+            <column name="date_created" type="timestamp with time zone"/>
             <column name="study_subject_id" type="int"/>
             <column name="sdv_update_id" type="int" defaultValue="0"/>
-            <column name="prev_status" type="int"/>
+            <column name="old_status_id" type="int" defaultValue="1"/>
             <column name="form_layout_id" type="int"/>
             <column name="sdv_status" defaultValueBoolean="false" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="date_updated" type="DATE"/>
+            <column name="date_updated" type="timestamp with time zone"/>
             <column name="update_id" type="int"/>           
             <column defaultValueBoolean="false" name="electronic_signature_status" type="BOOLEAN"/>
         </createTable>
@@ -679,15 +679,6 @@
             <column name="reference" type="VARCHAR(1000)"/>
         </createTable>
     </changeSet>
-	<changeSet author="pgawade (generated)" id="1235684743487-43">
-        <createTable tableName="openclinica_version">
-            <column name="name" type="VARCHAR(255)"/>
-            <column name="test_path" type="VARCHAR(1000)"/>
-        </createTable>
-    </changeSet>
-	<changeSet author="pgawade (generated)" id="1235684743487-43-1">
-		<dropTable tableName="openclinica_version" />
-    </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-43-2">
         <createTable tableName="openclinica_version">
         	<column autoIncrement="true" name="id" type="int">
@@ -784,7 +775,7 @@
             <column name="expression_evaluates_to" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="message" type="VARCHAR(255)"/>
+            <column name="message" type="VARCHAR(2040)"/>
             <column name="email_to" type="VARCHAR(255)"/>
             <column name="owner_id" type="int"/>
             <column name="date_created" type="DATE"/>
@@ -794,7 +785,7 @@
             <column name="version" type="int" defaultValue="0"/>
             <column name="oc_oid_reference" type="varchar(4000)"/>
             <column name="rule_action_run_id" type="INT"/>
-            <column name="email_subject" type="VARCHAR(255)"/>
+            <column name="email_subject" type="VARCHAR(1020)"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-51">
@@ -802,7 +793,7 @@
             <column autoIncrement="true" name="id" type="int">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
-            <column name="value" type="VARCHAR(1025)">
+            <column name="value" type="VARCHAR(2040)">
                 <constraints nullable="false"/>
             </column>
             <column name="context" type="int">
@@ -824,9 +815,7 @@
             <column name="rule_expression_id" type="int">
                 <constraints nullable="false"/>
             </column>
-            <column name="study_event_definition_id" type="int">
-                <constraints nullable="false"/>
-            </column>
+            <column name="study_event_definition_id" type="int"/>
             <column name="crf_id" type="int"/>
             <column name="crf_version_id" type="int"/>
             <column name="study_id" type="int">
@@ -930,13 +919,14 @@
             <column name="date_end" type="timestamp"/>
             <column name="owner_id" type="int"/>
             <column name="status_id" type="int"/>
-            <column name="date_created" type="DATE"/>
-            <column name="date_updated" type="DATE"/>
+            <column name="date_created" type="timestamp with time zone"/>
+            <column name="date_updated" type="timestamp with time zone"/>
             <column name="update_id" type="int"/>
             <column name="subject_event_status_id" type="int"/>
             <column name="start_time_flag" type="BOOLEAN"/>
             <column name="end_time_flag" type="BOOLEAN"/>
         </createTable>
+        <addUniqueConstraint tableName="study_event" constraintName="duplicate_event_uniqueness_key" columnNames="study_event_definition_id, study_subject_id, sample_ordinal"/>
     </changeSet>
     <changeSet author="pgawade (generated)" id="1235684743487-60">
         <createTable tableName="study_event_definition">
@@ -1020,8 +1010,8 @@
             <column name="study_id" type="int"/>
             <column name="status_id" type="int"/>
             <column name="enrollment_date" type="DATE"/>
-            <column name="date_created" type="DATE"/>
-            <column name="date_updated" type="DATE"/>
+            <column name="date_created" type="timestamp with time zone"/>
+            <column name="date_updated" type="timestamp with time zone"/>
             <column name="owner_id" type="int"/>
             <column name="update_id" type="int"/>
             <column name="oc_oid" type="VARCHAR(40)">
@@ -1051,9 +1041,9 @@
             <column name="date_of_birth" type="DATE"/>
             <column name="gender" type="char(1)"/>
             <column name="unique_identifier" type="VARCHAR(255)"/>
-            <column name="date_created" type="DATE"/>
+            <column name="date_created" type="timestamp with time zone"/>
             <column name="owner_id" type="int"/>
-            <column name="date_updated" type="DATE"/>
+            <column name="date_updated" type="timestamp with time zone"/>
             <column name="update_id" type="int"/>
             <column name="dob_collected" type="BOOLEAN"/>
         </createTable>

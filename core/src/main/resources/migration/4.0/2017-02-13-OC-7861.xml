@@ -55,8 +55,19 @@
         '
             LANGUAGE plpgsql;
          </sql>
-    </changeSet>    
-
+    </changeSet>
+    <changeSet author="pgawade (generated)" id="1235684743487-367">
+        <preConditions onFail="MARK_RAN">
+            <dbms type="postgresql" />
+            <!--<runningAs username="clinica" />-->
+        </preConditions>
+        <sql splitStatements="false">
+            CREATE TRIGGER item_data_update
+            AFTER DELETE OR UPDATE ON item_data
+            FOR EACH ROW
+            EXECUTE PROCEDURE item_data_trigger();
+        </sql>
+    </changeSet>
 
 <changeSet author="jkeremian" id="2017-02-13-OC-7863-03">
         <preConditions onFail="MARK_RAN"><dbms type="postgresql" /></preConditions>
