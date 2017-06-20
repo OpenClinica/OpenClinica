@@ -80,12 +80,12 @@
  <c:choose>
    <c:when test="${userRole.manageStudy}">
       <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-events')">
-      <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+      <span class="icon icon-question-circle gray"></span>
       </a>
    </c:when>
    <c:otherwise>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-events')">
-    <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+    <span class="icon icon-question-circle gray"></span>
     </a>
    </c:otherwise>
   </c:choose>
