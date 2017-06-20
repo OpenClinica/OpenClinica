@@ -80,19 +80,19 @@
  <c:choose>
    <c:when test="${userRole.manageStudy}">
       <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-events')">
-      <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+      <span class="icon icon-question-circle gray"></span>
       </a>
    </c:when>
    <c:otherwise>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-events')">
-    <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
+    <span class="icon icon-question-circle gray"></span>
     </a>
    </c:otherwise>
   </c:choose>
    <a href="javascript:openDocWindow('ViewStudyEvents?print=yes&<c:out value="${queryUrl}"/>')"
   onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"
   onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">
-  <img name="bt_Print0" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>"></a>
+  <span name="bt_Print0" class="icon icon-print" border="0" alt="<fmt:message key="print" bundle="${resword}"/>"></a>
   </div>
   </h1>
 
