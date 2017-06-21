@@ -29,11 +29,12 @@ public class ItemGroupMetadataDao extends AbstractDomainDao<ItemGroupMetadata> {
         return (ItemGroupMetadata) q.uniqueResult();
     }
 
+    public static final String findAllByCrfVersionQuery = "select distinct * from item_group_metadata igm where igm.crf_version_id = :crfversionid";
+
     @SuppressWarnings("unchecked")
     public List<ItemGroupMetadata> findAllByCrfVersion(int crf_version_id) {
-        String query = "select distinct * from item_group_metadata igm where igm.crf_version_id =?";
-        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemGroupMetadata.class);
-        q.setParameter(0, crf_version_id);
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(findAllByCrfVersionQuery).addEntity(ItemGroupMetadata.class);
+        q.setInteger("crfversionid", crf_version_id);
         return (List<ItemGroupMetadata>) q.list();
     }
 }

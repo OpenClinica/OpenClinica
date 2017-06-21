@@ -28,13 +28,14 @@ public class ItemDao extends AbstractDomainDao<Item> {
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(Item.class);
         return ((Item) q.uniqueResult());
     }
+    
+  public static final String findAllByCrfVersionIdQuery = "select distinct i.* from item i, item_form_metadata ifm " + "where i.item_id= ifm.item_id "
+          + "and ifm.crf_version_id = :crfversionid";
 
   @SuppressWarnings("unchecked")
   public List<Item> findAllByCrfVersionId(Integer crfVersionId) {
-      String query = "select distinct i.* from item i, item_form_metadata ifm " + "where i.item_id= ifm.item_id "
-              + "and ifm.crf_version_id=?";
-      org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(Item.class);
-      q.setParameter(0, crfVersionId.intValue());
+      org.hibernate.Query q = getCurrentSession().createSQLQuery(findAllByCrfVersionIdQuery).addEntity(Item.class);
+      q.setInteger("crfversionid", crfVersionId.intValue());
       return (List<Item>) q.list();
   }
 

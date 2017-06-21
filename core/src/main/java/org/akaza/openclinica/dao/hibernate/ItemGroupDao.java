@@ -31,12 +31,13 @@ public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
         return (ItemGroup) q.uniqueResult();
     }
 
+    public static final String findAllByCrfVersionIdQuery = "select distinct ig.* from item_group ig, item_group_metadata igm"
+            + " where igm.crf_version_id = :crfversionid and ig.item_group_id = igm.item_group_id";
+
     @SuppressWarnings("unchecked")
     public ArrayList<ItemGroup> findByCrfVersionId(Integer crfVersionId) {
-        String query = "select distinct ig.* from item_group ig, item_group_metadata igm where igm.crf_version_id =?"
-                + " and ig.item_group_id = igm.item_group_id";
-        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemGroup.class);
-        q.setParameter(0, crfVersionId.intValue());
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(findAllByCrfVersionIdQuery).addEntity(ItemGroup.class);
+        q.setInteger("crfversionid", crfVersionId.intValue());
         return (ArrayList<ItemGroup>) q.list();
     }
 

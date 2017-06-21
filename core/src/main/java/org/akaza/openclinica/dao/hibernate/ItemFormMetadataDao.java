@@ -19,11 +19,12 @@ public class ItemFormMetadataDao extends AbstractDomainDao<ItemFormMetadata> {
 
     }
 
+    public static final String findAllByCrfVersionQuery = "select distinct * from item_form_metadata ifm where ifm.crf_version_id = :crfversionid";
+
     @SuppressWarnings("unchecked")
     public List<ItemFormMetadata> findAllByCrfVersion(int crf_version_id) {
-        String query = "select distinct * from item_form_metadata ifm where ifm.crf_version_id =?";
-        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemFormMetadata.class);
-        q.setParameter(0, crf_version_id);
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(findAllByCrfVersionQuery).addEntity(ItemFormMetadata.class);
+        q.setInteger("crfversionid", crf_version_id);
         return (List<ItemFormMetadata>) q.list();
     }
 
