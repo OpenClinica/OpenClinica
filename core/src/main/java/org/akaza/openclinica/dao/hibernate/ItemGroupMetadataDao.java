@@ -31,8 +31,9 @@ public class ItemGroupMetadataDao extends AbstractDomainDao<ItemGroupMetadata> {
 
     @SuppressWarnings("unchecked")
     public List<ItemGroupMetadata> findAllByCrfVersion(int crf_version_id) {
-        String query = "select distinct * from item_group_metadata igm where igm.crf_version_id = " + crf_version_id;
+        String query = "select distinct * from item_group_metadata igm where igm.crf_version_id =?";
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemGroupMetadata.class);
+        q.setParameter(0, crf_version_id);
         return (List<ItemGroupMetadata>) q.list();
     }
 }

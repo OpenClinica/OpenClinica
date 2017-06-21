@@ -29,13 +29,14 @@ public class ItemDao extends AbstractDomainDao<Item> {
         return ((Item) q.uniqueResult());
     }
 
-    @SuppressWarnings("unchecked")
-    public List<Item> findAllByCrfId(Integer crfId) {
-        String query = "select distinct i.* from item i, item_form_metadata ifm,crf_version cv " + "where i.item_id= ifm.item_id "
-                + "and ifm.crf_version_id=cv.crf_version_id " + "and cv.crf_id=" + crfId;
-        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(Item.class);
-        return (List<Item>) q.list();
-    }
+  @SuppressWarnings("unchecked")
+  public List<Item> findAllByCrfId(Integer crfId) {
+      String query = "select distinct i.* from item i, item_form_metadata ifm,crf_version cv " + "where i.item_id= ifm.item_id "
+              + "and ifm.crf_version_id=cv.crf_version_id " + "and cv.crf_id=?";
+      org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(Item.class);
+      q.setParameter(0, crfId.intValue());
+      return (List<Item>) q.list();
+  }
 
     public int getItemDataTypeId(Item item) {
         String query = "select item_data_type_id from item where item_id = " + item.getItemId();

@@ -35,8 +35,9 @@ public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
     @SuppressWarnings("unchecked")
     public List<ItemGroup> findAllByCrfId(CrfBean crf) {
         getSessionFactory().getStatistics().logSummary();
-        String query = "select * from item_group ig  where ig.crf_id = " + crf.getCrfId();
+        String query = "select * from item_group ig  where ig.crf_id =?";
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemGroup.class);
+        q.setParameter(0, crf.getCrfId());
         return (ArrayList<ItemGroup>) q.list();
     }
 
