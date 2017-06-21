@@ -46,29 +46,29 @@
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
-		<td class="sidebar_tab">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-		<fmt:message key="instructions" bundle="${restext}"/>
+    <fmt:message key="instructions" bundle="${restext}"/>
 
-		<div class="sidebar_tab_content">
+    <div class="sidebar_tab_content">
 
-			<fmt:message key="select_subject_view_more_details" bundle="${restext}"/>
+      <fmt:message key="select_subject_view_more_details" bundle="${restext}"/>
 
-		</div>
+    </div>
 
-		</td>
+    </td>
 
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: none">
-		<td class="sidebar_tab">
+  </tr>
+  <tr id="sidebar_Instructions_closed" style="display: none">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-		<fmt:message key="instructions" bundle="${restext}"/>
+    <fmt:message key="instructions" bundle="${restext}"/>
 
-		</td>
+    </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
@@ -99,24 +99,19 @@
 
     <a href="ListDiscNotesForCRFServlet?type=${param.type}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>&tab=1" <c:if test="${param.type == 50}">style="color:green"</c:if>><fmt:message key="all_notes" bundle="${resterm}"/></a>&nbsp;
 
-    <a href="ListDiscNotesForCRFServlet?resolutionStatus=1&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><img
-                      name="icon_Note" src="images/icon_Note.gif" border="0"
+    <a href="ListDiscNotesForCRFServlet?resolutionStatus=1&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><span class="icon icon-flag red" border="0"
                       alt="<fmt:message key="Open" bundle="${resterm}"/>" title="<fmt:message key="Open" bundle="${resterm}"/>"/></a> (<fmt:message key="Open" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesForCRFServlet?resolutionStatus=2&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><img
-                      name="icon_flagYellow" src="images/icon_flagYellow.gif" border="0"
+    <a href="ListDiscNotesForCRFServlet?resolutionStatus=2&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><span class="icon icon icon-flag orange" border="0"
                       alt="<fmt:message key="Updated" bundle="${resterm}"/>" title="<fmt:message key="Updated" bundle="${resterm}"/>"/></a> (<fmt:message key="Updated" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesForCRFServlet?resolutionStatus=3&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><img
-                          name="icon_flagGreen" src="images/icon_flagGreen.gif" border="0"
+    <a href="ListDiscNotesForCRFServlet?resolutionStatus=3&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><span class="icon icon icon-flag green" border="0"
                           alt="<fmt:message key="Resolved" bundle="${resterm}"/>" title="<fmt:message key="Resolved" bundle="${resterm}"/>"/></a> (<fmt:message key="Resolved" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesForCRFServlet?resolutionStatus=4&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><img
-                             name="icon_flagBlack" src="images/icon_flagBlack.gif" border="0"
+    <a href="ListDiscNotesForCRFServlet?resolutionStatus=4&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><span class="icon icon-flag black" border="0"
                              alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>"/></a> (<fmt:message key="Closed" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesForCRFServlet?resolutionStatus=5&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><img
-                             name="icon_flagNA" src="images/icon_flagWhite.gif" border="0"
+    <a href="ListDiscNotesForCRFServlet?resolutionStatus=5&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><span class="icon icon-flag-empty blue" border="0"
                              alt="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" title="<fmt:message key="Not_Applicable" bundle="${resterm}"/>"/></a> (<fmt:message key="Not_Applicable" bundle="${resterm}"/>)&nbsp;
 
      <br />
@@ -164,10 +159,10 @@ You may also enroll a new subject and add a new study event:
 <%--
 <table border="0" cellpadding="0" cellspacing="0">
    <tr>
-	<td style="padding-left: 12px" valign="bottom">
+  <td style="padding-left: 12px" valign="bottom">
         <!---start allevents tab here -->
     <div id="Tab0NotSelected" style="display:none">
-	<div class="tab_BG"><div class="tab_L"><div class="tab_R">
+  <div class="tab_BG"><div class="tab_L"><div class="tab_R">
 
 <c:choose>
    <c:when test="${userRole.manageStudy}">
@@ -179,10 +174,10 @@ You may also enroll a new subject and add a new study event:
   </c:choose>
 
 
-	</div></div></div>
-	</div>
-	<div id="Tab0Selected">
-	<div class="tab_BG"><div class="tab_L"><div class="tab_R">
+  </div></div></div>
+  </div>
+  <div id="Tab0Selected">
+  <div class="tab_BG"><div class="tab_L"><div class="tab_R">
 
 <c:choose>
    <c:when test="${userRole.manageStudy}">
@@ -193,12 +188,12 @@ You may also enroll a new subject and add a new study event:
    </c:otherwise>
   </c:choose>
 
-	</div></div></div>
-	</div>
+  </div></div></div>
+  </div>
          <!---end allevents tab here -->
     </td>
-	<td align="right" style="padding-left: 12px; display: none" id="TabsBack"><a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0"></a></td>
-	<td align="right" style="padding-left: 12px; display: all" id="TabsBackDis"><img src="images/arrow_back_dis.gif" border="0"></td>
+  <td align="right" style="padding-left: 12px; display: none" id="TabsBack"><a href="javascript:TabsBack()"><img src="images/arrow_back.gif" border="0"></a></td>
+  <td align="right" style="padding-left: 12px; display: all" id="TabsBackDis"><img src="images/arrow_back_dis.gif" border="0"></td>
 
 
 <script language="JavaScript">
@@ -231,55 +226,55 @@ var TabDefID = new Array(TabsNumber)
 DisplaySectionTabs()
 
 function DisplaySectionTabs()
-	{
-	TabID=1;
+  {
+  TabID=1;
 
-	while (TabID<=TabsNumber)
+  while (TabID<=TabsNumber)
 
-		{
-		defID = TabDefID[TabID-1];
-		url = "ListDiscNotesForCRFServlet?module=${module}&type=${param.type}&resolutionStatus=${param.resolutionStatus}&defId=" + defID + "&tab=" + TabID;
-		currTabID = <c:out value="${tabId}"/>;
-		if (TabID<=TabsShown)
-			{
-			document.write('<td valign="bottom" id="Tab' + TabID + '" style="display: all">');
-			}
-		else
-			{
-			document.write('<td valign="bottom" id="Tab' + TabID + '" style="display: none">');
-			}
-	    if (TabID != currTabID) {
-		document.write('<div id="Tab' + TabID + 'NotSelected" style="display:all"><div class="tab_BG"><div class="tab_L"><div class="tab_R">');
-		document.write('<a class="tabtext" title="' + TabFullName[(TabID-1)] + '" href=' + url + ' onclick="javascript:HighlightTab(' + TabID + ');">' + TabLabel[(TabID-1)] + '</a></div></div></div></div>');
-		document.write('<div id="Tab' + TabID + 'Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">' + TabLabel[(TabID-1)] + '</span></div></div></div></div>');
-		document.write('</td>');
-		}
-		else {
-		//alert(TabID);
-		document.write('<div id="Tab' + TabID + 'NotSelected" style="display:all"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h">');
-		document.write('<span class="tabtext">' + TabLabel[(TabID-1)] + '</span></div></div></div></div>');
-		document.write('<div id="Tab' + TabID + 'Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">' + TabLabel[(TabID-1)] + '</span></div></div></div></div>');
-		document.write('</td>');
-		}
+    {
+    defID = TabDefID[TabID-1];
+    url = "ListDiscNotesForCRFServlet?module=${module}&type=${param.type}&resolutionStatus=${param.resolutionStatus}&defId=" + defID + "&tab=" + TabID;
+    currTabID = <c:out value="${tabId}"/>;
+    if (TabID<=TabsShown)
+      {
+      document.write('<td valign="bottom" id="Tab' + TabID + '" style="display: all">');
+      }
+    else
+      {
+      document.write('<td valign="bottom" id="Tab' + TabID + '" style="display: none">');
+      }
+      if (TabID != currTabID) {
+    document.write('<div id="Tab' + TabID + 'NotSelected" style="display:all"><div class="tab_BG"><div class="tab_L"><div class="tab_R">');
+    document.write('<a class="tabtext" title="' + TabFullName[(TabID-1)] + '" href=' + url + ' onclick="javascript:HighlightTab(' + TabID + ');">' + TabLabel[(TabID-1)] + '</a></div></div></div></div>');
+    document.write('<div id="Tab' + TabID + 'Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">' + TabLabel[(TabID-1)] + '</span></div></div></div></div>');
+    document.write('</td>');
+    }
+    else {
+    //alert(TabID);
+    document.write('<div id="Tab' + TabID + 'NotSelected" style="display:all"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h">');
+    document.write('<span class="tabtext">' + TabLabel[(TabID-1)] + '</span></div></div></div></div>');
+    document.write('<div id="Tab' + TabID + 'Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">' + TabLabel[(TabID-1)] + '</span></div></div></div></div>');
+    document.write('</td>');
+    }
 
-		TabID++
+    TabID++
 
-		}
-	}
+    }
+  }
 
 
 //-->
 </script>
   <td align="right" id="TabsNextDis" style="display: none"><img src="images/arrow_next_dis.gif" border="0"></td>
-	<td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0"></a></td>
+  <td align="right" id="TabsNext"><a href="javascript:TabsForward()"><img src="images/arrow_next.gif" border="0"></a></td>
 
    </tr>
 </table>
 
 <c:import url="../include/showTableWithTab.jsp">
-	<c:param name="rowURL" value="showDNotesForCRFs.jsp" />
-	<c:param name="groupNum" value="${groupSize}"/>
-	<c:param name="eventDefCRFNum" value="${eventDefCRFSize}"/>
+  <c:param name="rowURL" value="showDNotesForCRFs.jsp" />
+  <c:param name="groupNum" value="${groupSize}"/>
+  <c:param name="eventDefCRFNum" value="${eventDefCRFSize}"/>
     <c:param name="resolutionStatus" value="${param.resolutionStatus}"/>
     <c:param name="discNoteType" value="${discrepancyNoteType}"/>
     <c:param name="module" value="${module}"/>
@@ -301,45 +296,45 @@ function DisplaySectionTabs()
 <!-- EXPANDING WORKFLOW BOX -->
 
 <table border="0" cellpadding="0" cellspacing="0" style="position: relative; left: -14px;">
-	<tr>
-		<td id="sidebar_Workflow_closed" style="display: none">
-		<a href="javascript:leftnavExpand('sidebar_Workflow_closed'); leftnavExpand('sidebar_Workflow_open');"><img src="images/<fmt:message key="image_dir" bundle="${resformat}"/>/tab_Workflow_closed.gif" border="0"></a>
-	</td>
-	<td id="sidebar_Workflow_open" style="display: all">
-	<table border="0" cellpadding="0" cellspacing="0" class="workflowBox">
-		<tr>
-			<td class="workflowBox_T" valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td class="workflow_tab">
-					<a href="javascript:leftnavExpand('sidebar_Workflow_closed'); leftnavExpand('sidebar_Workflow_open');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+  <tr>
+    <td id="sidebar_Workflow_closed" style="display: none">
+    <a href="javascript:leftnavExpand('sidebar_Workflow_closed'); leftnavExpand('sidebar_Workflow_open');"><img src="images/<fmt:message key="image_dir" bundle="${resformat}"/>/tab_Workflow_closed.gif" border="0"></a>
+  </td>
+  <td id="sidebar_Workflow_open" style="display: all">
+  <table border="0" cellpadding="0" cellspacing="0" class="workflowBox">
+    <tr>
+      <td class="workflowBox_T" valign="top">
+      <table border="0" cellpadding="0" cellspacing="0">
+        <tr>
+          <td class="workflow_tab">
+          <a href="javascript:leftnavExpand('sidebar_Workflow_closed'); leftnavExpand('sidebar_Workflow_open');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 
-					<b><fmt:message key="workflow" bundle="${restext}"/></b>
+          <b><fmt:message key="workflow" bundle="${restext}"/></b>
 
-					</td>
-				</tr>
-			</table>
-			</td>
-			<td class="workflowBox_T" align="right" valign="top"><img src="images/workflowBox_TR.gif"></td>
-		</tr>
-		<tr>
-			<td colspan="2" class="workflowbox_B">
-			<div class="box_R"><div class="box_B"><div class="box_BR">
-				<div class="workflowBox_center">
+          </td>
+        </tr>
+      </table>
+      </td>
+      <td class="workflowBox_T" align="right" valign="top"><img src="images/workflowBox_TR.gif"></td>
+    </tr>
+    <tr>
+      <td colspan="2" class="workflowbox_B">
+      <div class="box_R"><div class="box_B"><div class="box_BR">
+        <div class="workflowBox_center">
 
 
-		<!-- Workflow items -->
+    <!-- Workflow items -->
 
-				<table border="0" cellpadding="0" cellspacing="0">
-					<tr>
-						<td>
+        <table border="0" cellpadding="0" cellspacing="0">
+          <tr>
+            <td>
 
-				<!-- These DIVs define shaded box borders -->
-						<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+        <!-- These DIVs define shaded box borders -->
+            <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-							<div class="textbox_center" align="center">
+              <div class="textbox_center" align="center">
 
-							<c:choose>
+              <c:choose>
                              <c:when test="${userRole.manageStudy}">
                                <span class="title_manage">
                                <a href="ManageStudy"><fmt:message key="manage_study" bundle="${resworkflow}"/></a>
@@ -353,21 +348,21 @@ function DisplaySectionTabs()
 
 
 
-							</span>
+              </span>
 
-							</div>
-						</div></div></div></div></div></div></div></div>
+              </div>
+            </div></div></div></div></div></div></div></div>
 
-						</td>
-						<td><img src="images/arrow.gif"></td>
-						<td>
+            </td>
+            <td><img src="images/arrow.gif"></td>
+            <td>
 
-				<!-- These DIVs define shaded box borders -->
-						<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+        <!-- These DIVs define shaded box borders -->
+            <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-							<div class="textbox_center" align="center">
+              <div class="textbox_center" align="center">
 
-							<c:choose>
+              <c:choose>
                              <c:when test="${userRole.manageStudy}">
                                <span class="title_manage">
                              </c:when>
@@ -376,26 +371,26 @@ function DisplaySectionTabs()
                              </c:otherwise>
                              </c:choose>
 
-							<b><fmt:message key="list_discrepancy_notes" bundle="${restext}"/></b>
+              <b><fmt:message key="list_discrepancy_notes" bundle="${restext}"/></b>
 
-							</span>
+              </span>
 
-							</div>
-						</div></div></div></div></div></div></div></div>
+              </div>
+            </div></div></div></div></div></div></div></div>
 
-						</td>
-					</tr>
-				</table>
+            </td>
+          </tr>
+        </table>
 
 
-		<!-- end Workflow items -->
+    <!-- end Workflow items -->
 
-				</div>
-			</div></div></div>
-			</td>
-		</tr>
-	</table>
-	</td>
+        </div>
+      </div></div></div>
+      </td>
+    </tr>
+  </table>
+  </td>
    </tr>
 </table>
 

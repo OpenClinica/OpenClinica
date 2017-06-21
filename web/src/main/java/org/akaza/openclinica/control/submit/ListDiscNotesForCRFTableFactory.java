@@ -117,15 +117,15 @@ public class ListDiscNotesForCRFTableFactory extends AbstractTableFactory {
         crfColumnImageIconPaths.put(7, "images/icon_Locked.gif");
 
         discNoteIconPaths.put(1,
-                "<img name='icon_Note' src='images/icon_Note.gif' border='0' alt='" + resword.getString("open") + "' title='" + resword.getString("open")
+                "<span name='icon_Note' class='icon icon-flag red' border='0' alt='" + resword.getString("open") + "' title='" + resword.getString("open")
                     + "'/>");
-        discNoteIconPaths.put(2, "<img name='icon_flagYellow' src='images/icon_flagYellow.gif' border='0' alt='" + resword.getString("updated") + "' title='"
+        discNoteIconPaths.put(2, "<span name='icon_flagYellow' class='icon icon icon-flag orange' border='0' alt='" + resword.getString("updated") + "' title='"
             + resword.getString("updated") + "' />");
-        discNoteIconPaths.put(3, "<img name='icon_flagGreen' src='images/icon_flagGreen.gif' border='0' alt='" + resword.getString("resolved") + "' title='"
+        discNoteIconPaths.put(3, "<span name='icon_flagGreen' class='icon icon icon-flag green' border='0' alt='" + resword.getString("resolved") + "' title='"
             + resword.getString("resolved") + "'/>");
-        discNoteIconPaths.put(4, "<img name='icon_flagBlack' src='images/icon_flagBlack.gif' border='0' alt='" + resword.getString("closed") + "' title='"
+        discNoteIconPaths.put(4, "<span name='icon_flagBlack' class='icon icon-flag black' border='0' alt='" + resword.getString("closed") + "' title='"
             + resword.getString("closed") + "'/>");
-        discNoteIconPaths.put(5, "<img name='icon_flagWhite' src='images/icon_flagWhite.gif' border='0' alt='" + resword.getString("not_applicable")
+        discNoteIconPaths.put(5, "<span name='icon_flagWhite' class='icon icon-flag-empty blue' border='0' alt='" + resword.getString("not_applicable")
             + "' title='" + resword.getString("not_applicable") + "'/>");
 
     }

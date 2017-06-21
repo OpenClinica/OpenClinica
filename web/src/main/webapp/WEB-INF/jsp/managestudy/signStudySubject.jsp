@@ -126,7 +126,7 @@
     </td>
         <td align="right">
             <!-- <span style="font-size:11px"><a href="#"><img
-		    src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"></a>View Printable Record</div>-->
+            src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"></a>View Printable Record</div>-->
             </h1>
 
         </td></tr>
@@ -420,7 +420,7 @@
         </c:choose>
 
     </c:otherwise>
-</c:choose>	<%--<a name="events"><a href="javascript:leftnavExpand('subjectEvents');javascript:setImage('ExpandGroup2','images/bt_Expand.gif');"><img
+</c:choose> <%--<a name="events"><a href="javascript:leftnavExpand('subjectEvents');javascript:setImage('ExpandGroup2','images/bt_Expand.gif');"><img
   name="ExpandGroup2" src="images/bt_Collapse.gif" border="0"> <fmt:message key="events" bundle="${resword}"/></a></a></div>
 <div id="subjectEvents">
     <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showStudyEventRow.jsp" /></c:import>
@@ -473,8 +473,7 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['New']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <img
-                                          name="icon_Note" src="images/icon_Note.gif" border="0"
+                                        <span class="icon icon-flag red" border="0"
                                           alt="<fmt:message key="Open" bundle="${resterm}"/>" title="<fmt:message key="Open" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
@@ -483,8 +482,7 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['Updated']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <img
-                                          name="icon_Note" src="images/icon_flagYellow.gif" border="0"
+                                        <span class="icon icon icon-flag orange" border="0"
                                           alt="<fmt:message key="Updated" bundle="${resterm}"/>" title="<fmt:message key="Updated" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
@@ -493,8 +491,7 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['Resolution Proposed']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <img
-                                          name="icon_Note" src="images/icon_flagGreen.gif" border="0"
+                                        <span class="icon icon icon-flag green"border="0"
                                           alt="<fmt:message key="Resolved" bundle="${resterm}"/>" title="<fmt:message key="Resolved" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
@@ -503,8 +500,7 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['Closed']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <img
-                                          name="icon_Note" src="images/icon_flagBlack.gif" border="0"
+                                        <span class="icon icon-flag black" border="0"
                                           alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
@@ -513,8 +509,7 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['Not Applicable']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <img
-                                          name="icon_Note" src="images/icon_flagWhite.gif" border="0"
+                                        <span class="icon icon-flag-empty blue" border="0"
                                           alt="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" title="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
@@ -663,7 +658,7 @@
     </c:choose>
 
     </c:otherwise>
-    </c:choose>	<a name="global"><a href="javascript:leftnavExpand('globalRecord');javascript:setImage('ExpandGroup5','images/bt_Collapse.gif');"><img
+    </c:choose> <a name="global"><a href="javascript:leftnavExpand('globalRecord');javascript:setImage('ExpandGroup5','images/bt_Collapse.gif');"><img
   name="ExpandGroup5" src="images/bt_Expand.gif" border="0"> <fmt:message key="global_subject_record" bundle="${resword}"/></a></a></div>
 
 <div id="globalRecord" style="display:none">

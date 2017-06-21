@@ -87,7 +87,7 @@
 <c:out value="${study.name}" />:
     <fmt:message key="add_subject" bundle="${resword}"/>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/add-subject')">
-        <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
+        <span class="icon icon-question-circle gray"></span></a>
 </span></h1>
 
 <p class="text">
@@ -208,7 +208,7 @@
 					</td>
 					<td>&nbsp;<span class="formlabel">&nbsp;*</span>
 					<A HREF="#">
-  					  <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
+  					  <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
                         <script type="text/javascript">
                         Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger" });
                         </script>
@@ -289,7 +289,7 @@
 					</td>
 					<td>&nbsp;
 					<A HREF="#">
-  					  <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
+  					  <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
                         <script type="text/javascript">
                         Calendar.setup({inputField  : "dobField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger" });
                         </script>

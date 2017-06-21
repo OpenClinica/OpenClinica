@@ -193,9 +193,8 @@ public class AuditUserLoginTableFactory extends AbstractTableFactory {
             String value = "";
             Integer userAccountId = (Integer) new BasicCellEditor().getValue(item, "userAccountId", rowcount);
             if (userAccountId != null) {
-                StringBuilder url = new StringBuilder();
-                url
-                        .append("<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewUserAccount?userId=");
+               StringBuilder url = new StringBuilder();
+                url.append("<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewUserAccount?userId=");
                 url.append(userAccountId.toString());
                 url
                         .append("&amp;viewFull=yes\"><img hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" src=\"images/bt_View.gif\" name=\"bt_View1\"/></a>");
