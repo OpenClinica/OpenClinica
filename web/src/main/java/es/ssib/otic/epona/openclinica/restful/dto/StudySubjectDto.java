@@ -141,6 +141,5 @@ public class StudySubjectDto {
 	public void setSubjectUid(String subjectUid) {
 		this.subjectUid = subjectUid;
 	}
-
 }
 

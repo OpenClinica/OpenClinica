@@ -9,6 +9,7 @@ public class CreateStudySubjectResultDto
 		0L;
 	
 	private String studySubjectOid; 
+	private int studySubjectId;
 	private String errorMessage;
 
 	public CreateStudySubjectResultDto() {
@@ -24,6 +25,18 @@ public class CreateStudySubjectResultDto
 		
 		this.studySubjectOid =
 			studySubjectOid;
+	}
+
+	public int getStudySubjectId() {
+		return
+			this.studySubjectId;
+	}
+
+	public void setStudySubjectId(
+		int studySubjectId) {
+
+		this.studySubjectId =
+			studySubjectId;
 	}
 
 	public String getErrorMessage() {

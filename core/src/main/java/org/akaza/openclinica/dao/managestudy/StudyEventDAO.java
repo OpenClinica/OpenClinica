@@ -720,6 +720,44 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         return 0;
     }
 
+    /**
+     * Get the maximum sample ordinal over all study events for the provided
+     * StudyEventDefinition / StudySubject combination. Note that the maximum
+     * may be zero but must be non-negative.
+     *
+     * @param sedbId
+     *            The study event definition id whose ordinal we're looking for.
+     * @param studySubjectId
+     *            The study subject whose ordinal we're looking for.
+     * @return The maximum sample ordinal over all study events for the provided
+     *         combination, or 0 if no such combination exists.
+     */
+    public int getMaxSampleOrdinal(
+	int sedbId,
+	int studySubjectId) {
+        ArrayList answer = new ArrayList();
+
+        this.unsetTypeExpected();
+        this.setTypeExpected(1, TypeNames.INT);
+
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), Integer.valueOf(sedbId));
+        variables.put(Integer.valueOf(2), Integer.valueOf(studySubjectId));
+
+        ArrayList alist = this.select(digester.getQuery("getMaxSampleOrdinal"), variables);
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+            try {
+                HashMap hm = (HashMap) it.next();
+                Integer max = (Integer) hm.get("max_ord");
+                return max.intValue();
+            } catch (Exception e) {
+            }
+        }
+
+        return 0;
+    }
+
     @Override
     public ArrayList findAllByStudy(StudyBean study) {
         ArrayList answer = new ArrayList();

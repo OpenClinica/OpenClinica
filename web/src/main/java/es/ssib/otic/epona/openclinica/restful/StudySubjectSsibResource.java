@@ -7,12 +7,15 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDaoSsib;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.domain.datamap.StudySubject;
@@ -31,7 +34,9 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
 import es.ssib.otic.epona.openclinica.restful.dto.CreateStudySubjectDto;
+import es.ssib.otic.epona.openclinica.restful.dto.CreateStudySubjectEventDto;
 import es.ssib.otic.epona.openclinica.restful.dto.CreateStudySubjectResultDto;
+import es.ssib.otic.epona.openclinica.restful.dto.IdResultDto;
 import es.ssib.otic.epona.openclinica.restful.dto.StudySubjectDto;
 
 /**
@@ -285,6 +290,8 @@ public class StudySubjectSsibResource {
 				new CreateStudySubjectResultDto();
 			resultBean.setStudySubjectOid(
 				studySubjectBean.getOid());
+			resultBean.setStudySubjectId(
+				studySubjectBean.getId());
 			return
 				new ResponseEntity<CreateStudySubjectResultDto>(
 					resultBean,
@@ -302,6 +309,126 @@ public class StudySubjectSsibResource {
 			return
 				new ResponseEntity<CreateStudySubjectResultDto>(
 					errorBean,
+					HttpStatus.INTERNAL_SERVER_ERROR);
+		}
+	}
+
+	@RequestMapping(
+		value = "/json/createEvent",
+		method = RequestMethod.POST)
+	public ResponseEntity<IdResultDto> createStudySubject(
+		@RequestBody CreateStudySubjectEventDto createStudySubjectEvent) {
+
+                try {
+
+                        LOGGER.info(
+                                "Entrando en createStudySubject: eventId "
+					+ createStudySubjectEvent.getStudyEventDefinitionId()
+					+ ", studySubjectId "
+					+ createStudySubjectEvent.getStudySubjectId());
+
+                        DataSource ds =
+                                (DataSource)
+                                        this.applicationContext.getBean(
+                                                "dataSource");
+
+                        UserAccountBean ub =
+                                new UserAccountBean();
+                        ub.setId(1);
+
+                        StudyEventDAO studyEventDao =
+                                new StudyEventDAO(
+                                        ds);
+
+                        StudyEventBean studyEventBean =
+				new StudyEventBean();
+			studyEventBean.setStudyEventDefinitionId(
+				createStudySubjectEvent.getStudyEventDefinitionId());
+			studyEventBean.setStudySubjectId(
+				createStudySubjectEvent.getStudySubjectId());
+			int maxSampleOrdinal =
+				studyEventDao.getMaxSampleOrdinal(
+					createStudySubjectEvent.getStudyEventDefinitionId(),
+					createStudySubjectEvent.getStudySubjectId());
+			if (!createStudySubjectEvent.isCrearNuevo() && (maxSampleOrdinal != 0)) {
+				LOGGER.info(
+					"Ya hay un evento creado para la definición "
+						+ createStudySubjectEvent.getStudyEventDefinitionId()
+						+ " y studySubject "
+						+ createStudySubjectEvent.getStudySubjectId());
+				IdResultDto response =
+					new IdResultDto(
+						-1);
+				return
+					new ResponseEntity(
+						response,
+						HttpStatus.OK);
+			}
+
+			studyEventBean.setSampleOrdinal(
+				maxSampleOrdinal + 1);
+			LOGGER.info(
+				"sampleOrdinal es " 
+					+ maxSampleOrdinal);
+			studyEventBean.setDateStarted(
+				createStudySubjectEvent.getStartDate());
+			studyEventBean.setDateEnded(
+				createStudySubjectEvent.getEndDate());
+			studyEventBean.setOwner(
+				ub);
+			studyEventBean.setStatus(
+				Status.AVAILABLE);
+			studyEventBean.setSubjectEventStatus(
+				SubjectEventStatus.SCHEDULED);
+			studyEventBean.setStartTimeFlag(
+				false);
+			studyEventBean.setEndTimeFlag(
+				false);
+			StudyEventBean result =
+				(StudyEventBean) studyEventDao.create(
+					studyEventBean);
+			if ((result == null) || (result.getId() == 0)) {
+				String message =
+					"No se ha podido crear studyEvent para studySubject "
+						+ createStudySubjectEvent.getStudySubjectId()
+						+ "y eventDefinition "
+						+ createStudySubjectEvent.getStudyEventDefinitionId();
+				LOGGER.warn(
+					message);
+				IdResultDto response =
+					new IdResultDto(
+						message);
+				return
+					new ResponseEntity<>(
+						response,
+						HttpStatus.INTERNAL_SERVER_ERROR);
+			}
+
+			IdResultDto response =
+				new IdResultDto(
+					result.getId());
+			return
+				new ResponseEntity<>(
+					response,
+					HttpStatus.OK);
+		} catch (Exception e) {
+			String message =
+				"Excepción creando studyEvent para studySubject "
+					+ createStudySubjectEvent.getStudySubjectId()
+					+ "y eventDefinitioon "
+					+ createStudySubjectEvent.getStudyEventDefinitionId()
+					+ ": "
+					+ e.getMessage();
+			LOGGER.warn(
+				message,
+				e);
+
+			IdResultDto response =
+				new IdResultDto(
+					message);
+			return
+				new ResponseEntity<>(
+					response,
 					HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 	}

@@ -186,4 +186,7 @@
         <property name="studyDaoSsib" ref="studyDaoSsibDomain"/>
     </bean>
 
+    <bean id="studyEventSsibResource" class="es.ssib.otic.epona.openclinica.restful.StudyEventSsibResource">
+<!--        <property name="studyEventDefinitionDao" ref="studyEventDefDaoDomain"/> -->
+    </bean>
 </beans>
