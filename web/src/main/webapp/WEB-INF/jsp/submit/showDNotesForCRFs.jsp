@@ -293,8 +293,7 @@ if dnote.crfName == edc.crfName, then include dnote--%>
 
             <c:choose>
                 <c:when test="${discNoteBean.resolutionStatusId == 1}">
-                    <c:if test="${newDisplayed eq 'false'}"><img
-                      name="icon_Note" src="images/icon_Note.gif" border="0"
+                    <c:if test="${newDisplayed eq 'false'}"><span class="icon icon-flag red"  border="0"
                       alt="<fmt:message key="Open" bundle="${resterm}"/>" title="<fmt:message key="Open" bundle="${resterm}"/>" align="left"/>
                         <c:out value=" (${newDN})"/><br /></c:if>
                     <c:set var="newDisplayed" value="true"/>
@@ -302,8 +301,7 @@ if dnote.crfName == edc.crfName, then include dnote--%>
 
                 <c:when test="${discNoteBean.resolutionStatusId == 2}">
                     <c:if test="${updatedDisplayed eq 'false'}">
-                        <img
-                          name="icon_flagYellow" src="images/icon_flagYellow.gif" border="0"
+                        <span class="icon icon icon-flag orange" border="0"
                           alt="<fmt:message key="Updated" bundle="${resterm}"/>" title="<fmt:message key="Updated" bundle="${resterm}"/>" align="left"/>
                         <c:out value="(${updatedDN})"/><br /></c:if>
                     <c:set var="updatedDisplayed" value="true"/>
@@ -312,8 +310,7 @@ if dnote.crfName == edc.crfName, then include dnote--%>
                 <c:when test="${discNoteBean.resolutionStatusId == 3}">
                     <c:if test="${resolvedDisplayed eq 'false'}">
 
-                        <img
-                          name="icon_flagGreen" src="images/icon_flagGreen.gif" border="0"
+                        <span class="icon icon icon-flag green"border="0"
                           alt="<fmt:message key="Resolved" bundle="${resterm}"/>" title="<fmt:message key="Resolved" bundle="${resterm}"/>" align="left"/>
                         <c:out value="(${resolvedDN})"/><br /></c:if>
                     <c:set var="resolvedDisplayed" value="true"/>
@@ -321,8 +318,7 @@ if dnote.crfName == edc.crfName, then include dnote--%>
 
                 <c:when test="${discNoteBean.resolutionStatusId == 4}">
                     <c:if test="${closedDisplayed eq 'false'}">
-                        <img
-                          name="icon_flagBlack" src="images/icon_flagBlack.gif" border="0"
+                        <span class="icon icon-flag black" border="0"
                           alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>" align="left"/>
                         <c:out value="(${closedDN})"/><br /></c:if>
                     <c:set var="closedDisplayed" value="true"/>

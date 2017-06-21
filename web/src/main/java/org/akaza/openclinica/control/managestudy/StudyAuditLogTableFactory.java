@@ -231,10 +231,9 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
             Integer studySubjectId = studySubjectBean.getId();
             if (studySubjectBean != null) {
                 StringBuilder url = new StringBuilder();
-                url
-                        .append("<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"javascript:openDocWindow('ViewStudySubjectAuditLog?id=");
+                url.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"javascript:openDocWindow('ViewStudySubjectAuditLog?id=");
                 url.append(studySubjectId);
-                url.append("')\"><img hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" src=\"images/bt_View.gif\" name=\"bt_View1\"/></a>");
+                url.append("')\"><span hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_View1\"/></a>");
                 value = url.toString();
             }
             return value;

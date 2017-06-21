@@ -187,16 +187,14 @@
 
     <c:choose>
         <c:when test="${discNote.resolutionStatusId == 1}">
-            <c:if test="${newDisplayed eq 'false'}"><img
-              name="icon_Note" src="images/icon_Note.gif" border="0"
+            <c:if test="${newDisplayed eq 'false'}"><span class="icon icon-flag red"  border="0"
               alt="<fmt:message key="Open" bundle="${resterm}"/>" title="<fmt:message key="Open" bundle="${resterm}"/>" align="left"/>
                 <c:out value=" (${newDN})"/><br /></c:if>
             <c:set var="newDisplayed" value="true"/>
         </c:when>
         <c:when test="${discNote.resolutionStatusId == 2}">
             <c:if test="${updatedDisplayed eq 'false'}">
-                <img
-                  name="icon_flagYellow" src="images/icon_flagYellow.gif" border="0"
+                <span class="icon icon icon-flag orange" border="0"
                   alt="<fmt:message key="Updated" bundle="${resterm}"/>" title="<fmt:message key="Updated" bundle="${resterm}"/>" align="left"/>
                 <c:out value="(${updatedDN})"/><br /></c:if>
             <c:set var="updatedDisplayed" value="true"/>
@@ -205,8 +203,7 @@
         <c:when test="${discNote.resolutionStatusId == 3}">
             <c:if test="${resolvedDisplayed eq 'false'}">
 
-                <img
-                  name="icon_flagGreen" src="images/icon_flagGreen.gif" border="0"
+                <span class="icon icon icon-flag green" border="0"
                   alt="<fmt:message key="Resolved" bundle="${resterm}"/>" title="<fmt:message key="Resolved" bundle="${resterm}"/>" align="left"/>
                 <c:out value="(${resolvedDN})"/><br /></c:if>
             <c:set var="resolvedDisplayed" value="true"/>
@@ -214,8 +211,7 @@
 
         <c:when test="${discNote.resolutionStatusId == 4}">
             <c:if test="${closedDisplayed eq 'false'}">
-                <img
-                  name="icon_flagBlack" src="images/icon_flagBlack.gif" border="0"
+                <span class="icon icon-flag black" border="0"
                   alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>" align="left"/>
                 <c:out value="(${closedDN})"/><br /></c:if>
             <c:set var="closedDisplayed" value="true"/>
@@ -223,8 +219,7 @@
 
         <c:when test="${discNote.resolutionStatusId == 5}">
             <c:if test="${not_applicableDisplayed eq 'false'}">
-                <img
-                  name="icon_flagWhite" src="images/icon_flagWhite.gif" border="0"
+                <span class="icon icon-flag-empty blue" border="0"
                   alt="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" title="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" align="left"/>
                 <c:out value="(${not_applicableDN})"/><br /></c:if>
             <c:set var="not_applicableDisplayed" value="true"/>

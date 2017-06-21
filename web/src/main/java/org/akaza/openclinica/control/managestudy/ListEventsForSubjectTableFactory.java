@@ -822,48 +822,35 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     }
 
     private String viewStudySubjectLinkBuilder(StudySubjectBean studySubject) {
-        HtmlBuilder actionLink = new HtmlBuilder();
-        actionLink.a().href("ViewStudySubject?id=" + studySubject.getId());
-        actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
-        actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
-        actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view"))
-                .append("hspace=\"2\"").end().aEnd();
-        actionLink.append("&nbsp;&nbsp;&nbsp;");
-        return actionLink.toString();
+        HtmlBuilder builder = new HtmlBuilder();
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"javascript:openDocWindow('ViewStudySubject?id="+studySubject.getId());
+        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_Reassign1\"/></a>");
+        builder.append("&nbsp;&nbsp;&nbsp;");
+        return builder.toString();
     }
 
     private String removeStudySubjectLinkBuilder(StudySubjectBean studySubject) {
-        HtmlBuilder actionLink = new HtmlBuilder();
-        actionLink.a().href("RemoveStudySubject?action=confirm&id=" + studySubject.getId() + "&subjectId=" + studySubject.getSubjectId() + "&studyId="
-                + studySubject.getStudyId());
-        actionLink.append("onMouseDown=\"javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');\"");
-        actionLink.append("onMouseUp=\"javascript:setImage('bt_Remove1','images/bt_Remove.gif');\"").close();
-        actionLink.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove")).title(resword.getString("remove"))
-                .append("hspace=\"2\"").end().aEnd();
-        actionLink.append("&nbsp;&nbsp;&nbsp;");
-        return actionLink.toString();
+        HtmlBuilder builder = new HtmlBuilder();
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-cancel');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-cancel');\" href=\"javascript:openDocWindow('RemoveStudySubject?action=confirm&id="+studySubject.getId()+"&subjectId="+studySubject.getSubjectId()+"&studyId="+studySubject.getStudyId());
+        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Remove\" alt=\"View\" class=\"icon icon-cancel\" name=\"bt_Reassign1\"/></a>");
+        builder.append("&nbsp;&nbsp;&nbsp;");
+        return builder.toString();
     }
 
     private String reAssignStudySubjectLinkBuilder(StudySubjectBean studySubject) {
-        HtmlBuilder actionLink = new HtmlBuilder();
-        actionLink.a().href("ReassignStudySubject?id=" + studySubject.getId());
-        actionLink.append("onMouseDown=\"javascript:setImage('bt_Reassign1','images/bt_Reassign_d.gif');\"");
-        actionLink.append("onMouseUp=\"javascript:setImage('bt_Reassign1','images/bt_Reassign.gif');\"").close();
-        actionLink.img().name("bt_Reassign1").src("images/bt_Reassign.gif").border("0").alt(resword.getString("reassign")).title(resword.getString("reassign"))
-                .append("hspace=\"2\"").end().aEnd();
-        actionLink.append("&nbsp;&nbsp;&nbsp;");
-        return actionLink.toString();
+        HtmlBuilder builder = new HtmlBuilder();
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" href=\"javascript:openDocWindow('ReassignStudySubject?id="+studySubject.getId());
+        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Reassign\" alt=\"Reassign\" class=\"icon icon-icon-reassign\" name=\"bt_Reassign1\"/></a>");
+        builder.append("&nbsp;&nbsp;&nbsp;");
+        return builder.toString();
     }
 
     private String restoreStudySubjectLinkBuilder(StudySubjectBean studySubject) {
-        HtmlBuilder actionLink = new HtmlBuilder();
-        actionLink.a().href("RestoreStudySubject?action=confirm&id=" + studySubject.getId() + "&subjectId=" + studySubject.getSubjectId() + "&studyId="
-                + studySubject.getStudyId());
-        actionLink.append("onMouseDown=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"");
-        actionLink.append("onMouseUp=\"javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');\"").close();
-        actionLink.img().name("bt_Restore1").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore")).title(resword.getString("restore"))
-                .append("hspace=\"2\"").end().aEnd();
-        return actionLink.toString();
+        HtmlBuilder builder = new HtmlBuilder();
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"javascript:openDocWindow('RestoreStudySubject?action=confirm&id="+studySubject.getId() + "&subjectId"+studySubject.getSubjectId()+"&studyId="+studySubject.getStudyId());
+        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
+        builder.append("&nbsp;&nbsp;&nbsp;");
+        return builder.toString();
     }
 
     private String eventDivBuilder(SubjectBean subject, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed,
