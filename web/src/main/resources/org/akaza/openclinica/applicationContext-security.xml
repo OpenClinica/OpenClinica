@@ -44,6 +44,9 @@
     <security:intercept-url pattern="/pages/api/v1/forms/migrate/**" filters="none"/>
     <security:intercept-url pattern="/pages/auth/api/**" filters="none"/>
     <security:intercept-url pattern="/pages/auth/api/v1/system/**" filters="none"/>
+
+    <security:intercept-url pattern="/pages/ssib/**" filters="none"/>
+
     <!--
     <security:form-login login-page="/pages/login/login" authentication-failure-url="/pages/login/login?action=errorLogin"
       default-target-url='/MainMenu' always-use-default-target='true' />
@@ -172,5 +175,18 @@
 <bean id="openRosaSubmissionController" class="org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController" autowire="byName">
 </bean>
 
+    <bean id="eMPiSsibResource" class="es.ssib.otic.epona.openclinica.restful.EMPiSsibResource">
+    </bean>
 
+    <bean id="studySubjectSsibResource" class="es.ssib.otic.epona.openclinica.restful.StudySubjectSsibResource">
+        <property name="studySubjectDaoSsib" ref="studySubjectDaoSsibDomain"/>
+    </bean>
+
+    <bean id="studySsibResource" class="es.ssib.otic.epona.openclinica.restful.StudySsibResource">
+        <property name="studyDaoSsib" ref="studyDaoSsibDomain"/>
+    </bean>
+
+    <bean id="studyEventSsibResource" class="es.ssib.otic.epona.openclinica.restful.StudyEventSsibResource">
+<!--        <property name="studyEventDefinitionDao" ref="studyEventDefDaoDomain"/> -->
+    </bean>
 </beans>
