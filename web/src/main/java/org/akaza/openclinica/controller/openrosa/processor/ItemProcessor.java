@@ -118,18 +118,18 @@ public class ItemProcessor implements Processor, Ordered {
                 for (int j = 0; j < crfNodeList.getLength(); j = j + 1) {
                     Node crfNode = crfNodeList.item(j);
                     if (crfNode instanceof Element) {
-                        CrfVersion crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
+                        CrfVersion crfVersion = container.getEventCrf().getCrfVersion();
                         EventCrf eventCrf = container.getEventCrf();
                         ArrayList<ItemData> itemDataList = new ArrayList<ItemData>();
 
                         HashMap<Integer,Set<Integer>> groupOrdinalMapping = new HashMap<Integer,Set<Integer>>();
                         NodeList groupNodeList = crfNode.getChildNodes();
                         
-                        List<Item> items = itemDao.findAllByCrfId(crfVersion.getCrf().getCrfId());
+                        List<Item> items = itemDao.findAllByCrfVersionId(crfVersion.getCrfVersionId());
                         List<ItemData> itemDatas = itemDataDao.findAllByEventCrf(container.getEventCrf().getEventCrfId());
-                        List<ItemGroup> itemGroups = itemGroupDao.findAllByCrfId(container.getEventCrf().getCrfVersion().getCrf());
-                        List<ItemGroupMetadata> itemGroupMetadatas = itemGroupMetadataDao.findAllByCrfVersion(container.getEventCrf().getCrfVersion().getCrfVersionId());
-                        List<ItemFormMetadata> itemFormMetadatas = itemFormMetadataDao.findAllByCrfVersion(container.getEventCrf().getCrfVersion().getCrfVersionId());
+                        List<ItemGroup> itemGroups = itemGroupDao.findByCrfVersionId(crfVersion.getCrfVersionId());
+                        List<ItemGroupMetadata> itemGroupMetadatas = itemGroupMetadataDao.findAllByCrfVersion(crfVersion.getCrfVersionId());
+                        List<ItemFormMetadata> itemFormMetadatas = itemFormMetadataDao.findAllByCrfVersion(crfVersion.getCrfVersionId());
 
                         // Group loop
                         for (int k = 0; k < groupNodeList.getLength(); k = k + 1) {

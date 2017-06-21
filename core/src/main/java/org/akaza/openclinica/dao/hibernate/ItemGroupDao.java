@@ -1,7 +1,6 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import java.util.ArrayList;
-import java.util.List;
 
 import org.akaza.openclinica.bean.oid.ItemGroupOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
@@ -33,19 +32,11 @@ public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
     }
 
     @SuppressWarnings("unchecked")
-    public List<ItemGroup> findAllByCrfId(CrfBean crf) {
-        getSessionFactory().getStatistics().logSummary();
-        String query = "select * from item_group ig  where ig.crf_id =?";
-        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemGroup.class);
-        q.setParameter(0, crf.getCrfId());
-        return (ArrayList<ItemGroup>) q.list();
-    }
-
-    @SuppressWarnings("unchecked")
     public ArrayList<ItemGroup> findByCrfVersionId(Integer crfVersionId) {
-        String query = "select distinct ig.* from item_group ig, item_group_metadata igm where igm.crf_version_id = " + crfVersionId
+        String query = "select distinct ig.* from item_group ig, item_group_metadata igm where igm.crf_version_id =?"
                 + " and ig.item_group_id = igm.item_group_id";
         org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemGroup.class);
+        q.setParameter(0, crfVersionId.intValue());
         return (ArrayList<ItemGroup>) q.list();
     }
 
