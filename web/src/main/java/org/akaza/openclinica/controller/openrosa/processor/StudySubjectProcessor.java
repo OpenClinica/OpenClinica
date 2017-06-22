@@ -47,10 +47,9 @@ public class StudySubjectProcessor implements Processor, Ordered {
     @Override
     public void process(SubmissionContainer container) throws Exception {
         logger.info("Executing study subject processor.");
-        
+
         String studySubjectOid = container.getSubjectContext().get("studySubjectOID");
         String embeddedStudySubjectId = getEmbeddedStudySubjectOid(container);
-        int nextLabel = studySubjectDao.findTheGreatestLabel() + 1;
         Date currentDate = new Date();
         UserAccount rootUser = userAccountDao.findByUserId(1);
         SimpleDateFormat dateFormatter = new SimpleDateFormat("yyyyMMdd.HHmmss");
@@ -79,12 +78,12 @@ public class StudySubjectProcessor implements Processor, Ordered {
             //If Study Subject exists in a parent/sibling study, create study subject with 'FIXME-<timestamp>' label to avoid data loss and mark it
             } else if (subjectExistsInParentSiblingStudy(embeddedStudySubjectId, study)) {
                 String subjectLabel = "FIXME-" + dateFormatter.format(currentDate);
-                Subject subject = createSubject(currentDate);
+                Subject subject = createSubject(currentDate, rootUser);
                 StudySubject studySubject = createStudySubject(subjectLabel, subject, study,rootUser,currentDate,embeddedStudySubjectId);
                 container.setSubject(studySubject);
             //Study Subject does not exist. Create it
             } else {
-                Subject subject = createSubject(currentDate);
+                Subject subject = createSubject(currentDate, rootUser);
                 StudySubject studySubject = createStudySubject(embeddedStudySubjectId, subject, study,rootUser,currentDate, null);
                 container.setSubject(studySubject);
             }
@@ -92,7 +91,8 @@ public class StudySubjectProcessor implements Processor, Ordered {
         } else {
             // create Subject & Study Subject
             Study study = studyDao.findByOcOID(container.getSubjectContext().get("studyOID"));
-            Subject subject = createSubject(currentDate);
+            int nextLabel = studySubjectDao.findTheGreatestLabelByStudy(study.getStudyId()) + 1;
+            Subject subject = createSubject(currentDate, rootUser);
             StudySubject studySubject = createStudySubject(Integer.toString(nextLabel), subject, study,rootUser,currentDate, null);
             container.setSubject(studySubject);
         }
@@ -118,9 +118,7 @@ public class StudySubjectProcessor implements Processor, Ordered {
         return 1;
     }
     
-    private Subject createSubject(Date currentDate) {
-        UserAccount rootUser = userAccountDao.findByUserId(1);
-
+    private Subject createSubject(Date currentDate, UserAccount rootUser) {
         Subject subject = new Subject();
         subject.setUserAccount(rootUser);
         subject.setStatus(Status.AVAILABLE);

@@ -118,20 +118,25 @@ public class ItemProcessor implements Processor, Ordered {
                 for (int j = 0; j < crfNodeList.getLength(); j = j + 1) {
                     Node crfNode = crfNodeList.item(j);
                     if (crfNode instanceof Element) {
-
-                        CrfVersion crfVersion = crfVersionDao.findByOcOID(container.getSubjectContext().get("crfVersionOID"));
+                        CrfVersion crfVersion = container.getEventCrf().getCrfVersion();
                         EventCrf eventCrf = container.getEventCrf();
                         ArrayList<ItemData> itemDataList = new ArrayList<ItemData>();
 
                         HashMap<Integer,Set<Integer>> groupOrdinalMapping = new HashMap<Integer,Set<Integer>>();
                         NodeList groupNodeList = crfNode.getChildNodes();
                         
+                        List<Item> items = itemDao.findAllByCrfVersionId(crfVersion.getCrfVersionId());
+                        List<ItemData> itemDatas = itemDataDao.findAllByEventCrf(container.getEventCrf().getEventCrfId());
+                        List<ItemGroup> itemGroups = itemGroupDao.findByCrfVersionId(crfVersion.getCrfVersionId());
+                        List<ItemGroupMetadata> itemGroupMetadatas = itemGroupMetadataDao.findAllByCrfVersion(crfVersion.getCrfVersionId());
+                        List<ItemFormMetadata> itemFormMetadatas = itemFormMetadataDao.findAllByCrfVersion(crfVersion.getCrfVersionId());
+
                         // Group loop
                         for (int k = 0; k < groupNodeList.getLength(); k = k + 1) {
                             Node groupNode = groupNodeList.item(k);
                             if (groupNode instanceof Element && !groupNode.getNodeName().startsWith("SECTION_")) {
                                 groupNodeName = groupNode.getNodeName();
-                                ItemGroup itemGroup = lookupItemGroup(groupNodeName, crfVersion);
+                                ItemGroup itemGroup = lookupItemGroup(groupNodeName, crfVersion, itemGroups);
                                 if (itemGroup == null) {
                                     logger.error("Failed to lookup item group: '" + groupNodeName + "'.  Continuing with submission.");
                                     continue;
@@ -151,16 +156,15 @@ public class ItemProcessor implements Processor, Ordered {
                                         
                                         itemName = itemNode.getNodeName().trim();
                                         itemValue = itemNode.getTextContent();
-                                       
-                                        Item item = lookupItem(itemName, crfVersion);
-                                        
+
+                                        Item item = lookupItem(itemName, crfVersion, items);
                                         if (item == null) {
                                             logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
                                             continue;
                                         }
 
-                                        ItemGroupMetadata itemGroupMeta = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-                                        ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                                        ItemGroupMetadata itemGroupMeta = lookupItemGroupMetadata(item.getItemId(), crfVersion.getCrfVersionId(), itemGroupMetadatas);
+                                        ItemFormMetadata itemFormMetadata = lookupItemFormMetadata(item.getItemId(), crfVersion.getCrfVersionId(), itemFormMetadatas);
                                         Integer itemOrdinal = getItemOrdinal(groupNode, itemGroupMeta.isRepeatingGroup(),itemDataList,item);
 
                                         // Convert space separated Enketo multiselect values to comma separated OC multiselect values
@@ -191,7 +195,7 @@ public class ItemProcessor implements Processor, Ordered {
                                         } else {
                                             itemDataList.add(newItemData);
                                         }
-                                        ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), itemOrdinal);
+                                        ItemData existingItemData = lookupItemData(item.getItemId(), eventCrf.getEventCrfId(), itemOrdinal,itemDatas);
                                         if (existingItemData == null) {
                                             // No existing value, create new item.
                                             if (newItemData.getOrdinal() < 0) {
@@ -215,30 +219,81 @@ public class ItemProcessor implements Processor, Ordered {
                                 }
                             }
                         }
-                        //}
-
-                            // Delete rows that have been removed
-                            removeDeletedRows(groupOrdinalMapping,eventCrf,crfVersion,container.getStudy(),container.getSubject(), container.getLocale(), container.getUser());
-                        }
+                        // Delete rows that have been removed
+                        removeDeletedRows(groupOrdinalMapping,eventCrf,crfVersion,container.getStudy(),container.getSubject(), container.getLocale(), container.getUser());
                     }
                 }
             }
         }
+    }
     
-    private Item lookupItem(String itemName, CrfVersion crfVersion) {
-        if (crfVersion.getXform() == null || crfVersion.getXform().equals("")) { 
-            return itemDao.findByOcOID(itemName);
-        } else { 
-            return itemDao.findByNameCrfId(itemName, crfVersion.getCrf().getCrfId());
+    private ItemFormMetadata lookupItemFormMetadata(Integer itemId, Integer crfVersionId, List<ItemFormMetadata> itemFormMetadataList) {
+        for (ItemFormMetadata itemFormMetadata: itemFormMetadataList) {
+            if (itemFormMetadata.getItem().getItemId() == itemId.intValue() && 
+                    itemFormMetadata.getCrfVersionId().intValue() == crfVersionId.intValue()) return itemFormMetadata;
         }
+        return null;
+    }
+    
+    private ItemGroupMetadata lookupItemGroupMetadata(Integer itemId, Integer crfVersionId, List<ItemGroupMetadata> itemGroupMetadataList) {
+        for (ItemGroupMetadata itemGroupMetadata: itemGroupMetadataList) {
+            if (itemGroupMetadata.getItem().getItemId() == itemId.intValue() && 
+                    itemGroupMetadata.getCrfVersion().getCrfVersionId() == crfVersionId.intValue()) return itemGroupMetadata;
+        }
+        return null;
+    }
+    
+    private ItemData lookupItemData(Integer itemId, Integer eventCrfId, Integer itemOrdinal, List<ItemData> itemDataList) {
+        for (ItemData itemData: itemDataList) {
+            if (itemData.getItem().getItemId() == itemId && 
+                    itemData.getEventCrf().getEventCrfId() == eventCrfId && 
+                    itemData.getOrdinal() == itemOrdinal.intValue()) return itemData;
+        }
+        return null;
     }
 
-    private ItemGroup lookupItemGroup(String groupNodeName, CrfVersion crfVersion) {
-        if (crfVersion.getXform() == null || crfVersion.getXform().equals("")) {
-            return itemGroupDao.findByOcOID(groupNodeName);
-        } else {
-            return itemGroupDao.findByNameCrfId(groupNodeName, crfVersion.getCrf());
+    private Item lookupItem(String itemName, CrfVersion crfVersion, List<Item> itemList) {
+        if (crfVersion.getXform() == null || crfVersion.getXform().equals("")) { 
+            return lookupItemByOid(itemName,itemList);
+        } else { 
+            return lookupItemByName(itemName, itemList);
         }
+    }
+    
+    private Item lookupItemByOid(String oid, List<Item> itemList) {
+        for (Item item: itemList) {
+            if (item.getOcOid().equals(oid)) return item;
+        }
+        return null;
+    }
+
+    private Item lookupItemByName(String name, List<Item> itemList) {
+        for (Item item: itemList) {
+            if (item.getName().equals(name)) return item;
+        }
+        return null;
+    }
+
+    private ItemGroup lookupItemGroup(String groupNodeName, CrfVersion crfVersion, List<ItemGroup> itemGroupList) {
+        if (crfVersion.getXform() == null || crfVersion.getXform().equals("")) {
+            return lookupItemGroupByOId(groupNodeName, itemGroupList);
+        } else {
+            return lookupItemGroupByName(groupNodeName, itemGroupList);
+        }
+    }
+    
+    private ItemGroup lookupItemGroupByOId(String oid, List<ItemGroup> itemGroupList) {
+        for (ItemGroup group:itemGroupList) {
+            if (group.getOcOid().equals(oid)) return group;
+        }
+        return null;
+    }
+
+    private ItemGroup lookupItemGroupByName(String groupName, List<ItemGroup> itemGroupList) {
+        for (ItemGroup group:itemGroupList) {
+            if (group.getName().equals(groupName)) return group;
+        }
+        return null;
     }
 
     private ItemData createItemData(Item item, String itemValue, Integer itemOrdinal, EventCrf eventCrf, Study study,

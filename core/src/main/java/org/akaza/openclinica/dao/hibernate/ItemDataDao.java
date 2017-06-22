@@ -20,6 +20,14 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
         return (ItemData) q.uniqueResult();
     }
 
+    public List<ItemData> findAllByEventCrf(Integer eventCrfId) {
+        String query = "select * from item_data where event_crf_id = " + eventCrfId;
+        org.hibernate.Query q = getCurrentSession().createSQLQuery(query).addEntity(ItemData.class);
+        
+        return (List<ItemData>) q.list();
+      
+    }
+
     public List<ItemData> findByEventCrfGroup(Integer eventCrfId, Integer itemGroupId) {
         String query = "select id.* " + 
             "from item_data id " + 
