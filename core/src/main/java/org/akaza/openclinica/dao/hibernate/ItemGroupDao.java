@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.oid.ItemGroupOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
+import org.hibernate.Query;
 
 public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
 
@@ -36,7 +37,7 @@ public class ItemGroupDao extends AbstractDomainDao<ItemGroup> {
 
     @SuppressWarnings("unchecked")
     public ArrayList<ItemGroup> findByCrfVersionId(Integer crfVersionId) {
-        org.hibernate.Query q = getCurrentSession().createSQLQuery(findAllByCrfVersionIdQuery).addEntity(ItemGroup.class);
+        Query q = getCurrentSession().createSQLQuery(findAllByCrfVersionIdQuery).addEntity(ItemGroup.class);
         q.setInteger("crfversionid", crfVersionId.intValue());
         return (ArrayList<ItemGroup>) q.list();
     }

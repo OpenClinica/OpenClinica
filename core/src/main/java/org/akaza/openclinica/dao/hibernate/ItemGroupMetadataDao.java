@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
+import org.hibernate.Query;
 
 public class ItemGroupMetadataDao extends AbstractDomainDao<ItemGroupMetadata> {
 
@@ -33,7 +34,7 @@ public class ItemGroupMetadataDao extends AbstractDomainDao<ItemGroupMetadata> {
 
     @SuppressWarnings("unchecked")
     public List<ItemGroupMetadata> findAllByCrfVersion(int crf_version_id) {
-        org.hibernate.Query q = getCurrentSession().createSQLQuery(findAllByCrfVersionQuery).addEntity(ItemGroupMetadata.class);
+        Query q = getCurrentSession().createSQLQuery(findAllByCrfVersionQuery).addEntity(ItemGroupMetadata.class);
         q.setInteger("crfversionid", crf_version_id);
         return (List<ItemGroupMetadata>) q.list();
     }

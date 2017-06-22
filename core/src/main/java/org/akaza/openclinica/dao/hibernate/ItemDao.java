@@ -6,6 +6,7 @@ import java.util.List;
 import org.akaza.openclinica.bean.oid.ItemOidGenerator;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.domain.datamap.Item;
+import org.hibernate.Query;
 
 public class ItemDao extends AbstractDomainDao<Item> {
 
@@ -34,7 +35,7 @@ public class ItemDao extends AbstractDomainDao<Item> {
 
   @SuppressWarnings("unchecked")
   public List<Item> findAllByCrfVersionId(Integer crfVersionId) {
-      org.hibernate.Query q = getCurrentSession().createSQLQuery(findAllByCrfVersionIdQuery).addEntity(Item.class);
+      Query q = getCurrentSession().createSQLQuery(findAllByCrfVersionIdQuery).addEntity(Item.class);
       q.setInteger("crfversionid", crfVersionId.intValue());
       return (List<Item>) q.list();
   }
