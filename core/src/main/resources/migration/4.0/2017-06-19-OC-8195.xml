@@ -5,19 +5,21 @@
 
 	<changeSet author="jkeremian" id="2017-06-19-OC-8195-01"
 		dbms="postgresql" runOnChange="true">
-		<comment>Before Changing data type of description field in discrepancy_note, we need to drop all Views</comment>
+		<comment>Dropping Views before updating crf_version fields into form_layout</comment>
 		<sql>
 			DROP VIEW IF EXISTS view_site_hidden_event_definition_crf;
-			DROP VIEW IF
+			DROP
+			VIEW IF
 			EXISTS view_study_hidden_event_definition_crf;
-			DROP VIEW IF EXISTS view_discrepancy_note;
+			DROP VIEW IF
+			EXISTS view_discrepancy_note;
 			DROP VIEW IF EXISTS
 			view_dn_item_data;
 			DROP VIEW IF EXISTS view_dn_event_crf;
-			DROP VIEW public.view_item_data_toolkit_filtered;
+			DROP VIEW
+			public.view_item_data_toolkit_filtered;
 			DROP VIEW
 			public.view_item_data_toolkit;
-
 		</sql>
 		<rollback>
 			<sql></sql>
@@ -27,16 +29,10 @@
 
 
 
-	<changeSet author="jkeremian" id="2017-06-19-OC-8195-02"
-		dbms="postgresql" runOnChange="true">
-		<comment>Generate dropped Views after updating crf_versions into form_layouts</comment>
-		<sql>
-
-			-- View: view_dn_item_data
-			-- DROP VIEW view_dn_item_data;
-			CREATE
-			OR REPLACE VIEW view_dn_item_data AS
-			SELECT s.study_id,
+	<changeSet author="jkeremian" id="2017-06-19-OC-8195-02">
+		<comment>Generate new View after updating crf_versions into form_layouts</comment>
+		<createView replaceIfExists="true" viewName="view_dn_item_data">
+            			SELECT s.study_id,
 			s.parent_study_id, ( SELECT
 			event_definition_crf.hide_crf
 			FROM
@@ -109,11 +105,13 @@
 			LEFT JOIN user_account ua ON dn.assigned_user_id =
 			ua.user_id
 			WHERE map.study_subject_id = ss.study_subject_id;
-			-----------------------------------------------------------------
-			--View: view_dn_event_crf
-			-- DROP VIEW view_dn_event_crf;
-			CREATE OR
-			REPLACE VIEW view_dn_event_crf AS
+            </createView>
+	</changeSet>
+
+
+	<changeSet author="jkeremian" id="2017-06-19-OC-8195-03">
+		<comment>Generate new View after updating crf_versions into form_layouts</comment>
+		<createView replaceIfExists="true" viewName="view_dn_event_crf">
 			SELECT s.study_id,
 			s.parent_study_id, ( SELECT
 			event_definition_crf.hide_crf
@@ -197,12 +195,13 @@
 			= s.study_id
 			LEFT JOIN user_account ua ON dn.assigned_user_id =
 			ua.user_id;
-			--------------------------------------------------------------------
+            </createView>
+	</changeSet>
 
-			-- View: view_site_hidden_event_definition_crf
-			-- DROP VIEW view_site_hidden_event_definition_crf;
-			CREATE OR REPLACE VIEW
-			view_site_hidden_event_definition_crf AS
+	<changeSet author="jkeremian" id="2017-06-19-OC-8195-04">
+		<comment>Generate new View after updating crf_versions into form_layouts</comment>
+		<createView replaceIfExists="true"
+			viewName="view_site_hidden_event_definition_crf">
 			SELECT
 			edc.event_definition_crf_id, edc.hide_crf, edc.study_id,
 			se.study_event_id,
@@ -219,11 +218,13 @@
 			event_definition_crf.parent_id != 0))
 			JOIN form_layout fl ON
 			edc.crf_id = fl.crf_id;
-			---------------------------------------------------------------
-			--View: view_study_hidden_event_definition_crf
-			-- DROP VIEW view_study_hidden_event_definition_crf;
-			CREATE OR REPLACE VIEW
-			view_study_hidden_event_definition_crf AS
+            </createView>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2017-06-19-OC-8195-05">
+		<comment>Generate new View after updating crf_versions into form_layouts</comment>
+		<createView replaceIfExists="true"
+			viewName="view_study_hidden_event_definition_crf">
 			SELECT
 			edc.event_definition_crf_id, edc.hide_crf, edc.study_id,
 			se.study_event_id,
@@ -234,11 +235,12 @@
 			se.study_event_definition_id AND edc.parent_id IS NULL
 			JOIN
 			form_layout fl ON edc.crf_id = fl.crf_id;
-			-----------------------------------------------------------
-			-- View:view_discrepancy_note
-			-- DROP VIEW view_discrepancy_note;
-			CREATE OR
-			REPLACE VIEW view_discrepancy_note AS
+            </createView>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2017-06-19-OC-8195-06">
+		<comment>Generate new View after updating crf_versions into form_layouts</comment>
+		<createView replaceIfExists="true" viewName="view_discrepancy_note">
 			( ( ( SELECT
 			view_dn_item_data.study_id,
 			view_dn_item_data.parent_study_id,
@@ -389,12 +391,12 @@
 			view_dn_subject.last_name, view_dn_subject.user_name,
 			view_dn_subject.owner_first_name, view_dn_subject.owner_last_name,
 			view_dn_subject.owner_user_name
-			FROM view_dn_subject;
-			-----------------------
-			-- View: public.view_item_data_toolkit
-			-- DROP VIEW public.view_item_data_toolkit;
+			FROM view_dn_subject;            </createView>
+	</changeSet>
 
-			CREATE OR REPLACE VIEW public.view_item_data_toolkit AS
+	<changeSet author="jkeremian" id="2017-06-19-OC-8195-07">
+		<comment>Generate new View after updating crf_versions into form_layouts</comment>
+		<createView replaceIfExists="true" viewName="view_item_data_toolkit">
 			SELECT DISTINCT id.item_data_id,
 			CASE
 			WHEN s.parent_study_id IS NULL THEN 0
@@ -430,12 +432,13 @@
 			JOIN study_event_definition sed ON sed.study_event_definition_id =
 			se.study_event_definition_id
 			ORDER BY id.item_data_id;
+   </createView>
+	</changeSet>
 
-			------------------------
-			-- View: public.view_item_data_toolkit_filtered
-			-- DROP VIEW public.view_item_data_toolkit_filtered;
-
-			CREATE OR REPLACE VIEW public.view_item_data_toolkit_filtered AS
+	<changeSet author="jkeremian" id="2017-06-19-OC-8195-08">
+		<comment>Generate new View after updating crf_versions into form_layouts</comment>
+		<createView replaceIfExists="true"
+			viewName="view_item_data_toolkit_filtered">
 			SELECT DISTINCT view.item_data_id,
 			view.parent_study_id,
 			view.study_id,
@@ -480,11 +483,7 @@
 			LEFT JOIN event_crf_flag_workflow ecfw ON ecfw.id =
 			ec_flag.flag_workflow_id
 			ORDER BY view.event_crf_id;
-
-
-		</sql>
-		<rollback>
-			<sql></sql>
-		</rollback>
+   </createView>
 	</changeSet>
+
 </databaseChangeLog>
