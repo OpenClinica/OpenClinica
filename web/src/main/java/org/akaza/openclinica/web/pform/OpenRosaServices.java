@@ -145,6 +145,7 @@ public class OpenRosaServices {
     public static final String NO_SUFFIX = "form.xml";
     public static final String QUERY_FLAVOR = "-query";
     public static final String NO_FLAVOR = "";
+    public static final String SVG = ".svg";
 
     public static final String FORM_CONTEXT = "ecid";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
@@ -496,8 +497,11 @@ public class OpenRosaServices {
         // Set content type, if known
         FileNameMap fileNameMap = URLConnection.getFileNameMap();
         String type = fileNameMap.getContentTypeFor(media.getPath() + media.getName());
-        if (type != null && !type.isEmpty())
+        if (type != null && !type.isEmpty()) {
             builder = builder.header("Content-Type", type);
+        } else if (media.getName().endsWith(SVG)) {
+            builder = builder.header("Content-Type", "image/svg+xml");
+        }
         return builder.build();
     }
 
