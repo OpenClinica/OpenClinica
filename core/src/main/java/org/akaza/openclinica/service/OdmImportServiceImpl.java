@@ -37,6 +37,9 @@ import org.springframework.validation.Errors;
 import org.springframework.web.client.RestTemplate;
 
 import javax.sql.DataSource;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
@@ -69,8 +72,26 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.dataSource = dataSource;
     }
 
+    private void printOdm(ODM odm){
+        JAXBContext jaxbContext = null;
+        try {
+            jaxbContext = JAXBContext.newInstance(ODM.class);
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            // output pretty printed
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+            jaxbMarshaller.marshal(odm, System.out);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
     @Transactional
     public void importOdmToOC(ODM odm, String boardId) {
+
+        printOdm(odm);
+
+
 
         CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(),dataSource);
 
@@ -122,7 +143,6 @@ public class OdmImportServiceImpl implements OdmImportService {
                             defaultVersionName = formLayoutRefs.get(0).getOID();
                         }
                         formLayout = getFormLayoutDao().findByNameCrfId(defaultVersionName, crf.getCrfId());
-                        CrfVersion crfVersion = getCrfVersionDao().findByNameCrfId(formLayout.getName(),crf.getCrfId());
                         EventDefinitionCrfDTO edcObj = new EventDefinitionCrfDTO();
                         edcObj.setUserAccount(userAccount);
                         edcObj.setConf(conf);
@@ -131,7 +151,6 @@ public class OdmImportServiceImpl implements OdmImportService {
                         edcObj.setOdmFormRef(odmFormRef);
                         edcObj.setStudy(study);
                         edcObj.setFormLayout(formLayout);
-                        edcObj.setCrfVersion(crfVersion);
                         edcObj.setStudyEventDefinition(studyEventDefinition);
 
                         EDCTagDTO populateEDCTagParameter = new EDCTagDTO();
@@ -259,7 +278,7 @@ public class OdmImportServiceImpl implements OdmImportService {
             throw new RuntimeException("Study with this oid: " + studyOid + " doesn't exist. Please fix !!! ");
         }
 
-        study = getStudyDao().saveOrUpdate(updateStudy(odmGlobalVariables, userAccount, study));
+        //study = getStudyDao().saveOrUpdate(updateStudy(odmGlobalVariables, userAccount, study));
         return study;
     }
 
@@ -353,7 +372,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         edcObj.getEventDefinitionCrf().setCrf(edcObj.getCrf());
         edcObj.getEventDefinitionCrf().setStatusId(org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
         edcObj.getEventDefinitionCrf().setUserAccount(edcObj.getUserAccount());
-        edcObj.getEventDefinitionCrf().setCrfVersion(edcObj.getCrfVersion());
+        edcObj.getEventDefinitionCrf().setFormLayout(edcObj.getFormLayout());
         edcObj.getEventDefinitionCrf().setDoubleEntry(false);
         edcObj.getEventDefinitionCrf().setElectronicSignature(false);
         setConfigurationProperties(edcObj.getConf(), edcObj.getEventDefinitionCrf());
