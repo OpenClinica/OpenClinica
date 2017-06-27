@@ -25,9 +25,11 @@
 <tr id="sidebar_Instructions_open" style="display: none">
     <td class="sidebar_tab">
 
-    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 
-    <b><fmt:message key="instructions" bundle="${resword}"/></b>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
+
+    <fmt:message key="instructions" bundle="${resword}"/>
+
 
     <div class="sidebar_tab_content">
 
@@ -39,9 +41,12 @@
   <tr id="sidebar_Instructions_closed" style="display: all">
     <td class="sidebar_tab">
 
-    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 
-    <b><fmt:message key="instructions" bundle="${resword}"/></b>
+
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
+
+    <fmt:message key="instructions" bundle="${resword}"/>
+
 
     </td>
   </tr>
@@ -74,7 +79,7 @@
 
 
  </script>
-<h1><span class="title_manage"><c:out value="${studyToView.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><c:out value="${studyToView.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><span class="icon icon-question-circle gray"></span></a></span></h1>
 
 
 <strong><fmt:message key="download_study_meta" bundle="${restext}"/>
@@ -803,9 +808,15 @@
       <td class="table_cell">
         <c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
          <a href="ViewStudyUser?name=<c:out value="${user.userName}"/>&studyId=<c:out value="${user.studyId}"/>"
+<<<<<<< HEAD
       onMouseDown="javascript:setImage('bt_View1','icon icon-search');"
       onMouseUp="javascript:setImage('bt_View1','icon icon-search');"><span
       name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+=======
+      onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
+      name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+>>>>>>> OC-8181
     </c:if>
       </td>
   </tr>

@@ -92,7 +92,7 @@
    <a href="javascript:openDocWindow('ViewStudyEvents?print=yes&<c:out value="${queryUrl}"/>')"
   onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"
   onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">
-  <img name="bt_Print0" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>"></a>
+  <span name="bt_Print0" class="icon icon-print" border="0" alt="<fmt:message key="print" bundle="${resword}"/>"></a>
   </div>
   </h1>
 
