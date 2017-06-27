@@ -9,12 +9,12 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <c:choose>
-	<c:when test="${userRole.role.id > 3}">
-		<jsp:include page="../include/home-header.jsp"/>
-	</c:when>
-	<c:otherwise>
-		<jsp:include page="../include/admin-header.jsp"/>
-	</c:otherwise>
+  <c:when test="${userRole.role.id > 3}">
+    <jsp:include page="../include/home-header.jsp"/>
+  </c:when>
+  <c:otherwise>
+    <jsp:include page="../include/admin-header.jsp"/>
+  </c:otherwise>
 </c:choose>
 <%--<jsp:include page="../include/admin-header.jsp"/>--%>
 
@@ -23,27 +23,26 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-		<div class="sidebar_tab_content">
+    <fmt:message key="instructions" bundle="${resword}"/>
 
-		</div>
 
-		</td>
+    <div class="sidebar_tab_content">
 
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
+    </div>
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+    </td>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
-
-		</td>
+  </tr>
+  <tr id="sidebar_Instructions_closed" style="display: all">
+    <td class="sidebar_tab">
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
+    <fmt:message key="instructions" bundle="${resword}"/>
+    </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 <jsp:useBean scope='request' id='studyToView' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
@@ -57,28 +56,31 @@
 <script language="JavaScript">
 
          function leftnavExpand(strLeftNavRowElementName){
-	       var objLeftNavRowElement;
+         var objLeftNavRowElement;
 
            objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
            if (objLeftNavRowElement != null) {
              if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-	           objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
+             objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
                objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
                if(objLeftNavRowElement.display == "none"){
-                   objExCl.src = "images/bt_Expand.gif"; 
+                   objExCl.src = "images/bt_Expand.gif";
                }else{
                    objExCl.src = "images/bt_Collapse.gif";
                }
-	         }
+           }
            }
 
 
  </script>
-<h1><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1>
+<h1><span class="title_manage"><c:out value="${studyToView.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><span class="icon icon-question-circle gray"></span></a></span></h1>
 
 
-<strong><fmt:message key="download_oid_in_odm_format_by_click" bundle="${restext}"/>
- <a href="DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>"> <fmt:message key="here" bundle="${restext}"/></a>.</strong>
+<strong><fmt:message key="download_study_meta" bundle="${restext}"/>
+<a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');">
+<fmt:message key="here" bundle="${restext}"/></a>.
+<fmt:message key="opening_finished_may_save" bundle="${restext}"/>
+ </strong>
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
 <br><br>
 <a href="javascript:leftnavExpand('overview');">
@@ -195,19 +197,6 @@
   <fmt:formatDate value="${studyToView.protocolDateVerification}" pattern="${dteFormat}"/>
   </td></tr>
 
- <!--
-  <tr valign="top"><td class="table_header_column">Collect Subject Father/Mother Information?:</td><td class="table_cell">
-  <c:choose>
-    <c:when test="${studyToView.genetic == true}">
-     Yes
-    </c:when>
-    <c:otherwise>
-     No
-    </c:otherwise>
-   </c:choose>
- </td></tr>
- -->
-
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="start_date" bundle="${resword}"/>:</td><td class="table_cell">
    <fmt:formatDate value="${studyToView.datePlannedStart}" pattern="${dteFormat}"/>
@@ -247,13 +236,13 @@
   <c:when test="${studyToView.protocolTypeKey=='interventional'}">
 
   <tr valign="top"><td class="table_header_column">
-  	<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntAllocation" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntAllocation'); return false;"><fmt:message key="allocation" bundle="${resword}"/></a>
-	:</td><td class="table_cell">
+    <a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntAllocation" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntAllocation'); return false;"><fmt:message key="allocation" bundle="${resword}"/></a>
+  :</td><td class="table_cell">
    <c:out value="${studyToView.allocation}"/>&nbsp;
   </td></tr>
 
   <tr valign="top"><td class="table_header_column">
-  	<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntMasking" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntMasking'); return false;"><fmt:message key="masking" bundle="${resword}"/></a>:</td><td class="table_cell">
+    <a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntMasking" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntMasking'); return false;"><fmt:message key="masking" bundle="${resword}"/></a>:</td><td class="table_cell">
     <c:out value="${studyToView.masking}"/>&nbsp;
   </td></tr>
 
@@ -263,13 +252,13 @@
 
   <tr valign="top"><td class="table_header_column">
   <%--<fmt:message key="assignment" bundle="${resword}"/>--%>
-	<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntDesign" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntDesign'); return false;">
+  <a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntDesign" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntDesign'); return false;">
            <fmt:message key="intervention_model" bundle="${resword}"/></a>:</td><td class="table_cell">
    <c:out value="${studyToView.assignment}"/>&nbsp;
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><%--<fmt:message key="endpoint" bundle="${resword}"/>--%>
-	<a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints'); return false;">
+  <a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints'); return false;">
           <fmt:message key="study_classification" bundle="${resword}"/></a>:</td><td class="table_cell">
    <c:out value="${studyToView.endpoint}"/>&nbsp;
   </td></tr>
@@ -532,7 +521,7 @@
   </tr>
 
   <!--
-   <tr valign="top"><td class="table_header_column"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/>:</td>
+   <tr valign="top"><td class="table_header_column"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/></td>
    <td class="table_cell">
    <c:choose>
    <c:when test="${studyToView.studyParameterConfig.subjectIdPrefixSuffix == 'true'}">
@@ -558,25 +547,26 @@
   </c:choose>
   </td>
   </tr>
+   <tr valign="top">
+       <td class="table_header_column"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td>
+       <td class="table_cell">
+            <c:choose>
+       <c:when test="${   studyToView.studyParameterConfig.interviewerNameRequired == 'yes' }">
+       <fmt:message key="yes" bundle="${resword}"/>
+
+       </c:when>
+       <c:when test="${studyToView.studyParameterConfig.interviewerNameRequired == 'no' }">
+            <fmt:message key="no" bundle="${resword}"/>
+      </c:when>
+       <c:otherwise>
+       <fmt:message key="not_used" bundle="${resword}"/>
+         </c:otherwise>
+      </c:choose>
+      </td>
+   </tr>
 
 
-
-   <tr valign="top"><td class="table_header_column"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/>:</td>
-
-   <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewerNameRequired== true}">
-    <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_default_as_blank" bundle="${restext}"/>:</td>
+  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_default_as_blank" bundle="${restext}"/></td>
 
   <td class="table_cell">
    <c:choose>
@@ -604,10 +594,10 @@
   </td>
   </tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_required" bundle="${restext}"/></td>
+  <tr valign="top"><td class="table_header_column"><fmt:message key="forced_reason_for_change" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewDateRequired== 'true'}">
+   <c:when test="${studyToView.studyParameterConfig.adminForcedReasonForChange == 'true'}">
   <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
@@ -615,6 +605,24 @@
    </c:otherwise>
   </c:choose>
   </td>
+  </tr>
+
+  <tr valign="top">
+      <td class="table_header_column"><fmt:message key="interview_date_required" bundle="${restext}"/></td>
+      <td class="table_cell">
+           <c:choose>
+       <c:when test="${  studyToView.studyParameterConfig.interviewDateRequired == 'yes'}">
+       <fmt:message key="yes" bundle="${resword}"/>
+
+       </c:when>
+      <c:when test="${studyToView.studyParameterConfig.interviewDateRequired == 'no'  }">
+            <fmt:message key="no" bundle="${resword}"/>
+      </c:when>
+       <c:otherwise>
+       <fmt:message key="not_used" bundle="${resword}"/>
+         </c:otherwise>
+      </c:choose>
+      </td>
   </tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_default_as_blank" bundle="${restext}"/></td>
@@ -642,7 +650,33 @@
   </c:choose>
   </td>
   </tr>
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="event_location_required" bundle="${resword}"/></td>
+        <td class="table_cell">
+            <fmt:message key="${studyToView.studyParameterConfig.eventLocationRequired}" bundle="${resword}"/>
+       </td>
+    </tr>
+    
+    
+    <c:if test="${portalURL!= '' && portalURL!= null}">   
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="participant_portal" bundle="${resword}"/></td>
+        <td class="table_cell">
+            <fmt:message key="${studyToView.studyParameterConfig.participantPortal}" bundle="${resword}"/>
+       </td>
+      </tr>
+   </c:if>
+    
 
+    <c:if test="${moduleManager!= '' && moduleManager!= null}">
+    <tr valign="top">
+        <td class="table_header_column"><fmt:message key="randomization" bundle="${resword}"/></td>
+        <td class="table_cell">
+            <fmt:message key="${studyToView.studyParameterConfig.randomization}" bundle="${resword}"/>
+       </td>
+      </tr>
+   </c:if>
+    
 </table>
 
 </div>
@@ -678,9 +712,9 @@
    <td class="table_cell">
      <c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
      <a href="ViewSite?id=<c:out value="${site.id}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-			name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+      onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
+      name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
      </c:if>
    </td>
   </tr>
@@ -722,11 +756,11 @@
    <c:out value="${definition.crfNum}"/>&nbsp;
    </td>
    <td class="table_cell">
-	   <a href="ViewEventDefinitionReadOnly?id=<c:out value="${definition.id}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-		    name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-	</td>
+     <a href="ViewEventDefinitionReadOnly?id=<c:out value="${definition.id}"/>"
+      onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
+        name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+  </td>
   </tr>
   </c:forEach>
   </table>
@@ -768,10 +802,10 @@
       <td class="table_cell">
         <c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
          <a href="ViewStudyUser?name=<c:out value="${user.userName}"/>&studyId=<c:out value="${user.studyId}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-			name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-		</c:if>
+      onMouseDown="javascript:setImage('bt_View1','icon icon-search');"
+      onMouseUp="javascript:setImage('bt_View1','icon icon-search');"><span
+      name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+    </c:if>
       </td>
   </tr>
   </c:forEach>
@@ -781,10 +815,5 @@
 </div>
 </div>
 
-<%--<br>--%>
-<%--<input type="button" onclick="confirmExit('ListStudy');"  name="cancel" value="   <fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>--%>
-<%--<br>--%>
- <%--<c:import url="../include/workflow.jsp">--%>
-  <%--<c:param name="module" value="admin"/>--%>
- <%--</c:import>--%>
+
 <jsp:include page="../include/footer.jsp"/>

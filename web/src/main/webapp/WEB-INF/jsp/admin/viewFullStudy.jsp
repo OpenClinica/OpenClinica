@@ -40,14 +40,8 @@
   </tr>
   <tr id="sidebar_Instructions_closed" style="display: all">
     <td class="sidebar_tab">
-
-
-
     <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
-
     <fmt:message key="instructions" bundle="${resword}"/>
-
-
     </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
@@ -808,15 +802,12 @@
       <td class="table_cell">
         <c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
          <a href="ViewStudyUser?name=<c:out value="${user.userName}"/>&studyId=<c:out value="${user.studyId}"/>"
-<<<<<<< HEAD
+
       onMouseDown="javascript:setImage('bt_View1','icon icon-search');"
       onMouseUp="javascript:setImage('bt_View1','icon icon-search');"><span
       name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-=======
-      onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-      name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
->>>>>>> OC-8181
+
+
     </c:if>
       </td>
   </tr>
