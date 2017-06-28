@@ -4,4 +4,5 @@
        <include file="migration/tenant/inserts.xml"/>
        <include file="migration/tenant/functions.xml"/>
        <include file="migration/tenant/triggers.xml"/>
+       <include file="migration/tenant/4.0-2017-06-19-OC-8195.xml"/>
 </databaseChangeLog>
