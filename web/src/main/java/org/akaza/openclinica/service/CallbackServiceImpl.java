@@ -45,7 +45,7 @@ public class CallbackServiceImpl implements CallbackService {
 
         if (StringUtils.isEmpty(_username))
             return null;
-        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByApiKey(user.getUserId());
+        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid(user.getUserId());
         if (StringUtils.isEmpty(ub.getName())) {
             ub = (UserAccountBean) userAccountDAO.findByUserName(_username);
         } else {
@@ -86,7 +86,7 @@ public class CallbackServiceImpl implements CallbackService {
         map.put("fName", "first");
         map.put("lName", "last");
         map.put("role_name", "Data Manager");
-        map.put("api_key", user.getUserId());
+        map.put("user_uuid", user.getUserId());
         Map<String, Object> appMetadata = user.getAppMetadata();
         Object userType = appMetadata.get("userContext");
         LinkedTreeMap<String, String> userTypeMap = (LinkedTreeMap<String, String>) userType;

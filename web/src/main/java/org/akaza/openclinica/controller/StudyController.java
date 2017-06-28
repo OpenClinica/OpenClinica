@@ -9,6 +9,8 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
+import org.akaza.openclinica.controller.helper.OCUserDTO;
+import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
@@ -132,7 +134,6 @@ import java.util.regex.Pattern;
 
     @RequestMapping(value = "/", method = RequestMethod.POST) public ResponseEntity<Object> createNewStudy(HttpServletRequest request,
             @RequestBody HashMap<String, Object> map) throws Exception {
-        ResponseEntity<HashMap> responseEntity = processSSOUserContext(request);
         ArrayList<ErrorObject> errorObjects = new ArrayList();
         StudyDTO studyDTO = new StudyDTO();
         logger.info("In Create Study");
@@ -161,13 +162,7 @@ import java.util.regex.Pattern;
         AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study Creation Started", "PENDING", LocalTime.now());
         AsyncStudyHelper.put(uniqueStudyID, asyncStudyHelper);
 
-        UserAccountBean ownerUserAccount = getStudyOwnerAccountWithCreatedUser(request, responseEntity);
-        if (ownerUserAccount == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type",
-                    "Owner Account");
-            errorObjects.add(errorOBject);
 
-        }
         if (StringUtils.isEmpty(uniqueStudyID)) {
             ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueStudyID");
             errorObjects.add(errorOBject);
@@ -202,13 +197,22 @@ import java.util.regex.Pattern;
         Locale locale = new Locale("en_US");
         request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
         ResourceBundleProvider.updateLocale(locale);
+
         request.setAttribute("uniqueProId", uniqueStudyID);
         request.setAttribute("name", name); // Brief Title
         request.setAttribute("oid", studyOid);
         request.setAttribute("uuid", uuid);
         request.setAttribute("envType", envType);
         request.setAttribute("studyEnvUuid", studyEnvUuid);
+        ResponseEntity<HashMap> responseEntity = processSSOUserContext(request, studyEnvUuid);
 
+        UserAccountBean ownerUserAccount = getStudyOwnerAccountWithCreatedUser(request, responseEntity);
+        if (ownerUserAccount == null) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type",
+                    "Owner Account");
+            errorObjects.add(errorOBject);
+
+        }
         Validator v0 = new Validator(request);
         v0.addValidation("name", Validator.NO_BLANKS);
 
@@ -269,6 +273,7 @@ import java.util.regex.Pattern;
             return getResponseSuccess(byOidEnvType);
         }
 
+
         StudyInfoObject studyInfoObject = null;
         Study schemaStudy = null;
         try {
@@ -311,6 +316,7 @@ import java.util.regex.Pattern;
 
     }
 
+
     private ResponseEntity<Object> getResponseSuccess(Study existingStudy) {
 
         ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
@@ -322,7 +328,7 @@ import java.util.regex.Pattern;
         return response;
     }
 
-    private ResponseEntity<HashMap> processSSOUserContext(HttpServletRequest request) throws Exception {
+    private ResponseEntity<HashMap> processSSOUserContext(HttpServletRequest request, String studyEnvUuid) throws Exception {
         ResponseEntity<HashMap> responseEntity = null;
         HttpSession session = request.getSession();
         if (session == null) {
@@ -332,9 +338,8 @@ import java.util.regex.Pattern;
         Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) session.getAttribute("userContextMap");
         if (userContextMap == null)
             return responseEntity;
-        HashMap<String, String> userMap = getUserInfo(userContextMap);
-        String username = userMap.get("username");
-
+        ResponseEntity<StudyEnvironmentRoleDTO[]> studyUserRoles = studyBuildService.getStudyUserRoles(request, studyEnvUuid);
+        HashMap<String, String> userMap = getUserInfo(request, userContextMap, studyUserRoles);
         UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
 
         if ((ub == null) || (ub.getId() == 0)) {
@@ -345,26 +350,79 @@ import java.util.regex.Pattern;
                 logger.error(e.getLocalizedMessage());
                 throw e;
             }
+        } else {
+            if (userMap.get("username") != null &&
+                    StringUtils.equals(ub.getName(), userMap.get("username")) != true) {
+                responseEntity = userAccountController.createOrUpdateAccount(request, userMap);
+                request.getSession().setAttribute("userBean", request.getAttribute("createdUaBean"));
+            } else {
+                HashMap<String, Object> userDTO = new HashMap<String, Object>();
+                userDTO.put("username", ub.getName());
+                userDTO.put("password", ub.getPasswd());
+                userDTO.put("firstName", ub.getFirstName());
+                userDTO.put("lastName", ub.getLastName());
+                userDTO.put("apiKey", ub.getApiKey());
+                responseEntity = new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
+            }
         }
         return responseEntity;
     }
 
-    private HashMap<String, String> getUserInfo(Map<String, Object> userContextMap) {
+    private HashMap<String, String> getUserInfo(HttpServletRequest request, Map<String, Object> userContextMap, ResponseEntity<StudyEnvironmentRoleDTO[]> studyUserRoles) {
+        String studyEnvUuid = (String) request.getAttribute("studyEnvUuid");
         HashMap<String, String> map = new HashMap<>();
-        String username = (String) userContextMap.get("username");
-        map.put("username", username);
-        map.put("fName", "fName");
-        map.put("lName", "lName");
-        map.put("role_name", "Data Manager");
+        ArrayList<LinkedHashMap<String, String>> roles = new ArrayList<>();
+
+        for (StudyEnvironmentRoleDTO role: studyUserRoles.getBody()) {
+            LinkedHashMap<String,String> studyRole = new LinkedHashMap<>();
+            studyRole.put("roleName",role.getRoleName());
+            studyRole.put("studyEnvUuid",role.getStudyEnvironmentUuid());
+            roles.add(studyRole);
+            if (role.getStudyEnvironmentUuid().equals(studyEnvUuid)) {
+                map.put("role_name", role.getRoleName());
+                UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
+                if ((ub == null) || (ub.getId() == 0)) {
+                    ResponseEntity<OCUserDTO> userInfo = studyBuildService.getUserDetails(request);
+                    if (userInfo == null)
+                        return null;
+                    OCUserDTO userDTO = userInfo.getBody();
+                    map.put("email", userDTO.getEmail());
+                    map.put("institution", userDTO.getOrganization());
+                    map.put("fName", userDTO.getFirstName());
+                    map.put("lName", userDTO.getLastName());
+                    map.put("user_uuid", userDTO.getUuid());
+                    map.put("username", userDTO.getUsername());
+                } else {
+                    String userUuid = (String) userContextMap.get("userUuid");
+                    if (StringUtils.isNotEmpty(userUuid) &&
+                            StringUtils.equals(ub.getUserUuid(), userUuid) != true) {
+                        ResponseEntity<OCUserDTO> userInfo = studyBuildService.getUserDetails(request);
+                        OCUserDTO userDTO = userInfo.getBody();
+                        map.put("email", userDTO.getEmail());
+                        map.put("institution", userDTO.getOrganization());
+                        map.put("fName", userDTO.getFirstName());
+                        map.put("lName", userDTO.getLastName());
+                        map.put("user_uuid", userDTO.getUuid());
+                        map.put("username", userDTO.getUsername());
+                    } else {
+                        map.put("email", ub.getEmail());
+                        map.put("institution", ub.getInstitutionalAffiliation());
+                        map.put("fName", ub.getFirstName());
+                        map.put("lName", ub.getLastName());
+                        map.put("user_uuid", ub.getUserUuid());
+                    }
+
+
+                }
+            }
+        }
+        userContextMap.put("roles",roles);
         switch ((String) userContextMap.get("userType")) {
         case "Business Admin":
             map.put("user_type", UserType.SYSADMIN.getName());
             break;
         }
         map.put("authorize_soap", "false");
-        map.put("email", "kkrumlian@openclinica.com");
-        map.put("institution", "OC");
-
         return map;
     }
 
@@ -397,119 +455,6 @@ import java.util.regex.Pattern;
         return response;
     }
 
-    @RequestMapping(value = "/createStudyAsync", method = RequestMethod.POST) public ResponseEntity<Object> createNewSkeletonStudyAsync(
-            HttpServletRequest request, @RequestBody HashMap<String, Object> map) throws Exception {
-        ResponseEntity<HashMap> responseEntity = processSSOUserContext(request);
-        ArrayList<ErrorObject> errorObjects = new ArrayList();
-        StudyDTO studyDTO = new StudyDTO();
-        StudyBean studyBean = null;
-        logger.info("In Create Study");
-        ResponseEntity<Object> response = null;
-
-        String validation_failed_message = "VALIDATION FAILED";
-        String validation_passed_message = "SUCCESS";
-
-        String uniqueStudyID = (String) map.get("uniqueStudyID");
-        String name = (String) map.get("briefTitle");
-        String oid = (String) map.get("oid");
-        String uuid = (String) map.get("uuid");
-        AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study Creation Started", "PENDING", LocalTime.now());
-        AsyncStudyHelper.put(uniqueStudyID, asyncStudyHelper);
-
-        UserAccountBean ownerUserAccount = getStudyOwnerAccountWithCreatedUser(request, responseEntity);
-        if (ownerUserAccount == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type",
-                    "Owner Account");
-            errorObjects.add(errorOBject);
-
-        }
-        if (StringUtils.isEmpty(uniqueStudyID)) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueStudyID");
-            errorObjects.add(errorOBject);
-        } else {
-            uniqueStudyID = uniqueStudyID.trim();
-        }
-        if (StringUtils.isEmpty(name)) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
-            errorObjects.add(errorOBject);
-        } else {
-            name = name.trim();
-        }
-        if (StringUtils.isEmpty(oid)) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "oid");
-            errorObjects.add(errorOBject);
-        } else {
-            oid = oid.trim();
-        }
-        if (StringUtils.isEmpty(uuid)) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "uuid");
-            errorObjects.add(errorOBject);
-        } else {
-            uuid = uuid.trim();
-        }
-        Locale locale = new Locale("en_US");
-        request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
-        ResourceBundleProvider.updateLocale(locale);
-        request.setAttribute("uniqueProId", uniqueStudyID);
-        request.setAttribute("name", name); // Brief Title
-        request.setAttribute("oid", oid);
-        request.setAttribute("uuid", uuid);
-        Validator v0 = new Validator(request);
-        v0.addValidation("name", Validator.NO_BLANKS);
-
-        HashMap vError0 = v0.validate();
-        if (!vError0.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "BriefTitle");
-            errorObjects.add(errorOBject);
-        }
-
-        Validator v1 = new Validator(request);
-        v1.addValidation("uniqueProId", Validator.NO_BLANKS);
-        HashMap vError1 = v1.validate();
-        if (!vError1.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueStudyId");
-            errorObjects.add(errorOBject);
-        }
-
-        Validator v2 = new Validator(request);
-        v1.addValidation("oid", Validator.NO_BLANKS);
-        HashMap vError2 = v2.validate();
-        if (!vError1.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "oid");
-            errorObjects.add(errorOBject);
-        }
-
-        Validator v3 = new Validator(request);
-        v1.addValidation("uuid", Validator.NO_BLANKS);
-        HashMap vError3 = v3.validate();
-        if (!vError1.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "uuid");
-            errorObjects.add(errorOBject);
-        }
-
-        studyDTO.setErrors(errorObjects);
-
-        Study study = new Study();
-        study.setUniqueIdentifier(uniqueStudyID);
-        study.setName(name);
-        study.setOc_oid(oid);
-
-        // Lambda Runnablestu
-        Runnable studyTask = () -> {
-            final AsyncStudyHelper asyncStudyHelper1 = new AsyncStudyHelper("Study Creation Started", "PENDING", LocalTime.now());
-            AsyncStudyHelper.put(study.getUniqueIdentifier(), asyncStudyHelper1);
-            try {
-                processStudyAsync(request, validation_passed_message, study, ownerUserAccount);
-            } catch (Exception e) {
-                logger.error("Error creating the study: " + study.getName() + " in async mode:");
-            }
-            AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating study", "ACTIVE");
-            AsyncStudyHelper.put(study.getUniqueIdentifier(), asyncStudyDone);
-        };
-        new Thread(studyTask).start();
-
-        return response;
-    }
 
     private ResponseEntity<Object> processStudyAsync(HttpServletRequest request, String validation_passed_message, Study study,
             UserAccountBean ownerUserAccount) throws Exception {

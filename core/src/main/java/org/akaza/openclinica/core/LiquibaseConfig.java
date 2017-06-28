@@ -25,7 +25,7 @@ public class LiquibaseConfig {
     public OCCreatePostgresAppServer createPostgresAppServer() {
         OCCreatePostgresAppServer appServer = new OCCreatePostgresAppServer();
         appServer.setDataSource(dataSource);
-        appServer.setChangeLog("classpath:migration/appServer/release.xml");
+        appServer.setChangeLog("classpath:migration/initDB/release.xml");
         return appServer;
     }
 
@@ -35,10 +35,10 @@ public class LiquibaseConfig {
         OCCommonTablesSpringLiquibase liquibase = new OCCommonTablesSpringLiquibase();
         liquibase.setDataSource(dataSource);
         liquibase.setDefaultSchema("public");
-        liquibase.setChangeLog("classpath:migration/schemaCommonTables/release.xml");
+        liquibase.setChangeLog("classpath:migration/dualPurposeStudyTable/release.xml");
         return liquibase;
     }
-
+    
     @Bean
     @DependsOn ("coreResources")
     public SpringLiquibase liquibasePublicSchema() {
@@ -49,12 +49,14 @@ public class LiquibaseConfig {
         return liquibase;
     }
 
+
+
     @Bean
     @DependsOn ("coreResources")
     public OCSpringLiquibase liquibaseForeignTables() {
         OCSpringLiquibase liquibase = new OCSpringLiquibase();
         liquibase.setDataSource(dataSource);
-        liquibase.setChangeLog("classpath:migration/schema/release.xml");
+        liquibase.setChangeLog("classpath:migration/tenantForeignTables/release.xml");
         return liquibase;
     }
 

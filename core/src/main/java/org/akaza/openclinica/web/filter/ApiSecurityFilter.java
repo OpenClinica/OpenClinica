@@ -103,6 +103,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
                             logger.debug("userContext:" + userContextMap);
                             userContextMap.put("username", _username);
+                            userContextMap.put("accessToken", accessToken);
                             CoreResources.setRootUserAccountBean(request, dataSource);
                             request.getSession().setAttribute("userContextMap", userContextMap);
                             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);

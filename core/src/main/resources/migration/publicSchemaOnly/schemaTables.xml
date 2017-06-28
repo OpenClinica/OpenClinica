@@ -5,7 +5,7 @@
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
     <changeSet author="pgawade" id="2017-03-15-7878-1">
         <createTable tableName="status">
-            <column autoIncrement="true" name="status_id" type="int">
+            <column autoIncrement="true" name="status_id" type="SERIAL">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="name" type="VARCHAR(255)"/>
@@ -71,7 +71,7 @@
     </changeSet>
     <changeSet author="yogi" id="2017-03-15-7878-2" failOnError="false">
         <createTable tableName="user_account">
-            <column autoIncrement="true" name="user_id" type="int">
+            <column autoIncrement="true" name="user_id" type="SERIAL">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="user_name" type="VARCHAR(64)"/>
@@ -108,18 +108,19 @@
             <column name="time_zone" type="VARCHAR(255)" defaultValue=""/>
             <column name="enable_api_key" defaultValueBoolean="false" type="boolean"/>
             <column name="api_key" type="VARCHAR(255)"/>
+            <column name="user_uuid" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
     <changeSet author="pgawade" id="2017-03-15-7878-3">
         <createTable tableName="user_type">
-            <column autoIncrement="true" name="user_type_id" type="int">
+            <column autoIncrement="true" name="user_type_id" type="SERIAL">
                 <constraints nullable="false" primaryKey="true"/>
             </column>
             <column name="user_type" type="VARCHAR(50)"/>
         </createTable>
         <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="user_account" constraintName="fk_user_acc_fk_user_f_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
         <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="user_account" constraintName="fk_user_acc_status_re_status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public" />
-        <addForeignKeyConstraint baseColumnNames="user_type_id" baseTableName="user_account" constraintName="fk_user_acc_ref_user__user_typ" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_type_id" referencedTableName="user_type" />
+        <addForeignKeyConstraint baseColumnNames="user_type_id" baseTableName="user_account" constraintName="fk_user_acc_ref_user__user_typ" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_type_id" referencedTableName="user_type" referencedTableSchemaName="public" />
     </changeSet>
     <changeSet author="pgawade (generated)" id="2017-03-15-7878-4">
             <insert tableName="user_type">
@@ -164,22 +165,20 @@
         </insert>
     </changeSet>
     <changeSet author="kkrumlian" id="2017-03-15-7878-7">
-        <preConditions onFail="MARK_RAN">
-            <dbms type="postgresql"/>
-        </preConditions>
+
         <sql splitStatements="false">
             SELECT nextval('user_account_user_id_seq')
         </sql>
     </changeSet>
     <changeSet author="pgawade (generated)" id="2017-03-15-7878-8">
         <createTable tableName="user_role">
-            <column autoIncrement="true" name="role_id" type="int">
-                <constraints nullable="false" primaryKey="true"/>
+            <column autoIncrement="true" name="role_id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="pk_user_role"/>
             </column>
             <column name="role_name" type="VARCHAR(64)">
                 <constraints nullable="false"/>
             </column>
-            <column name="parent_id" type="int"/>
+            <column name="parent_id" type="INT"/>
             <column name="role_desc" type="VARCHAR(2000)"/>
         </createTable>
     </changeSet>
@@ -274,10 +273,10 @@
         </createIndex>
     </changeSet>
     <changeSet author="pgawade (generated)" id="2017-03-15-7878-20">
-        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_user_role" constraintName="fk_study_us_study_use_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" />
+        <addForeignKeyConstraint baseColumnNames="owner_id" baseTableName="study_user_role" constraintName="fk_study_us_study_use_user_acc" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="user_id" referencedTableName="user_account" referencedTableSchemaName="public" />
     </changeSet>
     <changeSet author="pgawade (generated)" id="2017-03-15-7878-21">
-        <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_user_role" constraintName="fk_study_us_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status"/>
+        <addForeignKeyConstraint baseColumnNames="status_id" baseTableName="study_user_role" constraintName="fk_study_us_fk_study__status" deferrable="false" initiallyDeferred="false" onDelete="RESTRICT" onUpdate="RESTRICT" referencedColumnNames="status_id" referencedTableName="status" referencedTableSchemaName="public"/>
     </changeSet>
     <changeSet author="pgawade (generated)" id="2017-03-15-7878-22">
         <addForeignKeyConstraint baseColumnNames="study_id" baseTableName="study_user_role" constraintName="fk_person_role_study_id" deferrable="false" initiallyDeferred="false" onUpdate="RESTRICT" referencedColumnNames="study_id" referencedTableName="study" />
@@ -294,11 +293,5 @@
                 <where>role_name='Data Specialist'</where>
             </update>
         </rollback>
-    </changeSet>
-    <changeSet author="yogi" id="2017-03-15-7878-23">
-        <createSequence incrementBy="1"
-                        minValue="3"
-                        schemaName="public"
-                        sequenceName="study_study_id_seq"/>
     </changeSet>
 </databaseChangeLog>

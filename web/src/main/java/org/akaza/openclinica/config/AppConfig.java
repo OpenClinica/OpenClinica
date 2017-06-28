@@ -26,7 +26,6 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 public class AppConfig extends Auth0Config {
     @Override
     protected void authorizeRequests(final HttpSecurity http) throws Exception {
-        System.out.println("KKKKKK");
         http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/pages/home"));
         http.authorizeRequests()
                 .antMatchers("/css/**","/includes/**","/images/**", "/fonts/**",
@@ -34,7 +33,7 @@ public class AppConfig extends Auth0Config {
                         "/pages/callback",
                         "/pages/home",
                         "/pages/auth/api/**",
-                        "/pages/protocolversion/**",
+                        "/pages/studyversion/**",
                         "/rest2/openrosa/**",
                         "/pages/odmk/**",
                         "/pages/openrosa/**",
