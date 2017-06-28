@@ -274,8 +274,8 @@
 
             <!--align="left" -->
             <c:if test="${hasDiscNotes}"><a href=
-              "javascript:openDocWindow('ChooseDownloadFormat?subjectId=<c:out value="${currRow.bean.studySubject.id}"/>&discNoteType=${discNoteType}&module=${module}')"><img
-              hspace="2" width="24 " height="15" name="bt_View1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
+              "javascript:openDocWindow('ChooseDownloadFormat?subjectId=<c:out value="${currRow.bean.studySubject.id}"/>&discNoteType=${discNoteType}&module=${module}')"><span
+              hspace="2" width="24 " height="15" name="bt_View1" class="icon icon-download" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
 
 
             </c:if>
@@ -287,8 +287,8 @@
               hspace="4" style="float:left" width="24 " height="15" name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left"></a>
 
             <c:if test="${hasDiscNotes}"><a href=
-              "javascript:openDocWindow('ChooseDownloadFormat?subjectId=<c:out value="${currRow.bean.studySubject.id}"/>&discNoteType=${discNoteType}&resolutionStatus=${param.resolutionStatus}')"><img
-              hspace="4" width="24 " height="15" name="bt_View1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
+              "javascript:openDocWindow('ChooseDownloadFormat?subjectId=<c:out value="${currRow.bean.studySubject.id}"/>&discNoteType=${discNoteType}&resolutionStatus=${param.resolutionStatus}')"><span
+              hspace="4" width="24 " height="15" name="bt_View1" class="icon icon-download" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
 
                 <%--<a href=
     "javascript:openDocWindow('ChooseDownloadFormat?module=manage')"><img

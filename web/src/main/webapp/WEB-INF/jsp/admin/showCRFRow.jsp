@@ -98,8 +98,8 @@
         <c:when test="${version.downloadable}">
           <a href="DownloadVersionSpreadSheet?crfId=<c:out value="${currRow.bean.id}"/>&crfVersionId=<c:out value="${version.id}"/>"
              onMouseDown="javascript:setImage('bt_Download1','images/bt_Download_d.gif');"
-             onMouseUp="javascript:setImage('bt_Download1','images/bt_Download.gif');"><img
-            name="bt_Download1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_spreadsheet" bundle="${resword}"/>" title="<fmt:message key="download_spreadsheet" bundle="${resword}"/>" align="left" hspace="6">
+             onMouseUp="javascript:setImage('bt_Download1','images/bt_Download.gif');"><span
+            name="bt_Download1" class="icon icon-download" border="0" alt="<fmt:message key="download_spreadsheet" bundle="${resword}"/>" title="<fmt:message key="download_spreadsheet" bundle="${resword}"/>" align="left" hspace="6">
           </a>
         </c:when>
         <c:otherwise>

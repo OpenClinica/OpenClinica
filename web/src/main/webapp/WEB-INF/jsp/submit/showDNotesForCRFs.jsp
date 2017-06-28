@@ -326,8 +326,8 @@ if dnote.crfName == edc.crfName, then include dnote--%>
 
                 <c:when test="${discNoteBean.resolutionStatusId == 5}">
                     <c:if test="${not_applicableDisplayed eq 'false'}">
-                        <img
-                          name="icon_flagWhite" src="images/icon_flagWhite.gif" border="0"
+                        <span
+                          name="icon_flagWhite" class="icon icon-flag-empty blue" border="0"
                           alt="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" title="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" align="left"/>
                         <c:out value="(${not_applicableDN})"/><br /></c:if>
                     <c:set var="not_applicableDisplayed" value="true"/>
@@ -367,8 +367,8 @@ if dnote.crfName == edc.crfName, then include dnote--%>
                   hspace="2" style="float:left" name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left"></a>
 
                 <c:if test="${hasDiscNotes}"><a href=
-                  "javascript:openDocWindow('ChooseDownloadFormat?discNoteType=${discNoteType}&module=${module}&subjectId=${currRow.bean.studySubject.id}')"><img
-                  hspace="2" name="bt_View1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
+                  "javascript:openDocWindow('ChooseDownloadFormat?discNoteType=${discNoteType}&module=${module}&subjectId=${currRow.bean.studySubject.id}')"><span
+                  hspace="2" name="bt_View1" class="icon icon-download" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
 
                     <%--<a href=
                       "javascript:openDocWindow('ChooseDownloadFormat?module=manage')"><img
@@ -382,8 +382,8 @@ if dnote.crfName == edc.crfName, then include dnote--%>
                   hspace="2" style="float:left" name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left"></a>
 
                 <c:if test="${hasDiscNotes}"><a href=
-                  "javascript:openDocWindow('ChooseDownloadFormat?subjectId=${currRow.bean.studySubject.id}&discNoteType=${discNoteType}&module=${module}&resolutionStatus=${param.resolutionStatus}')"><img
-                  hspace="2" name="bt_View1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
+                  "javascript:openDocWindow('ChooseDownloadFormat?subjectId=${currRow.bean.studySubject.id}&discNoteType=${discNoteType}&module=${module}&resolutionStatus=${param.resolutionStatus}')"><span
+                  hspace="2" name="bt_View1" class="icon icon-download" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
 
                     <%--  <a href=
         "javascript:openDocWindow('ChooseDownloadFormat?module=manage')"><img

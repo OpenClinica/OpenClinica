@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedList;
+import java.util.List;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -23,6 +32,7 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.DisplayTableOfContentsBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.SectionBean;
 import org.akaza.openclinica.control.core.SecureController;
@@ -41,6 +51,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.SectionDAO;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
@@ -49,15 +60,6 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedList;
-import java.util.List;
-
-import javax.sql.DataSource;
 
 /**
  * @author ssachs
@@ -106,9 +108,8 @@ public class TableOfContentsServlet extends SecureController {
 
     public static final String ACTION_ADMINISTRATIVE_EDITING = "ae";
 
-    public static final String[] ACTIONS =
-        { ACTION_START_INITIAL_DATA_ENTRY, ACTION_CONTINUE_INITIAL_DATA_ENTRY, ACTION_START_DOUBLE_DATA_ENTRY, ACTION_CONTINUE_DOUBLE_DATA_ENTRY,
-            ACTION_ADMINISTRATIVE_EDITING };
+    public static final String[] ACTIONS = { ACTION_START_INITIAL_DATA_ENTRY, ACTION_CONTINUE_INITIAL_DATA_ENTRY, ACTION_START_DOUBLE_DATA_ENTRY,
+            ACTION_CONTINUE_DOUBLE_DATA_ENTRY, ACTION_ADMINISTRATIVE_EDITING };
 
     private FormProcessor fp;
 
@@ -202,7 +203,7 @@ public class TableOfContentsServlet extends SecureController {
         int eventCRFId = fp.getInt(INPUT_EVENT_CRF_ID);
 
         logger.info("Creating event CRF within Table of Contents.  Study id: " + currentStudy.getId() + "; CRF Version id: " + crfVersionId
-            + "; Study Event id: " + studyEventId + "; Event Definition CRF id: " + eventDefinitionCRFId + "; Subject: " + subjectId);
+                + "; Study Event id: " + studyEventId + "; Event Definition CRF id: " + eventDefinitionCRFId + "; Subject: " + subjectId);
 
         StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
         StudySubjectBean ssb = ssdao.findBySubjectIdAndStudy(subjectId, currentStudy);
@@ -219,6 +220,10 @@ public class TableOfContentsServlet extends SecureController {
         }
 
         CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
+        FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(crfVersionId);
+        List<CRFVersionBean> crfVersions = cvdao.findAllByCRFId(formLayout.getCrfId());
+        CRFVersionBean crfVersion = crfVersions.get(0);
         EntityBean eb = cvdao.findByPK(crfVersionId);
 
         if (!eb.isActive()) {
@@ -244,7 +249,7 @@ public class TableOfContentsServlet extends SecureController {
         if (eventCRFId == 0) {// no event CRF created yet
             ecb.setAnnotations("");
             ecb.setCreatedDate(new Date());
-            ecb.setCRFVersionId(crfVersionId);
+            ecb.setCRFVersionId(crfVersion.getId());
             ecb.setInterviewerName("");
             if (sEvent.getDateStarted() != null) {
                 ecb.setDateInterviewed(sEvent.getDateStarted());// default date
@@ -258,6 +263,7 @@ public class TableOfContentsServlet extends SecureController {
             ecb.setStudyEventId(studyEventId);
             ecb.setValidateString("");
             ecb.setValidatorAnnotations("");
+            ecb.setFormLayout(formLayout);
 
             ecb = (EventCRFBean) ecdao.create(ecb);
             logger.info("CREATED EVENT CRF");
@@ -302,8 +308,8 @@ public class TableOfContentsServlet extends SecureController {
                 verb = "start initial data entry";
             }
 
-            throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("you_are_trying_to") + verb + " "
-                + resexception.getString("on_event_CRF_inappropiate_action"));
+            throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET,
+                    resexception.getString("you_are_trying_to") + verb + " " + resexception.getString("on_event_CRF_inappropiate_action"));
         }
 
         if (action.equals(ACTION_START_DOUBLE_DATA_ENTRY)) {
@@ -471,8 +477,8 @@ public class TableOfContentsServlet extends SecureController {
 
         if (!SubmitDataServlet.maySubmitData(ub, currentRole)) {
             String exceptionName = resexception.getString("no_permission_to_perform_data_entry");
-            String noAccessMessage =
-                respage.getString("you_may_not_perform_data_entry_on_a_CRF") + " " + respage.getString("change_study_contact_study_coordinator");
+            String noAccessMessage = respage.getString("you_may_not_perform_data_entry_on_a_CRF") + " "
+                    + respage.getString("change_study_contact_study_coordinator");
 
             addPageMessage(noAccessMessage);
             throw new InsufficientPermissionException(Page.MENU, exceptionName, "1");
@@ -522,9 +528,9 @@ public class TableOfContentsServlet extends SecureController {
                     return;
                 } else {
                     addPageMessage(respage.getString("you_may_not_perform_administrative_editing") + " "
-                        + respage.getString("change_study_contact_study_coordinator"));
-                    throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception
-                            .getString("no_permission_to_perform_administrative_editing"), "1");
+                            + respage.getString("change_study_contact_study_coordinator"));
+                    throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS_SERVLET,
+                            resexception.getString("no_permission_to_perform_administrative_editing"), "1");
                 }
             } // end else if (action.equals(ACTION_ADMINISTRATIVE_EDITING))
         } // end else (for actions other than ACTION_START_INITIAL_DATA_ENTRY
@@ -670,7 +676,7 @@ public class TableOfContentsServlet extends SecureController {
 
         return answer;
     }
-    
+
     /**
      * A section contains all hidden dynamics will be removed from data entry tab and jump box.
      *
@@ -681,23 +687,23 @@ public class TableOfContentsServlet extends SecureController {
      */
     public static DisplayTableOfContentsBean getDisplayBeanWithShownSections(DataSource ds, DisplayTableOfContentsBean displayTableOfContentsBean,
             DynamicsMetadataService dynamicsMetadataService) {
-        if(displayTableOfContentsBean == null) {
+        if (displayTableOfContentsBean == null) {
             return displayTableOfContentsBean;
         }
         EventCRFBean ecb = displayTableOfContentsBean.getEventCRF();
         SectionDAO sectionDAO = new SectionDAO(ds);
         ArrayList<SectionBean> sectionBeans = getSections(ecb, ds);
         ArrayList<SectionBean> showSections = new ArrayList<SectionBean>();
-        if(sectionBeans != null && sectionBeans.size()>0) {
-            for(SectionBean s : sectionBeans) {
-                if(sectionDAO.containNormalItem(s.getCRFVersionId(), s.getId())) {
+        if (sectionBeans != null && sectionBeans.size() > 0) {
+            for (SectionBean s : sectionBeans) {
+                if (sectionDAO.containNormalItem(s.getCRFVersionId(), s.getId())) {
                     showSections.add(s);
                 } else {
-                    //for section contains dynamics, does it contain showing item_group/item?
-                    if(dynamicsMetadataService.hasShowingDynGroupInSection(s.getId(), s.getCRFVersionId(), ecb.getId())) {
+                    // for section contains dynamics, does it contain showing item_group/item?
+                    if (dynamicsMetadataService.hasShowingDynGroupInSection(s.getId(), s.getCRFVersionId(), ecb.getId())) {
                         showSections.add(s);
                     } else {
-                        if(dynamicsMetadataService.hasShowingDynItemInSection(s.getId(), s.getCRFVersionId(), ecb.getId())) {
+                        if (dynamicsMetadataService.hasShowingDynItemInSection(s.getId(), s.getCRFVersionId(), ecb.getId())) {
                             showSections.add(s);
                         }
                     }
@@ -707,13 +713,13 @@ public class TableOfContentsServlet extends SecureController {
         }
         return displayTableOfContentsBean;
     }
-    
+
     public static LinkedList<Integer> sectionIdsInToc(DisplayTableOfContentsBean toc) {
         LinkedList<Integer> ids = new LinkedList<Integer>();
-        if(toc != null) {
+        if (toc != null) {
             ArrayList<SectionBean> sectionBeans = toc.getSections();
-            if(sectionBeans!=null && sectionBeans.size()>0) {
-                for(int i=0; i<sectionBeans.size(); ++i) {
+            if (sectionBeans != null && sectionBeans.size() > 0) {
+                for (int i = 0; i < sectionBeans.size(); ++i) {
                     SectionBean s = sectionBeans.get(i);
                     ids.add(s.getId());
                 }
@@ -721,9 +727,10 @@ public class TableOfContentsServlet extends SecureController {
         }
         return ids;
     }
-    
+
     /**
      * Index starts from 0. If not in, return -1.
+     * 
      * @param sb
      * @param toc
      * @param sectionIdsInToc
@@ -732,12 +739,12 @@ public class TableOfContentsServlet extends SecureController {
     public static int sectionIndexInToc(SectionBean sb, DisplayTableOfContentsBean toc, LinkedList<Integer> sectionIdsInToc) {
         ArrayList<SectionBean> sectionBeans = new ArrayList<SectionBean>();
         int index = -1;
-        if(toc!=null) {
+        if (toc != null) {
             sectionBeans = toc.getSections();
         }
-        if(sectionBeans != null && sectionBeans.size()>0) {   
-            for(int i=0; i<sectionIdsInToc.size(); ++i) {
-                if(sb.getId()==sectionIdsInToc.get(i)) {
+        if (sectionBeans != null && sectionBeans.size() > 0) {
+            for (int i = 0; i < sectionIdsInToc.size(); ++i) {
+                if (sb.getId() == sectionIdsInToc.get(i)) {
                     index = i;
                     break;
                 }

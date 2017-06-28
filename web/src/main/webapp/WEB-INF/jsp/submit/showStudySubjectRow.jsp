@@ -98,41 +98,41 @@
         <c:choose>
         <c:when test="${event.subjectEventStatus.id==1}">  
          
-	      <img src="images/icon_Scheduled.gif"  border="0" style="position: relative; left: 7px;">	         
+	      <span class="icon icon-clock2"  border="0" style="position: relative; left: 7px;">	         
          </c:when>
         <c:when test="${event.subjectEventStatus.id==2}">
          
-         <img src="images/icon_NotStarted.gif"  border="0" style="position: relative; left: 7px;">     
+         <span class="icon icon-doc"  border="0" style="position: relative; left: 7px;">     
         
         </c:when>
         <c:when test="${event.subjectEventStatus.id==3}">
        
-         <img src="images/icon_InitialDE.gif"  border="0" style="position: relative; left: 7px;">     
+         <span class="icon icon-pencil-squared orange"  border="0" style="position: relative; left: 7px;">     
         
         </c:when>
         <c:when test="${event.subjectEventStatus.id==4}">
          
-         <img src="images/icon_DEcomplete.gif" border="0" style="position: relative; left: 7px;">   
+         <span class="icon icon-ok" border="0" style="position: relative; left: 7px;">   
         
         </c:when>  
         <c:when test="${event.subjectEventStatus.id==5}">  
             
-         <img src="images/icon_Stopped.gif" border="0" style="position: relative; left: 7px;"> 
+         <span class="icon icon-stop-circle red" border="0" style="position: relative; left: 7px;"> 
        
         </c:when>   
         <c:when test="${event.subjectEventStatus.id==6}">
          
-         <img src="images/icon_Skipped.gif" border="0" style="position: relative; left: 7px;">   
+         <span class="icon icon-redo" border="0" style="position: relative; left: 7px;">   
         
         </c:when>
         <c:when test="${event.subjectEventStatus.id==7}">
         
-         <img src="images/icon_Locked.gif" border="0" style="position: relative; left: 7px;">   
+         <span class="icon icon-icon-locked" border="0" style="position: relative; left: 7px;">   
         </c:when>
 
          <c:when test="${event.subjectEventStatus.id==8}">
 
-          <img src="images/icon_Signed.gif"  border="0" style="position: relative; left: 7px;">	         
+          <span class="icon icon-icon-sign"  border="0" style="position: relative; left: 7px;">	         
         </c:when>
 
         </c:choose> 

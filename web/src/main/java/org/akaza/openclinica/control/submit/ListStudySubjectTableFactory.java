@@ -121,15 +121,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
     public ListStudySubjectTableFactory(boolean showMoreLink) {
-        imageIconPaths.put(1, "images/icon_Scheduled.gif");
-        imageIconPaths.put(2, "images/icon_NotStarted.gif");
-        imageIconPaths.put(3, "images/icon_InitialDE.gif");
-        imageIconPaths.put(4, "images/icon_DEcomplete.gif");
-        imageIconPaths.put(5, "images/icon_Stopped.gif");
-        imageIconPaths.put(6, "images/icon_Skipped.gif");
-        imageIconPaths.put(7, "images/icon_Locked.gif");
-        imageIconPaths.put(8, "images/icon_Signed.gif");
         this.showMoreLink = showMoreLink;
+        imageIconPaths.put(1, "icon icon-clock2");
+        imageIconPaths.put(2, "icon icon-doc");
+        imageIconPaths.put(3, "icon icon-pencil-squared orange");
+        imageIconPaths.put(4, "icon icon-ok");
+        imageIconPaths.put(5, "icon icon-stop-circle red");
+        imageIconPaths.put(6, "icon icon-redo");
+        imageIconPaths.put(7, "icon icon-icon-locked");
+        imageIconPaths.put(8, "icon icon-icon-sign");
     }
 
     @Override
@@ -701,7 +701,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             logic();
 
             StringBuilder url = new StringBuilder();
-            url.append("<img src='" + imageIconPaths.get(subjectEventStatus.getId()) + "' border='0' style='position: relative; left: 7px;'>");
+            url.append("<span class='" + imageIconPaths.get(subjectEventStatus.getId()) + "' border='0' style='position: relative; left: 7px;'>");
             url.append(getCount());
 
             return url.toString();
@@ -732,7 +732,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
             StringBuilder url = new StringBuilder();
             url.append(eventDivBuilder(subject, rowcount, studyEvents, studyEventDefinition, studySubjectBean));
-            url.append("<img src='" + imageIconPaths.get(subjectEventStatus.getId()) + "' border='0' style='position: relative; left: 7px;'>");
+            url.append("<span class='" + imageIconPaths.get(subjectEventStatus.getId()) + "' style='padding-top: 2px; padding-bottom: 3px;'>");
             url.append(getCount());
             url.append("</a></td></tr></table>");
 

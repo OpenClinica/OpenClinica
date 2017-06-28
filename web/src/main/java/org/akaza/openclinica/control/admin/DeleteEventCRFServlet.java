@@ -171,13 +171,10 @@ public class DeleteEventCRFServlet extends SecureController {
                     // parentDiscrepancyNoteList is the list of the parent DNs records only
                     ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = getDnDao().findParentNotesOnlyByItemData(itemdata.getId());
                     for (DiscrepancyNoteBean parentDiscrepancyNote : parentDiscrepancyNoteList) {
-                        if (parentDiscrepancyNote.getResolutionStatusId() != 4) { // if the DN's resolution status is
-                                                                                  // not set to Closed
-                            String description = resword.getString("dn_auto-closed_description");
-                            String detailedNotes = resword.getString("dn_auto_closed_detailed_notes");
-                            // create new DN record , new DN Map record , also update the parent record
-                            createDiscrepancyNoteBean(description, detailedNotes, itemdata.getId(), study, ub, parentDiscrepancyNote);
-                        }
+                        String description = resword.getString("dn_auto-closed_description");
+                        String detailedNotes = resword.getString("dn_auto_closed_detailed_notes");
+                        // create new DN record , new DN Map record , also update the parent record
+                        createDiscrepancyNoteBean(description, detailedNotes, itemdata.getId(), study, ub, parentDiscrepancyNote);
                     }
                     iddao = new ItemDataDAO(sm.getDataSource());
                     ifmdao = new ItemFormMetadataDAO(sm.getDataSource());
@@ -240,9 +237,9 @@ public class DeleteEventCRFServlet extends SecureController {
         dnb.setDescription(description);
         dnb.setDetailedNotes(detailedNotes);
         dnb.setDiscrepancyNoteTypeId(parentDiscrepancyNote.getDiscrepancyNoteTypeId()); // set to parent DN Type Id
-        dnb.setResolutionStatusId(4); // set to closed
+        dnb.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
         dnb.setColumn("value"); // this is needed for DN Map object
-        dnb.setAssignedUserId(ub.getId());
+        dnb.setAssignedUser(null);
         dnb.setOwner(ub);
         dnb.setParentDnId(parentDiscrepancyNote.getId());
         dnb.setActivated(false);
@@ -250,11 +247,11 @@ public class DeleteEventCRFServlet extends SecureController {
         getDnDao().createMapping(dnb); // create DN mapping
 
         DiscrepancyNoteBean itemParentNote = (DiscrepancyNoteBean) getDnDao().findByPK(dnb.getParentDnId());
-        itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-        itemParentNote.setAssignedUserId(ub.getId());
+        itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
+        itemParentNote.setAssignedUser(null);
         itemParentNote.setOwner(ub);
         getDnDao().update(itemParentNote); // update parent DN
-        getDnDao().updateAssignedUser(itemParentNote); // update parent DN assigned user
+        getDnDao().updateAssignedUserToNull(itemParentNote); // update parent DN assigned user
 
     }
 
