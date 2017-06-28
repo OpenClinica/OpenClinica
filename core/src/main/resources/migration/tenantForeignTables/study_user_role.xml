@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="yogi" id="2017-03-14-7878-6" failOnError="false">
+        <sql splitStatements="false">
+            CREATE FOREIGN TABLE study_user_role
+            (
+            role_name character varying(40),
+            study_id integer,
+            status_id integer,
+            owner_id integer,
+            date_created date,
+            date_updated date,
+            update_id integer,
+            user_name character varying(64)
+            ) SERVER ${mappingServer}
+            OPTIONS (schema_name 'public', table_name 'study_user_role')
+        </sql>
+    </changeSet>
+</databaseChangeLog>

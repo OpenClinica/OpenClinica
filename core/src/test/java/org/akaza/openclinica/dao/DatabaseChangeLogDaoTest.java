@@ -45,7 +45,7 @@ public class DatabaseChangeLogDaoTest extends HibernateOcDbTestCase {
     public void testfindById() {
         DatabaseChangeLogDao databaseChangeLogDao = (DatabaseChangeLogDao) getContext().getBean("databaseChangeLogDao");
         DatabaseChangeLogBean databaseChangeLogBean = null;
-        databaseChangeLogBean = databaseChangeLogDao.findById("1235684743487-1", "pgawade (generated)", "migration/2.5/changeLogCreateTables.xml");
+        databaseChangeLogBean = databaseChangeLogDao.findById("1235684743487-1", "pgawade (generated)", "migration/initDB/initDB.xml");
 
         assertNotNull(databaseChangeLogBean);
         assertEquals("Author should be pgawade (generated)", "pgawade (generated)", databaseChangeLogBean.getAuthor());

@@ -116,8 +116,9 @@ public class UserAccountController {
 		String roleName = map.get("role_name");
 		String userType = map.get("user_type");
 		String apiKey = map.get("api_key");
+		apiKey = apiKey == null ? "" : apiKey;
 		String authorizeSoap = map.get("authorize_soap"); // true or false
-
+		String userUuid = map.get("user_uuid");
 		request.setAttribute("username", username);
 		request.setAttribute("fName", fName);
 		request.setAttribute("lName", lName);
@@ -179,6 +180,7 @@ public class UserAccountController {
 
 		uBean = buildUserAccount(username, fName, lName, password, institution, ownerUserAccount, email, passwordHash, Boolean.valueOf(authorizeSoap), role, uType);
 		uBean.setApiKey(apiKey);
+		uBean.setUserUuid(userUuid);
 		HashMap<String, Object> userDTO = new HashMap<String, Object>();
 		UserAccountBean uaBean = getUserAccount(uBean.getName());
 		if (!uaBean.isActive()) {
@@ -193,6 +195,7 @@ public class UserAccountController {
 		userDTO.put("firstName", uBean.getFirstName());
 		userDTO.put("lastName", uBean.getLastName());
 		userDTO.put("apiKey", uBean.getApiKey());
+		userDTO.put("userUuid", uBean.getUserUuid());
 		request.setAttribute("createdUaBean", uBean);
 		return new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
 	}

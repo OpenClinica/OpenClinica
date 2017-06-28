@@ -1,9 +1,12 @@
 package org.akaza.openclinica.service;
 
 import com.auth0.Auth0User;
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
+import org.akaza.openclinica.controller.helper.OCUserDTO;
+import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
@@ -19,10 +22,17 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.http.*;
+import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.web.client.RestTemplate;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.*;
@@ -155,5 +165,51 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             throw e;
         }
         return true;
+    }
+
+    public ResponseEntity getStudyUserRoles (HttpServletRequest request,  String studyEnvUuid) {
+        Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
+        if (userContextMap == null)
+            return null;
+        String userUuid = (String) userContextMap.get("userUuid");
+        String uri = CoreResources.getField("studyManagerServiceUrl") + userUuid + "/roles";
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        headers.add("Authorization", "Bearer " + userContextMap.get("accessToken"));
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        jsonConverter.setObjectMapper(objectMapper);
+        converters.add(jsonConverter);
+        restTemplate.setMessageConverters(converters);
+        ResponseEntity<StudyEnvironmentRoleDTO[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, StudyEnvironmentRoleDTO[].class);
+        return response;
+    }
+
+    public ResponseEntity getUserDetails (HttpServletRequest request) {
+        Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
+        if (userContextMap == null)
+            return null;
+        String userUuid = (String) userContextMap.get("userUuid");
+        String uri = CoreResources.getField("studyManagerServiceUrl") + userUuid;
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        headers.add("Authorization", "Bearer " + userContextMap.get("accessToken"));
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        jsonConverter.setObjectMapper(objectMapper);
+        converters.add(jsonConverter);
+        restTemplate.setMessageConverters(converters);
+        ResponseEntity<OCUserDTO> response = restTemplate.exchange(uri, HttpMethod.GET, entity, OCUserDTO.class);
+        return response;
     }
 }

@@ -18,8 +18,8 @@
 			email, active_study, institutional_affiliation,
 			status_id, owner_id, date_created,
 			passwd_challenge_question, passwd_challenge_answer,
-			phone, user_type_id,run_webservices,access_code,enable_api_key, api_key)
-			values (?,?,?,?,?,?,?,?,?,?,now(),?,?,?,?,?,?,?,?)</sql>
+			phone, user_type_id,run_webservices,access_code,enable_api_key, api_key, user_uuid)
+			values (?,?,?,?,?,?,?,?,?,?,now(),?,?,?,?,?,?,?,?,?)</sql>
 	</query>
 	<query>
 		<name>insertStudyUserRole</name>
@@ -39,7 +39,7 @@
 			status_id=?, update_id=?, date_updated=now(), date_lastvisit=?,
 			passwd_timestamp=?, passwd_challenge_question=?,
 			passwd_challenge_answer=?, phone=?, user_type_id=?, account_non_locked=?,lock_counter=?,run_webservices=?,access_code=?,
-			time_zone=? ,enable_api_key=? , api_key=? where user_id=?</sql>
+			time_zone=? ,enable_api_key=? , api_key=?, user_uuid=? where user_id=?</sql>
 	</query>
 	<query>
 		<name>createRole</name>
@@ -89,6 +89,10 @@
 	<query>
 		<name>findByApiKey</name>
 		<sql>select * from user_account where api_key=?</sql>
+	</query>
+	<query>
+		<name>findByUserUuid</name>
+		<sql>select * from user_account where user_uuid=?</sql>
 	</query>
 	<query>
 		<name>findAllParticipantsByStudyOid</name>

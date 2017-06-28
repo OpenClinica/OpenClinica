@@ -24,6 +24,7 @@ public class OCCreatePostgresAppServer extends SpringLiquibase {
         System.setProperty("dbPass", CoreResources.getField("dbPass"));
         System.setProperty("db", CoreResources.getField("db"));
         System.setProperty("dbHost", CoreResources.getField("dbHost"));
+        System.setProperty("mappingServer", "mapping_server_" + CoreResources.getField("db"));
         super.afterPropertiesSet();
     }
 }
