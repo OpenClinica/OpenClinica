@@ -381,7 +381,10 @@ import java.util.regex.Pattern;
             if (role.getStudyEnvironmentUuid().equals(studyEnvUuid)) {
                 map.put("role_name", role.getRoleName());
                 UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
-                if ((ub == null) || (ub.getId() == 0)) {
+                String userUuid = (String) userContextMap.get("userUuid");
+                if ((ub == null || ub.getId() == 0)
+                    || (StringUtils.isNotEmpty(userUuid) &&
+                        StringUtils.equals(ub.getUserUuid(), userUuid) != true)) {
                     ResponseEntity<OCUserDTO> userInfo = studyBuildService.getUserDetails(request);
                     if (userInfo == null)
                         return null;
@@ -393,26 +396,11 @@ import java.util.regex.Pattern;
                     map.put("user_uuid", userDTO.getUuid());
                     map.put("username", userDTO.getUsername());
                 } else {
-                    String userUuid = (String) userContextMap.get("userUuid");
-                    if (StringUtils.isNotEmpty(userUuid) &&
-                            StringUtils.equals(ub.getUserUuid(), userUuid) != true) {
-                        ResponseEntity<OCUserDTO> userInfo = studyBuildService.getUserDetails(request);
-                        OCUserDTO userDTO = userInfo.getBody();
-                        map.put("email", userDTO.getEmail());
-                        map.put("institution", userDTO.getOrganization());
-                        map.put("fName", userDTO.getFirstName());
-                        map.put("lName", userDTO.getLastName());
-                        map.put("user_uuid", userDTO.getUuid());
-                        map.put("username", userDTO.getUsername());
-                    } else {
-                        map.put("email", ub.getEmail());
-                        map.put("institution", ub.getInstitutionalAffiliation());
-                        map.put("fName", ub.getFirstName());
-                        map.put("lName", ub.getLastName());
-                        map.put("user_uuid", ub.getUserUuid());
-                    }
-
-
+                    map.put("email", ub.getEmail());
+                    map.put("institution", ub.getInstitutionalAffiliation());
+                    map.put("fName", ub.getFirstName());
+                    map.put("lName", ub.getLastName());
+                    map.put("user_uuid", ub.getUserUuid());
                 }
             }
         }
