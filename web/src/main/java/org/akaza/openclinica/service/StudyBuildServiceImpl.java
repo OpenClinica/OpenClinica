@@ -172,7 +172,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         if (userContextMap == null)
             return null;
         String userUuid = (String) userContextMap.get("userUuid");
-        String uri = CoreResources.getField("studyManagerServiceUrl") + userUuid + "/roles";
+        String uri = CoreResources.getField("SBSUrl") + userUuid + "/roles";
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
@@ -195,7 +195,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         if (userContextMap == null)
             return null;
         String userUuid = (String) userContextMap.get("userUuid");
-        String uri = CoreResources.getField("studyManagerServiceUrl") + userUuid;
+        String uri = CoreResources.getField("SBSUrl") + userUuid;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));

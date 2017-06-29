@@ -17,9 +17,9 @@
 			view_dn_item_data;
 			DROP VIEW IF EXISTS view_dn_event_crf;
 			DROP VIEW
-			public.view_item_data_toolkit_filtered;
+			view_item_data_toolkit_filtered;
 			DROP VIEW
-			public.view_item_data_toolkit;
+			view_item_data_toolkit;
 		</sql>
 		<rollback>
 			<sql></sql>
