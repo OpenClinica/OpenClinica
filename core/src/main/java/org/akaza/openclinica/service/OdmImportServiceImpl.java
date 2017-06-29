@@ -152,6 +152,7 @@ public class OdmImportServiceImpl implements OdmImportService {
                         edcObj.setStudy(study);
                         edcObj.setFormLayout(formLayout);
                         edcObj.setStudyEventDefinition(studyEventDefinition);
+                        edcObj.setOrdinal(odmFormRef.getOrderNumber().intValue());
 
                         EDCTagDTO populateEDCTagParameter = new EDCTagDTO();
                         populateEDCTagParameter.setConf(conf);
@@ -375,6 +376,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         edcObj.getEventDefinitionCrf().setFormLayout(edcObj.getFormLayout());
         edcObj.getEventDefinitionCrf().setDoubleEntry(false);
         edcObj.getEventDefinitionCrf().setElectronicSignature(false);
+        edcObj.getEventDefinitionCrf().setOrdinal(edcObj.getOrdinal());
         setConfigurationProperties(edcObj.getConf(), edcObj.getEventDefinitionCrf());
         if (edcObj.getOdmFormRef().getMandatory().equals(YesOrNo.YES)) {
             edcObj.getEventDefinitionCrf().setRequiredCrf(true);

@@ -20,6 +20,8 @@ public class EventDefinitionCrfDTO {
     private Study study;
     private StudyEventDefinition studyEventDefinition;
     private ODMcomplexTypeDefinitionFormRef odmFormRef;
+    private Integer ordinal;
+
 
     public EventDefinitionCrfDTO(EventDefinitionCrfDTO edcObj) {
         this.eventDefinitionCrf = edcObj.eventDefinitionCrf;
@@ -109,4 +111,11 @@ public class EventDefinitionCrfDTO {
         this.formLayout = formLayout;
     }
 
+    public Integer getOrdinal() {
+        return ordinal;
+    }
+
+    public void setOrdinal(Integer ordinal) {
+        this.ordinal = ordinal;
+    }
 }
