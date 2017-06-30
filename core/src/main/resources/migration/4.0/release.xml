@@ -8,4 +8,5 @@
        <include file="migration/4.0/2017-02-13-OC-7861.xml"/>  
        <include file="migration/4.0/2017-04-27-OC-8005.xml"/>     
        <include file="migration/4.0/2017-06-19-OC-8195.xml"/>     
+       <include file="migration/4.0/2017-06-20-OC-8195.xml"/>     
 </databaseChangeLog>

@@ -91,6 +91,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private DiscrepancyNotesSummary notesSummary;
     private final TypeDroplistFilterEditor discrepancyNoteTypeDropdown = new TypeDroplistFilterEditor();
     private final ResolutionStatusDroplistFilterEditor resolutionStatusDropdown = new ResolutionStatusDroplistFilterEditor();
+    private static final String QUERY_FLAVOR = "-query";
+    public static final String SINGLE_ITEM_FLAVOR = "-single_item";
 
     public ListNotesTableFactory(boolean showMoreLink) {
         this.showMoreLink = showMoreLink;
@@ -430,14 +432,15 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             // for "view" as action
             // This createNoteURL uses the same method as in ResolveDiscrepancyServlet
             String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
-            builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
+            // builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
+            builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + SINGLE_ITEM_FLAVOR);
             builder.close();
             builder.img().name("bt_View1").src("images/bt_View_d.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).align("left")
                     .append("hspace=\"6\"").close();
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
                 if (dnb.getEntityType() != "eventCrf") {
-                    builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
+                    builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
                     builder.close();
                     builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0").alt(resword.getString("view_within_crf"))
                             .title(resword.getString("view_within_crf")).align("left").append("hspace=\"6\"").close();
