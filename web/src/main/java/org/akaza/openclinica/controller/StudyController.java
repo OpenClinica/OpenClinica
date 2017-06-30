@@ -342,28 +342,25 @@ import java.util.regex.Pattern;
         HashMap<String, String> userMap = getUserInfo(request, userContextMap, studyUserRoles);
         UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
 
-        if ((ub == null) || (ub.getId() == 0)) {
+        if ((ub == null || ub.getId() == 0) ||
+                (userMap.get("username") != null &&
+                        StringUtils.equals(ub.getName(), userMap.get("username")) != true)) {
             // we need to create the user
             try {
                 responseEntity = userAccountController.createOrUpdateAccount(request, userMap);
+                request.getSession().setAttribute("userBean", request.getAttribute("createdUaBean"));
             } catch (Exception e) {
                 logger.error(e.getLocalizedMessage());
                 throw e;
             }
         } else {
-            if (userMap.get("username") != null &&
-                    StringUtils.equals(ub.getName(), userMap.get("username")) != true) {
-                responseEntity = userAccountController.createOrUpdateAccount(request, userMap);
-                request.getSession().setAttribute("userBean", request.getAttribute("createdUaBean"));
-            } else {
-                HashMap<String, Object> userDTO = new HashMap<String, Object>();
-                userDTO.put("username", ub.getName());
-                userDTO.put("password", ub.getPasswd());
-                userDTO.put("firstName", ub.getFirstName());
-                userDTO.put("lastName", ub.getLastName());
-                userDTO.put("apiKey", ub.getApiKey());
-                responseEntity = new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
-            }
+            HashMap<String, Object> userDTO = new HashMap<String, Object>();
+            userDTO.put("username", ub.getName());
+            userDTO.put("password", ub.getPasswd());
+            userDTO.put("firstName", ub.getFirstName());
+            userDTO.put("lastName", ub.getLastName());
+            userDTO.put("apiKey", ub.getApiKey());
+            responseEntity = new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
         }
         return responseEntity;
     }
