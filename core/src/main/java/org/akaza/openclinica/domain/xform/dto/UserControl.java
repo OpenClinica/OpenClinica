@@ -1,5 +1,7 @@
 package org.akaza.openclinica.domain.xform.dto;
 
+import java.util.List;
+
 public interface UserControl {
 
     public String getRef();
@@ -19,5 +21,7 @@ public interface UserControl {
     public void setHint(Hint hint);
 
     public String getMediatype();
+
+    public List<Item> getItem();
 
 }

@@ -254,7 +254,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 }
                 if (!itemExistInFormLayout)
                     formLayout = (FormLayoutBean) fldao.findByPK(vms.get(0).getFormLayout().getFormLayoutId());
-
+                // Get Original formLayout file from data directory
                 String xformOutput = "";
                 String directoryPath = Utils.getCrfMediaFilePath(crf.getOid(), formLayout.getOid());
                 File dir = new File(directoryPath);
@@ -267,6 +267,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                         }
                     }
                 }
+                // Unmarshal original form layout form
                 Html html = xformParser.unMarshall(xformOutput);
                 Body body = html.getBody();
                 Head head = html.getHead();
@@ -602,18 +603,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
         List<Item> items = null;
         String userControlRef = null;
         for (UserControl userControl : userControls) {
-            if (userControl instanceof Select) {
-                Select select = (Select) userControl;
-                items = select.getItem();
-                refs = addItemRefsToList(items, refs);
-            } else if (userControl instanceof Select1) {
-                Select1 select1 = (Select1) userControl;
-                items = select1.getItem();
+            if (userControl instanceof Select || userControl instanceof Select1) {
+                items = userControl.getItem();
                 refs = addItemRefsToList(items, refs);
             }
-
-            if (userControl != null)
+            if (userControl != null) {
                 userControlRef = userControl.getLabel().getRef();
+            }
             if (userControlRef != null) {
                 refs.add(userControlRef.substring(10, userControlRef.length() - 2));
             }
