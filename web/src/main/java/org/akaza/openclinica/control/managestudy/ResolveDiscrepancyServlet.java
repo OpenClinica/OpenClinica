@@ -47,6 +47,7 @@ import org.akaza.openclinica.control.submit.EnketoFormServlet;
 import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -57,6 +58,7 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.domain.xform.dto.Body;
@@ -78,7 +80,6 @@ import org.akaza.openclinica.domain.xform.dto.Translation;
 import org.akaza.openclinica.domain.xform.dto.UserControl;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
-import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
@@ -223,6 +224,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
             XformParser xformParser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
+            VersioningMapDao versioningMapDao = (VersioningMapDao) SpringServletAccess.getApplicationContext(context).getBean("versioningMapDao");
             StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
 
             // Cache the subject context for use during xform submission
@@ -241,6 +243,18 @@ public class ResolveDiscrepancyServlet extends SecureController {
             String contextHash = cache.putSubjectContext(subjectContext);
 
             if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+                // This section is for version migration ,where item does not exist in the current formLayout
+                boolean itemExistInFormLayout = false;
+                List<VersioningMap> vms = versioningMapDao.findByVersionIdAndItemId(ecb.getCRFVersionId(), item.getId());
+                for (VersioningMap vm : vms) {
+                    if (vm.getFormLayout().getFormLayoutId() == formLayout.getId()) {
+                        itemExistInFormLayout = true;
+                        break;
+                    }
+                }
+                if (!itemExistInFormLayout)
+                    formLayout = (FormLayoutBean) fldao.findByPK(vms.get(0).getFormLayout().getFormLayoutId());
+
                 String xformOutput = "";
                 String directoryPath = Utils.getCrfMediaFilePath(crf.getOid(), formLayout.getOid());
                 File dir = new File(directoryPath);
@@ -263,15 +277,22 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
                 UserControl itemUserControl = null;
                 UserControl itemCommentUserControl = null;
-                List<Group> groups = body.getGroup();
+
                 List<UserControl> userControls = body.getUsercontrol();
+                List<Group> groups = body.getGroup();
+                List<Repeat> repeats = body.getRepeat();
+
                 if (userControls != null) {
-                    itemUserControl = lookForUserControlInUserControls(userControls, item.getName());
-                    itemCommentUserControl = lookForUserControlInUserControls(userControls, item.getName() + COMMENT);
+                    itemUserControl = lookForUserControlInUserControl(userControls, item.getName());
+                    itemCommentUserControl = lookForUserControlInUserControl(userControls, item.getName() + COMMENT);
                 }
                 if (groups != null && itemUserControl == null) {
-                    itemUserControl = lookForUserControlInGroup(groups, item.getName());
-                    itemCommentUserControl = lookForUserControlInGroup(groups, item.getName() + COMMENT);
+                    itemUserControl = lookForUserControlInGroup(groups, item.getName(), null);
+                    itemCommentUserControl = lookForUserControlInGroup(groups, item.getName() + COMMENT, null);
+                }
+                if (repeats != null && itemUserControl == null) {
+                    itemUserControl = lookForUserControlInRepeat(repeats, item.getName(), null);
+                    itemCommentUserControl = lookForUserControlInRepeat(repeats, item.getName() + COMMENT, null);
                 }
 
                 if (itemUserControl != null) {
@@ -565,7 +586,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
         body.setUsercontrol(userControls);
 
         // Build Instance
-
         Meta meta = new Meta();
         meta.setInstanceID(new String());
         Form form = new Form();
@@ -580,6 +600,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // Set or Build IText
         List<String> refs = new ArrayList<>();
         List<Item> items = null;
+        String userControlRef = null;
         for (UserControl userControl : userControls) {
             if (userControl instanceof Select) {
                 Select select = (Select) userControl;
@@ -589,26 +610,30 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 Select1 select1 = (Select1) userControl;
                 items = select1.getItem();
                 refs = addItemRefsToList(items, refs);
-            } else {
+            }
 
+            if (userControl != null)
+                userControlRef = userControl.getLabel().getRef();
+            if (userControlRef != null) {
+                refs.add(userControlRef.substring(10, userControlRef.length() - 2));
             }
 
         }
 
-        List<Translation> translations = itext.getTranslation();
-        for (Translation translation : translations) {
-            List<Text> texts = translation.getText();
+        if (itext != null) {
+            List<Translation> translations = itext.getTranslation();
+            for (Translation translation : translations) {
+                List<Text> texts = translation.getText();
 
-            for (Iterator<Text> textIterator = texts.iterator(); textIterator.hasNext();) {
-                Text text = textIterator.next();
-                if (!refs.contains(text.getId())) {
-                    textIterator.remove();
+                for (Iterator<Text> textIterator = texts.iterator(); textIterator.hasNext();) {
+                    Text text = textIterator.next();
+                    if (!refs.contains(text.getId())) {
+                        textIterator.remove();
+                    }
                 }
             }
+            model.setItext(itext);
         }
-
-        // Build Itext
-        model.setItext(itext);
 
         // Assemble all
         head.setModel(model);
@@ -629,63 +654,59 @@ public class ResolveDiscrepancyServlet extends SecureController {
         return refs;
     }
 
-    private UserControl lookForUserControlInUserControls(List<UserControl> userControls, String itemName) {
-
-        for (Iterator<UserControl> controlIterator = userControls.iterator(); controlIterator.hasNext();) {
-            UserControl uControl = controlIterator.next();
+    private UserControl lookForUserControlInUserControl(List<UserControl> userControls, String itemName) {
+        UserControl userControl = null;
+        for (UserControl uControl : userControls) {
             if (uControl.getRef().endsWith(itemName)) {
-                return uControl;
+                userControl = uControl;
+                break;
             }
         }
+        return userControl;
+    }
 
-        return null;
+    private UserControl lookForUserControlInGroup(List<Group> groups, String itemName, UserControl userControl) {
+        for (Group group : groups) {
+            if (group.getUsercontrol() != null && userControl == null) {
+                userControl = lookForUserControlInUserControl(group.getUsercontrol(), itemName);
+                if (userControl != null)
+                    break;
+            }
+            if (group.getGroup() != null && userControl == null) {
+                userControl = lookForUserControlInGroup(group.getGroup(), itemName, userControl);
+                if (userControl != null)
+                    break;
+            }
+            if (group.getRepeat() != null && userControl == null) {
+                userControl = lookForUserControlInRepeat(group.getRepeat(), itemName, userControl);
+                if (userControl != null)
+                    break;
+            }
+        }
+        return userControl;
 
     }
 
-    private UserControl lookForUserControlInGroup(List<Group> groups, String itemName) {
-        for (Iterator<Group> groupIterator = groups.iterator(); groupIterator.hasNext();) {
-            Group group = groupIterator.next();
-
-            if (group.getUsercontrol() != null) {
-                for (Iterator<UserControl> controlIterator = group.getUsercontrol().iterator(); controlIterator.hasNext();) {
-                    UserControl uControl = controlIterator.next();
-                    if (uControl.getRef().endsWith(itemName)) {
-                        return uControl;
-                    }
-                }
+    private UserControl lookForUserControlInRepeat(List<Repeat> repeats, String itemName, UserControl userControl) {
+        for (Repeat repeat : repeats) {
+            if (repeat.getUsercontrol() != null && userControl == null) {
+                userControl = lookForUserControlInUserControl(repeat.getUsercontrol(), itemName);
+                if (userControl != null)
+                    break;
             }
-            if (group.getGroup() != null) {
-                lookForUserControlInGroup(group.getGroup(), itemName);
+            if (repeat.getGroup() != null && userControl == null) {
+                userControl = lookForUserControlInGroup(repeat.getGroup(), itemName, userControl);
+                if (userControl != null)
+                    break;
             }
-            if (group.getRepeat() != null) {
-                lookForUserControlInRepeat(group.getRepeat(), itemName);
+            if (repeat.getRepeat() != null && userControl == null) {
+                userControl = lookForUserControlInRepeat(repeat.getRepeat(), itemName, userControl);
+                if (userControl != null)
+                    break;
             }
         }
-        return null;
+        return userControl;
 
-    }
-
-    private UserControl lookForUserControlInRepeat(List<Repeat> repeats, String itemName) {
-        for (Iterator<Repeat> repeatIterator = repeats.iterator(); repeatIterator.hasNext();) {
-            Repeat repeat = repeatIterator.next();
-
-            if (repeat.getUsercontrol() != null) {
-                for (Iterator<UserControl> controlIterator = repeat.getUsercontrol().iterator(); controlIterator.hasNext();) {
-                    UserControl uControl = controlIterator.next();
-                    if (uControl.getRef().endsWith(itemName)) {
-                        return uControl;
-                    }
-                }
-            }
-            if (repeat.getGroup() != null) {
-                lookForUserControlInGroup(repeat.getGroup(), itemName);
-            }
-            if (repeat.getRepeat() != null) {
-                lookForUserControlInRepeat(repeat.getRepeat(), itemName);
-            }
-
-        }
-        return null;
     }
 
     private List<Bind> getBindElements(List<Bind> binds, ItemBean item) {
