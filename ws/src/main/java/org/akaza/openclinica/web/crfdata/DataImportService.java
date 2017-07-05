@@ -300,6 +300,18 @@ public class DataImportService {
                     if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
                         String eventCRFStatus = importedCRFStatuses.get(new Integer(eventCrfBean.getId()));
 
+                        CRFVersionDAO crfVersionDAO = new CRFVersionDAO(dataSource);
+                        CRFVersionBean crfVersion = (CRFVersionBean) crfVersionDAO.findByPK(Integer.valueOf(wrapper.getCrfVersionId()));
+                        // Perform CRF version migration if necessary
+                        if (crfVersion.getId() != eventCrfBean.getCRFVersionId()) {
+                            eventCrfBean.setCRFVersionId(crfVersion.getId());
+                            eventCrfBean.setSdvStatus(false);
+                            eventCrfBean.setUpdatedDate(new Date());
+                            eventCrfBean.setSdvUpdateId(userBean.getId());
+                            eventCrfBean.setUpdater(userBean);
+                            eventCrfDao.update(eventCrfBean);
+                        }
+                        // Update eventCRF status
                         if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
                                 && eventCrfBean.getStatus().isAvailable()) {
                             crfBusinessLogicHelper.markCRFStarted(eventCrfBean, userBean, true);
@@ -416,68 +428,5 @@ public class DataImportService {
         retList.add(msg.toString());
         retList.add(auditMsg.toString());
         return retList;
-    }
-
-    public void migrateCrfVersions(ODMContainer odmContainer, DataSource dataSource, StudyBean study, UserAccountBean userBean) throws OpenClinicaException{
-        
-        //Migrate CRF Version if necessary
-        ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
-        for (SubjectDataBean subjectDataBean : subjectDataBeans) {
-            StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), study.getId());
-
-            ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
-            for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
-                int parentStudyId = study.getParentStudyId();
-                StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(dataSource);
-                StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), study.getId(), parentStudyId);
-
-                int ordinal = 1;
-                try {
-                    ordinal = new Integer(studyEventDataBean.getStudyEventRepeatKey()).intValue();
-                } catch (Exception e) {
-                    // trying to catch NPEs, because tags can be without the
-                    // repeat key
-                }
-                StudyEventDAO studyEventDAO = new StudyEventDAO(dataSource);
-                StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
-                        sedBean.getId(), ordinal);
-
-                ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
-                for (FormDataBean formDataBean : formDataBeans) {
-                    //get crfversion from import file
-                    CRFVersionDAO<String, ArrayList> crfVersionDAO = new CRFVersionDAO(dataSource);
-                    CRFVersionBean crfVersionBean = crfVersionDAO.findByOid(formDataBean.getFormOID());
-
-                    CRFDAO<String, ArrayList> crfDAO = new CRFDAO(dataSource);
-                    CRFBean crf = (CRFBean) crfDAO.findByPK(crfVersionBean.getCrfId());
-
-                    //get event crf from db
-                    EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-                    List<EventCRFBean> eventCrfs = eventCRFDAO.findByStudyEventCrf(studyEvent, crf);
-                    // There should not be multiple eventCRFs retrieved for a given subject/event/crf combo.
-                    // Import validation should have already generated an error for this.  Adding it here to 
-                    // in case this method is called in some other context.
-                    if (eventCrfs.size() > 1) {
-                        MessageFormat mf = new MessageFormat("");
-                        mf.applyPattern(respage.getString("duplicate_event_crfs_found"));
-                        Object[] arguments = { subjectDataBean.getSubjectOID(), studyEventDataBean.getStudyEventOID(), formDataBean.getFormOID() };
-
-                        throw new OpenClinicaException(mf.format(arguments), "");
-                    }
-                    EventCRFBean eventCrf = eventCrfs.get(0);
-                    //if event crf doesn't match, update it
-                    if (eventCrf.getCRFVersionId() != crfVersionBean.getId()) {
-                        eventCrf.setCRFVersionId(crfVersionBean.getId());
-                        eventCrf.setSdvStatus(false);
-                        eventCrf.setUpdatedDate(new Date());
-                        eventCrf.setSdvUpdateId(userBean.getId());
-                        eventCrf.setUpdater(userBean);
-
-                        eventCRFDAO.update(eventCrf);
-                    }
-                }
-            }
-        }
     }
 }

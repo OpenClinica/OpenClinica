@@ -154,8 +154,6 @@ public class DataEndpoint {
                     return new DOMSource(mapFailConfirmation(null, err_msg));
                 }
 
-                dataImportService.migrateCrfVersions(odmContainer,dataSource,studyBean,userBean);
-                
                 // setup ruleSets to run if applicable
                 ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
                 List<ImportDataRuleRunnerContainer> containers = dataImportService.runRulesSetup(dataSource, studyBean, userBean, subjectDataBeans,
