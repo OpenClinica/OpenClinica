@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet id="2017-06-05-7394-1" author="sdibona">
+        <addUniqueConstraint
+            columnNames="study_event_id, crf_version_id, study_subject_id"
+            constraintName="uniq_study_event_crf_version_study_subject"
+            tableName="event_crf" />
+        <comment>Adding unique constraint to prevent duplicate entries in event_crf</comment>
+    </changeSet>
+</databaseChangeLog>
