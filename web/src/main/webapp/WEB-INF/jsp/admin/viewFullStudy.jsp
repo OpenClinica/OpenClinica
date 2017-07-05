@@ -713,8 +713,8 @@
      <c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
      <a href="ViewSite?id=<c:out value="${site.id}"/>"
       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-      name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
+      name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
      </c:if>
    </td>
   </tr>
@@ -758,8 +758,8 @@
    <td class="table_cell">
      <a href="ViewEventDefinitionReadOnly?id=<c:out value="${definition.id}"/>"
       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-        name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><center><span
+        name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
   </td>
   </tr>
   </c:forEach>
@@ -804,7 +804,7 @@
          <a href="ViewStudyUser?name=<c:out value="${user.userName}"/>&studyId=<c:out value="${user.studyId}"/>"
 
       onMouseDown="javascript:setImage('bt_View1','icon icon-search');"
-      onMouseUp="javascript:setImage('bt_View1','icon icon-search');"><span
+      onMouseUp="javascript:setImage('bt_View1','icon icon-search');"><center><span
       name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 
 

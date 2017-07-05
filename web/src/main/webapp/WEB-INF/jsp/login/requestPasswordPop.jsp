@@ -12,7 +12,7 @@ LdapUserService ldapUserService = (LdapUserService) ctx.getBean(LdapUserService.
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <!-- Main Content Area -->
-<div align="justify" style="width: 630px; height: 410px;; background:#FFFFFF; padding:5px 8px 0px 8px">
+<div align="justify" style="width: 630px; height: 500px;; background:#FFFFFF; padding:5px 8px 0px 8px">
 <h1><fmt:message key="request_password_form" bundle="${resword}"/></h1>
 <p><fmt:message key="you_must_be_an_openClinica_member_to_receive_a_password" bundle="${resword}"/></p>
 <p><a href="<%= ldapUserService.getPasswordRecoveryURL() %>" target="_blank"><fmt:message key="login.requestPassword.retrieveLdapPassword" bundle="${resword}"/></a></p>
@@ -48,7 +48,7 @@ LdapUserService ldapUserService = (LdapUserService) ctx.getBean(LdapUserService.
 </table>
 </div>
 </div></div></div></div></div></div></div></div>
-</div><br/>
+</div>
 <table border="0" cellpadding="0">
  <tr><td>
  <input type="submit" name="Submit" value="<fmt:message key="submit_password_request" bundle="${resword}"/>" class="button_xlong">
