@@ -1,5 +1,6 @@
 package org.akaza.openclinica.web.crfdata;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -417,7 +418,7 @@ public class DataImportService {
         return retList;
     }
 
-    public void migrateCrfVersions(ODMContainer odmContainer, DataSource dataSource, StudyBean study, UserAccountBean userBean) {
+    public void migrateCrfVersions(ODMContainer odmContainer, DataSource dataSource, StudyBean study, UserAccountBean userBean) throws OpenClinicaException{
         
         //Migrate CRF Version if necessary
         ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
@@ -453,8 +454,18 @@ public class DataImportService {
 
                     //get event crf from db
                     EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-                    EventCRFBean eventCrf = eventCRFDAO.findByStudyEventCrf(studyEvent, crf);
-                    
+                    List<EventCRFBean> eventCrfs = eventCRFDAO.findByStudyEventCrf(studyEvent, crf);
+                    // There should not be multiple eventCRFs retrieved for a given subject/event/crf combo.
+                    // Import validation should have already generated an error for this.  Adding it here to 
+                    // in case this method is called in some other context.
+                    if (eventCrfs.size() > 1) {
+                        MessageFormat mf = new MessageFormat("");
+                        mf.applyPattern(respage.getString("duplicate_event_crfs_found"));
+                        Object[] arguments = { subjectDataBean.getSubjectOID(), studyEventDataBean.getStudyEventOID(), formDataBean.getFormOID() };
+
+                        throw new OpenClinicaException(mf.format(arguments), "");
+                    }
+                    EventCRFBean eventCrf = eventCrfs.get(0);
                     //if event crf doesn't match, update it
                     if (eventCrf.getCRFVersionId() != crfVersionBean.getId()) {
                         eventCrf.setCRFVersionId(crfVersionBean.getId());

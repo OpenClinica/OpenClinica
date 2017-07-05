@@ -465,17 +465,13 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
 
     // TODO: to get rid of warning refactor executeFindAllQuery method in
     // superclass
-    public EventCRFBean findByStudyEventCrf(StudyEventBean studyEvent, CRFBean crf) {
-        EventCRFBean eventCrfBean = null;
+    public List<EventCRFBean> findByStudyEventCrf(StudyEventBean studyEvent, CRFBean crf) {
         HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
         variables.put(new Integer(1), new Integer(studyEvent.getId()));
         variables.put(new Integer(2), new Integer(crf.getId()));
 
         ArrayList<EventCRFBean> eventCrfs = executeFindAllQuery("findByStudyEventCrf", variables);
-        if (!eventCrfs.isEmpty() && eventCrfs.size() == 1) {
-            eventCrfBean = eventCrfs.get(0);
-        }
-        return eventCrfBean;
+        return eventCrfs;
 
     }
 

@@ -359,12 +359,18 @@ public class ImportCRFDataService {
                     //EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
                     CRFDAO crfDAO = new CRFDAO(ds);
                     CRFBean crfBean = crfDAO.findByVersionId(crfVersion.getId());
-                    EventCRFBean eventCRFBean = eventCRFDAO.findByStudyEventCrf(studyEvent, crfBean);
-                    //TODO:  If get more than one result we should abort with an error about bad data.
+                    List<EventCRFBean> eventCRFBeans = eventCRFDAO.findByStudyEventCrf(studyEvent, crfBean);
                     EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
                     EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(),
                             crfVersion.getId());
-                    if (eventCRFBean != null) {
+                    if (eventCRFBeans.size() > 1) {
+                        MessageFormat mf = new MessageFormat("");
+                        mf.applyPattern(respage.getString("duplicate_event_crfs_found"));
+                        Object[] arguments = { subjectDataBean.getSubjectOID(), studyEventDataBean.getStudyEventOID(), formDataBean.getFormOID() };
+
+                        throw new OpenClinicaException(mf.format(arguments), "");
+                    } else if (eventCRFBeans.size() == 1) {
+                        EventCRFBean eventCRFBean = eventCRFBeans.get(0);
                         if (permittedEventCRFIds.contains(new Integer(eventCRFBean.getId()))) {
                             for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
                                 groupMaxOrdinals.put(itemGroupDataBean.getItemGroupOID(),1);
