@@ -673,10 +673,10 @@ public class StudyInfoPanel implements Serializable {
                     if (ecb != null && ecb.getId() == dedc.getEventCRF().getId() && ecb.getCrf().getId() == dedc.getEventCRF().getCrf().getId()) {
                         // logger.info("ecb id*******" + ecb.getId() +
                         // dedc.getEventCRF().getId());
-                        displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
+                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>", "<span class='alert'>"
                             + dedc.getEdc().getCrf().getName() + "</span>", false, true, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
+                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>",
                                 "<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</a>", false, true, false));
 
                     }
@@ -684,10 +684,10 @@ public class StudyInfoPanel implements Serializable {
                     if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()) {
                         // logger.info("ecb id*******" + ecb.getId() +
                         // dedc.getEventCRF().getId());
-                        displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
+                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc'' alt='Not Started'/>", "<span class='alert'>"
                             + dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>",
+                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>",
                                 "<span class='alert'>" + dedc.getEdc().getCrf().getName() + "</a>", false, false, false));
 
                     }
@@ -761,10 +761,10 @@ public class StudyInfoPanel implements Serializable {
                     if (ecb != null && ecb.getId() == dedc.getEventCRF().getId() && ecb.getCrf().getId() == dedc.getEventCRF().getCrf().getId()) {
                         // logger.info("ecb id*******" + ecb.getId() +
                         // dedc.getEventCRF().getId());
-                        displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
+                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>", "<span class='alert'>"
                             + dedc.getEdc().getCrf().getName() + "</span>", false, true, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>", dedc.getEdc().getCrf().getName(),
+                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>", dedc.getEdc().getCrf().getName(),
                                 false, true, false));
 
                     }
@@ -772,10 +772,10 @@ public class StudyInfoPanel implements Serializable {
                     if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()) {
                         // logger.info("ecb id*******" + ecb.getId() +
                         // dedc.getEventCRF().getId());
-                        displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>", "<span class='alert'>"
+                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>", "<span class='alert'>"
                             + dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
                     } else {
-                        displayData.add(new StudyInfoPanelLine("<img src='images/icon_NotStarted.gif' alt='Not Started'/>", dedc.getEdc().getCrf().getName(),
+                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc'alt='Not Started'/>", dedc.getEdc().getCrf().getName(),
                                 false, false, false));
 
                     }

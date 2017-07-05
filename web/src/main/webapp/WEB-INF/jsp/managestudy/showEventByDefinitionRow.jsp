@@ -33,26 +33,26 @@
       <td class="table_cell"><c:out value="${currRow.bean.subjectEventStatus.name}"/></td>
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
-		<tr>
-		<td>
+    <tr>
+    <td>
         <a href="EnterDataForStudyEvent?eventId=<c:out value="${currRow.bean.id}"/>"
-		onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-		onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
-		name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-		
-		</td>
+    onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
+    name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+    
+    </td>
         <%--<c:if test="${(userBean.sysAdmin || userRole.manageStudy || (currRow.bean.owner.id == userBean.id)) && study.status.available}">--%>
         <c:if test="${study.status.available && !currRow.bean.status.deleted && currRow.bean.editable}">    
         <td>
 
             <a href="UpdateStudyEvent?module=<c:out value="${module}"/>&event_id=<c:out value="${currRow.bean.id}"/>&ss_id=<c:out value="${currRow.bean.studySubjectId}"/>"
             onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-            onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img
-            name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
-		</td>
-		</c:if>
-		</tr>
-		</table>
+            onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><span
+            name="bt_Edit1" class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
+    </td>
+    </c:if>
+    </tr>
+    </table>
       </td>          
     <c:set var="count" value="${count+1}"/>
    </tr>

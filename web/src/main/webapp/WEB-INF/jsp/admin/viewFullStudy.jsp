@@ -83,9 +83,9 @@
  </strong>
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
 <br><br>
-<a href="javascript:leftnavExpand('overview');">
+<a href="javascript:leftnavExpand('overview');" style="text-decoration:none;">
     <img id="excl_overview" src="images/bt_Collapse.gif" border="0">
-    <span class="table_title_Admin">
+    <span>
     <fmt:message key="overview" bundle="${resword}"/></span></a>
 <div id="overview" style="">
 <div style="width: 600px">
@@ -124,9 +124,9 @@
 </div>
 <br>
 
-<a href="javascript:leftnavExpand('sectiona');">
+<a href="javascript:leftnavExpand('sectiona');" style="text-decoration:none;">
     <img id="excl_sectiona" src="images/bt_Expand.gif" border="0">
-    <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> A: <fmt:message key="study_description" bundle="${resword}"/>]</span></a>
+    <span><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> A: <fmt:message key="study_description" bundle="${resword}"/>]</span></a>
 <div id="sectiona" style="display:none ">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -176,9 +176,9 @@
 <br>
 
 
-<a href="javascript:leftnavExpand('sectionb');">
+<a href="javascript:leftnavExpand('sectionb');" style="text-decoration:none;">
     <img id="excl_sectionb" src="images/bt_Expand.gif" border="0">
-    <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> B: <fmt:message key="study_status_and_design" bundle="${resword}"/>]</span></a>
+    <span><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> B: <fmt:message key="study_status_and_design" bundle="${resword}"/>]</span></a>
 <div id="sectionb" style="display:none ">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -296,8 +296,8 @@
 </div>
 <br>
 
-<a href="javascript:leftnavExpand('sectionc');">
-    <img id="excl_sectionc" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> C: <fmt:message key="conditions_and_eligibility" bundle="${resword}"/>]</span></a>
+<a href="javascript:leftnavExpand('sectionc');" style="text-decoration:none;">
+    <img id="excl_sectionc" src="images/bt_Expand.gif" border="0"> <span><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> C: <fmt:message key="conditions_and_eligibility" bundle="${resword}"/>]</span></a>
 <div id="sectionc" style="display:none ">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -348,8 +348,8 @@
 </div>
 <br>
 
-<a href="javascript:leftnavExpand('sectiond');">
-    <img id="excl_sectiond" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> D: <fmt:message key="facility_information" bundle="${resword}"/>]</span></a>
+<a href="javascript:leftnavExpand('sectiond');" style="text-decoration:none;">
+    <img id="excl_sectiond" src="images/bt_Expand.gif" border="0"> <span><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> D: <fmt:message key="facility_information" bundle="${resword}"/>]</span></a>
 <div id="sectiond" style="display:none ">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -399,8 +399,8 @@
 <br>
 
 
- <a href="javascript:leftnavExpand('sectione');">
-     <img id="excl_sectione" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> E: <fmt:message key="related_infomation" bundle="${resword}"/>]</span></a>
+ <a href="javascript:leftnavExpand('sectione');" style="text-decoration:none;">
+     <img id="excl_sectione" src="images/bt_Expand.gif" border="0"> <span><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> E: <fmt:message key="related_infomation" bundle="${resword}"/>]</span></a>
 <div id="sectione" style="display:none ">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -438,8 +438,8 @@
 </div>
 </div>
 <br>
-<a href="javascript:leftnavExpand('sectionf');">
-    <img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin"><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="study_parameter_configuration" bundle="${resword}"/>]</span></a>
+<a href="javascript:leftnavExpand('sectionf');" style="text-decoration:none;">
+    <img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="study_parameter_configuration" bundle="${resword}"/>]</span></a>
 <div id="sectionf" style="display:none ">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -685,8 +685,8 @@
 </div>
 </div>
 <br>
- <a href="javascript:leftnavExpand('sites');">
-     <img id="excl_sites" src="images/bt_Collapse.gif" border="0"> <span class="table_title_Admin"><fmt:message key="sites" bundle="${resword}"/>: (<c:out value="${siteNum}"/> <fmt:message key="sites" bundle="${resword}"/>)</span></a>
+ <a href="javascript:leftnavExpand('sites');" style="text-decoration:none;">
+     <img id="excl_sites" src="images/bt_Collapse.gif" border="0"> <span><fmt:message key="sites" bundle="${resword}"/>: (<c:out value="${siteNum}"/> <fmt:message key="sites" bundle="${resword}"/>)</span></a>
 <div id="sites" style="display: ">
  <div style="width: 600px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -713,8 +713,8 @@
      <c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
      <a href="ViewSite?id=<c:out value="${site.id}"/>"
       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-      name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
+      name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
      </c:if>
    </td>
   </tr>
@@ -727,8 +727,8 @@
 </div>
 <br>
 
- <a href="javascript:leftnavExpand('definitions');">
-     <img id="excl_definitions" src="images/bt_Collapse.gif" border="0"> <span class="table_title_Admin"><fmt:message key="event_definitions" bundle="${resword}"/>: (<c:out value="${defNum}"/> <fmt:message key="definitions" bundle="${resword}"/>)</span></a>
+ <a href="javascript:leftnavExpand('definitions');" style="text-decoration:none;">
+     <img id="excl_definitions" src="images/bt_Collapse.gif" border="0"> <span><fmt:message key="event_definitions" bundle="${resword}"/>: (<c:out value="${defNum}"/> <fmt:message key="definitions" bundle="${resword}"/>)</span></a>
  <div id="definitions" style="display: ">
  <div style="width: 600px">
  <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -758,8 +758,8 @@
    <td class="table_cell">
      <a href="ViewEventDefinitionReadOnly?id=<c:out value="${definition.id}"/>"
       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-        name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><center><span
+        name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
   </td>
   </tr>
   </c:forEach>
@@ -771,8 +771,8 @@
 <br>
 
 <br>
-<a href="javascript:leftnavExpand('users');">
-    <img id="excl_users" src="images/bt_Expand.gif" border="0">  <span class="table_title_Admin"><fmt:message key="users" bundle="${resword}"/>: (<c:out value="${userNum}"/> <fmt:message key="users" bundle="${resword}"/>)</span></a>
+<a href="javascript:leftnavExpand('users');" style="text-decoration:none;">
+    <img id="excl_users" src="images/bt_Expand.gif" border="0">  <span><fmt:message key="users" bundle="${resword}"/>: (<c:out value="${userNum}"/> <fmt:message key="users" bundle="${resword}"/>)</span></a>
 <div id="users" style="display:none ">
 
  <div style="width: 600px">
@@ -804,7 +804,7 @@
          <a href="ViewStudyUser?name=<c:out value="${user.userName}"/>&studyId=<c:out value="${user.studyId}"/>"
 
       onMouseDown="javascript:setImage('bt_View1','icon icon-search');"
-      onMouseUp="javascript:setImage('bt_View1','icon icon-search');"><span
+      onMouseUp="javascript:setImage('bt_View1','icon icon-search');"><center><span
       name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 
 
@@ -817,6 +817,5 @@
 </div></div></div></div></div></div></div></div>
 </div>
 </div>
-
 
 <jsp:include page="../include/footer.jsp"/>

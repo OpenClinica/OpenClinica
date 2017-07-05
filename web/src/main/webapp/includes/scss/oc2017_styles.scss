@@ -1,0 +1,906 @@
+// ----
+// Sass (v3.4.21)
+// Compass (v1.0.3)
+// ----
+
+/* Load web fonts */
+@import url('https://fonts.googleapis.com/css?family=Didact+Gothic|Open+Sans+Condensed:300,700|Open+Sans:400,400i,600,700,700i');
+@import url('fonts/icomoon.woff');
+
+
+//Shadows
+@mixin drop-shadow {
+  box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.5);
+}
+
+// Border radius
+@mixin border-radius {
+  border-radius: .2em;
+}
+
+// Colors
+$c-blue: #618ebb;
+$c-blue-link: #3a6087;
+$c-blue-2: darken($c-blue, 5%);
+$c-blue-3: darken($c-blue-2, 10%);
+$c-blue-4: darken($c-blue-2, 30%);
+$c-blue-navy: #00344c;
+$c-blue-light: lighten($c-blue, 20%);
+$c-gray-lightest: #f1f1f1;
+$c-gray-light: #ddd;
+$c-gray: #999;
+$c-gray-dark: #58585b;
+$c-gray-darkest: #333;
+$c-green: #06C279;
+$c-red: #e74c3c;
+$c-purple: #93397f;
+$c-orange: #ED7800;
+$c-yellow: #d4a718;
+$c-yellow-light: #f2e7b8;
+$c-white: #fff;
+
+$black-transparent: rgba(0,0,0,0.25);
+$gray-transparent: rgba(0,0,0,0.075);
+
+
+html {
+  box-sizing: border-box;
+}
+*, *:before, *:after {
+  box-sizing: inherit;
+}
+
+select, input, textarea {
+  font-size: 1em;
+}
+
+input[type="text"] {
+  background-color: white;
+  width: auto;
+  height: auto;
+  display: inline-block;
+  float: left;
+  min-height: 30px;
+  padding: .25em;
+  &.navSearch {
+    width: 13em;
+  }
+}
+input {
+  &[type="submit"], &[type="button"] {
+   &:not(.navSearchButton) {
+    background: $c-blue;
+    background: linear-gradient(to bottom, $c-blue 0%, $c-blue-3 100%); 
+    box-shadow: 1px 1px 3px rgba(0,0,0,0.3);
+    color: white;
+    font-size: 1em;
+    border-radius: .25em;
+    border: 0;
+    padding: .4em .9em;
+    margin: 0 .25em;
+    &:hover {
+      background: $c-blue-3;
+      background: linear-gradient(to top, $c-blue 0%, $c-blue-3 100%); 
+    }
+  }
+}
+}
+
+
+
+.navSearchButton {
+  background: $c-blue-3;
+  -webkit-border-top-right-radius: .2em;
+  -webkit-border-bottom-right-radius: .2em;
+  -moz-border-radius-topright: .2em;
+  -moz-border-radius-bottomright: .2em;
+  border-top-right-radius: .2em;
+  border-bottom-right-radius: .2em;
+  color: $c-white;
+  border: 0;
+  min-height: 30px;
+  font-size: 1em;
+  padding-left: .75em;
+  &:hover {
+    background: $c-blue-4;
+  }
+}
+
+body {
+  font-size: 100%;
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  margin: 0;
+  overflow-x: hidden;
+  width: 100% !important;
+
+  & > table {
+    margin: 0 auto;
+    min-width: 1024px;
+  }
+
+}
+
+p, ul, ol, td, th {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+}
+
+h1 {
+  color: $c-orange;
+  font-family: 'Didact Gothic', Helvetica, Arial, sans-serif;
+  font-size: 1.5em;
+  margin: 0 .25em;
+  & span {
+    &.icon-question-circle {
+      font-size: .75em;
+    }
+  }
+}
+
+li:not(div#bt_Home) {
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+  font-size: 1em;
+  margin: .5em 0;
+}
+
+td {
+  font-size: inherit;
+  line-height: inherit;
+}
+
+a {
+  &:link {
+    color: $c-blue-link;
+  }
+  &:visited {
+    color: $c-purple;
+  }
+  &:hover {
+    color: darken($c-blue, 50%);
+  }
+}
+
+// Custom type styles
+
+.alert {
+  color: $c-orange;
+  font-weight: 700;
+}
+
+
+// Custom icons
+
+.custom-icon {
+  &:before {
+    @include border-radius;
+    background: $gray-transparent;
+    color: $c-blue;
+    display: block;
+    line-height: 1.5em;
+    padding: 0.25em 0.35em;
+    min-width: 2em;
+  }
+}
+
+.icon {
+  &-sign {
+    &:before {
+      content: url("../../images/icon-sign.png");
+      background: $gray-transparent;
+      background-size: contain;
+    }
+  }
+}
+
+.disabled {
+  opacity: .4;
+}
+
+.icon {
+  display: inline-block;
+  color: red;
+}
+
+.fa, .icon {
+  text-align: center;
+
+  &:before {
+    @include border-radius;
+    background: $gray-transparent;
+    color: $c-blue;
+    display: block;
+    line-height: 1.5em;
+    padding: 0.25em 0.35em;
+    min-width: 2em;
+  }
+
+
+  &.black {
+    &:before {
+      color: black;
+    }
+  }
+
+  &.red {
+    &:before {
+      color: $c-red;
+    }
+  }
+
+  &.green {
+    &:before {
+      color: $c-green;
+    }
+  }
+
+  &.orange {
+    &:before {
+      color: $c-orange;
+    }
+  }
+
+  &.gray {
+    &:before {
+      color: $c-gray-dark;
+    }
+  }
+
+  &.white {
+    &:before {
+      color: $c-white;
+    }
+  }
+
+
+  &-step-forward, &-fast-forward, &-step-backward, &-fast-backward {
+    &:before {
+      font-size: .8rem;
+    }
+  }
+
+
+
+  &-caret-right, &-caret-left, &-caret-down {
+    .ViewSubjectsPopup & {
+      font-size: 2em !important;
+      margin-right: 0 !important;
+    }
+    .sidebar_tab & {
+      float: right;
+    }
+    &:before {
+      background: none;
+      line-height: 1em;
+    }
+  }
+
+  &-question-circle {
+    &:before{
+      background: none;
+    }
+  }
+
+  &-question-circle {
+    &:before {
+      border: none;
+      background-image: none;
+    }
+  }
+}
+
+/* navigation */
+
+
+.logo {
+  display: inline-block;
+  float: left;
+  margin: .25em 1em;
+  position: relative;
+  width: 150px;
+  img {
+    max-width: 150px;
+    margin: .25em 0;
+  }
+}
+
+.logo-2 {
+  display: inline-block;
+  float: left;
+  margin: .25em 1em;
+  position: relative;
+  width: 150px;
+  img {
+    max-width: 150px;
+    margin: .25em 0;
+  }
+}
+
+
+.nav-top-bar {
+  width: 100%;
+}
+
+.oc_nav {
+  background: $c-blue-navy;
+  color: white;
+  width: 100%;
+  margin-left: 0;
+  float: left;
+  padding-left: 0;
+  height: auto;
+  & > div {
+    display: inline-block;
+    position: relative;
+  }
+  & a {
+    color: white;
+    font-size: 0.875em;
+  }
+}
+
+
+.dropdown {
+  background-color: $c-gray-light;
+  border: solid 1px $c-gray-light;
+  font-family: inherit;
+}
+
+.taskLeftColumn,
+.taskRightColumn {
+  width: 50%;
+}
+
+/* layout */
+
+
+.aka_revised_content, .content {
+  float: none;
+  padding: .5em 1em 1em 1em;
+  width: 100%;
+  max-width: calc(100vw - 180px);
+  overflow-x: scroll;
+  form > div {
+    min-width: 60% !important;
+  }
+}
+
+
+#bt_Home, 
+#bt_SubmitData, 
+#bt_ExtractData, 
+#bt_ManageStudy, 
+.nav_bt, 
+.subnav, 
+#bt_Home td, 
+#bt_Home li, 
+.navbox_center {
+  background: $c-blue;
+  padding: .15em .25em;
+}
+
+#bt_Home li {
+  color: transparent;
+  display: inline-block;
+  padding: .5em;
+  float: none;  
+  line-height: 1.25em;
+  &:hover {
+    @include border-radius;
+    background-color: $c-blue-3;
+  }
+  &.active {
+    @include border-radius;
+    background-color: $c-blue-3;
+  }
+}
+
+
+/*Dropdown styling*/
+
+.nav_bt {
+  position: relative;
+  a {
+    &:link,
+    &:visited {
+      font-weight: bold;
+      text-decoration: none;
+    }
+  }
+  ul {
+    margin: 0.25em 0;
+  }
+}
+.dropdown {
+  border: none;
+  display: none;
+  position: absolute;
+  width: 36em;
+  z-index: 99;
+  &_BG {
+    @include drop-shadow;
+    background: none;
+    background-color: $c-gray-lightest;
+    box-shadow: 0px 5px 20px rgba(0,0,0,0.5);
+    margin-top: 0;
+    padding: .5em;
+  }
+  & a {
+    text-decoration: none;
+    &:before {
+      content: '\00BB';
+      margin-right: .5em;
+    }
+  }
+}
+
+
+
+.taskGroup {
+  background-color: $c-blue;
+  padding: .25em;
+  font-weight: bold;
+  color: white;
+}
+
+.taskLeftColumn,
+.taskRightColumn {
+  display: inline-block;
+  margin: 0;
+  padding: 0.25em 0.25em 0.75em 0.25em;
+  width: 49.5%;
+}
+#subnav_Tasks {
+
+  font-size: .8em;
+  line-height: 1.5;
+  right: 0 !important;
+  top: inherit !important;
+  left: inherit !important;
+}
+
+
+/*End of Dropdown Styling*/
+
+
+#findSubjects tr td div {
+  width: auto !important;
+}
+
+.header {
+  background-image: none;
+  width: 100%;
+}
+
+tr.filter {
+  font-size: 0.75em;
+}
+
+
+
+#sumBox {
+  box-shadow: none !important;
+  width: 100% !important;
+}
+
+#StudyInfo {
+  display: inline-block;
+  float: left;
+  line-height: 1.5em; 
+  padding: .5em 1em;
+  color: white;
+}
+
+#UserInfo { 
+  right: 0;
+  z-index: 9999;
+}
+
+#StudyInfo, #UserInfo {
+  font-size: .8em;
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  -ms-transform: translateY(-50%);
+}
+
+
+// Table row/cell shading and borders
+
+.summaryTable {
+  border: none !important;
+  font-size: .9em;
+  margin: 1em 0;
+  width: 75% !important;
+  td {
+    border-bottom: 1px solid $c-gray-light;
+    padding: .15em;
+  }
+}
+
+.tablebox_center {
+  font-size: .85rem;
+  margin: 1em 0;
+  tr {
+    &:first-child {
+      td {
+        &.table_cell {
+          border-top: 1px solid $c-gray-light;
+        }
+      }
+    }
+    &:last-child {
+      > td {
+        &.table_cell, &.table_cell_left {
+          border-bottom: 1px solid $c-gray-light;
+        }
+      }
+    }
+  }
+
+  td {
+    padding: .25em;
+    &.table_cell_top {
+      border-top: 1px solid $c-gray-light;
+    }
+    &.table_cell, &.table_cell_left, &.table_cell_top {
+      background-color: transparent;
+      border-bottom: 1px solid $c-gray-light;
+      border-right: 1px solid $c-gray-light;
+      table {
+        tr {
+          &:first-child {
+            td {
+              &.table_cell {
+                border-top: 1px solid $c-gray-light;
+              }
+            }
+          }
+          td {
+            &.table_cell {
+              &:first-child {
+                border-left: 1px solid $c-gray-light;
+              }
+            }
+          }
+        }
+      }
+    }
+    &.table_header_row, &.table_header_row_left, &.table_header_column_top, &.table_header_column {
+      background-color: $c-gray-light;
+      padding: .5em;
+      border-right: 1px solid white;
+      border-bottom: 1px solid white;
+      &:last-child {
+        border-right: 1px solid $c-gray-light;
+      }
+    }
+    &.table_cell_left {
+      border-left: 1px solid #ccc;
+    }
+  }
+}
+
+.textbox_center { 
+  background-color: $c-gray-lightest;
+  font-size: .85rem;
+  margin: 1.5em 0;
+  padding: 1.5em;
+  td {
+    padding: .25em;
+    &.table_cell, &.table_cell_left, &.table_header_column {
+      background-color: transparent;
+      border-bottom: 1px solid #ccc;
+      padding: .25em;
+    }
+  }
+  tr:last-child {
+    td {
+    &.table_cell, &.table_cell_left, &.table_header_column {
+      border-bottom: none;
+    }
+  }
+  }
+
+}
+
+
+
+.table_title_Admin {
+  display: inline-block;
+  margin: .5em 0;
+}
+
+.table_tools {
+  font-size: .85rem;
+  &:first-child {
+    text-align: right;
+  }
+}
+
+
+// End of View Subject Table
+
+#UserInfo {
+  display: inline-block;
+  float: right;
+  padding: .15em 1em;
+}
+
+
+.box_T {
+  width: 100%;
+}
+
+
+.footer_bottom {
+  font-size: 0.625em;
+}
+
+
+/* jmesa styles */
+
+.jmesa {
+
+  .filter {
+    .dynFilter {
+      position: relative;
+      font-family: verdana, arial, helvetica, sans-serif;
+      font-size: 11px;
+      padding: 0;
+      margin: 0;
+      min-height: 1.75em;
+      border: 1px solid #c0c0c0;
+      background-color: #efebe7;
+      height: 15px;
+      white-space: nowrap;
+      cursor: pointer;
+      z-index: 4;
+    }
+
+    #dynFilterDiv {
+      position: absolute;
+      top: -3px;
+      left: -2px;
+      padding: 0;
+      margin: 0;
+      min-height: 1.75em;
+      height: 17px;
+      border: 1px solid #c0c0c0;
+      background-color: #e1ebf4;
+    }
+
+    #dynFilterInput {
+      font-family: verdana, arial, helvetica, sans-serif;
+      font-size: 12px;
+      padding: 0;
+      margin: 0;
+      border-style: none;
+      background-color: #e1ebf4;
+    }
+
+    #dynFilterDroplistDiv {
+      position: absolute;
+      top: -2px;
+      left: -2px;
+      padding: 0;
+      margin: 0;
+      height: 17px;
+      background-color: #e1ebf4;
+      z-index: 4;
+    }
+
+    #dynFilterDroplist {
+      font-family: verdana, arial, helvetica, sans-serif;
+      font-size: 12px;
+      padding: 0;
+      margin: 0;
+      border: 1px solid #c0c0c0;
+      background-color: #e1ebf4;
+    }
+  }
+
+
+
+  // home screen view
+
+  #studySiteStatistics, #studyStatistics, #subjectEventStatusStatistics, #studySubjectStatusStatistics {
+    border-bottom: 1px solid $c-gray-light;
+    margin: 0 2em 2em 0;
+  }
+
+  // end of home screen view
+
+
+  // audit user activity screen
+
+  table#userLogins tr td {
+    padding: .3rem !important;
+  }
+
+
+  // end of audit user activity screen
+
+  & .fa, .icon {
+    font-size: .9em;
+    margin-right: .5em;    
+  }
+
+  & td {
+    font-size: .85rem;
+    padding: .15rem !important;
+  }
+  & .table {
+    border: none;
+  }
+  & > table {
+    min-width: 75%;
+  }
+  & .header {
+    & td {
+      background-color: $c-gray-light;
+      border-right: solid 1px #fff;
+      color: $c-gray-darkest;
+      font-family: 'Open Sans', arial, helvetica, sans-serif;
+      min-width: 6em;
+      white-space: normal;
+      &:last-child {
+        border-right: none;
+      }
+    }
+  }
+  & .even {
+    & td {
+      background-color: $c-gray-lightest;
+      border: none;
+    }
+  }
+  & .highlight {
+    & td {
+      background-color: $c-yellow-light;
+    }
+  }
+  & .odd, & .even, & .highlight {
+    td {
+      border: none;
+      font-family: 'Open Sans', arial, helvetica, sans-serif;
+      font-weight: 400;
+      hyphens: auto;
+      line-height: 1.5em;
+      min-width: 2em;
+    }
+    a {
+      text-decoration: none;
+    }
+  }
+}
+
+.ViewSubjectsPopup {
+  @include drop-shadow;
+  background-color: $c-gray-lightest;
+  color: $c-gray-dark;
+  font-size: .8rem;
+  padding: .25em;
+}
+
+div#subjectEvents {
+  font-size: .8em;
+}
+
+.highlight .tablebox_center td {
+  background-color: inherit;
+}
+
+
+/*Username dropdown CSS*/
+
+/* CSS Document */
+
+
+#userDropdown {
+  position: relative;
+  z-index: 100;
+  ul {
+// background-color: $c-blue-2;
+padding: 0;
+margin: 0;
+list-style: none;
+position: relative;
+}
+}
+
+#userDropdown ul li {
+  display:inline-block;
+  list-style-image: none;
+}
+
+#userDropdown a {
+  display:block;
+  padding:0 10px; 
+  color:white;
+  line-height: 30px;
+  text-decoration:none;
+}
+
+#userDropdown a:hover { 
+  background-color: $c-blue;
+  color: white;
+}
+
+/* Hide Dropdowns by Default */
+#userDropdown ul ul {
+  background-color: $c-blue-navy;
+  display: none;
+  position: absolute; 
+  /*top: 60px;*/ /* the height of the main #userDropdown */
+}
+
+/* Display Dropdowns on Hover */
+#userDropdown ul li:hover > ul {
+  display:inherit;
+}
+
+/* Fisrt Tier Dropdown */
+#userDropdown ul ul li {
+  width:170px;
+  float:none;
+  display:list-item;
+  position: relative;
+}
+
+
+
+// Lefthand Sidebar items
+
+
+.vline, .vline_B {
+  background-image: url(../images/leftbar_vline.gif);
+  padding-top: 6px;
+  padding-left: 3px; 
+}
+
+.vline {
+  background-repeat: repeat-y;
+}
+
+.vline_B {
+  background-repeat: no-repeat;
+  background-position: top-right;
+}
+
+.leftmenu {
+  padding-top: 6px;
+}
+
+
+table[width="160"] {
+  tr:nth-last-child(-n+2) {
+    td.sidebar_tab {
+      border-bottom: none;
+    }
+  }
+}
+
+.sidebar_tab {
+  background-color: $c-gray-lightest;
+  background-image: none;
+  border-bottom: 1px solid $c-gray;
+  font-size: .8em;
+  padding: 1em;
+  b {
+    display: block;
+  }
+  &_content span {
+    color: #494D4B !important;
+  }
+}
+
+// End of lefthand sidebar items
+
+.tablee_tools:first-child {
+  text-align: right;
+}
+
+
+
+
+
+
