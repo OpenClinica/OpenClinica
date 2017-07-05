@@ -426,10 +426,26 @@
     </query>
 
     <query>
+        <name>findByEventSubjectCrf</name>
+        <sql>select ec.* from event_crf  ec, crf_version cv
+            where ec.crf_version_id=cv.crf_version_id
+            and ec.study_event_id=? and cv.crf_id=? and ec.study_subject_id=?
+        </sql>
+    </query>
+
+    <query>
         <name>findByEventCrfVersion</name>
         <sql>select ec.* from event_crf  ec, crf_version cv
             where ec.crf_version_id=cv.crf_version_id
             and ec.study_event_id=? and cv.crf_version_id=?
+        </sql>
+    </query>
+
+    <query>
+        <name>findByStudyEventCrf</name>
+        <sql>select ec.* from event_crf  ec, crf_version cv
+            where ec.crf_version_id=cv.crf_version_id
+            and ec.study_event_id=? and cv.crf_id=?
         </sql>
     </query>
 
