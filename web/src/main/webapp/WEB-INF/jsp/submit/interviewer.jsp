@@ -32,9 +32,9 @@
 <style type="text/css">
 
 .tooltip {
-		
-	width:100%;
-	
+        
+    width:100%;
+    
 }
 
 </style>
@@ -68,7 +68,7 @@ var closing = true;
       
      //  jQuery('#nameNote1').mouseover(function(event){
        //  jQuery.getJSON("InitialDataEntry",{ name:0 },function(discrepancyNote){
-    	//		alert('w'+discrepancyNote);
+        //      alert('w'+discrepancyNote);
         //});
        // });
       
@@ -80,128 +80,128 @@ var closing = true;
 
    
       function genToolTipFromArray(flag){
-    	  var resStatus = new Array();
-    	  var detailedNotes= new Array();
-    	  var discrepancyType = new Array();
-    	  var updatedDates = new Array();
-		   var parentDnids = new Array();
-		   var totNotes = 0;
-		   var footNote = '<fmt:message key="footNote" bundle="${resword}"/>';
-    	  var i=0;
-    	  var discNotes = new Array();
-    	  var title = '<fmt:message key="tooltip_title1" bundle="${resword}"/>';
-    	  	if(flag =='interviewNotes')
-    	     	{
-    	     	<c:forEach var="discrepancyNoteBeans" items="${nameNotes}">
-    	     		resStatus[i]=<c:out value="${discrepancyNoteBeans.resolutionStatusId}"/>;
-    	     		detailedNotes[i]= '<c:out value="${discrepancyNoteBeans.description}"/>';   			
-    	  			discrepancyType[i] = '<c:out value="${discrepancyNoteBeans.disType.name}"/>';
-    	  			updatedDates[i]= '<c:out value="${discrepancyNoteBeans.createdDate}"/>';
-					parentDnids[i] = '<c:out value="${discrepancyNoteBeans.parentDnId}"/>';
-    	  			i++;
-    	  	 	</c:forEach>
-    	  	 	title = '<fmt:message key="tooltip_name_title" bundle="${resword}"/>';
-				totNotes = ${fn:length(existingNameNotes)};
-				if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + " " + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
-    	     	}
-    	   	else if(flag =='dateNotes')
-    	     {
-    	     	<c:forEach var="discrepancyNoteBeans" items="${intrvDates}">
-    	     		resStatus[i]=<c:out value="${discrepancyNoteBeans.resolutionStatusId}"/>;
-    	     		detailedNotes[i]= '<c:out value="${discrepancyNoteBeans.description}"/>';   			
-    	  			discrepancyType[i] = '<c:out value="${discrepancyNoteBeans.disType.name}"/>';
-    	  			updatedDates[i]= '<c:out value="${discrepancyNoteBeans.createdDate}"/>';
-					parentDnids[i] = '<c:out value="${discrepancyNoteBeans.parentDnId}"/>';
-    	  			i++;
-    	     	</c:forEach>
-    	   title = '<fmt:message key="tooltip_name_title" bundle="${resword}"/>';
-		   totNotes = ${fn:length(existingIntrvDateNotes)};
-		   
-	if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + " " + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
-    	   }
-    	
-	
-    		   var htmlgen = 
-		 	          '<div class=\"tooltip\">'+
-		 	          '<table  width="250">'+
-		 	          ' <tr><td  align=\"center\" class=\"header1\">'+title +
-		 	          ' </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="225" >'+
-		 	          drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates,parentDnids)+
-		 	          '</table><table width="250"  class="tableborder" align="left">'+  	
-		 	          '</table><table><tr></tr></table>'+
-		 	          '<table width="200"><tbody><td height="50" colspan="3">'+						
-						'<span class=\"note\">'+footNote +'</span>'+
-						
-						
-		 	          
-		 	         
-		 	          '</td></tr></tbody></table></table></div>';
-		  return htmlgen;
+          var resStatus = new Array();
+          var detailedNotes= new Array();
+          var discrepancyType = new Array();
+          var updatedDates = new Array();
+           var parentDnids = new Array();
+           var totNotes = 0;
+           var footNote = '<fmt:message key="footNote" bundle="${resword}"/>';
+          var i=0;
+          var discNotes = new Array();
+          var title = '<fmt:message key="tooltip_title1" bundle="${resword}"/>';
+            if(flag =='interviewNotes')
+                {
+                <c:forEach var="discrepancyNoteBeans" items="${nameNotes}">
+                    resStatus[i]=<c:out value="${discrepancyNoteBeans.resolutionStatusId}"/>;
+                    detailedNotes[i]= '<c:out value="${discrepancyNoteBeans.description}"/>';               
+                    discrepancyType[i] = '<c:out value="${discrepancyNoteBeans.disType.name}"/>';
+                    updatedDates[i]= '<c:out value="${discrepancyNoteBeans.createdDate}"/>';
+                    parentDnids[i] = '<c:out value="${discrepancyNoteBeans.parentDnId}"/>';
+                    i++;
+                </c:forEach>
+                title = '<fmt:message key="tooltip_name_title" bundle="${resword}"/>';
+                totNotes = ${fn:length(existingNameNotes)};
+                if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + " " + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
+                }
+            else if(flag =='dateNotes')
+             {
+                <c:forEach var="discrepancyNoteBeans" items="${intrvDates}">
+                    resStatus[i]=<c:out value="${discrepancyNoteBeans.resolutionStatusId}"/>;
+                    detailedNotes[i]= '<c:out value="${discrepancyNoteBeans.description}"/>';               
+                    discrepancyType[i] = '<c:out value="${discrepancyNoteBeans.disType.name}"/>';
+                    updatedDates[i]= '<c:out value="${discrepancyNoteBeans.createdDate}"/>';
+                    parentDnids[i] = '<c:out value="${discrepancyNoteBeans.parentDnId}"/>';
+                    i++;
+                </c:forEach>
+           title = '<fmt:message key="tooltip_name_title" bundle="${resword}"/>';
+           totNotes = ${fn:length(existingIntrvDateNotes)};
+           
+    if(totNotes >0) footNote = totNotes + " " + '<fmt:message key="foot_threads" bundle="${resword}"/>' + " " + '<fmt:message key="footNote_threads" bundle="${resword}"/>';
+           }
+        
+    
+               var htmlgen = 
+                      '<div class=\"tooltip\">'+
+                      '<table  width="250">'+
+                      ' <tr><td  align=\"center\" class=\"header1\">'+title +
+                      ' </td></tr><tr></tr></table><table  style="border-collapse:collapse" cellspacing="0" cellpadding="0" width="225" >'+
+                      drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates,parentDnids)+
+                      '</table><table width="250"  class="tableborder" align="left">'+      
+                      '</table><table><tr></tr></table>'+
+                      '<table width="200"><tbody><td height="50" colspan="3">'+                     
+                        '<span class=\"note\">'+footNote +'</span>'+
+                        
+                        
+                      
+                     
+                      '</td></tr></tbody></table></table></div>';
+          return htmlgen;
     }
     
       function drawRows(i,resStatus,detailedNotes,discrepancyType,updatedDates,parentDnIds)
       {
-     	var row = '';
-     	var noteType = '';
-     		for(var x=0;x<i;x++)
-     		{
-     		
-     	
-     			if(resStatus[x]=='1')
-     			{
-				if(parentDnIds[x] == '0')
-					{
-						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
-					}
-				else
-     				row+='<tr> <td class=\"label\"><img src="images/icon_Note.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="open" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
-     			}
-     			else if(resStatus[x]=='2')
-     			{
-				if(parentDnIds[x] == '0')
-					{
-						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
-					}
-				else
-     				row+='<tr > <td  class=\"label\"><img src="images/icon_flagYellow.gif" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="updated" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
-     			}
-     			else if(resStatus[x]=='3')
-     			{
-     				if(parentDnIds[x] == '0')
-					{
-						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
-					}
-				else
-					row+='<tr> <td class=\"label\"><img src="images/icon_flagGreen.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180"  align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="resolved" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
-     			}
-     			else if(resStatus[x]=='4')
-     			{
-				if(parentDnIds[x] == '0')
-					{
-						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
-					}
-				else
-     				row+='<tr> <td  class=\"label\"><img src="images/icon_flagBlack.gif" width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="closed" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
-     			}
-     			else if(resStatus[x]=='5')
-     		{
-			if(parentDnIds[x] == '0')
-					{
-						row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
-					}
-				else
-     			row+='<tr> <td width="16"  class=\"label\"><img src="images/icon_flagWhite.gif" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp; <fmt:message key="not_applicable" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
-     			}
-     			
-     			
-     		}
-     	
-     	return row;
+        var row = '';
+        var noteType = '';
+            for(var x=0;x<i;x++)
+            {
+            
+        
+                if(resStatus[x]=='1')
+                {
+                if(parentDnIds[x] == '0')
+                    {
+                        row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+                    }
+                else
+                    row+='<tr> <td class=\"label\"><span class="icon icon-flag red"  width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="open" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+                }
+                else if(resStatus[x]=='2')
+                {
+                if(parentDnIds[x] == '0')
+                    {
+                        row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+                    }
+                else
+                    row+='<tr > <td  class=\"label\"><span class="icon icon icon-flag orange" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="updated" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+                }
+                else if(resStatus[x]=='3')
+                {
+                    if(parentDnIds[x] == '0')
+                    {
+                        row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+                    }
+                else
+                    row+='<tr> <td class=\"label\"><span class="icon icon icon-flag green" width="16" height="13" alt="Note"></td>'+'<td  width="180"  align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="resolved" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td  class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+                }
+                else if(resStatus[x]=='4')
+                {
+                if(parentDnIds[x] == '0')
+                    {
+                        row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+                    }
+                else
+                    row+='<tr> <td  class=\"label\"><span class="icon icon-flag black" width="16" height="13" alt="Note"></td>'+'<td  width="180" align="left" class=\"label\" nowrap>&nbsp;<fmt:message key="closed" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+                }
+                else if(resStatus[x]=='5')
+            {
+            if(parentDnIds[x] == '0')
+                    {
+                        row+='<tr> <td class=\"label\"></td><td colspan = "3" class=\"borderlabel\" nowrap >&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+                    }
+                else
+                row+='<tr> <td width="16"  class=\"label\"><span class="icon icon-flag-empty blue" width="16" height="13" alt="Note"></td>'+'<td width="180"  align="left" class=\"label\" nowrap>&nbsp; <fmt:message key="not_applicable" bundle="${resword}"/>: &nbsp;'+discrepancyType[x] +'&nbsp;'+updatedDates[x]+'</td></tr><tr><td class=\"borderlabel\"></td><td class=\"borderlabel\" nowrap>&nbsp;'+detailedNotes[x].substring(0,60)+'...</td></tr>';
+                }
+                
+                
+            }
+        
+        return row;
      }
       
 function callTip(html)
 {
-	Tip(html,BGCOLOR,'#FFFFE5',BORDERCOLOR,'' );
+    Tip(html,BGCOLOR,'#FFFFE5',BORDERCOLOR,'' );
 }
 
 </script>
@@ -392,20 +392,20 @@ function callTip(html)
       <c:out value="${toc.studyEventDefinition.name}" />&nbsp;(<fmt:formatDate
       value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}" />)
     </td>
-	<td class="table_cell_top" >
+    <td class="table_cell_top" >
 <span><b><fmt:message key="gender" bundle="${resword}"/>:</b></span>
         
         </td>
          <td class="table_cell_noborder" style="padding-left:3px">
-	       <c:choose>
-	                   <c:when test="${subject.gender==109}"><fmt:message key="M" bundle="${resword}"/></c:when>
-	                   <c:when test="${subject.gender==102}"><fmt:message key="F" bundle="${resword}"/></c:when>
-	                   <c:otherwise>
-	                       <c:out value="${subject.gender}" />
-	                   </c:otherwise>
+           <c:choose>
+                       <c:when test="${subject.gender==109}"><fmt:message key="M" bundle="${resword}"/></c:when>
+                       <c:when test="${subject.gender==102}"><fmt:message key="F" bundle="${resword}"/></c:when>
+                       <c:otherwise>
+                           <c:out value="${subject.gender}" />
+                       </c:otherwise>
         </c:choose>
     </td>
-	
+    
 
    
 </tr>
@@ -417,11 +417,11 @@ function callTip(html)
    
             <b><fmt:message key="occurrence_number" bundle="${resword}"/>:</b>
 </c:if>     
-	 </td>
-		
+     </td>
+        
         <td class="table_cell_noborder" >
 <c:if test="${toc.studyEventDefinition.repeating}">         
-		 <c:out value="${toc.studyEvent.sampleOrdinal}" />
+         <c:out value="${toc.studyEvent.sampleOrdinal}" />
    </c:if> 
    </td>
 
@@ -436,16 +436,16 @@ function callTip(html)
      <td class="table_cell_noborder" >
         <c:out value="${age}" /><br>
     </td>
-	
-	</tr>
-	
-	<tr>
-		<!--study-->
-	 <td class="table_cell_noborder" >
+    
+    </tr>
+    
+    <tr>
+        <!--study-->
+     <td class="table_cell_noborder" >
 
         <b><fmt:message key="study" bundle="${resword}"/>:</b><br>
     </td>
-	
+    
     <td class="table_cell_noborder" >
      <c:out value="${studyTitle}" /><br>
     </td>
@@ -478,13 +478,13 @@ function callTip(html)
         </td>
 
     </tr>
-	<tr>
-	<!--site to be implemented -->
-	          <td class="table_cell_noborder" >
+    <tr>
+    <!--site to be implemented -->
+              <td class="table_cell_noborder" >
 
         <b><fmt:message key="site" bundle="${resword}"/>:</b><br>
     </td>
-	
+    
     <td class="table_cell_noborder" >
         <c:if test="${study.parentStudyId > '0'}">
             <c:out value="${siteTitle}" /><br>
@@ -493,7 +493,7 @@ function callTip(html)
             <fmt:message key="na" bundle="${resword}"/><br>
         </c:if>
     </td>
-	<!--person id todo -->
+    <!--person id todo -->
        <c:choose>
         <c:when test="${study.studyParameterConfig.personIdShownOnCRF == 'true'}">
             <td class="table_cell_top">
@@ -509,7 +509,7 @@ function callTip(html)
             <td class="table_cell_left" ></td>
         </c:otherwise>
     </c:choose>
-	</tr>
+    </tr>
 <tr>
  
 
@@ -774,7 +774,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
             </td>
         </tr>
     </table>
-	</c:if>
+    </c:if>
 </td>
 </tr>
 

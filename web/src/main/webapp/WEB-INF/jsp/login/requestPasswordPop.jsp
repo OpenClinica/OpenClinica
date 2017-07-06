@@ -12,7 +12,7 @@ LdapUserService ldapUserService = (LdapUserService) ctx.getBean(LdapUserService.
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <!-- Main Content Area -->
-<div align="justify" style="width: 630px; height: 330px;; background:#FFFFFF; padding:5px 8px 0px 8px">
+<div align="justify" style="width: 630px; height: 500px;; background:#FFFFFF; padding:5px 8px 0px 8px">
 <h1><fmt:message key="request_password_form" bundle="${resword}"/></h1>
 <p><fmt:message key="you_must_be_an_openClinica_member_to_receive_a_password" bundle="${resword}"/></p>
 <p><a href="<%= ldapUserService.getPasswordRecoveryURL() %>" target="_blank"><fmt:message key="login.requestPassword.retrieveLdapPassword" bundle="${resword}"/></a></p>
@@ -26,15 +26,15 @@ LdapUserService ldapUserService = (LdapUserService) ctx.getBean(LdapUserService.
 
 <div class="textbox_center">
 <table border="0" cellpadding="0" cellspacing="0">
-  <tr><td class="formlabel"><fmt:message key="user_name" bundle="${resword}"/>:</td>
+  <tr><td class="formlabel"><fmt:message key="user_name" bundle="${resword}"/></td>
       <td><div class="formfieldXL_BG"><input type="text" name="name" class="formfieldXL"></div></td>
   </tr>
   <tr valign="top">
-      <td class="formlabel"><fmt:message key="email" bundle="${resword}"/>:</td>
+      <td class="formlabel"><fmt:message key="email" bundle="${resword}"/></td>
       <td><div class="formfieldXL_BG"><input type="text" name="email" class="formfieldXL"></div></td>
   </tr>
   <tr valign="top">
-      <td class="formlabel"><fmt:message key="password_challenge_question" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
+      <td class="formlabel"><fmt:message key="password_challenge_question" bundle="${resword}"/></td><td><div class="formfieldXL_BG">
         <select name="passwdChallengeQuestion" class="formfieldXL">
             <option><fmt:message key="favourite_pet" bundle="${resword}"/></option>
             <option><fmt:message key="city_of_birth" bundle="${resword}"/></option>
@@ -42,7 +42,7 @@ LdapUserService ldapUserService = (LdapUserService) ctx.getBean(LdapUserService.
             <option><fmt:message key="favorite_color" bundle="${resword}"/></option>
         </select></div></td>
   </tr>
-  <tr valign="top"><td class="formlabel"><fmt:message key="password_challenge_answer" bundle="${resword}"/>:</td>
+  <tr valign="top"><td class="formlabel"><fmt:message key="password_challenge_answer" bundle="${resword}"/></td>
         <td><div class="formfieldXL_BG"><input type="text" name="passwdChallengeAnswer" class="formfieldXL"></div></td>
   </tr>
 </table>

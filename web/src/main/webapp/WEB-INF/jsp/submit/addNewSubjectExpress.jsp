@@ -1,203 +1,411 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%--
+    User: Hamid
+  Date: May 8, 2009
+  Time: 8:29:31 PM
+  To change this template use File | Settings | File Templates.
+--%>
+
+
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<jsp:useBean scope="request" id="label" class="java.lang.String"/>
 
+<jsp:useBean scope="session" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean" />
+<jsp:useBean scope="request" id="pageMessages" class="java.util.ArrayList" />
+<jsp:useBean scope="request" id="presetValues" class="java.util.HashMap" />
 
-  </table>
-  <c:set var="tabCount" value="${1}"/>
-  <table border="0" cellpadding="0" cellspacing="0" width="100%"
-         style="background-color:#CCCCCC">
-    <tr id="AddSubjectRow1" style="display:none">
-		<form id="subjectForm" name="subjectForm" action="AddNewSubject" method="post">
-		   
-			<td class="table_cell_left" colspan="2" nowrap>
-			  <jsp:include page="../include/showSubmitted.jsp" />
-			  <input type="hidden" name="addWithEvent" value="1"/>
-				<c:choose>
-			      <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
-			       <input type="text" value="<c:out value="${label}"/>" tabindex ="<c:out value="${tabCount}"/>" size="12" class="formfield" disabled>
-			       <input type="hidden" name="label" value="<c:out value="${label}"/>">
-			      </c:when>
-			      <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto editable'}">
-			       <input onfocus="this.select()" onclick ="<%--if (this.value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="label" tabindex ="<c:out value="${tabCount}"/>" value="<c:out value="${label}"/>" size="12" class="formfield">
-			      </c:when>
-			      <c:otherwise>
-			        <!--<input type="text" name="label" value="<c:out value="${label}"/>" size="5" class="formfield">-->
-			        <input onfocus="this.select()" onclick = "<%--if (this.value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="label" tabindex ="<c:out value="${tabCount}"/>" value="<fmt:message key="study_subject_ID" bundle="${resword}"/>" size="12" class="formfield">
-			      </c:otherwise>
-			    </c:choose>
-			<span class="formlabel">*</span></td>
-			<c:set var="tabCount" value="${tabCount+1}"/>
+<jsp:useBean scope="request" id="groups" class="java.util.ArrayList" />
 
-			<td valign="top" class="table_cell" nowrap>
-            <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
-            <select name="gender" class="formfield" tabindex="<c:out value="${tabCount}"/>">
-				<option value=""><fmt:message key="gender" bundle="${resword}"/>:</option>
-				<option value="m"><fmt:message key="male" bundle="${resword}"/></option>
-				<option value="f"><fmt:message key="female" bundle="${resword}"/></option>
-			</select>
-             <c:choose>
-             <c:when test="${study.studyParameterConfig.genderRequired !='false'}">
-                <span class="formlabel">*</span>
-             </c:when>
-             </c:choose>
-            </c:if>
-            </td>
-			 <c:set var="tabCount" value="${tabCount+1}"/>
- 
-			 
-			<c:set var="count" value="0"/>
-			<c:forEach var="groupClass" items="${studyGroupClasses}">			
-					
-			<td valign="top" class="table_cell" nowrap>
+<c:set var="uniqueIdentifier" value="" />
+<c:set var="chosenGender" value="" />
+<c:set var="label" value="" />
+<c:set var="secondaryLabel" value="" />
+<c:set var="enrollmentDate" value="" />
+<c:set var="startDate" value=""/>
+<c:set var="dob" value="" />
+<c:set var="yob" value="" />
+<c:set var="groupId" value="${0}" />
+<c:set var="studyEventDefinition" value=""/>
+<c:set var="location" value=""/>
+
+<c:forEach var="presetValue" items="${presetValues}">
+	<c:if test='${presetValue.key == "uniqueIdentifier"}'>
+		<c:set var="uniqueIdentifier" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "gender"}'>
+		<c:set var="chosenGender" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "label"}'>
+		<c:set var="label" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "secondaryLabel"}'>
+		<c:set var="secondaryLabel" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "enrollmentDate"}'>
+		<c:set var="enrollmentDate" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "startDate"}'>
+		<c:set var="startDate" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "dob"}'>
+		<c:set var="dob" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "yob"}'>
+		<c:set var="yob" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "group"}'>
+		<c:set var="groupId" value="${presetValue.value}" />
+	</c:if>
 	
-			  <select name="studyGroupId<c:out value="${count}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield">
-	
-				<option value=""><c:out value="${groupClass.name}"/>:</option>
-				 <c:forEach var="studyGroup" items="${groupClass.studyGroups}">
-				   <option value="<c:out value="${studyGroup.id}"/>"><c:out value="${studyGroup.name}"/></option>
-				 </c:forEach>
-			  </select>
-			</td>
-				<c:set var="count" value="${count+1}"/>	
-				<c:set var="tabCount" value="${tabCount+1}"/>
-			</c:forEach>
-					
-			<td valign="top" colspan="6" class="table_cell" nowrap>
-			<table border="0" cellpadding="0" cellspacing="0" width="100%">
-				<tr>
-					<td valign="top">
-	
-					<select name="studyEventDefinition" class="formfield" tabindex="<c:out value="${tabCount}"/>">
-	                   
-						<option value=""><fmt:message key="event" bundle="${resword}"/>:</option>
-						<c:forEach var="event" items="${allDefsArray}">
-						  <option value="<c:out value="${event.id}"/>"><c:out value="${event.name}"/></option>
-						</c:forEach>											
-						</select>
-					</td>
-					 <c:set var="tabCount" value="${tabCount+1}"/>
-					<td valign="top" align="right">
-					 <input onfocus="<%--if (this.value == '<fmt:message key="location" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="location" tabindex="<c:out value="${tabCount}"/>" size="8" value="<fmt:message key="location" bundle="${resword}"/>" class="formfield" />*
-					</td>
-					 <c:set var="tabCount" value="${tabCount+1}"/>
-					<td valign="top">
-					<input onfocus="<%--if (this.value == '<fmt:message key="eventMMDDYYYY" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="startDate" size="15" value="<fmt:message key="eventMMDDYYYY" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="enrollmentDateField"/>
-					<span class="formlabel">*</span></td>
-					 <c:set var="tabCount" value="${tabCount+1}"/>				
-				     <td valign="top"><A HREF="#" >
-                         <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger"/></a>
-                         <script type="text/javascript">
-                         Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger" });
-                         </script>
+	<c:if test='${presetValue.key == "studyEventDefinition"}'>
+		<c:set var="studyEventDefinition" value="${presetValue.value}" />
+	</c:if>
+	<c:if test='${presetValue.key == "location"}'>
+		<c:set var="location" value="${presetValue.value}" />
+	</c:if>
+</c:forEach>
 
-                    </td>
-				</tr>
-			</table>
-			</td>
-			<td valign="top" align="right" class="table_cell" nowrap>
-				<input type="submit" name="addSubject" value="<fmt:message key="add" bundle="${resword}"/>" tabindex="999" class="button_search" />
-			</td>
-			
-		</tr>
-		<tr id="AddSubjectRow2" style="display:none">
-			<td valign="top" align="left" colspan="2" class="table_cell_left" nowrap>
-			 <c:choose>
-	           <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
-			    &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="person_ID" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="uniqueIdentifier" value="<fmt:message key="person_ID" bundle="${resword}"/>" size="12" tabindex="<c:out value="${tabCount}"/>" class="formfield"><span class="formlabel">*</span>
-			   </c:when>
-			   <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='optional'}">
-			    &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="person_ID" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="uniqueIdentifier" value="<fmt:message key="person_ID" bundle="${resword}"/>" size="12" tabindex="<c:out value="${tabCount}"/>" class="formfield">
-			   </c:when>
-			   <c:otherwise>
-			    &nbsp;<input type="hidden" name="uniqueIdentifier" value="">
-			   </c:otherwise>
-			 </c:choose> 
-			  <c:set var="tabCount" value="${tabCount+1}"/> 
-			</td>
-			<td valign="top" align="left" colspan="2" class="table_cell" nowrap>
-			<table border="0">
-				<tr>
-					<td valign="top" align="right">
-					 <c:choose>
-	                    <c:when test="${study.studyParameterConfig.collectDob == '1'}">
-						&nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="DOB" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="dob" size="20" value="<fmt:message key="DOB" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="dobField" ><span class="formlabel">*</span>
-						</td>
-						 <td valign="top" align="left">
-                             <a href="#" >
-                                 <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger"/>
-                                 <script type="text/javascript">
-                                 Calendar.setup({inputField  : "dobField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger" });
-                                 </script>
 
-                             </a>
+<form name="subjectForm" action="AddNewSubject" method="post">
+<input type="hidden" name="subjectOverlay" value="true">
 
-                        </c:when>
-					    <c:when test="${study.studyParameterConfig.collectDob == '2'}">
-					     &nbsp;<input onfocus="<%--if (this.value == '<fmt:message key="YOB" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="yob" size="15" value="YOB: YYYY" class="formfield" tabindex="<c:out value="${tabCount}"/>"/><span class="formlabel">*</span>
-					    </c:when>
-					    <c:otherwise>
-					      &nbsp;<input type="hidden" name="dob" value="" />
-					    </c:otherwise>
-					  </c:choose>
-					    
-					 <c:set var="tabCount" value="${tabCount+1}"/>
-					</td>
-				</tr>
-			</table>
-			</td>
-			<td valign="top" align="left" colspan="2" class="table_cell" nowrap>
-			<table border="0">
-			<tr>
-			 <td valign="top" align="left">
-			  <input onfocus="<%--if (this.value == '<fmt:message key="enrollMMDDYYYY" bundle="${resword}"/>'){ this.value =''}--%>" type="text" name="enrollmentDate" size="20" value="<fmt:message key="enrollMMDDYYYY" bundle="${resword}"/>" tabindex="<c:out value="${tabCount}"/>" class="formfield" id="enrollmentDateField2"/>
-			  <span class="formlabel">*</span></td>
-					 <c:set var="tabCount" value="${tabCount+1}"/>				
-				     <td valign="top"><A HREF="#" >
-                         <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2"/></a>
-                         <script type="text/javascript">
-                         Calendar.setup({inputField  : "enrollmentDateField2", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger2" });
-                         </script>
-                      </td>
-              </tr>
+<div style="width: 500px; height: 550px; overflow: scroll; background:#FFFFFF; cursor:default">
+<table border="0" cellpadding="0" align="center">
+    <tr style="height:10px;">
+        <center><h3><fmt:message key="add_new_subject" bundle="${resword}"/></h3></center>
+        <td >&nbsp;</td>
+    </tr>
+    <tr valign="top">
+        <td class="formlabel" align="left">
+            <jsp:include page="../include/showSubmitted.jsp" />
+            <input type="hidden" name="addWithEvent" value="1"/>
+            <fmt:message key="study_subject_ID" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldXL_BG">
+                    <c:choose>
+                     <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
+                      <input onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45" class="formfield" disabled>
+                      <input type="hidden" name="label" value="<c:out value="${label}"/>">
+                     </c:when>
+                     <c:otherwise>
+                       <input onfocus="this.select()" type="text" name="label" value="<c:out value="${label}"/>" width="30" class="formfieldXL">
+                     </c:otherwise>
+                    </c:choose>
+                    </div></td>
+                    <td>&nbsp;*</td>
+                </tr>
+                <tr>
+                    <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
+                </tr>
+                
             </table>
-             </td>
-			<td valign="top" nowrap align="right" colspan="8" class="table_cell"><a href="AddNewSubject"><fmt:message key="enter_full_record_details" bundle="${resword}"/></a></td>
-		</tr>
-	    </form>
-	   
-								
-	 
-										
-		<!-- End Data -->
-					
-				
-			
-							
-		</table>
+        </td>
+    </tr>
+    <c:choose>
+    <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
+    <tr valign="top">
+        <td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldXL_BG">
+                        <input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL">
+                    </div></td>
+                    <td>&nbsp;*</td>
+                </tr>
+                <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
+            </table>
+        </td>
+    </tr>
+    </c:when>
+    <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='optional'}">
+    <tr valign="top">
+        <td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldXL_BG">
+                        <input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL">
+                    </div></td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    </c:when>
+    <c:otherwise>
+      <input type="hidden" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>">
+    </c:otherwise>
+    </c:choose>
 
-		<!-- End Table Contents -->			
-		</td>
+    <tr valign="top" >
 
-	</tr>
-	
-		
-		
- 
+        <td class="formlabel" align="right">
+            <fmt:message key="enrollment_date" bundle="${resword}"/>:
+        </td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top">
+            <!--layer-background-color:white;-->
+            <div class="formfieldM_BG">
+                        <input onfocus="this.select()" type="text" name="enrollmentDate" size="15" value="<c:out value="${enrollmentDate}" />" class="formfieldM" id="enrollmentDateField" />
+                    </td>
+                    <td align="right">
+                    <A HREF="#">
+                      &nbsp;<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
+                        <script type="text/javascript">
+                        Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger", customPX: 300, customPY: 10 });
+                        </script>
+                    </a>
+                        *
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
+                </tr>
+            </table>
+        </td>
+    </tr>
 
-  </table>
-	
-			
-	
- <!-- End Table 0 -->	
-</div>
-</div></div></div></div></div></div></div></div>
-		</td>
-	</tr>
+    <tr valign="top">
+        <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
+        <td class="formlabel" align="right"><fmt:message key="gender" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldS_BG">
+                        <select name="gender" class="formfieldS">
+                            <option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
+                            <c:choose>
+                                <c:when test="${!empty chosenGender}">
+                                    <c:choose>
+                                        <c:when test='${chosenGender == "m"}'>
+                                            <option value="m" selected><fmt:message key="male" bundle="${resword}"/></option>
+                                            <option value="f"><fmt:message key="female" bundle="${resword}"/></option>
+                                        </c:when>
+                                        <c:otherwise>
+                                            <option value="m"><fmt:message key="male" bundle="${resword}"/></option>
+                                            <option value="f" selected><fmt:message key="female" bundle="${resword}"/></option>
+                                        </c:otherwise>
+                                    </c:choose>
+                                </c:when>
+                                <c:otherwise>
+                                    <option value="m"><fmt:message key="male" bundle="${resword}"/></option>
+                                    <option value="f"><fmt:message key="female" bundle="${resword}"/></option>
+                                </c:otherwise>
+                            </c:choose>
+                            </select>
+                </td>
+    <td align="left">
+        <c:choose>
+        <c:when test="${study.studyParameterConfig.genderRequired !='false'}">
+           <span class="formlabel">&nbsp;*</span>
+        </c:when>
+        </c:choose>
+    </td>
+    </tr>
+    </table>
+        </td>
+    </c:if>
+    </tr>
+    <tr>
+        <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include></td>
+    </tr>
+
+
+    <c:choose>
+    <c:when test="${study.studyParameterConfig.collectDob == '1'}">
+    <tr valign="top">
+        <td class="formlabel" align="right"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldM_BG">
+                        <input onfocus="this.select()" type="text" name="dob" size="15" value="<c:out value="${dob}" />" class="formfieldM" id="dobField" />
+                    </td>
+                    <td>
+                    <A HREF="#">
+                      &nbsp;<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
+                        <script type="text/javascript">
+                        Calendar.setup({inputField  : "dobField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger", customPX: 300, customPY: 10 });
+                        </script>
+                    </a>
+                    </td>
+                    <td>&nbsp;* </td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dob"/></jsp:include></td>
+    </tr>
+
+    </c:when>
+    <c:when test="${study.studyParameterConfig.collectDob == '2'}">
+    <tr valign="top">
+        <td class="formlabel" align="right"><fmt:message key="year_of_birth" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldM_BG">
+                        <input onfocus="this.select()" type="text" name="yob" size="15" value="<c:out value="${yob}" />" class="formfieldM" />
+                    </td>
+                    <td>(<fmt:message key="date_format_year" bundle="${resformat}"/>) &nbsp;*</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yob"/></jsp:include></td>
+    </tr>
+
+  </c:when>
+  <c:otherwise>
+    <input type="hidden" name="dob" value="" />
+  </c:otherwise>
+ </c:choose>
+<c:if test="${(!empty studyGroupClasses)}">
+    <tr valign="top">
+      <td class="formlabel" align="right"><fmt:message key="subject_group_class" bundle="${resword}"/>:
+      <td class="table_cell">
+      <c:set var="count" value="0"/>
+      <table border="0" cellpadding="0">
+        <c:forEach var="group" items="${studyGroupClasses}">
+        <tr valign="top">
+         <td><b><c:out value="${group.name}"/></b></td>
+         <td><div class="formfieldM_BG">
+             <select name="studyGroupId<c:out value="${count}"/>" class="formfieldM">
+                 <option value=""><c:out value="${group.name}"/>:</option>
+                  <c:forEach var="studyGroup" items="${group.studyGroups}">
+                    <option value="<c:out value="${studyGroup.id}"/>"><c:out value="${studyGroup.name}"/></option>
+                  </c:forEach>
+              </select></div>
+             <c:import url="../showMessage.jsp"><c:param name="key" value="studyGroupId${count}" /></c:import>
+
+              </td>
+              <c:if test="${group.subjectAssignment=='Required'}">
+                <td align="left">&nbsp;*</td>
+              </c:if>
+              </tr>
+             <c:set var="count" value="${count+1}"/>
+        </c:forEach>
+        </table>
+      </td>
+    </tr>
+</c:if>
+
+    <tr valign="top">
+        <td class="formlabel" align="right"><fmt:message key="SED_2" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr><td>
+                    <div class="formfieldM_BG">
+                        <select name="studyEventDefinition" class="formfieldM">
+                            <option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
+                            <c:forEach var="event" items="${allDefsArray}">
+                                <option <c:if test="${studyEventDefinition == event.id}">SELECTED</c:if> value="<c:out value="${event.id}"/>"><c:out value="${event.name}" />
+                                </option>
+                            </c:forEach>
+                        </select>
+                    </div>
+                    </td>
+                    <td><span class="formlabel">&nbsp;*</span></td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyEventDefinition"/></jsp:include></td>
+                </tr>
+
+            </table>
+        </td>
+    </tr>
+
+    <tr valign="top">
+        <td class="formlabel" align="right">
+            <fmt:message key="start_date" bundle="${resword}"/>:
+        </td>
+          <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top">
+                        <div class="formfieldM_BG">
+                        <input type="text" name="startDate" size="15" value="<c:out value="${startDate}" />" class="formfieldM" id="enrollmentDateField2" />
+                    </td>
+                    <td>
+                        <A HREF="#" >
+                         &nbsp;<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2"/></a>&nbsp;*
+                         <script type="text/javascript">
+                         Calendar.setup({inputField  : "enrollmentDateField2", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger2" ,customPX: 300, customPY: 10 });
+                         </script>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDate"/></jsp:include></td>
+                </tr>
+
+            </table>
+          </td>
+    </tr>
+    <c:choose>
+    <c:when test="${study.studyParameterConfig.eventLocationRequired == 'required'}">
+    <tr valign="top">
+        <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldXL_BG">
+                       <input type="text" name="location"size="50" value="<c:out value="${location}"/>" class="formfieldXL">
+                    </div></td>
+                    <td>&nbsp;*</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    <tr>
+        <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include></td>
+    </tr>
+
+    </c:when>
+    <c:when test="${study.studyParameterConfig.eventLocationRequired == 'optional'}">
+    <tr valign="top">
+        <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td valign="top"><div class="formfieldXL_BG">
+                       <input type="text" name="location"size="50" class="formfieldXL">
+                    </div></td>
+                    <td>&nbsp;</td>
+                </tr>
+            </table>
+        </td>
+    </tr>
+    </c:when>
+    <c:otherwise>
+        <input type="hidden" name="location" value=""/>
+    </c:otherwise>
+    </c:choose>
+    <tr>
+        <td colspan="2" align="center">
+        <input type="submit" name="addSubject" value="<fmt:message key="add2" bundle="${resword}"/>" class="button" />
+        &nbsp;
+        <input type="button" id="cancel" name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>" class="button"/>
+
+        <div id="dvForCalander" style="width:1px; height:1px;"></div>
+    </td>
+    </tr>
+
 </table>
 
+</div>
 
-<DIV ID="testdiv1" STYLE="position:absolute;z-index:5;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
+</form>

@@ -44,7 +44,7 @@
 <script type="text/JavaScript" language="JavaScript" src="../../includes/prototype.js"></script>
 
 
-<body style="width:1024px;" class="main_BG"
+<body style="width:100%;" class="main_BG"
 
 <c:choose>
 

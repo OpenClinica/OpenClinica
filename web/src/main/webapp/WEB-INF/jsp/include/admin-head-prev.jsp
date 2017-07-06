@@ -44,7 +44,7 @@
 <%-- style="width:1152px;" I removed this include because you cannot have both
      "onLoad" tests: <jsp:include page="../include/showPopUp.jsp"/> reduce file size--%>
 <%--  TabsForwardByNum(<c:out value="${tabId}"/>);--%>
-<body style="width:1024px;" class="main_BG"
+<body style="width:100%;" class="main_BG"
 <c:choose>
 <c:when test="${tabId != null && tabId>0}">
       onload="<jsp:include page="../include/showPopUp2.jsp"/>"

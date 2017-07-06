@@ -40,27 +40,27 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open">
-		<td class="sidebar_tab">
+        <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <fmt:message key="instructions" bundle="${resword}"/>
 
-		<div class="sidebar_tab_content">
-			<fmt:message key="this_section_allows_a_study_manager_to_view_and_resolve" bundle="${restext}"/>
-		</div>
+        <div class="sidebar_tab_content">
+            <fmt:message key="this_section_allows_a_study_manager_to_view_and_resolve" bundle="${restext}"/>
+        </div>
 
-		</td>
+        </td>
 
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: none">
-		<td class="sidebar_tab">
+    </tr>
+    <tr id="sidebar_Instructions_closed" style="display: none">
+        <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <fmt:message key="instructions" bundle="${resword}"/>
 
-		</td>
+        </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
@@ -72,17 +72,17 @@
         <c:when test="${module eq 'manage'}"><span class="title_manage"></c:when>
         <c:otherwise><span class="title_manage"></c:otherwise>
         </c:choose>
-	<fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
+    <fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/notes-and-discrepancies')">
         <c:choose>
-        <c:when test="${module eq 'manage'}"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></c:when>
-        <c:otherwise><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></c:otherwise></c:choose></a>
+        <c:when test="${module eq 'manage'}"><span class="icon icon-question-circle gray"></span></c:when>
+        <c:otherwise><span class="icon icon-question-circle gray"></span></c:otherwise></c:choose></a>
  <%--<a href="javascript:openDocWindow('ViewNotes?print=yes')"--%>
 <%--<a href="javascript:onInvokeAction('listNotes','filter')"--%>
-	<%--onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"--%>
-	<%--onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">--%>
-	<%--<img name="bt_Print0" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>"></a>--%>
-</span></h1>
+    <%--onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"--%>
+    <%--onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">--%>
+    <%--<img name="bt_Print0" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>"></a>--%>
+</span></h1><br/>
 <%--
 <div class="dnKey"><strong><fmt:message key="Filter_by_status" bundle="${resword}"/>
 :</strong>
@@ -125,7 +125,7 @@
 <%--<c:set var="module" value="${module}" scope="request"/>--%>
 <%--
 <c:import url="showNotesTable.jsp">
-	<c:param name="rowURL" value="showDiscrepancyNoteRow.jsp" />
+    <c:param name="rowURL" value="showDiscrepancyNoteRow.jsp" />
 </c:import>
 <br><br>
 --%>
@@ -176,84 +176,84 @@
 
 <div style="clear:left">
 <table border="0" cellpadding="0" cellspacing="0" style="position: relative; left: -14px;">
-	<tr>
-		<td id="sidebar_Workflow_closed" style="display: none">
-		<a href="javascript:leftnavExpand('sidebar_Workflow_closed'); leftnavExpand('sidebar_Workflow_open');"><img src="images/<fmt:message key="image_dir" bundle="${resformat}"/>/tab_Workflow_closed.gif" border="0"></a>
-	</td>
-	<td id="sidebar_Workflow_open">
-	<table border="0" cellpadding="0" cellspacing="0" class="workflowBox">
-		<tr>
-			<td class="workflowBox_T" valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td class="workflow_tab">
-					<a href="javascript:leftnavExpand('sidebar_Workflow_closed'); leftnavExpand('sidebar_Workflow_open');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+    <tr>
+        <td id="sidebar_Workflow_closed" style="display: none">
+        <a href="javascript:leftnavExpand('sidebar_Workflow_closed'); leftnavExpand('sidebar_Workflow_open');"><img src="images/<fmt:message key="image_dir" bundle="${resformat}"/>/tab_Workflow_closed.gif" border="0"></a>
+    </td>
+    <td id="sidebar_Workflow_open">
+    <table border="0" cellpadding="0" cellspacing="0" class="workflowBox">
+        <tr>
+            <td class="workflowBox_T" valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>
+                    <td class="workflow_tab">
+                    &nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:leftnavExpand('sidebar_Workflow_closed'); leftnavExpand('sidebar_Workflow_open');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 
-					<b><fmt:message key="workflow" bundle="${resword}"/></b>
+                    <b><fmt:message key="workflow" bundle="${resword}"/></b>
 
-					</td>
-				</tr>
-			</table>
-			</td>
-			<td class="workflowBox_T" align="right" valign="top"><img src="images/workflowBox_TR.gif"></td>
-		</tr>
-		<tr>
-			<td colspan="2" class="workflowbox_B">
-			<div class="box_R"><div class="box_B"><div class="box_BR">
-				<div class="workflowBox_center">
+                    </td>
+                </tr>
+            </table>
+            </td>
+            <td class="workflowBox_T" align="right" valign="top"><img src="images/workflowBox_TR.gif"></td>
+        </tr>
+        <tr>
+            <td colspan="2" class="workflowbox_B">
+            <div class="box_R"><div class="box_B"><div class="box_BR">
+                <div class="workflowBox_center">
 
 
-		<!-- Workflow items -->
+        <!-- Workflow items -->
 
-				<table border="0" cellpadding="0" cellspacing="0">
-					<tr>
-						<td>
+                <table border="0" cellpadding="0" cellspacing="0">
+                    <tr>
+                        <td>
 
-				<!-- These DIVs define shaded box borders -->
-						<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+                <!-- These DIVs define shaded box borders -->
+                        <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-							<div class="textbox_center" align="center">
+                            <div class="textbox_center" align="center">
 
-							 <span class="title_manage">
-                               <fmt:message key="manage_study" bundle="${resword}"/>
+                             <span class="title_manage">
+                               &nbsp;&nbsp;&nbsp;&nbsp;<fmt:message key="manage_study" bundle="${resword}"/>
 
-							</span>
+                            </span>
 
-							</div>
-						</div></div></div></div></div></div></div></div>
+                            </div>
+                        </div></div></div></div></div></div></div></div>
 
-						</td>
-						<td><img src="images/arrow.gif"></td>
-						<td>
+                        </td>
+                        <td><img src="images/arrow.gif"></td>
+                        <td>
 
-				<!-- These DIVs define shaded box borders -->
-						<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+                <!-- These DIVs define shaded box borders -->
+                        <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-							<div class="textbox_center" align="center">
+                            <div class="textbox_center" align="center">
 
                              <span class="title_manage">
 
-							<b><fmt:message key="view_discrepancy_notes" bundle="${resword}"/></b>
+                            <b><fmt:message key="view_discrepancy_notes" bundle="${resword}"/></b>
 
 
-							</span>
+                            </span>
 
-							</div>
-						</div></div></div></div></div></div></div></div>
+                            </div>
+                        </div></div></div></div></div></div></div></div>
 
-						</td>
-					</tr>
-				</table>
+                        </td>
+                    </tr>
+                </table>
 
 
-		<!-- end Workflow items -->
+        <!-- end Workflow items -->
 
-				</div>
-			</div></div></div>
-			</td>
-		</tr>
-	</table>
-	</td>
+                </div>
+            </div></div></div>
+            </td>
+        </tr>
+    </table>
+    </td>
    </tr>
 </table>
 </div>

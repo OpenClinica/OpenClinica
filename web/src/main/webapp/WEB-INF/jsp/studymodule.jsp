@@ -9,7 +9,7 @@
 <jsp:include page="include/managestudy_top_pages.jsp"/>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
-
+<link rel="stylesheet" href="../includes/css/icomoon-style.css">
 
 
 <!-- move the alert message to the sidebar-->
@@ -18,9 +18,9 @@
 <tr id="sidebar_Instructions_open">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="${pageContext.request.contextPath}/images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
         <div class="sidebar_tab_content">
 
@@ -34,9 +34,9 @@
 <tr id="sidebar_Instructions_closed" style="display: none">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="${pageContext.request.contextPath}/images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
 
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
     </td>
 </tr>
@@ -94,7 +94,7 @@
             // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
             var warnings = "${regMessages}";
             if (warnings.length > 0) {
-            	jQuery.blockUI({ message: jQuery('#requestRandomizationForm'), css:{left: "300px", top:"10px" } });
+              jQuery.blockUI({ message: jQuery('#requestRandomizationForm'), css:{left: "300px", top:"10px" } });
             }
         });
 
@@ -123,7 +123,7 @@
             // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
             var warnings = "${regMessages}";
             if (warnings.length > 0) {
-            	jQuery.blockUI({ message: jQuery('#requestParticipateForm'), css:{left: "300px", top:"10px" } });
+              jQuery.blockUI({ message: jQuery('#requestParticipateForm'), css:{left: "300px", top:"10px" } });
             }
         });
 
@@ -141,16 +141,16 @@
   <form action="studymodule" method="post">
   <div>
       <h1><span class="title_manage"><c:out value="${currentStudy.name}"/>&nbsp;
-        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/></a>
-      </span></h1>
+        <span class="icon icon-question-circle gray"></span></a>
+      </span></h1><br/>
   </div>
   <div style="border: 1px solid #ccc; width:70%; padding-left:5px">
       <p>
           <fmt:message key="study_module_description_1" bundle="${pagemessage}">
-              <fmt:param value="<img src='../images/create_new.gif'/>"/>
-              <fmt:param value="<img src='../images/create_new.gif'/>"/>
-              <fmt:param value="<img src='../images/bt_Edit.gif'/>"/>
-              <fmt:param value="<img src='../images/bt_Details.gif'/>"/>
+              <fmt:param value="<img src='../images/create_new.png'/>"/>
+              <fmt:param value="<img src='../images/create_new.png'/>"/>
+              <fmt:param value="<img src='../images/bt_Edit.png'/>"/>
+              <fmt:param value="<img src='../images/bt_Details.png'/>"/>
           </fmt:message>
       </p>
       <%--<p>--%>
@@ -244,8 +244,8 @@
             <c:url var="updateStudy" value="/UpdateStudyNew?id=${studyId}"/>
             <c:url var="viewStudy" value="/ViewStudy?id=${studyId}&viewFull=yes"/>
             <td>
-                <a href="${viewStudy}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                <a href="${updateStudy}"><img src="../images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>"/></a>
+                <a href="${viewStudy}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                <a href="${updateStudy}"><span class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>"/></a>
             </td>
         </tr>
         <tr>
@@ -285,17 +285,17 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.crf == 1}">
-                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${crfCreateUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.crf == 2}">
-                        <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${crfListUrl}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${crfCreateUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${crfListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:when>
                     <c:otherwise>
-                        <a href="${crfListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${crfCreateUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${crfListUrl}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${crfCreateUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${crfListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:otherwise>
@@ -340,17 +340,17 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.eventDefinition == 1}">
-                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${eventUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.eventDefinition == 2}">
-                        <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${edListUrl}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${eventUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:when>
                     <c:otherwise>
-                        <a href="${edListUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${eventUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${edListUrl}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${eventUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${edListUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:otherwise>
@@ -395,17 +395,17 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.subjectGroup == 1}">
-                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${createSubGroupUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.subjectGroup == 2}">
-                        <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${listSubGroupUrl}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${createSubGroupUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listSubGroupUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:when>
                     <c:otherwise>
-                        <a href="${listSubGroupUrl}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${createSubGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${listSubGroupUrl}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${createSubGroupUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listSubGroupUrl}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:otherwise>
@@ -445,24 +445,24 @@
             <td>
                 <c:url var="createRule" value="/ImportRule"/>
                 <c:url var="viewRule" value="/ViewRuleAssignment"/>
-				<c:url var="ruleDesignerURL" value="${ruleDesignerURL}"/>
+        <c:url var="ruleDesignerURL" value="${ruleDesignerURL}"/>
 
                 <c:choose>
                     <c:when test="${studyModuleStatus.rule == 1}">
-                        <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+                        <a href="${createRule}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><span class="icon icon-pencil-squared" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.rule == 2}">
-                        <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+                        <a href="${viewRule}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${createRule}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><span class="icon icon-pencil-squared" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:when>
                     <c:otherwise>
-                        <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+                        <a href="${viewRule}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${createRule}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+            <a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><span class="icon icon-pencil-squared" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:otherwise>
@@ -507,17 +507,17 @@
 
                 <c:choose>
                     <c:when test="${studyModuleStatus.site == 1}">
-                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${subGroupUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.site == 2}">
-                        <a href="${siteList}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${siteList}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${subGroupUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${siteList}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:when>
                     <c:otherwise>
-                        <a href="${siteList}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${subGroupUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${siteList}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${subGroupUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${siteList}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:otherwise>
@@ -565,17 +565,17 @@
                 <c:url var="listStudyUser" value="/ListStudyUser"/>
                 <c:choose>
                     <c:when test="${studyModuleStatus.users == 1}">
-                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${assignUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.users == 2}">
-                        <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${listStudyUser}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${assignUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listStudyUser}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:when>
                     <c:otherwise>
-                        <a href="${listStudyUser}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
-                        <a href="${assignUrl}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
+                        <a href="${listStudyUser}"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
+                        <a href="${assignUrl}"><span class="icon icon-plus" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
                         <%-- <a href="${listStudyUser}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:otherwise>
@@ -630,10 +630,10 @@
                       <c:url var="deactivateParticipate" value="studymodule/${currentStudy.oid}/deactivate"/>
                       <c:choose>
                           <c:when test="${participateOCStatus == 'disabled' && !empty participateStatus}">
-                              <a href="${reactivateParticipate}" id="reactivateParticipateAccess" name="reactivateParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                              <a href="${reactivateParticipate}" id="reactivateParticipateAccess" name="reactivateParticipateAccess"><span class="icon icon-plus" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:when test="${participateOCStatus == 'disabled'}">
-                              <a href="javascript:;" id="requestParticipateAccess" name="requestParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                              <a href="javascript:;" id="requestParticipateAccess" name="requestParticipateAccess"><span class="icon icon-plus" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:otherwise>
                               <a href="${deactivateParticipate}" id="removeParticipateAccess" name="removeParticipateAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
@@ -669,13 +669,13 @@
                       <c:url var="deactivateRandomization" value="studymodule/${currentStudy.oid}/deactivaterandomization"/>
                       <c:choose>
                           <c:when test="${randomizationOCStatus == 'disabled' && !empty randomizationStatus}">
-                              <a href="${reactivateRandomization}" id="reactivateRandomizationAccess" name="reactivateRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                              <a href="${reactivateRandomization}" id="reactivateRandomizationAccess" name="reactivateRandomizationAccess"><span class="icon icon-plus" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:when test="${randomizationOCStatus == 'disabled'}">
-                              <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                              <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><span class="icon icon-plus" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:when test="${randomizationOCStatus == 'enabled' && empty randomizationStatus}">
-                              <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                              <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><span class="icon icon-plus" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:otherwise>
                               <a href="${deactivateRandomization}" id="removeRandomizeAccess" name="removeRandomizeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
@@ -725,7 +725,7 @@
             <h1>
                 <fmt:message key="participate_reg_title" bundle="${resword}"/>
                 <a href="javascript:openDocWindow('https://docs.openclinica.com/participate/activate-openclinica-participate-your-study')">
-                    <img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/>
+                    <span border="0" title="Help" alt="Help" class="icon icon-question-circle gray"/>
                 </a>
             </h1>
             <p class="participate-text"><fmt:message key="participate_reg_instructions_part1" bundle="${resword}"/></p>

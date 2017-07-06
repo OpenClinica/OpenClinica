@@ -94,10 +94,6 @@ document.write('<table border="0" cellpadding="0" cellspacing="0" width="' + doc
             <tr>
                 <td valign="top">
 
-<!-- Logo -->
-
-    <div class="logo"><img src="images/Logo.gif"></div>
-
 <!-- Main Navigation -->
 
     <jsp:include page="../include/navBar.jsp"/>

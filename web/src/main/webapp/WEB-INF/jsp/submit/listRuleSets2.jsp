@@ -49,8 +49,8 @@
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
         <td class="sidebar_tab">
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
+        <fmt:message key="instructions" bundle="${restext}"/>
         <div class="sidebar_tab_content">
         <fmt:message key="manage_execute_rule_assignments" bundle="${restext}"/>
         </div>
@@ -58,8 +58,8 @@
     </tr>
     <tr id="sidebar_Instructions_closed" style="display: none">
         <td class="sidebar_tab">
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
+        <fmt:message key="instructions" bundle="${restext}"/>
         </td>
   </tr>
 <jsp:include page="../include/viewRuleAssignmentSideInfo.jsp"/>
@@ -70,13 +70,13 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.domain.EntityBeanTable'/>
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
- <h1><span class="title_manage"><fmt:message key="rule_manage_rule_assignment" bundle="${resworkflow}"/> <c:out value="${study.name}" /> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/rules')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+ <h1><span class="title_manage"><fmt:message key="rule_manage_rule_assignment" bundle="${resworkflow}"/> <c:out value="${study.name}" /> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/rules')"><span class="icon icon-question-circle gray"></span></a>
 </c:when>
 <c:otherwise>
- <h1><span class="title_manage"><fmt:message key="rule_manage_rule_assignment" bundle="${resworkflow}"/> <c:out value="${study.name}" /> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/rules')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+ <h1><span class="title_manage"><fmt:message key="rule_manage_rule_assignment" bundle="${resworkflow}"/> <c:out value="${study.name}" /> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/rules')"><span class="icon icon-question-circle gray"></span></a>
 </c:otherwise>
 </c:choose>
-</span></h1>
+</span></h1><br/>
 
 
 

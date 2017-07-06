@@ -96,7 +96,7 @@
                         </c:when>
                         <c:when test="${event.subjectEventStatus.id==2}">
 
-                            <img src="images/icon_NotStarted.gif"  border="0" style="position: relative; left: 7px;">
+                            <span class="icon icon-doc"  border="0" style="position: relative; left: 7px;">
 
                         </c:when>
                         <c:when test="${event.subjectEventStatus.id==3}">
