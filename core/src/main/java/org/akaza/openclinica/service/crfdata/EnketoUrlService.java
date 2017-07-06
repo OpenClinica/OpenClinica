@@ -15,6 +15,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.core.form.xform.LogBean;
 import org.akaza.openclinica.core.form.xform.QueriesBean;
 import org.akaza.openclinica.core.form.xform.QueryBean;
@@ -71,6 +72,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 import freemarker.template.Configuration;
@@ -88,6 +90,7 @@ public class EnketoUrlService {
     public static final String INSTANCE_SUFFIX = "instance.tpl";
     public static final String FORM_SUFFIX = "form.xml";
     public static final String QUERY_FLAVOR = "-query";
+    public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     public static final String NO_FLAVOR = "";
     public static final String COMMENT = "comment";
     public static final String AUDIT = "audit";
@@ -175,7 +178,7 @@ public class EnketoUrlService {
     }
 
     public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout,
-            StudyEvent studyEvent, String flavor) throws Exception {
+            StudyEvent studyEvent, String flavor, ItemDataBean idb) throws Exception {
         Study study = enketoCredentials.getParentStudy(studyOid);
         studyOid = study.getOc_oid();
 
@@ -185,10 +188,11 @@ public class EnketoUrlService {
 
         String goTo = null;
         if (subjectContext.getItemName() != null) {
-            goTo = (subjectContext.isItemInRepeatingGroup())
-                    ? "//" + subjectContext.getItemRepeatGroupName() + "[" + subjectContext.getItemRepeatOrdinal() + "]//" + subjectContext.getItemName()
-                    : "//" + subjectContext.getItemName();
+            goTo = (subjectContext.isItemInRepeatingGroup()) ? "//" + subjectContext.getItemRepeatGroupName() + "["
+                    + subjectContext.getItemRepeatOrdinalAdjusted() + "]//" + subjectContext.getItemName() : "//" + subjectContext.getItemName();
         }
+        if (flavor.equals(SINGLE_ITEM_FLAVOR))
+            goTo = "//" + subjectContext.getItemName();
 
         if (studyEvent == null) {
             // Lookup relevant data
@@ -208,8 +212,20 @@ public class EnketoUrlService {
                 formLayout.getFormLayoutId());
 
         CrfVersion crfVersion = eventCrf.getCrfVersion();
+        boolean markComplete = true;
+        if (eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
+            markComplete = false;
+        }
+
         // Load populated instance
-        String populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, flavor);
+        String populatedInstance = "";
+        if (flavor.equals(QUERY_FLAVOR)) {
+            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, flavor);
+        } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+            populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
+            flavor = flavor + "[" + idb.getId() + "]";
+            markComplete = false;
+        }
 
         // Call Enketo api to get edit url
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
@@ -217,13 +233,8 @@ public class EnketoUrlService {
         // Build redirect url
         String redirectUrl = getRedirectUrl(subject.getOcOid(), studyOid);
 
-        boolean markComplete = true;
-        if (eventCrf.getStatusId() == Status.UNAVAILABLE.getCode()) {
-            markComplete = false;
-        }
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
-
         EnketoURLResponse eur = enketo.getEditURL(formLayout, flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
                 goTo);
         editURL = eur.getEdit_url();
@@ -458,6 +469,47 @@ public class EnketoUrlService {
             value = value.replaceAll("&", "&amp;").replaceAll("<", "&lt;").replaceAll(">", "&gt;");
         }
         return value;
+    }
+
+    private String populateInstanceSingleItem(PFormCacheSubjectContextEntry subjectContext, EventCrf eventCrf, StudyEvent studyEvent, StudySubject studySubject,
+            CrfVersion crfVersion) throws JsonProcessingException {
+        String itemName = subjectContext.getItemName();
+        if (itemName.endsWith(QUERY_SUFFIX))
+            itemName = itemName.substring(0, itemName.length() - QUERY_SUFFIX.length());
+
+        int ordinal = subjectContext.getItemRepeatOrdinalOriginal();
+
+        ItemData itemData = itemDataDao.findByEventCrfItemNameDeletedOrNot(eventCrf.getEventCrfId(), itemName, ordinal);
+        if (itemData == null) {
+            List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
+            for (EventCrf eCrf : eventCrfs) {
+                itemData = itemDataDao.findByEventCrfItemNameDeletedOrNot(eventCrf.getEventCrfId(), itemName, ordinal);
+            }
+        }
+
+        String itemValue = getItemValue(itemData, crfVersion);
+
+        String queries = "";
+        if (itemData != null) {
+            ObjectMapper mapper = new ObjectMapper();
+            QueriesBean queriesBean = buildQueryElement(itemData);
+            queries = queriesBean != null ? mapper.writeValueAsString(queriesBean) : "";
+        }
+
+        StringBuffer sb = new StringBuffer();
+        sb.append("<form>");
+
+        sb.append("<" + itemName + ">");
+        sb.append(itemValue);
+        sb.append("</" + itemName + ">");
+
+        sb.append("<" + itemName + QUERY_SUFFIX + ">");
+        sb.append(queries);
+        sb.append("</" + itemName + QUERY_SUFFIX + ">");
+
+        sb.append("</form>");
+
+        return sb.toString();
     }
 
 }

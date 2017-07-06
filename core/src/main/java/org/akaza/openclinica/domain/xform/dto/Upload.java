@@ -1,12 +1,14 @@
 package org.akaza.openclinica.domain.xform.dto;
 
+import java.util.List;
+
 public class Upload implements UserControl {
     private String ref;
     private String appearance;
     private Label label = null;
     private Hint hint = null;
     private String mediatype;
-    
+
     public String getRef() {
         return ref;
     }
@@ -47,6 +49,10 @@ public class Upload implements UserControl {
         this.mediatype = mediatype;
     }
 
-    
-    
+    @Override
+    public List<Item> getItem() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }
