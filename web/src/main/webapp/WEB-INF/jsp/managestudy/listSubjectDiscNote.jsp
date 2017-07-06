@@ -15,8 +15,8 @@
         <c:set var="moduleStr" value="manage"/>
     </c:when>
     <c:otherwise>
-    	<jsp:include page="../include/submit-header.jsp"/>
-    	<c:set var="moduleStr" value="submit"/>
+        <jsp:include page="../include/submit-header.jsp"/>
+        <c:set var="moduleStr" value="submit"/>
     </c:otherwise>
 </c:choose>
 
@@ -48,9 +48,9 @@
 <tr id="sidebar_Instructions_open" style="display: all">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
         <div class="sidebar_tab_content">
 
@@ -66,9 +66,9 @@
 <tr id="sidebar_Instructions_closed" style="display: none">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
 
-        <b><fmt:message key="instructions" bundle="${restext}"/></b>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
     </td>
 </tr>
@@ -111,24 +111,19 @@ applied on resolution status or type--%>
 
     <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&type=${param.type}" <c:if test="${param.type == 50}">style="color:green"</c:if>><fmt:message key="all_notes" bundle="${resterm}"/></a>&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=1&type=${param.type}"><img
-      name="icon_Note" src="images/icon_Note.gif" border="0"
+    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=1&type=${param.type}"><span class="icon icon-flag red"  border="0"
       alt="<fmt:message key="Open" bundle="${resterm}"/>" title="<fmt:message key="Open" bundle="${resterm}"/>"/></a> (<fmt:message key="Open" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=2&type=${param.type}"><img
-      name="icon_flagYellow" src="images/icon_flagYellow.gif" border="0"
+    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=2&type=${param.type}"><span class="icon icon icon-flag orange" border="0"
       alt="<fmt:message key="Updated" bundle="${resterm}"/>" title="<fmt:message key="Updated" bundle="${resterm}"/>"/></a> (<fmt:message key="Updated" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=3&type=${param.type}"><img
-      name="icon_flagGreen" src="images/icon_flagGreen.gif" border="0"
+    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=3&type=${param.type}"><span class="icon icon icon-flag green" border="0"
       alt="<fmt:message key="Resolved" bundle="${resterm}"/>" title="<fmt:message key="Resolved" bundle="${resterm}"/>"/></a> (<fmt:message key="Resolved" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=4&type=${param.type}"><img
-      name="icon_flagBlack" src="images/icon_flagBlack.gif" border="0"
+    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=4&type=${param.type}"><span class="icon icon-flag black" border="0"
       alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>"/></a> (<fmt:message key="Closed" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=5&type=${param.type}"><img
-      name="icon_flagNA" src="images/icon_flagWhite.gif" border="0"
+    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=5&type=${param.type}"><span class="icon icon-flag-empty blue" border="0"
       alt="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" title="<fmt:message key="Not_Applicable" bundle="${resterm}"/>"/></a> (<fmt:message key="Not_Applicable" bundle="${resterm}"/>)&nbsp;
 
     &nbsp;<strong>[#] = <fmt:message key="Repeated_events" bundle="${resword}"/></strong>
@@ -271,7 +266,7 @@ applied on resolution status or type--%>
 
 
 
-							</span>
+                            </span>
 
                                                     </div>
                                                 </div></div></div></div></div></div></div></div>
@@ -294,9 +289,9 @@ applied on resolution status or type--%>
                              </c:otherwise>
                              </c:choose>
 
-							<b><fmt:message key="list_discrepancy_notes" bundle="${restext}"/></b>
+                            <b><fmt:message key="list_discrepancy_notes" bundle="${restext}"/></b>
 
-							</span>
+                            </span>
 
                                                     </div>
                                                 </div></div></div></div></div></div></div></div>

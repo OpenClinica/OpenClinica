@@ -292,46 +292,34 @@ public class ListSubjectTableFactory extends AbstractTableFactory {
 
 	private String updateSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
-		builder.a().href("UpdateSubject?action=show&id=" + subjectId);
-		builder.onmouseout("javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');");
-		builder.onmouseover("javascript:setImage('bt_Edit1','images/bt_Edit.gif');");
-		builder.close();
-		builder.img().name("bt_Edit1").src("images/bt_Edit.gif").border("0").alt(resword.getString("edit")).title(resword.getString("edit")).align("left").append("hspace=\"6\"").close();
-		builder.aEnd();
-		return builder.toString();
+		builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-pencil');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-pencil');\" href=\"javascript:openDocWindow('UpdateSubject?action=show&id="+subjectId);
+        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Edit\" alt=\"View\" class=\"icon icon-pencil\" name=\"bt_Reassign1\"/></a>");
+        builder.append("&nbsp;&nbsp;&nbsp;");
+        return builder.toString();
 	}
 
 	private String removeSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
-		builder.a().href("RemoveSubject?action=confirm&id=" + subjectId);
-		builder.onmouseout("javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');");
-		builder.onmouseover("javascript:setImage('bt_Remove1','images/bt_Remove.gif');");
-		builder.close();
-		builder.img().name("bt_Remove1").src("images/bt_Remove.gif").border("0").alt(resword.getString("remove")).title(resword.getString("remove")).append("hspace=\"2\"").close();
-		builder.aEnd();
-		return builder.toString();
+		builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-cancel');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-cancel');\" href=\"javascript:openDocWindow('RemoveSubject?action=confirm&id="+subjectId);
+        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Remove\" alt=\"View\" class=\"icon icon-cancel\" name=\"bt_Reassign1\"/></a>");
+        builder.append("&nbsp;&nbsp;&nbsp;");
+        return builder.toString();
 	}
 
 	private String viewSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
-		builder.a().href("ViewSubject?action=show&id=" + subjectId);
-		builder.onmouseout("javascript:setImage('bt_View1','images/bt_View_d.gif');");
-		builder.onmouseover("javascript:setImage('bt_View1','images/bt_View.gif');");
-		builder.close();
-		builder.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).align("left").append("hspace=\"6\"").close();
-		builder.aEnd();
-		return builder.toString();
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"javascript:openDocWindow('ViewSubject?action=show&id="+subjectId);
+        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_Reassign1\"/></a>");
+        builder.append("&nbsp;&nbsp;&nbsp;");
+        return builder.toString();
 	}
 
 	private String restoreSubjectLink(Integer subjectId) {
 		HtmlBuilder builder = new HtmlBuilder();
-		builder.a().href("RestoreSubject?action=confirm&id=" + subjectId);
-		builder.onmouseout("javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');");
-		builder.onmouseover("javascript:setImage('bt_Restore3','images/bt_Restore.gif');");
-		builder.close();
-		builder.img().name("bt_Restore3").src("images/bt_Restore.gif").border("0").alt(resword.getString("restore")).title(resword.getString("restore")).align("left").append("hspace=\"6\"").close();
-		builder.aEnd();
-		return builder.toString();
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"javascript:openDocWindow('RestoreSubject?action=confirm&id="+subjectId);
+        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
+        builder.append("&nbsp;&nbsp;&nbsp;");
+        return builder.toString();
 	}
 
 	private String formatDate(Date date) {

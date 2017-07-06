@@ -24,31 +24,31 @@
       <td class="table_cell"><c:out value="${currRow.bean.status.name}"/></td>
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
-		<tr>
-		 <td><a href="ViewStudyUser?name=<c:out value="${currRow.bean.userName}"/>&studyId=<c:out value="${currRow.bean.studyId}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');">
-			<img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-		</td>      
+    <tr>
+     <td><a href="ViewStudyUser?name=<c:out value="${currRow.bean.userName}"/>&studyId=<c:out value="${currRow.bean.studyId}"/>"
+      onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');">
+      <span name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+    </td><td>&nbsp;</td>      
        <c:choose>
         <c:when test="${!currRow.bean.status.deleted}">
         <td><a href="SetStudyUserRole?action=confirm&name=<c:out value="${currRow.bean.userName}"/>&studyId=<c:out value="${currRow.bean.studyId}"/>"
-		  onMouseDown="javascript:setImage('bt_SetRole1','images/bt_SetRole_d.gif');"
-		  onMouseUp="javascript:setImage('bt_SetRole1','images/bt_SetRole.gif');">
-		  <img name="bt_SetRole1" src="images/bt_SetRole.gif" border="0" alt="<fmt:message key="set_role" bundle="${resword}"/>" title="<fmt:message key="set_role" bundle="${resword}"/>" align="left" hspace="6"></a>
-		</td>
+      onMouseDown="javascript:setImage('bt_SetRole1','images/bt_SetRole_d.gif');"
+      onMouseUp="javascript:setImage('bt_SetRole1','images/bt_SetRole.gif');">
+      <span name="bt_SetRole1" class="icon icon-user" border="0" alt="<fmt:message key="set_role" bundle="${resword}"/>" title="<fmt:message key="set_role" bundle="${resword}"/>" align="left" hspace="6"></a>
+    </td><td>&nbsp;</td>
        <td><a href="RemoveStudyUserRole?action=confirm&name=<c:out value="${currRow.bean.userName}"/>&studyId=<c:out value="${currRow.bean.studyId}"/>"
-		 onMouseDown="javascript:setImage('bt_RemoveRole1','images/bt_RemoveRole_d.gif');"
-		 onMouseUp="javascript:setImage('bt_RemoveRole1','images/bt_RemoveRole.gif');">
-		 <img name="bt_RemoveRole1" src="images/bt_RemoveRole.gif" border="0" alt="<fmt:message key="remove_role" bundle="${resword}"/>" title="<fmt:message key="remove_role" bundle="${resword}"/>" align="left" hspace="6"></a>
-	   </td>      
+     onMouseDown="javascript:setImage('bt_RemoveRole1','images/bt_RemoveRole_d.gif');"
+     onMouseUp="javascript:setImage('bt_RemoveRole1','images/bt_RemoveRole.gif');">
+     <span name="bt_RemoveRole1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove_role" bundle="${resword}"/>" title="<fmt:message key="remove_role" bundle="${resword}"/>" align="left" hspace="6"></a>
+     </td>      
        </c:when>
        <c:otherwise>
          <td><a href="RestoreStudyUserRole?action=confirm&name=<c:out value="${currRow.bean.userName}"/>&studyId=<c:out value="${currRow.bean.studyId}"/>"
-			onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');">
-			<img name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
-		 </td> 
+      onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
+      onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');">
+      <img name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
+     </td> 
       
        </c:otherwise>
       </c:choose>

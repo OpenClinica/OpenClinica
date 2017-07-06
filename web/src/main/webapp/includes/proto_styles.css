@@ -56,7 +56,7 @@ body {
     padding-left: 6px;
     padding-right: 8px;
     padding-bottom: 4px;
-    background-color: #FFFFFF;
+    background-color: #000000;
     /*background-color: #FFFFFF;
     border: solid thin #C3C3C3;*/
 /*   #8FAFCF;*/
@@ -65,7 +65,7 @@ body {
 
 #headerDiv {
     clear:both;
-    width: 1024px;
+    width: 100%;
     height: 120px;
     color:black;
 

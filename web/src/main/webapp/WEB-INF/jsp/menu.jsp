@@ -16,6 +16,7 @@
 
 
 <link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
+<link rel="stylesheet" href="includes/css/oc2017_styles.css" type="text/css">
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
@@ -43,21 +44,12 @@
 </style>
 
 <!-- then instructions-->
-<div id="box" class="dialog">
-<span id="mbm">
-    <br>
-     <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
-   </span><br>
-    <div style="text-align:center; width:100%;">
-        <button onclick="hm('box');">OK</button>
-    </div>
-</div>
 <tr id="sidebar_Instructions_open" style="display: all">
         <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></a>
 
-        <b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <fmt:message key="instructions" bundle="${resword}"/>
 
         <div class="sidebar_tab_content">
         <fmt:message key="may_change_request_access" bundle="${restext}"/>
@@ -69,9 +61,9 @@
     <tr id="sidebar_Instructions_closed" style="display: none">
         <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></a>
 
-        <b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <fmt:message key="instructions" bundle="${resword}"/>
 
         </td>
   </tr>
@@ -80,7 +72,7 @@
 
 
 <h1> 
-    <span class="title_manage" style="line-height:5px;">
+    <span class="title_manage" style="line-height:35px;">
         <fmt:message key="welcome_to" bundle="${restext}"/>
             <c:choose>
                 <c:when test='${study.parentStudyId > 0}'>
@@ -91,7 +83,7 @@
                 </c:otherwise>
         </c:choose>
         <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/overview-openclinica')">
-            <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+            <span class="icon icon-question-circle gray"></span></a>
     </span>
 </h1>
 
@@ -119,7 +111,7 @@
 
 </c:if>
 <span class="table_title_Admin" style="line-height:15px;">
-<a href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />"><fmt:message key="notes_assigned_to_me" bundle="${restext}"/><span>${assignedDiscrepancies}</span>&nbsp;</a><br /><br />
+<a style="text-decoration: none;" href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />"><p style="padding-left:10px;">Notes & Discrepancies Assigned to Me: 0</p></a><br /><br />
 </span>
 
 <c:if test="${userRole.investigator || userRole.researchAssistant || userRole.researchAssistant2}">
@@ -270,6 +262,3 @@
 
 </div>
 </c:if>
-
-
-<jsp:include page="include/footer.jsp"/>

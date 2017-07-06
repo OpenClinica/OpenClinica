@@ -1,5 +1,5 @@
-<?xml version="1.0"?><!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"                         
-"http://castor.org/mapping.dtd">
+<?xml version="1.0"?><!DOCTYPE mapping PUBLIC "-//EXOLAB/Castor Mapping DTD Version 1.0//EN"
+        "http://castor.org/mapping.dtd">
 <mapping>
     <class name="org.akaza.openclinica.domain.xform.dto.Html">
         <map-to xml="html" ns-uri="http://www.w3.org/1999/xhtml" ns-prefix="h" />
@@ -7,7 +7,7 @@
             <bind-xml name="head" node="element" xmlns:h="http://www.w3.org/1999/xhtml" />
         </field>
         <field name="body" type="org.akaza.openclinica.domain.xform.dto.Body">
-            <bind-xml name="body" node="element" xmlns:h="http://www.w3.org/1999/xhtml" />
+           <bind-xml name="body" node="element" xmlns="http://www.w3.org/2002/xforms" />           
         </field>
     </class>
     <class name="org.akaza.openclinica.domain.xform.dto.Head">
@@ -24,7 +24,7 @@
         <field name="itext" type="org.akaza.openclinica.domain.xform.dto.Itext">
             <bind-xml name="itext" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
-        <field name="instance" type="string" collection="arraylist">
+        <field name="instance" type="org.akaza.openclinica.domain.xform.dto.Instance" collection="arraylist">
             <bind-xml name="instance" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
         <field name="bind" type="org.akaza.openclinica.domain.xform.dto.Bind" collection="arraylist">
@@ -55,7 +55,7 @@
             <bind-xml name="id" node="attribute" />
         </field>
         <field name="value" type="org.akaza.openclinica.domain.xform.dto.Value" collection="arraylist">
-            <bind-xml name="text" node="element" xmlns="http://www.w3.org/2002/xforms" />
+            <bind-xml name="value" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
     </class>
     <class name="org.akaza.openclinica.domain.xform.dto.Value">
@@ -71,7 +71,7 @@
         </field>
     </class>
     <class name="org.akaza.openclinica.domain.xform.dto.Body">
-        <map-to xml="body" ns-uri="http://www.w3.org/1999/xhtml" ns-prefix="h" />
+        <map-to xml="body" />                
         <field name="cssClass" type="string">
             <bind-xml name="class" node="attribute" />
         </field>
@@ -81,14 +81,39 @@
         <field name="group" type="org.akaza.openclinica.domain.xform.dto.Group" collection="arraylist">
             <bind-xml name="group" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
-                <field name="usercontrol" type="org.akaza.openclinica.domain.xform.dto.UserControl" collection="arraylist">
-            <bind-xml auto-naming="deriveByClass" node="element"  />
-       </field>
-         <field name="repeat" type="org.akaza.openclinica.domain.xform.dto.Repeat" collection="arraylist">
+        <field name="usercontrol" type="org.akaza.openclinica.domain.xform.dto.UserControl" collection="arraylist">
+            <bind-xml auto-naming="deriveByClass" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+        <field name="repeat" type="org.akaza.openclinica.domain.xform.dto.Repeat" collection="arraylist">
             <bind-xml name="repeat" node="element" xmlns="http://www.w3.org/2002/xforms" />
-        </field>        
-        
+        </field>
+
     </class>
+    
+        <class name="org.akaza.openclinica.domain.xform.dto.Instance">
+        <map-to xml="instance" ns-uri="http://www.w3.org/2002/xforms" />
+        <field name="form" type="org.akaza.openclinica.domain.xform.dto.Form">
+            <bind-xml name="form" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+    </class>
+    
+        <class name="org.akaza.openclinica.domain.xform.dto.Form">
+        <map-to xml="form" ns-uri="http://www.w3.org/2002/xforms" />
+        <field name="meta" type="org.akaza.openclinica.domain.xform.dto.Meta">
+            <bind-xml name="meta" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+    </class>
+
+        <class name="org.akaza.openclinica.domain.xform.dto.Meta">
+        <map-to xml="meta" ns-uri="http://www.w3.org/2002/xforms" />
+        <field name="instanceID" type="string">
+            <bind-xml name="instanceID" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+    </class>
+    
+    
+    
+    
     <class name="org.akaza.openclinica.domain.xform.dto.Bind">
         <map-to xml="bind" />
         <field name="nodeSet" type="string">
@@ -115,6 +140,9 @@
         <field name="relevant" type="string">
             <bind-xml name="relevant" node="attribute" />
         </field>
+        <field name="enkFor" type="string">
+            <bind-xml name="enk:for" node="attribute"  xmlns:enk="http://enketo.org/xforms"/>
+        </field>        
         <field name="jrPreload" type="string" >
             <bind-xml name="jr:preload" node="attribute"  xmlns:jr="http://openrosa.org/javarosa" />
         </field>
@@ -164,7 +192,7 @@
             <bind-xml name="itemset" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
     </class>
-   <class name="org.akaza.openclinica.domain.xform.dto.Input">
+    <class name="org.akaza.openclinica.domain.xform.dto.Input">
         <map-to xml="input" ns-uri="http://www.w3.org/2002/xforms" />
         <field name="ref" type="string">
             <bind-xml name="ref" node="attribute" />
@@ -179,8 +207,8 @@
             <bind-xml name="hint" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
     </class>
-    
-   <class name="org.akaza.openclinica.domain.xform.dto.Upload">
+
+    <class name="org.akaza.openclinica.domain.xform.dto.Upload">
         <map-to xml="upload" ns-uri="http://www.w3.org/2002/xforms" />
         <field name="ref" type="string">
             <bind-xml name="ref" node="attribute" />
@@ -211,7 +239,7 @@
             <bind-xml name="value" node="element" />
         </field>
     </class>
-    
+
     <class name="org.akaza.openclinica.domain.xform.dto.Label">
         <map-to xml="label" />
         <field name="ref" type="string">
@@ -221,7 +249,7 @@
             <bind-xml name="label" node="text" />
         </field>
     </class>
-    
+
     <class name="org.akaza.openclinica.domain.xform.dto.Repeat">
         <map-to xml="repeat" />
         <field name="nodeset" type="string">
@@ -238,18 +266,18 @@
         </field>
         <field name="usercontrol" type="org.akaza.openclinica.domain.xform.dto.UserControl" collection="arraylist">
             <bind-xml auto-naming="deriveByClass" node="element"  />
-       </field>
-         <field name="group" type="org.akaza.openclinica.domain.xform.dto.Group" collection="arraylist">
+        </field>
+        <field name="group" type="org.akaza.openclinica.domain.xform.dto.Group" collection="arraylist">
             <bind-xml name="group" node="element" xmlns="http://www.w3.org/2002/xforms" />
-        </field>  
-         <field name="repeat" type="org.akaza.openclinica.domain.xform.dto.Repeat" collection="arraylist">
+        </field>
+        <field name="repeat" type="org.akaza.openclinica.domain.xform.dto.Repeat" collection="arraylist">
             <bind-xml name="repeat" node="element" xmlns="http://www.w3.org/2002/xforms" />
-        </field>        
-       
-                <field name="ref" type="string">
+        </field>
+
+        <field name="ref" type="string">
             <bind-xml name="ref" node="attribute" />
         </field>
-        
+
     </class>
 
     <class name="org.akaza.openclinica.domain.xform.dto.Hint">
@@ -269,21 +297,21 @@
         <field name="label" type="org.akaza.openclinica.domain.xform.dto.Label">
             <bind-xml name="label" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
-        <field name="repeat" type="org.akaza.openclinica.domain.xform.dto.Repeat">
+        <field name="repeat" type="org.akaza.openclinica.domain.xform.dto.Repeat" collection="arraylist">
             <bind-xml name="repeat" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
-         <field name="usercontrol" type="org.akaza.openclinica.domain.xform.dto.UserControl" collection="arraylist">
+        <field name="usercontrol" type="org.akaza.openclinica.domain.xform.dto.UserControl" collection="arraylist">
             <bind-xml auto-naming="deriveByClass" node="element"  />
-       </field>
+        </field>
         <field name="group" type="org.akaza.openclinica.domain.xform.dto.Group" collection="arraylist">
             <bind-xml name="group" node="element" xmlns="http://www.w3.org/2002/xforms" />
-        </field>  
-                <field name="ref" type="string">
+        </field>
+        <field name="ref" type="string">
             <bind-xml name="ref" node="attribute" />
         </field>
-        
+
     </class>
-    
+
     <class name="org.akaza.openclinica.domain.xform.dto.Item">
         <map-to xml="item" />
         <field name="label" type="org.akaza.openclinica.domain.xform.dto.Label">

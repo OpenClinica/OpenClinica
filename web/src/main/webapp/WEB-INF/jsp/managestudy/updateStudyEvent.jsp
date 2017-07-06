@@ -31,26 +31,26 @@
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+    <fmt:message key="instructions" bundle="${resword}"/>
 
-		<div class="sidebar_tab_content">
-		</div>
+    <div class="sidebar_tab_content">
+    </div>
 
-		</td>
+    </td>
 
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
+  </tr>
+  <tr id="sidebar_Instructions_closed" style="display: all">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+    <fmt:message key="instructions" bundle="${resword}"/>
 
-		</td>
+    </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
@@ -114,12 +114,12 @@
   &nbsp;&nbsp;<c:out value="${eventDefinition.name}"/></div>
   </td></tr>
   <tr valign="top">
-  	<td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
-	  	<td valign="top">
-		  	<table border="0" cellpadding="0" cellspacing="0">
-			<tr>
-				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="start"/><c:param name="count" value="1"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) *
+    <td class="formlabel"><fmt:message key="start_date_time" bundle="${resword}"/>:</td>
+      <td valign="top">
+        <table border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="start"/><c:param name="count" value="1"/></c:import>
+        <td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) *
                 <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
                     <c:choose>
                         <c:when test="${hasStartDateNote eq 'yes'}">
@@ -133,21 +133,21 @@
                         </c:otherwise>
                     </c:choose>
                 </c:if></td>
-			</tr>
-			<tr>
-				<td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="start"/></jsp:include></td>
-			</tr>
-			</table>
-		</td>
-	</tr>
+      </tr>
+      <tr>
+        <td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="start"/></jsp:include></td>
+      </tr>
+      </table>
+    </td>
+  </tr>
 
  <tr valign="top">
-  	<td class="formlabel"><fmt:message key="end_date_time" bundle="${resword}"/>:</td>
-	  	<td valign="top">
-		  	<table border="0" cellpadding="0" cellspacing="0">
-			<tr>
-				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="end"/><c:param name="count" value="2"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)
+    <td class="formlabel"><fmt:message key="end_date_time" bundle="${resword}"/>:</td>
+      <td valign="top">
+        <table border="0" cellpadding="0" cellspacing="0">
+      <tr>
+        <c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="end"/><c:param name="count" value="2"/></c:import>
+        <td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
                     <c:choose>
                         <c:when test="${hasEndDateNote eq 'yes'}">
@@ -161,13 +161,13 @@
                         </c:otherwise>
                     </c:choose>
                     </c:if></td>
-			</tr>
-			<tr>
-				<td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="end"/></jsp:include></td>
-			</tr>
-			</table>
-		</td>
-	</tr>
+      </tr>
+      <tr>
+        <td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="end"/></jsp:include></td>
+      </tr>
+      </table>
+    </td>
+  </tr>
     <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
     <tr valign="top"><td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
     <td>

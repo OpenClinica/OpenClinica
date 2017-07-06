@@ -8,14 +8,12 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.xform.dto.Html;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Marshaller;
 import org.exolab.castor.xml.Unmarshaller;
 import org.exolab.castor.xml.XMLContext;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.stereotype.Component;
 
 public class XformParser {
     private XMLContext xmlContext = null;
@@ -34,7 +32,7 @@ public class XformParser {
 
         xmlContext = new XMLContext();
         Mapping mapping = xmlContext.createMapping();
-        mapping.loadMapping(coreResources.getURL("openRosaXFormMapping.xml"));
+        mapping.loadMapping(coreResources.getURL("xformMapping.xml"));
         xmlContext.addMapping(mapping);
 
         Marshaller marshaller = xmlContext.createMarshaller();
@@ -43,6 +41,9 @@ public class XformParser {
         marshaller.setNamespaceMapping("xsd", "http://www.w3.org/2001/XMLSchema");
         marshaller.setNamespaceMapping("ev", "http://www.w3.org/2001/xml-events");
         marshaller.setNamespaceMapping("", "http://www.w3.org/2002/xforms");
+        marshaller.setNamespaceMapping("enk", "http://enketo.org/xforms");
+        marshaller.setNamespaceMapping("oc", "http://openclinica.org/xforms");
+
         marshaller.setWriter(writer);
         marshaller.marshal(html);
         String xform = writer.toString();

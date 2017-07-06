@@ -1,0 +1,178 @@
+@font-face {
+  font-family: 'icomoon';
+  src:  url('../fonts/icomoon.eot?w30xif');
+  src:  url('../fonts/icomoon.eot?w30xif#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon.ttf?w30xif') format('truetype'),
+    url('../fonts/icomoon.woff?w30xif') format('woff'),
+    url('../fonts/icomoon.svg?w30xif#icomoon') format('svg');
+  font-weight: normal;
+  font-style: normal;
+}
+
+[class^="icon-"], [class*=" icon-"] {
+  /* use !important to prevent issues with browser extensions that change fonts */
+  font-family: 'icomoon' !important;
+  speak: none;
+  font-style: normal;
+  font-weight: normal;
+  font-variant: normal;
+  text-transform: none;
+  line-height: 1;
+
+  /* Better Font Rendering =========== */
+  -webkit-font-smoothing: antialiased;
+  -moz-osx-font-smoothing: grayscale;
+}
+
+.icon-archive:before {
+  content: "\e914";
+}
+.icon-question-circle:before {
+  content: "\e912";
+}
+.icon-question:before {
+  content: "\e913";
+}
+.icon-caret-right:before {
+  content: "\e90e";
+}
+.icon-caret-left:before {
+  content: "\e90f";
+}
+.icon-caret-up:before {
+  content: "\e910";
+}
+.icon-caret-down:before {
+  content: "\e911";
+}
+.icon-doc:before {
+  content: "\e800";
+}
+.icon-ok:before {
+  content: "\e801";
+}
+.icon-lock:before {
+  content: "\e802";
+}
+.icon-lock-open:before {
+  content: "\e803";
+}
+.icon-search:before {
+  content: "\e804";
+}
+.icon-pencil:before {
+  content: "\e805";
+}
+.icon-user:before {
+  content: "\e806";
+}
+.icon-cancel:before {
+  content: "\e807";
+}
+.icon-ccw:before {
+  content: "\e808";
+}
+.icon-calendar:before {
+  content: "\e809";
+}
+.icon-plus:before {
+  content: "\e80a";
+}
+.icon-flag:before {
+  content: "\e80b";
+}
+.icon-download:before {
+  content: "\e80c";
+}
+.icon-upload:before {
+  content: "\e80d";
+}
+.icon-print:before {
+  content: "\e80e";
+}
+.icon-doc-text:before {
+  content: "\f0f6";
+}
+.icon-flag-empty:before {
+  content: "\f11d";
+}
+.icon-pencil-squared:before {
+  content: "\f14b";
+}
+.icon-file-excel:before {
+  content: "\f1c3";
+}
+.icon-trash:before {
+  content: "\f1f8";
+}
+.icon-stop-circle:before {
+  content: "\f28d";
+}
+.icon-icon-sign:before {
+  content: "\e900";
+  color: #27ae60;
+}
+.icon-icon-sign2:before {
+  content: "\e908";
+  color: #27ae60;
+}
+.icon-icon-removeRole:before {
+  content: "\e909";
+}
+.icon-icon-removeRole2:before {
+  content: "\e903";
+}
+.icon-icon-stop:before {
+  content: "\e902";
+}
+.icon-icon-doubleDataEntry:before {
+  content: "\e90d";
+}
+.icon-icon-unsavedData:before {
+  content: "\e90c";
+}
+.icon-icon-unArchive:before {
+  content: "\e90b";
+}
+.icon-icon-reassign2:before {
+  content: "\e90a";
+}
+.icon-icon-reassign-old:before {
+  content: "\e901";
+}
+.icon-icon-locked:before {
+  content: "\e904";
+}
+.icon-icon-reassign:before {
+  content: "\e905";
+}
+.icon-icon-dataEntryCompleted:before {
+  content: "\e906";
+}
+.icon-icon-newVersion:before {
+  content: "\e907";
+}
+.icon-redo:before {
+  content: "\e966";
+}
+.icon-clock2:before {
+  content: "\e94f";
+}
+.icon-redo2:before {
+  content: "\e968";
+}
+.icon-first:before {
+  content: "\ea21";
+}
+.icon-last:before {
+  content: "\ea22";
+}
+.icon-previous2:before {
+  content: "\ea23";
+}
+.icon-next2:before {
+  content: "\ea24";
+}
+.icon-checkbox-checked:before {
+  content: "\ea52";
+}

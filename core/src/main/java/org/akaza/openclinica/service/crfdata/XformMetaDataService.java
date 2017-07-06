@@ -512,7 +512,7 @@ public class XformMetaDataService {
         }
     }
 
-    private void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, String crfOid, String formLayoutOid) throws IOException {
+    public void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, String crfOid, String formLayoutOid) throws IOException {
         // Create the directory structure for saving the media
         String dir = Utils.getCrfMediaFilePath(crfOid, formLayoutOid);
         if (!new File(dir).exists()) {

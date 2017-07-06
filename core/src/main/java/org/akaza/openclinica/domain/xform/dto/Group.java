@@ -1,21 +1,20 @@
 package org.akaza.openclinica.domain.xform.dto;
 
-import java.util.ArrayList;
 import java.util.List;
 
 public class Group {
     private Label label;
-    private Repeat repeat;
+    private List<Repeat> repeat;
     private List<Group> group;
     private String appearance;
     private List<UserControl> usercontrol;
     private String ref;
 
-    public Repeat getRepeat() {
+    public List<Repeat> getRepeat() {
         return repeat;
     }
 
-    public void setRepeat(Repeat repeat) {
+    public void setRepeat(List<Repeat> repeat) {
         this.repeat = repeat;
     }
 

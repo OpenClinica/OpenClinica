@@ -9,7 +9,8 @@ public class PFormCacheSubjectContextEntry {
     private String formLayoutOid = null;
     private Integer userAccountId = null;
     private String itemName = null;
-    private Integer itemRepeatOrdinal = null;
+    private Integer itemRepeatOrdinalAdjusted = null;
+    private Integer itemRepeatOrdinalOriginal = null;
     private boolean isItemInRepeatingGroup = false;
     private String itemRepeatGroupName = null;
     private String studyOid = null;
@@ -78,14 +79,6 @@ public class PFormCacheSubjectContextEntry {
         this.itemName = itemName;
     }
 
-    public Integer getItemRepeatOrdinal() {
-        return itemRepeatOrdinal;
-    }
-
-    public void setItemRepeatOrdinal(Integer itemRepeatOrdinal) {
-        this.itemRepeatOrdinal = itemRepeatOrdinal;
-    }
-
     public boolean isItemInRepeatingGroup() {
         return isItemInRepeatingGroup;
     }
@@ -100,6 +93,22 @@ public class PFormCacheSubjectContextEntry {
 
     public void setItemRepeatGroupName(String itemRepeatGroupName) {
         this.itemRepeatGroupName = itemRepeatGroupName;
+    }
+
+    public Integer getItemRepeatOrdinalAdjusted() {
+        return itemRepeatOrdinalAdjusted;
+    }
+
+    public void setItemRepeatOrdinalAdjusted(Integer itemRepeatOrdinalAdjusted) {
+        this.itemRepeatOrdinalAdjusted = itemRepeatOrdinalAdjusted;
+    }
+
+    public Integer getItemRepeatOrdinalOriginal() {
+        return itemRepeatOrdinalOriginal;
+    }
+
+    public void setItemRepeatOrdinalOriginal(Integer itemRepeatOrdinalOriginal) {
+        this.itemRepeatOrdinalOriginal = itemRepeatOrdinalOriginal;
     }
 
 }

@@ -98,7 +98,6 @@ public class OpenRosaServices {
     @Autowired
     XformParserHelper xformParserHelper;
 
-    public static final String QUERY = "-query";
     public static final String INPUT_USER_SOURCE = "userSource";
     public static final String INPUT_FIRST_NAME = "Participant";
     public static final String INPUT_LAST_NAME = "User";
@@ -113,6 +112,7 @@ public class OpenRosaServices {
     public static final String QUERY_SUFFIX = "form-queries.xml";
     public static final String NO_SUFFIX = "form.xml";
     public static final String QUERY_FLAVOR = "-query";
+    public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     public static final String NO_FLAVOR = "";
     public static final String SVG = ".svg";
 
@@ -245,24 +245,31 @@ public class OpenRosaServices {
         if (!mayProceedPreview(request, studyOID))
             return null;
         String flavor = getQuerySet(uniqueId);
+
         String formLayoutOid = getFormLayoutOid(uniqueId);
 
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
         CrfBean crf = crfDao.findById(formLayout.getCrf().getCrfId());
 
         String xformOutput = "";
-        String directoryPath = Utils.getCrfMediaFilePath(crf.getOcOid(), formLayout.getOcOid());
-        File dir = new File(directoryPath);
-        File[] directoryListing = dir.listFiles();
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-                if (flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(QUERY_SUFFIX) || flavor.equals(NO_FLAVOR) && child.getName().endsWith(NO_SUFFIX)) {
-                    xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
-                    break;
+        String attribute = "";
+        if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+            attribute = uniqueId.substring(uniqueId.indexOf(SINGLE_ITEM_FLAVOR));
+            xformOutput = (String) context.getAttribute(attribute);
+        } else {
+            String directoryPath = Utils.getCrfMediaFilePath(crf.getOcOid(), formLayout.getOcOid());
+            File dir = new File(directoryPath);
+            File[] directoryListing = dir.listFiles();
+            if (directoryListing != null) {
+                for (File child : directoryListing) {
+                    if ((flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(QUERY_SUFFIX))
+                            || (flavor.equals(NO_FLAVOR) && child.getName().endsWith(NO_SUFFIX))) {
+                        xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                        break;
+                    }
                 }
             }
         }
-
         XFormList formList = null;
 
         try {
@@ -282,9 +289,13 @@ public class OpenRosaServices {
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
             List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
             if (flavor.equals(QUERY_FLAVOR)) {
-                form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + QUERY);
-                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + QUERY);
-                form.setFormID(formLayout.getOcOid() + QUERY);
+                form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + QUERY_FLAVOR);
+                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + QUERY_FLAVOR);
+                form.setFormID(formLayout.getOcOid() + QUERY_FLAVOR);
+            } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+                form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + attribute);
+                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + attribute);
+                form.setFormID(formLayout.getOcOid() + attribute);
             } else {
                 form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid());
                 form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid());
@@ -392,7 +403,7 @@ public class OpenRosaServices {
     @Path("/{studyOID}/formXml")
     @Produces(MediaType.APPLICATION_XML)
     public String getFormXml(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formId") String uniqueId, @RequestHeader("Authorization") String authorization) throws Exception {
+            @QueryParam("formId") String uniqueId, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
 
@@ -410,18 +421,23 @@ public class OpenRosaServices {
         CrfBean crf = formLayout.getCrf();
 
         String xformOutput = "";
-        String directoryPath = Utils.getCrfMediaFilePath(crf.getOcOid(), formLayout.getOcOid());
-        File dir = new File(directoryPath);
-        File[] directoryListing = dir.listFiles();
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-                if (flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(QUERY_SUFFIX) || flavor.equals(NO_FLAVOR) && child.getName().endsWith(NO_SUFFIX)) {
-                    xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
-                    break;
+        if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+            String attribute = uniqueId.substring(uniqueId.indexOf(SINGLE_ITEM_FLAVOR));
+            xformOutput = (String) context.getAttribute(attribute);
+        } else {
+            String directoryPath = Utils.getCrfMediaFilePath(crf.getOcOid(), formLayout.getOcOid());
+            File dir = new File(directoryPath);
+            File[] directoryListing = dir.listFiles();
+            if (directoryListing != null) {
+                for (File child : directoryListing) {
+                    if ((flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(QUERY_SUFFIX))
+                            || (flavor.equals(NO_FLAVOR) && child.getName().endsWith(NO_SUFFIX))) {
+                        xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                        break;
+                    }
                 }
             }
         }
-
         try {
             if (StringUtils.isNotEmpty(xformOutput)) {
                 xform = xformOutput;
@@ -903,22 +919,28 @@ public class OpenRosaServices {
     }
 
     private String getFormLayoutOid(String uniqueId) {
-        if (uniqueId.endsWith(QUERY)) {
-            uniqueId = uniqueId.replace(QUERY, "");
+        if (uniqueId.endsWith(QUERY_FLAVOR)) {
+            uniqueId = uniqueId.substring(0, uniqueId.length() - QUERY_FLAVOR.length());
+        } else if (uniqueId.contains(SINGLE_ITEM_FLAVOR)) {
+            uniqueId = uniqueId.substring(0, uniqueId.indexOf(SINGLE_ITEM_FLAVOR));
         }
         return uniqueId;
     }
 
     private String getCrfVersionOid(String uniqueId) {
-        if (uniqueId.endsWith(QUERY)) {
-            uniqueId = uniqueId.replace(QUERY, "");
+        if (uniqueId.endsWith(QUERY_FLAVOR)) {
+            uniqueId = uniqueId.substring(0, uniqueId.length() - QUERY_FLAVOR.length());
+        } else if (uniqueId.contains(SINGLE_ITEM_FLAVOR)) {
+            uniqueId = uniqueId.substring(0, uniqueId.indexOf(SINGLE_ITEM_FLAVOR));
         }
         return uniqueId;
     }
 
     private String getQuerySet(String uniqueId) {
-        if (uniqueId.endsWith(QUERY)) {
+        if (uniqueId.endsWith(QUERY_FLAVOR)) {
             return QUERY_FLAVOR;
+        } else if (uniqueId.contains(SINGLE_ITEM_FLAVOR)) {
+            return SINGLE_ITEM_FLAVOR;
         } else {
             return NO_FLAVOR;
         }

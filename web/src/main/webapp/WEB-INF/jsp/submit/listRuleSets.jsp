@@ -22,8 +22,8 @@
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
 		<td class="sidebar_tab">
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-		<b><fmt:message key="instructions" bundle="${restext}"/></b>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
+		<fmt:message key="instructions" bundle="${restext}"/>
 		<div class="sidebar_tab_content">
         <fmt:message key="manage_execute_rule_assignments" bundle="${restext}"/>
 		</div>
@@ -31,8 +31,8 @@
 	</tr>
 	<tr id="sidebar_Instructions_closed" style="display: none">
 		<td class="sidebar_tab">
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-		<b><fmt:message key="instructions" bundle="${restext}"/></b>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
+		<fmt:message key="instructions" bundle="${restext}"/>
 		</td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>

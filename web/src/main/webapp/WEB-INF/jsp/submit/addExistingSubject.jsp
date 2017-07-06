@@ -17,7 +17,7 @@
 
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 
-		<b>Instructions</b>
+		Instructions
 
 		<div class="sidebar_tab_content">
 			Please confirm the subject information shown before proceeding.
@@ -31,7 +31,7 @@
 
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 
-		<b>Instructions</b>
+		Instructions
 
 		</td>
   </tr>

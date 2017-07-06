@@ -16,7 +16,7 @@
 	<td class="table_cell"><c:out value="${currRow.bean.owner.name}" /></td>
     <td class="table_cell">
         <a target="_new" href="AccessFile?fileId=<c:out value="${currRow.bean.id}"/>">
-            <img name="bt_Download1" src="images/bt_Download.gif" border="0" align="left" hspace="6"
+            <span name="bt_Download1" class="icon icon-download" border="0" align="left" hspace="6"
                  alt="<fmt:message key="download" bundle="${resword}"/>" title="<fmt:message key="download" bundle="${resword}"/>">
         </a>
         <a href="ExportDataset?action=delete&datasetId=<c:out value="${currRow.bean.datasetId}"/>&adfId=<c:out value="${currRow.bean.id}"/>">

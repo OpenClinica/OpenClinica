@@ -24,6 +24,9 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
     private static String findByEventCrfItemName = "select id from ItemData id " + "join id.item i where i.name = :itemName "
             + "and id.eventCrf.eventCrfId = :eventCrfId " + "and id.ordinal = :ordinal " + "and id.deleted=false";
 
+    private static String findByEventCrfItemNameDeletedOrNot = "select id from ItemData id " + "join id.item i where i.name = :itemName "
+            + "and id.eventCrf.eventCrfId = :eventCrfId " + "and id.ordinal = :ordinal ";
+
     private static String findByItemEventCrfOrdinalQuery = "select id from ItemData id " + "join id.item i where i in :items "
             + "and id.eventCrf.eventCrfId = :eventCrfid " + "and id.ordinal >= 1 and id.ordinal <= :numItems " + "and id.deleted=false";
 
@@ -95,6 +98,14 @@ public class ItemDataDao extends AbstractDomainDao<ItemData> {
 
     public ItemData findByEventCrfItemName(int eventCrfId, String itemName, int ordinal) {
         Query q = getCurrentSession().createQuery(findByEventCrfItemName);
+        q.setParameter("eventCrfId", eventCrfId);
+        q.setParameter("itemName", itemName);
+        q.setParameter("ordinal", ordinal);
+        return (ItemData) q.uniqueResult();
+    }
+
+    public ItemData findByEventCrfItemNameDeletedOrNot(int eventCrfId, String itemName, int ordinal) {
+        Query q = getCurrentSession().createQuery(findByEventCrfItemNameDeletedOrNot);
         q.setParameter("eventCrfId", eventCrfId);
         q.setParameter("itemName", itemName);
         q.setParameter("ordinal", ordinal);

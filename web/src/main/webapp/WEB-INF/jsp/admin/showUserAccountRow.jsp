@@ -51,15 +51,15 @@
 				<td><a href="ViewUserAccount?userId=<c:out value="${currRow.bean.id}"/>"
 					onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
 					onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
-					><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a></td>
+					><span name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a></td><td>&nbsp;<td/>
 				<td><a href="EditUserAccount?userId=<c:out value="${currRow.bean.id}"/>"
 					onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
 					onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
-					><img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a></td>
+					><span name="bt_Edit1" class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a></td><td>&nbsp;<td/>
 			    <td><a href="SetUserRole?action=confirm&userId=<c:out value="${currRow.bean.id}"/>"
 		          onMouseDown="javascript:setImage('bt_SetRole1','images/bt_SetRole_d.gif');"
-		          onMouseUp="javascript:setImage('bt_SetRole1','images/bt_SetRole.gif');"><img 
-		          name="bt_SetRole1" src="images/bt_SetRole.gif" border="0" alt="<fmt:message key="set_role" bundle="${resword}"/>" title="<fmt:message key="set_role" bundle="${resword}"/>" align="left" hspace="6"></a>
+		          onMouseUp="javascript:setImage('bt_SetRole1','images/bt_SetRole.gif');"><span 
+		          name="bt_SetRole1" class="icon icon-user" border="0" alt="<fmt:message key="set_role" bundle="${resword}"/>" title="<fmt:message key="set_role" bundle="${resword}"/>" align="left" hspace="6"></a>
 		        </td>		
 		
 				<c:set var="confirmQuestion">
@@ -69,10 +69,11 @@
 				</c:set> 
 				
 				<c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
+				<td>&nbsp;<td/>
 				<td><a href="DeleteUser?action=3&userId=<c:out value="${currRow.bean.id}"/>" onClick="<c:out value="${onClick}" />"
 					onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
 					onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');">
-					<img name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+					<span name="bt_Remove1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
 				&nbsp;</td>
 				<c:if test='${currRow.bean.status.locked}'>
 				<td><a href="UnLockUser?userId=<c:out value="${currRow.bean.id}"/>"
@@ -161,7 +162,7 @@
 						<a href="EditStudyUserRole?studyId=<c:out value="${sur.studyId}" />&userName=<c:out value="${currRow.bean.name}"/>"
 							onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
 							onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"
-							><img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
+							><span name="bt_Edit1" class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
 					</c:if>
 					<c:choose>
 					<c:when test='${sur.status.deleted}'>
@@ -174,7 +175,7 @@
 						<a href="DeleteStudyUserRole?studyId=<c:out value="${sur.studyId}" />&userName=<c:out value="${currRow.bean.name}"/>&action=3" onClick="<c:out value="${onClick}" />"
 							onMouseDown="javascript:setImage('bt_Remove3','images/bt_Remove_d.gif');"
 						    onMouseUp="javascript:setImage('bt_Remove3','images/bt_Remove.gif');"
-						   	><img name="bt_Remove3" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+						   	><span name="bt_Remove3" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
 					</c:otherwise>
 					</c:choose>
 				</td>

@@ -50,16 +50,17 @@
 <div class="formfieldS_BG">
     <input type="text" name="<c:out value="${dateFieldName}"/>" value="<c:out value="${date}" />" class="formfieldS" id="${prefix}dateField"/>
 </div>
-</td>
+</td><td>&nbsp;</td>
 <td valign="top">
     <a href="#" >
-        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="${prefix}dateTrigger" />
+        <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="${prefix}dateTrigger" />
         <script type="text/javascript">
         Calendar.setup({inputField  : "${prefix}dateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "${prefix}dateTrigger" });
         </script>
         
     </a>
 </td>
+</td><td>&nbsp;</td>
 <td valign="top">
 <div class="formfieldXS_BG">
 <select name="<c:out value="${hourFieldName}"/>" class="formfieldXS">

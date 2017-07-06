@@ -194,8 +194,8 @@
             </c:forEach>
             <td valign="top" class="table_tools" nowrap>
                 <c:if test="${param.studyHasDiscNotes}"><a href=
-              "javascript:openDocWindow('ChooseDownloadFormat?resolutionStatus=${param.resolutionStatus}&discNoteType=${param.type}&module=${param.module}')"><img
-              class="downloadAllDNotes" width="24 " height="15" name="bt_View1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_all_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_all_discrepancy_notes" bundle="${resword}"/>"></a></c:if>
+              "javascript:openDocWindow('ChooseDownloadFormat?resolutionStatus=${param.resolutionStatus}&discNoteType=${param.type}&module=${param.module}')"><span
+              class="downloadAllDNotes" width="24 " height="15" name="bt_View1" class="icon icon-download" border="0" alt="<fmt:message key="download_all_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_all_discrepancy_notes" bundle="${resword}"/>"></a></c:if>
 
 
                      <a href=

@@ -121,6 +121,7 @@
 					</td>
 				</tr>
 			</table>
+			<br/>
 
 		</td>
 
@@ -228,12 +229,12 @@
             <c:if test="${column.showLink}">
             	</a>
             </c:if>
-							<c:if test="${(table.sortingColumnInd == i) && column.showLink}">
-								<c:choose>
-									<c:when test="${table.ascendingSort}"><img src="images/bt_sort_ascending.gif" alt="<fmt:message key="ascending_sort" bundle="${resword}"/>" title="<fmt:message key="ascending_sort" bundle="${resword}"/>" /></c:when>
-									<c:otherwise><img src="images/bt_sort_descending.gif" alt="<fmt:message key="descending_sort" bundle="${resword}"/>" title="<fmt:message key="descending_sort" bundle="${resword}"/>" /></c:otherwise>
-								</c:choose>
-							</c:if>
+			<c:if test="${(table.sortingColumnInd == i) && column.showLink}">
+				<c:choose>
+					<c:when test="${table.ascendingSort}"><span class="icon icon-caret-down gray" alt="<fmt:message key="ascending_sort" bundle="${resword}"/>" title="<fmt:message key="ascending_sort" bundle="${resword}"/>" /></c:when>
+					<c:otherwise><span class="icon icon-caret-up gray" alt="<fmt:message key="descending_sort" bundle="${resword}"/>" title="<fmt:message key="descending_sort" bundle="${resword}"/>" /></c:otherwise>
+				</c:choose>
+			</c:if>
 
             </td>
 						<c:set var="i" value="${i + 1}" />

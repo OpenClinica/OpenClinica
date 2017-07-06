@@ -1,11 +1,12 @@
 package org.akaza.openclinica.domain.xform.dto;
 
+import java.util.ArrayList;
 import java.util.List;
 
 public class Model {
     private Itext itext;
     private List<Bind> bind;
-    private List<String> instance;// = "initialvalueinmodeldto";
+    private List<Instance> instance;
 
     public Itext getItext() {
         return itext;
@@ -15,11 +16,11 @@ public class Model {
         this.itext = itext;
     }
 
-    public List<String> getInstance() {
+    public List<Instance> getInstance() {
         return instance;
     }
 
-    public void setInstance(List<String> instance) {
+    public void setInstance(List<Instance> instance) {
         this.instance = instance;
     }
 
@@ -41,4 +42,11 @@ public class Model {
         }
         return null;
     }
+
+    public void addInstance(Instance inst) {
+        if (getInstance() == null)
+            instance = new ArrayList<Instance>();
+        instance.add(inst);
+    }
+
 }

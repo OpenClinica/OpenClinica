@@ -16,12 +16,12 @@ and whether they should be open or closed --%>
 
     <c:choose>
         <c:when test="${openAlerts}">
-            <div id="alertsDivTop"><fmt:message key="alerts_messages" bundle="${resword}"/><img hspace="5" width="9" height="13" border="0" alt="+" src="../images/sidebar_collapse.gif" onclick="changeOpenDivButton(this)"/></div><div id="alertsDiv" class="sideTopBar">
+            <div id="alertsDivTop"><fmt:message key="alerts_messages" bundle="${resword}"/><span hspace="5" width="9" height="13" border="0" alt="+" src="icon icon-caret-down gray" onclick="changeOpenDivButton(this)"/></div><div id="alertsDiv" class="sideTopBar">
             <view:alertTag />
         </div>
         </c:when>
         <c:otherwise>
-            <div id="alertsDivTop"><fmt:message key="alerts_messages" bundle="${resword}"/><img hspace="5" width="9" height="13" border="0" alt="+" src="../images/sidebar_expand.gif" onclick="changeOpenDivButton(this)"/></div><div id="alertsDiv" style="display:none" class="sideTopBar">
+            <div id="alertsDivTop"><fmt:message key="alerts_messages" bundle="${resword}"/><span hspace="5" width="9" height="13" border="0" alt="+" src="icon icon-caret-right gray" onclick="changeOpenDivButton(this)"/></div><div id="alertsDiv" style="display:none" class="sideTopBar">
             <view:alertTag />
         </div>
         </c:otherwise>
