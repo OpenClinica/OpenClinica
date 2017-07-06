@@ -144,7 +144,7 @@
             <column name="oc_oid" type="VARCHAR(40)">
                 <constraints nullable="false"/>
             </column>
-            <column name="study_id" type="INT"/>
+            <column name="source_study_id" type="INT"/>
         </createTable>
     </changeSet>
     <changeSet author="yogi (generated)" id="1497972092906-14">

@@ -3,7 +3,7 @@
 <databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
                    xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
                    xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
-    <changeSet author="yogi" id="2017-03-14-7878-6" failOnError="false">
+    <changeSet author="yogi" id="2017-03-14-7878-6">
         <sql splitStatements="false">
             CREATE FOREIGN TABLE study_user_role
             (

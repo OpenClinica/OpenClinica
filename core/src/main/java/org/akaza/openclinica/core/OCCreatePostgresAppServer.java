@@ -10,6 +10,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -20,11 +21,13 @@ public class OCCreatePostgresAppServer extends SpringLiquibase {
 
     @Override
     public void afterPropertiesSet() throws LiquibaseException {
-        System.setProperty("dbUser", CoreResources.getField("dbUser"));
-        System.setProperty("dbPass", CoreResources.getField("dbPass"));
-        System.setProperty("db", CoreResources.getField("db"));
-        System.setProperty("dbHost", CoreResources.getField("dbHost"));
-        System.setProperty("mappingServer", "mapping_server_" + CoreResources.getField("db"));
+        HashMap<String,String> parameters = new HashMap<>();
+        parameters.put("dbUser", CoreResources.getField("dbUser"));
+        parameters.put("dbPass", CoreResources.getField("dbPass"));
+        parameters.put("db", CoreResources.getField("db"));
+        parameters.put("dbHost", CoreResources.getField("dbHost"));
+        parameters.put("mappingServer", "mapping_server_" + CoreResources.getField("db"));
+        super.setChangeLogParameters(parameters);
         super.afterPropertiesSet();
     }
 }

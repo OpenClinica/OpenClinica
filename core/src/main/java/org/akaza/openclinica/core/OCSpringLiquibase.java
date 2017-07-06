@@ -4,11 +4,13 @@ import liquibase.Liquibase;
 import liquibase.exception.DatabaseException;
 import liquibase.exception.LiquibaseException;
 import liquibase.integration.spring.SpringLiquibase;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.sql.DataSource;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.util.HashMap;
 import java.util.List;
 
 /**
@@ -19,6 +21,9 @@ public class OCSpringLiquibase extends SpringLiquibase {
 
     @Override
     public void afterPropertiesSet() throws LiquibaseException {
+        HashMap<String,String> parameters = new HashMap<>();
+        parameters.put("mappingServer", "mapping_server_" + CoreResources.getField("db"));
+        super.setChangeLogParameters(parameters);
 
     }
 
