@@ -461,15 +461,17 @@
             <column name="owner_id" type="INT"/>
             <column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
             <column name="study_subject_id" type="INT"/>
-            <column defaultValueNumeric="0" name="sdv_update_id" type="INT"/>
-            <column defaultValueNumeric="1" name="old_status_id" type="INT"/>
-            <column name="form_layout_id" type="INT"/>
-            <column defaultValueBoolean="false" name="sdv_status" type="BOOLEAN">
-                <constraints nullable="false"/>
-            </column>
             <column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
             <column name="update_id" type="INT"/>
             <column defaultValueBoolean="false" name="electronic_signature_status" type="BOOLEAN"/>
+            <column defaultValueBoolean="false" name="sdv_status" type="BOOLEAN">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="1" name="old_status_id" type="INT"/>
+            <column defaultValueNumeric="0" name="sdv_update_id" type="INT"/>
+            <column name="form_layout_id" type="INT"/>
+
+
         </createTable>
     </changeSet>
     <changeSet author="yogi (generated)" id="1497972092906-38">
