@@ -41,6 +41,7 @@
 	<xsl:variable name="sexExist" select="//odm:SubjectData/@OpenClinica:Sex"/>
 	<xsl:variable name="uniqueIdExist" select="//odm:SubjectData/@OpenClinica:UniqueIdentifier"/>
 	<xsl:variable name="dobExist" select="//odm:SubjectData/@OpenClinica:DateOfBirth"/>
+        <xsl:variable name="yearOfBirthExist" select="//odm:SubjectData/@OpenClinica:YearOfBirth"/>
 	<xsl:variable name="subjectStatusExist" select="//odm:SubjectData/@OpenClinica:Status"/>
 	<xsl:variable name="subjectSecondaryIdExist" select="//odm:SubjectData/@OpenClinica:SecondaryID"/>
 	
@@ -224,6 +225,11 @@
 							<xsl:if test="$dobExist">
 								<td class="table_header_row">
 									<xsl:text>Date of Birth</xsl:text>
+								</td>
+							</xsl:if>
+                                                        <xsl:if test="$yearOfBirthExist">
+								<td class="table_header_row">
+									<xsl:text>Year of Birth</xsl:text>
 								</td>
 							</xsl:if>
 							<!--Starting Study Event Column Headers -->
@@ -443,6 +449,18 @@
 					<xsl:choose>
 						<xsl:when test="@OpenClinica:DateOfBirth">
 							<xsl:value-of select="@OpenClinica:DateOfBirth"/>
+						</xsl:when>
+						<xsl:otherwise>
+							<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
+						</xsl:otherwise>
+					</xsl:choose>
+				</td>
+			</xsl:if>
+                        <xsl:if test="$yearOfBirthExist">
+				<td class="table_cell">
+					<xsl:choose>
+						<xsl:when test="@OpenClinica:YearOfBirth">
+							<xsl:value-of select="@OpenClinica:YearOfBirth"/>
 						</xsl:when>
 						<xsl:otherwise>
 							<xsl:text disable-output-escaping="yes">&amp;nbsp;</xsl:text>
