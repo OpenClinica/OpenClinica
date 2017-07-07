@@ -75,11 +75,21 @@
         <div class="nav-top-bar">
         <!-- Logo -->
             <div class="logo"><a href="MainMenu"><img src="images/logo-color-on-dark.svg" alt="OpenClinica Logo" /></a></div>
-          
-            <div id="StudyInfo">           
-                <b><a href="ViewStudy?id=1&viewFull=yes" title="Default Study" alt="Default Study">Default Study</a></b>
-                (default-study)|
-                <a href="ChangeStudy">Change</a>
+
+            <div id="StudyInfo">
+                <c:choose>
+                    <c:when test='${study.parentStudyId > 0}'>
+                        <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes"
+                            title="<c:out value='${study.parentStudyName}'/>"
+                            alt="<c:out value='${study.parentStudyName}'/>" ><c:out value="${study.abbreviatedParentStudyName}" /></a>
+                            :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.id}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                    </c:when>
+                    <c:otherwise>
+                        <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                    </c:otherwise>
+                </c:choose>
+                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
             </div>
 
             <div id="UserInfo">
@@ -92,13 +102,13 @@
                             <li><a href="#">Account</a></li>
                             <li><a href="#">Billing</a></li>
                             <li> <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
-                        </ul>        
+                        </ul>
                         </li>
                     </ul>
                 </div>
             </div>
-        </div>   
-            
+        </div>
+
          <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
             <div class="navbox_center">
@@ -111,20 +121,44 @@
                                 <tr>
                                     <td>
                                       <form METHOD="GET" action="ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == 'Study Subject ID') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
-                                                                    <!--<a href="javascript:reportBug()">Report Issue</a>|-->                              
+                                                                    <!--<a href="javascript:reportBug()">Report Issue</a>|-->
                                             <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = 'Study Subject ID'" onfocus="if (this.value == 'Study Subject ID') this.value = ''" value="Enter Study Subject ID" class="navSearch"/>
                                             <input type="hidden" name="navBar" value="yes"/>
                                             <input type="submit" value="View &#8594;"  class="navSearchButton"/>
-                                        </form>                                        
+                                        </form>
                                     </td>
-                                    <td align="right" style="font-weight: normal;">                                  
+                                    <td align="right" style="font-weight: normal;">
                                     <ul>
-                                        <li><a href="MainMenu">Home</a></li>
-                                        <li><a href="ListStudySubjects">Subject Matrix</a></li>
-                                        <li><a href="ViewNotes">Notes &amp; Discrepancies</a></li>
-                                        <li><a href="StudyAuditLog">Study Audit Log</a></li>
+                                        <c:if test="${userRole.coordinator || userRole.director}">
+                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            <li><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                        </c:if>
+                                        <c:if test="${userRole.researchAssistant ||userRole.researchAssistant2}">
+                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            <c:if test="${study.status.available}">
+                                                <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            </c:if>
+                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                        </c:if>
+                                        <c:if test="${userRole.investigator}">
+                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            <c:if test="${study.status.available}">
+                                                <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            </c:if>
+                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                        </c:if>
+                                        <c:if test="${userRole.monitor }">
+                                            <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            <li><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_sdv" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                            <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="nav_notes_and_discrepancies" bundle="${resword}"/></a>&nbsp;&nbsp;|&nbsp;&nbsp;</li>
+                                        </c:if>
                                         <li id="nav_Tasks" style="position: relative; z-index: 3;">
-                                            <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link">Tasks
+                                            <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link"><fmt:message key="nav_tasks" bundle="${resword}"/>
                                                <span class="icon icon-caret-down white"></span></a>
                                         </li>
                                         </ul>
@@ -133,7 +167,7 @@
                             </table>
                             </div></div></div></div>
                         </td>
-                    </tr>                 
+                    </tr>
                 </table>
             </div>
             <!-- End shaded box border DIVs -->
