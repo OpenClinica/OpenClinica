@@ -36,9 +36,7 @@ import org.springframework.web.client.RestTemplate;
 public class CreateXformCRFVersionServlet extends SecureController {
     Locale locale;
     FileUploadHelper uploadHelper = new FileUploadHelper();
-    // public final String FM_BASEURL = "http://fm2.openclinica.info/api/protocol/";
-    public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/protocol/";
-    // public final String FM_BASEURL = "http://oc.local:8090/api/protocol/";
+    public final String FM_BASEURL = CoreResources.getField("formManager").trim();
 
     @Override
     protected void processRequest() throws Exception {
@@ -122,7 +120,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
         ArrayList<ByteArrayResource> byteArrayResources = new ArrayList<>();
         RestTemplate restTemplate = new RestTemplate();
 
-        String uploadFilesUrl = FM_BASEURL + studyOid + "/forms/" + crfName + "/artifacts";
+        String uploadFilesUrl = FM_BASEURL + "/api/protocol/" + studyOid + "/forms/" + crfName + "/artifacts";
         map.add("file", byteArrayResources);
 
         for (FileItem file : files) {
