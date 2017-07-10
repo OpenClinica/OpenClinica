@@ -36,7 +36,7 @@ import org.springframework.web.client.RestTemplate;
 public class CreateXformCRFVersionServlet extends SecureController {
     Locale locale;
     FileUploadHelper uploadHelper = new FileUploadHelper();
-    public final String FM_BASEURL = CoreResources.getField("formManager").trim();
+    public final static String FM_BASEURL = CoreResources.getField("formManager").trim();
 
     @Override
     protected void processRequest() throws Exception {
