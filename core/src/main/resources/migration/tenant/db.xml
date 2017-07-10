@@ -388,8 +388,8 @@
             <column name="item_data_id" type="INT"/>
             <column name="discrepancy_note_id" type="INT"/>
             <column name="column_name" type="VARCHAR(255)"/>
-            <column defaultValueBoolean="true" name="activated" type="BOOLEAN"/>
             <column name="study_subject_id" type="INT"/>
+            <column defaultValueBoolean="true" name="activated" type="BOOLEAN"/>
         </createTable>
     </changeSet>
     <changeSet author="yogi (generated)" id="1497972092906-32">
