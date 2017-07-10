@@ -757,8 +757,8 @@
             <column name="required" type="BOOLEAN"/>
             <column name="default_value" type="VARCHAR(4000)"/>
             <column name="response_layout" type="VARCHAR(255)"/>
-            <column defaultValueBoolean="true" name="show_item" type="BOOLEAN"/>
             <column name="width_decimal" type="VARCHAR(10)"/>
+            <column defaultValueBoolean="true" name="show_item" type="BOOLEAN"/>
         </createTable>
     </changeSet>
     <changeSet author="yogi (generated)" id="1497972092906-55">
