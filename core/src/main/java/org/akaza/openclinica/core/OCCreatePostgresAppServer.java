@@ -26,7 +26,9 @@ public class OCCreatePostgresAppServer extends SpringLiquibase {
         parameters.put("dbPass", CoreResources.getField("dbPass"));
         parameters.put("db", CoreResources.getField("db"));
         parameters.put("dbHost", CoreResources.getField("dbHost"));
-        parameters.put("mappingServer", "mapping_server_" + CoreResources.getField("db"));
+        // replace all dashes with underscores to comply with app server criteria where no dashes are allowed
+        String dbName = CoreResources.getField("db").replaceAll("-", "_");
+        parameters.put("mappingServer", "mapping_server_" + dbName);
         super.setChangeLogParameters(parameters);
         super.afterPropertiesSet();
     }

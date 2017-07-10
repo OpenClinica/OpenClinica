@@ -83,9 +83,9 @@
             <column name="event_crf_id" type="INT"/>
             <column name="study_event_id" type="INT"/>
             <column name="event_crf_version_id" type="INT"/>
+            <column name="item_data_repeat_key" type="VARCHAR(4000)"/>
             <column name="instance_id" type="VARCHAR(4000)"/>
             <column name="details" type="VARCHAR(255)"/>
-            <column name="item_data_repeat_key" type="VARCHAR(4000)"/>
         </createTable>
     </changeSet>
     <changeSet author="yogi (generated)" id="1497972092906-8">
@@ -388,8 +388,8 @@
             <column name="item_data_id" type="INT"/>
             <column name="discrepancy_note_id" type="INT"/>
             <column name="column_name" type="VARCHAR(255)"/>
-            <column defaultValueBoolean="true" name="activated" type="BOOLEAN"/>
             <column name="study_subject_id" type="INT"/>
+            <column defaultValueBoolean="true" name="activated" type="BOOLEAN"/>
         </createTable>
     </changeSet>
     <changeSet author="yogi (generated)" id="1497972092906-32">
@@ -681,9 +681,9 @@
             <column name="owner_id" type="INT"/>
             <column name="update_id" type="INT"/>
             <column name="ordinal" type="INT"/>
-            <column name="instance_id" type="VARCHAR(255)"/>
-            <column defaultValueBoolean="false" name="deleted" type="BOOLEAN"/>
             <column name="old_status_id" type="INT"/>
+            <column defaultValueBoolean="false" name="deleted" type="BOOLEAN"/>
+            <column name="instance_id" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
     <changeSet author="yogi (generated)" id="1497972092906-51">
@@ -757,8 +757,8 @@
             <column name="required" type="BOOLEAN"/>
             <column name="default_value" type="VARCHAR(4000)"/>
             <column name="response_layout" type="VARCHAR(255)"/>
-            <column defaultValueBoolean="true" name="show_item" type="BOOLEAN"/>
             <column name="width_decimal" type="VARCHAR(10)"/>
+            <column defaultValueBoolean="true" name="show_item" type="BOOLEAN"/>
         </createTable>
     </changeSet>
     <changeSet author="yogi (generated)" id="1497972092906-55">
@@ -1179,8 +1179,8 @@
             <column name="update_id" type="INT"/>
             <column name="status_id" type="INT"/>
             <column defaultValueNumeric="0" name="version" type="INT"/>
-            <column name="oc_oid_reference" type="VARCHAR(4000)"/>
             <column name="rule_action_run_id" type="INT"/>
+            <column name="oc_oid_reference" type="VARCHAR(4000)"/>
             <column name="email_subject" type="VARCHAR(1020)"/>
         </createTable>
     </changeSet>
@@ -1193,8 +1193,8 @@
             <column name="oc_oid" type="VARCHAR(512)"/>
             <column name="value" type="VARCHAR(512)"/>
             <column name="version" type="INT"/>
-            <column name="property" type="VARCHAR(4000)"/>
             <column name="rule_expression_id" type="INT"/>
+            <column name="property" type="VARCHAR(4000)"/>
         </createTable>
     </changeSet>
     <changeSet author="yogi (generated)" id="1497972092906-80">
