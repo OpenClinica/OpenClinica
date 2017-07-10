@@ -681,9 +681,9 @@
             <column name="owner_id" type="INT"/>
             <column name="update_id" type="INT"/>
             <column name="ordinal" type="INT"/>
-            <column name="instance_id" type="VARCHAR(255)"/>
-            <column defaultValueBoolean="false" name="deleted" type="BOOLEAN"/>
             <column name="old_status_id" type="INT"/>
+            <column defaultValueBoolean="false" name="deleted" type="BOOLEAN"/>
+            <column name="instance_id" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
     <changeSet author="yogi (generated)" id="1497972092906-51">
