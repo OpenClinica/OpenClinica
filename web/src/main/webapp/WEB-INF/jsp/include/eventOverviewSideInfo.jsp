@@ -17,18 +17,18 @@
  <tr id="sidebar_Info_closed" style="display: all">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Info_open'); leftnavExpand('sidebar_Info_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Info_open'); leftnavExpand('sidebar_Info_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="info" bundle="${resword}"/></b>
+		<fmt:message key="info" bundle="${resword}"/>
 
 		</td>
   </tr>
  <tr id="sidebar_Info_open" style="display: none">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Info_open'); leftnavExpand('sidebar_Info_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Info_open'); leftnavExpand('sidebar_Info_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="info" bundle="${resword}"/></b>
+		<fmt:message key="info" bundle="${resword}"/>
 
 		<div class="sidebar_tab_content">
 
