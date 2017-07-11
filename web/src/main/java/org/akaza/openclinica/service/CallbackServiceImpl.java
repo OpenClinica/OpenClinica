@@ -90,11 +90,23 @@ public class CallbackServiceImpl implements CallbackService {
         Map<String, Object> appMetadata = user.getAppMetadata();
         Object userType = appMetadata.get("userContext");
         LinkedTreeMap<String, String> userTypeMap = (LinkedTreeMap<String, String>) userType;
+        String convertedUserType = null;
         switch ((String) userTypeMap.get("userType")) {
         case "Business Admin":
-            map.put("user_type", UserType.SYSADMIN.getName());
+            convertedUserType = UserType.SYSADMIN.getName();
             break;
+        case "Tech Admin":
+            convertedUserType = UserType.TECHADMIN.getName();
+            break;
+        case "User":
+            convertedUserType = UserType.USER.getName();
+            break;
+        default:
+            String error = "Invalid userType:" + (String) userTypeMap.get("userType");
+            logger.error(error);
+            throw new Exception(error);
         }
+        map.put("user_type", convertedUserType);
         map.put("authorize_soap", "false");
         map.put("email", user.getEmail());
         map.put("institution", "OC");
