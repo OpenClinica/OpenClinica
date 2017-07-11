@@ -42,7 +42,7 @@ public class CallbackServiceImpl implements CallbackService {
     public UserAccountBean isCallbackSuccessful(HttpServletRequest request, Auth0User user) throws Exception {
         UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
         String _username = user.getNickname();
-
+        logger.info("Callback for user:" + _username);
         if (StringUtils.isEmpty(_username))
             return null;
         UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid(user.getUserId());
@@ -64,6 +64,7 @@ public class CallbackServiceImpl implements CallbackService {
     private void updateStudyUsername(UserAccountBean ub, Auth0User user) {
         Map<String, Object> appMetadata = user.getAppMetadata();
         Query query=studyUserRoleDao.getCurrentSession().createQuery("update StudyUserRole set id.userName=:userName where id.userName=:prevUser");
+        logger.info("update StudyUserRole set id.userName=" + user.getNickname() + " where id.userName=" + user.getUserId());
         query.setParameter("userName", user.getNickname());
         query.setParameter("prevUser", user.getUserId());
         int modifications=query.executeUpdate();
