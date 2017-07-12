@@ -148,8 +148,6 @@ public class ImportCRFDataService {
                         // event, but haven't entered data yet? this would
                         // have us with a study event, but no corresponding
                         // event crf, yet.
-                        
-                        // TODO:  Should fail out here if we find more than one event crf.  means there is a duplicate and we should abort import.
                         if (eventCrfBeans.isEmpty()) {
                             logger.debug("   found no event crfs from Study Event id " + studyEventBean.getId() + ", location " + studyEventBean.getLocation());
                             // spell out criteria and create a bean if

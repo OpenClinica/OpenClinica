@@ -162,6 +162,9 @@ public class DataEndpoint {
                 List<String> auditMsgs = new DataImportService().submitData(odmContainer, dataSource, studyBean, userBean, displayItemBeanWrappers,
                         importedCRFStatuses);
 
+                // Migrate CRF versions, if necessary
+                dataImportService.migrateCrfVersions(odmContainer,dataSource,studyBean,userBean);
+                
                 // run rules if applicable
                 List<String> ruleActionMsgs = dataImportService.runRules(studyBean, userBean, containers, ruleSetService, ExecutionMode.SAVE);
 
