@@ -219,11 +219,13 @@ public class EnketoUrlService {
 
         // Load populated instance
         String populatedInstance = "";
+        String crfFlavor = "";
         if (flavor.equals(QUERY_FLAVOR)) {
             populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, flavor);
+            crfFlavor = flavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
-            flavor = flavor + "[" + idb.getId() + "]";
+            crfFlavor = flavor + "[" + idb.getId() + "]";
             markComplete = false;
         }
 
@@ -235,9 +237,14 @@ public class EnketoUrlService {
 
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
-        EnketoURLResponse eur = enketo.getEditURL(formLayout, flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
-                goTo);
-        editURL = eur.getEdit_url();
+        EnketoURLResponse eur = enketo.getEditURL(formLayout, crfFlavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
+                goTo, flavor);
+
+        if (flavor.equals(QUERY_FLAVOR)) {
+            editURL = eur.getEdit_url();
+        } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+            editURL = eur.getEdit_iframe_url();
+        }
         int hashIndex = editURL.lastIndexOf("#");
         String part1 = "";
         String part2 = "";
@@ -483,7 +490,9 @@ public class EnketoUrlService {
         if (itemData == null) {
             List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
             for (EventCrf eCrf : eventCrfs) {
-                itemData = itemDataDao.findByEventCrfItemNameDeletedOrNot(eventCrf.getEventCrfId(), itemName, ordinal);
+                itemData = itemDataDao.findByEventCrfItemNameDeletedOrNot(eCrf.getEventCrfId(), itemName, ordinal);
+                if (itemData != null)
+                    break;
             }
         }
 
@@ -495,9 +504,11 @@ public class EnketoUrlService {
             QueriesBean queriesBean = buildQueryElement(itemData);
             queries = queriesBean != null ? mapper.writeValueAsString(queriesBean) : "";
         }
+        int repeatOrdinal = itemData.getOrdinal();
 
         StringBuffer sb = new StringBuffer();
-        sb.append("<form>");
+        sb.append("<form xmlns:enk=\"http://enketo.org/xforms\" id=\"single_item\" >");
+        sb.append("<group_layout enk:ordinal=\"" + repeatOrdinal + "\">");
 
         sb.append("<" + itemName + ">");
         sb.append(itemValue);
@@ -507,6 +518,8 @@ public class EnketoUrlService {
         sb.append(queries);
         sb.append("</" + itemName + QUERY_SUFFIX + ">");
 
+        sb.append("</group_layout>");
+        sb.append("<meta><instanceID>uuid:" + itemName + "</instanceID></meta>");
         sb.append("</form>");
 
         return sb.toString();

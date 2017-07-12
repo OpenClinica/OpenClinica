@@ -29,6 +29,7 @@ import javax.ws.rs.DELETE;
 import javax.ws.rs.GET;
 import javax.ws.rs.HEAD;
 import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
 import javax.ws.rs.Path;
 import javax.ws.rs.PathParam;
 import javax.ws.rs.Produces;
@@ -602,6 +603,14 @@ public class OpenRosaServices {
             LOGGER.debug("Failed OpenRosa submission with unhandled error");
             return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @PUT
+    @Path("/{studyOID}/fieldsubmission")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response doFieldSubmissionPut(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
+            @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) {
+        return doFieldSubmission(request, response, servletContext, studyOID, context);
     }
 
     @POST

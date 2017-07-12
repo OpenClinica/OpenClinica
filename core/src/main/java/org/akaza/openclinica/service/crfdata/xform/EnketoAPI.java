@@ -25,6 +25,8 @@ public class EnketoAPI {
     private String token = null;
     private String ocURL = null;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    public static final String QUERY_FLAVOR = "-query";
+    public static final String SINGLE_ITEM_FLAVOR = "-single_item";
 
     public EnketoAPI(EnketoCredentials credentials) {
         this.enketoURL = credentials.getServerUrl();
@@ -98,9 +100,9 @@ public class EnketoAPI {
         return null;
     }
 
-    public EnketoURLResponse getEditURL(FormLayout formLayout, String flavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo) {
-        String crfOid = formLayout.getOcOid() + flavor;
+    public EnketoURLResponse getEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
+            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor) {
+        String crfOid = formLayout.getOcOid() + crfFlavor;
         if (enketoURL == null)
             return null;
 
@@ -111,8 +113,13 @@ public class EnketoAPI {
             String hashString = ecid + "." + String.valueOf(cal.getTimeInMillis());
             ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
             String instanceId = encoder.encodePassword(hashString, null);
+            URL eURL = null;
+            if (flavor.equals(QUERY_FLAVOR)) {
+                eURL = new URL(enketoURL + "/api/v2/instance/fieldsubmission/iframe");
+            } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+                eURL = new URL(enketoURL + "/api/v2/instance/fieldsubmission/view/dnc/iframe");
+            }
 
-            URL eURL = new URL(enketoURL + "/api/v2/instance/fieldsubmission/iframe");
             // URL eURL = new URL(enketoURL + "/api/v2/instance/iframe");
 
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
