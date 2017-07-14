@@ -146,15 +146,10 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            //@pgawade 25-June-2012: fix for issue 14427 
-            //html.a().href("#").id("addSubject");// onclick(
-            html.a().href("javascript:;").id("addSubject");
-            // "initmb();sm('box', 730,100);"
-            // );
+            html.a().href("AddNewSubject");
             html.quote();
             html.quote().close();
             html.nbsp().append(reswords.getString("add_new_subject")).nbsp().aEnd();
-
             return html.toString();
         }
 
