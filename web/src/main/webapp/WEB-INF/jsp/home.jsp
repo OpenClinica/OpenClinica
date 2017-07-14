@@ -60,7 +60,8 @@
                 console.log("SSO Session but NOT locally authenticated ");
                 webAuth.authorize({
                     scope: 'openid name email picture',
-                    state: '${state}'
+                    state: '${state}',
+                    connection: data.lastUsedConnection.name
                 }, function (err) {
                     // this only gets called if there was a login error
                     console.error('Error logging in: ' + err);
@@ -88,7 +89,7 @@
                 <c:otherwise>
                     // user is not logged in locally and no SSO session exists - send to the portal application's partner login page
                     console.log("NO SSO Session and NOT locally authenticated ");
-                    window.location = '${partnerLoginUrl}?externalReturnUrl=' + encodeURIComponent(window.location);
+                   window.location = '${partnerLoginUrl}?externalReturnUrl=' + encodeURIComponent(window.location);
             </c:otherwise>
             </c:choose>
         }
@@ -151,4 +152,3 @@
 
 </body>
 </html>
-0
