@@ -115,11 +115,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>)request.getSession().getAttribute("userContextMap");
         if (userContextMap == null)
             return;
-        ArrayList<LinkedHashMap<String, String>> roles =  (ArrayList<LinkedHashMap<String, String>>) userContextMap.get("roles");
-        if (roles == null)
-            return;
-        for (LinkedHashMap<String, String> roleByStudy : roles) {
-            Study study = studyDao.findByStudyEnvUuid(roleByStudy.get("studyEnvUuid"));
+        ResponseEntity <StudyEnvironmentRoleDTO[]> userRoles = getUserRoles(request);
+        for (StudyEnvironmentRoleDTO role: userRoles.getBody()) {
+            Study study = studyDao.findByStudyEnvUuid(role.getStudyEnvironmentUuid());
             if (study == null)
                 continue;
             Study parentStudy = study.getStudy();
@@ -127,8 +125,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             UserAccount userAccount = new UserAccount();
             userAccount.setUserName(ub.getName());
             ArrayList<StudyUserRole> byUserAccount = studyUserRoleDao.findAllUserRolesByUserAccount(userAccount, study.getStudyId(), parentStudyId);
-            String role = roleByStudy.get("roleName");
-            String ocRole = getOCRole(role, false);
+            String rolename = role.getRoleName();
+            String ocRole = getOCRole(rolename, false);
             if (byUserAccount.isEmpty()) {
                 StudyUserRole studyUserRole = new StudyUserRole();
                 StudyUserRoleId userRoleId = new StudyUserRoleId();
@@ -167,7 +165,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return true;
     }
 
-    public ResponseEntity getStudyUserRoles (HttpServletRequest request,  String studyEnvUuid) {
+    public ResponseEntity getUserRoles(HttpServletRequest request) {
         Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
         if (userContextMap == null)
             return null;
@@ -178,7 +176,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        headers.add("Authorization", "Bearer " + userContextMap.get("accessToken"));
+        String accessToken = (String) request.getSession().getAttribute("accessToken");
+        headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Accept-Charset", "UTF-8");
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         List<HttpMessageConverter<?>> converters = new ArrayList<>();
@@ -201,7 +200,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        headers.add("Authorization", "Bearer " + userContextMap.get("accessToken"));
+        String accessToken = (String) request.getSession().getAttribute("accessToken");
+        headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Accept-Charset", "UTF-8");
         HttpEntity<String> entity = new HttpEntity<String>(headers);
         List<HttpMessageConverter<?>> converters = new ArrayList<>();
@@ -211,5 +211,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         restTemplate.setMessageConverters(converters);
         ResponseEntity<OCUserDTO> response = restTemplate.exchange(uri, HttpMethod.GET, entity, OCUserDTO.class);
         return response;
+    }
+    public void updateStudyUsername(UserAccountBean ub, Auth0User user) {
+        int numUpdated = studyUserRoleDao.updateUsername(user.getNickname(), user.getUserId());
+        logger.debug(numUpdated + " studyUserRoles updated for user:" + user.getNickname() + " and prevUser:" + user.getUserId());
     }
 }

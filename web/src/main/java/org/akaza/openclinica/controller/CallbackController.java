@@ -3,6 +3,7 @@ package org.akaza.openclinica.controller;
 import com.auth0.Auth0User;
 import com.auth0.NonceUtils;
 import com.auth0.SessionUtils;
+import com.auth0.Tokens;
 import com.auth0.spring.security.mvc.Auth0CallbackHandler;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.service.CallbackService;
@@ -38,7 +39,9 @@ public class CallbackController extends Auth0CallbackHandler {
         SessionUtils.setState(req, "nonce=123456");
         NonceUtils.addNonceToStorage(req);
         super.handle(req, res);
+        Tokens tokens = SessionUtils.getTokens(req);
         Auth0User user = SessionUtils.getAuth0User(req);
+        req.getSession().setAttribute("accessToken", tokens.getAccessToken());
         UserAccountBean ub = callbackService.isCallbackSuccessful(req, user);
         if (ub != null) {
             req.getSession().setAttribute(USER_BEAN_NAME, ub);
