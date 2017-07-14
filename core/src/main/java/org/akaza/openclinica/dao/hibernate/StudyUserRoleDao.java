@@ -36,4 +36,12 @@ public class StudyUserRoleDao extends CompositeIdAbstractDomainDao<StudyUserRole
         q.setParameter("parentStudyId", parentStudyId);
         return (ArrayList<StudyUserRole>) q.list();
     }
+    public int updateUsername(String username, String prevUsername) {
+        String queryStr = "update StudyUserRole set id.userName=:userName where id.userName=:prevUser";
+        Query query = getCurrentSession().createQuery(queryStr);
+        query.setParameter("userName", username);
+        query.setParameter("prevUser", prevUsername);
+        int modifications = query.executeUpdate();
+        return modifications;
+    }
 }

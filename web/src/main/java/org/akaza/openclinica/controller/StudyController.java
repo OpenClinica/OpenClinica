@@ -338,7 +338,7 @@ import java.util.regex.Pattern;
         Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) session.getAttribute("userContextMap");
         if (userContextMap == null)
             return responseEntity;
-        ResponseEntity<StudyEnvironmentRoleDTO[]> studyUserRoles = studyBuildService.getStudyUserRoles(request, studyEnvUuid);
+        ResponseEntity<StudyEnvironmentRoleDTO[]> studyUserRoles = studyBuildService.getUserRoles(request);
         HashMap<String, String> userMap = getUserInfo(request, userContextMap, studyUserRoles);
         UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
 
