@@ -77,9 +77,9 @@
 </c:otherwise>
 </c:choose>
 </span></h1><br/>
-
-
-
+<c:url var="createRule" value="/ImportRule"/>
+<div class="homebox_bullets"><a href="${createRule}"><fmt:message key="add_rules" bundle="${resword}"/></a></div>
+<br/>
 <div id="ruleAssignmentsDiv">
     <form  action="${pageContext.request.contextPath}/ViewRuleAssignment">
         <input type="hidden" name="module" value="admin">
