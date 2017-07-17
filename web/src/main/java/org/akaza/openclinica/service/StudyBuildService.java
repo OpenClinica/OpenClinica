@@ -1,5 +1,6 @@
 package org.akaza.openclinica.service;
 
+import com.auth0.Auth0User;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.domain.datamap.Study;
@@ -19,7 +20,8 @@ public interface StudyBuildService {
 
     void saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub) throws Exception;
 
-    ResponseEntity getStudyUserRoles(HttpServletRequest request, String studyEnvUuid);
+    ResponseEntity getUserRoles(HttpServletRequest request);
 
     ResponseEntity getUserDetails(HttpServletRequest request);
+    void updateStudyUsername(UserAccountBean ub, Auth0User user);
 }

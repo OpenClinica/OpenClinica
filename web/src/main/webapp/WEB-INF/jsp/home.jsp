@@ -13,7 +13,7 @@
     <link rel="stylesheet" type="text/css" href="/css/jquery.growl.css"/>
     <script src="http://code.jquery.com/jquery.js"></script>
     <script src="/js/jquery.growl.js" type="text/javascript"></script>
-    <script src="//cdn.auth0.com/w2/auth0-7.2.1.js"></script>
+    <script src="//cdn.auth0.com/js/auth0/8.8/auth0.min.js"></script>
 </head>
 <body>
 
@@ -29,12 +29,18 @@
     };
     <sec:authorize var="authenticated" access="isAuthenticated()" />
     // check SSO status
-    var auth0 = new Auth0({
+    var webAuth = new auth0.WebAuth({
         domain: '${domain}',
         clientID: '${clientId}',
-        callbackURL: '${fn:replace(pageContext.request.requestURL, pageContext.request.requestURI, '')}${loginCallback}'
+        audience: 'https://www.openclinica.com',
+        responseType: 'code',
+        redirectUri: '${fn:replace(pageContext.request.requestURL, pageContext.request.requestURI, '')}${loginCallback}'
     });
-    auth0.getSSOData(function (err, data) {
+    var auth = new auth0.Authentication({
+        domain: '${domain}',
+        clientID: '${clientId}'
+    });
+    auth.getSSOData(function (err, data) {
         if (data && data.sso === true) {
             // have SSO session
             console.log('SSO: an Auth0 SSO session already exists');
@@ -52,9 +58,10 @@
             if (!loggedIn || (loggedInUserId !== data.lastUsedUserID)) {
                 // have SSO session but no valid local session - auto-login user
                 console.log("SSO Session but NOT locally authenticated ");
-                auth0.login({
+                webAuth.authorize({
                     scope: 'openid name email picture',
-                    state: '${state}'
+                    state: '${state}',
+                    connection: data.lastUsedConnection.name
                 }, function (err) {
                     // this only gets called if there was a login error
                     console.error('Error logging in: ' + err);
@@ -82,7 +89,7 @@
                 <c:otherwise>
                     // user is not logged in locally and no SSO session exists - send to the portal application's partner login page
                     console.log("NO SSO Session and NOT locally authenticated ");
-                    window.location = '${partnerLoginUrl}?externalReturnUrl=' + encodeURIComponent(window.location);
+                   window.location = '${partnerLoginUrl}?externalReturnUrl=' + encodeURIComponent(window.location);
             </c:otherwise>
             </c:choose>
         }
@@ -145,4 +152,3 @@
 
 </body>
 </html>
-0
