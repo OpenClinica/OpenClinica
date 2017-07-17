@@ -103,17 +103,17 @@ public class EnketoAPI {
     }
 
 
-    public EnketoURLResponse registerAndGetEditURL(FormLayout formLayout, String flavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo) {
+    public EnketoURLResponse registerAndGetEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
+            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor) {
         EnketoURLResponse urlResponse = null;
         try {
-            urlResponse = getEditURL(formLayout, flavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo);
+            urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor);
         } catch (Exception e) {
             if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized")
                     || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
                 savePformRegistration();
                 try {
-                    urlResponse = getEditURL(formLayout, flavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo);
+                    urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor);
                 } catch (Exception e1) {
                     logger.error(e.getMessage());
                     logger.error(ExceptionUtils.getStackTrace(e));
@@ -194,7 +194,7 @@ public class EnketoAPI {
     }
 
     public EnketoURLResponse getEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo,String flavor) {
+            String studyOid, List<FormLayoutMedia> mediaList, String goTo,String flavor) throws Exception {
         EnketoURLResponse urlResponse = null;
         String crfOid = formLayout.getOcOid() + crfFlavor;
         if (enketoURL == null)
