@@ -55,4 +55,10 @@ public class Upload implements UserControl {
         return null;
     }
 
+    @Override
+    public ItemSet getItemSet() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
 }

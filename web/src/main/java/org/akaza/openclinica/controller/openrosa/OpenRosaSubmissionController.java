@@ -316,29 +316,27 @@ public class OpenRosaSubmissionController {
                 logger.info("Field Submissions to the study not allowed.  Aborting field submission.");
                 return new ResponseEntity<String>(HttpStatus.NOT_ACCEPTABLE);
             }
-            if (ServletFileUpload.isMultipartContent(request)) {
-                String dir = getAttachedFilePath(studyOID);
-                FileProperties fileProperties = new FileProperties();
-                DiskFileItemFactory factory = new DiskFileItemFactory();
-                ServletFileUpload upload = new ServletFileUpload(factory);
-                upload.setFileSizeMax(fileProperties.getFileSizeMax());
-                List<FileItem> items = upload.parseRequest(request);
-                for (FileItem item : items) {
-                    if (item.getFieldName().equals("instance_id")) {
-                        instanceId = item.getString();
-                    } else if (item.getFieldName().equals("xml_submission_fragment_file")) {
-                        requestBody = item.getString("UTF-8");
-                    } else if (item.getContentType() != null) {
-                        if (!new File(dir).exists())
-                            new File(dir).mkdirs();
+            String dir = getAttachedFilePath(studyOID);
+            FileProperties fileProperties = new FileProperties();
+            DiskFileItemFactory factory = new DiskFileItemFactory();
+            ServletFileUpload upload = new ServletFileUpload(factory);
+            upload.setFileSizeMax(fileProperties.getFileSizeMax());
+            List<FileItem> items = upload.parseRequest(request);
+            for (FileItem item : items) {
+                if (item.getFieldName().equals("instance_id")) {
+                    instanceId = item.getString();
+                } else if (item.getFieldName().equals("xml_submission_fragment_file")) {
+                    requestBody = item.getString("UTF-8");
+                } else if (item.getContentType() != null) {
+                    if (!new File(dir).exists())
+                        new File(dir).mkdirs();
 
-                        File file = processUploadedFile(item, dir);
-                        map.put(item.getFieldName(), file.getPath());
+                    File file = processUploadedFile(item, dir);
+                    map.put(item.getFieldName(), file.getPath());
 
-                    }
                 }
-                listOfUploadFilePaths.add(map);
             }
+            listOfUploadFilePaths.add(map);
             if (instanceId == null) {
                 logger.info("Field Submissions to the study not allowed without a valid instanceId.  Aborting field submission.");
                 return new ResponseEntity<String>(HttpStatus.NOT_ACCEPTABLE);
