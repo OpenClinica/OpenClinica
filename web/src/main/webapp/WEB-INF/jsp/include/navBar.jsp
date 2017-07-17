@@ -293,6 +293,7 @@
             <c:otherwise>
                 <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="AuditUserActivity?restore=true"><fmt:message key="user_audit_log" bundle="${resword}"/></a></div>
             </c:otherwise>
         </c:choose>
         </div>
@@ -300,9 +301,10 @@
         <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
         </div>
         <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="${urlPrefix}ViewAllJobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
         </div>
         <br clear="all">
         <div class="taskGroup"><fmt:message key="nav_study_setup" bundle="${resword}"/></div>
@@ -339,7 +341,6 @@
             <div class="taskLink"><a href="${urlPrefix}ListCRF?module=admin"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
         </div>
         <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewAllJobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
             <div class="taskLink"><a href="${urlPrefix}ListSubject"><fmt:message key="nav_subjects" bundle="${resword}"/></a></div>
         </div>
         <br clear="all">
@@ -350,7 +351,9 @@
         </div>
         <div class="taskRightColumn">
             <div class="taskLink"><a href="${urlPrefix}j_spring_security_logout"><fmt:message key="nav_log_out" bundle="${resword}"/></a></div>
+
         </div>
+
         <br clear="all">
         <div></div>
     </div>

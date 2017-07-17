@@ -44,7 +44,6 @@
 <h1><span class="title_manage"><fmt:message key="administer_all_jobs" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/brief-overview/jobs')"><span class="icon icon-question-circle gray"></span></a></span></h1><br/>
 
 <div class="homebox_bullets"><a href="ViewJob"><fmt:message key="view_all_export_data_jobs" bundle="${resword}"/></a></div>
-<div class="homebox_bullets"><a href="ViewImportJob"><fmt:message key="view_all_import_data_jobs" bundle="${resword}"/></a></div>
 <div  class="homebox_bullets"> <a title="View all Jobs" href='pages/listCurrentScheduledJobs' onclick="javascript:HighlightTab(1);"><fmt:message key="view_currently_executing_data_export_jobs" bundle="${resword}"/></a></div>
 <p></p>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
