@@ -24,4 +24,6 @@ public interface UserControl {
 
     public List<Item> getItem();
 
+    public ItemSet getItemSet();
+
 }

@@ -25,6 +25,8 @@ public class EnketoAPI {
     private String token = null;
     private String ocURL = null;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    public static final String QUERY_FLAVOR = "-query";
+    public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     private String userPasswdCombo;
 
     public EnketoAPI(EnketoCredentials credentials) {
@@ -101,17 +103,17 @@ public class EnketoAPI {
     }
 
 
-    public EnketoURLResponse registerAndGetEditURL(FormLayout formLayout, String flavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo) {
+    public EnketoURLResponse registerAndGetEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
+            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor) {
         EnketoURLResponse urlResponse = null;
         try {
-            urlResponse = getEditURL(formLayout, flavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo);
+            urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor);
         } catch (Exception e) {
             if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized")
                     || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
                 savePformRegistration();
                 try {
-                    urlResponse = getEditURL(formLayout, flavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo);
+                    urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor);
                 } catch (Exception e1) {
                     logger.error(e.getMessage());
                     logger.error(ExceptionUtils.getStackTrace(e));
@@ -191,10 +193,10 @@ public class EnketoAPI {
         return accountExists;
     }
 
-    public EnketoURLResponse getEditURL(FormLayout formLayout, String flavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo) throws Exception {
+    public EnketoURLResponse getEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
+            String studyOid, List<FormLayoutMedia> mediaList, String goTo,String flavor) throws Exception {
         EnketoURLResponse urlResponse = null;
-        String crfOid = formLayout.getOcOid() + flavor;
+        String crfOid = formLayout.getOcOid() + crfFlavor;
         if (enketoURL == null)
             return null;
 
@@ -205,8 +207,13 @@ public class EnketoAPI {
             String hashString = ecid + "." + String.valueOf(cal.getTimeInMillis());
             ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
             String instanceId = encoder.encodePassword(hashString, null);
+            URL eURL = null;
+            if (flavor.equals(QUERY_FLAVOR)) {
+                eURL = new URL(enketoURL + "/api/v2/instance/fieldsubmission/iframe");
+            } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+                eURL = new URL(enketoURL + "/api/v2/instance/fieldsubmission/view/dnc/iframe");
+            }
 
-            URL eURL = new URL(enketoURL + "/api/v2/instance/fieldsubmission/iframe");
             // URL eURL = new URL(enketoURL + "/api/v2/instance/iframe");
 
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
