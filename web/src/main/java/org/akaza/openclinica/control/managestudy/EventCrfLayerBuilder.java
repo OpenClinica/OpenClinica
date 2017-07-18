@@ -27,7 +27,7 @@ public class EventCrfLayerBuilder {
     Integer rowCount;
     List<StudyEventBean> studyEvents;
     DataEntryStage eventCrfStatus;
-    EventCRFBean eventCrfBean;
+    EventCRFBean eventCrfBean = null;
     StudySubjectBean studySubject;
     StudyBean currentStudy;
     StudyUserRoleBean currentRole;
@@ -183,7 +183,7 @@ public class EventCrfLayerBuilder {
                 html.td(0).styleClass(table_cell_left).close();
                 viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent());
                 html.nbsp().nbsp();
-                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
+                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -229,7 +229,7 @@ public class EventCrfLayerBuilder {
                 html.td(0).styleClass(table_cell_left).close();
                 viewEventCrfContentLink(html, studySubject, eventCrfBean, getStudyEvent());
                 html.nbsp().nbsp();
-                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
+                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -262,9 +262,9 @@ public class EventCrfLayerBuilder {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
-                viewSectionDataEntryParameterized(html, eventDefinitionCrf);
+                viewSectionDataEntryParameterized(html, eventCrfBean, eventDefinitionCrf, getStudyEvent());
                 html.nbsp().nbsp();
-                viewSectionDataEntryParameterized(html, eventDefinitionCrf, reswords.getString("view"));
+                viewSectionDataEntryParameterized(html, eventCrfBean, eventDefinitionCrf, reswords.getString("view"), getStudyEvent());
                 html.tdEnd().trEnd(0);
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -283,9 +283,9 @@ public class EventCrfLayerBuilder {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
-                viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf);
+                viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf, getStudyEvent());
                 html.nbsp().nbsp();
-                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
+                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -328,9 +328,9 @@ public class EventCrfLayerBuilder {
             if (!hiddenCrf()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
-                viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf);
+                viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf, getStudyEvent());
                 html.nbsp().nbsp();
-                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf);
+                viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
@@ -422,33 +422,88 @@ public class EventCrfLayerBuilder {
         builder.aEnd();
     }
 
-    private void viewSectionDataEntry(HtmlBuilder builder, EventCRFBean eventCrf, String link, EventDefinitionCRFBean eventDefinitionCrf) {
-        String href = "ViewSectionDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&ecId=" + eventCrf.getId() + "&tabId=1"
-                + "&exitTo=ListStudySubjects";
+    private void viewSectionDataEntry(HtmlBuilder builder, EventCRFBean eventCrf, String link, EventDefinitionCRFBean eventDefinitionCrf,
+            StudyEventBean studyEvent) {
+        int formLayoutId = 0;
+        int eventCrfId = 0;
+        int studyEventId = 0;
+        if (eventCrf == null || eventCrf.getId() == 0) {
+            formLayoutId = eventDefinitionCrf.getDefaultVersionId();
+        } else {
+            formLayoutId = eventCrf.getFormLayoutId();
+            eventCrfId = eventCrf.getId();
+        }
+        if (studyEvent != null) {
+            studyEventId = studyEvent.getId();
+        }
+
+        String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId=" + eventCrfId + "&originatingPage="
+                + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=view";
         builder.a().href(href).close();
         builder.append(link);
         builder.aEnd();
     }
 
-    private void viewSectionDataEntry(HtmlBuilder builder, EventCRFBean eventCrf, EventDefinitionCRFBean eventDefinitionCrf) {
-        String href = "ViewSectionDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&ecId=" + eventCrf.getId() + "&tabId=1"
-                + "&exitTo=ListStudySubjects";
+    private void viewSectionDataEntry(HtmlBuilder builder, EventCRFBean eventCrf, EventDefinitionCRFBean eventDefinitionCrf, StudyEventBean studyEvent) {
+        int formLayoutId = 0;
+        int eventCrfId = 0;
+        int studyEventId = 0;
+        if (eventCrf == null || eventCrf.getId() == 0) {
+            formLayoutId = eventDefinitionCrf.getDefaultVersionId();
+        } else {
+            formLayoutId = eventCrf.getFormLayoutId();
+            eventCrfId = eventCrf.getId();
+        }
+        if (studyEvent != null) {
+            studyEventId = studyEvent.getId();
+        }
+
+        String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId=" + eventCrfId + "&originatingPage="
+                + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=view";
         builder.a().href(href).close();
         builder.img().src("images/bt_View.gif").border("0").align("left").close();
         builder.aEnd();
     }
 
-    private void viewSectionDataEntryParameterized(HtmlBuilder builder, EventDefinitionCRFBean eventDefinitionCrf, String link) {
-        String href = "ViewSectionDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&crfVersionId=" + eventDefinitionCrf.getDefaultVersionId()
-                + "&tabId=1" + "&exitTo=ListStudySubjects";
+    private void viewSectionDataEntryParameterized(HtmlBuilder builder, EventCRFBean eventCrf, EventDefinitionCRFBean eventDefinitionCrf, String link,
+            StudyEventBean studyEvent) {
+        int formLayoutId = 0;
+        int eventCrfId = 0;
+        int studyEventId = 0;
+        if (eventCrf == null || eventCrf.getId() == 0) {
+            formLayoutId = eventDefinitionCrf.getDefaultVersionId();
+        } else {
+            formLayoutId = eventCrf.getFormLayoutId();
+            eventCrfId = eventCrf.getId();
+        }
+        if (studyEvent != null) {
+            studyEventId = studyEvent.getId();
+        }
+
+        String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId=" + eventCrfId + "&originatingPage="
+                + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=view";
         builder.a().href(href).close();
         builder.append(link);
         builder.aEnd();
     }
 
-    private void viewSectionDataEntryParameterized(HtmlBuilder builder, EventDefinitionCRFBean eventDefinitionCrf) {
-        String href = "ViewSectionDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&crfVersionId=" + eventDefinitionCrf.getDefaultVersionId()
-                + "&tabId=1" + "&exitTo=ListStudySubjects";
+    private void viewSectionDataEntryParameterized(HtmlBuilder builder, EventCRFBean eventCrf, EventDefinitionCRFBean eventDefinitionCrf,
+            StudyEventBean studyEvent) {
+        int formLayoutId = 0;
+        int eventCrfId = 0;
+        int studyEventId = 0;
+        if (eventCrf == null || eventCrf.getId() == 0) {
+            formLayoutId = eventDefinitionCrf.getDefaultVersionId();
+        } else {
+            formLayoutId = eventCrf.getFormLayoutId();
+            eventCrfId = eventCrf.getId();
+        }
+        if (studyEvent != null) {
+            studyEventId = studyEvent.getId();
+        }
+
+        String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId=" + eventCrfId + "&originatingPage="
+                + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=view";
         builder.a().href(href).close();
         builder.img().src("images/bt_View.gif").border("0").align("left").close();
         builder.aEnd();
@@ -574,7 +629,7 @@ public class EventCrfLayerBuilder {
         }
 
         String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEvent.getId() + "&eventCrfId=" + eventCrf.getId()
-                + "&originatingPage=" + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId();
+                + "&originatingPage=" + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=edit";
         builder.a().href(href).close();
         builder.img().src("images/bt_Edit.gif").border("0").align("left").close();
         builder.aEnd();
@@ -589,7 +644,7 @@ public class EventCrfLayerBuilder {
             formLayoutId = eventCrf.getFormLayoutId();
         }
         String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEvent.getId() + "&eventCrfId=" + eventCrf.getId()
-                + "&originatingPage=" + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId();
+                + "&originatingPage=" + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=edit";
         builder.a().href(href).close();
         builder.append(link);
         builder.aEnd();

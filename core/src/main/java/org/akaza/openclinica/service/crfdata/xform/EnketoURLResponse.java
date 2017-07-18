@@ -12,6 +12,7 @@ public class EnketoURLResponse {
     private String code = null;
     private boolean complete_button = true;
     private String edit_iframe_url = null;
+    private String view_iframe_url = null;
 
     private String single_fieldsubmission_iframe_url = null;
 
@@ -85,6 +86,14 @@ public class EnketoURLResponse {
 
     public void setEdit_iframe_url(String edit_iframe_url) {
         this.edit_iframe_url = edit_iframe_url;
+    }
+
+    public String getView_iframe_url() {
+        return view_iframe_url;
+    }
+
+    public void setView_iframe_url(String view_iframe_url) {
+        this.view_iframe_url = view_iframe_url;
     }
 
 }

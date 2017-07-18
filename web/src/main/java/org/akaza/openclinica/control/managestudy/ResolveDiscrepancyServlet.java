@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -110,6 +111,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String COMMENT = "_comment";
     public static final String QUERY_SUFFIX = "form-queries.xml";
     public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
+    public static final String VIEW_MODE = "view";
+    public static final String EDIT_MODE = "edit";
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -233,15 +236,16 @@ public class ResolveDiscrepancyServlet extends SecureController {
             PFormCache cache = PFormCache.getInstance(context);
             PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
             subjectContext.setStudySubjectOid(ssb.getOid());
-            subjectContext.setStudyEventDefinitionId(seb.getStudyEventDefinitionId());
-            subjectContext.setOrdinal(seb.getSampleOrdinal());
+            subjectContext.setStudyEventDefinitionId(String.valueOf(seb.getStudyEventDefinitionId()));
+            subjectContext.setOrdinal(String.valueOf(seb.getSampleOrdinal()));
             subjectContext.setFormLayoutOid(formLayout.getOid());
-            subjectContext.setUserAccountId(ub.getId());
+            subjectContext.setUserAccountId(String.valueOf(ub.getId()));
             subjectContext.setItemName(item.getName() + COMMENT);
             subjectContext.setItemRepeatOrdinalAdjusted(repeatOrdinal);
             subjectContext.setItemRepeatOrdinalOriginal(idb.getOrdinal());
             subjectContext.setItemInRepeatingGroup(igmBean.isRepeatingGroup());
             subjectContext.setItemRepeatGroupName(igBean.getLayoutGroupPath());
+            subjectContext.setStudyEventId(String.valueOf(seb.getId()));
             String contextHash = cache.putSubjectContext(subjectContext);
 
             if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
@@ -316,12 +320,14 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 String attribute = SINGLE_ITEM_FLAVOR + "[" + idb.getId() + "]";
                 context.setAttribute(attribute, xform);
             }
+            StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
+            Role role = currentRole.getRole();
 
             String formUrl = null;
             if (ecb.getId() > 0) {
-                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, null, flavor, idb);
+                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role, EDIT_MODE);
             } else {
-                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor);
+                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE);
             }
             int hashIndex = formUrl.lastIndexOf("#");
             String part1 = formUrl;
