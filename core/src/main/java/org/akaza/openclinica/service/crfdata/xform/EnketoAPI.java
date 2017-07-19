@@ -47,16 +47,14 @@ public class EnketoAPI {
     public static final String SURVEY_100_PERCENT_READONLY = "/api/v2/survey/view/iframe";
 
     public static final String SURVEY_WRITABLE_DN = "/api/v2/survey/single/fieldsubmission/iframe";
-
     public static final String SURVEY_WRITABLE_DN_CLOSE_BUTTON = "/api/v2/survey/single/fieldsubmission/c/iframe";
 
     public static final String INSTANCE_100_PERCENT_READONLY = "/api/v2/instance/view/iframe";
 
-    public static final String INSTANCE_READONLY_DN = "/api/v2/instance/fieldsubmission/view/dn/iframe";
-    public static final String INSTANCE_READONLY_DN_CLOSE_BUTTON = "/api/v2/instance/fieldsubmission/view/dn/c/iframe";
+    public static final String INSTANCE_READONLY_DN = "/api/v2/instance/fieldsubmission/note/iframe";
+    public static final String INSTANCE_READONLY_DN_CLOSE_BUTTON = "/api/v2/instance/fieldsubmission/note/c/iframe";
 
     public static final String INSTANCE_WRITABLE_DN = "/api/v2/instance/fieldsubmission/iframe";
-
     public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/api/v2/instance/fieldsubmission/c/iframe";
 
     public EnketoAPI(EnketoCredentials credentials) {
