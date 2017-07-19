@@ -104,23 +104,23 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     final HashMap<Integer, String> crfColumnImageIconPaths = new HashMap<Integer, String>(8);
 
     public ListEventsForSubjectTableFactory(boolean showMoreLink) {
-        imageIconPaths.put(1, "images/icon_Scheduled.gif");
-        imageIconPaths.put(2, "images/icon_NotStarted.gif");
-        imageIconPaths.put(3, "images/icon_InitialDE.gif");
-        imageIconPaths.put(4, "images/icon_DEcomplete.gif");
-        imageIconPaths.put(5, "images/icon_Stopped.gif");
-        imageIconPaths.put(6, "images/icon_Skipped.gif");
-        imageIconPaths.put(7, "images/icon_Locked.gif");
-        imageIconPaths.put(8, "images/icon_Signed.gif");
+        imageIconPaths.put(1, "icon icon-clock2");
+        imageIconPaths.put(2, "icon icon-doc");
+        imageIconPaths.put(3, "icon icon-icon-dataEntryCompleted orange");
+        imageIconPaths.put(4, "icon icon-ok");
+        imageIconPaths.put(5, "icon icon-stop-circle red");
+        imageIconPaths.put(6, "icon icon-redo");
+        imageIconPaths.put(7, "icon icon-icon-locked");
+        imageIconPaths.put(8, "icon icon-icon-sign");
 
-        crfColumnImageIconPaths.put(0, "images/CRF_status_icon_Invalid.gif");
-        crfColumnImageIconPaths.put(1, "images/CRF_status_icon_Scheduled.gif");
-        crfColumnImageIconPaths.put(2, "images/CRF_status_icon_Started.gif");
-        crfColumnImageIconPaths.put(3, "images/CRF_status_icon_InitialDEcomplete.gif");
-        crfColumnImageIconPaths.put(4, "images/CRF_status_icon_DDE.gif");
-        crfColumnImageIconPaths.put(5, "images/CRF_status_icon_Complete.gif");
-        crfColumnImageIconPaths.put(6, "images/CRF_status_icon_Complete.gif");
-        crfColumnImageIconPaths.put(7, "images/CRF_status_icon_Locked.gif");
+        crfColumnImageIconPaths.put(0, "icon icon-file-excel red");
+        crfColumnImageIconPaths.put(1, "icon icon-clock2");
+        crfColumnImageIconPaths.put(2, "icon icon-pencil-squared orange");
+        crfColumnImageIconPaths.put(3, "icon icon-icon-dataEntryCompleted orange");
+        crfColumnImageIconPaths.put(4, "icon icon-icon-doubleDataEntry orange");
+        crfColumnImageIconPaths.put(5, "icon icon-ok");
+        crfColumnImageIconPaths.put(6, "icon icon-ok");
+        crfColumnImageIconPaths.put(7, "icon icon-icon-locked");
         this.showMoreLink = showMoreLink;
     }
 
@@ -699,7 +699,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                     studyEvents.add(studyEvent);
                 }
                 url.append(eventDivBuilder(subject, Integer.valueOf(rowcount + String.valueOf(i)), studyEvents, studyEventDefinition, studySubjectBean));
-                url.append("<img src='" + imageIconPaths.get(subjectEventStatus.getId()) + "' border='0' style='position: relative; left: 7px;'>");
+                url.append("<span class='" + imageIconPaths.get(subjectEventStatus.getId()) + "' border='0' style='position: relative; left: 7px;'>");
                 url.append("</a></td></tr></table>");
             }
 
@@ -768,7 +768,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                         dataEntryStage, eventCrf, studySubjectBean, studyBean, currentRole, currentUser, eventDefintionCrf, crf, studyEventDefinition, path);
 
                 url.append(eventCrfLayerBuilder.buid());
-                url.append("<img src='" + crfColumnImageIconPaths.get(dataEntryStage.getId()) + "' border='0'>");
+                url.append("<span class='" + crfColumnImageIconPaths.get(dataEntryStage.getId()) + "' border='0'>");
                 url.append("</a></td></tr></table>");
             }
 
@@ -1002,9 +1002,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     private void updateStudyEventLinkBuilder(HtmlBuilder builder, Integer studySubjectId, String studyEventId, String edit) {
         String href1 = "UpdateStudyEvent?event_id=" + studyEventId + "&ss_id=" + studySubjectId;
-        builder.a().href(href1);
-        builder.close();
-        builder.img().src("images/bt_Edit.gif").border("0").align("left").close().aEnd();
+        builder.append("<a href=\"href1\">");
+        builder.append("<span hspace=\"2\" border=\"0\" align=\"left\" class=\"icon icon-pencil\"/></a>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(edit).aEnd();
 
@@ -1012,19 +1011,16 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     private void removeStudyEventLinkBuilder(HtmlBuilder builder, Integer studySubjectId, String studyEventId, String remove) {
         String href1 = "RemoveStudyEvent?action=confirm&id=" + studyEventId + "&studySubId=" + studySubjectId;
-        builder.a().href(href1);
-        builder.close();
-        builder.img().src("images/bt_Remove.gif").border("0").align("left").close().aEnd();
-        builder.nbsp().nbsp().a().href(href1);
+       builder.append("<a href=\"href1\">");
+        builder.append("<span hspace=\"2\" border=\"0\" align=\"left\" class=\"icon icon-cancel\"/></a>");
         builder.close().append(remove).aEnd();
 
     }
 
     private void createNewStudyEventLinkBuilder(HtmlBuilder builder, Integer studySubjectId, StudyEventDefinitionBean sed, String schedule) {
         String href1 = "CreateNewStudyEvent?studySubjectId=" + studySubjectId + "&studyEventDefinition=" + sed.getId();
-        builder.a().href(href1);
-        builder.close();
-        builder.img().src("images/bt_Schedule.gif").border("0").align("left").close().aEnd();
+        builder.append("<a href=\"href1\">");
+        builder.append("<span hspace=\"2\" border=\"0\" align=\"left\" class=\"icon icon-clock2\"/></a>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(schedule).aEnd();
 
@@ -1032,9 +1028,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     private void enterDataForStudyEventLinkBuilder(HtmlBuilder builder, String studyEventId, String view) {
         String href1 = "EnterDataForStudyEvent?eventId=" + studyEventId;
-        builder.a().href(href1);
-        builder.close();
-        builder.img().src("images/bt_View.gif").border("0").align("left").close().aEnd();
+        builder.append("<a href=\"href1\">");
+        builder.append("<span hspace=\"2\" border=\"0\" align=\"left\" class=\"icon icon-search\"/></a>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(view).aEnd();
 
