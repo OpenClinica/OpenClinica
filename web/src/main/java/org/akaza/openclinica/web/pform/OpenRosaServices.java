@@ -847,10 +847,6 @@ public class OpenRosaServices {
         HashMap<String, String> value = getSubjectContextCacheValue(context);
         String studySubjectOid = value.get("studySubjectOID");
 
-        StudySubject ssBean = ssDao.findByOcOID(studySubjectOid);
-        StudyBean study = getStudy(ssBean.getStudy().getOc_oid());
-        StudyBean parentStudy = getParentStudy(ssBean.getStudy().getOc_oid());
-
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
@@ -858,21 +854,28 @@ public class OpenRosaServices {
         Element root = doc.createElement("root");
         doc.appendChild(root);
 
-        List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(study.getId(), parentStudy.getId());
-        for (UserAccount userAccount : users) {
-            Element item = doc.createElement("item");
-            Element userName = doc.createElement("user_name");
-            userName.appendChild(doc.createTextNode(userAccount.getUserName()));
-            Element firstName = doc.createElement("first_name");
-            firstName.appendChild(doc.createTextNode(userAccount.getFirstName()));
-            Element lastName = doc.createElement("last_name");
-            lastName.appendChild(doc.createTextNode(userAccount.getLastName()));
-            item.appendChild(userName);
-            item.appendChild(firstName);
-            item.appendChild(lastName);
-            root.appendChild(item);
-        }
+        List<UserAccount> users = null;
 
+        StudySubject ssBean = ssDao.findByOcOID(studySubjectOid);
+
+        if (ssBean != null) {
+            StudyBean study = getStudy(ssBean.getStudy().getOc_oid());
+            StudyBean parentStudy = getParentStudy(ssBean.getStudy().getOc_oid());
+            users = userAccountDao.findNonRootNonParticipateUsersByStudyId(study.getId(), parentStudy.getId());
+            for (UserAccount userAccount : users) {
+                Element item = doc.createElement("item");
+                Element userName = doc.createElement("user_name");
+                userName.appendChild(doc.createTextNode(userAccount.getUserName()));
+                Element firstName = doc.createElement("first_name");
+                firstName.appendChild(doc.createTextNode(userAccount.getFirstName()));
+                Element lastName = doc.createElement("last_name");
+                lastName.appendChild(doc.createTextNode(userAccount.getLastName()));
+                item.appendChild(userName);
+                item.appendChild(firstName);
+                item.appendChild(lastName);
+                root.appendChild(item);
+            }
+        }
         DOMSource dom = new DOMSource(doc);
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
