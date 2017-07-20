@@ -1259,8 +1259,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private void updateStudyEventLinkBuilder(HtmlBuilder builder, Integer studySubjectId, String studyEventId, String edit) {
         String href1 = "UpdateStudyEvent?event_id=" + studyEventId + "&ss_id=" + studySubjectId;
-        builder.append("<a href=\"href1\">");
-        builder.append("<span hspace=\"2\" border=\"0\" align=\"left\" class=\"icon icon-pencil\"/></a>");
+        builder.a().href(href1);
+        builder.close();
+        builder.img().src("images/bt_Edit.png").border("0").align("left").close().aEnd();
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(edit).aEnd();
 
@@ -1268,8 +1269,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private void removeStudyEventLinkBuilder(HtmlBuilder builder, Integer studySubjectId, String studyEventId, String remove) {
         String href1 = "RemoveStudyEvent?action=confirm&id=" + studyEventId + "&studySubId=" + studySubjectId;
-        builder.append("<a href=\"href1\">");
-        builder.append("<span hspace=\"2\" border=\"0\" align=\"left\" class=\"icon icon-cancel\"/></a>");
+        builder.a().href(href1);
+        builder.close();
+        builder.img().src("images/bt_Remove.png").border("0").align("left").close().aEnd();
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(remove).aEnd();
 
@@ -1277,18 +1279,19 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private void createNewStudyEventLinkBuilder(HtmlBuilder builder, Integer studySubjectId, StudyEventDefinitionBean sed, String schedule) {
         String href1 = "CreateNewStudyEvent?studySubjectId=" + studySubjectId + "&studyEventDefinition=" + sed.getId();
-        builder.append("<a href=\"href1\">");
-        builder.append("<span hspace=\"2\" border=\"0\" align=\"left\" class=\"icon icon-clock2\"/></a>");
+        builder.a().href(href1);
+        builder.close();
+        builder.img().src("images/bt_Schedule.png").border("0").align("left").close().aEnd();
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(schedule).aEnd();
 
     }
 
     private void enterDataForStudyEventLinkBuilder(HtmlBuilder builder, String studyEventId, String view) {
-    
         String href1 = "EnterDataForStudyEvent?eventId=" + studyEventId;
-        builder.append("<a href=\"href1\">");
-        builder.append("<span hspace=\"2\" border=\"0\" align=\"left\" class=\"icon icon-search\"/></a>");
+        builder.a().href(href1);
+        builder.close();
+        builder.img().src("images/bt_View.png").border("0").align("left").close().aEnd();
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(view).aEnd();
 
