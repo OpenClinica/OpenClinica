@@ -7,43 +7,43 @@
  <tr id="sidebar_IconKey_open">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_IconKey_open'); leftnavExpand('sidebar_IconKey_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_IconKey_open'); leftnavExpand('sidebar_IconKey_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
 		<fmt:message key="icon_key" bundle="${reswords}"/><br clear="all"><br>
 
 		<table border="0" cellpadding="4" cellspacing="0">
 		   <tr>
-				<td><img src="images/bt_View.gif"></td>
+				<td><span class="icon icon-search"></td>
 				<td><fmt:message key="view" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
-				<td><img src="images/bt_Edit.gif"></td>
+				<td><span class="icon icon-pencil"></td>
 				<td><fmt:message key="edit" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
-				<td><img src="images/bt_Restore.gif"></td>
+				<td><span class="icon icon-ccw"></td>
 				<td><fmt:message key="restore" bundle="${reswords}"/></td>
 			</tr>
 
 			<tr>
-				<td><img src="images/bt_Remove.gif"></td>
+				<td><span class="icon icon-cancel"></td>
 				<td><fmt:message key="remove" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
-				<td><img src="images/bt_Delete.gif"></td>
+				<td><span class="icon icon-trash red"></td>
 				<td><fmt:message key="delete" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
-				<td><img src="images/bt_Lock.gif"></td>
+				<td><span class="icon icon-lock"></td>
 				<td><fmt:message key="lock" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
-				<td><img src="images/bt_Unlock.gif"></td>
+				<td><span class="icon icon-icon-unArchive"></td>
 				<td><fmt:message key="unlock" bundle="${reswords}"/></td>
 			</tr>
 
 			<tr>
-				<td><img src="images/bt_Print.gif"></td>
+				<td><span class="icon icon-print"></td>
 				<td><fmt:message key="print" bundle="${reswords}"/></td>
 			</tr>
 
@@ -61,7 +61,7 @@
 	<tr id="sidebar_IconKey_closed" style="display: none">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_IconKey_open'); leftnavExpand('sidebar_IconKey_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_IconKey_open'); leftnavExpand('sidebar_IconKey_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
 		<fmt:message key="icon_key" bundle="${reswords}"/>
 
