@@ -404,14 +404,14 @@ public class EventCrfLayerBuilder {
     private void viewEventCrfContentLink(HtmlBuilder builder, StudySubjectBean studySubject, EventCRFBean eventCrf, StudyEventBean studyEvent) {
         String href = "ViewEventCRFContent?id=" + studySubject.getId() + "&ecId=" + eventCrf.getId() + "&eventId=" + studyEvent.getId();
         builder.a().href(href).close();
-        builder.img().src("images/bt_View.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>");
         builder.aEnd();
     }
 
     private void viewEventCrfContentLinkPrint(HtmlBuilder builder, StudySubjectBean studySubject, EventCRFBean eventCrf, StudyEventBean studyEvent) {
         String href = "ViewEventCRFContent?id=" + studySubject.getId() + "&ecId=" + eventCrf.getId() + "&eventId=" + studyEvent.getId();
         builder.a().href(href).close();
-        builder.img().src("images/bt_Print.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-print\"/>");
         builder.aEnd();
     }
 
@@ -434,7 +434,7 @@ public class EventCrfLayerBuilder {
         String href = "ViewSectionDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&ecId=" + eventCrf.getId() + "&tabId=1"
                 + "&exitTo=ListStudySubjects";
         builder.a().href(href).close();
-        builder.img().src("images/bt_View.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>");
         builder.aEnd();
     }
 
@@ -450,7 +450,7 @@ public class EventCrfLayerBuilder {
         String href = "ViewSectionDataEntry?eventDefinitionCRFId=" + eventDefinitionCrf.getId() + "&crfVersionId=" + eventDefinitionCrf.getDefaultVersionId()
                 + "&tabId=1" + "&exitTo=ListStudySubjects";
         builder.a().href(href).close();
-        builder.img().src("images/bt_View.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>");
         builder.aEnd();
     }
 
@@ -463,7 +463,7 @@ public class EventCrfLayerBuilder {
                 + getCRFVersionOID();
 
         builder.a().href(href).close();
-        builder.img().src("images/bt_Print.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-print\"/>");
         builder.aEnd();
     }
 
@@ -489,7 +489,7 @@ public class EventCrfLayerBuilder {
                 + this.studyEventDefinition.getOid() + "%5b" + sampleOrdinal + "%5d/" + this.eventDefinitionCrf.getDefaultCRF().getOid();
 
         builder.a().href(href).close();
-        builder.img().src("images/bt_Print.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-print\"/>");
         builder.aEnd();
     }
 
@@ -576,7 +576,7 @@ public class EventCrfLayerBuilder {
         String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEvent.getId() + "&eventCrfId=" + eventCrf.getId()
                 + "&originatingPage=" + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId();
         builder.a().href(href).close();
-        builder.img().src("images/bt_Edit.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-pencil\"/>");
         builder.aEnd();
     }
 
@@ -598,7 +598,7 @@ public class EventCrfLayerBuilder {
     private void initialDataEntryParameterizedLink(HtmlBuilder builder, EventCRFBean eventCrf) {
         String href = "InitialDataEntry?eventCRFId=" + eventCrf.getId() + "&exitTo=ListStudySubjects";
         builder.a().href(href).close();
-        builder.img().src("images/bt_Edit.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-pencil\"/>");
         builder.aEnd();
     }
 
@@ -612,7 +612,7 @@ public class EventCrfLayerBuilder {
     private void doubleDataEntryLink(HtmlBuilder builder, EventCRFBean eventCrf) {
         String href = "DoubleDataEntry?eventCRFId= " + eventCrf.getId() + "&exitTo=ListStudySubjects";
         builder.a().href(href).close();
-        builder.img().src("images/bt_Edit.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-pencil\"/>");
         builder.aEnd();
     }
 
