@@ -273,7 +273,6 @@ import java.util.regex.Pattern;
             return getResponseSuccess(byOidEnvType);
         }
 
-
         StudyInfoObject studyInfoObject = null;
         Study schemaStudy = null;
         try {

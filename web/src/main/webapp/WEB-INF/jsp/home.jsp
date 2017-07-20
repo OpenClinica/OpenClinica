@@ -28,14 +28,24 @@
         return auth0.logout(options, {version: 'v2'});
     };
     <sec:authorize var="authenticated" access="isAuthenticated()" />
+    var urlParams = new URLSearchParams(window.location.search);
+    var extUrl = urlParams.get('externalReturnUrl');
+    var studyParam = '';
+    if (extUrl != null && extUrl.indexOf("?studyEnvUuid=") > 0) {
+        studyParam = extUrl.substr(extUrl.indexOf("?studyEnvUuid="));
+    }
+
     // check SSO status
     var webAuth = new auth0.WebAuth({
         domain: '${domain}',
         clientID: '${clientId}',
         audience: 'https://www.openclinica.com',
         responseType: 'code',
+        //redirectUri: 'https://www.google.com/search?site=&source=hp&q=how+to+make+a+cutting+board'
         redirectUri: '${fn:replace(pageContext.request.requestURL, pageContext.request.requestURI, '')}${loginCallback}'
+            + studyParam
     });
+
     var auth = new auth0.Authentication({
         domain: '${domain}',
         clientID: '${clientId}'
@@ -57,7 +67,6 @@
 
             if (!loggedIn || (loggedInUserId !== data.lastUsedUserID)) {
                 // have SSO session but no valid local session - auto-login user
-                console.log("SSO Session but NOT locally authenticated ");
                 webAuth.authorize({
                     scope: 'openid name email picture',
                     state: '${state}',
@@ -89,7 +98,7 @@
                 <c:otherwise>
                     // user is not logged in locally and no SSO session exists - send to the portal application's partner login page
                     console.log("NO SSO Session and NOT locally authenticated ");
-                   window.location = '${partnerLoginUrl}?externalReturnUrl=' + encodeURIComponent(window.location);
+                    window.location = '${partnerLoginUrl}?externalReturnUrl=' + encodeURIComponent(window.location);
             </c:otherwise>
             </c:choose>
         }
