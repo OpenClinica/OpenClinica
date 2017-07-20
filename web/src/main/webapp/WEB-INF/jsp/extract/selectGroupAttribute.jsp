@@ -8,22 +8,22 @@
 
 function selectAll() {
     if (document.cl.all.checked) {
-	  for (var i=0; i <document.cl.elements.length; i++) {		
-		if (document.cl.elements[i].name.indexOf('groupSelected') != -1) {
-			document.cl.elements[i].checked = true;
-		}
-	  }
-	} else {
-	  for (var i=0; i <document.cl.elements.length; i++) {		
-		if (document.cl.elements[i].name.indexOf('groupSelected') != -1) {
-			document.cl.elements[i].checked = false;
-		}
-	  }
-	}
+    for (var i=0; i <document.cl.elements.length; i++) {    
+    if (document.cl.elements[i].name.indexOf('groupSelected') != -1) {
+      document.cl.elements[i].checked = true;
+    }
+    }
+  } else {
+    for (var i=0; i <document.cl.elements.length; i++) {    
+    if (document.cl.elements[i].name.indexOf('groupSelected') != -1) {
+      document.cl.elements[i].checked = false;
+    }
+    }
+  }
 }
 function notSelectAll() {
-	if (!this.checked){
-		document.cl.all.checked = false;
+  if (!this.checked){
+    document.cl.all.checked = false;
     }
 
 }
@@ -33,7 +33,35 @@ function notSelectAll() {
 <jsp:include page="../include/extract-header.jsp"/>
 
 
-<jsp:include page="../include/sidebar.jsp"/>
+<%--<jsp:include page="../include/sidebar.jsp"/>--%>
+<!-- move the alert message to the sidebar-->
+<jsp:include page="../include/sideAlert.jsp"/>
+<!-- then instructions-->
+<tr id="sidebar_Instructions_open" style="display: none">
+    <td class="sidebar_tab">
+
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+
+    <fmt:message key="instructions" bundle="${resword}"/>
+
+    <div class="sidebar_tab_content">
+
+    </div>
+
+    </td>
+
+  </tr>
+  <tr id="sidebar_Instructions_closed" style="display: all">
+    <td class="sidebar_tab">
+
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+
+    <fmt:message key="instructions" bundle="${resword}"/>
+
+    </td>
+  </tr>
+
+<jsp:include page="../include/createDatasetSideInfo.jsp"/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
@@ -68,8 +96,8 @@ function notSelectAll() {
    </p> --%>
    
    <p><input type="checkbox" name="all" value="1" 
-	onClick="javascript:selectAll();"><fmt:message key="select_all_groups" bundle="${resword}"/></p>
-	
+  onClick="javascript:selectAll();"><fmt:message key="select_all_groups" bundle="${resword}"/></p>
+  
 
    <%-- put in a table with metadata, tbh --%>
 <div style="width: 100%">
@@ -90,36 +118,36 @@ function notSelectAll() {
    
    <td class="table_cell">
    <c:choose>
-   	<c:when test="${sgclass.selected}">
-   		<input type="checkbox" checked name="groupSelected<c:out value='${sgclass.id}'/>" value="yes">
-   	</c:when>
-   	<c:otherwise>
-   		<input type="checkbox" name="groupSelected<c:out value='${sgclass.id}'/>" value="yes">
-   	</c:otherwise>
-   	</c:choose>
-	</td>
-	
-	<td class="table_cell"><c:out value="${sgclass.name}"/></td>
-	
-	<td class="table_cell"><c:out value="${sgclass.groupClassTypeName}"/></td>
-	
-	<td class="table_cell">
-	<c:forEach var='group' items='${sgclass.studyGroups}' varStatus='status'>
-	  <c:choose>
-		<c:when test="${status.last}">
-			<c:out value="${group.name}"/>&nbsp;
-		</c:when>
-		<c:otherwise>
-			<c:out value="${group.name}"/>,&nbsp;
-		</c:otherwise>
-	  </c:choose>
-	</c:forEach>&nbsp;</td>
-	
-	<td class="table_cell"><c:out value="${sgclass.status.name}"/></td>
-	
-	<td class="table_cell"><c:out value="${sgclass.subjectAssignment}"/></td>
-	
-	</tr>
+    <c:when test="${sgclass.selected}">
+      <input type="checkbox" checked name="groupSelected<c:out value='${sgclass.id}'/>" value="yes">
+    </c:when>
+    <c:otherwise>
+      <input type="checkbox" name="groupSelected<c:out value='${sgclass.id}'/>" value="yes">
+    </c:otherwise>
+    </c:choose>
+  </td>
+  
+  <td class="table_cell"><c:out value="${sgclass.name}"/></td>
+  
+  <td class="table_cell"><c:out value="${sgclass.groupClassTypeName}"/></td>
+  
+  <td class="table_cell">
+  <c:forEach var='group' items='${sgclass.studyGroups}' varStatus='status'>
+    <c:choose>
+    <c:when test="${status.last}">
+      <c:out value="${group.name}"/>&nbsp;
+    </c:when>
+    <c:otherwise>
+      <c:out value="${group.name}"/>,&nbsp;
+    </c:otherwise>
+    </c:choose>
+  </c:forEach>&nbsp;</td>
+  
+  <td class="table_cell"><c:out value="${sgclass.status.name}"/></td>
+  
+  <td class="table_cell"><c:out value="${sgclass.subjectAssignment}"/></td>
+  
+  </tr>
    
    </c:forEach>
    </table>

@@ -95,13 +95,13 @@
 <form action="AddNewSubject" method="post">
 <jsp:include page="../include/showSubmitted.jsp" />
 
-<div style="width: 550px">
+<div style="width: 740px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
 <div class="textbox_center">
 <table border="0" cellpadding="5">
-	<tr valign="top">
-		<td class="formlabel"><fmt:message key="study_subject_ID" bundle="${resword}"/></td>
+	<tr>
+		<td class="formlabel" align="right"><fmt:message key="study_subject_ID" bundle="${resword}"/></td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
@@ -118,16 +118,18 @@
 					</div></td>
 					<td>&nbsp;*</td>
 				</tr>
-				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
-				</tr>
+				
 			</table>
 		</td>
 	</tr>
+	<tr>
+		<td></td>
+		<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
+	</tr>
 	<c:choose>
 	<c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
-	<tr valign="top">
-	  	<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/></td>
+	<tr>
+	  	<td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/></td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
@@ -137,16 +139,17 @@
 					<td>&nbsp;* <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
 					<img name="flag_uniqueIdentifier" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 				</tr>
-				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
-				</tr>
 			</table>
 		</td>
 	</tr>
+	<tr>
+		<td></td>
+		<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
+	</tr>
 	</c:when>
 	<c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='optional'}">
-	<tr valign="top">
-	  	<td class="formlabel"><fmt:message key="person_ID" bundle="${resword}"/></td>
+	<tr>
+	  	<td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/></td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
@@ -155,11 +158,12 @@
 					</div></td>
 					<td>&nbsp;</td>
 				</tr>
-				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
-				</tr>
 			</table>
 		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
 	</tr>
 	</c:when>
 	<c:otherwise>
@@ -167,8 +171,8 @@
 	</c:otherwise>
 	</c:choose>
 
-	<tr valign="top">
-	  	<td class="formlabel"><fmt:message key="secondary_ID" bundle="${resword}"/></td>
+	<tr>
+	  	<td class="formlabel" align="right"><fmt:message key="secondary_ID" bundle="${resword}"/></td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
@@ -183,9 +187,8 @@
 			</table>
 		</td>
 	</tr>
-	<tr valign="top">
-
-		<td class="formlabel">
+	<tr>
+		<td class="formlabel" align="right">
             <c:if test="${study.parentStudyId == 0}">
                 <fmt:message key="date_of_enrollment_for_study" bundle="${resword}"/>'
                 <c:out value="${study.name}" /> ' 
@@ -228,9 +231,9 @@
 	  	</td>
 	</tr>
 
-	<tr valign="top">
+	<tr>
         <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
-        <td class="formlabel"><fmt:message key="gender" bundle="${resword}"/></td>
+        <td class="formlabel" align="right"><fmt:message key="gender" bundle="${resword}"/></td>
 		<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
@@ -269,25 +272,26 @@
 	    </c:if>
 	</td>
 	</tr>
-	<tr>
-	<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include></td>
-	</tr>
+	
 			</table>
 		</td>
     </c:if>
     </tr>
+    <tr><td></td>
+		<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include></td>
+	</tr>
 
 	<c:choose>
 	<c:when test="${study.studyParameterConfig.collectDob == '1'}">
-	<tr valign="top">
-		<td class="formlabel"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
+	<tr>
+		<td class="formlabel" align="right"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
 	  	<td valign="top">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<td valign="top"><div class="formfieldM_BG">
 						<input onfocus="this.select()" type="text" name="dob" size="15" value="<c:out value="${dob}" />" class="formfieldM" id="dobField" />
 					</td>
-					<td>&nbsp;
+					<td>&nbsp;*
 					<A HREF="#">
   					  <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
                         <script type="text/javascript">
@@ -297,14 +301,16 @@
                     </a>
                     </td>
 					<td>
-					<%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%> &nbsp;* <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+					<%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%> <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
 					<img name="flag_dob" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 				</tr>
-				<tr>
-					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dob"/></jsp:include></td>
-				</tr>
+				
 			</table>
 	  	</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dob"/></jsp:include></td>
 	</tr>
 	</c:when>
 	<c:when test="${study.studyParameterConfig.collectDob == '2'}">
@@ -340,7 +346,7 @@
 </div>
 
 <c:if test="${(!empty groups)}">
-<br>
+
 <div style="width: 550px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -398,7 +404,7 @@
 
 </div>
 </c:if>
-<br>
+
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
