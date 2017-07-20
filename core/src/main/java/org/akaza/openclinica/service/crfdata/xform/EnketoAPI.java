@@ -83,6 +83,7 @@ public class EnketoAPI {
             return "";
 
         URL eURL = null;
+
         // https://jira.openclinica.com/browse/OC-8269 Open Form when study is locked
         // https://jira.openclinica.com/browse/OC-8270 Open Form when event is locked
         // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
@@ -92,19 +93,22 @@ public class EnketoAPI {
         // https://jira.openclinica.com/browse/OC-8273 CRC views XForms.
         // https://jira.openclinica.com/browse/OC-7573 Data Manager views XForms.
         // https://jira.openclinica.com/browse/OC-7574 Study Director views XForms.
+        // https://jira.openclinica.com/browse/OC-7575 Monitor views XForms.
         if (parentStudy.getStatus().equals(Status.LOCKED)
-                || (studyEvent != null && studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId())) || mode.equals(VIEW_MODE)) {
+                || (studyEvent != null && studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId()))
+                || parentStudy.getStatus().equals(Status.FROZEN) || mode.equals(VIEW_MODE)) {
             eURL = new URL(enketoURL + SURVEY_100_PERCENT_READONLY);
+
             // https://jira.openclinica.com/browse/OC-8267 Data Specialist edits XForms.
             // https://jira.openclinica.com/browse/OC-8266 Data Entry Person edits XForms.
             // https://jira.openclinica.com/browse/OC-7572 Investigator edits XForms.
             // https://jira.openclinica.com/browse/OC-7571 CRC edits XForms.
-        } else if (!parentStudy.getStatus().equals(Status.FROZEN) && mode.equals(EDIT_MODE)
-                && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
+        } else if (mode.equals(EDIT_MODE) && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
             eURL = new URL(enketoURL + SURVEY_WRITABLE_DN);
+
             // https://jira.openclinica.com/browse/OC-8278 Data Manager edits XForms.
             // https://jira.openclinica.com/browse/OC-8279 Study Director edits XForms.
-        } else if (!parentStudy.getStatus().equals(Status.FROZEN) && mode.equals(EDIT_MODE) && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
+        } else if (mode.equals(EDIT_MODE) && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
             eURL = new URL(enketoURL + SURVEY_WRITABLE_DN_CLOSE_BUTTON);
         }
         String myUrl = null;
@@ -178,6 +182,7 @@ public class EnketoAPI {
             if (parentStudy.getStatus().equals(Status.LOCKED) || studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId())) {
                 eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                 markComplete = false;
+
                 // https://jira.openclinica.com/browse/OC-8275 Data Specialist views XForms.
                 // https://jira.openclinica.com/browse/OC-8274 Data Entry Person views XForms.
                 // https://jira.openclinica.com/browse/OC-8272 Investigator views XForms.
@@ -186,6 +191,7 @@ public class EnketoAPI {
                     && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
                 eURL = new URL(enketoURL + INSTANCE_READONLY_DN);
                 markComplete = false;
+
                 // https://jira.openclinica.com/browse/OC-7575 Monitor views XForms.
                 // https://jira.openclinica.com/browse/OC-7574 Study Director views XForms.
                 // https://jira.openclinica.com/browse/OC-7573 Data Manager views XForms.
@@ -193,6 +199,7 @@ public class EnketoAPI {
                     && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR || role == Role.MONITOR)) {
                 eURL = new URL(enketoURL + INSTANCE_READONLY_DN_CLOSE_BUTTON);
                 markComplete = false;
+
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
                 // https://jira.openclinica.com/browse/OC-8267 Data Specialist edits XForms.
                 // https://jira.openclinica.com/browse/OC-8266 Data Entry Person edits XForms.
@@ -201,12 +208,30 @@ public class EnketoAPI {
             } else if (flavor.equals(QUERY_FLAVOR) && !parentStudy.getStatus().equals(Status.FROZEN) && mode.equals(EDIT_MODE)
                     && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
                 eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN);
+
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
                 // https://jira.openclinica.com/browse/OC-8279 Study Director edits XForms.
                 // https://jira.openclinica.com/browse/OC-8278 Data Manager edits XForms.
             } else if (flavor.equals(QUERY_FLAVOR) && !parentStudy.getStatus().equals(Status.FROZEN) && mode.equals(EDIT_MODE)
                     && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
                 eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN_CLOSE_BUTTON);
+
+                // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
+            } else if (flavor.equals(QUERY_FLAVOR) && parentStudy.getStatus().equals(Status.FROZEN) && mode.equals(EDIT_MODE)
+                    && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
+                eURL = new URL(enketoURL + INSTANCE_READONLY_DN);
+                markComplete = false;
+
+                // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
+            } else if (flavor.equals(QUERY_FLAVOR) && parentStudy.getStatus().equals(Status.FROZEN) && mode.equals(EDIT_MODE)
+                    && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
+                eURL = new URL(enketoURL + INSTANCE_READONLY_DN_CLOSE_BUTTON);
+                markComplete = false;
+
+                // https://jira.openclinica.com/browse/OC-7575 Monitor views XForms.
+            } else if (flavor.equals(QUERY_FLAVOR) && mode.equals(EDIT_MODE) && role == Role.MONITOR) {
+                eURL = new URL(enketoURL + INSTANCE_READONLY_DN_CLOSE_BUTTON);
+                markComplete = false;
 
                 // View Queries for Individual fields
             } else if (flavor.equals(SINGLE_ITEM_FLAVOR) && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
