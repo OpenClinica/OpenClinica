@@ -33,100 +33,95 @@ import org.akaza.openclinica.service.rule.RuleSetService;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
 @Component
 public class JobTriggerService {
-	RuleSetDao ruleSetDao;
-	DataSource ds;
-	UserAccountDAO userAccountDao;
-	StudyDAO studyDao;
-	StudySubjectDAO ssdao;
-	StudyEventDAO sedao;
-	StudyEventDefinitionDAO seddao;
-	ItemDAO idao;
-	ItemGroupMetadataDAO igmdao;
-	ItemGroupDAO igdao;
-	CRFDAO cdao;
-	CRFVersionDAO cvdao;
-	EventCRFDAO edao;
-	NotificationActionProcessor notificationActionProcessor;
-	RuleSetService ruleSetService;
-	ItemDataDAO iddao;
-	ItemBean iBean;
-	
-	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    @Autowired
+    RuleSetDao ruleSetDao;
+    @Autowired
+    DataSource ds;
+    @Autowired
+    RuleSetService ruleSetService;
 
+    UserAccountDAO userAccountDao;
+    StudyDAO studyDao;
+    StudySubjectDAO ssdao;
+    StudyEventDAO sedao;
+    StudyEventDefinitionDAO seddao;
+    ItemDAO idao;
+    ItemGroupMetadataDAO igmdao;
+    ItemGroupDAO igdao;
+    CRFDAO cdao;
+    CRFVersionDAO cvdao;
+    EventCRFDAO edao;
+    NotificationActionProcessor notificationActionProcessor;
+    ItemDataDAO iddao;
+    ItemBean iBean;
+    
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private static final SimpleDateFormat currentDateFormat = new SimpleDateFormat("HH:mm:ss");
 
-	private static final SimpleDateFormat currentDateFormat = new SimpleDateFormat("HH:mm:ss");
+    // @Scheduled(cron = "0 0/2 * * * ?") // trigger every 2 minutes
+    // @Scheduled(cron = "0 0/1 * * * ?") // trigger every minute
+    @Scheduled(cron = "0 0 0/1 * * ?") // trigger every hour
+    public void hourlyJobTrigger() throws NumberFormatException, ParseException {
+        try {
+            logger.info("The time is now " + currentDateFormat.format(new Date()));
+            triggerJob();
+        } catch (Exception e) {
+            logger.error(e.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(e));
+            throw e;
+        }
+    }
 
-	public JobTriggerService(DataSource ds, RuleSetDao ruleSetDao, RuleSetService ruleSetService) {
-		this.ds = ds;
-		this.ruleSetDao = ruleSetDao;
-		this.ruleSetService = ruleSetService;
-	}
-
-	// @Scheduled(cron = "0 0/2 * * * ?") // trigger every 2 minutes
-	// @Scheduled(cron = "0 0/1 * * * ?")
-	// trigger every minute
-	@Scheduled(cron = "0 0 0/1 * * ?")
-	// trigger every hour
-	public void hourlyJobTrigger() throws NumberFormatException, ParseException {
-	    try {
-    		logger.info("The time is now " + currentDateFormat.format(new Date()));
-    		triggerJob();
-	    } catch (Exception e) {
-	        logger.error(e.getMessage());
-	        logger.error(ExceptionUtils.getStackTrace(e));
-	        throw e;
-	    }
-	}
-
-	public void triggerJob(){
-		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		ArrayList<RuleSetBean> ruleSets = ruleSetDao.findAllRunOnSchedules(true);
-		for (RuleSetBean ruleSet : ruleSets) {
-			if (ruleSet.getStatus().AVAILABLE != null && ruleSet.isRunSchedule()) {
-				if(ruleSet.getItemId()!=null){ 
+    public void triggerJob(){
+        ResourceBundleProvider.updateLocale(new Locale("en_US"));
+        ArrayList<RuleSetBean> ruleSets = ruleSetDao.findAllRunOnSchedules(true);
+        for (RuleSetBean ruleSet : ruleSets) {
+            if (ruleSet.getStatus().AVAILABLE != null && ruleSet.isRunSchedule()) {
+                if(ruleSet.getItemId()!=null){ 
                  // item Specific Rule
-					System.out.println("*** Item Specific Rule ***");
-				ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
-				StudyBean currentStudy = (StudyBean) getStudyDao().findByPK(ruleSet.getStudyId());
-				ResourceBundleProvider.updateLocale(Locale.getDefault());
-				UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(1);
-				ruleSetBeans.add(ruleSet);
-				ruleSetService.runRulesInBulk(ruleSetBeans, false, currentStudy, ub, true);
-				}else{
-			// Event Specific Rule		
-					System.out.println("*** Event Specific Rule ***");
-				    StudyEventChangeDetails studyEventChangeDetails = new StudyEventChangeDetails(true, true);
-					ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
-					ExpressionBean eBean = new ExpressionBean();
-					eBean.setValue(ruleSet.getTarget().getValue()+".A.B");
-					
-					ruleSet.setTarget(eBean);
-					ruleSetBeans.add(ruleSet);
-		
-					ruleSetService.runRulesInBeanProperty(ruleSetBeans ,1, studyEventChangeDetails);
+                    System.out.println("*** Item Specific Rule ***");
+                ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
+                StudyBean currentStudy = (StudyBean) getStudyDao().findByPK(ruleSet.getStudyId());
+                ResourceBundleProvider.updateLocale(Locale.getDefault());
+                UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(1);
+                ruleSetBeans.add(ruleSet);
+                ruleSetService.runRulesInBulk(ruleSetBeans, false, currentStudy, ub, true);
+                }else{
+            // Event Specific Rule        
+                    System.out.println("*** Event Specific Rule ***");
+                    StudyEventChangeDetails studyEventChangeDetails = new StudyEventChangeDetails(true, true);
+                    ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
+                    ExpressionBean eBean = new ExpressionBean();
+                    eBean.setValue(ruleSet.getTarget().getValue()+".A.B");
+                    
+                    ruleSet.setTarget(eBean);
+                    ruleSetBeans.add(ruleSet);
+        
+                    ruleSetService.runRulesInBeanProperty(ruleSetBeans ,1, studyEventChangeDetails);
 
-				}
-			}
-		}
-	}
+                }
+            }
+        }
+    }
 
 
 
-	public StudySubjectDAO getStudySubjecdao() {
-		return new StudySubjectDAO(ds);
-	}
+    public StudySubjectDAO getStudySubjecdao() {
+        return new StudySubjectDAO(ds);
+    }
 
-	public UserAccountDAO getUserAccountDao() {
-		return new UserAccountDAO(ds);
-	}
+    public UserAccountDAO getUserAccountDao() {
+        return new UserAccountDAO(ds);
+    }
 
-	public StudyDAO getStudyDao() {
-		return new StudyDAO(ds);
-	}
+    public StudyDAO getStudyDao() {
+        return new StudyDAO(ds);
+    }
 
 }

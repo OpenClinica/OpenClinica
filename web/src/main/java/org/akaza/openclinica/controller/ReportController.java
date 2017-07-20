@@ -1,7 +1,10 @@
 package org.akaza.openclinica.controller;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.JobTriggerService;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -11,14 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.ServletContext;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.TimeZone;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping(value = "/healthcheck")

@@ -12,7 +12,16 @@
     <context-param>
         <param-name>contextConfigLocation</param-name>
         <param-value>
-            classpath*:org/akaza/openclinica/applicationContext*.xml
+            classpath:org/akaza/openclinica/applicationContext-security.xml
+            classpath:org/akaza/openclinica/applicationContext-web-beans.xml
+            classpath:org/akaza/openclinica/applicationContext-core-timer.xml
+            classpath:org/akaza/openclinica/applicationContext-core-spring.xml
+            classpath:org/akaza/openclinica/applicationContext-core-security.xml
+            classpath:org/akaza/openclinica/applicationContext-core-service.xml
+            classpath:org/akaza/openclinica/applicationContext-core-scheduler.xml
+            classpath:org/akaza/openclinica/applicationContext-core-hibernate.xml
+            classpath:org/akaza/openclinica/applicationContext-core-email.xml
+            classpath:org/akaza/openclinica/applicationContext-core-db.xml
         </param-value>
     </context-param>
 
