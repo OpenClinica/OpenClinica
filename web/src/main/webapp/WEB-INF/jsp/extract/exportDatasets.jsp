@@ -6,7 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
-<jsp:include page="../include/extract-refresh-header.jsp"/>
+<jsp:include page="../include/extract-header.jsp"/>
 <script type="text/javascript">
     var openDataExtractLink = true;
     function openDoc(inURL) {
@@ -22,8 +22,8 @@
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
 		<td class="sidebar_tab">
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+		<fmt:message key="instructions" bundle="${resword}"/>
 		<div class="sidebar_tab_content">
 		</div>
 		</td>
@@ -31,8 +31,8 @@
 	</tr>
 	<tr id="sidebar_Instructions_closed" style="display: all">
 		<td class="sidebar_tab">
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+		<fmt:message key="instructions" bundle="${resword}"/>
 		</td>
   </tr>
 
@@ -41,7 +41,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="dataset" class="org.akaza.openclinica.bean.extract.DatasetBean"/>
 <jsp:useBean scope="request" id="filelist" class="java.util.ArrayList"/>
-<h1><span class="title_manage"><fmt:message key="download_data" bundle="${resword}"/>: <c:out value="${dataset.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/export-datasets')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="download_data" bundle="${resword}"/>: <c:out value="${dataset.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/export-datasets')"><span class="icon icon-question-circle gray" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -66,9 +66,9 @@
 <p><fmt:message key="export_dataset_download1" bundle="${restext}"/></p>
 
 <input type="hidden" name="datasetId" value="<c:out value="${dataset.id}"/>"/>
-<table border="0" cellpadding="5" width="525">
-<tr valign="top">
-    <td class="text">
+<table border="0" cellpadding="5" width="625">
+<tr valign="top" width="100%">
+    <td class="text" >
 	<ul><%-- <li><a href="ExportDataset?action=html&datasetId=<c:out value="${dataset.id}"/>"><fmt:message key="view_as_HTML" bundle="${resword}"/></a></li> --%>
 	<c:forEach var="extract" items="${extractProperties}">
 			<%-- use fn:startsWith(extract.filedescription, '&') here, for i18n --%>
