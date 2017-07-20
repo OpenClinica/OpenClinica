@@ -63,6 +63,7 @@ import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -73,6 +74,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
@@ -111,6 +113,9 @@ public class OpenRosaServices {
 
     @Autowired
     StudyDao studyDao;
+
+    @Autowired
+    StudyEventDao studyEventDao;
 
     @Autowired
     StudySubjectDao ssDao;
@@ -581,6 +586,14 @@ public class OpenRosaServices {
         }
     }
 
+    @PUT
+    @Path("/{studyOID}/fieldsubmission/complete")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response doFieldSubmissionCompletePut(@Context HttpServletRequest request, @Context HttpServletResponse response,
+            @Context ServletContext servletContext, @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) throws Exception {
+        return doFieldSubmissionComplete(request, response, servletContext, studyOID, context);
+    }
+
     @POST
     @Path("/{studyOID}/fieldsubmission/complete")
     @Produces(MediaType.APPLICATION_XML)
@@ -732,8 +745,9 @@ public class OpenRosaServices {
             CRFVersionDAO versionDAO = new CRFVersionDAO(getDataSource());
             ArrayList<CRFVersionBean> crfs = versionDAO.findDefCRFVersionsByStudyEvent(nextEvent.getStudyEventDefinitionId());
             PFormCache cache = PFormCache.getInstance(context);
+            StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
             for (CRFVersionBean crfVersion : crfs) {
-                String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
+                String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid(), studyEvent);
                 String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
                         String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid(), studyOID);
             }
@@ -833,10 +847,6 @@ public class OpenRosaServices {
         HashMap<String, String> value = getSubjectContextCacheValue(context);
         String studySubjectOid = value.get("studySubjectOID");
 
-        StudySubject ssBean = ssDao.findByOcOID(studySubjectOid);
-        StudyBean study = getStudy(ssBean.getStudy().getOc_oid());
-        StudyBean parentStudy = getParentStudy(ssBean.getStudy().getOc_oid());
-
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
@@ -844,21 +854,28 @@ public class OpenRosaServices {
         Element root = doc.createElement("root");
         doc.appendChild(root);
 
-        List<UserAccount> users = userAccountDao.findNonRootNonParticipateUsersByStudyId(study.getId(), parentStudy.getId());
-        for (UserAccount userAccount : users) {
-            Element item = doc.createElement("item");
-            Element userName = doc.createElement("user_name");
-            userName.appendChild(doc.createTextNode(userAccount.getUserName()));
-            Element firstName = doc.createElement("first_name");
-            firstName.appendChild(doc.createTextNode(userAccount.getFirstName()));
-            Element lastName = doc.createElement("last_name");
-            lastName.appendChild(doc.createTextNode(userAccount.getLastName()));
-            item.appendChild(userName);
-            item.appendChild(firstName);
-            item.appendChild(lastName);
-            root.appendChild(item);
-        }
+        List<UserAccount> users = null;
 
+        StudySubject ssBean = ssDao.findByOcOID(studySubjectOid);
+
+        if (ssBean != null) {
+            StudyBean study = getStudy(ssBean.getStudy().getOc_oid());
+            StudyBean parentStudy = getParentStudy(ssBean.getStudy().getOc_oid());
+            users = userAccountDao.findNonRootNonParticipateUsersByStudyId(study.getId(), parentStudy.getId());
+            for (UserAccount userAccount : users) {
+                Element item = doc.createElement("item");
+                Element userName = doc.createElement("user_name");
+                userName.appendChild(doc.createTextNode(userAccount.getUserName()));
+                Element firstName = doc.createElement("first_name");
+                firstName.appendChild(doc.createTextNode(userAccount.getFirstName()));
+                Element lastName = doc.createElement("last_name");
+                lastName.appendChild(doc.createTextNode(userAccount.getLastName()));
+                item.appendChild(userName);
+                item.appendChild(firstName);
+                item.appendChild(lastName);
+                root.appendChild(item);
+            }
+        }
         DOMSource dom = new DOMSource(doc);
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);
