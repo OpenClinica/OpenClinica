@@ -70,8 +70,7 @@
 <jsp:useBean scope="request" id="displayEventCRFs" class="java.util.ArrayList" />
 
 <h1><span class="title_manage"><fmt:message key="enter_or_validate_data" bundle="${resword}"/><c:out value="${studyEvent.studyEventDefinition.name}" />
- <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/schedule-event#enterData')">
- <span class="icon icon-question-circle gray" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> </span></h1>
+</span></h1>
 
 
 

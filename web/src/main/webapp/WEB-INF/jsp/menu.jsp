@@ -82,8 +82,6 @@
                     <c:out value='${study.name}'/>
                 </c:otherwise>
         </c:choose>
-        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/overview-openclinica')">
-            <span class="icon icon-question-circle gray"></span></a>
     </span>
 </h1>
 

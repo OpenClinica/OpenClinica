@@ -47,8 +47,6 @@
 <h1><span class="title_manage">
 <fmt:message key="manage_all_groups_in_study" bundle="${restext}"/>
     <c:out value="${study.name}"/>
-    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/manage-all-groups')">
-        <span class="icon icon-question-circle gray"></span></a>
 </span></h1>
 
 <%-- 
