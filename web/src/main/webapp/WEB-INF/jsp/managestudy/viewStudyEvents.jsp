@@ -126,7 +126,7 @@
       </c:forEach>
       </select> </div>
     </td>
-    <td></td>
+    <td></td><td>&nbsp;&nbsp;</td>
     <td>Status</td>
     <td>
       <div class="formfieldM_BG">
@@ -165,7 +165,7 @@
       </script>
       </a>
       (<fmt:message key="date_format" bundle="${resformat}"/>)
-    </td>
+    </td><td>&nbsp;&nbsp;</td>
     <td>Date Ended</td>
     <td>
         <div class="formfieldS_BG">
