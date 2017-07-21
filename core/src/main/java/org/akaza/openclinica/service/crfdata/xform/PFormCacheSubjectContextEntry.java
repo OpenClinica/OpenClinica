@@ -3,11 +3,12 @@ package org.akaza.openclinica.service.crfdata.xform;
 public class PFormCacheSubjectContextEntry {
 
     private String studySubjectOid = null;
-    private Integer studyEventDefinitionId = null;
-    private Integer ordinal = null;
+    private String studyEventDefinitionId = null;
+    private String studyEventId = null;
+    private String ordinal = null;
     private String crfVersionOid = null;
     private String formLayoutOid = null;
-    private Integer userAccountId = null;
+    private String userAccountId = null;
     private String itemName = null;
     private Integer itemRepeatOrdinalAdjusted = null;
     private Integer itemRepeatOrdinalOriginal = null;
@@ -23,19 +24,19 @@ public class PFormCacheSubjectContextEntry {
         this.studySubjectOid = studySubjectOid;
     }
 
-    public Integer getStudyEventDefinitionId() {
+    public String getStudyEventDefinitionId() {
         return studyEventDefinitionId;
     }
 
-    public void setStudyEventDefinitionId(Integer studyEventDefinitionId) {
+    public void setStudyEventDefinitionId(String studyEventDefinitionId) {
         this.studyEventDefinitionId = studyEventDefinitionId;
     }
 
-    public Integer getOrdinal() {
+    public String getOrdinal() {
         return ordinal;
     }
 
-    public void setOrdinal(Integer ordinal) {
+    public void setOrdinal(String ordinal) {
         this.ordinal = ordinal;
     }
 
@@ -55,11 +56,11 @@ public class PFormCacheSubjectContextEntry {
         this.crfVersionOid = crfVersionOid;
     }
 
-    public Integer getUserAccountId() {
+    public String getUserAccountId() {
         return userAccountId;
     }
 
-    public void setUserAccountId(Integer userAccountId) {
+    public void setUserAccountId(String userAccountId) {
         this.userAccountId = userAccountId;
     }
 
@@ -109,6 +110,14 @@ public class PFormCacheSubjectContextEntry {
 
     public void setItemRepeatOrdinalOriginal(Integer itemRepeatOrdinalOriginal) {
         this.itemRepeatOrdinalOriginal = itemRepeatOrdinalOriginal;
+    }
+
+    public String getStudyEventId() {
+        return studyEventId;
+    }
+
+    public void setStudyEventId(String studyEventId) {
+        this.studyEventId = studyEventId;
     }
 
 }

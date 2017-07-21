@@ -510,6 +510,9 @@ public class OpenRosaSubmissionController {
         String studyStatus = study.getStatus().getName().toString();
 
         if (ssBean == null) {
+            logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
+            if (participateStatus.equalsIgnoreCase("enabled") && (studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("FROZEN"))
+                    && pManageStatus.equalsIgnoreCase("ACTIVE"))
             logger.debug("studyStatus: " + studyStatus);
             if (studyStatus.equalsIgnoreCase("available"))
                 accessPermission = true;

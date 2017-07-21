@@ -10,34 +10,35 @@
 
 
 
+<%--<jsp:include page="../include/sidebar.jsp"/>--%>
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
-		<fmt:message key="instructions" bundle="${resword}"/>
+    <fmt:message key="instructions" bundle="${resword}"/>
 
-		<div class="sidebar_tab_content">
+    <div class="sidebar_tab_content">
 
-		</div>
+    </div>
 
-		</td>
+    </td>
 
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
+  </tr>
+  <tr id="sidebar_Instructions_closed" style="display: all">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
-		<fmt:message key="instructions" bundle="${resword}"/>
+    <fmt:message key="instructions" bundle="${resword}"/>
 
-		</td>
+    </td>
   </tr>
 
-<jsp:include page="../include/sideInfo.jsp"/>
+<jsp:include page="../include/createDatasetSideInfo.jsp"/>
 
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>

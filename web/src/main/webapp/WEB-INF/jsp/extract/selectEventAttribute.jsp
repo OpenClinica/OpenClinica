@@ -9,8 +9,35 @@
 
 <jsp:include page="../include/extract-header.jsp"/>
 
+<%--<jsp:include page="../include/sidebar.jsp"/>--%>
+<!-- move the alert message to the sidebar-->
+<jsp:include page="../include/sideAlert.jsp"/>
+<!-- then instructions-->
+<tr id="sidebar_Instructions_open" style="display: none">
+    <td class="sidebar_tab">
 
-<jsp:include page="../include/sidebar.jsp"/>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+
+    <fmt:message key="instructions" bundle="${resword}"/>
+
+    <div class="sidebar_tab_content">
+
+    </div>
+
+    </td>
+
+  </tr>
+  <tr id="sidebar_Instructions_closed" style="display: all">
+    <td class="sidebar_tab">
+
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+
+    <fmt:message key="instructions" bundle="${resword}"/>
+
+    </td>
+  </tr>
+
+<jsp:include page="../include/createDatasetSideInfo.jsp"/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
@@ -83,7 +110,7 @@
    </p>
    <c:if test="${subjectAgeAtEvent == 1}">
    <p>
-	
+  
    <c:choose>
      <c:when test="${newDataset.showSubjectAgeAtEvent}">
        <input type="checkbox" checked name="age_at_event" value="yes">

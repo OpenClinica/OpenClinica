@@ -52,13 +52,13 @@
 
 <!-- Table Actions row (pagination, search, tools) -->
 
-		<tr>
-	
+		
+
 	<!-- Pagination cell (for multi-page tables) -->
 	
-		<td width="33%" valign="top" class="table_actions">
+		<td width="33%" class="table_actions">
 		<table border="0" cellpadding="0" cellspacing="0">
-			<tr>
+			
 				<td valign="top" class="table_tools">
 					<c:if test="${table.paginated && (table.currPageNumber > 1)}">
 						<a href="<c:out value="${firstPageQuery}"/>"><img src="images/arrow_first.gif" border="0" alt="<fmt:message key="first_page" bundle="${resword}"/>" title="<fmt:message key="first_page" bundle="${resword}"/>"></a>
@@ -76,7 +76,7 @@
 						<a href="<c:out value="${lastPageQuery}"/>"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a>
 					</c:if>
 				</td>
-			</tr>
+			
 		</table>
 		</td>
 	
@@ -88,7 +88,7 @@
 			<form action="<c:out value="${table.postAction}" />?module=${module}" method="POST">
 		</c:if>
 	
-		<td width="33%" valign="top" align="center" class="table_actions">
+		<td width="33%" align="center" class="table_actions">
 		
 
 				<jsp:include page="showSubmitted.jsp" />
@@ -133,7 +133,7 @@
 	
 	<!-- Table Tools/Actions cell -->
 	
-		<td width="33%" align="left" valign="top" class="table_actions">
+		<td width="33%" align="left" class="table_actions">
 			<table border="0" cellpadding="0" cellspacing="0">
 				<tr>
 					<c:set var="isFirstLink" value="${true}" />
