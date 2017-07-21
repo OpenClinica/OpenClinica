@@ -69,11 +69,9 @@ function notSelectAll() {
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
 
-<c:choose>
-<c:when test="${newDataset.id>0}">
+
 <h1><span class="title_manage"><fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="view_selected_items" bundle="${resword}"/></span></h1>
-</c:otherwise>
-</c:choose>
+
 
 <P><jsp:include page="../showInfo.jsp"/></P>
 
