@@ -183,7 +183,4 @@
 </table>
 </form>
 
-<c:import url="../include/workflow.jsp">
-   <c:param name="module" value="extract"/>
-</c:import>
 <jsp:include page="../include/footer.jsp"/>
