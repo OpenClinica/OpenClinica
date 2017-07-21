@@ -46,7 +46,7 @@ import java.util.Date;
 import java.util.List;
 
 public class OdmImportServiceImpl implements OdmImportService {
-    public final String FM_BASEURL = "http://fm2.openclinica.info:8080/api/buckets?boardUuid={0}";
+    public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/buckets?boardUuid={0}";
     // public final String FM_BASEURL = "http://oc.local:8090/api/protocol/";
 
     private UserAccountDao userAccountDao;

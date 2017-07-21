@@ -364,7 +364,7 @@ import java.util.regex.Pattern;
         return responseEntity;
     }
 
-    private HashMap<String, String> getUserInfo(HttpServletRequest request, Map<String, Object> userContextMap, ResponseEntity<StudyEnvironmentRoleDTO[]> studyUserRoles) {
+    private HashMap<String, String> getUserInfo(HttpServletRequest request, Map<String, Object> userContextMap, ResponseEntity<StudyEnvironmentRoleDTO[]> studyUserRoles) throws Exception {
         String studyEnvUuid = (String) request.getAttribute("studyEnvUuid");
         HashMap<String, String> map = new HashMap<>();
         ArrayList<LinkedHashMap<String, String>> roles = new ArrayList<>();
@@ -405,6 +405,16 @@ import java.util.regex.Pattern;
         case "Business Admin":
             map.put("user_type", UserType.SYSADMIN.getName());
             break;
+        case "Tech Admin":
+            map.put("user_type", UserType.TECHADMIN.getName());
+            break;
+        case "User":
+            map.put("user_type", UserType.USER.getName());
+            break;
+        default:
+            String error = "Invalid userType:" + (String) userContextMap.get("userType");
+            logger.error(error);
+            throw new Exception(error);
         }
         map.put("authorize_soap", "false");
         return map;
