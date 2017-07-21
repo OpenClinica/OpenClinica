@@ -166,16 +166,19 @@ public class EnketoAPI {
 
 
     public EnketoURLResponse registerAndGetEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor) {
+            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode) {
         EnketoURLResponse urlResponse = null;
         try {
-            urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor);
+            //  Role role, Study parentStudy, StudyEvent studyEvent, String mode
+            urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor,
+                    role, parentStudy, studyEvent, mode);
         } catch (Exception e) {
             if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized")
                     || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
                 savePformRegistration();
                 try {
-                    urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor);
+                    urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor,
+                            role, parentStudy, studyEvent, mode);
                 } catch (Exception e1) {
                     logger.error(e.getMessage());
                     logger.error(ExceptionUtils.getStackTrace(e));
@@ -256,8 +259,10 @@ public class EnketoAPI {
     }
 
     public EnketoURLResponse getEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode) {
+            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode)
+            throws Exception {
         String crfOid = formLayout.getOcOid() + crfFlavor;
+        EnketoURLResponse urlResponse = null;
         if (enketoURL == null)
             return null;
 
