@@ -26,7 +26,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 public class AppConfig extends Auth0Config {
     @Override
     protected void authorizeRequests(final HttpSecurity http) throws Exception {
-        http.exceptionHandling().authenticationEntryPoint(new LoginUrlAuthenticationEntryPoint("/pages/home"));
+        http.exceptionHandling().authenticationEntryPoint(new OCLoginUrlAuthenticationEntryPoint("/pages/home"));
         http.authorizeRequests()
                 .antMatchers("/css/**","/includes/**","/images/**", "/fonts/**",
                         "/js/**", "/login", "/logout",

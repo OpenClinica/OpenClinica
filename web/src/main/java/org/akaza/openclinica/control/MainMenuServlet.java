@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
 import org.akaza.openclinica.control.admin.SiteStatisticsTableFactory;
@@ -22,13 +23,14 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
+import org.apache.commons.lang.StringUtils;
 
-import java.util.ArrayList;
+import javax.servlet.http.HttpServletRequest;
 import java.util.Date;
 import java.util.Locale;
 
@@ -63,6 +65,22 @@ public class MainMenuServlet extends SecureController {
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
     }
 
+
+    public void processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) {
+        String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
+        if (StringUtils.isEmpty(studyEnvUuid))
+            return;
+
+        StudyDAO sd = getStudyDAO();
+        StudyBean study = sd.findByStudyEnvUuid(studyEnvUuid);
+        if (study == null)
+            return;
+        int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
+        if (ub.getActiveStudyId() == parentStudyId)
+            return;
+        ub.setActiveStudyId(parentStudyId);
+    }
+
     @Override public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
         ub.incNumVisitsToMainMenu();
@@ -76,18 +94,17 @@ public class MainMenuServlet extends SecureController {
             return;
         }
 
-
-
         // a flag tells whether users are required to change pwd upon the first
         // time log in or pwd expired
         // update last visit date to current date
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
+        processSpecificStudyEnvUuid(request, ub1);
         ub1.setLastVisitDate(new Date(System.currentTimeMillis()));
         // have to actually set the above to a timestamp? tbh
         ub1.setOwner(ub1);
         ub1.setUpdater(ub1);
-         udao.update(ub1);
+        udao.update(ub1);
 
         // Use study Id in JSPs
         if (currentStudy != null) {

@@ -12,6 +12,8 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
@@ -51,6 +53,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     private StudyUserRoleDao studyUserRoleDao;
     @Autowired
     private SchemaServiceDao schemaServiceDao;
+    @Autowired
+    private UserAccountDAO userAccountDAO;
 
     public StudyInfoObject process(HttpServletRequest request, Study study, UserAccountBean ub) throws Exception  {
         String schemaName = null;
@@ -111,10 +115,22 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         }
         return null;
     }
-    public void saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub) throws Exception {
-        LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>)request.getSession().getAttribute("userContextMap");
-        if (userContextMap == null)
+
+    public void processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) {
+        String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
+        if (StringUtils.isEmpty(studyEnvUuid))
             return;
+        Study study = studyDao.findByStudyEnvUuid(studyEnvUuid);
+        if (study == null)
+            return;
+        Study parentStudy = study.getStudy();
+        int parentStudyId = parentStudy == null ? study.getStudyId() : study.getStudy().getStudyId();
+        ub.setActiveStudyId(parentStudyId);
+        userAccountDAO.update(ub);
+    }
+
+    public void saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub) throws Exception {
+        processSpecificStudyEnvUuid(request, ub);
         ResponseEntity <StudyEnvironmentRoleDTO[]> userRoles = getUserRoles(request);
         for (StudyEnvironmentRoleDTO role: userRoles.getBody()) {
             Study study = studyDao.findByStudyEnvUuid(role.getStudyEnvironmentUuid());
@@ -122,6 +138,11 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 continue;
             Study parentStudy = study.getStudy();
             int parentStudyId = parentStudy == null ? study.getStudyId() : study.getStudy().getStudyId();
+            // set this as the active study
+            if (ub.getActiveStudyId() == 0) {
+                ub.setActiveStudyId(parentStudyId);
+                userAccountDAO.update(ub);
+            }
             UserAccount userAccount = new UserAccount();
             userAccount.setUserName(ub.getName());
             ArrayList<StudyUserRole> byUserAccount = studyUserRoleDao.findAllUserRolesByUserAccount(userAccount, study.getStudyId(), parentStudyId);
@@ -151,6 +172,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                     }
                 }
             }
+        }
+        if (ub.getActiveStudyId() == 0) {
+            throw new Exception("Your study has not been published yet.");
         }
     }
 

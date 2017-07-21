@@ -78,6 +78,12 @@
            WHERE s.unique_identifier = ?
          </sql>
     </query>
+	<query>
+		<name>findByStudyEnvUuid</name>
+		<sql>SELECT s.* FROM study s
+			WHERE s.study_env_uuid = ?
+		</sql>
+	</query>
     <query>
         <name>findSiteByUniqueIdentifier</name>
         <sql>select site.* from study site, study study where

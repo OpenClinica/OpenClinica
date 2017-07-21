@@ -392,6 +392,24 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         }
     }
 
+    public StudyBean findByStudyEnvUuid(String uuid) {
+        StudyBean sb = null;
+        this.unsetTypeExpected();
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), uuid);
+        ArrayList alist = this.select(digester.getQuery("findByUniqueIdentifier"), variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            sb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+            return sb;
+        } else {
+            logger.info("returning null from find by Unique Identifier...");
+            return null;
+        }
+    }
+
     public StudyBean findSiteByUniqueIdentifier(String parentUniqueIdentifier, String siteUniqueIdentifier) {
         StudyBean sb = null;
         this.unsetTypeExpected();
