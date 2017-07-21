@@ -233,7 +233,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.study == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('study')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('study')"><span class="icon icon-ok" border="0"/></a>
                         <input type="hidden" id="study" name="study" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -636,7 +636,7 @@
                               <a href="javascript:;" id="requestParticipateAccess" name="requestParticipateAccess"><span class="icon icon-plus" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:otherwise>
-                              <a href="${deactivateParticipate}" id="removeParticipateAccess" name="removeParticipateAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
+                              <a href="${deactivateParticipate}" id="removeParticipateAccess" name="removeParticipateAccess"><span class="icon icon-cancel" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
                           </c:otherwise>
                       </c:choose>
                   </td>
@@ -678,7 +678,7 @@
                               <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><span class="icon icon-plus" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:otherwise>
-                              <a href="${deactivateRandomization}" id="removeRandomizeAccess" name="removeRandomizeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
+                              <a href="${deactivateRandomization}" id="removeRandomizeAccess" name="removeRandomizeAccess"><span class="icon icon-cancel" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
                           </c:otherwise>
                       </c:choose>
                   </td>
