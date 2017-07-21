@@ -1,8 +1,20 @@
 package org.akaza.openclinica.service.crfdata;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
+import java.io.File;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import javax.servlet.ServletContext;
+
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.core.form.xform.LogBean;
@@ -28,6 +40,10 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
 
 import javax.servlet.ServletContext;
 import java.io.File;
@@ -66,6 +82,9 @@ public class EnketoUrlService {
     @Autowired
     @Qualifier("dataSource")
     private BasicDataSource dataSource;
+
+    @Autowired
+    ServletContext context;
 
     @Autowired
     private CrfVersionDao crfVersionDao;
@@ -128,24 +147,28 @@ public class EnketoUrlService {
     UserAccountDAO udao;
     StudyDAO sdao;
 
-    public String getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String flavor)
-            throws Exception {
+    public String getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String flavor, Role role,
+            String mode) throws Exception {
         // Call Enketo api to get edit url
-        Study study = enketoCredentials.getParentStudy(studyOid);
-        studyOid = study.getOc_oid();
+        Study parentStudy = enketoCredentials.getParentStudy(studyOid);
+        studyOid = parentStudy.getOc_oid();
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
-        return enketo.getFormURL(subjectContext.getFormLayoutOid() + flavor) + "?ecid=" + subjectContextKey;
+        StudyEvent studyEvent = null;
+        if (subjectContext.getStudyEventId() != null) {
+            studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
+        }
+        return enketo.getFormURL(subjectContext.getFormLayoutOid() + flavor, studyOid, role, parentStudy, studyEvent, mode) + "?ecid=" + subjectContextKey;
 
     }
 
-    public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout,
-            StudyEvent studyEvent, String flavor, ItemDataBean idb) throws Exception {
+    public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout, String flavor,
+            ItemDataBean idb, Role role, String mode) throws Exception {
         Study study = enketoCredentials.getParentStudy(studyOid);
         studyOid = study.getOc_oid();
 
         String editURL = null;
-        StudyEventDefinition eventDef;
-        StudySubject subject;
+        StudyEventDefinition eventDef = null;
+        StudySubject subject = null;
 
         String goTo = null;
         if (subjectContext.getItemName() != null) {
@@ -155,17 +178,12 @@ public class EnketoUrlService {
         if (flavor.equals(SINGLE_ITEM_FLAVOR))
             goTo = "//" + subjectContext.getItemName();
 
-        if (studyEvent == null) {
-            // Lookup relevant data
-            eventDef = studyEventDefinitionDao.findByStudyEventDefinitionId(subjectContext.getStudyEventDefinitionId());
-            subject = studySubjectDao.findByOcOID(subjectContext.getStudySubjectOid());
-            studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(eventDef.getOc_oid(), Integer.valueOf(subjectContext.getOrdinal()),
-                    subject.getStudySubjectId());
+        // Lookup relevant data
+        eventDef = studyEventDefinitionDao.findByStudyEventDefinitionId(Integer.valueOf(subjectContext.getStudyEventDefinitionId()));
+        StudyEvent studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
+        eventDef = studyEvent.getStudyEventDefinition();
+        subject = studyEvent.getStudySubject();
 
-        } else {
-            eventDef = studyEvent.getStudyEventDefinition();
-            subject = studyEvent.getStudySubject();
-        }
         if (formLayout == null) {
             formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
         }
@@ -180,11 +198,13 @@ public class EnketoUrlService {
 
         // Load populated instance
         String populatedInstance = "";
+        String crfFlavor = "";
         if (flavor.equals(QUERY_FLAVOR)) {
             populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, flavor);
+            crfFlavor = flavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
-            flavor = flavor + "[" + idb.getId() + "]";
+            crfFlavor = flavor + "[" + idb.getId() + "]";
             markComplete = false;
         }
 
@@ -196,10 +216,23 @@ public class EnketoUrlService {
 
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
+        EnketoURLResponse eur = enketo.registerAndGetEditURL(formLayout, crfFlavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
+                goTo, flavor, role, study, studyEvent, mode);
 
-        EnketoURLResponse eur = enketo.registerAndGetEditURL(formLayout, flavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
-                goTo);
-        editURL = eur.getEdit_url();
+        if (eur.getEdit_url() != null) {
+            editURL = eur.getEdit_url();
+        } else if (eur.getEdit_iframe_url() != null) {
+            editURL = eur.getEdit_iframe_url();
+        } else if (eur.getView_iframe_url() != null) {
+            editURL = eur.getView_iframe_url();
+        }
+
+        // if (flavor.equals(QUERY_FLAVOR)) {
+        // editURL = eur.getEdit_url();
+        // } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
+        // editURL = eur.getEdit_iframe_url();
+        // }
+
         int hashIndex = editURL.lastIndexOf("#");
         String part1 = "";
         String part2 = "";
@@ -374,6 +407,7 @@ public class EnketoUrlService {
             }
         }
 
+        data.put("instanceID", "uuid:1234");
         Template template = new Template("template name", new StringReader(templateStr), new Configuration());
 
         StringWriter wtr = new StringWriter();
@@ -420,7 +454,9 @@ public class EnketoUrlService {
         if (itemData == null) {
             List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
             for (EventCrf eCrf : eventCrfs) {
-                itemData = itemDataDao.findByEventCrfItemNameDeletedOrNot(eventCrf.getEventCrfId(), itemName, ordinal);
+                itemData = itemDataDao.findByEventCrfItemNameDeletedOrNot(eCrf.getEventCrfId(), itemName, ordinal);
+                if (itemData != null)
+                    break;
             }
         }
 
@@ -432,9 +468,11 @@ public class EnketoUrlService {
             QueriesBean queriesBean = buildQueryElement(itemData);
             queries = queriesBean != null ? mapper.writeValueAsString(queriesBean) : "";
         }
+        int repeatOrdinal = itemData.getOrdinal();
 
         StringBuffer sb = new StringBuffer();
-        sb.append("<form>");
+        sb.append("<form xmlns:enk=\"http://enketo.org/xforms\" id=\"single_item\" >");
+        sb.append("<group_layout enk:ordinal=\"" + repeatOrdinal + "\">");
 
         sb.append("<" + itemName + ">");
         sb.append(itemValue);
@@ -444,6 +482,8 @@ public class EnketoUrlService {
         sb.append(queries);
         sb.append("</" + itemName + QUERY_SUFFIX + ">");
 
+        sb.append("</group_layout>");
+        sb.append("<meta><instanceID>uuid:" + itemName + "</instanceID></meta>");
         sb.append("</form>");
 
         return sb.toString();

@@ -22,6 +22,7 @@ import org.akaza.openclinica.core.form.xform.QueriesBean;
 import org.akaza.openclinica.core.form.xform.QueryBean;
 import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
 import org.akaza.openclinica.dao.hibernate.DnItemDataMapDao;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.ResolutionStatusDao;
@@ -32,6 +33,7 @@ import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNoteType;
 import org.akaza.openclinica.domain.datamap.DnItemDataMap;
 import org.akaza.openclinica.domain.datamap.DnItemDataMapId;
+import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.user.UserAccount;
@@ -64,6 +66,8 @@ public class QueryServiceImpl implements QueryService {
     private DnItemDataMapDao dnItemDataMapDao;
     @Autowired
     private UserAccountDao userAccountDao;
+    @Autowired
+    private EventCrfDao eventCrfDao;
     @Autowired
     private StudyDao studyDao;
 
@@ -182,9 +186,23 @@ public class QueryServiceImpl implements QueryService {
     }
 
     private ItemData getItemData(QueryServiceHelperBean helperBean) {
-        ItemData id = itemDataDao.findByEventCrfItemName(helperBean.getContainer().getEventCrf().getEventCrfId(), helperBean.getParentElementName(),
-                helperBean.getItemOrdinal());
-        return id;
+        int eventCrfId = helperBean.getContainer().getEventCrf().getEventCrfId();
+        String itemName = helperBean.getParentElementName();
+        int ordinal = helperBean.getItemOrdinal();
+        int studyEventId = helperBean.getContainer().getStudyEvent().getStudyEventId();
+        String studySubjectOid = helperBean.getContainer().getSubject().getOcOid();
+
+        ItemData itemData = itemDataDao.findByEventCrfItemNameDeletedOrNot(eventCrfId, itemName, ordinal);
+        if (itemData == null) {
+            List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEventId, studySubjectOid);
+            for (EventCrf eCrf : eventCrfs) {
+                itemData = itemDataDao.findByEventCrfItemNameDeletedOrNot(eCrf.getEventCrfId(), itemName, ordinal);
+                if (itemData != null)
+                    break;
+            }
+        }
+
+        return itemData;
     }
 
     private ItemData createBlankItemData(QueryServiceHelperBean helperBean) {

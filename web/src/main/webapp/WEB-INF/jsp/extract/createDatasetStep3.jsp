@@ -9,14 +9,15 @@
 
 
 <!-- move the alert message to the sidebar-->
+<!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+		<fmt:message key="instructions" bundle="${resword}"/>
 
 		<div class="sidebar_tab_content">
 
@@ -28,14 +29,15 @@
 	<tr id="sidebar_Instructions_closed" style="display: all">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+		<fmt:message key="instructions" bundle="${resword}"/>
+		<c:if test="${newDataset.id>0}">
 		<div class="sidebar_tab_content">
-		<p><fmt:message key="filter_data_selecting_range" bundle="${restext}"/></p>
-		<p><fmt:message key="select_event_start_end_however" bundle="${restext}"/></p>
-		<p><fmt:message key="not_filter_study_by_enrollment_leave_blank" bundle="${restext}"/></p>
+		<P><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/> <font color="red"><fmt:message key="name_description_required" bundle="${restext}"/></font></P>
+		<p><fmt:message key="copy_dataset_by_change_name" bundle="${restext}"/></p>
 		</div>
+		</c:if>
 		</td>
   </tr>
 
@@ -68,11 +70,11 @@
 
 <c:choose>
 <c:when test="${newDataset.id>0}">
-<h1><span class="title_manage"><fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="define_temporal_scope" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/edit-dataset')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+<h1><span class="title_manage"><fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="define_temporal_scope" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/edit-dataset')"><span class="icon icon-question-circle gray" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 : <c:out value="${newDataset.name}"/></span></h1>
 </c:when>
 <c:otherwise>
-<h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="define_temporal_scope" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="define_temporal_scope" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')"><span class="icon icon-question-circle gray" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 </c:otherwise>
 </c:choose>
 

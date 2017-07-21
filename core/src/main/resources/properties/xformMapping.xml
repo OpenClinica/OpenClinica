@@ -26,8 +26,8 @@
         </field>
         <field name="instance" type="org.akaza.openclinica.domain.xform.dto.Instance" collection="arraylist">
             <bind-xml name="instance" node="element" xmlns="http://www.w3.org/2002/xforms" />
-        </field>
-        <field name="bind" type="org.akaza.openclinica.domain.xform.dto.Bind" collection="arraylist">
+        </field>       
+         <field name="bind" type="org.akaza.openclinica.domain.xform.dto.Bind" collection="arraylist">
             <bind-xml name="bind" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
     </class>
@@ -92,13 +92,35 @@
     
         <class name="org.akaza.openclinica.domain.xform.dto.Instance">
         <map-to xml="instance" ns-uri="http://www.w3.org/2002/xforms" />
+        <field name="id" type="string">
+            <bind-xml name="id" node="attribute" />
+        </field>        
+        <field name="src" type="string">
+            <bind-xml name="src" node="attribute" />
+        </field>        
         <field name="form" type="org.akaza.openclinica.domain.xform.dto.Form">
             <bind-xml name="form" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+        <field name="root" type="org.akaza.openclinica.domain.xform.dto.Root">
+            <bind-xml name="root" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+    </class>
+    
+        <class name="org.akaza.openclinica.domain.xform.dto.Root">
+        <map-to xml="root" ns-uri="http://www.w3.org/2002/xforms" />
+        <field name="item" type="org.akaza.openclinica.domain.xform.dto.RootItem" collection="arraylist">
+            <bind-xml name="item" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
     </class>
     
         <class name="org.akaza.openclinica.domain.xform.dto.Form">
         <map-to xml="form" ns-uri="http://www.w3.org/2002/xforms" />
+         <field name="id" type="string">
+            <bind-xml name="id" node="attribute" />
+        </field>        
+        <field name="version" type="string">
+            <bind-xml name="version" node="attribute" />
+        </field>                
         <field name="meta" type="org.akaza.openclinica.domain.xform.dto.Meta">
             <bind-xml name="meta" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
@@ -233,10 +255,10 @@
             <bind-xml name="nodeset" node="attribute" />
         </field>
         <field name="label" type="org.akaza.openclinica.domain.xform.dto.Label">
-            <bind-xml name="label" node="element" />
+            <bind-xml name="label" node="element" xmlns="http://www.w3.org/2002/xforms"/>
         </field>
         <field name="value" type="org.akaza.openclinica.domain.xform.dto.Value">
-            <bind-xml name="value" node="element" />
+            <bind-xml name="value" node="element" xmlns="http://www.w3.org/2002/xforms" />
         </field>
     </class>
 
@@ -310,6 +332,16 @@
             <bind-xml name="ref" node="attribute" />
         </field>
 
+    </class>
+
+    <class name="org.akaza.openclinica.domain.xform.dto.RootItem">
+        <map-to xml="item" />
+        <field name="name" type="string">
+            <bind-xml name="name" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
+        <field name="itextId" type="string">
+            <bind-xml name="itextId" node="element" xmlns="http://www.w3.org/2002/xforms" />
+        </field>
     </class>
 
     <class name="org.akaza.openclinica.domain.xform.dto.Item">

@@ -11,6 +11,8 @@ public class EnketoURLResponse {
     private String iframe_url = null;
     private String code = null;
     private boolean complete_button = true;
+    private String edit_iframe_url = null;
+    private String view_iframe_url = null;
 
     private String single_fieldsubmission_iframe_url = null;
 
@@ -76,6 +78,22 @@ public class EnketoURLResponse {
 
     public void setComplete_button(boolean complete_button) {
         this.complete_button = complete_button;
+    }
+
+    public String getEdit_iframe_url() {
+        return edit_iframe_url;
+    }
+
+    public void setEdit_iframe_url(String edit_iframe_url) {
+        this.edit_iframe_url = edit_iframe_url;
+    }
+
+    public String getView_iframe_url() {
+        return view_iframe_url;
+    }
+
+    public void setView_iframe_url(String view_iframe_url) {
+        this.view_iframe_url = view_iframe_url;
     }
 
 }

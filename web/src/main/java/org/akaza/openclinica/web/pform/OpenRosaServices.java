@@ -1,5 +1,52 @@
 package org.akaza.openclinica.web.pform;
 
+import java.io.ByteArrayInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.OutputStream;
+import java.io.StringWriter;
+import java.net.FileNameMap;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.TimeZone;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import javax.ws.rs.Consumes;
+import javax.ws.rs.DELETE;
+import javax.ws.rs.GET;
+import javax.ws.rs.HEAD;
+import javax.ws.rs.POST;
+import javax.ws.rs.PUT;
+import javax.ws.rs.Path;
+import javax.ws.rs.PathParam;
+import javax.ws.rs.Produces;
+import javax.ws.rs.QueryParam;
+import javax.ws.rs.WebApplicationException;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.StreamingOutput;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+
 import ch.qos.logback.classic.LoggerContext;
 import ch.qos.logback.core.util.StatusPrinter;
 import org.akaza.openclinica.bean.core.Status;
@@ -11,7 +58,16 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.hibernate.CrfDao;
+import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
+import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
+import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -20,6 +76,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
@@ -79,6 +136,9 @@ public class OpenRosaServices {
 
     @Autowired
     StudyDao studyDao;
+
+    @Autowired
+    StudyEventDao studyEventDao;
 
     @Autowired
     StudySubjectDao ssDao;
@@ -549,6 +609,14 @@ public class OpenRosaServices {
         }
     }
 
+    @PUT
+    @Path("/{studyOID}/fieldsubmission/complete")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response doFieldSubmissionCompletePut(@Context HttpServletRequest request, @Context HttpServletResponse response,
+            @Context ServletContext servletContext, @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) throws Exception {
+        return doFieldSubmissionComplete(request, response, servletContext, studyOID, context);
+    }
+
     @POST
     @Path("/{studyOID}/fieldsubmission/complete")
     @Produces(MediaType.APPLICATION_XML)
@@ -571,6 +639,14 @@ public class OpenRosaServices {
             LOGGER.debug("Failed OpenRosa submission with unhandled error");
             return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
+    }
+
+    @PUT
+    @Path("/{studyOID}/fieldsubmission")
+    @Produces(MediaType.APPLICATION_XML)
+    public Response doFieldSubmissionPut(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext servletContext,
+            @PathParam("studyOID") String studyOID, @QueryParam(FORM_CONTEXT) String context) {
+        return doFieldSubmission(request, response, servletContext, studyOID, context);
     }
 
     @POST
@@ -692,8 +768,9 @@ public class OpenRosaServices {
             CRFVersionDAO versionDAO = new CRFVersionDAO(getDataSource());
             ArrayList<CRFVersionBean> crfs = versionDAO.findDefCRFVersionsByStudyEvent(nextEvent.getStudyEventDefinitionId());
             PFormCache cache = PFormCache.getInstance(context);
+            StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
             for (CRFVersionBean crfVersion : crfs) {
-                String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid());
+                String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid(), studyEvent);
                 String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
                         String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid(), null, studyOID);
             }
@@ -805,30 +882,31 @@ public class OpenRosaServices {
         Document doc = docBuilder.newDocument();
         Element root = doc.createElement("root");
         doc.appendChild(root);
+
+        List<UserAccount> users = null;
+
         StudySubject ssBean = ssDao.findByOcOID(studySubjectOid);
 
-        // get public studies
-        StudyBean publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
-        StudyBean parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
-        CoreResources.setRequestSchema("public");
-        List<UserAccount> users = userAccountDao
-            .findNonRootNonParticipateUsersByStudyId(publicStudy.getId(), parentPublicStudy.getId());
+        if (ssBean != null) {
+            StudyBean publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
+            StudyBean parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
+            CoreResources.setRequestSchema("public");
+            users = userAccountDao.findNonRootNonParticipateUsersByStudyId(publicStudy.getId(), parentPublicStudy.getId());
             CoreResources.setRequestSchema(publicStudy.getSchemaName());
-        CoreResources.setRequestSchema(publicStudy.getSchemaName());
-        for (UserAccount userAccount : users) {
-            Element item = doc.createElement("item");
-            Element userName = doc.createElement("user_name");
-            userName.appendChild(doc.createTextNode(userAccount.getUserName()));
-            Element firstName = doc.createElement("first_name");
-            firstName.appendChild(doc.createTextNode(userAccount.getFirstName()));
-            Element lastName = doc.createElement("last_name");
-            lastName.appendChild(doc.createTextNode(userAccount.getLastName()));
-            item.appendChild(userName);
-            item.appendChild(firstName);
-            item.appendChild(lastName);
-            root.appendChild(item);
+            for (UserAccount userAccount : users) {
+                Element item = doc.createElement("item");
+                Element userName = doc.createElement("user_name");
+                userName.appendChild(doc.createTextNode(userAccount.getUserName()));
+                Element firstName = doc.createElement("first_name");
+                firstName.appendChild(doc.createTextNode(userAccount.getFirstName()));
+                Element lastName = doc.createElement("last_name");
+                lastName.appendChild(doc.createTextNode(userAccount.getLastName()));
+                item.appendChild(userName);
+                item.appendChild(firstName);
+                item.appendChild(lastName);
+                root.appendChild(item);
+            }
         }
-
         DOMSource dom = new DOMSource(doc);
         StringWriter writer = new StringWriter();
         StreamResult result = new StreamResult(writer);

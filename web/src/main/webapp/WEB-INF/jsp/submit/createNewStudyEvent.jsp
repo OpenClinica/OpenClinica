@@ -108,13 +108,13 @@
 	
 <fmt:message key="schedule_study_event_for" bundle="${resword}"/><b> <c:out value="${chosenSubject.name}" /></b>
         <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/schedule-event')">
-            <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+            <span class="icon icon-question-circle gray" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 	</c:when>
 	<c:otherwise>
 	
 <fmt:message key="schedule_study_event_for" bundle="${resword}"/>
 <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/schedule-event#enterData')">
-<img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+<span class="icon icon-question-circle gray" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 	</c:otherwise>
 </c:choose>
 </span></h1><br/>
@@ -159,7 +159,7 @@
 <form action="CreateNewStudyEvent" method="post">
 <jsp:include page="../include/showSubmitted.jsp" />
 
-<div style="width: 600px">
+<div style="width: 850px">
 
 <!-- These DIVs define shaded box borders -->
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -248,11 +248,13 @@
 				</td>
 				<td>*</td>
 			</tr>
-			<tr>
-				<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyEventDefinition"/></jsp:include></td>
-			</tr>
+			
 			</table>
 		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyEventDefinition"/></jsp:include></td>
 	</tr>
 
 	<tr>
@@ -265,17 +267,19 @@
 				<c:param name="count" value="1"/>
 				</c:import>
 
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) *<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=start&column=start_date','spanAlert-start'); return false;">
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) *<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=start&column=start_date','spanAlert-start'); return false;">
 				<img name="flag_start" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
-			<tr>
-				<td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="start"/></jsp:include></td>
-			</tr>
+			
 			</table>
 		</td>
 	</tr>
+	<tr>
+		<td></td>
+		<td colspan="7"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="start"/></jsp:include></td>
+	</tr>
 
-	<tr valign="top">
+	<tr>
 		<td class="formlabel"><fmt:message key="end_date_time" bundle="${resword}"/>:</td>
 		<td valign="top">
 		  	<table border="0" cellpadding="0" cellspacing="0">
@@ -285,21 +289,36 @@
 				<c:param name="count" value="2"/>
 				</c:import>
 
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=end&column=end_date','spanAlert-end'); return false;">
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=end&column=end_date','spanAlert-end'); return false;">
 				<img name="flag_end" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
+			
+			</table>
+		</td>
+	</tr>
+	<tr>
+		<td></td>
+		<td colspan="7">
+			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="end" /></jsp:include>
+		</td>
+	</tr>
+
+	<tr>
+		<td class="formlabel" align="right"></td>
+		<td valign="top">
+		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<td colspan="7">
-					<fmt:message key="leave_this_field_blank_if_not_applicable" bundle="${restext}"/><br/>
-					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="end" /></jsp:include>
+					<fmt:message key="leave_this_field_blank_if_not_applicable" bundle="${restext}"/>
 				</td>
 			</tr>
 			</table>
 		</td>
 	</tr>
+
     <c:if test="${study.studyParameterConfig.eventLocationRequired != 'not_used'}">
     <tr>
-        <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
+        <td class="formlabel" align="right"><fmt:message key="location" bundle="${resword}"/></td>
           <td valign="top">
               <table border="0" cellpadding="0" cellspacing="0">
             <tr>
@@ -327,7 +346,7 @@
 </div>
 
 </div></div></div></div></div></div></div></div>
-</div> </div><br>
+</div> </div>
 
 <a href="javascript:leftnavExpand('schedule0');">
     <img id="excl_schedule0" src="images/bt_Expand.gif" border="0"> <fmt:message key="schedule_another_event" bundle="${resword}"/></a>
@@ -669,7 +688,7 @@
 			</table>
 		</td>
 	</tr>
-    <tr valign="top">
+    <tr>
 		<td class="formlabel"><fmt:message key="end_date_time" bundle="${resword}"/>:</td>
 		<td valign="top">
 		  	<table border="0" cellpadding="0" cellspacing="0">
@@ -820,7 +839,7 @@
 </div>
 </div><br>
 
-
+<br>
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>

@@ -79,7 +79,7 @@
  <fmt:message key="view_all_events_in" bundle="${resword}"/> <c:out value="${study.name}"/>
  <c:choose>
    <c:when test="${userRole.manageStudy}">
-      <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-events')">
+      <a>
       <span class="icon icon-question-circle gray"></span>
       </a>
    </c:when>
@@ -89,28 +89,26 @@
     </a>
    </c:otherwise>
   </c:choose>
-   <a href="javascript:openDocWindow('ViewStudyEvents?print=yes&<c:out value="${queryUrl}"/>')"
-  onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"
-  onMouseUp="javascript:setImage('bt_Print0','images/bt_Print.gif');">
-  <span name="bt_Print0" class="icon icon-print" border="0" alt="<fmt:message key="print" bundle="${resword}"/>"></a>
+   <a href="javascript:openDocWindow('ViewStudyEvents?print=yes&<c:out value="${queryUrl}"/>')">
+  <span class="icon icon-print"></a>
   </div>
   </h1>
 
 
-<div style="width: 640px">
+<div style="width: 980px">
 <!-- These DIVs define shaded box borders -->
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">
 <form method="POST" action="ViewStudyEvents" name="control">
 <jsp:include page="../include/showSubmitted.jsp" />
 <br/>
-<table border="0" cellpadding="0" cellspacing="0" >&nbsp;&nbsp;
+<table border="0" cellpadding="0" cellspacing="0" >
 <tr valign="top"><b><fmt:message key="filter_events_by" bundle="${resword}"/>:</b></tr>
 </table>
 
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
-    <td>&nbsp;&nbsp;&nbsp;<fmt:message key="study_event_definition" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
+    <td><fmt:message key="study_event_definition" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
     <td>
       <div class="formfieldL_BG">
       <c:set var="definitionId1" value="${definitionId}"/>
@@ -128,10 +126,8 @@
       </c:forEach>
       </select> </div>
     </td>
-  </tr>
-  <tr><td><br/></td></tr>
-  <tr>
-    <td>&nbsp;&nbsp;&nbsp;Status&nbsp;&nbsp;&nbsp;</td>
+    <td></td>
+    <td>Status</td>
     <td>
       <div class="formfieldM_BG">
       <c:set var="status1" value="${statusId}"/>
@@ -153,33 +149,31 @@
      </div>
     </td>
   </tr>
-  <tr><td><br/></td></tr>
+  
+  <tr><td></td></tr>
   <tr>
-    <td>&nbsp;&nbsp;&nbsp;Date Started&nbsp;&nbsp;&nbsp;</td>
+    <td>Date Started</td>
     <td>
       <div class="formfieldS_BG">
        <input type="text" name="startDate" value="<c:out value="${startDate}"/>" class="formfieldS" id="startDateField"></div>
       <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDate"/></jsp:include>
     </td>
-    <td><A HREF="#">
-      &nbsp;<span class="icon icon-calendar"alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="startDateTrigger"/>
+    <td><a>
+      <span class="icon icon-calendar"alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="startDateTrigger"/>
       <script type="text/javascript">
       Calendar.setup({inputField  : "startDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "startDateTrigger" });
       </script>
       </a>
       (<fmt:message key="date_format" bundle="${resformat}"/>)
     </td>
-  </tr>
-  <tr><td><br/></td></tr>
-  <tr>
-    <td>&nbsp;&nbsp;&nbsp;Date Ended&nbsp;&nbsp;&nbsp;</td>
+    <td>Date Ended</td>
     <td>
         <div class="formfieldS_BG">
           <input type="text" name="endDate" value="<c:out value="${endDate}"/>" class="formfieldS" id="endDateField"></div>
          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="endDate"/></jsp:include>
       </td>
-     <td><A HREF="#" >
-          &nbsp;<span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="endDateTrigger"/>
+     <td><a>
+          <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="endDateTrigger"/>
          <script type="text/javascript">
          Calendar.setup({inputField  : "endDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "endDateTrigger" });
          </script>
@@ -187,9 +181,9 @@
        </a> (<fmt:message key="date_format" bundle="${resformat}"/>)
    </td>
   </tr>
-  <tr><td><br/></td></tr>
+ 
   <tr>
-    <td></td>
+    <td></td><td></td><td></td><td></td><td></td>
     <td><input type="submit" name="submit" value="<fmt:message key="apply_filter" bundle="${resword}"/>" class="button_medium"></td>
   </tr>
 </table>
@@ -198,7 +192,7 @@
 </div>
 </div></div></div></div></div></div></div></div>
 </div>
-<br><br>
+
 <c:if test="${empty allEvents}">
  <p>&nbsp;&nbsp;&nbsp;<fmt:message key="no_events_within_parameters" bundle="${restext}"/>
 </c:if>

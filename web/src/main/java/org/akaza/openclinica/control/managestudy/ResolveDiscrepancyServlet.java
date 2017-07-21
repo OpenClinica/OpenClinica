@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -68,11 +69,13 @@ import org.akaza.openclinica.domain.xform.dto.Head;
 import org.akaza.openclinica.domain.xform.dto.Html;
 import org.akaza.openclinica.domain.xform.dto.Instance;
 import org.akaza.openclinica.domain.xform.dto.Item;
+import org.akaza.openclinica.domain.xform.dto.ItemSet;
 import org.akaza.openclinica.domain.xform.dto.Itext;
 import org.akaza.openclinica.domain.xform.dto.Label;
 import org.akaza.openclinica.domain.xform.dto.Meta;
 import org.akaza.openclinica.domain.xform.dto.Model;
 import org.akaza.openclinica.domain.xform.dto.Repeat;
+import org.akaza.openclinica.domain.xform.dto.RootItem;
 import org.akaza.openclinica.domain.xform.dto.Select;
 import org.akaza.openclinica.domain.xform.dto.Select1;
 import org.akaza.openclinica.domain.xform.dto.Text;
@@ -108,6 +111,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String COMMENT = "_comment";
     public static final String QUERY_SUFFIX = "form-queries.xml";
     public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
+    public static final String VIEW_MODE = "view";
+    public static final String EDIT_MODE = "edit";
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -231,15 +236,16 @@ public class ResolveDiscrepancyServlet extends SecureController {
             PFormCache cache = PFormCache.getInstance(context);
             PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
             subjectContext.setStudySubjectOid(ssb.getOid());
-            subjectContext.setStudyEventDefinitionId(seb.getStudyEventDefinitionId());
-            subjectContext.setOrdinal(seb.getSampleOrdinal());
+            subjectContext.setStudyEventDefinitionId(String.valueOf(seb.getStudyEventDefinitionId()));
+            subjectContext.setOrdinal(String.valueOf(seb.getSampleOrdinal()));
             subjectContext.setFormLayoutOid(formLayout.getOid());
-            subjectContext.setUserAccountId(ub.getId());
+            subjectContext.setUserAccountId(String.valueOf(ub.getId()));
             subjectContext.setItemName(item.getName() + COMMENT);
             subjectContext.setItemRepeatOrdinalAdjusted(repeatOrdinal);
             subjectContext.setItemRepeatOrdinalOriginal(idb.getOrdinal());
             subjectContext.setItemInRepeatingGroup(igmBean.isRepeatingGroup());
             subjectContext.setItemRepeatGroupName(igBean.getLayoutGroupPath());
+            subjectContext.setStudyEventId(String.valueOf(seb.getId()));
             String contextHash = cache.putSubjectContext(subjectContext);
 
             if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
@@ -273,6 +279,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 Head head = html.getHead();
                 Model model = head.getModel();
                 List<Bind> binds = model.getBind();
+                List<Instance> instances = model.getInstance();
                 binds = getBindElements(binds, item);
                 Itext itext = model.getItext();
 
@@ -297,28 +304,30 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 }
 
                 if (itemUserControl != null) {
-                    itemUserControl.setRef("/form/" + item.getName());
+                    itemUserControl.setRef("/form/group_layout/" + item.getName());
                 }
                 if (itemCommentUserControl != null) {
-                    itemCommentUserControl.setRef("/form/" + item.getName() + COMMENT);
+                    itemCommentUserControl.setRef("/form/group_layout/" + item.getName() + COMMENT);
                 }
                 List<UserControl> uControls = new ArrayList<>();
                 uControls.add(itemUserControl);
                 uControls.add(itemCommentUserControl);
 
-                String xform = xformParser.marshall(buildSingleItemForm(item, uControls, binds, itext));
-                xform = xform.substring(0, xform.indexOf("<meta>")) + "<" + item.getName() + "/><" + item.getName() + COMMENT + " " + FS_QUERY_ATTRIBUTE + "=\""
-                        + item.getName() + "\"/>" + xform.substring(xform.indexOf("<meta>"));
+                String xform = xformParser.marshall(buildSingleItemForm(item, uControls, binds, itext, instances));
+                xform = xform.substring(0, xform.indexOf("<meta>")) + "<group_layout>" + "<" + item.getName() + "/><" + item.getName() + COMMENT + " "
+                        + FS_QUERY_ATTRIBUTE + "=\"" + item.getName() + "\"/>" + "</group_layout>" + xform.substring(xform.indexOf("<meta>"));
 
                 String attribute = SINGLE_ITEM_FLAVOR + "[" + idb.getId() + "]";
                 context.setAttribute(attribute, xform);
             }
+            StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
+            Role role = currentRole.getRole();
 
             String formUrl = null;
             if (ecb.getId() > 0) {
-                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, null, flavor, idb);
+                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role, EDIT_MODE);
             } else {
-                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor);
+                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE);
             }
             int hashIndex = formUrl.lastIndexOf("#");
             String part1 = formUrl;
@@ -575,7 +584,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
     }
 
-    private Html buildSingleItemForm(ItemBean item, List<UserControl> userControls, List<Bind> binds, Itext itext) {
+    private Html buildSingleItemForm(ItemBean item, List<UserControl> userControls, List<Bind> binds, Itext itext, List<Instance> instances) {
 
         Html html = new Html();
         Head head = new Head();
@@ -588,9 +597,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         // Build Instance
         Meta meta = new Meta();
-        meta.setInstanceID(new String());
+        meta.setInstanceID("uuid:" + item.getName());
+
         Form form = new Form();
         form.setMeta(meta);
+        form.setId("single_item");
+        form.setVersion("v1");
+
         Instance instance = new Instance();
         instance.setForm(form);
         model.addInstance(instance);
@@ -601,21 +614,34 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // Set or Build IText
         List<String> refs = new ArrayList<>();
         List<Item> items = null;
+        ItemSet itemSet = null;
         String userControlRef = null;
         for (UserControl userControl : userControls) {
             if (userControl instanceof Select || userControl instanceof Select1) {
                 items = userControl.getItem();
-                refs = addItemRefsToList(items, refs);
-            }
-            if (userControl != null) {
-                userControlRef = userControl.getLabel().getRef();
-            }
-            if (userControlRef != null) {
-                refs.add(userControlRef.substring(10, userControlRef.length() - 2));
-            }
+                itemSet = userControl.getItemSet();
+                if (items != null) {
+                    refs = addItemRefsToList(items, refs);
+                } else if (itemSet != null) {
+                    String instanceId = getInstanceId(itemSet);
+                    Instance inst = getInstanceByInstanceId(instanceId, instances);
+                    if (inst != null) {
+                        model.addInstance(inst);
+                        for (RootItem rootItem : inst.getRoot().getItem()) {
+                            refs.add(rootItem.getItextId());
+                        }
+                    }
+                }
 
+                if (userControl != null) {
+                    userControlRef = userControl.getLabel().getRef();
+                }
+                if (userControlRef != null) {
+                    refs.add(userControlRef.substring(10, userControlRef.length() - 2));
+                }
+
+            }
         }
-
         if (itext != null) {
             List<Translation> translations = itext.getTranslation();
             for (Translation translation : translations) {
@@ -631,12 +657,41 @@ public class ResolveDiscrepancyServlet extends SecureController {
             model.setItext(itext);
         }
 
+        Instance usersInstance = new Instance();
+        usersInstance.setId("_users");
+        usersInstance.setSrc("jr://file-csv/users.xml");
+        model.addInstance(usersInstance);
+
         // Assemble all
         head.setModel(model);
         html.setHead(head);
         html.setBody(body);
         return html;
 
+    }
+
+    private String getInstanceId(ItemSet itemSet) {
+        String instanceId = "";
+        String nodeSet = itemSet.getNodeSet();
+        if (nodeSet.startsWith("instance")) {
+            int begIndex = nodeSet.indexOf("('");
+            int endIndex = nodeSet.indexOf("')");
+            instanceId = nodeSet.substring(begIndex + 2, endIndex);
+            int index = nodeSet.indexOf("/root/item");
+            itemSet.setNodeSet(nodeSet.substring(0, index + 10));
+        }
+        return instanceId;
+    }
+
+    private Instance getInstanceByInstanceId(String instanceId, List<Instance> instances) {
+        Instance instance = null;
+        for (Instance inst : instances) {
+            if (inst.getId() != null && inst.getId().equals(instanceId)) {
+                instance = inst;
+                break;
+            }
+        }
+        return instance;
     }
 
     private List<String> addItemRefsToList(List<Item> items, List<String> refs) {
@@ -710,11 +765,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
             Bind bind = bindIterator.next();
             if (bind.getNodeSet().endsWith(item.getName())) {
                 setBindProperties(bind);
-                bind.setNodeSet("/form/" + item.getName());
+                bind.setNodeSet("/form/group_layout/" + item.getName());
             } else if (bind.getNodeSet().endsWith(item.getName() + COMMENT)) {
                 setBindProperties(bind);
-                bind.setNodeSet("/form/" + item.getName() + COMMENT);
-                bind.setEnkFor("/form/" + item.getName());
+                bind.setNodeSet("/form/group_layout/" + item.getName() + COMMENT);
+                bind.setEnkFor("/form/group_layout/" + item.getName());
             } else if (bind.getNodeSet().endsWith("meta/instanceID")) {
                 bind.setNodeSet("/form/meta/instanceID");
             } else {
@@ -729,6 +784,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
         bind.setCalculate(null);
         bind.setRequired(null);
         bind.setRelevant(null);
+        bind.setConstraintMsg(null);
+        bind.setItemGroup(null);
     }
 
 }
