@@ -33,8 +33,8 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
+import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -412,7 +412,6 @@ public class StudyModuleController {
                 logger.error(ExceptionUtils.getStackTrace(e));
             }
             map.addAttribute("participateURLDisplay", url);
-            map.addAttribute("participateURLFull", url + "/#/login");
         }
 
 

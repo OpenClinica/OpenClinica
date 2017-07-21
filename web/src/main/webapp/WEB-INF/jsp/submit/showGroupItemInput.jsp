@@ -328,7 +328,7 @@ function switchStr(itemId, id,attribute,str1,str2) {
 	<label for="<c:out value="${inputName}"/>"></label>
 	<c:set var="pathAndName" value="${displayItem.data.value}"/>
 	<c:choose>
-	<c:when test="${inputTxtValue==null || empty inputTxtValue}">
+	<c:when test="${inputTxtValue==null || empty inputTxtValue || isLast}">
 		<div id="div<c:out value="${inputName}"/>" name="myDiv">
 		<c:choose>
     	<c:when test="${isInError}">
@@ -341,7 +341,14 @@ function switchStr(itemId, id,attribute,str1,str2) {
 			<input type="button" id="up<c:out value="${inputName}"/>" name="uploadFile<c:out value="${inputName}"/>" value="<fmt:message key="click_to_upload" bundle="${resword}"/>" onClick="javascript:openDocWindow('UploadFile?submitted=no&itemId=<c:out value="${itemId}"/>&inputName=<c:out value="${inputName}"/>')">
 			<input type="hidden" id="fa<c:out value="${inputName}"/>" name="fileAction<c:out value="${inputName}"/>" value="upload">
 		</div>
-		<input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>">
+		<c:choose>
+		<c:when test="${isLast}">
+        <input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value >
+		</c:when>
+		<c:otherwise>
+        <input type="hidden" id="<c:out value="${inputName}"/>" name="<c:out value="${inputName}"/>" value="<c:out value="${inputTxtValue}"/>">
+		</c:otherwise>
+		</c:choose>
 	</c:when>
 	<c:otherwise>
 		<div id="div<c:out value="${inputName}"/>" name="myDiv">

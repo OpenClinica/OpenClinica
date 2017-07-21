@@ -397,6 +397,9 @@ public class UpdateStudyEventServlet extends SecureController {
                     } else {
                         studyEvent.setEndTimeFlag(true);
                     }
+                }else{
+                	//In case of empty value
+                	studyEvent.setDateEnded(end);
                 }
 
                 studyEvent.setLocation(fp.getString(INPUT_LOCATION));
@@ -464,6 +467,9 @@ public class UpdateStudyEventServlet extends SecureController {
                     } else {
                         studyEvent.setEndTimeFlag(true);
                     }
+                }else{
+                	//In case of empty value
+                	studyEvent.setDateEnded(end);
                 }
                 // YW >>
                 studyEvent.setLocation(fp.getString(INPUT_LOCATION));
