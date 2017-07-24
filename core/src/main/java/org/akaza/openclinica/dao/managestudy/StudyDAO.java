@@ -398,14 +398,14 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.setTypesExpected();
         HashMap variables = new HashMap();
         variables.put(new Integer(1), uuid);
-        ArrayList alist = this.select(digester.getQuery("findByUniqueIdentifier"), variables);
+        ArrayList alist = this.select(digester.getQuery("findByStudyEnvUuid"), variables);
         Iterator it = alist.iterator();
 
         if (it.hasNext()) {
             sb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
             return sb;
         } else {
-            logger.info("returning null from find by Unique Identifier...");
+            logger.info("returning null from find by Study Env Uuid...");
             return null;
         }
     }

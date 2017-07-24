@@ -157,7 +157,7 @@ public class ChangeStudyServlet extends SecureController {
                     } else // should this be DEFAULT_TENANT_ID from CoreResources?
                         request.setAttribute("changeStudySchema", "public");
 
-                    request.setAttribute("uniqueStudyId", studyInfoObject.getStudyBean().getIdentifier());
+                    request.setAttribute("studyEnvUuid", studyInfoObject.getStudyBean().getStudyEnvUuid());
                     request.setAttribute("currentStudy", currentStudy);
                     forwardPage(Page.CHANGE_STUDY_CONFIRM);
                     return;
@@ -184,11 +184,11 @@ public class ChangeStudyServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         String studySchema = fp.getString("changeStudySchema");
         request.setAttribute("changeStudySchema", "public");
-        String uniqueStudyId = fp.getString("uniqueStudyId");
-        String prevStudyId = currentStudy != null ? currentStudy.getIdentifier() : null;
+        String studyEnvUuid = fp.getString("studyEnvUuid");
+        String prevStudyEnvUuid = currentStudy != null ? currentStudy.getStudyEnvUuid() : null;
 
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        StudyBean current = sdao.findByUniqueIdentifier(uniqueStudyId);
+        StudyBean current = sdao.findByStudyEnvUuid(studyEnvUuid);
 
         // reset study parameters -jxu 02/09/2007
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
@@ -235,7 +235,7 @@ public class ChangeStudyServlet extends SecureController {
             udao.update(ub);
             request.setAttribute("changeStudySchema", studySchema);
             StudyDAO sdaoStudy = new StudyDAO(sm.getDataSource());
-            StudyBean study = sdaoStudy.findByUniqueIdentifier(uniqueStudyId);
+            StudyBean study = sdaoStudy.findByStudyEnvUuid(studyEnvUuid);
             session.setAttribute("study", study);
             currentStudy = study;
             if (current.getParentStudyId() > 0) {
@@ -306,7 +306,7 @@ public class ChangeStudyServlet extends SecureController {
         }
         ub.incNumVisitsToMainMenu();
         // YW 2-18-2008, if study has been really changed <<
-        if (StringUtils.equals(prevStudyId, uniqueStudyId) != true)  {
+        if (StringUtils.equals(prevStudyEnvUuid, studyEnvUuid) != true)  {
             session.removeAttribute("eventsForCreateDataset");
             session.setAttribute("tableFacadeRestore", "false");
         }
