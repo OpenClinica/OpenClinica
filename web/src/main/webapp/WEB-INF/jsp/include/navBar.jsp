@@ -122,7 +122,7 @@
                                     <td>
                                       <form METHOD="GET" action="ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == 'Study Subject ID') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
                                                                     <!--<a href="javascript:reportBug()">Report Issue</a>|-->
-                                            <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = 'Study Subject ID'" onfocus="if (this.value == 'Study Subject ID') this.value = ''" value="Enter Study Subject ID" class="navSearch"/>
+                                            <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = 'Enter Study Subject ID'" onfocus="if (this.value == 'Study Subject ID') this.value = ''" value="Study Subject ID" class="navSearch"/>
                                             <input type="hidden" name="navBar" value="yes"/>
                                             <input type="submit" value="View &#8594;"  class="navSearchButton"/>
                                         </form>
