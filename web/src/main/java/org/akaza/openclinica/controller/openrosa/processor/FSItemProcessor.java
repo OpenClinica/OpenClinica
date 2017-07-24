@@ -197,63 +197,62 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             itemValue = itemNode.getTextContent();
 
             item = itemDao.findByNameCrfId(itemNode.getNodeName(), crfVersion.getCrf().getCrfId());
-            if (item == null) {
+            if (item != null) {
+                ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+
+                // Convert space separated Enketo multiselect values to comma separated OC multiselect values
+                Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
+                if (responseTypeId == 3 || responseTypeId == 7) {
+                    itemValue = itemValue.replaceAll(" ", ",");
+                }
+                if (responseTypeId == 4) {
+                    /*
+                     * for (HashMap uploadFilePath : listOfUploadFilePaths) {
+                     * if ((boolean) uploadFilePath.containsKey(itemValue) && itemValue != "") {
+                     * itemValue = (String) uploadFilePath.get(itemValue);
+                     * break;
+                     * }
+                     * }
+                     */ FormLayoutMedia media = formLayoutMediaDao.findByEventCrfIdAndFileName(container.getEventCrf().getEventCrfId(), itemValue);
+                    if (media == null) {
+                        media = new FormLayoutMedia();
+                    }
+                    media.setName(itemValue);
+                    media.setFormLayout(formLayout);
+                    media.setEventCrfId(container.getEventCrf().getEventCrfId());
+                    media.setPath("/" + container.getStudy().getOc_oid() + "/");
+
+                    formLayoutMediaDao.saveOrUpdate(media);
+                }
+
+                ItemData newItemData = createItemData(item, itemValue, itemOrdinal, container);
+                Errors itemErrors = validateItemData(newItemData, item, responseTypeId);
+                if (itemErrors.hasErrors()) {
+                    container.getErrors().addAllErrors(itemErrors);
+                    throw new Exception("Item validation error.  Rolling back submission changes.");
+                }
+
+                ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), container.getEventCrf().getEventCrfId(), itemOrdinal);
+                if (existingItemData == null) {
+                    newItemData.setStatus(Status.UNAVAILABLE);
+                    itemDataDao.saveOrUpdate(newItemData);
+                    resetSdvStatus(container);
+
+                } else if (existingItemData.getValue().equals(newItemData.getValue())) {
+
+                } else {
+                    // Existing item. Value changed. Update existing value.
+                    existingItemData.setInstanceId(container.getInstanceId());
+                    existingItemData.setValue(newItemData.getValue());
+                    existingItemData.setUpdateId(container.getUser().getUserId());
+                    existingItemData.setDateUpdated(new Date());
+                    itemDataDao.saveOrUpdate(existingItemData);
+                    resetSdvStatus(container);
+                }
+            } else {
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
             }
-
-            ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
-
-            // Convert space separated Enketo multiselect values to comma separated OC multiselect values
-            Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
-            if (responseTypeId == 3 || responseTypeId == 7) {
-                itemValue = itemValue.replaceAll(" ", ",");
-            }
-            if (responseTypeId == 4) {
-                /*
-                 * for (HashMap uploadFilePath : listOfUploadFilePaths) {
-                 * if ((boolean) uploadFilePath.containsKey(itemValue) && itemValue != "") {
-                 * itemValue = (String) uploadFilePath.get(itemValue);
-                 * break;
-                 * }
-                 * }
-                 */ FormLayoutMedia media = formLayoutMediaDao.findByEventCrfIdAndFileName(container.getEventCrf().getEventCrfId(), itemValue);
-                if (media == null) {
-                    media = new FormLayoutMedia();
-                }
-                media.setName(itemValue);
-                media.setFormLayout(formLayout);
-                media.setEventCrfId(container.getEventCrf().getEventCrfId());
-                media.setPath("/" + container.getStudy().getOc_oid() + "/");
-
-                formLayoutMediaDao.saveOrUpdate(media);
-            }
-
-            ItemData newItemData = createItemData(item, itemValue, itemOrdinal, container);
-            Errors itemErrors = validateItemData(newItemData, item, responseTypeId);
-            if (itemErrors.hasErrors()) {
-                container.getErrors().addAllErrors(itemErrors);
-                throw new Exception("Item validation error.  Rolling back submission changes.");
-            }
-
-            ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), container.getEventCrf().getEventCrfId(), itemOrdinal);
-            if (existingItemData == null) {
-                newItemData.setStatus(Status.UNAVAILABLE);
-                itemDataDao.saveOrUpdate(newItemData);
-                resetSdvStatus(container);
-
-            } else if (existingItemData.getValue().equals(newItemData.getValue())) {
-
-            } else {
-                // Existing item. Value changed. Update existing value.
-                existingItemData.setInstanceId(container.getInstanceId());
-                existingItemData.setValue(newItemData.getValue());
-                existingItemData.setUpdateId(container.getUser().getUserId());
-                existingItemData.setDateUpdated(new Date());
-                itemDataDao.saveOrUpdate(existingItemData);
-                resetSdvStatus(container);
-            }
         }
-
     }
 
     private boolean shouldProcessItemNode(Node itemNode) {

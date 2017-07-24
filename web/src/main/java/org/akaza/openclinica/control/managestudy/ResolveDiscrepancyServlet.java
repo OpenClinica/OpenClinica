@@ -633,13 +633,12 @@ public class ResolveDiscrepancyServlet extends SecureController {
                     }
                 }
 
-                if (userControl != null) {
-                    userControlRef = userControl.getLabel().getRef();
-                }
-                if (userControlRef != null) {
-                    refs.add(userControlRef.substring(10, userControlRef.length() - 2));
-                }
-
+            }
+            if (userControl != null) {
+                userControlRef = userControl.getLabel().getRef();
+            }
+            if (userControlRef != null) {
+                refs.add(userControlRef.substring(10, userControlRef.length() - 2));
             }
         }
         if (itext != null) {
