@@ -482,6 +482,9 @@ public class CoreResources implements ResourceLoaderAware {
         return null;
     }
 
+    public static String getRequestSchema(HttpServletRequest request) {
+        return (String) request.getAttribute("requestSchema");
+    }
     public static boolean setRequestSchema(String schema) {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null && requestAttributes.getRequest() != null) {
