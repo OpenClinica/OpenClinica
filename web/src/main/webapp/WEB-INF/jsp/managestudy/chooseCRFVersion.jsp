@@ -8,6 +8,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<link rel="stylesheet" href="../../includes/css/icomoon-style.css">
 
 <link rel="stylesheet" href="../../includes/style_shaded_table.css" type="text/css">
 
@@ -21,9 +22,9 @@
 <tr id="sidebar_Instructions_open" style="display: all">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../../images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+		<fmt:message key="instructions" bundle="${resword}"/>
 
 		<div class="sidebar_tab_content">
 			<fmt:message key="choose_crf_instruction_key"  bundle="${resword}"/>
@@ -35,16 +36,16 @@
 	<tr id="sidebar_Instructions_closed" style="display: none">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="../../images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+		<fmt:message key="instructions" bundle="${resword}"/>
 
 		</td>
   </tr><jsp:include page="../include/sideInfo.jsp"/>
   
 <h1><span class="title_manage">
 <fmt:message key="choose_CRF_version" bundle="${resword}"/>
-<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/crf-version-migration')"><img src="../../images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+
  
 </span></h1>
 <script type="text/JavaScript" language="JavaScript" src="../../includes/jmesa/jquery.min.js"></script>
@@ -155,15 +156,14 @@ $.noConflict();
 <td  class="table_cell"  > <c:out value="${crfBean.owner.name}" />&nbsp;</td>
 <!-- <td  class="table_cell"  > <c:out value="${version.status.name}" />&nbsp;</td>-->
 <td  class="table_cell"  style="text-align:center;" ><c:if test="${version.id == formLayoutId}">X</c:if>&nbsp;</td>
-<td  class="table_cell"  > &nbsp;
+<td  class="table_cell"  >
 <a onmouseup="javascript:setImage('bt_View1','../../images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');" 
 href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&formLayoutId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes','','','')">
-<img hspace="6" border="0" align="left" title="View" alt="View" src="../../images/bt_View.gif" name="bt_View1">
+<span hspace="6" border="0" align="left" title="View" alt="View" class="icon icon-search" name="bt_View1">
 </a>
-&nbsp;
 <a onmouseup="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" onmousedown="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" 
 href="#" onclick="window.openNewWindow('../../ViewCRFVersion?id=<c:out value="${version.id}"/>','','','')">
-<img hspace="6" border="0" align="left" title="Metadata" alt="Metadata" src="../../images/bt_Metadata.gif" name="bt_Metadata">
+<span border="0" align="left" title="Metadata" alt="Metadata" class="icon icon-icon-dataEntryCompleted orange" name="bt_Metadata">
 </a>
 
 
