@@ -67,6 +67,7 @@ import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -423,8 +424,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // BWP 01/08 >>
             // sm = new SessionManager(ub, userName);
             sm = new SessionManager(ub, userName, SpringServletAccess.getApplicationContext(context));
-            ub = sm.getUserBean();
-            session.setAttribute("userBean", ub);
+            if (StringUtils.isEmpty(ub.getName())) {
+                ub = sm.getUserBean();
+                session.setAttribute("userBean", ub);
+            }
             request.setAttribute("userBean", ub);
             StudyDAO sdao = new StudyDAO(sm.getDataSource());
             if (currentPublicStudy == null || currentPublicStudy.getId() <= 0) {

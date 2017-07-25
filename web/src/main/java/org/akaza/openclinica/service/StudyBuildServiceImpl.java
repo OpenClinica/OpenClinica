@@ -2,6 +2,7 @@ package org.akaza.openclinica.service;
 
 import com.auth0.Auth0User;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
@@ -54,11 +55,11 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     @Autowired
     private SchemaServiceDao schemaServiceDao;
     @Autowired
-    private UserAccountDAO userAccountDAO;
+    private UserAccountDao userAccountDao;
 
     public StudyInfoObject process(HttpServletRequest request, Study study, UserAccountBean ub) throws Exception  {
         String schemaName = null;
-
+        boolean isUserUpdated = false;
         try {
             int schemaId = schemaServiceDao.getProtocolSchemaSeq();
             study.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
@@ -66,14 +67,14 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             schemaName = CoreResources.getField("schemaPrefix")+ schemaId;
             study.setSchemaName(schemaName);
             Integer studyId = (Integer) studyDao.save(study);
-            saveStudyEnvRoles(request, ub);
+            isUserUpdated = saveStudyEnvRoles(request, ub);
         } catch (Exception e) {
             logger.error("Error while creating a study entry in public schema:" + schemaName);
             logger.error(e.getMessage(), e);
             throw e;
         }
         createSchema(schemaName);
-        return new StudyInfoObject(schemaName, study);
+        return new StudyInfoObject(schemaName, study, ub, isUserUpdated);
     }
 
 
@@ -116,7 +117,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return null;
     }
 
-    public void processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) {
+    public void processSpecificStudyEnvUuid(HttpServletRequest request, UserAccount ub) {
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
         if (StringUtils.isEmpty(studyEnvUuid))
             return;
@@ -124,36 +125,39 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         if (study == null)
             return;
         Study parentStudy = study.getStudy();
-        int parentStudyId = parentStudy == null ? study.getStudyId() : study.getStudy().getStudyId();
-        ub.setActiveStudyId(parentStudyId);
-        userAccountDAO.update(ub);
+        Study toUpdate = parentStudy == null ? study : study.getStudy();
+        ub.setActiveStudy(toUpdate);
+        userAccountDao.saveOrUpdate(ub);
     }
 
-    public void saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub) throws Exception {
+    public boolean saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ubIn) throws Exception {
+        UserAccount ub = userAccountDao.findByUserId(ubIn.getId());
         processSpecificStudyEnvUuid(request, ub);
+        boolean studyUserRoleUpdated = false;
+        int userActiveStudyId = ub.getActiveStudy().getStudyId();
         ResponseEntity <StudyEnvironmentRoleDTO[]> userRoles = getUserRoles(request);
         for (StudyEnvironmentRoleDTO role: userRoles.getBody()) {
             Study study = studyDao.findByStudyEnvUuid(role.getStudyEnvironmentUuid());
             if (study == null)
                 continue;
             Study parentStudy = study.getStudy();
-            int parentStudyId = parentStudy == null ? study.getStudyId() : study.getStudy().getStudyId();
+            Study toUpdate = parentStudy == null ? study : study.getStudy();
             // set this as the active study
-            if (ub.getActiveStudyId() == 0) {
-                ub.setActiveStudyId(parentStudyId);
-                userAccountDAO.update(ub);
+            if (ub.getActiveStudy().getStudyId() == 0) {
+                ub.setActiveStudy(toUpdate);
+                userAccountDao.saveOrUpdate(ub);
             }
             UserAccount userAccount = new UserAccount();
-            userAccount.setUserName(ub.getName());
-            ArrayList<StudyUserRole> byUserAccount = studyUserRoleDao.findAllUserRolesByUserAccount(userAccount, study.getStudyId(), parentStudyId);
+            userAccount.setUserName(ub.getUserName());
+            ArrayList<StudyUserRole> byUserAccount = studyUserRoleDao.findAllUserRolesByUserAccount(userAccount, study.getStudyId(), toUpdate.getStudyId());
             String rolename = role.getRoleName();
             String ocRole = getOCRole(rolename, false);
             if (byUserAccount.isEmpty()) {
                 StudyUserRole studyUserRole = new StudyUserRole();
                 StudyUserRoleId userRoleId = new StudyUserRoleId();
                 studyUserRole.setId(userRoleId);
-                userRoleId.setUserName(ub.getName());
-                studyUserRole.setOwnerId(ub.getOwnerId());
+                userRoleId.setUserName(ub.getUserName());
+                studyUserRole.setOwnerId(ub.getUserId());
 
                 studyUserRole.setRoleName(ocRole);
 
@@ -161,6 +165,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 studyUserRole.setStatusId(org.akaza.openclinica.bean.core.Status.AVAILABLE.getId());
                 studyUserRole.setDateCreated(new Date());
                 studyUserRoleDao.saveOrUpdate(studyUserRole);
+                if (userActiveStudyId == toUpdate.getStudyId())
+                    studyUserRoleUpdated = true;
             } else {
                 for (StudyUserRole sur : byUserAccount) {
                     if (sur.getRoleName().equals(ocRole))
@@ -169,13 +175,19 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                         sur.setRoleName(ocRole);
                         sur.setDateUpdated(new Date());
                         StudyUserRole studyUserRole = studyUserRoleDao.saveOrUpdate(sur);
+                        if (userActiveStudyId == toUpdate.getStudyId())
+                            studyUserRoleUpdated = true;
                     }
                 }
             }
         }
-        if (ub.getActiveStudyId() == 0) {
+        if (ub.getActiveStudy().getStudyId() == 0) {
             throw new Exception("Your study has not been published yet.");
         }
+        if (studyUserRoleUpdated) {
+            return true;
+        } else
+            return false;
     }
 
     private boolean createSchema(String schemaName) throws Exception {
