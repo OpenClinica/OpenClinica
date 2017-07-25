@@ -45,7 +45,7 @@
 <jsp:useBean scope="request" id="datasets" class="java.util.ArrayList"/>
 
 
-<h1><span class="title_manage"><c:out value="${study.name}" />: <fmt:message key="view_dataset" bundle="${resworkflow}"/></span></h1><br/>
+<h1><span class="title_manage"><c:out value="${study.name}" />: <fmt:message key="view_dataset" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide')"><span class="icon icon-question-circle gray"></span></a></span></h1><br/>
 
 
 <%--<p><center><a href="ViewDatasets?action=owner&ownerId=<c:out value="${userBean.id}"/>">Show Only My Datasets</a> |

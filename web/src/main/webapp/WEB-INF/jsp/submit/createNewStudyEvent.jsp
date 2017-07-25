@@ -107,10 +107,14 @@
 	<c:when test="${requestStudySubject == requestStudySubjectFalse}">
 	
 <fmt:message key="schedule_study_event_for" bundle="${resword}"/><b> <c:out value="${chosenSubject.name}" /></b>
+        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/schedule-event')">
+            <span class="icon icon-question-circle gray" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 	</c:when>
 	<c:otherwise>
 	
 <fmt:message key="schedule_study_event_for" bundle="${resword}"/>
+<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/schedule-event#enterData')">
+<span class="icon icon-question-circle gray" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 	</c:otherwise>
 </c:choose>
 </span></h1><br/>
