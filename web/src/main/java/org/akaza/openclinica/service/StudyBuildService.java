@@ -18,7 +18,7 @@ public interface StudyBuildService {
 
     StudyInfoObject process(HttpServletRequest request, Study study, UserAccountBean ub) throws Exception;
 
-    void saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub) throws Exception;
+    boolean saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub) throws Exception;
 
     ResponseEntity getUserRoles(HttpServletRequest request);
 

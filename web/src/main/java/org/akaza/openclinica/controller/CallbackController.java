@@ -6,6 +6,7 @@ import com.auth0.SessionUtils;
 import com.auth0.Tokens;
 import com.auth0.spring.security.mvc.Auth0CallbackHandler;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.service.CallbackService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -42,8 +43,11 @@ public class CallbackController extends Auth0CallbackHandler {
         Tokens tokens = SessionUtils.getTokens(req);
         Auth0User user = SessionUtils.getAuth0User(req);
         req.getSession().setAttribute("accessToken", tokens.getAccessToken());
-        UserAccountBean ub = callbackService.isCallbackSuccessful(req, user);
+        UserAccountHelper userAccountHelper = callbackService.isCallbackSuccessful(req, user);
+        UserAccountBean ub = userAccountHelper.getUb();
         if (ub != null) {
+            if (userAccountHelper.isUpdated())
+              ub = callbackService.getUpdatedUser(ub);
             req.getSession().setAttribute(USER_BEAN_NAME, ub);
         } else {
             unauthorized(res, "Bad credentials");

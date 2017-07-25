@@ -6,8 +6,10 @@ import com.google.gson.internal.LinkedTreeMap;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.UserAccountController;
+import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
@@ -34,12 +36,14 @@ public class CallbackServiceImpl implements CallbackService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired
     private StudyUserRoleDao studyUserRoleDao;
-    @Autowired DataSource dataSource;
-    @Autowired UserAccountController userAccountController;
+    @Autowired private DataSource dataSource;
+    @Autowired private UserAccountController userAccountController;
     @Autowired private StudyBuildService studyBuildService;
+    @Autowired private UserAccountDAO userAccountDAO;
+
     private ObjectMapper objectMapper = new ObjectMapper();
     @Override
-    public UserAccountBean isCallbackSuccessful(HttpServletRequest request, Auth0User user) throws Exception {
+    public UserAccountHelper isCallbackSuccessful(HttpServletRequest request, Auth0User user) throws Exception {
         UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
         String _username = user.getNickname();
         logger.info("Callback for user:" + _username);
@@ -56,8 +60,12 @@ public class CallbackServiceImpl implements CallbackService {
         if (ub.getId() == 0) {
             ub = createUserAccount(request, user);
         }
-        updateStudyUserRoles(request, ub, user);
-        return ub;
+        boolean isUserUpdated = updateStudyUserRoles(request, ub, user);
+        return new UserAccountHelper(ub, isUserUpdated);
+    }
+
+    public UserAccountBean getUpdatedUser(UserAccountBean ub) {
+        return (UserAccountBean) userAccountDAO.findByUserName(ub.getName());
     }
 
     @Modifying
@@ -72,13 +80,13 @@ public class CallbackServiceImpl implements CallbackService {
     }
 
     @Modifying
-    private void updateStudyUserRoles(HttpServletRequest request, UserAccountBean ub, Auth0User user) throws Exception {
+    private boolean updateStudyUserRoles(HttpServletRequest request, UserAccountBean ub, Auth0User user) throws Exception {
         Map<String, Object> appMetadata = user.getAppMetadata();
         Object userContext = appMetadata.get("userContext");
         String toJson = objectMapper.writeValueAsString(userContext);
         Map<String, Object> userContextMap = objectMapper.readValue(toJson, Map.class);
         request.getSession().setAttribute("userContextMap", userContextMap);
-        studyBuildService.saveStudyEnvRoles(request, ub);
+        return studyBuildService.saveStudyEnvRoles(request, ub);
     }
 
     private UserAccountBean createUserAccount(HttpServletRequest request, Auth0User user) throws Exception {

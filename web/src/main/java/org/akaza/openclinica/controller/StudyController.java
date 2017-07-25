@@ -278,7 +278,7 @@ import java.util.regex.Pattern;
         try {
             studyInfoObject = studyBuildService.process(request, study, ownerUserAccount);
             liquibaseOnDemandService.createForeignTables(studyInfoObject);
-            schemaStudy = liquibaseOnDemandService.process(studyInfoObject, ownerUserAccount);
+            schemaStudy = liquibaseOnDemandService.process(studyInfoObject, studyInfoObject.getUb());
         } catch (Exception e) {
             try {
                 schemaCleanupService.dropSchema(studyInfoObject);
@@ -460,7 +460,7 @@ import java.util.regex.Pattern;
         AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study added to Public schema", "PENDING");
         AsyncStudyHelper.put(study.getUniqueIdentifier(), asyncStudyHelper);
         liquibaseOnDemandService.createForeignTables(studyInfoObject);
-        Study schemaStudy = liquibaseOnDemandService.process(studyInfoObject, ownerUserAccount);
+        Study schemaStudy = liquibaseOnDemandService.process(studyInfoObject, studyInfoObject.getUb());
 
         logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
         logger.debug("study oc_id:" + schemaStudy.getOc_oid());
