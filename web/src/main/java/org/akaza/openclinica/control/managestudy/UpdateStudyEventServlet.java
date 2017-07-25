@@ -193,7 +193,7 @@ public class UpdateStudyEventServlet extends SecureController {
 
         StudyDAO sdao = new StudyDAO(this.sm.getDataSource());
         StudyBean studyBean = (StudyBean) sdao.findByPK(ssub.getStudyId());
-        checkRoleByUserAndStudy(ub, studyBean.getParentStudyId(), studyBean.getId());
+        checkRoleByUserAndStudy(ub, studyBean, sdao);
         // To remove signed status from the list
         EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
         boolean removeSign = false;

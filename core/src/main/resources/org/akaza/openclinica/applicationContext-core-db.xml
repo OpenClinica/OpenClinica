@@ -1,92 +1,36 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
 <beans
-    xmlns="http://www.springframework.org/schema/beans"
-    xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-    xmlns:p="http://www.springframework.org/schema/p"
-    xsi:schemaLocation="http://www.springframework.org/schema/beans 
-                        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd"
-    >
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd">
 
-    <!-- 
-    <bean id="testDao" class="org.akaza.openclinica.dao.test.TestDao">
-        <property name="jdbcTemplate">
-            <ref bean="jdbcTemplate"/>
-        </property>
+
+    <!--  Service layer supports legacy DAOs via constructor injection of dataSource
+          and Hibernate DAO injection via autowiring -->
+
+    <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource" primary="true">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="maxTotal" value="50"/>
+        <property name="maxIdle" value="2"/>
+        <property name="maxWaitMillis" value="180000"/>
+        <property name="removeAbandonedOnBorrow" value="true"/>
+        <property name="removeAbandonedTimeout" value="300"/>
+        <property name="logAbandoned" value="true"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnReturn" value="true"/>
+        <property name="timeBetweenEvictionRunsMillis" value="300000"/>
+        <property name="minEvictableIdleTimeMillis" value="600000"/>
+        <property name="url" value="s[url]"/>
+        <property name="username" value="s[username]"/>
+        <property name="password" value="s[password]"/>
+        <property name="bigStringTryClob" value="true"/>
+        <qualifier value="dataSource"/>
     </bean>
 
-    <bean id="jdbcTemplate" class="org.springframework.jdbc.core.JdbcTemplate" autowire="byName">
-     <property name="dataSource">
-            <ref bean="ds"/>
-        </property>
-    </bean>
-     -->
-
-    <bean id="liquibase" class="liquibase.integration.spring.SpringLiquibase" depends-on="coreResources">
-      <property name="dataSource" ref="dataSource" />
-      <property name="changeLog" value="classpath:migration/master.xml" />
-      <property name="defaultSchema" value="s[schema]"/>
-      
-      
-    </bean>
-
-    <!-- 
-    <bean id="dataSource" class="org.apache.commons.dbcp.BasicDataSource"
-        p:driverClassName="s[driver]"
-        p:maxActive="50" p:maxIdle="2"
-        p:maxWait="180000"
-        p:removeAbandoned="true"
-        p:removeAbandonedTimeout="300"
-        p:logAbandoned="true"
-        p:testWhileIdle="true"
-        p:testOnReturn="true"
-        p:timeBetweenEvictionRunsMillis="300000"
-        p:minEvictableIdleTimeMillis="600000"
-        p:url="s[url]"
-        p:username="s[username]"
-        p:password="s[password]"
-        />
-         -->
-        
-        
-      <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">
-      <property name="driverClassName" value="s[driver]"/>
-      <property name="maxActive" value="50"/>
-      <property name="maxIdle" value="2"/>
-      <property name="maxWait" value="180000"/>
-      <property name="removeAbandoned" value="true"/>
-      <property name="removeAbandonedTimeout" value="300"/>
-      <property name="logAbandoned" value="true"/>
-      <property name="testWhileIdle" value="true"/>
-      <property name="testOnReturn" value="true"/>
-      <property name="timeBetweenEvictionRunsMillis" value="300000"/>
-      <property name="minEvictableIdleTimeMillis" value="600000"/>
-      <property name="url" value="s[url]"/>
-      <property name="username" value="s[username]"/>
-      <property name="password" value="s[password]"/>
-      <property name="bigStringTryClob" value="true"/>
-       </bean>  
-     
-    <!-- 
-    <bean class="org.springframework.beans.factory.config.MethodInvokingFactoryBean">
-        <property name="targetObject"><ref local="dataSource"/></property>
-        <property name="targetMethod"><value>addConnectionProperty</value></property>
-        <property name="arguments">
-            <list>
-                <value>SetBigStringTryClob</value>
-                <value>true</value>
-            </list>
-        </property>
-    </bean>
-    -->
-    
     <bean id="queryStore" class="org.akaza.openclinica.dao.QueryStore" init-method="init">
         <property name="dataSource" ref="dataSource"/>
     </bean>
-      
-    <!-- Exposing old-fashioned DAOs as Spring beans -->
-   <!--  <bean class="org.akaza.openclinica.dao.login.UserAccountDAO">
-        <constructor-arg ref="dataSource"/>
-        </bean>
--->
+
 </beans>

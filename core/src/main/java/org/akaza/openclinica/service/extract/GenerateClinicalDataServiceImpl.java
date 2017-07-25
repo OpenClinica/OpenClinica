@@ -23,6 +23,7 @@ import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
@@ -139,9 +140,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
     public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID) {
         LinkedHashMap<String, OdmClinicalDataBean> hm = new LinkedHashMap<String, OdmClinicalDataBean>();
-        Study study = new Study();
-        study.setOc_oid(studyOID);
-        study = getStudyDao().findByColumnName(studyOID, "oc_oid");
+
+        Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
         List<StudySubject> studySubjs = study.getStudySubjects();
         if (study.getStudies().size() < 1) {
             hm.put(studyOID, constructClinicalData(study, studySubjs));
@@ -813,16 +813,17 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
         Study study = getStudyDao().findByOcOID(studyOID);
         int parentStudyId = 0;
         int studyId = study.getStudyId();
+        Study publicStudy = getStudyDao().findPublicStudy(studyOID);
 
-        if (study.getStudy() != null) {
+        if (publicStudy.getStudy() != null) {
             isActiveRoleAtSite = true;
-            parentStudyId = study.getStudy().getStudyId();
+            parentStudyId = publicStudy.getStudy().getStudyId();
         } else {
-            parentStudyId = studyId;
+            parentStudyId = publicStudy.getStudyId();
             isActiveRoleAtSite = false;
         }
 
-        ArrayList<StudyUserRole> surlist = getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, studyId, parentStudyId);
+        ArrayList<StudyUserRole> surlist = getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, publicStudy.getStudyId(), parentStudyId);
         if (surlist == null || surlist.size() == 0) {
             // Does not have permission to view study or site info / return null
             return null;

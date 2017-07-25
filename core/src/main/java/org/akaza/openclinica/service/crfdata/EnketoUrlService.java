@@ -21,50 +21,19 @@ import org.akaza.openclinica.core.form.xform.LogBean;
 import org.akaza.openclinica.core.form.xform.QueriesBean;
 import org.akaza.openclinica.core.form.xform.QueryBean;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
-import org.akaza.openclinica.dao.hibernate.CrfDao;
-import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
-import org.akaza.openclinica.dao.hibernate.ItemDao;
-import org.akaza.openclinica.dao.hibernate.ItemDataDao;
-import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
-import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
-import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
-import org.akaza.openclinica.dao.hibernate.ResponseTypeDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.AuditLogEvent;
-import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
-import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
-import org.akaza.openclinica.domain.datamap.ItemData;
-import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
-import org.akaza.openclinica.domain.datamap.ItemGroup;
-import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLResponse;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
-import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -72,6 +41,20 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+
+import javax.servlet.ServletContext;
+import java.io.File;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -104,6 +87,9 @@ public class EnketoUrlService {
     ServletContext context;
 
     @Autowired
+    private CrfVersionDao crfVersionDao;
+
+    @Autowired
     private FormLayoutDao formLayoutDao;
 
     @Autowired
@@ -117,9 +103,6 @@ public class EnketoUrlService {
 
     @Autowired
     private EventCrfDao eventCrfDao;
-
-    @Autowired
-    private ItemDao itemDao;
 
     @Autowired
     private CrfDao crfDao;
@@ -229,11 +212,11 @@ public class EnketoUrlService {
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
 
         // Build redirect url
-        String redirectUrl = getRedirectUrl(subject.getOcOid(), studyOid);
+        String redirectUrl = CoreResources.getField("sysURL");
 
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
-        EnketoURLResponse eur = enketo.getEditURL(formLayout, crfFlavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
+        EnketoURLResponse eur = enketo.registerAndGetEditURL(formLayout, crfFlavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
                 goTo, flavor, role, study, studyEvent, mode);
 
         if (eur.getEdit_url() != null) {
@@ -265,31 +248,6 @@ public class EnketoUrlService {
 
         return editURL;
 
-    }
-
-    private String getRedirectUrl(String studySubjectOid, String studyOid) {
-        String portalURL = CoreResources.getField("portalURL");
-        String url = "";
-        if (portalURL != null && !portalURL.equals("")) {
-            ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-            Authorization pManageAuthorization = registrar.getAuthorization(studyOid);
-            try {
-                URL pManageUrl = new URL(portalURL);
-
-                if (pManageAuthorization != null && pManageAuthorization.getStudy() != null && pManageAuthorization.getStudy().getHost() != null
-                        && !pManageAuthorization.getStudy().getHost().equals("")) {
-                    url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
-                            + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-                }
-            } catch (MalformedURLException e) {
-                logger.error("Error building redirect URL: " + e.getMessage());
-                logger.error(ExceptionUtils.getStackTrace(e));
-                return "";
-            }
-        }
-        if (!url.equals(""))
-            url = url + "/#/event/" + studySubjectOid + "/dashboard";
-        return url;
     }
 
     public QueriesBean buildQueryElement(ItemData itemdata) {

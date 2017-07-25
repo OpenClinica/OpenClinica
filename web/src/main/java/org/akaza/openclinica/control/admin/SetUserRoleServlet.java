@@ -209,9 +209,12 @@ public class SetUserRoleServlet extends SecureController {
                         + userStudy.getName() + ".");
                 }
                 ArrayList <String> pMessage =  (ArrayList<String>) request.getAttribute(SecureController.PAGE_MESSAGE);
-                String url=response.encodeRedirectURL("ListUserAccounts"+"?alertmessage="+  URLEncoder.encode(pMessage.get(0), "UTF-8"));
-                          response.sendRedirect(url);
-          //   forwardPage(Page.LIST_USER_ACCOUNTS_SERVLET);
+                String actionUrl = "ListUserAccounts";
+                if (pMessage != null) {
+                    actionUrl += "?alertmessage="+  URLEncoder.encode(pMessage.get(0), "UTF-8");
+                }
+                String url=response.encodeRedirectURL(actionUrl);
+                response.sendRedirect(url);
 
             }
 

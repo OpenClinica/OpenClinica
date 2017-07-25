@@ -144,6 +144,8 @@ public class OpenRosaSubmissionController {
 
         DataBinder dataBinder = new DataBinder(null);
         Errors errors = dataBinder.getBindingResult();
+        Study parentStudy = studyDao.findByOcOID(studyOID);
+        request.setAttribute("requestSchema", parentStudy.getSchemaName());
         Study study = studyDao.findByOcOID(studyOID);
         String requestBody = null;
 
@@ -227,6 +229,9 @@ public class OpenRosaSubmissionController {
         int studyEventOrdinal = Integer.valueOf(subjectContext.get("studyEventOrdinal"));
 
         UserAccount userAccount = userAccountDao.findById(userAccountID);
+        Study parentStudy = studyDao.findByOcOID(studyOID);
+        request.setAttribute("requestSchema", parentStudy.getSchemaName());
+
         StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOID);
         Study study = studyDao.findByOcOID(studyOID);
         StudyEventDefinition sed = studyEventDefinitionDao.findById(studyEventDefinitionID);
@@ -304,6 +309,8 @@ public class OpenRosaSubmissionController {
 
         DataBinder dataBinder = new DataBinder(null);
         Errors errors = dataBinder.getBindingResult();
+        Study publicStudy = studyDao.findByOcOID(studyOID);
+        request.setAttribute("requestSchema", publicStudy.getSchemaName());
         Study study = studyDao.findByOcOID(studyOID);
         String requestBody = null;
         String instanceId = null;
@@ -497,31 +504,19 @@ public class OpenRosaSubmissionController {
 
     private boolean mayProceed(Study childStudy, StudySubjectBean ssBean) throws Exception {
         boolean accessPermission = false;
-        ParticipantPortalRegistrar participantPortalRegistrar = new ParticipantPortalRegistrar();
         Study study = getParentStudy(childStudy);
-        StudyParameterValue pStatus = studyParameterValueDao.findByStudyIdParameter(study.getStudyId(), "participantPortal");
-
-        // ACTIVE, PENDING, or INACTIVE
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(childStudy.getOc_oid()).toString();
-
-        // enabled or disabled
-        String participateStatus = pStatus.getValue().toString();
 
         // available, pending, frozen, or locked
         String studyStatus = study.getStatus().getName().toString();
 
         if (ssBean == null) {
-            logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
-            if (participateStatus.equalsIgnoreCase("enabled") && (studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("FROZEN"))
-                    && pManageStatus.equalsIgnoreCase("ACTIVE"))
+            logger.debug("studyStatus: " + studyStatus);
+            if (studyStatus.equalsIgnoreCase("available"))
                 accessPermission = true;
         } else {
-            logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus
+            logger.info("studyStatus: " + studyStatus
                     + "  studySubjectStatus: " + ssBean.getStatus().getName());
-            // TODO: Disabled pManage status check for OC16 conference. Re-enable after.
-            // if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") &&
-            // pManageStatus.equalsIgnoreCase("ACTIVE")
-            if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && ssBean.getStatus() == Status.AVAILABLE)
+            if (studyStatus.equalsIgnoreCase("available") && ssBean.getStatus() == Status.AVAILABLE)
                 accessPermission = true;
         }
         return accessPermission;

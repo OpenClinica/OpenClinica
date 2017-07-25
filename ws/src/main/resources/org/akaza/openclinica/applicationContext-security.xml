@@ -1,6 +1,7 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <beans xmlns="http://www.springframework.org/schema/beans"
        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:p="http://www.springframework.org/schema/p"
        xmlns:security="http://www.springframework.org/schema/security"
        xmlns:oauth="http://www.springframework.org/schema/security/oauth2"
        xsi:schemaLocation="http://www.springframework.org/schema/beans
@@ -8,7 +9,7 @@
 
 
                            http://www.springframework.org/schema/security
-                           http://www.springframework.org/schema/security/spring-security-4.1.xsd
+                           http://www.springframework.org/schema/security/spring-security-4.2.xsd
                            http://www.springframework.org/schema/security/oauth2 
                            http://www.springframework.org/schema/security/spring-security-oauth2.xsd">
 
@@ -46,12 +47,43 @@
         <constructor-arg value="/pages/login/login"/>
         <property name="forceHttps" value="false"/>
     </bean>
-    
+    <security:authentication-manager alias="authenticationManager">
+        <security:authentication-provider user-service-ref="ocUserDetailsService">
+            <security:password-encoder ref="openClinicaPasswordEncoder"/>
+        </security:authentication-provider>
+        <security:authentication-provider ref="ldapAuthenticationProvider"/>
+    </security:authentication-manager>
+
+    <bean id="shaPasswordEncoder" class="org.springframework.security.authentication.encoding.ShaPasswordEncoder"/>
+    <bean id="md5PasswordEncoder" class="org.springframework.security.authentication.encoding.Md5PasswordEncoder"/>
+
+    <bean id="openClinicaPasswordEncoder" class="org.akaza.openclinica.core.OpenClinicaPasswordEncoder">
+        <property name="currentPasswordEncoder" ref="shaPasswordEncoder"/>
+        <property name="oldPasswordEncoder" ref="md5PasswordEncoder"/>
+    </bean>
+
+    <bean id="securityManager" class="org.akaza.openclinica.core.SecurityManager">
+        <property name="encoder" ref="openClinicaPasswordEncoder"/>
+        <property name="providers">
+            <list>
+                <ref bean="ldapAuthenticationProvider"/>
+                <bean class="org.springframework.security.authentication.dao.DaoAuthenticationProvider">
+                    <property name="userDetailsService" ref="ocUserDetailsService"/>
+                    <property name="passwordEncoder" ref="openClinicaPasswordEncoder"/>
+                </bean>
+            </list>
+        </property>
+    </bean>
+    <bean id="ocUserDetailsService" class="org.akaza.openclinica.web.filter.OpenClinicaJdbcService"
+          p:dataSource-ref="dataSource"
+          p:usersByUsernameQuery="SELECT user_name,passwd,enabled,account_non_locked FROM user_account WHERE user_name = ?">
+        <property name="enableAuthorities" value="true"/>
+    </bean>
     <bean id="myFilter" class="org.akaza.openclinica.web.filter.OpenClinicaUsernamePasswordAuthenticationFilter">
         <property name="authenticationManager" ref="authenticationManager"/>
         <property name="authenticationFailureHandler" ref="failureHandler" />
         <property name="authenticationSuccessHandler" ref="successHandler" />
-        <!-- 
+        <!--
         <property name="authenticationFailureUrl" value="/pages/login/login?action=errorLogin"/>
         <property name="defaultTargetUrl" value="/MainMenu"/>
          -->

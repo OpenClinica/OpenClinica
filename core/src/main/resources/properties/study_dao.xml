@@ -67,11 +67,23 @@
          </sql>
 	</query>
 	<query>
+		<name>findByPublicOid</name>
+		<sql>SELECT s.* FROM public.study s
+			WHERE s.OC_OID = ?
+		</sql>
+	</query>
+	<query>
         <name>findByUniqueIdentifier</name>
         <sql>SELECT s.* FROM study s
            WHERE s.unique_identifier = ?
          </sql>
     </query>
+	<query>
+		<name>findByStudyEnvUuid</name>
+		<sql>SELECT s.* FROM study s
+			WHERE s.study_env_uuid = ?
+		</sql>
+	</query>
     <query>
         <name>findSiteByUniqueIdentifier</name>
         <sql>select site.* from study site, study study where
@@ -94,7 +106,7 @@
 	</query>
 	<query>
 		<name>findNextKey</name>
-		<sql>select nextval('study_study_id_seq') as key</sql>
+		<sql>select nextval('public.study_study_id_seq') as key</sql>
 	</query>
 	<query>
 		<name>createStepOne</name>
@@ -115,7 +127,8 @@
 		PROTOCOL_DATE_VERIFICATION=?, PHASE=?, EXPECTED_TOTAL_ENROLLMENT=?,
 		SPONSOR=?, COLLABORATORS=?, MEDLINE_IDENTIFIER=?, results_reference=?,
 		URL=?,URL_DESCRIPTION=?, CONDITIONS=?, KEYWORDS=?, ELIGIBILITY=?,
-		GENDER=?, AGE_MAX=?, AGE_MIN=?, HEALTHY_VOLUNTEER_ACCEPTED=?
+		GENDER=?, AGE_MAX=?, AGE_MIN=?, HEALTHY_VOLUNTEER_ACCEPTED=?,
+        SCHEMA_NAME=?, UUID=?
 		WHERE STUDY_ID=?
       </sql>
 	</query>

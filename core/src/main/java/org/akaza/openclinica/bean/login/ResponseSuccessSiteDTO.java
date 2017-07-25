@@ -2,16 +2,16 @@ package org.akaza.openclinica.bean.login;
 
 public class ResponseSuccessSiteDTO {
 
-	private String uniqueSiteProtocolID;
+	private String uniqueSiteStudyID;
 	private String siteOid;
 	private String message;
 
-	public String getUniqueSiteProtocolID() {
-		return uniqueSiteProtocolID;
+	public String getUniqueSiteStudyID() {
+		return uniqueSiteStudyID;
 	}
 
-	public void setUniqueSiteProtocolID(String uniqueSiteProtocolID) {
-		this.uniqueSiteProtocolID = uniqueSiteProtocolID;
+	public void setUniqueSiteStudyID(String uniqueSiteStudyID) {
+		this.uniqueSiteStudyID = uniqueSiteStudyID;
 	}
 
 	public String getSiteOid() {

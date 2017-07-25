@@ -217,7 +217,7 @@
 
   <rule_set_rule id="3" rule_set_id="-1" rule_id="-1" owner_id="0" date_created="2008-07-02" status_id="1" version="0"/>
   <rule_set_rule id="4" rule_set_id="-2" rule_id="-1" owner_id="0" date_created="2008-07-02" status_id="1" version="0"/>
-  
+
   <rule_action id="3" rule_set_rule_id="3" action_type="1" expression_evaluates_to="true" message="RULE_1 is TRUE" owner_id="0" date_created="2008-07-02" status_id="1" version="0"/>
   <rule_action id="4" rule_set_rule_id="3" action_type="1" expression_evaluates_to="false" message="RULE_1 is FALSE" owner_id="0" date_created="2008-07-02" status_id="1" version="0"/>
   <rule_action id="5" rule_set_rule_id="4" action_type="1" expression_evaluates_to="true" message="RULE_1 is TRUE" owner_id="0" date_created="2008-07-02" status_id="1" version="0"/>
@@ -225,11 +225,11 @@
   <rule_expression id="1" value="SE_ED1NONRE.F_AGEN.IG_AGEN_UNGROUPED[1].I_AGEN_PERIODSTART eq &quot;07/01/2008&quot; and I_CONC_CON_MED_NAME eq &quot;Tylenol&quot;" context="1" owner_id="0" date_created="2008-07-02" date_updated="2008-07-02" update_id="0" status_id="1" version="0"/>
   <rule_expression id="2" value="SE_ED2REPEA.F_CONC_V20.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_NAME" context="1" owner_id="0" date_created="2008-07-02" status_id="1" version="0"/>
   <rule_expression id="3" value="SE_ED2REPEA.F_CONC.IG_CONC_CONCOMITANTMEDICATIONS.I_CONC_CON_MED_NAME" context="1" owner_id="0" date_created="2008-07-02" status_id="1" version="0"/>
-  
-  <!--  InValid RuleSets 
+
+  <!--  InValid RuleSets
   <rule_set id="3" rule_expression_id="2" study_event_definition_id="2" crf_id="2" crf_version_id="2" study_id="1" owner_id="0" date_created="2008-07-02" status_id="1" version="1"/>
   <rule_set id="4" rule_expression_id="3" study_event_definition_id="2" crf_id="2"                    study_id="1" owner_id="0" date_created="2008-07-02" status_id="5" version="1"/>
-  
+
   <rule_set_rule id="5" rule_set_id="3" rule_id="1" owner_id="0" date_created="2008-07-02" status_id="5"/>
   <rule_set_rule id="6" rule_set_id="4" rule_id="1" owner_id="0" date_created="2008-07-02" status_id="1"/>
   -->

@@ -3,6 +3,7 @@ package org.akaza.openclinica.service.crfdata.xform;
 import java.net.URL;
 import java.util.Calendar;
 import java.util.Date;
+import java.util.HashMap;
 import java.util.List;
 
 import org.akaza.openclinica.bean.core.Role;
@@ -13,14 +14,13 @@ import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.service.pmanage.Authorization;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
@@ -56,18 +56,20 @@ public class EnketoAPI {
 
     public static final String INSTANCE_WRITABLE_DN = "/api/v2/instance/fieldsubmission/iframe";
     public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/api/v2/instance/fieldsubmission/c/iframe";
+    private String userPasswdCombo;
 
     public EnketoAPI(EnketoCredentials credentials) {
         this.enketoURL = credentials.getServerUrl();
         this.token = credentials.getApiKey();
         this.ocURL = credentials.getOcInstanceUrl();
+        this.userPasswdCombo =  new String(Base64.encodeBase64((CoreResources.getField("ocform.adminapikey") + ":").getBytes()));
     }
 
     public String getOfflineFormURL(String crfOID) throws Exception {
         if (enketoURL == null)
             return "";
         URL eURL = new URL(enketoURL + SURVEY_OFFLINE_MODE);
-        EnketoURLResponse response = getURL(eURL, crfOID);
+        EnketoURLResponse response = registerAndGetURL(eURL, crfOID);
         if (response != null) {
             String myUrl = response.getOffline_url();
             if (enketoURL.toLowerCase().startsWith("https") && !myUrl.toLowerCase().startsWith("https")) {
@@ -112,7 +114,7 @@ public class EnketoAPI {
             eURL = new URL(enketoURL + SURVEY_WRITABLE_DN_CLOSE_BUTTON);
         }
         String myUrl = null;
-        EnketoURLResponse response = getURL(eURL, crfOID);
+        EnketoURLResponse response = registerAndGetURL(eURL, crfOID);
         if (response != null) {
             if (response.getSingle_fieldsubmission_iframe_url() != null) {
                 myUrl = response.getSingle_fieldsubmission_iframe_url();
@@ -132,39 +134,135 @@ public class EnketoAPI {
         if (enketoURL == null)
             return "";
         URL eURL = new URL(enketoURL + SURVEY_PREVIEW_MODE);
-        EnketoURLResponse response = getURL(eURL, crfOID);
+        EnketoURLResponse response = registerAndGetURL(eURL, crfOID);
         if (response != null)
             return response.getPreview_url();
         else
             return "";
     }
 
-    private EnketoURLResponse getURL(URL url, String crfOID) {
+    private EnketoURLResponse registerAndGetURL(URL url, String crfOID) {
+        EnketoURLResponse urlResponse = null;
         try {
-            String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
-            HttpHeaders headers = new HttpHeaders();
-            headers.setContentType(MediaType.APPLICATION_JSON);
-            headers.add("Authorization", "Basic " + userPasswdCombo);
-            headers.add("Accept-Charset", "UTF-8");
-            EnketoURLRequest body = new EnketoURLRequest(ocURL, crfOID);
-            HttpEntity<EnketoURLRequest> request = new HttpEntity<EnketoURLRequest>(body, headers);
-            RestTemplate rest = new RestTemplate();
-            ResponseEntity<EnketoURLResponse> response = rest.postForEntity(url.toString(), request, EnketoURLResponse.class);
-            if (response != null)
-                return response.getBody();
-            else
-                return null;
+            urlResponse = getURL(url, crfOID);
+        } catch (Exception e) {
+            if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized")
+                    || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
+                savePformRegistration();
+                try {
+                    urlResponse = getURL(url, crfOID);
+                } catch (Exception e1) {
+                    logger.error(e.getMessage());
+                    logger.error(ExceptionUtils.getStackTrace(e));
+                }
+            } else {
+                logger.error(e.getMessage());
+                logger.error(ExceptionUtils.getStackTrace(e));
+            }
+        } finally {
+            return urlResponse;
+        }
+    }
 
+
+    public EnketoURLResponse registerAndGetEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
+            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode) {
+        EnketoURLResponse urlResponse = null;
+        try {
+            //  Role role, Study parentStudy, StudyEvent studyEvent, String mode
+            urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor,
+                    role, parentStudy, studyEvent, mode);
+        } catch (Exception e) {
+            if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized")
+                    || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
+                savePformRegistration();
+                try {
+                    urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor,
+                            role, parentStudy, studyEvent, mode);
+                } catch (Exception e1) {
+                    logger.error(e.getMessage());
+                    logger.error(ExceptionUtils.getStackTrace(e));
+                }
+            } else {
+                logger.error(e.getMessage());
+                logger.error(ExceptionUtils.getStackTrace(e));
+            }
+        }
+        return urlResponse;
+    }
+
+    private EnketoURLResponse getURL(URL url, String crfOID) throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Authorization", "Basic " +
+                new String(Base64.encodeBase64((token + ":").getBytes())));
+        headers.add("Accept-Charset", "UTF-8");
+        EnketoURLRequest body = new EnketoURLRequest(ocURL, crfOID);
+        HttpEntity<EnketoURLRequest> request = new HttpEntity<EnketoURLRequest>(body, headers);
+        RestTemplate rest = new RestTemplate();
+        ResponseEntity<EnketoURLResponse> response = rest.postForEntity(url.toString(), request, EnketoURLResponse.class);
+        if (response != null)
+            return response.getBody();
+        else
+            return null;
+
+    }
+
+    public EnketoAccountResponse savePformRegistration() {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Authorization", "Basic " + userPasswdCombo);
+        headers.add("Accept-Charset", "UTF-8");
+        EnketoAccountRequest body = new EnketoAccountRequest(ocURL, token);
+        HttpEntity<EnketoAccountRequest> request = new HttpEntity<EnketoAccountRequest>(body, headers);
+
+        RestTemplate rest = new RestTemplate();
+        ResponseEntity<EnketoAccountResponse> response = null;
+        if (!checkExistingEnketoAccount())
+        {
+            response = rest.postForEntity(enketoURL + "/accounts/api/v1/account", request,
+                    EnketoAccountResponse.class);
+        } else {
+            try {
+                response = rest
+                        .exchange(enketoURL + "/accounts/api/v1/account", HttpMethod.PUT, request, EnketoAccountResponse.class, new HashMap<String, String>());
+            } catch (Exception e) {
+                System.out.println(e.getMessage());
+            }
+        }
+        return response.getBody();
+    }
+
+    public boolean checkExistingEnketoAccount()
+    {
+        boolean accountExists = false;
+
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Authorization", "Basic " + userPasswdCombo);
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity<EnketoAccountRequest> entity = new HttpEntity<EnketoAccountRequest>(headers);
+
+        try
+        {
+            RestTemplate rest = new RestTemplate();
+            ResponseEntity<EnketoAccountResponse> response = rest.exchange(CoreResources.getField("form.engine.url") +
+                            "/accounts/api/v1/account" + "?server_url=" + ocURL +
+                            "&api_key=" + token,
+                    HttpMethod.GET, entity, EnketoAccountResponse.class);
+            if (response.getBody().getCode() == 200) accountExists = true;
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
         }
-        return null;
+        return accountExists;
     }
 
     public EnketoURLResponse getEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode) {
+            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode)
+            throws Exception {
         String crfOid = formLayout.getOcOid() + crfFlavor;
+        EnketoURLResponse urlResponse = null;
         if (enketoURL == null)
             return null;
 
@@ -263,15 +361,14 @@ public class EnketoAPI {
             RestTemplate rest = new RestTemplate();
             ResponseEntity<EnketoURLResponse> response = rest.postForEntity(eURL.toString(), request, EnketoURLResponse.class);
             if (response != null)
-                return response.getBody();
-            else
-                return null;
+                urlResponse = response.getBody();
 
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
+            throw e;
         }
-        return null;
+        return urlResponse;
     }
 
 }

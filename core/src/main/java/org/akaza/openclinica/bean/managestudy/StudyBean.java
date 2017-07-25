@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
+import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 
 import java.util.ArrayList;
@@ -72,7 +73,19 @@ public class StudyBean extends AuditableEntityBean {
     private String collaborators = "";
     private String medlineIdentifier = "";
     private boolean resultsReference = false;
-    
+    private String schemaName = "";
+    private StudyEnvEnum envType;
+    private String uuid;
+    private String studyEnvUuid;
+
+    public String getStudyEnvUuid() {
+        return studyEnvUuid;
+    }
+
+    public void setStudyEnvUuid(String studyEnvUuid) {
+        this.studyEnvUuid = studyEnvUuid;
+    }
+
     // private boolean usingDOB = false;
     // private boolean discrepancyManagement = false;
     private String oid;
@@ -258,9 +271,38 @@ public class StudyBean extends AuditableEntityBean {
      * @param collaborators
      *            The collaborators to set.
      */
+    public void setSchemaName(String schemaName) {
+        this.schemaName = schemaName;
+    }
+
+
+    public String getSchemaName() {
+        return schemaName;
+    }
+
+    public StudyEnvEnum getEnvType() {
+        return this.envType;
+    }
+
+    public void setEnvType(StudyEnvEnum envType) {
+        this.envType = envType;
+    }
+
+    public String getUuid() {
+        return this.uuid;
+    }
+
+    public void setUuid(String uuid) {
+        this.uuid = uuid;
+    }
+    /**
+     * @param collaborators
+     *            The collaborators to set.
+     */
     public void setCollaborators(String collaborators) {
         this.collaborators = collaborators;
     }
+
 
     /**
      * @return Returns the conditions.

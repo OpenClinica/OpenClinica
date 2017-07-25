@@ -11,14 +11,10 @@ import org.springframework.validation.Validator;
 
 import javax.sql.DataSource;
 
-public class StudyMetadataRequestValidator implements Validator {
+public class StudyMetadataRequestValidator extends AbstractValidator implements Validator {
 
-    DataSource dataSource;
-    StudyDAO studyDAO;
     StudySubjectDAO studySubjectDAO;
     StudyEventDefinitionDAO studyEventDefinitionDAO;
-    UserAccountDAO userAccountDAO;
-    BaseVSValidatorImplementation helper;
 
     public StudyMetadataRequestValidator(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -46,45 +42,6 @@ public class StudyMetadataRequestValidator implements Validator {
         	if ( site!=null){site_id = site.getId();}
         }
         helper.verifyUser(studyMetadataRequest.getUser(), getUserAccountDAO(), study.getId(), site_id,   e) ;
-        	
-        
-//        
-//        StudyUserRoleBean studySur = getUserAccountDAO().findRoleByUserNameAndStudyId(studyMetadataRequest.getUser().getName(), study.getId());
-//	      if (studySur.getStatus() != Status.AVAILABLE) {
-//	          e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
-//	                  "You do not have sufficient privileges to proceed with this operation.");
-//	          return;
-//	      }
-        
-//        if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() == null) {
-//            StudyBean study = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getStudyUniqueId());
-//            if (study == null) {
-//            	  e.reject("subjectTransferValidator.study_does_not_exist", new Object[] { studyMetadataRequest.getStudyUniqueId() }, "Study identifier you specified "
-//                          + studyMetadataRequest.getStudyUniqueId() + " does not correspond to a valid study.");
-//                  return;  
-//            }
-//       
-//            StudyUserRoleBean studySur = getUserAccountDAO().findRoleByUserNameAndStudyId(studyMetadataRequest.getUser().getName(), study.getId());
-//            if (studySur.getStatus() != Status.AVAILABLE) {
-//                e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
-//                        "You do not have sufficient privileges to proceed with this operation.");
-//                return;
-//            }
-//        }
-//        if (studyMetadataRequest.getStudyUniqueId() != null && studyMetadataRequest.getSiteUniqueId() != null) {
-//            StudyBean study = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getStudyUniqueId());
-//            StudyBean site = getStudyDAO().findByUniqueIdentifier(studyMetadataRequest.getSiteUniqueId());
-//            if (study == null || site == null || site.getParentStudyId() != study.getId()) {
-//                e.reject("studyEventDefinitionRequestValidator.invalid_study_identifier_site_identifier");
-//                return;
-//            }
-//            StudyUserRoleBean siteSur = getUserAccountDAO().findRoleByUserNameAndStudyId(studyMetadataRequest.getUser().getName(), site.getId());
-//            if (siteSur.getStatus() != Status.AVAILABLE) {
-//                e.reject("studyEventDefinitionRequestValidator.insufficient_permissions",
-//                        "You do not have sufficient privileges to proceed with this operation.");
-//                return;
-//            }
-//        }
     }
 
     public StudyDAO getStudyDAO() {

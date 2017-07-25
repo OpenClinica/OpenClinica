@@ -117,7 +117,8 @@
                 PROTOCOL_DATE_VERIFICATION=?, PHASE=?, EXPECTED_TOTAL_ENROLLMENT=?,
                 SPONSOR=?, COLLABORATORS=?, MEDLINE_IDENTIFIER=?, results_reference=?,
                 URL=?,URL_DESCRIPTION=?, CONDITIONS=?, KEYWORDS=?, ELIGIBILITY=?,
-                GENDER=?, AGE_MAX=?, AGE_MIN=?, HEALTHY_VOLUNTEER_ACCEPTED=?
+                GENDER=?, AGE_MAX=?, AGE_MIN=?, HEALTHY_VOLUNTEER_ACCEPTED=?,
+                SCHEMA_NAME=?
                 WHERE STUDY_ID=?
       </sql>
         </query>
