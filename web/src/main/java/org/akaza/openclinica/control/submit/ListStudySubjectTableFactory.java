@@ -1261,7 +1261,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String href1 = "UpdateStudyEvent?event_id=" + studyEventId + "&ss_id=" + studySubjectId;
         builder.a().href(href1);
         builder.close();
-        builder.img().src("images/bt_Edit.png").border("0").align("left").close().aEnd();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-pencil\"/>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(edit).aEnd();
 
@@ -1271,7 +1271,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String href1 = "RemoveStudyEvent?action=confirm&id=" + studyEventId + "&studySubId=" + studySubjectId;
         builder.a().href(href1);
         builder.close();
-        builder.img().src("images/bt_Remove.png").border("0").align("left").close().aEnd();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-cancel\"/>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(remove).aEnd();
 
@@ -1281,7 +1281,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String href1 = "CreateNewStudyEvent?studySubjectId=" + studySubjectId + "&studyEventDefinition=" + sed.getId();
         builder.a().href(href1);
         builder.close();
-        builder.img().src("images/bt_Schedule.png").border("0").align("left").close().aEnd();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-clock2\"/>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(schedule).aEnd();
 
@@ -1291,7 +1291,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String href1 = "EnterDataForStudyEvent?eventId=" + studyEventId;
         builder.a().href(href1);
         builder.close();
-        builder.img().src("images/bt_View.png").border("0").align("left").close().aEnd();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>");
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append(view).aEnd();
 
