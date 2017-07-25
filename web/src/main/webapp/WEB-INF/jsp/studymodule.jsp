@@ -144,13 +144,13 @@
         <span class="icon icon-question-circle gray"></span></a>
       </span></h1><br/>
   </div>
-  <div style="border: 1px solid #ccc; width:70%; padding-left:5px">
+  <div style="border: 1px solid #ccc; width:90%; padding-left:5px">
       <p>
           <fmt:message key="study_module_description_1" bundle="${pagemessage}">
-              <fmt:param value="<img src='../images/create_new.png'/>"/>
-              <fmt:param value="<img src='../images/create_new.png'/>"/>
-              <fmt:param value="<img src='../images/bt_Edit.png'/>"/>
-              <fmt:param value="<img src='../images/bt_Details.png'/>"/>
+              <fmt:param value="<span class='icon icon-plus'/>"/>
+              <fmt:param value="<span class='icon icon-plus'/>"/>
+              <fmt:param value="<span class='icon icon-pencil'/>"/>
+              <fmt:param value="<span class='icon icon-search'/>"/>
           </fmt:message>
       </p>
       <%--<p>--%>
