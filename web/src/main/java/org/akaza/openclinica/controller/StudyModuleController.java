@@ -503,16 +503,22 @@ public class StudyModuleController {
         } else {
             currentStudy.setOldStatus(currentStudy.getStatus());
             currentStudy.setStatus(Status.get(studyModuleStatus.getStudyStatus()));
-            if (currentStudy.getParentStudyId() > 0) {
-                studyDao.updateStudyStatus(currentStudy);
-            } else {
-                studyDao.updateStudyStatus(currentStudy);
-            }
-
+            studyDao.updateStudyStatus(currentStudy);
             ArrayList siteList = (ArrayList) studyDao.findAllByParent(currentStudy.getId());
             if (siteList.size() > 0) {
                 studyDao.updateSitesStatus(currentStudy);
             }
+            String currentSchema = CoreResources.getRequestSchema(request);
+            CoreResources.setRequestSchema("public");
+            StudyBean publicStudy = studyDao.findByOid(currentStudy.getOid());
+            publicStudy.setOldStatus(currentStudy.getStatus());
+            publicStudy.setStatus(Status.get(studyModuleStatus.getStudyStatus()));
+            studyDao.updateStudyStatus(publicStudy);
+            ArrayList publicSiteList = (ArrayList) studyDao.findAllByParent(publicStudy.getId());
+            if (publicSiteList.size() > 0) {
+                studyDao.updateSitesStatus(publicStudy);
+            }
+            CoreResources.setRequestSchema(currentSchema);
         }
         return "redirect:studymodule";
     }
