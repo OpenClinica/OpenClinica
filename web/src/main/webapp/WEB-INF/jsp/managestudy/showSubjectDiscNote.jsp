@@ -112,8 +112,8 @@
               alt="<fmt:message key="data_entry_started" bundle="${resterm}"/>" title="<fmt:message key="data_entry_started" bundle="${resterm}"/>" align="left"/>
         </c:when>
         <c:when test="${event.subjectEventStatus.id == 4}">
-            <img
-              name="icon_Note" src="images/icon_DEcomplete.gif" border="0"
+            <span
+              name="icon_Note" class="icon icon-checkbox-checked green" border="0"
               alt="<fmt:message key="completed" bundle="${resterm}"/>" title="<fmt:message key="completed" bundle="${resterm}"/>" align="left"/>
         </c:when>
         <c:when test="${event.subjectEventStatus.id == 5}">

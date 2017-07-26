@@ -271,7 +271,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.crf == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('crf')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('crf')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="crf" name="crf" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -326,7 +326,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.eventDefinition == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('eventDefinition')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('eventDefinition')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="eventDefinition" name="eventDefinition" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -381,7 +381,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.subjectGroup == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('subjectGroup')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('subjectGroup')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="subjectGroup" name="subjectGroup" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -434,7 +434,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.rule == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('rule')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('rule')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="rule" name="rule" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -493,7 +493,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.site == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('site')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('site')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="site" name="site" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -552,7 +552,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.users == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('users')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('users')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="users" name="users" value=""/>
                     </c:when>
                     <c:otherwise>

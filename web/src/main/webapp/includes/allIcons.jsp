@@ -76,7 +76,7 @@
 				<td><fmt:message key="unsaved_data_in_form" bundle="${resword}"/></td>
 			</tr>
 			<tr>
-				<td><img src="../images/icon_DEcomplete.gif"></td>
+				<td><span class="icon icon-checkbox-checked green"></td>
 				<td><fmt:message key="completed" bundle="${resword}"/></td>
 			</tr>
 			<tr>
