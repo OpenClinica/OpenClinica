@@ -116,16 +116,4 @@ as the link is provided on Build Study page tasks -> Create Rules -> Actions
 <div>&nbsp;</div>
 <div class="homebox_bullets"><a href="${designerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}">Designer</a></div><br/>
 -->
-<c:choose>
-    <c:when test="${userBean.sysAdmin && module=='admin'}">
-        <c:import url="../include/workflow.jsp">
-            <c:param name="module" value="admin" />
-        </c:import>
-    </c:when>
-    <c:otherwise>
-        <c:import url="../include/workflow.jsp">
-            <c:param name="module" value="manage" />
-        </c:import>
-    </c:otherwise>
-</c:choose>
 <jsp:include page="../include/footer.jsp"/>

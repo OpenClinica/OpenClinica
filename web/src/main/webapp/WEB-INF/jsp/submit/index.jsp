@@ -228,9 +228,6 @@ You may also enroll a new subject and add a new study event:
 <c:import url="addNewSubjectExpress.jsp">
 </c:import>
 
-<c:import url="../include/workflow.jsp">
-    <c:param name="module" value="submit"/>
-</c:import>
 
 
 <jsp:include page="../include/footer.jsp"/>
