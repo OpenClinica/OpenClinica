@@ -119,7 +119,7 @@
                             <tr>
                                 <td>
                                    
-                                    <a href="ViewSectionDataEntry?module=<c:out value="${module}"/>&crfId=<c:out value="${crf.id}"/>&crfVersionId=<c:out value="${version.id}"/>&tabId=1"
+                                    <a href="EnketoFormServlet?formLayoutId=<c:out value="${version.id}"/>&studyEventId=<c:out value="0"/>&eventCrfId=<c:out value="0"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"       
                                        onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                                        onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                                             name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
