@@ -43,19 +43,19 @@
     <center>
 
     <!-- OpenClinica logo -->
-	<%String ua = request.getHeader( "User-Agent" );
-	String temp = "";
-	String iev = "";
-	if( ua != null && ua.indexOf( "MSIE" ) != -1 ) {
-		temp = ua.substring(ua.indexOf( "MSIE" ),ua.length());
-		iev = temp.substring(4, temp.indexOf(";"));
-		iev = iev.trim();
-	}
-	if(iev.length() > 1 && Double.valueOf(iev)<7) {%>
-	<div ID="OClogoIE6">&nbsp;</div>
-	<%} else {%>
+    <%String ua = request.getHeader( "User-Agent" );
+    String temp = "";
+    String iev = "";
+    if( ua != null && ua.indexOf( "MSIE" ) != -1 ) {
+        temp = ua.substring(ua.indexOf( "MSIE" ),ua.length());
+        iev = temp.substring(4, temp.indexOf(";"));
+        iev = iev.trim();
+    }
+    if(iev.length() > 1 && Double.valueOf(iev)<7) {%>
+    <div ID="OClogoIE6">&nbsp;</div>
+    <%} else {%>
     <div ID="OClogo">&nbsp;</div>
-  	<%}%>
+    <%}%>
     <!-- end OpenClinica logo -->
         <table width="720 px">
 
@@ -98,7 +98,7 @@
                         <div class="formfieldM_BG">
                             <input style="width:200px;height:30px" type="password" id="j_password" name="j_password"  class="formfieldM"  autocomplete="off">
                         </div>
-                    <br/>
+                    <br/><br/>
                     <input type="submit" name="submit" value="<fmt:message key='login' bundle='${resword}'/>" class="loginbutton" />
                     <a href="#" id="requestPassword"> <fmt:message key="forgot_password" bundle="${resword}"/></a>
                    </form>
@@ -126,7 +126,7 @@
 
         jQuery(document).ready(function() {
 
-        	jQuery.get("../../RssReader", function(data){
+            jQuery.get("../../RssReader", function(data){
 //                alert("Data Loaded: " + data);
                 jQuery("#newsBox").html(data);
             });
