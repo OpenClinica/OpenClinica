@@ -5,6 +5,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
 import org.akaza.openclinica.controller.helper.OCUserDTO;
 import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
@@ -15,15 +16,18 @@ import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.data.jpa.repository.Modifying;
 import org.springframework.http.*;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
@@ -38,6 +42,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import java.util.*;
 
 /**
@@ -50,6 +55,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     @Autowired
     private StudyDao studyDao;
+    @Autowired
+    @Qualifier("dataSource")
+    private BasicDataSource dataSource;
+
     @Autowired
     private StudyUserRoleDao studyUserRoleDao;
     @Autowired
@@ -118,23 +127,39 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
     public void processSpecificStudyEnvUuid(HttpServletRequest request, UserAccount ub) {
+        HttpSession session = request.getSession();
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
         if (StringUtils.isEmpty(studyEnvUuid))
             return;
-        Study study = studyDao.findByStudyEnvUuid(studyEnvUuid);
-        if (study == null)
+
+        StudyDAO studyDAO = new StudyDAO(dataSource);
+        StudyBean currentPublicStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
+        Study userStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
+        if (currentPublicStudy == null) {
             return;
-        Study parentStudy = study.getStudy();
-        Study toUpdate = parentStudy == null ? study : study.getStudy();
-        ub.setActiveStudy(toUpdate);
+        }
+
+        int parentStudyId = currentPublicStudy.getParentStudyId() > 0 ? currentPublicStudy.getParentStudyId() : currentPublicStudy.getId();
+        if (ub.getActiveStudy() != null  && ub.getActiveStudy().getStudyId() == parentStudyId)
+            return;
+        ub.setActiveStudy(userStudy);
         userAccountDao.saveOrUpdate(ub);
+        session.setAttribute("study", null);
+        session.setAttribute("publicStudy", null);
     }
+
 
     public boolean saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ubIn) throws Exception {
         UserAccount ub = userAccountDao.findByUserId(ubIn.getId());
         processSpecificStudyEnvUuid(request, ub);
         boolean studyUserRoleUpdated = false;
-        int userActiveStudyId = ub.getActiveStudy().getStudyId();
+        int userActiveStudyId;
+
+        if (ub.getActiveStudy() == null)
+            userActiveStudyId = 0;
+        else
+            userActiveStudyId = ub.getActiveStudy().getStudyId();
+
         ResponseEntity <StudyEnvironmentRoleDTO[]> userRoles = getUserRoles(request);
         for (StudyEnvironmentRoleDTO role: userRoles.getBody()) {
             Study study = studyDao.findByStudyEnvUuid(role.getStudyEnvironmentUuid());
