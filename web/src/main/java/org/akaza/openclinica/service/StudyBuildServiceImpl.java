@@ -168,7 +168,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             Study parentStudy = study.getStudy();
             Study toUpdate = parentStudy == null ? study : study.getStudy();
             // set this as the active study
-            if (ub.getActiveStudy().getStudyId() == 0) {
+            if (ub.getActiveStudy() == null) {
                 ub.setActiveStudy(toUpdate);
                 userAccountDao.saveOrUpdate(ub);
             }
