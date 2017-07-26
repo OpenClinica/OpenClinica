@@ -17,6 +17,7 @@ import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFact
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
@@ -71,10 +72,19 @@ public class MainMenuServlet extends SecureController {
         if (StringUtils.isEmpty(studyEnvUuid))
             return;
 
+        String currentSchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
         StudyDAO sd = getStudyDAO();
         StudyBean study = sd.findByStudyEnvUuid(studyEnvUuid);
-        if (study == null)
+        if (study == null) {
+            CoreResources.setRequestSchema(currentSchema);
             return;
+        }
+        currentPublicStudy = study;
+        CoreResources.setRequestSchema(currentPublicStudy.getSchemaName());
+        currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
+        session.setAttribute("publicStudy", currentPublicStudy);
+        session.setAttribute("study", currentStudy);
         int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
         if (ub.getActiveStudyId() == parentStudyId)
             return;
