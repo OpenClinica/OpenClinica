@@ -753,9 +753,6 @@
         <form action="studymodule/${currentStudy.oid}/randomize" method="post">
             <h1>
                 <fmt:message key="randomization_reg_title" bundle="${resword}"/>
-                <a href="javascript:openDocWindow('https://docs.openclinica.com/randomization/activate-openclinica-randomize-your-study')">
-                    <img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/>
-                </a>
             </h1>
             <p class="randomization-text"><fmt:message key="randomization_reg_instructions_part1" bundle="${resword}"/></p>
             <br>

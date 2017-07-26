@@ -90,7 +90,7 @@ public class SDVUtil {
 
     String getIconForSdvStatusPrefix() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
-        return "<img hspace='2' border='0'  title='SDV Complete' alt='SDV Complete' src='" + prefix + "images/icon_";
+        return "<span hspace='2' border='0'  title='SDV Complete' alt='SDV Complete' class='icon icon-ok'>";
     }
 
     String getIconForCrfStatusPrefix() {
@@ -121,14 +121,14 @@ public class SDVUtil {
         SUBJECT_EVENT_STATUS_ICONS.put(7, "Locked");
         SUBJECT_EVENT_STATUS_ICONS.put(8, "Signed");
 
-        CRF_STATUS_ICONS.put(0, "Invalid");
-        CRF_STATUS_ICONS.put(1, "NotStarted");
-        CRF_STATUS_ICONS.put(2, "InitialDE");
-        CRF_STATUS_ICONS.put(3, "InitialDEComplete");
-        CRF_STATUS_ICONS.put(4, "DDE");
-        CRF_STATUS_ICONS.put(5, "DEcomplete");
-        CRF_STATUS_ICONS.put(6, "InitialDE");
-        CRF_STATUS_ICONS.put(7, "Locked");
+        CRF_STATUS_ICONS.put(0, "icon icon-file-excel red");
+        CRF_STATUS_ICONS.put(1, "icon icon-doc");
+        CRF_STATUS_ICONS.put(2, "icon icon-pencil-squared orange");
+        CRF_STATUS_ICONS.put(3, "icon icon-icon-dataEntryCompleted orange");
+        CRF_STATUS_ICONS.put(4, "icon icon-icon-doubleDataEntry orange");
+        CRF_STATUS_ICONS.put(5, "icon icon-checkbox-checked green");
+        CRF_STATUS_ICONS.put(6, "icon icon-pencil-squared orange");
+        CRF_STATUS_ICONS.put(7, "icon icon-lock");
     }
 
     private DataSource dataSource;
@@ -925,7 +925,7 @@ public class SDVUtil {
                 sdvStatus.append("<center><a href='javascript:void(0)' onclick='prompt(document.sdvForm,");
                 sdvStatus.append(crfBean.getId());
                 sdvStatus.append(")'>");
-                sdvStatus.append(getIconForSdvStatusPrefix()).append("DoubleCheck").append(ICON_FORCRFSTATUS_SUFFIX).append("</a></center>");
+                sdvStatus.append(getIconForSdvStatusPrefix()).append("</a></center>");
             } else {
                 sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ").append("class='sdvCheck'").append(" name='")
                         .append(CHECKBOX_NAME).append(crfBean.getId()).append("' /></center>");
@@ -1008,20 +1008,12 @@ public class SDVUtil {
         builderHref.append("ViewSectionDataEntry?eventDefinitionCRFId=").append(eventDefinitionCRFId);
         builderHref.append("&crfVersionId=").append(crfVersionId).append("&tabId=1&studySubjectId=").append(studySubjectId).append("'\">");
 
-        StringBuilder builder = new StringBuilder(html.toString()).append(getIconForCrfStatusPrefix());
+        StringBuilder builder = new StringBuilder(html.toString());
 
         String imgName = "";
         StringBuilder input = new StringBuilder("<input type=\"hidden\" statusId=\"");
         input.append(statusId).append("\" />");
-
-        if (statusId > 0 && statusId < 8) {
-
-            builder.append(CRF_STATUS_ICONS.get(statusId));
-        } else {
-            builder.append(CRF_STATUS_ICONS.get(0));
-
-        }
-        builder.append(ICON_FORCRFSTATUS_SUFFIX);
+        builder.append("<center><span class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0'></center>");
         //"<input type=\"hidden\" statusId=\"1\" />"
         builder.append("</a>");
         builder.append(" ");
