@@ -141,7 +141,7 @@
   <form action="studymodule" method="post">
   <div>
       <h1><span class="title_manage"><c:out value="${currentStudy.name}"/>&nbsp;
-        <span class="icon icon-question-circle gray"></span></a>
+        <span class=""></span></a>
       </span></h1><br/>
   </div>
   <div style="border: 1px solid #ccc; width:90%; padding-left:5px">
@@ -725,7 +725,7 @@
             <h1>
                 <fmt:message key="participate_reg_title" bundle="${resword}"/>
                 <a href="javascript:openDocWindow('https://docs.openclinica.com/participate/activate-openclinica-participate-your-study')">
-                    <span border="0" title="Help" alt="Help" class="icon icon-question-circle gray"/>
+                    <span border="0" title="Help" alt="Help" class=""/>
                 </a>
             </h1>
             <p class="participate-text"><fmt:message key="participate_reg_instructions_part1" bundle="${resword}"/></p>

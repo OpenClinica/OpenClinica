@@ -53,13 +53,13 @@
 <c:when test="${userBean.sysAdmin && module=='admin'}">
 	<h1><span class="title_manage"><fmt:message key="administer_CRFs2" bundle="${resworkflow}"/>
         <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/administer-crfs-crf-template#content-title-2991')">
-            <span class="icon icon-question-circle gray"></span></a>
+            <span class=""></span></a>
 </span></h1>
 </c:when>
 <c:otherwise>
 	<h1><span class="title_manage"><fmt:message key="manage_CRFs2" bundle="${resworkflow}"/>
         <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/manage-crf')">
-		<span class="icon icon-question-circle gray"></span></a>
+		<span class=""></span></a>
 </span></h1>
 </c:otherwise>
 </c:choose>

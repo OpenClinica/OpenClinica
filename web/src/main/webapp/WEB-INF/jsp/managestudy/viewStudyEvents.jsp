@@ -80,12 +80,12 @@
  <c:choose>
    <c:when test="${userRole.manageStudy}">
       <a>
-      <span class="icon icon-question-circle gray"></span>
+      <span class=""></span>
       </a>
    </c:when>
    <c:otherwise>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-events')">
-    <span class="icon icon-question-circle gray"></span>
+    <span class=""></span>
     </a>
    </c:otherwise>
   </c:choose>
