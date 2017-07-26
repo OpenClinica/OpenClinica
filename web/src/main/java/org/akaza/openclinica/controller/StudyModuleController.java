@@ -1,17 +1,5 @@
 package org.akaza.openclinica.controller;
 
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -33,8 +21,8 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.service.pmanage.RandomizationRegistrar;
+import org.akaza.openclinica.service.pmanage.SeRandomizationDTO;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -43,42 +31,34 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.HttpSessionRequiredException;
-import org.springframework.web.bind.annotation.ExceptionHandler;
-import org.springframework.web.bind.annotation.ModelAttribute;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.SessionAttributes;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.bind.support.SessionStatus;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.util.*;
 
 /**
  * @author: sshamim Date: Jan 22, 2009 Time: 6:52:16 PM Manages the Study creation process
  */
-@Controller("studyModuleController")
-@RequestMapping("/studymodule")
-@SessionAttributes("studyModuleStatus")
-public class StudyModuleController {
-    @Autowired
-    @Qualifier("sidebarInit")
-    private SidebarInit sidebarInit;
-
-    @Autowired
-    @Qualifier("studyModuleStatusDao")
-    private StudyModuleStatusDao studyModuleStatusDao;
-
-    @Autowired
-    @Qualifier("ruleSetService")
-    private RuleSetServiceInterface ruleSetService;
-
-    @Autowired
-    @Qualifier("dataSource")
-    private BasicDataSource dataSource;
-
+@Controller("studyModuleController") @RequestMapping("/studymodule") @SessionAttributes("studyModuleStatus") public class StudyModuleController {
+    public static final String REG_MESSAGE = "regMessages";
+    public static ResourceBundle respage;
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    @Autowired CoreResources coreResources;
+    @Autowired @Qualifier("sidebarInit") private SidebarInit sidebarInit;
+    @Autowired @Qualifier("studyModuleStatusDao") private StudyModuleStatusDao studyModuleStatusDao;
+    @Autowired @Qualifier("ruleSetService") private RuleSetServiceInterface ruleSetService;
+    @Autowired @Qualifier("dataSource") private BasicDataSource dataSource;
     private EventDefinitionCRFDAO eventDefinitionCRFDao;
     private StudyEventDefinitionDAO studyEventDefinitionDao;
     private CRFDAO crfDao;
@@ -86,20 +66,14 @@ public class StudyModuleController {
     private StudyDAO studyDao;
     private UserAccountDAO userDao;
     private org.akaza.openclinica.dao.rule.RuleDAO ruleDao;
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    public static final String REG_MESSAGE = "regMessages";
-    public static ResourceBundle respage;
-    @Autowired
-    CoreResources coreResources;
-    @Autowired
-    private JavaMailSenderImpl mailSender;
+    @Autowired private JavaMailSenderImpl mailSender;
 
     public StudyModuleController() {
 
     }
 
-    @RequestMapping(value = "/{study}/deactivate", method = RequestMethod.GET)
-    public String deactivateParticipate(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+    @RequestMapping(value = "/{study}/deactivate", method = RequestMethod.GET) public String deactivateParticipate(@PathVariable("study") String studyOid,
+            HttpServletRequest request) throws Exception {
         studyDao = new StudyDAO(dataSource);
         StudyBean study = studyDao.findByOid(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
@@ -118,8 +92,8 @@ public class StudyModuleController {
         return "redirect:/pages/studymodule";
     }
 
-    @RequestMapping(value = "/{study}/deactivaterandomization", method = RequestMethod.GET)
-    public String deactivateRandomization(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+    @RequestMapping(value = "/{study}/deactivaterandomization", method = RequestMethod.GET) public String deactivateRandomization(
+            @PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
         studyDao = new StudyDAO(dataSource);
         StudyBean study = studyDao.findByOid(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
@@ -138,8 +112,8 @@ public class StudyModuleController {
         return "redirect:/pages/studymodule";
     }
 
-    @RequestMapping(value = "/{study}/reactivate", method = RequestMethod.GET)
-    public String reactivateParticipate(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+    @RequestMapping(value = "/{study}/reactivate", method = RequestMethod.GET) public String reactivateParticipate(@PathVariable("study") String studyOid,
+            HttpServletRequest request) throws Exception {
         studyDao = new StudyDAO(dataSource);
         StudyBean study = studyDao.findByOid(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
@@ -158,8 +132,8 @@ public class StudyModuleController {
         return "redirect:/pages/studymodule";
     }
 
-    @RequestMapping(value = "/{study}/reactivaterandomization", method = RequestMethod.GET)
-    public String reactivateRandomization(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+    @RequestMapping(value = "/{study}/reactivaterandomization", method = RequestMethod.GET) public String reactivateRandomization(
+            @PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
         studyDao = new StudyDAO(dataSource);
         StudyBean study = studyDao.findByOid(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
@@ -178,9 +152,8 @@ public class StudyModuleController {
         return "redirect:/pages/studymodule";
     }
 
-
-    @RequestMapping(value = "/{study}/register", method = RequestMethod.POST)
-    public String registerParticipate(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+    @RequestMapping(value = "/{study}/register", method = RequestMethod.POST) public String registerParticipate(@PathVariable("study") String studyOid,
+            HttpServletRequest request) throws Exception {
         studyDao = new StudyDAO(dataSource);
         StudyBean study = studyDao.findByOid(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
@@ -233,8 +206,8 @@ public class StudyModuleController {
         return "redirect:/pages/studymodule";
     }
 
-    @RequestMapping(value = "/{study}/randomize", method = RequestMethod.POST)
-    public String registerRandimization(@PathVariable("study") String studyOid, HttpServletRequest request) throws Exception {
+    @RequestMapping(value = "/{study}/randomize", method = RequestMethod.POST) public String registerRandimization(@PathVariable("study") String studyOid,
+            HttpServletRequest request) throws Exception {
         studyDao = new StudyDAO(dataSource);
         StudyBean study = studyDao.findByOid(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
@@ -247,16 +220,17 @@ public class StudyModuleController {
         String status = "";
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 
-            // Update OC Study configuration
+        // Update OC Study configuration
 
         // send another email to sales@openclinica.com thru MandrillViaOcUi
-         status = randomizationRegistrar.randomizeStudy(study.getOid(),study.getIdentifier() , userBean); 
+        status = randomizationRegistrar.randomizeStudy(study.getOid(), study.getIdentifier(), userBean);
         if (status.equals("")) {
-    //        addRegMessage(request, respage.getString("randomization_not_available"));
+            //        addRegMessage(request, respage.getString("randomization_not_available"));
         } else {
             // Update OC Study configuration
-            randomizationRegistrar.sendEmail(mailSender,userBean,respage.getString("randomization_email_subject_sent_to_user"),respage.getString("randomization_email_content_message_sent_to_user"));
-         
+            randomizationRegistrar.sendEmail(mailSender, userBean, respage.getString("randomization_email_subject_sent_to_user"),
+                    respage.getString("randomization_email_content_message_sent_to_user"));
+
             spv.setStudyId(study.getId());
             spv.setParameter("randomization");
             spv.setValue("enabled");
@@ -267,13 +241,12 @@ public class StudyModuleController {
 
             StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
             currentStudy.getStudyParameterConfig().setRandomization("enabled");
-           }
+        }
 
         return "redirect:/pages/studymodule";
     }
 
-    @RequestMapping(method = RequestMethod.GET)
-    public ModelMap handleMainPage(HttpServletRequest request, HttpServletResponse response) {
+    @RequestMapping(method = RequestMethod.GET) public ModelMap handleMainPage(HttpServletRequest request, HttpServletResponse response) {
         ModelMap map = new ModelMap();
         // Todo need something to reset panel from all the Spring Controllers
         StudyInfoPanel panel = new StudyInfoPanel();
@@ -406,8 +379,8 @@ public class StudyModuleController {
 
                 if (pManageAuthorization != null && pManageAuthorization.getStudy() != null && pManageAuthorization.getStudy().getHost() != null
                         && !pManageAuthorization.getStudy().getHost().equals("")) {
-                    url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
-                            + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
+                    url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost() + ((pManageUrl.getPort()
+                            > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
 
                 }
             } catch (MalformedURLException e) {
@@ -418,41 +391,39 @@ public class StudyModuleController {
             map.addAttribute("participateURLFull", url + "/#/login");
         }
 
-
         // Load Randomization  information
         String moduleManager = CoreResources.getField("moduleManager");
         map.addAttribute("moduleManager", moduleManager);
         if (moduleManager != null && !moduleManager.equals("")) {
 
-        String randomizationOCStatus = currentStudy.getStudyParameterConfig().getRandomization();
+            String randomizationOCStatus = currentStudy.getStudyParameterConfig().getRandomization();
             RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-            SeRandomizationDTO randomization=null;
-                try {
-                    randomization = randomizationRegistrar.getCachedRandomizationDTOObject(currentStudy.getOid(), true);
-                } catch (Exception e1) {
-                    // TODO Auto-generated catch block
-                    e1.printStackTrace();
-                }
+            SeRandomizationDTO randomization = null;
+            try {
+                randomization = randomizationRegistrar.getCachedRandomizationDTOObject(currentStudy.getOid(), true);
+            } catch (Exception e1) {
+                // TODO Auto-generated catch block
+                e1.printStackTrace();
+            }
             String randomizationStatus = "";
 
-                URL randomizeUrl=null;
-                if (randomization != null && randomization.getStatus() != null){
-                    randomizationStatus = randomization.getStatus();
-                    if (randomization.getUrl()!=null){
+            URL randomizeUrl = null;
+            if (randomization != null && randomization.getStatus() != null) {
+                randomizationStatus = randomization.getStatus();
+                if (randomization.getUrl() != null) {
                     try {
-                        randomizeUrl= new URL (randomization.getUrl());
+                        randomizeUrl = new URL(randomization.getUrl());
                     } catch (MalformedURLException e) {
                         // TODO Auto-generated catch block
                         e.printStackTrace();
                     }
-                   } 
                 }
-                map.addAttribute("randomizeURL", randomizeUrl);
-              map.addAttribute("randomizationOCStatus", randomizationOCStatus);
-                map.addAttribute("randomizationStatus", randomizationStatus);
+            }
+            map.addAttribute("randomizeURL", randomizeUrl);
+            map.addAttribute("randomizationOCStatus", randomizationOCStatus);
+            map.addAttribute("randomizationStatus", randomizationStatus);
 
         }
-
 
         // @pgawade 13-April-2011- #8877: Added the rule designer URL
         if (null != coreResources) {
@@ -493,10 +464,8 @@ public class StudyModuleController {
         return map;
     }
 
-
-    @RequestMapping(value = "/{study}/changeStatus", method = RequestMethod.POST)
-    public String changeStudyStatus(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus, BindingResult result, SessionStatus status,
-            HttpServletRequest request) {
+    @RequestMapping(method = RequestMethod.POST) public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus,
+            BindingResult result, SessionStatus status, HttpServletRequest request) {
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
         if (request.getParameter("saveStudyStatus") == null) {
             studyModuleStatusDao.saveOrUpdate(studyModuleStatus);
@@ -524,43 +493,13 @@ public class StudyModuleController {
         return "redirect:studymodule";
     }
 
-    @RequestMapping(method = RequestMethod.POST)
-    public String processSubmit(@ModelAttribute("studyModuleStatus") StudyModuleStatus studyModuleStatus, BindingResult result, SessionStatus status,
+    @ExceptionHandler(HttpSessionRequiredException.class) public String handleSessionRequiredException(HttpSessionRequiredException ex,
             HttpServletRequest request) {
-        StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
-        if (request.getParameter("saveStudyStatus") == null) {
-            studyModuleStatusDao.saveOrUpdate(studyModuleStatus);
-            status.setComplete();
-        } else {
-            currentStudy.setOldStatus(currentStudy.getStatus());
-            currentStudy.setStatus(Status.get(studyModuleStatus.getStudyStatus()));
-            studyDao.updateStudyStatus(currentStudy);
-            ArrayList siteList = (ArrayList) studyDao.findAllByParent(currentStudy.getId());
-            if (siteList.size() > 0) {
-                studyDao.updateSitesStatus(currentStudy);
-            }
-            String currentSchema = CoreResources.getRequestSchema(request);
-            CoreResources.setRequestSchema("public");
-            StudyBean publicStudy = studyDao.findByOid(currentStudy.getOid());
-            publicStudy.setOldStatus(currentStudy.getStatus());
-            publicStudy.setStatus(Status.get(studyModuleStatus.getStudyStatus()));
-            studyDao.updateStudyStatus(publicStudy);
-            ArrayList publicSiteList = (ArrayList) studyDao.findAllByParent(publicStudy.getId());
-            if (publicSiteList.size() > 0) {
-                studyDao.updateSitesStatus(publicStudy);
-            }
-            CoreResources.setRequestSchema(currentSchema);
-        }
-        return "redirect:studymodule";
-    }
-
-    @ExceptionHandler(HttpSessionRequiredException.class)
-    public String handleSessionRequiredException(HttpSessionRequiredException ex, HttpServletRequest request) {
         return "redirect:/MainMenu";
     }
 
-    @ExceptionHandler(NullPointerException.class)
-    public String handleNullPointerException(NullPointerException ex, HttpServletRequest request, HttpServletResponse response) {
+    @ExceptionHandler(NullPointerException.class) public String handleNullPointerException(NullPointerException ex, HttpServletRequest request,
+            HttpServletResponse response) {
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
         if (currentStudy == null) {
             return "redirect:/MainMenu";

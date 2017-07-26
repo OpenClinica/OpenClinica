@@ -132,6 +132,28 @@ import java.util.regex.Pattern;
      * }
      */
 
+    @RequestMapping(value = "/{studyOid}/changeStatus/{status}", method = RequestMethod.POST) public ResponseEntity<Object> changeStudyStatus(
+            @PathVariable("studyOid") String studyOid, @PathVariable("status") int status, HttpServletRequest request) {
+        UserAccountBean ub = getStudyOwnerAccount(request);
+
+        if (ub == null)
+            return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
+        StudyDAO studyDAO = new StudyDAO(dataSource);
+        StudyBean currentStudy = studyDAO.findByOid(studyOid);
+
+        currentStudy.setOldStatus(currentStudy.getStatus());
+        currentStudy.setStatus(Status.get(status));
+        studyDAO.updateStudyStatus(currentStudy);
+        ArrayList siteList = (ArrayList) studyDAO.findAllByParent(currentStudy.getId());
+        if (siteList.size() > 0) {
+            studyDAO.updateSitesStatus(currentStudy);
+        }
+
+        return new ResponseEntity<Object>("Success", HttpStatus.OK);
+
+    }
+
+
     @RequestMapping(value = "/", method = RequestMethod.POST) public ResponseEntity<Object> createNewStudy(HttpServletRequest request,
             @RequestBody HashMap<String, Object> map) throws Exception {
         ArrayList<ErrorObject> errorObjects = new ArrayList();

@@ -22,7 +22,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -114,24 +113,20 @@ public class ChangeStudyServlet extends SecureController {
         }
 
 
-        if (StringUtil.isBlank(action)) {
+        if (StringUtils.isEmpty(action)) {
             request.setAttribute("studies", validStudies);
 
             forwardPage(Page.CHANGE_STUDY);
         } else {
-            if ("confirm".equalsIgnoreCase(action)) {
-                logger.info("confirm");
-                confirmChangeStudy(studies, studyList);
 
-            } else if ("submit".equalsIgnoreCase(action)) {
-                logger.info("submit");
-                changeStudy();
-            }
+            validateChangeStudy(studies, studyList);
+            logger.info("submit");
+            changeStudy();
         }
 
     }
 
-    private void confirmChangeStudy(List<StudyUserRoleBean> studies, List<StudyBean> studyList) throws Exception {
+    private void validateChangeStudy(List<StudyUserRoleBean> studies, List<StudyBean> studyList) throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
         v.addValidation("studyId", Validator.IS_AN_INTEGER);
@@ -159,7 +154,6 @@ public class ChangeStudyServlet extends SecureController {
 
                     request.setAttribute("studyEnvUuid", studyInfoObject.getStudyBean().getStudyEnvUuid());
                     request.setAttribute("currentStudy", currentStudy);
-                    forwardPage(Page.CHANGE_STUDY_CONFIRM);
                     return;
 
                 }
@@ -182,9 +176,9 @@ public class ChangeStudyServlet extends SecureController {
     private void changeStudy() throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
-        String studySchema = fp.getString("changeStudySchema");
+        String studySchema = fp.getString("changeStudySchema", true);
         request.setAttribute("changeStudySchema", "public");
-        String studyEnvUuid = fp.getString("studyEnvUuid");
+        String studyEnvUuid = fp.getString("studyEnvUuid", true);
         String prevStudyEnvUuid = currentStudy != null ? currentStudy.getStudyEnvUuid() : null;
 
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
