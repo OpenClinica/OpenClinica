@@ -111,6 +111,8 @@
         <h1>
             <div class="title_manage">
                 <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/>
+                <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-subject')">
+                    <span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
 
            </div>
         </h1>

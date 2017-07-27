@@ -165,8 +165,5 @@
 <input type="submit" name="submit" value="<fmt:message key="lock_event_definition" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="if_you_lock_this_definition" bundle="${resword}"/>");'>
 </form>
 
-<c:import url="../include/workflow.jsp">
-  <c:param name="module" value="manage"/>
-</c:import>
 
 <jsp:include page="../include/footer.jsp"/>

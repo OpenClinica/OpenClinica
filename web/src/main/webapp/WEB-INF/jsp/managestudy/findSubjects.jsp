@@ -76,6 +76,8 @@
 
 <h1><span class="title_manage">
 <fmt:message key="view_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
+<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/subject-matrix')">
+     <span class="" ></span></a>
 </span></h1>
 
 <div id="findSubjectsDiv">

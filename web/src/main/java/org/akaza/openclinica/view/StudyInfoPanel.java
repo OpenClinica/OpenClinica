@@ -395,7 +395,7 @@ public class StudyInfoPanel implements Serializable {
                 this.setData(resword.getString("dataset_owner"), dsb.getOwner().getName());
                 this.setData(resword.getString("date_last_run"), local_sdf.format(dsb.getDateLastRun()));
 
-            } else if (page.equals(Page.EXPORT_DATASETS)) {
+            } else if (page.equals(Page.VIEW_DATASETS)) {
 
                 this.setCreateDataset(false);
 
@@ -527,19 +527,19 @@ public class StudyInfoPanel implements Serializable {
     public String getStageImageText(DataEntryStage stage) {
         String answer = "";
         if (stage.isInitialDE()) {
-            answer = "<img src='images/icon_InitialDE.gif' alt='Initial Data Entry'>";
+            answer = "<span class='icon icon-icon-doubleDataEntry orange' alt='Initial Data Entry'>";
         } else if (stage.isInitialDE_Complete()) {
-            answer = "<img src='images/icon_InitialDEcomplete.gif' alt='Initial Data Entry Complete'>";
+            answer = "<span class='icon icon-checkbox-checked green' alt='Initial Data Entry Complete'>";
         } else if (stage.isDoubleDE()) {
-            answer = "<img src='images/icon_DDE.gif' alt='Double Data Entry'>";
+            answer = "<span class='icon icon-icon-dataEntryCompleted orange' alt='Double Data Entry'>";
         } else if (stage.isDoubleDE_Complete()) {
-            answer = "<img src='images/icon_DEcomplete.gif' alt='Data Entry Complete'>";
+            answer = "<span class='icon icon-checkbox-checked green' alt='Data Entry Complete'>";
         } else if (stage.isAdmin_Editing()) {
-            answer = "<img src='images/icon_AdminEdit.gif' alt='Administrative Editing'>";
+            answer = "<span class='icon icon-pencil' alt='Administrative Editing'>";
         } else if (stage.isLocked()) {
-            answer = "<img src='images/icon_Locked.gif' alt='Locked'>";
+            answer = "<span class='icon icon-icon-locked' alt='Locked'>";
         } else {
-            answer = "<img src='images/icon_Invalid.gif' alt='Invalid'>";
+            answer = "<span class='icon icon-file-excel red' alt='Invalid'>";
         }
 
         return answer;
