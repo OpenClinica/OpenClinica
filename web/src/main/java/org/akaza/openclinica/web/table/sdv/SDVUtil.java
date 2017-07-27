@@ -79,12 +79,12 @@ public class SDVUtil {
     private final static String VIEW_ICON_FORSUBJECT_PREFIX =
         "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
     private final static String VIEW_ICON_FORSUBJECT_SUFFIX =
-        "\"><img hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" src=\"../images/bt_View.gif\" name=\"bt_View1\"/></a>";
-    private final static String ICON_FORCRFSTATUS_PREFIX = "<img hspace='2' border='0'  title='Event CRF Status' alt='Event CRF Status' src='../images/icon_";
+        "\"><span hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" class=\"icon icon-serach\" name=\"bt_View1\"/></a>";
+    private final static String ICON_FORCRFSTATUS_PREFIX = "<span hspace='2' border='0'  title='Event CRF Status' alt='Event CRF Status' class='icon icon-search'>";
 
     private final static String ICON_FORCRFSTATUS_SUFFIX = ".gif'/>";
     public final static String CHECKBOX_NAME = "sdvCheck_";
-    public final static String VIEW_ICON_HTML = "<img src=\"../images/bt_View.gif\" border=\"0\" />";
+    public final static String VIEW_ICON_HTML = "<span class=\"icon icon-search\" border=\"0>";
     private ResourceBundle resformat;
     private String pathPrefix;
 
@@ -95,17 +95,17 @@ public class SDVUtil {
 
     String getIconForCrfStatusPrefix() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
-        return "<img hspace='2' border='0'  title='Event CRF Status' alt='Event CRF Status' src='" + prefix + "images/icon_";
+        return "<span hspace='2' border='0'  title='Event CRF Status' alt='Event CRF Status' class='icon icon-ok'>";
     }
 
     String getIconForSubjectSufix() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
-        return "\"><img hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" src=\"" + prefix + "images/bt_View.gif\" name=\"bt_View1\"/></a>";
+        return "\"><span hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_View1\"/></a>";
     }
 
     String getIconForViewHtml() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
-        return "<img src=\"" + prefix + "images/bt_View.gif\" border=\"0\" />";
+        return "<span src=\"icon icon-search\" border=\"0\" />";
     }
 
     public final static Map<Integer, String> SUBJECT_EVENT_STATUS_ICONS = new HashMap<Integer, String>();
