@@ -122,7 +122,7 @@
 
         </c:when>
         <c:when test="${event.studyEvent.subjectEventStatus.id==4}">
-            <img src="images/icon_DEcomplete.gif" alt="${event.studyEvent.subjectEventStatus.name}" title="<c:out value="${event.studyEvent.subjectEventStatus.name}"/>" border="0" style="position: relative; left: 7px;">
+            <span class="icon icon-checkbox-checked green" alt="${event.studyEvent.subjectEventStatus.name}" title="<c:out value="${event.studyEvent.subjectEventStatus.name}"/>" border="0" style="position: relative; left: 7px;">
 
         </c:when>
         <c:when test="${event.studyEvent.subjectEventStatus.id==5}">
@@ -253,8 +253,8 @@ if dnote.crfName == edc.crfName, then include dnote--%>
                               alt="<fmt:message key="double_data_entry" bundle="${resterm}"/>" title="<fmt:message key="double_data_entry" bundle="${resterm}"/>" align="left"/>
                         </c:when>
                         <c:when test="${displayEventCRFBean.eventCRF.stage.id == 5}">
-                            <img
-                              name="icon_Note" src="images/icon_DEcomplete.gif" border="0"
+                            <span
+                              name="icon_Note" class="icon icon-checkbox-checked green" border="0"
                               alt="<fmt:message key="data_entry_complete" bundle="${resterm}"/>" title="<fmt:message key="data_entry_complete" bundle="${resterm}"/>" align="left"/>
                         </c:when>
                         <c:when test="${displayEventCRFBean.eventCRF.stage.id == 6}">

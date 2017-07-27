@@ -141,16 +141,16 @@
   <form action="studymodule" method="post">
   <div>
       <h1><span class="title_manage"><c:out value="${currentStudy.name}"/>&nbsp;
-        <span class="icon icon-question-circle gray"></span></a>
+        <span class=""></span></a>
       </span></h1><br/>
   </div>
-  <div style="border: 1px solid #ccc; width:70%; padding-left:5px">
+  <div style="border: 1px solid #ccc; width:90%; padding-left:5px">
       <p>
           <fmt:message key="study_module_description_1" bundle="${pagemessage}">
-              <fmt:param value="<img src='../images/create_new.png'/>"/>
-              <fmt:param value="<img src='../images/create_new.png'/>"/>
-              <fmt:param value="<img src='../images/bt_Edit.png'/>"/>
-              <fmt:param value="<img src='../images/bt_Details.png'/>"/>
+              <fmt:param value="<span class='icon icon-plus'/>"/>
+              <fmt:param value="<span class='icon icon-plus'/>"/>
+              <fmt:param value="<span class='icon icon-pencil'/>"/>
+              <fmt:param value="<span class='icon icon-search'/>"/>
           </fmt:message>
       </p>
       <%--<p>--%>
@@ -271,7 +271,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.crf == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('crf')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('crf')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="crf" name="crf" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -326,7 +326,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.eventDefinition == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('eventDefinition')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('eventDefinition')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="eventDefinition" name="eventDefinition" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -381,7 +381,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.subjectGroup == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('subjectGroup')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('subjectGroup')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="subjectGroup" name="subjectGroup" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -434,7 +434,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.rule == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('rule')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('rule')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="rule" name="rule" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -493,7 +493,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.site == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('site')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('site')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="site" name="site" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -552,7 +552,7 @@
             <td>
                 <c:choose>
                     <c:when test="${studyModuleStatus.users == 3}">
-                        <a href='javascript:void(0)' onclick="prompt('users')"><img src="../images/icon_DEcomplete.gif" border="0"/></a>
+                        <a href='javascript:void(0)' onclick="prompt('users')"><span class="icon icon-checkbox-checked green" border="0"/></a>
                         <input type="hidden" id="users" name="users" value=""/>
                     </c:when>
                     <c:otherwise>
@@ -725,7 +725,7 @@
             <h1>
                 <fmt:message key="participate_reg_title" bundle="${resword}"/>
                 <a href="javascript:openDocWindow('https://docs.openclinica.com/participate/activate-openclinica-participate-your-study')">
-                    <span border="0" title="Help" alt="Help" class="icon icon-question-circle gray"/>
+                    <span border="0" title="Help" alt="Help" class=""/>
                 </a>
             </h1>
             <p class="participate-text"><fmt:message key="participate_reg_instructions_part1" bundle="${resword}"/></p>
@@ -753,9 +753,6 @@
         <form action="studymodule/${currentStudy.oid}/randomize" method="post">
             <h1>
                 <fmt:message key="randomization_reg_title" bundle="${resword}"/>
-                <a href="javascript:openDocWindow('https://docs.openclinica.com/randomization/activate-openclinica-randomize-your-study')">
-                    <img border="0" title="Help" alt="Help" src="../images/bt_Help_Manage.gif"/>
-                </a>
             </h1>
             <p class="randomization-text"><fmt:message key="randomization_reg_instructions_part1" bundle="${resword}"/></p>
             <br>

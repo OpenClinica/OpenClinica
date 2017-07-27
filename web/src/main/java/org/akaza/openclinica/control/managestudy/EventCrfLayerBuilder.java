@@ -580,7 +580,7 @@ public class EventCrfLayerBuilder {
     private void removeEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject) {
         String href = "RemoveEventCRF?action=confirm&id=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
         builder.a().href(href).close();
-        builder.img().src("images/bt_Remove.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-cancel\"/>");
         builder.aEnd();
     }
 
@@ -594,7 +594,7 @@ public class EventCrfLayerBuilder {
     private void restoreEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject) {
         String href = "RestoreEventCRF?action=confirm&id=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
         builder.a().href(href).close();
-        builder.img().src("images/bt_Restore.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-ccw\"/>");
         builder.aEnd();
     }
 
@@ -608,7 +608,7 @@ public class EventCrfLayerBuilder {
     private void deleteEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject) {
         String href = "DeleteEventCRF?action=confirm&ssId=" + studySubject.getId() + "&ecId=" + eventCrf.getId();
         builder.a().href(href).close();
-        builder.img().src("images/bt_Delete.gif").border("0").align("left").close();
+        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-trash red\"/>");
         builder.aEnd();
     }
 

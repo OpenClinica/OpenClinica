@@ -72,11 +72,11 @@
         <c:when test="${module eq 'manage'}"><span class="title_manage"></c:when>
         <c:otherwise><span class="title_manage"></c:otherwise>
         </c:choose>
-    <fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
+    <fmt:message key="queries" bundle="${resword}"/>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/notes-and-discrepancies')">
         <c:choose>
-        <c:when test="${module eq 'manage'}"><span class="icon icon-question-circle gray"></span></c:when>
-        <c:otherwise><span class="icon icon-question-circle gray"></span></c:otherwise></c:choose></a>
+        <c:when test="${module eq 'manage'}"><span class=""></span></c:when>
+        <c:otherwise><span class=""></span></c:otherwise></c:choose></a>
  <%--<a href="javascript:openDocWindow('ViewNotes?print=yes')"--%>
 <%--<a href="javascript:onInvokeAction('listNotes','filter')"--%>
     <%--onMouseDown="javascript:setImage('bt_Print0','images/bt_Print_d.gif');"--%>
@@ -172,91 +172,5 @@
         <input type="hidden" name="module" value="submit">
         ${viewNotesHtml}
     </form>
-<!-- EXPANDING WORKFLOW BOX -->
 
-<div style="clear:left">
-<table border="0" cellpadding="0" cellspacing="0" style="position: relative; left: -14px;">
-    <tr>
-        <td id="sidebar_Workflow_closed" style="display: none">
-        <a href="javascript:leftnavExpand('sidebar_Workflow_closed'); leftnavExpand('sidebar_Workflow_open');"><img src="images/<fmt:message key="image_dir" bundle="${resformat}"/>/tab_Workflow_closed.gif" border="0"></a>
-    </td>
-    <td id="sidebar_Workflow_open">
-    <table border="0" cellpadding="0" cellspacing="0" class="workflowBox">
-        <tr>
-            <td class="workflowBox_T" valign="top">
-            <table border="0" cellpadding="0" cellspacing="0">
-                <tr>
-                    <td class="workflow_tab">
-                    &nbsp;&nbsp;&nbsp;&nbsp;<a href="javascript:leftnavExpand('sidebar_Workflow_closed'); leftnavExpand('sidebar_Workflow_open');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
-
-                    <b><fmt:message key="workflow" bundle="${resword}"/></b>
-
-                    </td>
-                </tr>
-            </table>
-            </td>
-            <td class="workflowBox_T" align="right" valign="top"><img src="images/workflowBox_TR.gif"></td>
-        </tr>
-        <tr>
-            <td colspan="2" class="workflowbox_B">
-            <div class="box_R"><div class="box_B"><div class="box_BR">
-                <div class="workflowBox_center">
-
-
-        <!-- Workflow items -->
-
-                <table border="0" cellpadding="0" cellspacing="0">
-                    <tr>
-                        <td>
-
-                <!-- These DIVs define shaded box borders -->
-                        <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-                            <div class="textbox_center" align="center">
-
-                             <span class="title_manage">
-                               &nbsp;&nbsp;&nbsp;&nbsp;<fmt:message key="manage_study" bundle="${resword}"/>
-
-                            </span>
-
-                            </div>
-                        </div></div></div></div></div></div></div></div>
-
-                        </td>
-                        <td><img src="images/arrow.gif"></td>
-                        <td>
-
-                <!-- These DIVs define shaded box borders -->
-                        <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-                            <div class="textbox_center" align="center">
-
-                             <span class="title_manage">
-
-                            <b><fmt:message key="view_discrepancy_notes" bundle="${resword}"/></b>
-
-
-                            </span>
-
-                            </div>
-                        </div></div></div></div></div></div></div></div>
-
-                        </td>
-                    </tr>
-                </table>
-
-
-        <!-- end Workflow items -->
-
-                </div>
-            </div></div></div>
-            </td>
-        </tr>
-    </table>
-    </td>
-   </tr>
-</table>
-</div>
-
-<!-- END WORKFLOW BOX -->
 <jsp:include page="../include/footer.jsp"/>

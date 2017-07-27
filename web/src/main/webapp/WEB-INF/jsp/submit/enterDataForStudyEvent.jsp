@@ -71,7 +71,7 @@
 
 <h1><span class="title_manage"><fmt:message key="enter_or_validate_data" bundle="${resword}"/><c:out value="${studyEvent.studyEventDefinition.name}" />
  <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/schedule-event#enterData')">
- <span class="icon icon-question-circle gray" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> </span></h1>
+ <span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a> </span></h1>
 
 
 
@@ -150,7 +150,7 @@
                                        <c:if test="${!study.status.locked}">
                                         <span style="float:right">
                                         <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-location'); return false;">
-                                        <img id="flag_location" name="flag_location" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                        <span id="flag_location" name="flag_location" class="icon icon-flag blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                         </a></span>
                                        </c:if>
                                     </c:otherwise>
@@ -180,7 +180,7 @@
                                        <c:if test="${!study.status.locked}">
                                         <span style="float:right">
                                         <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg=','spanAlert-start_date'); return false;">
-                                            <img id="flag_start_date" name="flag_start_date" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                            <span id="flag_start_date" name="flag_start_date" class="icon icon-flag blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                         </a></span>
                                        </c:if>
                                     </c:otherwise>
@@ -205,7 +205,7 @@
                                       <c:if test="${!study.status.locked}">
                                         <span style="float:right">
                                         <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg=','spanAlert-end_date'); return false;">
-                                        <img id="flag_end_date" name="flag_end_date" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                        <span id="flag_end_date" name="flag_end_date" class="icon icon-flag blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                         </a></span>
                                       </c:if>
                                     </c:otherwise>
@@ -341,16 +341,16 @@
                 var qer = document.startForm<c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${dedc.edc.crf.id}"/>.value;
                 document.startForm<c:out value="${dedc.edc.crf.id}"/>.formLayoutId.value=qer;
                 document.getElementById('ide1-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>').href =
-                	buildUrl(qer,'<c:out value="${studyEvent.id}"/>','<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${originatingPage}"/>' );
+                    buildUrl(qer,'<c:out value="${studyEvent.id}"/>','<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${originatingPage}"/>' );
                         document.getElementById('ide2-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>').href =
-                	buildUrl(qer,'<c:out value="${studyEvent.id}"/>','<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${originatingPage}"/>' );
+                    buildUrl(qer,'<c:out value="${studyEvent.id}"/>','<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${originatingPage}"/>' );
             }
                 function buildUrl(formLayoutId, studyEventId, eventCRFStatusId, originatingPage,mode){
-                	 return "EnketoFormServlet?formLayoutId="+ formLayoutId +
-                			 "&studyEventId=" + studyEventId +
-                			 "&eventCrfId=" + eventCRFStatusId +
-                			 "&originatingPage=" + originatingPage+
-                 			 "&mode=" + mode;
+                     return "EnketoFormServlet?formLayoutId="+ formLayoutId +
+                             "&studyEventId=" + studyEventId +
+                             "&eventCrfId=" + eventCRFStatusId +
+                             "&originatingPage=" + originatingPage+
+                             "&mode=" + mode;
                  }
 
             </SCRIPT>
@@ -479,24 +479,24 @@
 
     <c:choose>
         <c:when test="${dec.stage.initialDE}">
-            <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
+            <span class="icon icon-icon-doubleDataEntry orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
         </c:when>
         <c:when test="${dec.stage.initialDE_Complete}">
-            <img src="images/icon_InitialDEcomplete.gif" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
+            <span class="icon icon-icon-dataEntryCompleted orange" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
         </c:when>
         <c:when test="${dec.stage.doubleDE}">
-            <img src="images/icon_DDE.gif" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>" title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
+            <span class="icon icon-icon-doubleDataEntry orange" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>" title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
         </c:when>
         <c:when test="${dec.stage.doubleDE_Complete}">
-            <img src="images/icon_DEcomplete.gif" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
+            <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
         </c:when>
 
         <c:when test="${dec.stage.admin_Editing}">
-            <img src="images/icon_AdminEdit.gif" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>">
+            <span class="icon icon-pencil" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>">
         </c:when>
 
         <c:when test="${dec.stage.locked}">
-            <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
+            <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
         </c:when>
 
         <c:otherwise>
