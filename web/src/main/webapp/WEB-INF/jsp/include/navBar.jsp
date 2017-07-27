@@ -90,6 +90,8 @@
                 </c:choose>
                 (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="#"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a>
             </div>
 
             <div id="UserInfo">
