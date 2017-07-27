@@ -208,8 +208,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
             html.quote();
             html.append(getAction());
             html.quote().close();
-            html.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_all_discrepancy_notes")).title(
-                    resword.getString("download_all_discrepancy_notes")).append("class=\"downloadAllDNotes\" width=\"24 \" height=\"15\"").end().aEnd();
+            html.append("<span border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"6\" width=\"24 \" height=\"15\"/>");
             return html.toString();
         }
     }
@@ -228,8 +227,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
             html.quote();
             html.append(getAction());
             html.quote().close();
-            html.img().name("bt_View1").src("images/bt_Print.gif").border("0").alt(resword.getString("print")).title(
-                    resword.getString("print")).append("class=\"downloadAllDNotes\" width=\"24 \" height=\"15\"").end().aEnd();
+            html.append("<span border=\"0\" align=\"left\" class=\"icon icon-print\" hspace=\"6\" width=\"24 \" height=\"15\"/>");
             return html.toString();
         }
     }

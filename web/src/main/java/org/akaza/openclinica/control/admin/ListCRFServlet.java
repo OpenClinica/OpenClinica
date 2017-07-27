@@ -8,6 +8,7 @@
 package org.akaza.openclinica.control.admin;
 
 import java.io.File;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
@@ -156,6 +157,7 @@ public class ListCRFServlet extends SecureController {
 
         request.setAttribute("table", table);
         request.setAttribute("study", currentStudy);
+        request.setAttribute("originatingPage", URLEncoder.encode("ListCRF?module=" + module, "UTF-8"));
 
         resetPanel();
         panel.setStudyInfoShown(false);

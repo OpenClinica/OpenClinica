@@ -87,7 +87,7 @@
 <c:out value="${study.name}" />:
     <fmt:message key="add_subject" bundle="${resword}"/>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/add-subject')">
-        <span class="icon icon-question-circle gray"></span></a>
+        <span class=""></span></a>
 </span></h1>
 
 <p class="text">

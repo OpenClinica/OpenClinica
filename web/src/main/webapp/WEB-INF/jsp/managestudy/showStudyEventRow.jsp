@@ -281,25 +281,25 @@
 		<td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
 		<c:choose>
 		 <c:when test="${dec.stage.initialDE}">
-		  <img src="images/icon_InitialDE.gif" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
+		  <span class="icon icon-icon-dataEntryCompleted orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
 		 </c:when>
 		 <c:when test="${dec.stage.initialDE_Complete}">
-		  <img src="images/icon_InitialDEcomplete.gif" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
+		  <span class="icon icon-icon-dataEntryCompleted orange" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
 		 </c:when>
 		 <c:when test="${dec.stage.doubleDE}">
-		    <img src="images/icon_DDE.gif" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>" title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
+		    <span class="icon icon-checkbox-checked green" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>" title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
 		 </c:when>
 		 <c:when test="${dec.stage.doubleDE_Complete}">
-		   <img src="images/icon_DEcomplete.gif" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
+		   <span class="icon icon-checkbox-checked green" alt="<fmt:message key="data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="data_entry_complete" bundle="${resword}"/>">
 		 </c:when>
 		 <c:when test="${dec.stage.admin_Editing}">
-		    <img src="images/icon_AdminEdit.gif" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>">
+		    <span class="icon icon-pencil" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>">
 		 </c:when>
 		 <c:when test="${dec.stage.locked || dec.eventCRF.status.locked || dec.locked}">
-		   <img src="images/icon_Locked.gif" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
+		   <span class="icon icon-icon-locked" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
 		 </c:when>
 		 <c:otherwise>
-		    <img src="images/icon_Invalid.gif" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
+		    <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
 		 </c:otherwise>
 		</c:choose>
 

@@ -306,7 +306,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         StringBuilder path = new StringBuilder(contextPath).append("/pages/viewAllSubjectSDVtmp?studyId=").append(studyId).append("&sdv_f_studySubjectId=");
         path.append(studySubjectBean.getLabel());
         urlPrefix.append(path).append("\">");
-        actions.append(urlPrefix).append(SDVUtil.VIEW_ICON_HTML).append("</a></td>");
+        actions.append(urlPrefix).append("<span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\">").append("</a></td>");
 
         if (!studySubjectSDVd && stats.get("shouldDisplaySDVButton") == 1) {
             StringBuilder jsCodeString =

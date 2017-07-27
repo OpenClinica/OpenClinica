@@ -198,10 +198,4 @@
 </form>
 <br><br>
 
-<!-- EXPANDING WORKFLOW BOX -->
-
-
-
-<!-- END WORKFLOW BOX -->
-
 <jsp:include page="../include/footer.jsp"/>

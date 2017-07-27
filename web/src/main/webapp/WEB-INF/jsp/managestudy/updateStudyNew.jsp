@@ -11,13 +11,13 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 <c:choose>
-	<c:when test="${userRole.role.id > 3}">
-		<jsp:include page="../include/home-header.jsp"/>
-	</c:when>
-	<c:otherwise>
-	
-		<jsp:include page="../include/admin-header.jsp"/>
-	</c:otherwise>
+  <c:when test="${userRole.role.id > 3}">
+    <jsp:include page="../include/home-header.jsp"/>
+  </c:when>
+  <c:otherwise>
+  
+    <jsp:include page="../include/admin-header.jsp"/>
+  </c:otherwise>
 </c:choose>
 
   <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery-1.9.1.min.js"></script>
@@ -51,26 +51,26 @@
 
 
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+    <fmt:message key="instructions" bundle="${resword}"/>
 
-		<div class="sidebar_tab_content">
-		</div>
+    <div class="sidebar_tab_content">
+    </div>
 
-		</td>
+    </td>
 
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
+  </tr>
+  <tr id="sidebar_Instructions_closed" style="display: all">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+    <fmt:message key="instructions" bundle="${resword}"/>
 
-		</td>
+    </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 <jsp:useBean scope='request' id='parentStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
@@ -85,34 +85,34 @@
        <!--
          function leftnavExpand(strLeftNavRowElementName){
 
-	       var objLeftNavRowElement;
+         var objLeftNavRowElement;
 
            objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
            if (objLeftNavRowElement != null) {
              if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-	           objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
-	           objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-	           if(objLeftNavRowElement.display == "none"){
-    	          objExCl.src = "images/bt_Expand.gif";
-        	   }else{
-               	   objExCl.src = "images/bt_Collapse.gif";
-		       }
-	         }
+             objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
+             objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
+             if(objLeftNavRowElement.display == "none"){
+                objExCl.src = "images/bt_Expand.gif";
+             }else{
+                   objExCl.src = "images/bt_Collapse.gif";
+           }
+           }
            }
        
            function registerPManage(event){
                var regURL = 'pages/pmanage/regSubmit?studyoid=' + "${studyToView.oid}";
                jQuery.ajax({
-        	       type:'GET',
-        	       url: regURL,
-        	       success: function(data){
+                 type:'GET',
+                 url: regURL,
+                 success: function(data){
                        jQuery('#pManageDiv').html('Registration: ' + data);
-        	    }});
+              }});
            }
            
            function togglePManage(show){
-        	   if (show) jQuery('#pManageDiv').show();
-        	   else jQuery('#pManageDiv').hide();
+             if (show) jQuery('#pManageDiv').show();
+             else jQuery('#pManageDiv').hide();
            }
        //-->
  </script>
@@ -124,15 +124,15 @@
 <c:set var="endDate" value="" />
 <c:set var="protocolDateVerification" value="" />
 <c:forEach var="presetValue" items="${presetValues}">
-	<c:if test='${presetValue.key == "startDate"}'>
-		<c:set var="startDate" value="${presetValue.value}" />
-	</c:if>
-	<c:if test='${presetValue.key == "endDate"}'>
-		<c:set var="endDate" value="${presetValue.value}" />
-	</c:if>
-	<c:if test='${presetValue.key == "protocolDateVerification"}'>
-		<c:set var="protocolDateVerification" value="${presetValue.value}" />
-	</c:if>
+  <c:if test='${presetValue.key == "startDate"}'>
+    <c:set var="startDate" value="${presetValue.value}" />
+  </c:if>
+  <c:if test='${presetValue.key == "endDate"}'>
+    <c:set var="endDate" value="${presetValue.value}" />
+  </c:if>
+  <c:if test='${presetValue.key == "protocolDateVerification"}'>
+    <c:set var="protocolDateVerification" value="${presetValue.value}" />
+  </c:if>
 </c:forEach>
 
 
@@ -420,7 +420,7 @@
            </td></tr>
            <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntDesign" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntDesign'); return false;">
            <fmt:message key="intervention_model" bundle="${resword}"/></a>:</td><td>
-			<%-- was assignment, tbh --%>
+      <%-- was assignment, tbh --%>
            <c:set var="assignment1" value="${studyToView.assignment}"/>
             <div class="formfieldXL_BG"><select name="assignment" class="formfieldXL">
             <option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
@@ -442,7 +442,7 @@
            </td></tr>
           <tr valign="top"><td class="formlabel"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#IntEndpoints'); return false;">
           <fmt:message key="study_classification" bundle="${resword}"/></a>:</td><td>
-			<%-- was endpoint, tbh --%>
+      <%-- was endpoint, tbh --%>
            <c:set var="endpoint1" value="${studyToView.endpoint}"/>
            <div class="formfieldXL_BG"><select name="endpoint" class="formfieldXL">
            <option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
@@ -575,7 +575,7 @@
     <br>
 
 <a href="javascript:leftnavExpand('sectionc');">
-	<img id="excl_sectionc" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
+  <img id="excl_sectionc" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
          <fmt:message key="conditions_and_eligibility" bundle="${resword}"/></span></a>
 <div id="sectionc" style="display:none ">
 <div style="width: 600px">
@@ -668,7 +668,7 @@
 <br>
 
 <a href="javascript:leftnavExpand('sectiond');">
-	<img id="excl_sectiond" src="images/bt_Expand.gif" border="0">
+  <img id="excl_sectiond" src="images/bt_Expand.gif" border="0">
     <span class="table_title_Admin">
         <fmt:message key="facility_information" bundle="${resword}"/></span></a>
 <div id="sectiond" style="display:none ">
@@ -747,7 +747,7 @@
 
 
  <a href="javascript:leftnavExpand('sectione');">
- 	<img id="excl_sectione" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
+  <img id="excl_sectione" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
            <fmt:message key="related_infomation" bundle="${resword}"/></span></a>
 <div id="sectione" style="display:none ">
 <div style="width: 600px">
@@ -793,7 +793,7 @@
 </div>
 <br>
 <a href="javascript:leftnavExpand('sectionf');">
-	<img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
+  <img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span class="table_title_Admin">
     <fmt:message key="study_parameter_configuration" bundle="${resword}"/></span></a>
 <div id="sectionf" style="display:none ">
 <div style="width: 600px">
@@ -1052,7 +1052,4 @@
 <br>
 
 <br>
- <c:import url="../include/workflow.jsp">
-  <c:param name="module" value="admin"/>
- </c:import>
 <jsp:include page="../include/footer.jsp"/>

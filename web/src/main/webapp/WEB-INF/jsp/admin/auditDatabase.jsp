@@ -76,16 +76,4 @@
 <br>
 <input type="button" onclick="confirmExit('ListUserAccounts');"  name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>
 
-<c:choose>
-    <c:when test="${userBean.sysAdmin && module=='admin'}">
-        <c:import url="../include/workflow.jsp">
-            <c:param name="module" value="admin"/>
-        </c:import>
-    </c:when>
-    <c:otherwise>
-        <c:import url="../include/workflow.jsp">
-            <c:param name="module" value="manage"/>
-        </c:import>
-    </c:otherwise>
-</c:choose>
 <jsp:include page="../include/footer.jsp"/>

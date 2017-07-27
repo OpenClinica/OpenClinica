@@ -62,7 +62,7 @@
 <h1><span class="title_manage">
 <fmt:message key="sdv_sdv_for" bundle="${resword}"/> <c:out value="${study.name}"/>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data')">
-        <span class="icon icon-question-circle gray"></span></a>
+        <span class=""></span></a>
 </span></h1><br/>
 
 <jsp:useBean scope='session' id='sSdvRestore' class='java.lang.String' />

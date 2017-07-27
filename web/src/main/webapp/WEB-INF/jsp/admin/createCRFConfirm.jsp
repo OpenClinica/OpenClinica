@@ -74,17 +74,4 @@
 <input type="submit" name="Submit" value="<fmt:message key="submit_CRF" bundle="${resword}"/>" class="button_long">
 </form>
 
-<c:choose>
-  <c:when test="${userBean.sysAdmin && module=='admin'}">
-  <c:import url="../include/workflow.jsp">
-   <c:param name="module" value="admin"/>
-  </c:import>
- </c:when>
-  <c:otherwise>
-   <c:import url="../include/workflow.jsp">
-   <c:param name="module" value="manage"/>
-  </c:import>
-  </c:otherwise>
- </c:choose>
-
 <jsp:include page="../include/footer.jsp"/>

@@ -40,7 +40,7 @@
 <jsp:useBean scope="request" id="studies" class="java.util.ArrayList"/>
 <jsp:useBean scope="session" id="publicStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 
-<h1><span class="title_manage"><fmt:message key="change_your_current_study" bundle="${restext}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/working-openclinica')"><span class="icon icon-question-circle gray"></span></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="change_your_current_study" bundle="${restext}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/working-openclinica')"><span class=""></span></a></span></h1>
 
 <c:choose>
  <c:when test="${publicStudy != null && publicStudy.id>0}">

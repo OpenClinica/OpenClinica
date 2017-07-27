@@ -125,7 +125,7 @@
 
         </c:when>
         <c:when test="${event.studyEvent.subjectEventStatus.id==4}">
-            <img alt="" title="" src="images/icon_DEcomplete.gif"  border="0" style="position: relative; left: 7px;">
+            <span alt="" title="" class="icon icon-checkbox-checked green"  border="0" style="position: relative; left: 7px;">
 
         </c:when>
         <c:when test="${event.studyEvent.subjectEventStatus.id==5}">

@@ -114,7 +114,4 @@
 
 </form>
 
-<c:import url="../include/workflow.jsp">
- <c:param name="module" value="admin"/>
-</c:import>
 <jsp:include page="../include/footer.jsp"/>
