@@ -478,17 +478,6 @@ import java.util.*;
             if (siteList.size() > 0) {
                 studyDao.updateSitesStatus(currentStudy);
             }
-            String currentSchema = CoreResources.getRequestSchema(request);
-            CoreResources.setRequestSchema("public");
-            StudyBean publicStudy = studyDao.findByOid(currentStudy.getOid());
-            publicStudy.setOldStatus(currentStudy.getStatus());
-            publicStudy.setStatus(Status.get(studyModuleStatus.getStudyStatus()));
-            studyDao.updateStudyStatus(publicStudy);
-            ArrayList publicSiteList = (ArrayList) studyDao.findAllByParent(publicStudy.getId());
-            if (publicSiteList.size() > 0) {
-                studyDao.updateSitesStatus(publicStudy);
-            }
-            CoreResources.setRequestSchema(currentSchema);
         }
         return "redirect:studymodule";
     }

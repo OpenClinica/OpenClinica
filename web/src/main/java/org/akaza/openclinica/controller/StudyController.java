@@ -12,6 +12,7 @@ import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import org.akaza.openclinica.controller.helper.OCUserDTO;
 import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -139,9 +140,12 @@ import java.util.regex.Pattern;
         if (ub == null)
             return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
         StudyDAO studyDAO = new StudyDAO(dataSource);
-        StudyBean currentStudy = studyDAO.findByOid(studyOid);
-
-        currentStudy.setOldStatus(currentStudy.getStatus());
+        StudyBean currentPublicStudy = studyDAO.findByOid(studyOid);
+        String schema = currentPublicStudy.getSchemaName();
+        CoreResources.setRequestSchema(request, schema);
+        StudyDAO studyDAO1 = new StudyDAO(dataSource);
+        StudyBean currentStudy = studyDAO1.findByOid(studyOid);
+        currentStudy.setOldStatus(currentPublicStudy.getStatus());
         currentStudy.setStatus(Status.get(status));
         studyDAO.updateStudyStatus(currentStudy);
         ArrayList siteList = (ArrayList) studyDAO.findAllByParent(currentStudy.getId());
