@@ -72,7 +72,7 @@
         <c:when test="${module eq 'manage'}"><span class="title_manage"></c:when>
         <c:otherwise><span class="title_manage"></c:otherwise>
         </c:choose>
-    <fmt:message key="view_discrepancy_notes" bundle="${resword}"/>
+    <fmt:message key="queries" bundle="${resword}"/>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/notes-and-discrepancies')">
         <c:choose>
         <c:when test="${module eq 'manage'}"><span class=""></span></c:when>
