@@ -501,7 +501,7 @@ public class CreateDatasetServlet extends SecureController {
 
                     request.setAttribute("dataset", dsb);
 
-                    forwardPage(Page.VIEW_DATASETS);
+                    forwardPage(Page.EXPORT_DATASETS);
                 }
             } else {
                 // refine this bit to catch errors, hopefully
