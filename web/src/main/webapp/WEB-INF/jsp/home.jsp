@@ -20,6 +20,8 @@
 <script type="text/javascript">
     // hide the page in case there is an SSO session (to avoid flickering)
     $('body').hide();
+    // For Logout
+
     var auth0Logout = function () {
         var options = {
             client_id: '${clientId}',
