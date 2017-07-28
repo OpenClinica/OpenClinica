@@ -34,7 +34,17 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
     private Role role;
 
+    public String getEnvType() {
+        return envType;
+    }
+
+    public void setEnvType(String envType) {
+        this.envType = envType;
+    }
+
     private int studyId;
+
+    private String envType;
 
     // not in the database, and not guaranteed to correspond to studyId; studyId
     // is authoritative

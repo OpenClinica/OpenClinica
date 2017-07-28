@@ -36,6 +36,10 @@
 			</exclusions>
         </dependency>
 		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>auth0</artifactId>
+		</dependency>
+		<dependency>
 			<groupId>javax.xml.bind</groupId>
 			<artifactId>jaxb-api</artifactId>
 			<scope>compile</scope>

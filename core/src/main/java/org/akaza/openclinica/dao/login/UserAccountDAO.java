@@ -31,6 +31,7 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * <P>
@@ -103,6 +104,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(25, TypeNames.STRING); // timezone
         this.setTypeExpected(26, TypeNames.BOOL); // enable_api_key
         this.setTypeExpected(27, TypeNames.STRING); // api_key
+        this.setTypeExpected(28, TypeNames.STRING); // user_uuid
+
     }
 
     public void setPrivilegeTypesExpected() {
@@ -210,7 +213,14 @@ public class UserAccountDAO extends AuditableEntityDAO {
             variables.put(new Integer(22), uab.getApiKey());
         }
 
-        variables.put(new Integer(23), new Integer(uab.getId()));
+        if (StringUtils.isEmpty(uab.getUserUuid())) {
+            nullVars.put(new Integer(23), new Integer(TypeNames.STRING));
+            variables.put(new Integer(23), null);
+        } else {
+            variables.put(new Integer(23), uab.getUserUuid());
+        }
+
+        variables.put(new Integer(24), new Integer(uab.getId()));
 
         String sql = digester.getQuery("update");
         this.execute(sql, variables, nullVars);
@@ -315,6 +325,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
         variables.put(new Integer(16), uab.getAccessCode());
         variables.put(new Integer(17), uab.isEnableApiKey());
         variables.put(new Integer(18), uab.getApiKey());
+        variables.put(new Integer(19), uab.getUserUuid());
+
 
         boolean success = true;
         this.execute(digester.getQuery("insert"), variables);
@@ -440,7 +452,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         String time_zone = (String) hm.get("time_zone");
         Boolean enableApiKey = (Boolean) hm.get("enable_api_key");
         String apiKey = (String) hm.get("api_key");
-
+        String userUuid = (String) hm.get("user_uuid");
         // begin to set objects in the bean
         eb.setId(userId.intValue());
         eb.setActiveStudyId(activeStudy.intValue());
@@ -460,7 +472,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         eb.setTime_zone(time_zone);
         eb.setEnableApiKey(enableApiKey);
         eb.setApiKey(apiKey);
-
+        eb.setUserUuid(userUuid);
         // for testing, tbh
         if (eb.isTechAdmin()) {
             // logger.warn("&&& is TECH ADMIN &&&");
@@ -620,6 +632,21 @@ public class UserAccountDAO extends AuditableEntityDAO {
         return eb;
     }
 
+    public EntityBean findByUserUuid(String uuid) {
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+
+        variables.put(new Integer(1), uuid);
+
+        ArrayList alist = this.select(digester.getQuery("findByUserUuid"), variables);
+        UserAccountBean eb = new UserAccountBean();
+        Iterator it = alist.iterator();
+        if (it.hasNext()) {
+            eb = (UserAccountBean) this.getEntityFromHashMap((HashMap) it.next(), true);
+        }
+        return eb;
+    }
+
     public Collection findAllParticipantsByStudyOid(String studyOid) {
         this.setTypesExpected();
         HashMap variables = new HashMap();
@@ -648,6 +675,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(1, TypeNames.STRING);
         this.setTypeExpected(2, TypeNames.INT);
         this.setTypeExpected(3, TypeNames.STRING);
+        this.setTypeExpected(4, TypeNames.STRING);
         HashMap allStudyUserRoleBeans = new HashMap();
 
         HashMap variables = new HashMap();
@@ -660,10 +688,12 @@ public class UserAccountDAO extends AuditableEntityDAO {
             String roleName = (String) hm.get("role_name");
             String studyName = (String) hm.get("name");
             Integer studyId = (Integer) hm.get("study_id");
+            String envType = (String) hm.get("env_type");
             StudyUserRoleBean sur = new StudyUserRoleBean();
             sur.setRoleName(roleName);
             sur.setStudyId(studyId.intValue());
             sur.setStudyName(studyName);
+            sur.setEnvType(envType);
             allStudyUserRoleBeans.put(studyId, sur);
         }
 

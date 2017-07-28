@@ -108,10 +108,12 @@ public class UserProcessor implements Processor {
                 
                 //Create study user role
                 Date date = new Date();
-                StudyUserRoleId studyUserRoleId = new StudyUserRoleId(Role.RESEARCHASSISTANT2.getName(), container.getStudy().getStudyId(), Status.AUTO_DELETED.getCode(),
-                        rootUser.getUserId(), date,
+                StudyUserRoleId studyUserRoleId = new StudyUserRoleId(Role.RESEARCHASSISTANT2.getName(), container.getStudy().getStudyId(),
                         createdUser.getUserName());
                 StudyUserRole studyUserRole = new StudyUserRole(studyUserRoleId);
+                studyUserRole.setStatusId(Status.AUTO_DELETED.getCode());
+                studyUserRole.setOwnerId(rootUser.getUserId());
+                studyUserRole.setDateCreated(date);
                 studyUserRoleDao.saveOrUpdate(studyUserRole);
                 //TODO: StudyUserRole object had to be heavily modified.  May need fixing.  Also roleName specified
                 // doesn't exist in role table.  May need to fix that.

@@ -1,30 +1,5 @@
 package org.akaza.openclinica.control.core;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletConfig;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
@@ -49,7 +24,6 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.view.BreadcrumbTrail;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.view.StudyInfoPanelLine;
@@ -57,6 +31,7 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
 import org.quartz.Trigger;
@@ -70,63 +45,61 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletConfig;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+import java.io.UnsupportedEncodingException;
+import java.util.*;
+
 /**
  * Abstract class for creating a controller servlet and extending capabilities of SecureController. However, not using the SingleThreadModel.
- * @author jnyayapathi
  *
+ * @author jnyayapathi
  */
 public abstract class CoreSecureController extends HttpServlet {
 
-
-    private static final Logger LOGGER = LoggerFactory.getLogger(CoreSecureController.class);
-
-    protected HashMap errors = new HashMap();
-
-    private static String SCHEDULER = "schedulerFactoryBean";
-
-    private StdScheduler scheduler;
-
-    public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
-
-    protected StudyInfoPanel panel = new StudyInfoPanel();
-
     public static final String PAGE_MESSAGE = "pageMessages";// for showing
+    public static final String INPUT_MESSAGES = "formMessages"; // for showing
+    public static final String PRESET_VALUES = "presetValues"; // for setting
+    public static final String ADMIN_SERVLET_CODE = "admin";
+    public static final String BEAN_TABLE = "table";
+    public static final String STUDY_INFO_PANEL = "panel"; // for setting the
+    public static final String BREADCRUMB_TRAIL = "breadcrumbs";
     // page
     // wide message
-
-    public static final String INPUT_MESSAGES = "formMessages"; // for showing
+    public static final String POP_UP_URL = "popUpURL";
     // input-specific
     // messages
-
-    public static final String PRESET_VALUES = "presetValues"; // for setting
-    // preset values
-
-    public static final String ADMIN_SERVLET_CODE = "admin";
-
-    public static final String BEAN_TABLE = "table";
-
-    public static final String STUDY_INFO_PANEL = "panel"; // for setting the
-    // side panel
-
-    public static final String BREADCRUMB_TRAIL = "breadcrumbs";
-
-    public static final String POP_UP_URL = "popUpURL";
-
-    // public static String DATASET_HOME_DIR = "OpenClinica";
-
     // Use this variable as the key for the support url
     public static final String SUPPORT_URL = "supportURL";
-
+    // preset values
     public static final String MODULE = "module";// to determine which module
+    public static final String USER_BEAN_NAME = "userBean";
+    private static final Logger LOGGER = LoggerFactory.getLogger(CoreSecureController.class);
+    // side panel
+    public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
+    private static String SCHEDULER = "schedulerFactoryBean";
 
+    // public static String DATASET_HOME_DIR = "OpenClinica";
+    protected HashMap errors = new HashMap();
+    protected StudyInfoPanel panel = new StudyInfoPanel();
+    private StdScheduler scheduler;
     private CRFLocker crfLocker;
-
-    private DataSource dataSource = null;
 
     // user is in
 
     // for setting the breadcrumb trail
     // protected HashMap errors = new HashMap();//error messages on the page
+    private DataSource dataSource = null;
 
     protected void addPageMessage(String message, HttpServletRequest request) {
         ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
@@ -140,8 +113,7 @@ public abstract class CoreSecureController extends HttpServlet {
         request.setAttribute(PAGE_MESSAGE, pageMessages);
     }
 
-    @Override
-    public void init(ServletConfig config) throws ServletException {
+    @Override public void init(ServletConfig config) throws ServletException {
         super.init(config);
 
         ServletContext context = getServletContext();
@@ -184,8 +156,7 @@ public abstract class CoreSecureController extends HttpServlet {
         request.setAttribute(BEAN_TABLE, table);
     }
 
-    @Override
-    public void init() throws ServletException {
+    @Override public void init() throws ServletException {
         ServletContext context = getServletContext();
         // DATASET_HOME_DIR = context.getInitParameter("datasetHomeDir");
     }
@@ -193,18 +164,13 @@ public abstract class CoreSecureController extends HttpServlet {
     /**
      * Process request
      *
-     * @param request
-     *            TODO
-     * @param response
-     *            TODO
-     *
+     * @param request  TODO
+     * @param response TODO
      * @throws Exception
      */
     protected abstract void processRequest(HttpServletRequest request, HttpServletResponse response) throws Exception;
 
     protected abstract void mayProceed(HttpServletRequest request, HttpServletResponse response) throws InsufficientPermissionException;
-
-    public static final String USER_BEAN_NAME = "userBean";
 
     public void passwdTimeOut(HttpServletRequest request, HttpServletResponse response, UserAccountBean ub) {
         Date lastChangeDate = ub.getPasswdTimestamp();
@@ -279,17 +245,16 @@ public abstract class CoreSecureController extends HttpServlet {
 
         ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
 
-        successMsg =
-                successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fileBeans.get(0).getId()
-                        + "\">here </a>");
+        successMsg = successMsg
+                .replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fileBeans.get(0).getId() + "\">here </a>");
 
         return successMsg;
     }
 
     private StdScheduler getScheduler(HttpServletRequest request) {
-        scheduler =
-                this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(
-                        SCHEDULER);
+        scheduler = this.scheduler != null ?
+                scheduler :
+                (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(SCHEDULER);
         return scheduler;
     }
 
@@ -299,8 +264,10 @@ public abstract class CoreSecureController extends HttpServlet {
             UserAccountBean ub = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
 
             if (eventCrf != null && crfLocker.isLocked(eventCrf.getId())) {
-                if (ub != null && ub.getId() == crfLocker.getLockOwner(eventCrf.getId())) crfLocker.unlock(eventCrf.getId());
-                else if (ub == null) crfLocker.unlock(eventCrf.getId());
+                if (ub != null && ub.getId() == crfLocker.getLockOwner(eventCrf.getId()))
+                    crfLocker.unlock(eventCrf.getId());
+                else if (ub == null)
+                    crfLocker.unlock(eventCrf.getId());
             }
         }
     }
@@ -328,7 +295,7 @@ public abstract class CoreSecureController extends HttpServlet {
         }
 
         UserAccountBean ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
-        StudyBean currentStudy = (StudyBean) session.getAttribute("study");
+        StudyBean currentStudy = (StudyBean) session.getAttribute("publicStudy");
         StudyUserRoleBean currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
         // Set current language preferences
@@ -402,7 +369,12 @@ public abstract class CoreSecureController extends HttpServlet {
                 } else {
                     currentStudy = new StudyBean();
                 }
-                session.setAttribute("study", currentStudy);// The above line is moved here since currentstudy's value is set in else block and could change
+                session.setAttribute("publicStudy",
+                        currentStudy);// The above line is moved here since currentstudy's value is set in else block and could change
+                request.setAttribute("requestSchema", currentStudy.getSchemaName());
+                StudyBean currentTenantStudy = (StudyBean) sdao.findByUniqueIdentifier(currentStudy.getIdentifier());
+                request.setAttribute("requestSchema", "public");
+                session.setAttribute("study", currentTenantStudy);
             } else if (currentStudy.getId() > 0) {
                 // YW 06-20-2007<< set site's parentstudy name when site is
                 // restored
@@ -412,36 +384,35 @@ public abstract class CoreSecureController extends HttpServlet {
                 // YW >>
             }
 
-
             if (currentStudy.getParentStudyId() > 0) {
                 /*
                  * The Role decription will be set depending on whether the user
                  * logged in at study lever or site level. issue-2422
                  */
                 List roles = Role.toArrayList();
-                for (Iterator it = roles.iterator(); it.hasNext();) {
+                for (Iterator it = roles.iterator(); it.hasNext(); ) {
                     Role role = (Role) it.next();
                     switch (role.getId()) {
-                        case 2:
-                            role.setDescription("site_Study_Coordinator");
-                            break;
-                        case 3:
-                            role.setDescription("site_Study_Director");
-                            break;
-                        case 4:
-                            role.setDescription("site_investigator");
-                            break;
-                        case 5:
-                            role.setDescription("site_Data_Entry_Person");
-                            break;
-                        case 6:
-                            role.setDescription("site_monitor");
-                            break;
-                        case 7:
-                            role.setDescription("site_Data_Entry_Person2");
-                            break;
-                        default:
-                            // logger.info("No role matched when setting role description");
+                    case 2:
+                        role.setDescription("site_Study_Coordinator");
+                        break;
+                    case 3:
+                        role.setDescription("site_Study_Director");
+                        break;
+                    case 4:
+                        role.setDescription("site_investigator");
+                        break;
+                    case 5:
+                        role.setDescription("site_Data_Entry_Person");
+                        break;
+                    case 6:
+                        role.setDescription("site_monitor");
+                        break;
+                    case 7:
+                        role.setDescription("site_Data_Entry_Person2");
+                        break;
+                    default:
+                        // logger.info("No role matched when setting role description");
                     }
                 }
             } else {
@@ -450,26 +421,26 @@ public abstract class CoreSecureController extends HttpServlet {
                  * description. issue-2422
                  */
                 List roles = Role.toArrayList();
-                for (Iterator it = roles.iterator(); it.hasNext();) {
+                for (Iterator it = roles.iterator(); it.hasNext(); ) {
                     Role role = (Role) it.next();
                     switch (role.getId()) {
-                        case 2:
-                            role.setDescription("Study_Coordinator");
-                            break;
-                        case 3:
-                            role.setDescription("Study_Director");
-                            break;
-                        case 4:
-                            role.setDescription("Investigator");
-                            break;
-                        case 5:
-                            role.setDescription("Data_Entry_Person");
-                            break;
-                        case 6:
-                            role.setDescription("Monitor");
-                            break;
-                        default:
-                            // logger.info("No role matched when setting role description");
+                    case 2:
+                        role.setDescription("Study_Coordinator");
+                        break;
+                    case 3:
+                        role.setDescription("Study_Director");
+                        break;
+                    case 4:
+                        role.setDescription("Investigator");
+                        break;
+                    case 5:
+                        role.setDescription("Data_Entry_Person");
+                        break;
+                    case 6:
+                        role.setDescription("Monitor");
+                        break;
+                    default:
+                        // logger.info("No role matched when setting role description");
                     }
                 }
             }
@@ -528,6 +499,7 @@ public abstract class CoreSecureController extends HttpServlet {
             if (!request.getRequestURI().endsWith("ResetPassword")) {
                 passwdTimeOut(request, response, ub);
             }
+            request.setAttribute("requestSchema", getRequestSchema(request, currentStudy.getSchemaName()));
             mayProceed(request, response);
             //   pingJobServer(request);
             processRequest(request, response);
@@ -551,6 +523,13 @@ public abstract class CoreSecureController extends HttpServlet {
 
     }
 
+    public String getRequestSchema(HttpServletRequest request, String schemaName) {
+        switch (StringUtils.substringAfterLast(request.getRequestURI(), "/")) {
+        default:
+            return schemaName;
+        }
+    }
+
     /**
      * Handles the HTTP <code>GET</code> method.
      *
@@ -559,8 +538,7 @@ public abstract class CoreSecureController extends HttpServlet {
      * @throws ServletException
      * @throws java.io.IOException
      */
-    @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    @Override protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try {
             LOGGER.debug("GET Request");
             process(request, response);
@@ -573,13 +551,10 @@ public abstract class CoreSecureController extends HttpServlet {
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request
-     *            servlet request
-     * @param response
-     *            servlet response
+     * @param request  servlet request
+     * @param response servlet response
      */
-    @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
+    @Override protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException {
         try {
             LOGGER.debug("POST Request");
             process(request, response);
@@ -590,20 +565,16 @@ public abstract class CoreSecureController extends HttpServlet {
     }
 
     /**
-     * <P>
+     * <p>
      * Forwards to a jsp page. Additions to the forwardPage() method involve
      * checking the session for the bread crumb trail and setting it, if
      * necessary. Setting it here allows the developer to only have to update
      * the <code>BreadcrumbTrail</code> class.
      *
-     * @param jspPage
-     *            The page to go to.
-     * @param checkTrail
-     *            The command to check for, and set a trail in the session.
-     * @param request
-     *            TODO
-     * @param response
-     *            TODO
+     * @param jspPage    The page to go to.
+     * @param checkTrail The command to check for, and set a trail in the session.
+     * @param request    TODO
+     * @param response   TODO
      */
     protected void forwardPage(Page jspPage, boolean checkTrail, HttpServletRequest request, HttpServletResponse response) {
         Page page1 = Page.valueOf(jspPage.name());
@@ -682,9 +653,8 @@ public abstract class CoreSecureController extends HttpServlet {
                 }
             }
          */
-            LOGGER.error(se.getMessage(),se);
-        }
-        finally {
+            LOGGER.error(se.getMessage(), se);
+        } finally {
             page1 = null;
             jspPage = null;
             temp = null;
@@ -705,23 +675,17 @@ public abstract class CoreSecureController extends HttpServlet {
      * <code>addEntityList("groups", allGroups, "There are no groups to display, so you cannot add a subject to this Study.",
      * Page.SUBMIT_DATA)</code>
      *
-     * @param beanName
-     *            The name of the entity list as it should be stored in the
-     *            request object.
-     * @param list
-     *            The Collection of entities.
-     * @param messageIfEmpty
-     *            The message to display if the collection is empty.
-     * @param destinationIfEmpty
-     *            The Page to go to if the collection is empty.
-     * @param request
-     *            TODO
-     * @param response
-     *            TODO
+     * @param beanName           The name of the entity list as it should be stored in the
+     *                           request object.
+     * @param list               The Collection of entities.
+     * @param messageIfEmpty     The message to display if the collection is empty.
+     * @param destinationIfEmpty The Page to go to if the collection is empty.
+     * @param request            TODO
+     * @param response           TODO
      * @throws InconsistentStateException
      */
     protected void addEntityList(String beanName, Collection list, String messageIfEmpty, Page destinationIfEmpty, HttpServletRequest request,
-                                 HttpServletResponse response) throws InconsistentStateException {
+            HttpServletResponse response) throws InconsistentStateException {
         if (list.isEmpty()) {
             throw new InconsistentStateException(destinationIfEmpty, messageIfEmpty);
         }
@@ -731,7 +695,7 @@ public abstract class CoreSecureController extends HttpServlet {
 
     /**
      * @return A blank String if this servlet is not an Administer System
-     *         servlet. CoreSecureController.ADMIN_SERVLET_CODE otherwise.
+     * servlet. CoreSecureController.ADMIN_SERVLET_CODE otherwise.
      */
     protected String getAdminServlet() {
         return "";
@@ -749,39 +713,38 @@ public abstract class CoreSecureController extends HttpServlet {
      * Check if an entity with passed entity id is included in studies of
      * current user.
      * </p>
-     *
+     * <p>
      * <p>
      * Note: This method called AuditableEntityDAO.findByPKAndStudy which
      * required "The subclass must define findByPKAndStudyName before calling
      * this method. Otherwise an inactive AuditableEntityBean will be returned."
      * </p>
      *
+     * @param entityId int
+     * @param userName String
+     * @param adao     AuditableEntityDAO
+     * @param ds       javax.sql.DataSource
      * @author ywang 10-18-2007
-     * @param entityId
-     *            int
-     * @param userName
-     *            String
-     * @param adao
-     *            AuditableEntityDAO
-     * @param ds
-     *            javax.sql.DataSource
      */
     protected boolean entityIncluded(int entityId, String userName, AuditableEntityDAO adao, DataSource ds) {
         StudyDAO sdao = new StudyDAO(ds);
-        ArrayList<StudyBean> studies = (ArrayList<StudyBean>) sdao.findAllByUserNotRemoved(userName);
-        for (int i = 0; i < studies.size(); ++i) {
-            if (adao.findByPKAndStudy(entityId, studies.get(i)).getId() > 0) {
-                return true;
-            }
-            // Here follow the current logic - study subjects at sites level are
-            // visible to parent studies.
-            if (studies.get(i).getParentStudyId() <= 0) {
-                ArrayList<StudyBean> sites = (ArrayList<StudyBean>) sdao.findAllByParent(studies.get(i).getId());
-                if (sites.size() > 0) {
-                    for (int j = 0; j < sites.size(); ++j) {
-                        if (adao.findByPKAndStudy(entityId, sites.get(j)).getId() > 0) {
-                            return true;
-                        }
+        HttpServletRequest request = CoreResources.getRequest();
+        HttpSession session = request.getSession();
+        if (session == null)
+            return false;
+        StudyBean publicStudy = (StudyBean) session.getAttribute("publicStudy");
+        StudyBean schemaStudy = sdao.findByOid(publicStudy.getOid());
+        if (adao.findByPKAndStudy(entityId, schemaStudy).getId() > 0) {
+            return true;
+        }
+        // Here follow the current logic - study subjects at sites level are
+        // visible to parent studies.
+        if (schemaStudy.getParentStudyId() <= 0) {
+            ArrayList<StudyBean> sites = (ArrayList<StudyBean>) sdao.findAllByParent(schemaStudy.getId());
+            if (sites.size() > 0) {
+                for (int j = 0; j < sites.size(); ++j) {
+                    if (adao.findByPKAndStudy(entityId, sites.get(j)).getId() > 0) {
+                        return true;
                     }
                 }
             }
@@ -920,7 +883,7 @@ public abstract class CoreSecureController extends HttpServlet {
     }
 
     public Boolean sendEmail(String to, String from, String subject, String body, Boolean htmlEmail, String successMessage, String failMessage,
-                             Boolean sendMessage, HttpServletRequest request) throws Exception {
+            Boolean sendMessage, HttpServletRequest request) throws Exception {
         Boolean messageSent = true;
         try {
             JavaMailSenderImpl mailSender = (JavaMailSenderImpl) SpringServletAccess.getApplicationContext(getServletContext()).getBean("mailSender");
@@ -928,8 +891,8 @@ public abstract class CoreSecureController extends HttpServlet {
             //@pgawade 09-Feb-2012 #issue 13201 - setting the "mail.smtp.localhost" property to localhost when java API is not able to
             //retrieve the host name
             Properties javaMailProperties = mailSender.getJavaMailProperties();
-            if(null != javaMailProperties){
-                if (javaMailProperties.get("mail.smtp.localhost") == null || ((String)javaMailProperties.get("mail.smtp.localhost")).equalsIgnoreCase("") ){
+            if (null != javaMailProperties) {
+                if (javaMailProperties.get("mail.smtp.localhost") == null || ((String) javaMailProperties.get("mail.smtp.localhost")).equalsIgnoreCase("")) {
                     javaMailProperties.put("mail.smtp.localhost", "localhost");
                 }
             }
@@ -976,9 +939,8 @@ public abstract class CoreSecureController extends HttpServlet {
 
     public void unlockCRFsForUser(int userId) {
         crfLocker.unlockAllForUser(userId);
-        
-    }
 
+    }
 
     // JN:Doesnt look like the following method is used anywhere, commenting out
     /*
@@ -1016,6 +978,10 @@ public abstract class CoreSecureController extends HttpServlet {
      * null) { url += "?" + query; } return url; }
      */
 
+    public CRFLocker getCrfLocker() {
+        return crfLocker;
+    }
+
     /**
      * A inner class designed to allow the implementation of a JUnit test case
      * for abstract CoreSecureController. The inner class allows the test case
@@ -1034,10 +1000,5 @@ public abstract class CoreSecureController extends HttpServlet {
         public void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
             CoreSecureController.this.process(request, response);
         }
-    }
-
-
-    public CRFLocker getCrfLocker() {
-        return crfLocker;
     }
 }

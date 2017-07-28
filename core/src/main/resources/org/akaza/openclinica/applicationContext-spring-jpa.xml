@@ -1,0 +1,57 @@
+<?xml version="1.0" encoding="UTF-8"?>
+
+<beans
+        xmlns="http://www.springframework.org/schema/beans"
+        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+        xmlns:tx="http://www.springframework.org/schema/cache"
+        xmlns:jpa="http://www.springframework.org/schema/data/jpa"
+        xsi:schemaLocation="http://www.springframework.org/schema/beans
+                        http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
+                      http://www.springframework.org/schema/data/jpa http://www.springframework.org/schema/data/jpa/spring-jpa.xsd">
+
+
+    <bean id="archiveDataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource">
+        <property name="driverClassName" value="org.postgresql.Driver"/>
+        <property name="maxTotal" value="5"/>
+        <property name="maxIdle" value="2"/>
+        <property name="maxWaitMillis" value="180000"/>
+        <property name="removeAbandonedOnBorrow" value="true"/>
+        <property name="removeAbandonedTimeout" value="300"/>
+        <property name="logAbandoned" value="true"/>
+        <property name="testWhileIdle" value="true"/>
+        <property name="testOnReturn" value="true"/>
+        <property name="timeBetweenEvictionRunsMillis" value="300000"/>
+        <property name="minEvictableIdleTimeMillis" value="600000"/>
+        <property name="url" value="s[archiveUrl]"/>
+        <property name="username" value="s[archiveUsername]"/>
+        <property name="password" value="s[archivePassword]"/>
+        <property name="bigStringTryClob" value="true"/>
+        <qualifier value="archiveDS"/>
+    </bean>
+
+    <bean id="hibernateJpaVendorAdapter"
+          class="org.springframework.orm.jpa.vendor.HibernateJpaVendorAdapter"/>
+
+    <!-- Configure the entity manager factory bean -->
+    <bean id="entityManagerFactory"
+          class="org.springframework.orm.jpa.LocalContainerEntityManagerFactoryBean">
+        <property name="dataSource" ref="archiveDataSource"/>
+        <property name="jpaVendorAdapter" ref="hibernateJpaVendorAdapter"/>
+        <!-- Set JPA properties -->
+        <property name="jpaProperties">
+            <props>
+                <prop key="hibernate.dialect">s[hibernate.dialect]</prop>
+            </props>
+        </property>
+        <property name="packagesToScan" value="org.akaza.openclinica.dao.hibernate,org.akaza.openclinica.dao.jpa"/>
+        <qualifier value="archiveEM"/>
+    </bean>
+
+    <!-- Configure the transaction manager bean -->
+    <bean id="archiveTransactionManager" class="org.springframework.orm.jpa.JpaTransactionManager">
+        <property name="entityManagerFactory" ref="entityManagerFactory"/>
+        <qualifier value="archival"/>
+    </bean>
+
+    <jpa:repositories base-package="org.akaza.openclinica.dao.jpa"/>
+</beans>

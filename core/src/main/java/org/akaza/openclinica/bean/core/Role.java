@@ -73,6 +73,16 @@ public class Role extends Term {
         return INVALID;
     }
 
+    public static Role getByDesc(String desc) {
+        for (int i = 0; i < list.size(); i++) {
+            Role temp = (Role) list.get(i);
+            if (temp.getDescription().equals(desc) || temp.description.equals(desc)) {
+                return temp;
+            }
+        }
+        return INVALID;
+    }
+
     public static ArrayList toArrayList() {
         return new ArrayList(list);
     }

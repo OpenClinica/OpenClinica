@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="yogi" id="2017-03-14-7878-4">
+        <sql splitStatements="false">
+            CREATE FOREIGN TABLE user_account
+            (
+            user_id integer,
+            user_name character varying(64),
+            passwd character varying(255),
+            first_name character varying(50),
+            last_name character varying(50),
+            email character varying(120),
+            active_study integer,
+            institutional_affiliation character varying(255),
+            status_id integer,
+            owner_id integer,
+            date_created date,
+            date_updated date,
+            date_lastvisit timestamp without time zone,
+            passwd_timestamp date,
+            passwd_challenge_question character varying(64),
+            passwd_challenge_answer character varying(255),
+            phone character varying(64),
+            user_type_id integer,
+            update_id integer,
+            enabled boolean,
+            account_non_locked boolean,
+            lock_counter integer,
+            run_webservices boolean,
+            access_code character varying(64),
+            time_zone character varying(255),
+            enable_api_key boolean,
+            api_key character varying(255),
+            user_uuid character varying(255)
+            ) SERVER ${mappingServer}
+            OPTIONS (schema_name 'public', table_name 'user_account');
+        </sql>
+    </changeSet>
+</databaseChangeLog>

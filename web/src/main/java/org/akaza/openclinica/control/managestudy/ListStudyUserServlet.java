@@ -51,9 +51,10 @@ public class ListStudyUserServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
+        request.setAttribute("requestSchema", "public");
         FormProcessor fp = new FormProcessor(request);
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-        ArrayList users = udao.findAllUsersByStudy(currentStudy.getId());
+        ArrayList users = udao.findAllUsersByStudy(currentPublicStudy.getId());
 
         EntityBeanTable table = fp.getEntityBeanTable();
         ArrayList allStudyUserRows = StudyUserRoleRow.generateRowsFromBeans(users);

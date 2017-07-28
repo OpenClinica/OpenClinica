@@ -9,20 +9,31 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.job.AutowiringSpringBeanJobFactory;
+import org.akaza.openclinica.job.JobExecutionExceptionListener;
+import org.akaza.openclinica.job.JobTriggerListener;
+import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.apache.commons.dbcp.BasicDataSource;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
-import org.quartz.SimpleTrigger;
+import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang.StringUtils;
+import org.quartz.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.BeansException;
+import org.springframework.beans.factory.NoSuchBeanDefinitionException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.config.ConfigurableListableBeanFactory;
 import org.springframework.context.ApplicationContext;
+import org.springframework.context.ConfigurableApplicationContext;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
+import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.PlatformTransactionManager;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -32,9 +43,15 @@ import org.springframework.web.context.WebApplicationContext;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
 import java.io.File;
 import java.text.SimpleDateFormat;
+import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
+import java.util.Properties;
+
+import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 
 @Controller("extractController")
 @RequestMapping("/extract")
@@ -50,7 +67,11 @@ public class ExtractController {
     private DatasetDAO datasetDao;
 
     @Autowired
+    @Qualifier("schedulerFactoryBean")
     private Scheduler scheduler;
+
+    @Autowired
+    private OpenClinicaSchedulerFactoryBean schedulerFactoryBean;
 
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -150,9 +171,16 @@ public class ExtractController {
         // result code, user message, optional URL, archive message, log file message
         // asdf table: sort most recent at top
         logger.debug("found xslt file name " + xsltPath);
-
+        ApplicationContext context = null;
+        Scheduler jobScheduler = scheduler;
+        try {
+            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+        jobScheduler = getSchemaScheduler(request, context, jobScheduler);
         // String xmlFilePath = generalFileDir + ODMXMLFileName;
-        simpleTrigger = xsltService.generateXsltTrigger(scheduler, xsltPath,
+        simpleTrigger = xsltService.generateXsltTrigger(jobScheduler, xsltPath,
                 generalFileDir, // xml_file_path
                 endFilePath + File.separator,
                 exportFileName,
@@ -161,17 +189,13 @@ public class ExtractController {
         // System.out.println("just set locale: " + LocaleResolver.getLocale(request).getLanguage());
 
         cnt++;
-        ApplicationContext context = null;
-        try {
-            context = (ApplicationContext) scheduler.getContext().get("applicationContext");
-        } catch (SchedulerException e) {
-            e.printStackTrace();
-        }
+
         //WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
         JobDetailFactoryBean jobDetailFactoryBean = context.getBean(JobDetailFactoryBean.class, simpleTrigger, this.TRIGGER_GROUP_NAME);
 
+
         try {
-            Date dateStart = scheduler.scheduleJob(jobDetailFactoryBean.getObject(), simpleTrigger);
+            Date dateStart = jobScheduler.scheduleJob(jobDetailFactoryBean.getObject(), simpleTrigger);
             logger.debug("== found job date: " + dateStart.toString());
 
         } catch (SchedulerException se) {
@@ -189,6 +213,73 @@ public class ExtractController {
         return map;
     }
 
+    private Scheduler getSchemaScheduler(HttpServletRequest request, ApplicationContext context, Scheduler jobScheduler) {
+        if (request.getAttribute(CURRENT_TENANT_ID) != null) {
+            String schema = (String) request.getAttribute(CURRENT_TENANT_ID);
+            if (StringUtils.isNotEmpty(schema) &&
+                    (schema.equalsIgnoreCase("public") != true)) {
+                try {
+                    jobScheduler = (Scheduler) context.getBean(schema);
+                    logger.debug("Existing schema scheduler found:" + schema);
+                } catch (NoSuchBeanDefinitionException e) {
+                    createSchedulerFactoryBean(context, schema);
+                    try {
+                        jobScheduler = (Scheduler) context.getBean(schema);
+                    } catch (BeansException e1) {
+                        e1.printStackTrace();
+                    }
+                } catch (BeansException e) {
+                    e.printStackTrace();
+
+                }
+            }
+        }
+        return jobScheduler;
+    }
+
+    public void createSchedulerFactoryBean(ApplicationContext context, String schema) {
+        logger.debug("Creating a new schema scheduler:" + schema);
+        OpenClinicaSchedulerFactoryBean sFBean = new OpenClinicaSchedulerFactoryBean();
+        sFBean.setSchedulerName(schema);
+        Properties properties = new Properties();
+        AutowiringSpringBeanJobFactory jobFactory = new AutowiringSpringBeanJobFactory();
+        jobFactory.setApplicationContext(context);
+        sFBean.setJobFactory(jobFactory);
+        sFBean.setDataSource((DataSource) context.getBean("dataSource"));
+        sFBean.setTransactionManager((PlatformTransactionManager) context.getBean("transactionManager"));
+        sFBean.setApplicationContext(context);
+        sFBean.setApplicationContextSchedulerContextKey("applicationContext");
+        sFBean.setGlobalJobListeners(new JobExecutionExceptionListener());
+        sFBean.setGlobalTriggerListeners(new JobTriggerListener());
+
+        // use global Quartz properties
+        properties.setProperty("org.quartz.jobStore.misfireThreshold",
+                CoreResources.getField("org.quartz.jobStore.misfireThreshold"));
+        properties.setProperty("org.quartz.jobStore.class",
+                CoreResources.getField("org.quartz.jobStore.class"));
+        properties.setProperty("org.quartz.jobStore.driverDelegateClass",
+                CoreResources.getField("org.quartz.jobStore.driverDelegateClass"));
+        properties.setProperty("org.quartz.jobStore.useProperties",
+                CoreResources.getField("org.quartz.jobStore.useProperties"));
+        properties.setProperty("org.quartz.jobStore.tablePrefix", schema + "."+
+                CoreResources.getField("org.quartz.jobStore.tablePrefix"));
+        properties.setProperty("org.quartz.threadPool.class",
+                CoreResources.getField("org.quartz.threadPool.class"));
+        properties.setProperty("org.quartz.threadPool.threadCount",
+                CoreResources.getField("org.quartz.threadPool.threadCount"));
+        properties.setProperty("org.quartz.threadPool.threadPriority",
+                CoreResources.getField("org.quartz.threadPool.threadPriority"));
+        sFBean.setQuartzProperties(properties);
+        try {
+            sFBean.afterPropertiesSet();
+        } catch (Exception e) {
+            logger.error("Error creating the scheduler bean:" + schema, e.getMessage(), e);
+            return;
+        }
+        sFBean.start();
+        ConfigurableListableBeanFactory beanFactory = ((ConfigurableApplicationContext) context).getBeanFactory();
+        beanFactory.registerSingleton(schema, sFBean);
+    }
     /**
      * @deprecated Use {@link #setAllProps(ExtractPropertyBean,DatasetBean,SimpleDateFormat,ExtractUtils)} instead
      */

@@ -88,7 +88,7 @@
                         <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
                     </c:otherwise>
                 </c:choose>
-                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
+                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;(<c:out value="${study.envType}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="#"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a>
@@ -103,7 +103,7 @@
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a></li>
                             <li><a href="#">Account</a></li>
                             <li><a href="#">Billing</a></li>
-                            <li> <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
+                            <li> <a href="${urlPrefix}pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
                         </ul>
                         </li>
                     </ul>
