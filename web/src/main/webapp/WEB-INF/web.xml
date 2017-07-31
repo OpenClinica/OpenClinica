@@ -20,11 +20,10 @@
             classpath:org/akaza/openclinica/applicationContext-core-security.xml
             classpath:org/akaza/openclinica/applicationContext-core-service.xml
             classpath:org/akaza/openclinica/applicationContext-core-scheduler.xml
+            classpath:org/akaza/openclinica/applicationContext-core-annotation-scheduler.xml
             classpath:org/akaza/openclinica/applicationContext-core-hibernate.xml
             classpath:org/akaza/openclinica/applicationContext-core-email.xml
             classpath:org/akaza/openclinica/applicationContext-core-db.xml
-
-
         </param-value>
     </context-param>
 

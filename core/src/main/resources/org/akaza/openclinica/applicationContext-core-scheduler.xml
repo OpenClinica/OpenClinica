@@ -40,12 +40,5 @@ http://www.springframework.org/schema/task/spring-task-3.0.xsd"
             </list>
         </property>
     </bean>
-         <task:annotation-driven scheduler="taskScheduler"/>
-     <task:scheduler id="taskScheduler" pool-size="42"/>
-        <bean id="jobTriggerService" class="org.akaza.openclinica.service.JobTriggerService" autowire="byName">
-                <constructor-arg ref="dataSource"/>
-                <constructor-arg ref="ruleSetDao"/>
-                <constructor-arg ref="ruleSetService"/>        
-    </bean>
-    
+
 </beans>

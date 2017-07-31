@@ -1,7 +1,10 @@
 package org.akaza.openclinica.controller;
 
+import java.util.HashMap;
+import java.util.Locale;
+import java.util.TimeZone;
+
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.JobTriggerService;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.dbcp.BasicDataSource;
@@ -11,14 +14,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.ServletContext;
-
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.TimeZone;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping(value = "/healthcheck")
@@ -79,7 +78,6 @@ public class ReportController {
 
 		HashMap<String, Boolean> map = new HashMap<>();
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		System.out.println("I'm in rest call");
 		Boolean result = ruleSetService.calculateTimezoneDiff(TimeZone.getTimeZone(serverZoneId), TimeZone.getTimeZone(ssZoneId), Integer.valueOf(runTime), Integer.valueOf(serverTime));
 		map.put("result", result);
 
@@ -120,7 +118,6 @@ public class ReportController {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		String ssZoneId = hashMap.get("ssZoneId");
 		String serverZoneId = hashMap.get("serverZoneId");
-		System.out.println("I'm in rest call");
 		HashMap<String, String> map = expressionService.getSSDate(ssZoneId, serverZoneId);
 		return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
 
@@ -144,7 +141,6 @@ public class ReportController {
 	public ResponseEntity<HashMap> getRunTime() throws Exception {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		HashMap<String, Integer> map = new HashMap<>();
-		System.out.println("I'm in rest call for RunTime");
 		int result = ruleSetService.getRunTimeWhenTimeIsNotSet();
 		map.put("result", result);
 		return new ResponseEntity<HashMap>(map, org.springframework.http.HttpStatus.OK);
