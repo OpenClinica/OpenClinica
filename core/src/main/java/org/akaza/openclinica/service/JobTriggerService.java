@@ -10,22 +10,11 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
-import org.akaza.openclinica.domain.rule.action.NotificationActionProcessor;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
@@ -46,21 +35,6 @@ public class JobTriggerService {
     @Autowired
     RuleSetService ruleSetService;
 
-    UserAccountDAO userAccountDao;
-    StudyDAO studyDao;
-    StudySubjectDAO ssdao;
-    StudyEventDAO sedao;
-    StudyEventDefinitionDAO seddao;
-    ItemDAO idao;
-    ItemGroupMetadataDAO igmdao;
-    ItemGroupDAO igdao;
-    CRFDAO cdao;
-    CRFVersionDAO cvdao;
-    EventCRFDAO edao;
-    NotificationActionProcessor notificationActionProcessor;
-    ItemDataDAO iddao;
-    ItemBean iBean;
-    
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private static final SimpleDateFormat currentDateFormat = new SimpleDateFormat("HH:mm:ss");
 
@@ -69,8 +43,9 @@ public class JobTriggerService {
     @Scheduled(cron = "0 0 0/1 * * ?") // trigger every hour
     public void hourlyJobTrigger() throws NumberFormatException, ParseException {
         try {
-            logger.info("The time is now " + currentDateFormat.format(new Date()));
+            logger.info("Beginning scheduled rule run.  The time is now " + currentDateFormat.format(new Date()));
             triggerJob();
+            logger.info("Completed scheduled rule run.");
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
@@ -84,17 +59,15 @@ public class JobTriggerService {
         for (RuleSetBean ruleSet : ruleSets) {
             if (ruleSet.getStatus().AVAILABLE != null && ruleSet.isRunSchedule()) {
                 if(ruleSet.getItemId()!=null){ 
-                 // item Specific Rule
-                    System.out.println("*** Item Specific Rule ***");
-                ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
-                StudyBean currentStudy = (StudyBean) getStudyDao().findByPK(ruleSet.getStudyId());
-                ResourceBundleProvider.updateLocale(Locale.getDefault());
-                UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(1);
-                ruleSetBeans.add(ruleSet);
-                ruleSetService.runRulesInBulk(ruleSetBeans, false, currentStudy, ub, true);
+                     // item Specific Rule
+                    ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
+                    StudyBean currentStudy = (StudyBean) getStudyDao().findByPK(ruleSet.getStudyId());
+                    ResourceBundleProvider.updateLocale(Locale.getDefault());
+                    UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(1);
+                    ruleSetBeans.add(ruleSet);
+                    ruleSetService.runRulesInBulk(ruleSetBeans, false, currentStudy, ub, true);
                 }else{
-            // Event Specific Rule        
-                    System.out.println("*** Event Specific Rule ***");
+                    // Event Specific Rule        
                     StudyEventChangeDetails studyEventChangeDetails = new StudyEventChangeDetails(true, true);
                     ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
                     ExpressionBean eBean = new ExpressionBean();
