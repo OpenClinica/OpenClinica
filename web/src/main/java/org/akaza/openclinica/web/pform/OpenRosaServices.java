@@ -845,8 +845,10 @@ public class OpenRosaServices {
 
     private String getUserXml(ServletContext context) throws Exception {
         HashMap<String, String> value = getSubjectContextCacheValue(context);
-        String studySubjectOid = value.get("studySubjectOID");
-
+        String studySubjectOid = "";
+        if (value != null) {
+            studySubjectOid = value.get("studySubjectOID");
+        }
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
 
@@ -986,11 +988,14 @@ public class OpenRosaServices {
     @SuppressWarnings("unchecked")
     private HashMap<String, String> getSubjectContextCacheValue(ServletContext context) {
         LinkedHashMap<String, Object> subjectContextCache = (LinkedHashMap<String, Object>) context.getAttribute("subjectContextCache");
+        HashMap<String, String> value = null;
         String lastKey = null;
-        for (String key : subjectContextCache.keySet()) {
-            lastKey = key;
+        if (subjectContextCache != null) {
+            for (String key : subjectContextCache.keySet()) {
+                lastKey = key;
+            }
+            value = (HashMap<String, String>) subjectContextCache.get(lastKey);
         }
-        HashMap<String, String> value = (HashMap<String, String>) subjectContextCache.get(lastKey);
         return value;
     }
 
