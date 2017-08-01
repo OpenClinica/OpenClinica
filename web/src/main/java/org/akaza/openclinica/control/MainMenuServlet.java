@@ -28,12 +28,18 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.StudyBuildService;
+import org.akaza.openclinica.service.StudyBuildServiceImpl;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
 import java.util.Date;
 import java.util.Locale;
 
@@ -69,13 +75,22 @@ public class MainMenuServlet extends SecureController {
     }
 
 
-    public void processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) {
+    public void processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) throws Exception {
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
         if (StringUtils.isEmpty(studyEnvUuid))
             return;
+        ServletContext context = getServletContext();
+        WebApplicationContext ctx =
+                WebApplicationContextUtils
+                        .getWebApplicationContext(context);
+        String currentSchema = CoreResources.getRequestSchema(request);
+        CoreResources.setRequestSchema(request, "public");
+        StudyBuildService studyService = ctx.getBean("studyBuildService", StudyBuildServiceImpl.class);
+        studyService.updateStudyUserRoles(request, studyService.getUserAccountObject(ub), ub.getActiveStudyId());
+        UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
 
-        String currentSchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+        ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getName());
+        ub.setRoles(userRoleBeans);
         StudyDAO sd = getStudyDAO();
         StudyBean study = sd.findByStudyEnvUuid(studyEnvUuid);
         if (study == null) {
@@ -87,12 +102,15 @@ public class MainMenuServlet extends SecureController {
         currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
         session.setAttribute("publicStudy", currentPublicStudy);
         session.setAttribute("study", currentStudy);
+
         int parentStudyId = currentPublicStudy.getParentStudyId() > 0 ? currentPublicStudy.getParentStudyId() : currentPublicStudy.getId();
         StudyUserRoleBean roleInParent = ub.getRoleByStudy(parentStudyId);
-        // inherited role from parent study, pick the higher
-        // role
-        currentRole.setRole(Role.max(currentRole.getRole(), roleInParent.getRole()));
-        session.setAttribute("userRole", currentRole);
+
+        if (roleInParent.getStudyId() != parentStudyId) {
+            logger.error("You have no roles for this study.");
+            throw new Exception("You have no roles for this study.");
+        }
+        session.setAttribute("userRole", roleInParent);
         if (ub.getActiveStudyId() == parentStudyId)
             return;
         ub.setActiveStudyId(parentStudyId);

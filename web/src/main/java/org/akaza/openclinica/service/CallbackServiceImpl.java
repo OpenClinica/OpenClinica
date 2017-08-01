@@ -49,7 +49,9 @@ public class CallbackServiceImpl implements CallbackService {
         logger.info("Callback for user:" + _username);
         if (StringUtils.isEmpty(_username))
             return null;
-        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid(user.getUserId());
+        Map<String, Object> userContextMap = getUserContextMap(user);
+        String userUuid = (String) userContextMap.get("userUuid");
+        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid(userUuid);
         if (StringUtils.isEmpty(ub.getName())) {
             ub = (UserAccountBean) userAccountDAO.findByUserName(_username);
         } else {
@@ -58,9 +60,9 @@ public class CallbackServiceImpl implements CallbackService {
             updateStudyUsername(ub, user);
         }
         if (ub.getId() == 0) {
-            ub = createUserAccount(request, user);
+            ub = createUserAccount(request, user, userContextMap);
         }
-        boolean isUserUpdated = updateStudyUserRoles(request, ub, user);
+        boolean isUserUpdated = updateStudyUserRoles(request, ub, user, userContextMap);
         return new UserAccountHelper(ub, isUserUpdated);
     }
 
@@ -79,23 +81,33 @@ public class CallbackServiceImpl implements CallbackService {
         logger.info(modifications + " studyUserRole rows have been updated from user:" + ub.getName() + " to user:" + user.getNickname());
     }
 
-    @Modifying
-    private boolean updateStudyUserRoles(HttpServletRequest request, UserAccountBean ub, Auth0User user) throws Exception {
+    public Map<String, Object> getUserContextMap(Auth0User user)  throws Exception {
         Map<String, Object> appMetadata = user.getAppMetadata();
         Object userContext = appMetadata.get("userContext");
         String toJson = objectMapper.writeValueAsString(userContext);
         Map<String, Object> userContextMap = objectMapper.readValue(toJson, Map.class);
+        return userContextMap;
+    }
+    @Modifying
+    private boolean updateStudyUserRoles(HttpServletRequest request, UserAccountBean ub, Auth0User user, Map<String, Object> userContextMap) throws Exception {
         request.getSession().setAttribute("userContextMap", userContextMap);
         return studyBuildService.saveStudyEnvRoles(request, ub);
     }
 
-    private UserAccountBean createUserAccount(HttpServletRequest request, Auth0User user) throws Exception {
+    private UserAccountBean createUserAccount(HttpServletRequest request, Auth0User user, Map<String, Object> userContextMap ) throws Exception {
         HashMap<String, String> map = new HashMap<>();
         map.put("username", user.getNickname());
-        map.put("fName", "first");
-        map.put("lName", "last");
+        if (StringUtils.isNotEmpty(user.getGivenName()))
+            map.put("fName", user.getGivenName());
+        else
+            map.put("fName", "first");
+        if (StringUtils.isNotEmpty(user.getFamilyName()))
+            map.put("lName", user.getFamilyName());
+        else
+            map.put("lName", "last");
+
         map.put("role_name", "Data Manager");
-        map.put("user_uuid", user.getUserId());
+        map.put("user_uuid", (String) userContextMap.get("userUuid"));
         Map<String, Object> appMetadata = user.getAppMetadata();
         Object userType = appMetadata.get("userContext");
         LinkedTreeMap<String, String> userTypeMap = (LinkedTreeMap<String, String>) userType;

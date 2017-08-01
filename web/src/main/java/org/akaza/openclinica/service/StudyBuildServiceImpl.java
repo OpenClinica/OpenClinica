@@ -128,33 +128,31 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
     public boolean processSpecificStudyEnvUuid(HttpServletRequest request, int userActiveStudyId, UserAccount ub) {
-        boolean allUserRolesUpdated =false;
+        boolean studyEnvUuidProcessed =false;
         HttpSession session = request.getSession();
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
         if (StringUtils.isEmpty(studyEnvUuid))
-            return allUserRolesUpdated;
+            return studyEnvUuidProcessed;
+
+        updateStudyUserRoles(request, ub, userActiveStudyId);
 
         StudyDAO studyDAO = new StudyDAO(dataSource);
         StudyBean currentPublicStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
         Study userStudy = studyDao.findByStudyEnvUuid(studyEnvUuid);
         if (currentPublicStudy == null) {
-            return allUserRolesUpdated;
+            return studyEnvUuidProcessed;
         }
 
         int parentStudyId = currentPublicStudy.getParentStudyId() > 0 ? currentPublicStudy.getParentStudyId() : currentPublicStudy.getId();
         if (ub.getActiveStudy() != null  && ub.getActiveStudy().getStudyId() == parentStudyId)
-            return allUserRolesUpdated;
+            return studyEnvUuidProcessed;
 
         // check to see if the user has a role for this study
         ArrayList<StudyUserRole> userRoles = studyUserRoleDao.findAllUserRolesByUserAccount(ub, currentPublicStudy.getId(), parentStudyId);
         if (userRoles.isEmpty()) {
-            updateStudyUserRoles(request, ub, userActiveStudyId);
-            allUserRolesUpdated= true;
-            userRoles = studyUserRoleDao.findAllUserRolesByUserAccount(ub, currentPublicStudy.getId(), parentStudyId);
-            if (userRoles.isEmpty()) {
-                logger.error("Sorry you do not have a user role for this study:" + currentPublicStudy.getStudyEnvUuid());
-                return allUserRolesUpdated;
-            }
+            logger.error("Sorry you do not have a user role for this study:" + currentPublicStudy.getStudyEnvUuid());
+            studyEnvUuidProcessed = true;
+            return studyEnvUuidProcessed;
         }
         StudyUserRoleBean studyUserRoleBean = new StudyUserRoleBean();
         ub.setActiveStudy(userStudy);
@@ -162,10 +160,14 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
         session.setAttribute("study", null);
         session.setAttribute("publicStudy", null);
-        return allUserRolesUpdated;
+        studyEnvUuidProcessed = true;
+        return studyEnvUuidProcessed;
     }
-
-
+    @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
+    public UserAccount getUserAccountObject(UserAccountBean ubIn) {
+        UserAccount byUserId = userAccountDao.findByUserId(ubIn.getId());
+        return byUserId;
+    }
     public boolean saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ubIn) throws Exception {
         UserAccount ub = userAccountDao.findByUserId(ubIn.getId());
         boolean studyUserRoleUpdated = false;
@@ -175,22 +177,29 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             userActiveStudyId = 0;
         else
             userActiveStudyId = ub.getActiveStudy().getStudyId();
-        boolean allUserRolesUpdated = processSpecificStudyEnvUuid(request, userActiveStudyId, ub);
+        boolean studyEnvUuidProcessed = processSpecificStudyEnvUuid(request, userActiveStudyId, ub);
 
-        if(allUserRolesUpdated && ub.getActiveStudy().getStudyId() != 0)
+        if(studyEnvUuidProcessed)
             return true;
+
         studyUserRoleUpdated = updateStudyUserRoles(request, ub, userActiveStudyId);
-        if (ub.getActiveStudy().getStudyId() == 0) {
-            throw new Exception("Your study has not been published yet.");
+        if (ub.getActiveStudy() == null) {
+            logger.error("There are no studies or this user has no studies avaiable");
+            return false;
+        } else if (ub.getActiveStudy().getStudyId() == 0) {
+            throw new Exception("You have no roles for this study.");
         }
         if (studyUserRoleUpdated) {
             return true;
         } else
             return false;
     }
-    private boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId) {
+    @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
+    public boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId) {
         boolean studyUserRoleUpdated = false;
         ResponseEntity<StudyEnvironmentRoleDTO[]> userRoles = getUserRoles(request);
+        if (userRoles == null)
+            return studyUserRoleUpdated;
         for (StudyEnvironmentRoleDTO role: userRoles.getBody()) {
             Study study = studyDao.findByStudyEnvUuid(role.getStudyEnvironmentUuid());
             if (study == null)

@@ -83,6 +83,8 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.StudyBuildService;
+import org.akaza.openclinica.service.StudyBuildServiceImpl;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -106,6 +108,8 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * This class enhances the Controller in several ways.
@@ -372,7 +376,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
-
         request.setCharacterEncoding("UTF-8");
         session = request.getSession();
         // BWP >> 1/8/2008
@@ -432,7 +435,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             StudyDAO sdao = new StudyDAO(sm.getDataSource());
             if (currentPublicStudy == null || currentPublicStudy.getId() <= 0) {
                 UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
-                ub = (UserAccountBean) uDAO.findByUserUuid(ub.getUserUuid());
+                ub = (UserAccountBean) uDAO.findByUserName(ub.getName());
                 session.setAttribute(USER_BEAN_NAME, ub);
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
                     StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
