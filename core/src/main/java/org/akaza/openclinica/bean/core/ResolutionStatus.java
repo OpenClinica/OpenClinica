@@ -39,7 +39,7 @@ public class ResolutionStatus extends Term {
 
     public static final ResolutionStatus CLOSED = new ResolutionStatus(4, "Closed", null, "icon icon-flag black");
 
-    public static final ResolutionStatus NOT_APPLICABLE = new ResolutionStatus(5, "Not_Applicable", null, "images/icon_flagWhite.gif");
+    public static final ResolutionStatus NOT_APPLICABLE = new ResolutionStatus(5, "Not_Applicable", null, "icon icon-flag-empty blue");
 
     public static final ResolutionStatus CLOSED_MODIFIED = new ResolutionStatus(6, "Closed_Modified", null, "icon icon-flag black");
 
