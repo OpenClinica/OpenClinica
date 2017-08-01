@@ -4,6 +4,7 @@ import com.auth0.Auth0User;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
@@ -24,4 +25,6 @@ public interface StudyBuildService {
 
     ResponseEntity getUserDetails(HttpServletRequest request);
     void updateStudyUsername(UserAccountBean ub, Auth0User user);
+    boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId);
+    UserAccount getUserAccountObject(UserAccountBean ubIn);
 }
