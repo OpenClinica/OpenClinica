@@ -150,7 +150,7 @@
         </tr>
             <c:forEach var="status" items="${mapKeys}">
                 <tr>
-                    <td><strong>${status.name}</strong><img src="${status.iconFilePath}" border="0" align="right"></td>
+                    <td><strong>${status.name}</strong> &nbsp;&nbsp;<span class="${status.iconFilePath}" border="0" align="right"></td>
                     <c:forEach var="typeName" items="${typeNames}">
                         <td align="center">${summaryMap[status.name][typeName]}</td>
                     </c:forEach>
