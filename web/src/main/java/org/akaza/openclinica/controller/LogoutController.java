@@ -44,7 +44,7 @@ public class LogoutController {
         session.removeAttribute("passwordExpired");
         SecurityContextHolder.clearContext();
         session.invalidate();
-
+        model.put("externalReturnUrl", req.getParameter("externalReturnUrl"));
         return "login/logout";
     }
 

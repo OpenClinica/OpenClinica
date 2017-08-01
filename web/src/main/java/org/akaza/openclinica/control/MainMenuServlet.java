@@ -7,6 +7,8 @@
  */
 package org.akaza.openclinica.control;
 
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
@@ -85,10 +87,21 @@ public class MainMenuServlet extends SecureController {
         currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
         session.setAttribute("publicStudy", currentPublicStudy);
         session.setAttribute("study", currentStudy);
-        int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
+        int parentStudyId = currentPublicStudy.getParentStudyId() > 0 ? currentPublicStudy.getParentStudyId() : currentPublicStudy.getId();
+        StudyUserRoleBean roleInParent = ub.getRoleByStudy(parentStudyId);
+        // inherited role from parent study, pick the higher
+        // role
+        currentRole.setRole(Role.max(currentRole.getRole(), roleInParent.getRole()));
+        session.setAttribute("userRole", currentRole);
         if (ub.getActiveStudyId() == parentStudyId)
             return;
         ub.setActiveStudyId(parentStudyId);
+    }
+
+
+    public String processExternalReturnUrl(HttpServletRequest request) {
+        String externReturnUrl = (String) request.getParameter("externReturnUrl");
+        return externReturnUrl;
     }
 
     @Override public void processRequest() throws Exception {
@@ -110,6 +123,7 @@ public class MainMenuServlet extends SecureController {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
         processSpecificStudyEnvUuid(request, ub1);
+        String externalReturnUrl = processExternalReturnUrl(request);
         ub1.setLastVisitDate(new Date(System.currentTimeMillis()));
         // have to actually set the above to a timestamp? tbh
         ub1.setOwner(ub1);
@@ -187,10 +201,10 @@ public class MainMenuServlet extends SecureController {
             }
 
         }
-
-        forwardPage(Page.MENU);
-        //            }
-
+        if (StringUtils.isNotEmpty(externalReturnUrl))
+            response.sendRedirect(externalReturnUrl);
+        else
+            forwardPage(Page.MENU);
     }
 
     private void setupSubjectSDVTable() {
