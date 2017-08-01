@@ -33,9 +33,9 @@ public class ResolutionStatus extends Term {
 
     public static final ResolutionStatus OPEN = new ResolutionStatus(1, "New", null, "icon icon-flag red");
 
-    public static final ResolutionStatus UPDATED = new ResolutionStatus(2, "Updated", null, "images/icon_flagYellow.gif");
+    public static final ResolutionStatus UPDATED = new ResolutionStatus(2, "Updated", null, "icon icon icon-flag orange");
 
-    public static final ResolutionStatus RESOLVED = new ResolutionStatus(3, "Resolution_Proposed", null, "images/icon_flagGreen.gif");
+    public static final ResolutionStatus RESOLVED = new ResolutionStatus(3, "Resolution_Proposed", null, "icon icon icon-flag green");
 
     public static final ResolutionStatus CLOSED = new ResolutionStatus(4, "Closed", null, "icon icon-flag black");
 
