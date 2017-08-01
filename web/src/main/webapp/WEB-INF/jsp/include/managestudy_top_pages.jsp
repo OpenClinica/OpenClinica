@@ -59,24 +59,24 @@ onload="TabsForwardByNum(<c:out value="${tabId}"/>);<jsp:include page="../includ
 >
 <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%" class=
   "background">
-	<tr>
-		<td valign="top">
+  <tr>
+    <td valign="top">
 <!-- Header Table -->
 
 <!-- NEW 06-22 -->
-	<script language="JavaScript">
-	var StatusBoxValue=1;
-	</script>
+  <script language="JavaScript">
+  var StatusBoxValue=1;
+  </script>
 
 <table border="0" cellpadding="0" cellspacing="0" class="header">
 
-			<tr>
-				<td valign="top">
+      <tr>
+        <td valign="top">
 
 
 <!-- Main Navigation -->
 
-	<jsp:include page="../include/navBar.jsp">
+  <jsp:include page="../navBar.jsp">
         <jsp:param name="isSpringController" value="true" />
     </jsp:include>
 <!-- End Main Navigation -->
