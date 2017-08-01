@@ -117,14 +117,12 @@
 
 
           </td>
-          <c:if test="${study.studyParameterConfig.participantPortal=='enabled'}">          
             <td>
               <a href="ParticipantFormServlet?crfOID=<c:out value="${version.oid}"/>" 
                  onMouseDown="javascript:setImage('bt_ViewParticipant1','images/bt_ViewParticipant_d.gif');"
                  onMouseUp="javascript:setImage('bt_ViewParticipant1','images/bt_ViewParticipant.gif');" target="_blank"><span
                 name="bt_ViewParticipant1" class="icon icon-user" border="0" alt="<fmt:message key="view_participant_form" bundle="${resword}"/>" title="<fmt:message key="view_participant_form" bundle="${resword}"/>" align="left" hspace="6"></a>
             </td>
-          </c:if>
           <c:if test="${version.status.available && userBean.sysAdmin && module=='admin'}">
               <td><a href="LockCRFVersion?module=<c:out value="${module}"/>&id=<c:out value="${version.id}"/>"
                 onMouseDown="javascript:setImage('bt_Lock1','images/bt_Lock_d.gif');"
