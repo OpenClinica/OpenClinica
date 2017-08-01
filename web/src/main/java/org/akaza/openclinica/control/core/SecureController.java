@@ -431,6 +431,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             request.setAttribute("userBean", ub);
             StudyDAO sdao = new StudyDAO(sm.getDataSource());
             if (currentPublicStudy == null || currentPublicStudy.getId() <= 0) {
+                UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
+                ub = (UserAccountBean) uDAO.findByUserUuid(ub.getUserUuid());
+                session.setAttribute(USER_BEAN_NAME, ub);
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
                     StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
                     currentPublicStudy = (StudyBean) sdao.findByPK(ub.getActiveStudyId());

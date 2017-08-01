@@ -12,7 +12,6 @@
     <link rel="stylesheet" type="text/css" href="/css/home.css">
     <link rel="stylesheet" type="text/css" href="/css/jquery.growl.css"/>
     <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="/js/jquery.growl.js" type="text/javascript"></script>
     <script src="//cdn.auth0.com/js/auth0/8.8/auth0.min.js"></script>
 </head>
 <body>
@@ -20,8 +19,6 @@
 <script type="text/javascript">
     // hide the page in case there is an SSO session (to avoid flickering)
     $('body').hide();
-    // For Logout
-
     var auth0Logout = function () {
         var options = {
             client_id: '${clientId}',
@@ -35,6 +32,11 @@
     var studyParam = '';
     if (extUrl != null && extUrl.indexOf("?studyEnvUuid=") > 0) {
         studyParam = extUrl.substr(extUrl.indexOf("?studyEnvUuid="));
+    } else {
+        var tempStudy = urlParams.get('studyEnvUuid');
+        if (tempStudy != null) {
+            studyParam = "?studyEnvUuid=" + tempStudy;
+        }
     }
 
     // check SSO status
