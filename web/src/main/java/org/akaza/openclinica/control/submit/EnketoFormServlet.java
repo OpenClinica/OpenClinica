@@ -44,7 +44,7 @@ public class EnketoFormServlet extends SecureController {
         String formLayoutId = request.getParameter(FORM_LAYOUT_ID);
 
         String studyEventId = request.getParameter(STUDY_EVENT_ID);
-        String eventCrfId = request.getParameterValues(EVENT_CRF_ID)[0];
+        String eventCrfId = request.getParameter(EVENT_CRF_ID);
         String formUrl = null;
 
         StudyEvent studyEvent = studyEventDao.findById(Integer.valueOf(studyEventId));

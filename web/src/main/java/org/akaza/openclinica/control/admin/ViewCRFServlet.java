@@ -8,6 +8,7 @@ package org.akaza.openclinica.control.admin;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
@@ -122,6 +123,7 @@ public class ViewCRFServlet extends SecureController {
             }
             Collection<TableColumnHolder> items = populate(crf, layoutVersions);
             request.setAttribute(CRF, crf);
+            request.setAttribute("originatingPage", URLEncoder.encode("ViewCRF?module=" + module + "&crfId=" + crf.getId(), "UTF-8"));
             forwardPage(Page.VIEW_CRF);
 
         }

@@ -589,7 +589,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         Html html = new Html();
         Head head = new Head();
         Model model = new Model();
-        head.setTitle("This is the title");
+        head.setTitle(resword.getString("view_query"));
 
         // Set body
         Body body = new Body();
