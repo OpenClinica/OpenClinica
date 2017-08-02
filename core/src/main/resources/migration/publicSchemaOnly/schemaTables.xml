@@ -151,7 +151,6 @@
             <column name="email" value="openclinica_admin@example.com"/>
             <column name="active_study" valueNumeric="1"/>
             <column name="institutional_affiliation" value="Akaza Research"/>
-            <column name="status_id" valueNumeric="1"/>
             <column name="owner_id" valueNumeric="1"/>
             <column name="date_created"/>
             <column name="date_updated" valueDate="2006-10-23"/>
