@@ -240,7 +240,6 @@
                             <!-- all child notes if any -->
                             <c:forEach var="child" items="${note.value.children}" varStatus="status">
                                 <tr>
-                                    <td class="table_cell_left" colspan="2" bgcolor="#f5f5f5" width="50%" valign="top"><b><c:out value="${child.description}"/></b></td>
                                     <td class="table_cell" bgcolor="#f5f5f5" align="left" width="25%" valign="top" nowrap><fmt:message key="status" bundle="${resword}"/>: <c:out value="${child.resStatus.name}"/></td>
                                     <td class="table_cell" bgcolor="#f5f5f5" width="25%" align="right" valign="top" nowrap>
                                     	<fmt:formatDate value="${child.createdDate}" pattern="${dteFormat}"/> by <c:out value="${child.owner.name}"/><br>
