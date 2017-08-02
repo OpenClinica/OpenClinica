@@ -203,13 +203,6 @@ function setYPos(id) {
 			</c:choose>
 		</div>
 		<div style="clear:both;"></div> 
-		<div class="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
-		<div class="dnBoxCol2-1">
-			<span id="description${parentId}">
-				<div class="formfieldXL_BG"><input type="text" id="description${parentId}id" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
-				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
-			</span>
-		</div>
 		<div class="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
 		<div class="dnBoxCol2">
 			<div class="formtextareaXL4_BG">
