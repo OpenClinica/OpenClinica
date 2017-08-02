@@ -217,7 +217,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 <div style="width: 418;">	
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">
-add	<div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
+<div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:<span class="alert">*</span></div>
 	<div class="dnBoxCol2 dnBoxText">
 		<div class="formtextareaXL4_BG">
 	  		<textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>

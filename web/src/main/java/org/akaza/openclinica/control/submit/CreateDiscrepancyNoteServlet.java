@@ -594,21 +594,21 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             
 
             Validator v = new Validator(request);
-            String description = fp.getString("description");
+            //String description = fp.getString("description");
             int typeId = fp.getInt("typeId");
             int assignedUserAccountId = fp.getInt(SUBMITTED_USER_ACCOUNT_ID);
             int resStatusId = fp.getInt(RES_STATUS_ID);
             String detailedDes = fp.getString("detailedDes");
             int sectionId = fp.getInt("sectionId");
             DiscrepancyNoteBean note = new DiscrepancyNoteBean();
-            v.addValidation("description", Validator.NO_BLANKS);
-            v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-            v.addValidation("detailedDes", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1000);
+            v.addValidation("detailedDes", Validator.NO_BLANKS);
+            // v.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+            // v.addValidation("detailedDes", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1000);
 
             v.addValidation("typeId", Validator.NO_BLANKS);
 
             HashMap errors = v.validate();
-            note.setDescription(description);
+            //note.setDescription(description);
             note.setDetailedNotes(detailedDes);
             note.setOwner(ub);
             note.setOwnerId(ub.getId());
@@ -806,7 +806,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         message.append(respage.getString("email_body_separator"));
                         message.append(respage.getString("disc_note_info"));
                         message.append(respage.getString("email_body_separator"));
-                        message.append(MessageFormat.format(respage.getString("mailDNParameters1"), note.getDescription(), note.getDetailedNotes(), ub.getName()));
+                        message.append(MessageFormat.format(respage.getString("mailDNParameters1"), note.getDetailedNotes(), ub.getName()));
                         message.append(respage.getString("email_body_separator"));
                         message.append(respage.getString("entity_information"));
                         message.append(respage.getString("email_body_separator"));
