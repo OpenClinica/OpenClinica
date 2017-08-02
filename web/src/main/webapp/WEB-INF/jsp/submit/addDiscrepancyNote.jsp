@@ -118,7 +118,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 //-->
 </script>
 </head>
-<body style="margin: 0px 12px 0px 12px;" onload="javascript:setStatus('<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
+<body style="margin: 0px 12px 0px 12px;" onload="javascript:setStatus('<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
 <%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%>
 <div style="float: left;"><h1 class="title_manage"><c:out value="${entityName}"/>: Add Query</h1></div>
 <div style="float: right;"><a href="#" onclick="javascript:window.close();"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a></div>
