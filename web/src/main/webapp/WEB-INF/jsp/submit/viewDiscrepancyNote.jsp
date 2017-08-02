@@ -276,9 +276,6 @@
                         					<c:when test="${status.id == 2}">
                         						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
             								</c:when>
-            								<c:when test="${status.id == 3}">
-                        						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="Propose_Resolution" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
-            								</c:when>
             								<c:when test="${status.id == 4}">
                         						<input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="close_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
             								</c:when>
