@@ -203,7 +203,7 @@ function setYPos(id) {
 			</c:choose>
 		</div>
 		<div style="clear:both;"></div> 
-		<div class="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
+		<div class="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:<span class="alert">*</span></div>
 		<div class="dnBoxCol2">
 			<div class="formtextareaXL4_BG">
 		  		<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
