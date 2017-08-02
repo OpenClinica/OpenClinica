@@ -16,7 +16,7 @@
 <html>
 <head>
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
-<title><fmt:message key="openclinica" bundle="${resword}"/>- <fmt:message key="add_discrepancy_note" bundle="${resword}"/></title>
+<title><fmt:message key="openclinica" bundle="${resword}"/>- Add Query</title>
 <link rel="stylesheet" href="includes/styles.css" type="text/css">
 <script language="JavaScript" src="includes/global_functions_javascript.js"></script>
 
@@ -120,7 +120,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 </head>
 <body style="margin: 0px 12px 0px 12px;" onload="javascript:setStatus('<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
 <%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%>
-<div style="float: left;"><h1 class="title_manage"><c:out value="${entityName}"/>: <fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
+<div style="float: left;"><h1 class="title_manage"><c:out value="${entityName}"/>: Add Query</h1></div>
 <div style="float: right;"><a href="#" onclick="javascript:window.close();"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a></div>
 <div style="clear:both;"></div> 
 <div class="alert">
@@ -211,22 +211,13 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 </table>
 
 <div style="clear:both;"></div> 
-<h3 class="title_manage"><fmt:message key="add_note" bundle="${resword}"/></h3>
+<h3 class="title_manage">Add Query</h3>
 
 <!-- dn box -->
 <div style="width: 418;">	
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">
-
-	<div class="dnBoxCol1 dnBoxText"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
-	<div class="dnBoxCol2 dnBoxText">
-		<span id="description">
-			<div class="formfieldXL_BG"><input type="text" name="description" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
-			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description"/></jsp:include>
-		</span>
-	</div>
-	
-	<div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
+add	<div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
 	<div class="dnBoxCol2 dnBoxText">
 		<div class="formtextareaXL4_BG">
 	  		<textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
