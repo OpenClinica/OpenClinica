@@ -12,7 +12,6 @@
 <jsp:include page="include/managestudy_top_pages.jsp"/>
 
 
-
 <!-- move the alert message to the sidebar-->
 <jsp:include page="include/sideAlert.jsp"/>
 <!-- then instructions-->
