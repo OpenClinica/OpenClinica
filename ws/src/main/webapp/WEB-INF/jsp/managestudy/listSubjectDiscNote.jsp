@@ -8,7 +8,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
-
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 <c:choose>
     <c:when test="${module eq 'manage'}">
         <jsp:include page="../include/managestudy-header.jsp"/>
@@ -105,24 +105,24 @@ applied on resolution status or type--%>
 
     <a href="ListDiscNotesSubjectServlet?module=${module}&type=${param.type}" <c:if test="${param.type == 50}">style="color:green"</c:if>>All Notes</a>&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=1&type=${param.type}"><img
-      name="icon_Note" src="images/icon_Note.gif" border="0"
+    <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=1&type=${param.type}"><span
+      name="icon_Note" class="fa fa-bubble-red" border="0"
       alt="<fmt:message key="Open" bundle="${resterm}"/>" title="<fmt:message key="Open" bundle="${resterm}"/>"/></a> (<fmt:message key="Open" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=2&type=${param.type}"><img
-      name="icon_flagYellow" src="images/icon_flagYellow.gif" border="0"
+    <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=2&type=${param.type}"><span
+      name="icon_flagYellow" class="fa fa-bubble-orange" border="0"
       alt="<fmt:message key="Updated" bundle="${resterm}"/>" title="<fmt:message key="Updated" bundle="${resterm}"/>"/></a> (<fmt:message key="Updated" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=3&type=${param.type}"><img
-      name="icon_flagGreen" src="images/icon_flagGreen.gif" border="0"
+    <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=3&type=${param.type}"><span
+      name="icon_flagGreen" class="fa fa-bubble-green" border="0"
       alt="<fmt:message key="Resolved" bundle="${resterm}"/>" title="<fmt:message key="Resolved" bundle="${resterm}"/>"/></a> (<fmt:message key="Resolved" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=4&type=${param.type}"><img
-      name="icon_flagBlack" src="images/icon_flagBlack.gif" border="0"
+    <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=4&type=${param.type}"><span
+      name="icon_flagBlack" class="fa fa-bubble-black" border="0"
       alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>"/></a> (<fmt:message key="Closed" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=5&type=${param.type}"><img
-      name="icon_flagNA" src="images/icon_flagWhite.gif" border="0"
+    <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=5&type=${param.type}"><span
+      name="icon_flagNA" class="fa fa-bubble-white" border="0"
       alt="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" title="<fmt:message key="Not_Applicable" bundle="${resterm}"/>"/></a> (<fmt:message key="Not_Applicable" bundle="${resterm}"/>)&nbsp;
 
     &nbsp;<strong>[#] = <fmt:message key="Repeated_events" bundle="${resword}"/></strong>
