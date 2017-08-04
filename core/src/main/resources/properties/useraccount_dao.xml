@@ -83,6 +83,10 @@
 		<sql>select * from user_account where user_name=?</sql>
 	</query>
 	<query>
+		<name>findByEmail</name>
+		<sql>select * from user_account where email=?</sql>
+	</query>
+	<query>
 		<name>findByAccessCode</name>
 		<sql>select * from user_account where access_code=?</sql>
 	</query>

@@ -1,80 +1,115 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-<%@ page import="org.akaza.openclinica.i18n.util.ResourceBundleProvider" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<script src="//cdn.auth0.com/js/auth0/8.8/auth0.min.js"></script>
 
 <script language="JavaScript">
-        /*function reportBug() {
-            var bugtrack = "https://www.openclinica.com/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
-            var user= "<c:out value="${userBean.name}"/>";
-            bugtrack = bugtrack + user+ "&url=" + window.location.href;
-            openDocWindow(bugtrack);
-        }*/
-        function confirmCancel(pageName){
-            var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
-            if(confirm1){
-                window.location = pageName;
+    window.name = "wdwGo";
+    window.onbeforeunload = function() {
+        localStorage.removeItem('userToken');
+        jQuery.get('${urlPrefix}pages/invalidateSession', function(data){
+        });
+        return null;
+    }
+    var auth = new auth0.Authentication({
+        domain: localStorage.getItem("domain"),
+        clientID: localStorage.getItem("clientID")
+    });
+    function getAuth0SSOData() {
+        auth.getSSOData(function (err, data) {
+            //alert("data.sso:" + data.sso);
+            // if there is still a session, do nothing
+            if (err || (data && data.sso)) {
+                return;
             }
-        }
-        function confirmExit(pageName){
-            var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
-            if(confirm1){
-                window.location = pageName;
-            }
-        }
-        function goBack(){
-            var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
-            if(confirm1){
-                return history.go(-1);
-            }
-        }
-        function lockedCRFAlert(userName){
-            alert('<fmt:message key="CRF_unavailable" bundle="${resword}"/>'+'\n'
-                    +'          '+userName+' '+'<fmt:message key="Currently_entering_data" bundle="${resword}"/>'+'\n'
-                    +'<fmt:message key="Leave_the_CRF" bundle="${resword}"/>');
-            return false;
-        }
-        function confirmCancelAction( pageName, contextPath){
-            var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
-            if(confirm1){
-                 var tform = document.forms["fr_cancel_button"];
-                tform.action=contextPath+"/"+pageName;
-                tform.submit();
+            // alert("Removing token");
 
-            }
-        }
-        function confirmExitAction( pageName, contextPath){
-            var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
-            if(confirm1){
-                 var tform = document.forms["fr_cancel_button"];
-                tform.action=contextPath+"/"+pageName;
-                tform.submit();
+            // if we get here, it means there is no session on Auth0,
+            // then remove the token and redirect to #login
+            localStorage.removeItem('userToken');
+            window.location = '${urlPrefix}pages/logout?externalReturnUrl=' + window.location;
 
-            }
+        });
+    }
+    getAuth0SSOData();
+    setInterval(function () {
+        //alert("comes in navBar:" + localStorage.getItem('userToken'));
+        // if the token is not in local storage, there is nothing to check (i.e. the user is already logged out)
+        if (!localStorage.getItem('userToken')) return;
+        getAuth0SSOData();
+    }, 10000);
+
+    /*function reportBug() {
+     var bugtrack = "https://www.openclinica.com/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
+     var user= "<c:out value="${userBean.name}"/>";
+     bugtrack = bugtrack + user+ "&url=" + window.location.href;
+     openDocWindow(bugtrack);
+     }*/
+    function confirmCancel(pageName) {
+        var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
+        if (confirm1) {
+            window.location = pageName;
         }
+    }
+    function confirmExit(pageName) {
+        var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
+        if (confirm1) {
+            window.location = pageName;
+        }
+    }
+    function goBack() {
+        var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
+        if (confirm1) {
+            return history.go(-1);
+        }
+    }
+    function lockedCRFAlert(userName) {
+        alert('<fmt:message key="CRF_unavailable" bundle="${resword}"/>' + '\n'
+            + '          ' + userName + ' ' + '<fmt:message key="Currently_entering_data" bundle="${resword}"/>' + '\n'
+            + '<fmt:message key="Leave_the_CRF" bundle="${resword}"/>');
+        return false;
+    }
+    function confirmCancelAction(pageName, contextPath) {
+        var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
+        if (confirm1) {
+            var tform = document.forms["fr_cancel_button"];
+            tform.action = contextPath + "/" + pageName;
+            tform.submit();
+
+        }
+    }
+    function confirmExitAction(pageName, contextPath) {
+        var confirm1 = confirm('<fmt:message key="sure_to_exit" bundle="${resword}"/>');
+        if (confirm1) {
+            var tform = document.forms["fr_cancel_button"];
+            tform.action = contextPath + "/" + pageName;
+            tform.submit();
+
+        }
+    }
 </script>
 
 
-<jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String' />
+<jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String'/>
 <c:set var="restore" value="true"/>
 <c:if test="${tableFacadeRestore=='false'}"><c:set var="restore" value="false"/></c:if>
 <c:set var="profilePage" value="${param.profilePage}"/>
-<!--  If Controller Spring based append ../ to urls -->
+<!-- If Controller Spring based append ../ to urls -->
 <c:set var="urlPrefix" value=""/>
-<c:set var="requestFromSpringController" value="${param.isSpringController}" />
+<c:set var="requestFromSpringController" value="${param.isSpringController}"/>
 <c:if test="${requestFromSpringController == 'true' }">
-      <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
+    <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
 </c:if>
 
 <!-- Main Navigation -->
-    <link rel="stylesheet" href="includes/css/icomoon-style.css">
-     <div class="oc_nav">
-        <div class="nav-top-bar">
+<link rel="stylesheet" href="includes/css/icomoon-style.css">
+<div class="oc_nav">
+    <div class="nav-top-bar">
         <!-- Logo -->
-            <div class="logo"><a href="MainMenu"><img src="images/logo-color-on-dark.svg" alt="OpenClinica Logo" /></a></div>
+        <div class="logo"><a href="MainMenu"><img src="images/logo-color-on-dark.svg" alt="OpenClinica Logo"/></a></div>
 
             <div id="StudyInfo">
                 <c:choose>
@@ -94,24 +129,33 @@
                 <a href="#"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a>
             </div>
 
-            <div id="UserInfo">
-                <div id="userDropdown">
-                    <ul>
-                        <li><a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)<span class="icon icon-caret-down white"></span></a></a>
+        <div id="UserInfo">
+            <div id="userDropdown">
+                <ul>
+                    <li><a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}"/></b> (<c:out value="${userRole.role.description}"/>)<span
+                            class="icon icon-caret-down white"></span></a></a>
                         <!-- First Tier Drop Down -->
                         <ul class="dropdown_BG">
-                            <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a></li>
+                            <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback"
+                                                                                                                                bundle="${resword}"/></a></li>
                             <li><a href="#">Account</a></li>
                             <li><a href="#">Billing</a></li>
-                            <li> <a href="${urlPrefix}pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
+                            <li><a href="${urlPrefix}pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
                         </ul>
-                        </li>
-                    </ul>
-                </div>
+                    </li>
+                </ul>
             </div>
         </div>
+    </div>
 
-         <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+    <div class="box_T">
+        <div class="box_L">
+            <div class="box_R">
+                <div class="box_B">
+                    <div class="box_TL">
+                        <div class="box_TR">
+                            <div class="box_BL">
+                                <div class="box_BR">
 
             <div class="navbox_center">
                 <!-- Top Navigation Row -->
@@ -172,25 +216,26 @@
                     </tr>
                 </table>
             </div>
-            <!-- End shaded box border DIVs -->
-        </div></div></div></div></div></div></div></div></div>
+        </div>
+    </div>
+</div>
 
 
-            </td>
-        </tr>
-    </table>
-    <!-- NAVIGATION DROP-DOWN -->
-
+</td>
+</tr>
+</table>
+<!-- NAVIGATION DROP-DOWN -->
 
 
 <div id="nav_hide" style="position: absolute; left: 0px; top: 0px; visibility: hidden; z-index: 2; width: 100%; height: 400px;">
 
-<a href="#" onmouseover="hideSubnavs();"><img src="http://dev40.openclinica.info:8080/OpenClinica/images/spacer.gif" alt="" width="1000" height="400" border="0"/></a>
+    <a href="#" onmouseover="hideSubnavs();"><img src="http://dev40.openclinica.info:8080/OpenClinica/images/spacer.gif" alt="" width="1000" height="400"
+                                                  border="0"/></a>
 </div>
 
 
-    </div>
-    <img src="${urlPrefix}images/spacer.gif" width="596" height="1"><br>
+</div>
+<img src="${urlPrefix}images/spacer.gif" width="596" height="1"><br>
 <!-- End Main Navigation -->
 <div id="subnav_Tasks" class="dropdown">
     <div class="dropdown_BG">
@@ -336,16 +381,16 @@
         <br clear="all">
         </c:if>
         <c:if test="${userBean.sysAdmin || userBean.techAdmin}">
-        <div class="taskGroup"><fmt:message key="nav_administration" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListStudy"><fmt:message key="nav_studies" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ListUserAccounts"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ListCRF?module=admin"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListSubject"><fmt:message key="nav_subjects" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
+            <div class="taskGroup"><fmt:message key="nav_administration" bundle="${resword}"/></div>
+            <div class="taskLeftColumn">
+                <div class="taskLink"><a href="${urlPrefix}ListStudy"><fmt:message key="nav_studies" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ListUserAccounts"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ListCRF?module=admin"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
+            </div>
+            <div class="taskRightColumn">
+                <div class="taskLink"><a href="${urlPrefix}ListSubject"><fmt:message key="nav_subjects" bundle="${resword}"/></a></div>
+            </div>
+            <br clear="all">
         </c:if>
         <div class="taskGroup"><fmt:message key="nav_other" bundle="${resword}"/></div>
         <div class="taskLeftColumn">

@@ -215,7 +215,7 @@ public class UserAccountController {
 		createdUserAccountBean.setPasswdChallengeQuestion("");
 		createdUserAccountBean.setPasswdChallengeAnswer("");
 		createdUserAccountBean.setOwner(ownerUserAccount);
-		createdUserAccountBean.setRunWebservices(false);
+		createdUserAccountBean.setRunWebservices(true);
 		createdUserAccountBean.setPhone("");
 		createdUserAccountBean.setAccessCode("");
 		createdUserAccountBean.setPasswd(password);

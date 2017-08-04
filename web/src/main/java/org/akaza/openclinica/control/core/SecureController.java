@@ -427,8 +427,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // BWP 01/08 >>
             // sm = new SessionManager(ub, userName);
             sm = new SessionManager(ub, userName, SpringServletAccess.getApplicationContext(context));
-            if (StringUtils.isEmpty(ub.getName())) {
-                ub = sm.getUserBean();
+            if (ub == null || StringUtils.isEmpty(ub.getName())) {
+                UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
+                ub = (UserAccountBean) uDAO.findByEmail(userName);
                 session.setAttribute("userBean", ub);
             }
             request.setAttribute("userBean", ub);

@@ -38,7 +38,9 @@
             studyParam = "?studyEnvUuid=" + tempStudy;
         }
     }
-
+    localStorage.setItem("domain", '${domain}');
+    localStorage.setItem("clientID", '${clientId}');
+    localStorage.setItem("state", '${state}');
     // check SSO status
     var webAuth = new auth0.WebAuth({
         domain: '${domain}',
@@ -57,6 +59,7 @@
     auth.getSSOData(function (err, data) {
         if (data && data.sso === true) {
             // have SSO session
+            //alert('SSO: an Auth0 SSO session already exists');
             console.log('SSO: an Auth0 SSO session already exists');
             <c:choose>
                 <c:when test="${authenticated}">
@@ -71,6 +74,8 @@
 
             if (!loggedIn || (loggedInUserId !== data.lastUsedUserID)) {
                 // have SSO session but no valid local session - auto-login user
+                //alert('have SSO session but no valid local session - auto-login user');
+                localStorage.setItem("userToken", true);
                 webAuth.authorize({
                     scope: 'openid name email picture',
                     state: '${state}',
@@ -80,6 +85,7 @@
                     console.error('Error logging in: ' + err);
                 });
             } else {
+               // alert("SSO Session and locally authenticated ");
                 // have SSO session and valid user - display page
                 console.log("SSO Session and locally authenticated ");
                 $('body').show();
@@ -94,13 +100,16 @@
         } else {
             <c:choose>
                 <c:when test="${authenticated}">
+                    //alert("NO SSO Session but locally authenticated ");
                     console.log("NO SSO Session but locally authenticated ");
                     // user is logged in locally, but no SSO session exists -> log them out locally
                     window.location = '${fn:replace(pageContext.request.requestURL, pageContext.request.requestURI, '')}${logoutEndpoint}';
 
             </c:when>
                 <c:otherwise>
+                    //alert("NO SSO Session and NOT locally authenticated ")
                     // user is not logged in locally and no SSO session exists - send to the portal application's partner login page
+                    localStorage.removeItem('userToken');
                     console.log("NO SSO Session and NOT locally authenticated ");
                     window.location = '${partnerLoginUrl}?externalReturnUrl=' + encodeURIComponent(window.location);
             </c:otherwise>
