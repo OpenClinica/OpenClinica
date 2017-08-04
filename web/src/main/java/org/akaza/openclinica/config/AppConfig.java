@@ -13,8 +13,6 @@ import org.springframework.security.config.annotation.method.configuration.Enabl
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
-import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
-
 
 @Configuration
 @ComponentScan(basePackages = {"com.auth0.web", "com.auth0.spring.security.mvc"})
@@ -25,6 +23,7 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
         @PropertySource("classpath:auth0.properties")
 })
 public class AppConfig extends Auth0Config {
+
     @Override
     protected void authorizeRequests(final HttpSecurity http) throws Exception {
         http.exceptionHandling().authenticationEntryPoint(new OCLoginUrlAuthenticationEntryPoint("/pages/home"));
@@ -34,6 +33,7 @@ public class AppConfig extends Auth0Config {
                         "/pages/callback",
                         "/pages/home",
                         "/pages/logout",
+                        "/pages/invalidateSession",
                         "/pages/auth/api/**",
                         "/pages/studyversion/**",
                         "/rest2/openrosa/**",
