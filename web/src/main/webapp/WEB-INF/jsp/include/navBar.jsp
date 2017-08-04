@@ -8,6 +8,7 @@
 <script src="//cdn.auth0.com/js/auth0/8.8/auth0.min.js"></script>
 
 <script language="JavaScript">
+    jQuery.noConflict();
     window.name = "wdwGo";
     window.onbeforeunload = function() {
         localStorage.removeItem('userToken');
