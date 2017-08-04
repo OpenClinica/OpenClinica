@@ -286,20 +286,4 @@
 <br><br>
 </c:forEach>
 
-
-<c:choose>
-  <c:when test="${userBean.sysAdmin && module=='admin'}">
-  <p><a href="ListCRF?module=admin"><fmt:message key="go_back_to_CRF_list" bundle="${resword}"/></a></p>
-  <c:import url="../include/workflow.jsp">
-   <c:param name="module" value="admin"/>
-  </c:import>
- </c:when>
-  <c:otherwise>
-  <p><a href="ListCRF?module=manage"><fmt:message key="go_back_to_CRF_list" bundle="${resword}"/></a></p>
-   <c:import url="../include/workflow.jsp">
-   <c:param name="module" value="manage"/>
-  </c:import>
-  </c:otherwise>
- </c:choose>
-
 <jsp:include page="../include/footer.jsp"/>

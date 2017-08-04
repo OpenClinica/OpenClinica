@@ -102,8 +102,5 @@
 </div>
 <p><a href="#" onClick="history.go(-1)"><fmt:message key="back_to_group_class_list" bundle="${resword}"/></a></p>
 
- <c:import url="../include/workflow.jsp">
-   <c:param name="module" value="manage"/> 
- </c:import>
  
 <jsp:include page="../include/footer.jsp"/>

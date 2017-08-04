@@ -874,7 +874,10 @@ public class OpenRosaServices {
 
     private String getUserXml(ServletContext context, String studyOID) throws Exception {
         HashMap<String, String> value = getSubjectContextCacheValue(context, studyOID);
-        String studySubjectOid = value.get("studySubjectOID");
+        String studySubjectOid = "";
+        if (value != null) {
+            studySubjectOid = value.get("studySubjectOID");
+        }
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -1038,16 +1041,18 @@ public class OpenRosaServices {
         String lastKey = null;
         // the cache has to be studyOid based to accommodate for multiple studies
         HashMap<String, String> resultMap = null;
-        for (String key : subjectContextCache.keySet()) {
-            resultMap = (HashMap<String, String>) subjectContextCache.get(key);
-            String resultStudyOid = (String) resultMap.get("studyOid");
-            if (StringUtils.equals(resultStudyOid, studyOid)) {
-                break;
+        if (subjectContextCache != null) {
+            for (String key : subjectContextCache.keySet()) {
+                resultMap = (HashMap<String, String>) subjectContextCache.get(key);
+                String resultStudyOid = (String) resultMap.get("studyOid");
+                if (StringUtils.equals(resultStudyOid, studyOid)) {
+                    break;
+                }
+                lastKey = key;
             }
-            lastKey = key;
-        }
-        if (resultMap == null) {
-            resultMap = (HashMap<String, String>) subjectContextCache.get(lastKey);
+            if (resultMap == null) {
+                resultMap = (HashMap<String, String>) subjectContextCache.get(lastKey);
+            }
         }
         return resultMap;
     }

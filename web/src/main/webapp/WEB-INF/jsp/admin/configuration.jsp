@@ -9,28 +9,28 @@
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
-<tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+<tr id="sidebar_Instructions_open" style="display: all">
+        <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <fmt:message key="instructions" bundle="${resword}"/>
 
-		<div class="sidebar_tab_content">
+        <div class="sidebar_tab_content">
 
-		</div>
+        </div>
 
-		</td>
+        </td>
 
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
+    </tr>
+    <tr id="sidebar_Instructions_closed" style="display: none">
+        <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="images/icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="images/icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <fmt:message key="instructions" bundle="${resword}"/>
 
-		</td>
+        </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
@@ -58,12 +58,12 @@
 
 <!-- These DIVs define shaded box borders -->
 
-	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+    <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-		<div class="tablebox_center">
+        <div class="tablebox_center">
 
 
-		<!-- Table Contents -->
+        <!-- Table Contents -->
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 
@@ -116,12 +116,12 @@
         </td>
     </tr>
 
-	</table>
-	</div>
+    </table>
+    </div>
 
-	</div></div></div></div></div></div></div></div>
+    </div></div></div></div></div></div></div></div>
 
-	</div>
+    </div>
 
 <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium">
 <input type="button" onclick="confirmCancel('ListUserAccounts');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>

@@ -172,9 +172,4 @@
  <input type="submit" name="submit" value="<fmt:message key="unlock_event_definition" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_unlock" bundle="${resword}"/>");'>
 </form>
 
-<c:import url="../include/workflow.jsp">
-  <c:param name="module" value="manage"/>
-</c:import>
-
-
 <jsp:include page="../include/footer.jsp"/>

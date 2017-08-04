@@ -26,7 +26,7 @@
 	   <img src="images/icon_DDE.gif" alt="Double Data Entry" title="Double Data Entry">
     </c:when>
     <c:when test="${EventCRFBean.stage.name=='data entry complete'}">
-	   <img src="images/icon_DEcomplete.gif" alt="Data Entry Complete" title="Data Entry Complete">
+	   <span class="icon icon-checkbox-checked green" alt="Data Entry Complete" title="Data Entry Complete">
     </c:when>
 	<c:when test="${EventCRFBean.stage.name=='administrative editing'}">
 	   <img src="images/icon_AdminEdit.gif" alt="Administrative Editing" title="Administrative Editing">
@@ -125,7 +125,7 @@ function getSib(theSibling){
 	   <img src="images/icon_DDE.gif" alt="Double Data Entry" title="Double Data Entry">
     </c:when>
     <c:when test="${EventCRFBean.stage.name=='data entry complete'}">
-	   <img src="images/icon_DEcomplete.gif" alt="Data Entry Complete" title="Data Entry Complete">
+	   <span class="icon icon-checkbox-checked green" alt="Data Entry Complete" title="Data Entry Complete">
     </c:when>
 	<c:when test="${EventCRFBean.stage.name=='administrative editing'}">
 	   <img src="images/icon_AdminEdit.gif" alt="Administrative Editing" title="Administrative Editing">

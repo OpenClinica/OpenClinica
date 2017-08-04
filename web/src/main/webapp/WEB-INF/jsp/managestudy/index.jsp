@@ -372,9 +372,7 @@
 
 
 <!-- End Main Content Area -->
-<c:import url="../include/workflow.jsp">
-  <c:param name="module" value="manage"/>
-</c:import>
+
 </div>
 <br clear="all">
 <jsp:include page="../include/footer.jsp"/>

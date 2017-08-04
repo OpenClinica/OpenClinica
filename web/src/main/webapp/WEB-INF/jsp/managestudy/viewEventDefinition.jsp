@@ -297,9 +297,5 @@
 </c:if>
 <p><a href="ListEventDefinition"><fmt:message key="go_back_to_definition_list" bundle="${resword}"/></a></p>  
  
- <c:import url="../include/workflow.jsp">
-   <c:param name="module" value="manage"/> 
- </c:import>
- 
-   
+
 <jsp:include page="../include/footer.jsp"/>

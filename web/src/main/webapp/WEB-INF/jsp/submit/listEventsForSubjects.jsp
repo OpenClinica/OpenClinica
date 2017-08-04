@@ -77,7 +77,5 @@
 <br>
 <input type="button" onclick="confirmExit('MainMenu');"  name="exit" value="<fmt:message key="exit" bundle="${resword}"/>   " class="button_medium"/>
 
-<c:import url="../include/workflow.jsp">
-   <c:param name="module" value="submit"/>
-</c:import>
+
 <jsp:include page="../include/footer.jsp"/>
