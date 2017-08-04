@@ -203,7 +203,7 @@
                                       <c:if test="${!study.status.locked}">
                                         <span style="float:right">
                                         <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg=','spanAlert-end_date'); return false;">
-                                        <span id="flag_end_date" name="flag_end_date" class="icon icon-flag blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                        <span id="flag_end_date" name="flag_end_date" class="fa fa-bubble-blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                         </a></span>
                                       </c:if>
                                     </c:otherwise>
