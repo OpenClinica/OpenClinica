@@ -170,8 +170,5 @@
     <input type="button" value="<fmt:message key="cancel" bundle="${resword}"/>" title="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" size="50" onclick="history.back();"/>
  </form>
 
-<c:import url="../include/workflow.jsp">
-  <c:param name="module" value="admin"/>
-</c:import>
 
 <jsp:include page="../include/footer.jsp"/>

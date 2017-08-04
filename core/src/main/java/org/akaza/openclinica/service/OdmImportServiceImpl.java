@@ -46,8 +46,6 @@ import java.util.Date;
 import java.util.List;
 
 public class OdmImportServiceImpl implements OdmImportService {
-    public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/buckets?boardUuid={0}";
-    // public final String FM_BASEURL = "http://oc.local:8090/api/protocol/";
 
     private UserAccountDao userAccountDao;
     private StudyUserRoleDao studyUserRoleDao;
@@ -61,10 +59,9 @@ public class OdmImportServiceImpl implements OdmImportService {
     private EventDefinitionCrfTagDao eventDefinitionCrfTagDao;
     private StudyParameterValueDao studyParameterValueDao;
     private DataSource dataSource;
-
     private XformParser xformParser;
-
     private XformMetaDataService xformService;
+    private CoreResources coreResources;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -533,12 +530,19 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.formLayoutDao = formLayoutDao;
     }
 
-    public Form[] getAllCrfsByProtIdFromFormManager(String boardId) {
-        // String protocolId = study.getUniqueIdentifier();
-        // String protocolId = study.getOc_oid();
-        // String url = FM_BASEURL + protocolId + "/forms";
+    public CoreResources getCoreResources() {
+        return coreResources;
+    }
 
-        String url = MessageFormat.format(FM_BASEURL, boardId);
+    public void setCoreResources(CoreResources coreResources) {
+        this.coreResources = coreResources;
+    }
+
+    public Form[] getAllCrfsByProtIdFromFormManager(String boardId) {
+
+        String formServiceBaseURL = getCoreResources().getField("formManager").trim() + "/api/buckets?boardUuid={0}";
+
+        String url = MessageFormat.format(formServiceBaseURL, boardId);
         Bucket[] buckets = null;
         RestTemplate restTemplate = new RestTemplate();
         ArrayList<Form> forms = null;

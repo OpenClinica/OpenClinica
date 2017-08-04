@@ -37,53 +37,53 @@
 
       var app_Audit_HistoryLabel = '<oc:jsEscape key="Audit_History" bundle="${resword}"/>';
       var app_audit_eventLabel = '<oc:jsEscape key="audit_event" bundle="${resword}"/>';
-	  var app_date_time_of_serverLabel = '<oc:jsEscape key="date_time_of_server" bundle="${resword}"/>';
-	  var app_userLabel = '<oc:jsEscape key="user" bundle="${resword}"/>';
-	  var app_value_typeLabel = '<oc:jsEscape key="value_type" bundle="${resword}"/>';
-	  var app_oldLabel = '<oc:jsEscape key="old" bundle="${resword}"/>';
-	  var app_newLabel = '<oc:jsEscape key="new" bundle="${resword}"/>';
+    var app_date_time_of_serverLabel = '<oc:jsEscape key="date_time_of_server" bundle="${resword}"/>';
+    var app_userLabel = '<oc:jsEscape key="user" bundle="${resword}"/>';
+    var app_value_typeLabel = '<oc:jsEscape key="value_type" bundle="${resword}"/>';
+    var app_oldLabel = '<oc:jsEscape key="old" bundle="${resword}"/>';
+    var app_newLabel = '<oc:jsEscape key="new" bundle="${resword}"/>';
 
 
 
 
 
-	  var app_nav_notes_and_discrepanciesLabel = '<oc:jsEscape key="nav_notes_and_discrepancies" bundle="${resword}"/>';
-	  var app_noteLabel = '<oc:jsEscape key="note" bundle="${resword}"/>';
-	  var app_assigned_toLabel = '<oc:jsEscape key="assigned_to" bundle="${resword}"/>';
-	  var app_IDLabel = '<oc:jsEscape key="ID" bundle="${resword}"/>';
-	  var app_typeLabel = '<oc:jsEscape key="type" bundle="${resword}"/>';
-	  var app_current_statusLabel = '<oc:jsEscape key="current_status" bundle="${resword}"/>';
-	  var app_n_of_notesLabel = '<oc:jsEscape key="n_of_notes" bundle="${resword}"/>';
-//	  var app_Last_updatedLabel = '<oc:jsEscape key="last_updated_date" bundle="${resword}"/>';
+    var app_nav_notes_and_discrepanciesLabel = '<oc:jsEscape key="queries" bundle="${resword}"/>';
+    var app_noteLabel = '<oc:jsEscape key="note" bundle="${resword}"/>';
+    var app_assigned_toLabel = '<oc:jsEscape key="assigned_to" bundle="${resword}"/>';
+    var app_IDLabel = '<oc:jsEscape key="ID" bundle="${resword}"/>';
+    var app_typeLabel = '<oc:jsEscape key="type" bundle="${resword}"/>';
+    var app_current_statusLabel = '<oc:jsEscape key="current_status" bundle="${resword}"/>';
+    var app_n_of_notesLabel = '<oc:jsEscape key="n_of_notes" bundle="${resword}"/>';
+//    var app_Last_updatedLabel = '<oc:jsEscape key="last_updated_date" bundle="${resword}"/>';
 
-	  var app_CreatedByLabel = '<oc:jsEscape key="created_by" bundle="${resword}"/>';
-	  var app_CreatedDateLabel = '<oc:jsEscape key="created_date" bundle="${resword}"/>';
+    var app_CreatedByLabel = '<oc:jsEscape key="created_by" bundle="${resword}"/>';
+    var app_CreatedDateLabel = '<oc:jsEscape key="created_date" bundle="${resword}"/>';
 
-	  var app_this_is_a_new_threadLabel = '<oc:jsEscape key="this_is_a_new_thread" bundle="${resword}"/>';
-
-
+    var app_this_is_a_new_threadLabel = '<oc:jsEscape key="this_is_a_new_thread" bundle="${resword}"/>';
 
 
-	  var app_metadataLabel = '<oc:jsEscape key="metadata" bundle="${resword}"/>';
-	  var app_left_item_textLabel = '<oc:jsEscape key="left_item_text" bundle="${resword}"/>';
-	  var app_unitsLabel = '<oc:jsEscape key="units" bundle="${resword}"/>';
-	  var app_data_typeLabel = '<oc:jsEscape key="data_type" bundle="${resword}"/>';
-	  var app_response_options_textLabel = '<oc:jsEscape key="response_options_text" bundle="${resword}"/>';
-	  var app_response_valuesLabel = '<oc:jsEscape key="response_values" bundle="${resword}"/>';
-	  var app_rule_group_labelLabel = '<oc:jsEscape key="rule_group_label" bundle="${resword}"/>';
+
+
+    var app_metadataLabel = '<oc:jsEscape key="metadata" bundle="${resword}"/>';
+    var app_left_item_textLabel = '<oc:jsEscape key="left_item_text" bundle="${resword}"/>';
+    var app_unitsLabel = '<oc:jsEscape key="units" bundle="${resword}"/>';
+    var app_data_typeLabel = '<oc:jsEscape key="data_type" bundle="${resword}"/>';
+    var app_response_options_textLabel = '<oc:jsEscape key="response_options_text" bundle="${resword}"/>';
+    var app_response_valuesLabel = '<oc:jsEscape key="response_values" bundle="${resword}"/>';
+    var app_rule_group_labelLabel = '<oc:jsEscape key="rule_group_label" bundle="${resword}"/>';
 
 
      //study subject
-	  var app_date_of_birthLabel = '<oc:jsEscape key="date_of_birth" bundle="${resword}"/>';
-	  var app_genderLabel = '<oc:jsEscape key="gender" bundle="${resword}"/>';
-	  var app_enrollMMDDYYYYLabel = '<oc:jsEscape key="enrollMMDDYYYY" bundle="${resword}"/>';
-	  var app_subject_statusLabel = '<oc:jsEscape key="subject_status" bundle="${resword}"/>';
-	  var app_subject_unique_IDLabel = '<oc:jsEscape key="subject_unique_ID" bundle="${resword}"/>';
-	  var app_secondary_IDLabel = '<oc:jsEscape key="secondary_ID" bundle="${resword}"/>';
-	  var app_groupLabel = '<oc:jsEscape key="group" bundle="${resword}"/>';
-	  var app_detailsLabel = '<oc:jsEscape key="details" bundle="${resword}"/>';
+    var app_date_of_birthLabel = '<oc:jsEscape key="date_of_birth" bundle="${resword}"/>';
+    var app_genderLabel = '<oc:jsEscape key="gender" bundle="${resword}"/>';
+    var app_enrollMMDDYYYYLabel = '<oc:jsEscape key="enrollMMDDYYYY" bundle="${resword}"/>';
+    var app_subject_statusLabel = '<oc:jsEscape key="subject_status" bundle="${resword}"/>';
+    var app_subject_unique_IDLabel = '<oc:jsEscape key="subject_unique_ID" bundle="${resword}"/>';
+    var app_secondary_IDLabel = '<oc:jsEscape key="secondary_ID" bundle="${resword}"/>';
+    var app_groupLabel = '<oc:jsEscape key="group" bundle="${resword}"/>';
+    var app_detailsLabel = '<oc:jsEscape key="details" bundle="${resword}"/>';
 
-	  var app_enrollment_dateLabel = '<oc:jsEscape key="enrollment_date" bundle="${resword}"/>';
+    var app_enrollment_dateLabel = '<oc:jsEscape key="enrollment_date" bundle="${resword}"/>';
 
 
 

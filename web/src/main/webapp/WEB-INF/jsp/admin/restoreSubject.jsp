@@ -136,8 +136,4 @@
  <input type="submit" name="submit" value="<fmt:message key="restore_subject" bundle="${resword}"/>" class="button_long" onClick='return confirm("<fmt:message key="restore_explication" bundle="${restext}"/>");'>
 </form>
 
-<c:import url="../include/workflow.jsp">
- <c:param name="module" value="admin"/>
-</c:import>
-
 <jsp:include page="../include/footer.jsp"/>

@@ -148,6 +148,7 @@
         <property name="studyDao" ref="studyDaoDomain"/>
         <property name="studyParameterValueDao" ref="studyParameterValueDao"/>
         <property name="xformParser" ref="xformParser"/>
+        <property name="coreResources" ref="coreResources"/>
     </bean>
     <bean id = "enketoCredentials" class="org.akaza.openclinica.service.crfdata.xform.EnketoCredentials">
         <property name="studyDao" ref="studyDaoDomain"/>

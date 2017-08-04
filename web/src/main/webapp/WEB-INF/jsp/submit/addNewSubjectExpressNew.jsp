@@ -159,23 +159,25 @@
             <!--layer-background-color:white;-->
             <div class="formfieldM_BG">
                         <input onfocus="this.select()" type="text" name="enrollmentDate" size="15" value="<c:out value="${enrollmentDate}" />" class="formfieldM" id="enrollmentDateField" />
+                        <a href="#">
+                             <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
+                                <script type="text/javascript">
+                                Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger", customPX: 300, customPY: 10 });
+                                </script>
+                            </a>
+                                *
                     </td>
                     <td align="right">
-                    <A HREF="#">
-                      &nbsp;<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
-                        <script type="text/javascript">
-                        Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger", customPX: 300, customPY: 10 });
-                        </script>
-                    </a>
-                        *
+                    
                     </td>
                 </tr>
-                <tr>
-                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
-                </tr>
+               
             </table>
         </td>
     </tr>
+     <tr>
+                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
+                </tr>
 
     <tr valign="top">
         <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
@@ -232,16 +234,18 @@
                 <tr>
                     <td valign="top"><div class="formfieldM_BG">
                         <input onfocus="this.select()" type="text" name="dob" size="15" value="<c:out value="${dob}" />" class="formfieldM" id="dobField" />
+                         <a href="#">
+                            <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
+                            <script type="text/javascript">
+                            Calendar.setup({inputField  : "dobField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger", customPX: 300, customPY: 10 });
+                            </script>
+                        </a>
+                        *
                     </td>
                     <td>
-                    <A HREF="#">
-                      &nbsp;<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
-                        <script type="text/javascript">
-                        Calendar.setup({inputField  : "dobField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger", customPX: 300, customPY: 10 });
-                        </script>
-                    </a>
+                   
                     </td>
-                    <td>&nbsp;* </td>
+                    
                 </tr>
             </table>
         </td>
@@ -321,12 +325,13 @@
                     </td>
                     <td><span class="formlabel">&nbsp;*</span></td>
                 </tr>
-                <tr>
-                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyEventDefinition"/></jsp:include></td>
-                </tr>
+                
 
             </table>
         </td>
+    </tr>
+    <tr>
+        <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyEventDefinition"/></jsp:include></td>
     </tr>
 
     <tr valign="top">
@@ -339,22 +344,25 @@
                     <td valign="top">
                         <div class="formfieldM_BG">
                         <input type="text" name="startDate" size="15" value="<c:out value="${startDate}" />" class="formfieldM" id="enrollmentDateField2" />
+                         <a href="#">
+
+                             <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2"/></a>&nbsp;*
+                             <script type="text/javascript">
+                             Calendar.setup({inputField  : "enrollmentDateField2", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger2" ,customPX: 300, customPY: 10 });
+                             </script>
                     </td>
                     <td>
-                        <A HREF="#" >
-                         &nbsp;<img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2"/></a>&nbsp;*
-                         <script type="text/javascript">
-                         Calendar.setup({inputField  : "enrollmentDateField2", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger2" ,customPX: 300, customPY: 10 });
-                         </script>
+                        
                     </td>
                 </tr>
-                <tr>
-                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDate"/></jsp:include></td>
-                </tr>
+             
 
             </table>
           </td>
     </tr>
+       <tr>
+        <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDate"/></jsp:include></td>
+        </tr>
     <c:choose>
     <c:when test="${study.studyParameterConfig.eventLocationRequired == 'required'}">
     <tr valign="top">
@@ -395,13 +403,14 @@
     </c:otherwise>
     </c:choose>
     <tr>
-        <td colspan="2" align="center">
-        <input type="submit" name="addSubject" value="<fmt:message key="add2" bundle="${resword}"/>" class="button" />
-        &nbsp;
-        <input type="button" id="cancel" name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>" class="button"/>
 
-        <div id="dvForCalander" style="width:1px; height:1px;"></div>
-    </td>
+        <td colspan="2">
+            <input type="submit" name="addSubject" value="Add"/>
+            &nbsp;
+            <input type="button" id="cancel" name="cancel" value="Cancel"/>
+
+            <div id="dvForCalander" style="width:1px; height:1px;"></div>
+        </td>
     </tr>
 
 </table>

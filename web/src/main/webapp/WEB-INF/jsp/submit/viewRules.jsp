@@ -348,16 +348,4 @@
 
 <p><a href="ViewRuleAssignment"/><fmt:message key="rule_go_back_to_Assignment_list" bundle="${resword}"/></a></p>
 
-<c:choose>
-  <c:when test="${userBean.sysAdmin && module=='admin'}">
-  <c:import url="../include/workflow.jsp">
-   <c:param name="module" value="admin"/>
-  </c:import>
- </c:when>
-  <c:otherwise>
-   <c:import url="../include/workflow.jsp">
-   <c:param name="module" value="manage"/>
-  </c:import>
-  </c:otherwise>
- </c:choose>
 <jsp:include page="../include/footer.jsp"/>

@@ -435,22 +435,20 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             // builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
             builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + SINGLE_ITEM_FLAVOR);
             builder.close();
-            builder.img().name("bt_View1").src("images/bt_View_d.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).align("left")
-                    .append("hspace=\"6\"").close();
+            builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
+            builder.append("&nbsp;");
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
                 if (dnb.getEntityType() != "eventCrf") {
                     builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
                     builder.close();
-                    builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0").alt(resword.getString("view_within_crf"))
-                            .title(resword.getString("view_within_crf")).align("left").append("hspace=\"6\"").close();
+                    builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                     builder.aEnd();
                 } else {
                     if (dnb.getStageId() == 5) {
                         builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
                         builder.close();
-                        builder.img().name("bt_Reassign1").src("images/bt_Reassign_d.gif").border("0").alt(resword.getString("view_within_crf"))
-                                .title(resword.getString("view_within_crf")).align("left").append("hspace=\"6\"").close();
+                        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                         builder.aEnd();
                     }
                 }
@@ -474,14 +472,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             if (this.getResolutionStatus() >= 1 && this.getResolutionStatus() <= 5) {
                 actionLink.a().href("javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
                         + "&resolutionStatus=" + resolutionStatus + "')");
-                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes"))
-                        .title(resword.getString("download_discrepancy_notes")).append("hspace=\"4\" width=\"24 \" height=\"15\"").end().aEnd();
+                actionLink.append("<span border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"4\" width=\"24 \" height=\"15\"/>");
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             } else {
                 actionLink.a().href("javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
                         + "&module=" + module + "')");
-                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes"))
-                        .title(resword.getString("download_discrepancy_notes")).append("hspace=\"2\" width=\"24 \" height=\"15\"").end().aEnd();
+                 actionLink.append("<span border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"4\" width=\"24 \" height=\"15\"/>");
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             }
         }

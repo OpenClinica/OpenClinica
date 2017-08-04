@@ -10,24 +10,24 @@
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.DatasetRow" />
 
 <tr>
-	<td class="table_cell_left">
-		<c:choose>
-			<c:when test='${currRow.bean.status.name == "removed"}'>
-				<font color='gray'><c:out value="${currRow.bean.name}" /></font>
-			</c:when>
-			<c:otherwise>
-				<c:out value="${currRow.bean.name}" />
-			</c:otherwise>
-		</c:choose>
-	</td>
-	<td class="table_cell"><c:out value="${currRow.bean.description}" /></td>
-	<td class="table_cell"><c:out value="${currRow.bean.owner.name}" /></td>
-	<td class="table_cell"><fmt:formatDate value="${currRow.bean.createdDate}" pattern="${dteFormat}"/></td>
-	<td class="table_cell"><c:out value="${currRow.bean.status.name}" /></td>
-	
-	<%-- ACTIONS --%>
-	<td class="table_cell">
-	<table border="0" cellpadding="0" cellspacing="0">
+    <td class="table_cell_left">
+        <c:choose>
+            <c:when test='${currRow.bean.status.name == "removed"}'>
+                <font color='gray'><c:out value="${currRow.bean.name}" /></font>
+            </c:when>
+            <c:otherwise>
+                <c:out value="${currRow.bean.name}" />
+            </c:otherwise>
+        </c:choose>
+    </td>
+    <td class="table_cell"><c:out value="${currRow.bean.description}" /></td>
+    <td class="table_cell"><c:out value="${currRow.bean.owner.name}" /></td>
+    <td class="table_cell"><fmt:formatDate value="${currRow.bean.createdDate}" pattern="${dteFormat}"/></td>
+    <td class="table_cell"><c:out value="${currRow.bean.status.name}" /></td>
+    
+    <%-- ACTIONS --%>
+    <td class="table_cell">
+    <table border="0" cellpadding="0" cellspacing="0">
       <c:choose>
           <c:when test="${userBean.sysAdmin}">
               <tr>
@@ -37,34 +37,34 @@
                         <td><a href="RestoreDataset?dsId=<c:out value="${currRow.bean.id}"/>"
                             onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
                             onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
-                               ><img name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a></td>
+                               ><span name="bt_Restore3" class="icon icon-ccw" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a></td>
                         <td></td>
                     </c:when>
                     <c:otherwise>
                     <td>
                     <a href="ViewDatasets?action=details&datasetId=<c:out value="${currRow.bean.id}"/>"
                     onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-                    name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
+                    name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td><td>
                     <a href="EditDataset?dsId=<c:out value="${currRow.bean.id}"/>"
                     onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img
-                    name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><span
+                    name="bt_Edit1" class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
 
                     <td>
                     <a href="RemoveDataset?dsId=<c:out value="${currRow.bean.id}"/>"
                     onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><img
-                    name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
+                    name="bt_Remove1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
 
                     <td>
                     <a href="ExportDataset?datasetId=<c:out value="${currRow.bean.id}"/>"
                     onMouseDown="javascript:setImage('bt_Export1','images/bt_Export_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"><img
-                    name="bt_Export1" src="images/bt_Export.gif" border="0" alt="<fmt:message key="export_dataset" bundle="${resword}"/>" title="<fmt:message key="export_dataset" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"><span
+                    name="bt_Export1" class="icon icon-upload" border="0" alt="<fmt:message key="export_dataset" bundle="${resword}"/>" title="<fmt:message key="export_dataset" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
                     </c:otherwise>
                 </c:choose>
@@ -80,7 +80,7 @@
                         <td><a href="RestoreDataset?dsId=<c:out value="${currRow.bean.id}"/>"
                             onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
                             onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"
-                               ><img name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a></td>
+                               ><span name="bt_Restore3" class="icon icon-ccw" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a></td>
                         <td></td>
                         </c:when>
                         <c:otherwise>
@@ -93,28 +93,28 @@
                     <td>
                     <a href="ViewDatasets?action=details&datasetId=<c:out value="${currRow.bean.id}"/>"
                     onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-                    name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
+                    name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td><td>
                     <c:if test="${currRow.bean.owner.name == userBean.name}">
                     <a href="EditDataset?dsId=<c:out value="${currRow.bean.id}"/>"
                     onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img
-                    name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><span
+                    name="bt_Edit1" class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
 
                     <td>
                     <a href="RemoveDataset?dsId=<c:out value="${currRow.bean.id}"/>"
                     onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><img
-                    name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
+                    name="bt_Remove1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
                     </c:if>
                     <td>
                     <a href="ExportDataset?datasetId=<c:out value="${currRow.bean.id}"/>"
                     onMouseDown="javascript:setImage('bt_Export1','images/bt_Export_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"><img
-                    name="bt_Export1" src="images/bt_Export.gif" border="0" alt="<fmt:message key="export_dataset" bundle="${resword}"/>" title="<fmt:message key="export_dataset" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"><span
+                    name="bt_Export1" class="icon icon-upload" border="0" alt="<fmt:message key="export_dataset" bundle="${resword}"/>" title="<fmt:message key="export_dataset" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
                     </c:otherwise>
                 </c:choose>
@@ -123,6 +123,6 @@
           </c:otherwise>
       </c:choose>
 
-		</table>
-	</td>
+        </table>
+    </td>
 </tr>

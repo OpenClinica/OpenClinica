@@ -33,7 +33,7 @@
           name="selected<c:out value="${count}"/>" value="yes">
        </c:when>
        <c:otherwise>
-        <img src="images/icon_DEcomplete.gif" alt="CRF Selected" title="CRF Selected">
+        <span class="icon icon-checkbox-checked green" alt="CRF Selected" title="CRF Selected">
        </c:otherwise>
       </c:choose>
       </td>          
