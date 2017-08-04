@@ -15,6 +15,7 @@
 </c:choose>
 
 <link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
@@ -147,7 +148,7 @@
         </tr>
             <c:forEach var="status" items="${mapKeys}">
                 <tr>
-                    <td><strong>${status.name}</strong> &nbsp;&nbsp;<i class="${status.iconFilePath}" border="0" align="right"></td>
+                    <td><strong>${status.name}</strong> &nbsp;&nbsp;<span class="${status.iconFilePath}" border="0" align="right"></td>
                     <td align="center"> ${summaryMap[status.name]['Total']}</td>
                 </tr>
             </c:forEach>
