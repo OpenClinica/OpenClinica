@@ -74,14 +74,8 @@
      <div class="oc_nav">
         <div class="nav-top-bar">
         <!-- Logo -->
-            <c:if test="${requestFromSpringController == 'true' }">
-                <div class="logo"><a href="../MainMenu"><img src="../images/logo-color-on-dark.svg" alt="OpenClinica Logo" /></a></div>
-            </c:if>
+            <div class="logo"><a href="MainMenu"><img src="images/logo-color-on-dark.svg" alt="OpenClinica Logo" /></a></div>
 
-            <c:if test="${!param.isSpringController }">
-                <div class="logo"><a href="MainMenu"><img src="images/logo-color-on-dark.svg" alt="OpenClinica Logo" /></a></div>
-            </c:if>
-            
             <div id="StudyInfo">
                 <c:choose>
                     <c:when test='${study.parentStudyId > 0}'>
