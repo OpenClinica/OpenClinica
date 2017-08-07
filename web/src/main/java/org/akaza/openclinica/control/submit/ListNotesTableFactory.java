@@ -108,7 +108,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "discrepancyNoteBean.resolutionStatus", "siteId",
                 "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus","discrepancyNoteBean.detailedNotes"
-                ,"entityName","actions");
+                ,"actions");
 
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
@@ -121,7 +121,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("eventName"), resword.getString("event_name"), null, null, true, false);
         configureColumn(row.getColumn("crfName"), resword.getString("CRF"), null, null, true, false);
         configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, false, false);
-        configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), new EntityNameCellEditor(), null, true, false);
+        //configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), new EntityNameCellEditor(), null, true, false);
         //configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), resword.getString("detailed_notes"), null, null, true, false);
         //configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"), new AssignedUserCellEditor(), null, true, false);
@@ -218,7 +218,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("eventStartDate", discrepancyNoteBean.getEventStart());
             h.put("crfName", discrepancyNoteBean.getCrfName());
             h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
-            h.put("entityName", discrepancyNoteBean.getEntityName());
+            //h.put("entityName", discrepancyNoteBean.getEntityName());
             //h.put("entityValue", discrepancyNoteBean.getEntityValue());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
             h.put("discrepancyNoteBean.detailedNotes", discrepancyNoteBean.getDetailedNotes());
