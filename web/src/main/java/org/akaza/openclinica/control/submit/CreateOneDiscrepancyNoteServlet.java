@@ -122,7 +122,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         int refresh = 0;
         String field = fp.getString(ENTITY_FIELD, true);
         
-        String description = fp.getString("description" + parentId);
+        //String description = fp.getString("description" + parentId);
         int typeId = fp.getInt("typeId" + parentId);
         String detailedDes = fp.getString("detailedDes" + parentId);
         int resStatusId = fp.getInt(RES_STATUS_ID + parentId);
@@ -131,14 +131,14 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         viewNoteLink = this.appendPageFileName(viewNoteLink, "fromBox", "1");
 
         Validator v = new Validator(request);
-        v.addValidation("description" + parentId, Validator.NO_BLANKS);
-        v.addValidation("description" + parentId, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+        v.addValidation("detailedDes" + parentId, Validator.NO_BLANKS);
+       // v.addValidation("description" + parentId, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
         v.addValidation("detailedDes" + parentId, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 1000);
         v.addValidation("typeId" + parentId, Validator.NO_BLANKS);
         HashMap errors = v.validate();
 
         dn.setParentDnId(parentId);
-        dn.setDescription(description);
+       // dn.setDescription(description);
         dn.setDiscrepancyNoteTypeId(typeId);
         dn.setDetailedNotes(detailedDes);
         dn.setResolutionStatusId(resStatusId);
@@ -284,7 +284,7 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                     message.append(respage.getString("email_body_separator"));
                     message.append(respage.getString("disc_note_info"));
                     message.append(respage.getString("email_body_separator"));
-                    message.append(MessageFormat.format(respage.getString("mailDNParameters1"), dn.getDescription(), dn.getDetailedNotes(), ub.getName()));
+                    message.append(MessageFormat.format(respage.getString("mailDNParameters1"),dn.getDetailedNotes(), ub.getName()));
                     message.append(respage.getString("email_body_separator"));
                     message.append(respage.getString("entity_information"));
                     message.append(respage.getString("email_body_separator"));
