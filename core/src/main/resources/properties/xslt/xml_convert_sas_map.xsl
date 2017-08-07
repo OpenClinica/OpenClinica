@@ -53,14 +53,26 @@
             <xsl:variable name="noprefixoid" select="replace(@OID, '^IG_', '')"/>
             <xsl:variable name="noprefixoidtokenized" select="tokenize($noprefixoid,'_')"/>
             <xsl:if test="string-length(@OID) &gt; 35 ">
-                <xsl:value-of select="
-                    concat('_',substring(string-join(subsequence($noprefixoidtokenized,1,count($noprefixoidtokenized)-1),'_'),1,26),'_',$noprefixoidtokenized[count($noprefixoidtokenized)])"/>
+                <xsl:value-of select="concat('_',substring(string-join(subsequence($noprefixoidtokenized,1,count($noprefixoidtokenized)-1),'_'),1,26),'_',$noprefixoidtokenized[count($noprefixoidtokenized)])"/>
             </xsl:if>
             <xsl:if test="string-length(@OID) &lt; 36 and not(contains(@OID, 'UNGROUPED'))">
                 <xsl:value-of select="concat('_',substring($noprefixoid,1,31))"/>
             </xsl:if>
             <xsl:if test="contains(@OID, 'UNGROUPED')">
-                <xsl:value-of select="replace($formdef/OpenClinica:FormDetails/@ParentFormOID, '^F_', '_')"/>
+                <xsl:variable name="isFormNameAvailable">
+                    <xsl:call-template name="isFormBasedTableNameAvailable">
+                        <xsl:with-param name="formDef" select="$formdef"/>
+                        <xsl:with-param name="ungroupedOID" select="@OID"/>
+                    </xsl:call-template>
+                </xsl:variable>
+                <xsl:choose>
+                    <xsl:when test="$isFormNameAvailable= 'false'">
+                        <xsl:value-of select="concat('_',substring($noprefixoid,1,31))"/>
+                    </xsl:when>
+                    <xsl:otherwise>
+                        <xsl:value-of select="replace($formdef/OpenClinica:FormDetails/@ParentFormOID, '^F_', '_')"/>
+                    </xsl:otherwise>
+                </xsl:choose>
             </xsl:if>
         </xsl:variable>
         <xsl:element name="TABLE">
@@ -79,6 +91,34 @@
             <xsl:apply-templates select="odm:ItemRef" mode="map"/>
         </xsl:element>
     </xsl:template>
+
+
+    <!-- Determine if the form based name of the ungrouped table conflicts with another table name -->
+    <!-- Return 'false' if name is not usable.  Empty string otherwise.-->
+    <xsl:template name="isFormBasedTableNameAvailable">
+        <xsl:param name="formDef"/>
+        <xsl:param name="ungroupedOID"/>
+        <xsl:variable name="ungroupedCuratedName" select="replace($formDef/OpenClinica:FormDetails/@ParentFormOID, '^F_', '_')"/>
+        <xsl:variable name="formOID" select="$formDef/@OID"/>
+        <xsl:for-each select="/odm:ODM/odm:Study/odm:MetaDataVersion/odm:ItemGroupDef[.//OpenClinica:PresentInForm/@FormOID=$formOID]">
+            <xsl:variable name="noprefixoid" select="replace(@OID, '^IG_', '')"/>
+            <xsl:variable name="noprefixoidtokenized" select="tokenize($noprefixoid,'_')"/>
+            <xsl:if test="not(@OID = $ungroupedOID)">
+                <xsl:variable name="curatedGroupName">
+                    <xsl:if test="string-length(@OID) &gt; 35 ">
+                        <xsl:value-of select="concat('_',substring(string-join(subsequence($noprefixoidtokenized,1,count($noprefixoidtokenized)-1),'_'),1,26),'_',$noprefixoidtokenized[count($noprefixoidtokenized)])"/>
+                    </xsl:if>
+                    <xsl:if test="string-length(@OID) &lt; 36">
+                        <xsl:value-of select="concat('_',substring($noprefixoid,1,31))"/>
+                    </xsl:if>
+                </xsl:variable>
+                <xsl:if test="$ungroupedCuratedName = $curatedGroupName">
+                    <xsl:value-of select="false()"/>
+                </xsl:if>
+            </xsl:if>
+        </xsl:for-each>
+    </xsl:template>
+    
     <!-- Return row header data using above data.-->
     <xsl:template match="row" mode="map">
         <xsl:param name="itemgroup"/>
