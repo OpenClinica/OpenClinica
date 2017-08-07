@@ -587,9 +587,7 @@
             <th class="table_header_row">CRF Name</th>
             <th class="table_header_row">New</th>
             <th class="table_header_row">Updated</th>
-            <th class="table_header_row">Resolution Proposed</th>
             <th class="table_header_row">Closed</th>
-            <th class="table_header_row">Not Applicable</th>
             <th class="table_header_row">Actions</th>
         </thead>
         <tbody>
@@ -628,15 +626,6 @@
                                     </c:if>
                                 </td><%-- updated --%>
                                 <td class="table_cell">
-                                    <c:set var="discNoteCount" value="${discNoteMap['Resolution Proposed']}"/>
-                                    <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon icon-flag green" border="0"
-                                          alt="<fmt:message key="Resolved" bundle="${resterm}"/>" title="<fmt:message key="Resolved" bundle="${resterm}"/>" align="left"/>
-                                        (${discNoteCount})
-                                        <c:set var="discNoteCount" value="${0}"/>
-                                    </c:if>
-                                </td><%-- Resolution Proposed --%>
-                                <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['Closed']}"/>
                                     <c:if test="${discNoteCount > 0}">
                                         <span class="icon icon-flag black" border="0"
@@ -645,15 +634,6 @@
                                         <c:set var="discNoteCount" value="${0}"/>
                                     </c:if>
                                 </td><%-- closed --%>
-                                <td class="table_cell">
-                                    <c:set var="discNoteCount" value="${discNoteMap['Not Applicable']}"/>
-                                    <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon-flag-empty blue" border="0"
-                                          alt="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" title="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" align="left"/>
-                                        (${discNoteCount})
-                                        <c:set var="discNoteCount" value="${0}"/>
-                                    </c:if>
-                                </td><%-- N/A --%>
                                 <td class="table_cell">
                                     <a onmouseup="javascript:setImage('bt_View1','images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','images/bt_View_d.gif');" href="EnterDataForStudyEvent?eventId=${studyEvent.id}">
                                         <img hspace="6" border="0" align="left" title="View" alt="View" src="images/bt_View.gif" name="bt_View1"/>

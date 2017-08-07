@@ -236,7 +236,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 		</c:when>
 		<c:otherwise>
 			<c:set var="typeId1" value="${discrepancyNote.discrepancyNoteTypeId}"/>
-			<select name="typeId" id="typeId" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
+			<select name="typeId" id="typeId" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
 				<c:forEach var="type" items="${discrepancyTypes}">
 				<c:choose>
 				<c:when test="${typeId1 == type.id}">
