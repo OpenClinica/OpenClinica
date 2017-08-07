@@ -395,7 +395,7 @@ public class StudyInfoPanel implements Serializable {
                 this.setData(resword.getString("dataset_owner"), dsb.getOwner().getName());
                 this.setData(resword.getString("date_last_run"), local_sdf.format(dsb.getDateLastRun()));
 
-            } else if (page.equals(Page.VIEW_DATASETS)) {
+            } else if (page.equals(Page.EXPORT_DATASETS)) {
 
                 this.setCreateDataset(false);
 

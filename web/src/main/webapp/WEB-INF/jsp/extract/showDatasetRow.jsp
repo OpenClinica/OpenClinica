@@ -91,29 +91,21 @@
                     </c:when>
                     <c:otherwise>
                     <td>
-                    <a href="ViewDatasets?action=details&datasetId=<c:out value="${currRow.bean.id}"/>"
-                    onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
+                    <a href="ViewDatasets?action=details&datasetId=<c:out value="${currRow.bean.id}"/>"><span
                     name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td><td>
                     <c:if test="${currRow.bean.owner.name == userBean.name}">
-                    <a href="EditDataset?dsId=<c:out value="${currRow.bean.id}"/>"
-                    onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><span
+                    <a href="EditDataset?dsId=<c:out value="${currRow.bean.id}"/>"><span
                     name="bt_Edit1" class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
 
                     <td>
-                    <a href="RemoveDataset?dsId=<c:out value="${currRow.bean.id}"/>"
-                    onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
+                    <a href="RemoveDataset?dsId=<c:out value="${currRow.bean.id}"/>"><span
                     name="bt_Remove1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
                     </c:if>
                     <td>
-                    <a href="ExportDataset?datasetId=<c:out value="${currRow.bean.id}"/>"
-                    onMouseDown="javascript:setImage('bt_Export1','images/bt_Export_d.gif');"
-                    onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"><span
+                    <a href="ExportDataset?datasetId=<c:out value="${currRow.bean.id}"/>"><span
                     name="bt_Export1" class="icon icon-upload" border="0" alt="<fmt:message key="export_dataset" bundle="${resword}"/>" title="<fmt:message key="export_dataset" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
                     </c:otherwise>

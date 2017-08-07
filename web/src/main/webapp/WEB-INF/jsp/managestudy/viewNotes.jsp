@@ -15,6 +15,7 @@
 </c:choose>
 
 <link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
@@ -137,31 +138,27 @@
     <img name="ExpandGroup1" src="images/bt_Collapse.gif" border="0">
     <fmt:message key="hide_summary_statistics" bundle="${resword}"/></a>
 </div>
-<div id="sumBox" style="display:block; width:600px;">
+<div style="display:block; width:600px;">
     <%--<h3>Summary statistics</h3>--%>
     <c:if test="${empty summaryMap}"><fmt:message key="There_are_no_discrepancy_notes" bundle="${resword}"/></c:if>
     <!-- NEW Summary-->
-    <table cellspacing="0" class="summaryTable" style="width:600px;">
+    <table border="0" cellspacing="0" class="summaryTable" style="width:600px;">
         <tr><td>&nbsp;</td>
-            <c:forEach var="typeName"  items="${typeNames}">
-                <td align="center"><strong>${typeName}</strong></td>
-            </c:forEach>
-            <td align="center"><strong>Total</strong></td>
+            <td>&nbsp;</td>
+            <td align="center"><strong>Query</strong></td>
         </tr>
             <c:forEach var="status" items="${mapKeys}">
                 <tr>
-                    <td><strong>${status.name}</strong><img src="${status.iconFilePath}" border="0" align="right"></td>
-                    <c:forEach var="typeName" items="${typeNames}">
-                        <td align="center">${summaryMap[status.name][typeName]}</td>
-                    </c:forEach>
+                    <td><strong>${status.name}</strong></td>
+                    <td><span class="${status.iconFilePath}" border="0" align="right"></td>
                     <td align="center"> ${summaryMap[status.name]['Total']}</td>
                 </tr>
             </c:forEach>
-        <tr><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td></tr>
-        <tr><td><strong>Total</strong></td>
-            <c:forEach var="typeName"  items="${typeNames}">
-                <td align="center">${typeKeys[typeName]}</td>
-            </c:forEach>
+        <tr>
+            <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
+        </tr>
+        <tr>
+            <td>&nbsp;</td><td>&nbsp;</td>
             <td align="center">${grandTotal}</td>
         </tr>
     </table>

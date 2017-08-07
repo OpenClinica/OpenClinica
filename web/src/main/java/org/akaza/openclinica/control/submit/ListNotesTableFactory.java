@@ -107,9 +107,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
         tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "discrepancyNoteBean.resolutionStatus", "siteId",
-                "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus",
-                "entityName", "entityValue", "discrepancyNoteBean.entityType", "discrepancyNoteBean.description", "discrepancyNoteBean.detailedNotes",
-                "numberOfNotes", "discrepancyNoteBean.user", "discrepancyNoteBean.owner", "actions");
+                "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus","discrepancyNoteBean.detailedNotes"
+                ,"actions");
+
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
         configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, false);
@@ -121,22 +121,16 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("eventName"), resword.getString("event_name"), null, null, true, false);
         configureColumn(row.getColumn("crfName"), resword.getString("CRF"), null, null, true, false);
         configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, false, false);
-        configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), new EntityNameCellEditor(), null, true, false);
-        configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.description"), resword.getString("description"), null, null, true, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), resword.getString("detailed_notes"), null, null, false, false);
-        configureColumn(row.getColumn("numberOfNotes"), resword.getString("of_notes"), null, null, false, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"), new AssignedUserCellEditor(), null, true, false);
+        //configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), new EntityNameCellEditor(), null, true, false);
+        //configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
+        configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), resword.getString("detailed_notes"), null, null, true, false);
+        //configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"), new AssignedUserCellEditor(), null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.resolutionStatus"), resword.getString("resolution_status"), new ResolutionStatusCellEditor(),
                 resolutionStatusDropdown, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.disType"), resword.getString("type"), new DiscrepancyNoteTypeCellEditor(),
                 discrepancyNoteTypeDropdown, true, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.entityType"), resword.getString("entity_type"), null, null, true, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.owner"), resword.getString("owner"), new OwnerCellEditor(), null, false, false);
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
-        configureColumn(row.getColumn("age"), resword.getString("days_open"), null, null);
-        configureColumn(row.getColumn("days"), resword.getString("days_since_updated"), null, null);
     }
 
     @Override
@@ -224,16 +218,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("eventStartDate", discrepancyNoteBean.getEventStart());
             h.put("crfName", discrepancyNoteBean.getCrfName());
             h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
-            h.put("entityName", discrepancyNoteBean.getEntityName());
-            h.put("entityValue", discrepancyNoteBean.getEntityValue());
+            //h.put("entityName", discrepancyNoteBean.getEntityName());
+            //h.put("entityValue", discrepancyNoteBean.getEntityValue());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
-            h.put("discrepancyNoteBean.description", discrepancyNoteBean.getDescription());
             h.put("discrepancyNoteBean.detailedNotes", discrepancyNoteBean.getDetailedNotes());
-            h.put("numberOfNotes", discrepancyNoteBean.getNumChildren());
-            h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());
-            h.put("discrepancyNoteBean.entityType", discrepancyNoteBean.getEntityType());
-            h.put("discrepancyNoteBean.owner", discrepancyNoteBean.getOwner());
-
+            //h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());
+            
             theItems.add(h);
             setStudyHasDiscNotes(true);
         }
@@ -351,7 +341,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             ResolutionStatus status = (ResolutionStatus) ((HashMap<Object, Object>) item).get("discrepancyNoteBean.resolutionStatus");
 
             if (status != null) {
-                value = "<img src=\"" + status.getIconFilePath() + "\" border=\"0\" align=\"left\"> &nbsp;&nbsp;" + status.getName();
+                value = "<span class=\"" + status.getIconFilePath() + "\" border=\"0\" align=\"left\"> &nbsp;&nbsp;" + status.getName();
             }
             return value;
         }
@@ -435,20 +425,20 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             // builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
             builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + SINGLE_ITEM_FLAVOR);
             builder.close();
-            builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
+            builder.append("<span title=\"View\" border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
             builder.append("&nbsp;");
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
                 if (dnb.getEntityType() != "eventCrf") {
                     builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
                     builder.close();
-                    builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
+                    builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                     builder.aEnd();
                 } else {
                     if (dnb.getStageId() == 5) {
                         builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
                         builder.close();
-                        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
+                        builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                         builder.aEnd();
                     }
                 }
@@ -472,12 +462,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             if (this.getResolutionStatus() >= 1 && this.getResolutionStatus() <= 5) {
                 actionLink.a().href("javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
                         + "&resolutionStatus=" + resolutionStatus + "')");
-                actionLink.append("<span border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"4\" width=\"24 \" height=\"15\"/>");
+                actionLink.append("<span title=\"Download queries for all subjects\" border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"4\" width=\"24 \" height=\"15\"/>");
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             } else {
                 actionLink.a().href("javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
                         + "&module=" + module + "')");
-                 actionLink.append("<span border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"4\" width=\"24 \" height=\"15\"/>");
+                 actionLink.append("<span title=\"Download queries for all subjects\" border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"4\" width=\"24 \" height=\"15\"/>");
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             }
         }
