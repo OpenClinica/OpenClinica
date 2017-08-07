@@ -208,7 +208,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
             html.quote();
             html.append(getAction());
             html.quote().close();
-            html.append("<span border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"6\" width=\"24 \" height=\"15\"/>");
+            html.append("<span title=\"Download queries for all subjects\" border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"6\" width=\"24 \" height=\"15\"/>");
             return html.toString();
         }
     }
@@ -227,7 +227,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
             html.quote();
             html.append(getAction());
             html.quote().close();
-            html.append("<span border=\"0\" align=\"left\" class=\"icon icon-print\" hspace=\"6\" width=\"24 \" height=\"15\"/>");
+            html.append("<span title=\"Print\" border=\"0\" align=\"left\" class=\"icon icon-print\" hspace=\"6\" width=\"24 \" height=\"15\"/>");
             return html.toString();
         }
     }

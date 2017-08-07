@@ -149,7 +149,7 @@ public class ExportDatasetServlet extends SecureController {
 
         if (StringUtil.isBlank(action)) {
             loadList(db, asdfdao, datasetId, fp, eb);
-            forwardPage(Page.VIEW_DATASETS);
+            forwardPage(Page.EXPORT_DATASETS);
         } else if ("delete".equalsIgnoreCase(action) && adfId > 0) {
             boolean success = false;
             ArchivedDatasetFileBean adfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(adfId);
@@ -166,7 +166,7 @@ public class ExportDatasetServlet extends SecureController {
                 }
             }
             loadList(db, asdfdao, datasetId, fp, eb);
-            forwardPage(Page.VIEW_DATASETS);
+            forwardPage(Page.EXPORT_DATASETS);
         } else {
             logger.info("**** found action ****: " + action);
             String generateReport = "";

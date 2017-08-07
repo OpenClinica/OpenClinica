@@ -10,6 +10,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 
 
 <c:choose>
@@ -440,9 +441,7 @@
             <th class="table_header_row">CRF Name</th>
             <th class="table_header_row">New</th>
             <th class="table_header_row">Updated</th>
-            <th class="table_header_row">Resolution Proposed</th>
             <th class="table_header_row">Closed</th>
-            <th class="table_header_row">Not Applicable</th>
             <th class="table_header_row">Actions</th>
         </thead>
         <tbody>
@@ -473,7 +472,7 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['New']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon-flag red" border="0"
+                                        <span class="fa fa-bubble-red" border="0"
                                           alt="<fmt:message key="Open" bundle="${resterm}"/>" title="<fmt:message key="Open" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
@@ -482,42 +481,24 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['Updated']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon icon-flag orange" border="0"
+                                        <span class="fa fa-bubble-orange" border="0"
                                           alt="<fmt:message key="Updated" bundle="${resterm}"/>" title="<fmt:message key="Updated" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
                                     </c:if>
                                 </td><%-- updated --%>
                                 <td class="table_cell">
-                                    <c:set var="discNoteCount" value="${discNoteMap['Resolution Proposed']}"/>
-                                    <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon icon-flag green"border="0"
-                                          alt="<fmt:message key="Resolved" bundle="${resterm}"/>" title="<fmt:message key="Resolved" bundle="${resterm}"/>" align="left"/>
-                                        (${discNoteCount})
-                                        <c:set var="discNoteCount" value="${0}"/>
-                                    </c:if>
-                                </td><%-- Resolution Proposed --%>
-                                <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['Closed']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon-flag black" border="0"
+                                        <span class="fa fa-bubble-black" border="0"
                                           alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
                                     </c:if>
                                 </td><%-- closed --%>
                                 <td class="table_cell">
-                                    <c:set var="discNoteCount" value="${discNoteMap['Not Applicable']}"/>
-                                    <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon-flag-empty blue" border="0"
-                                          alt="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" title="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" align="left"/>
-                                        (${discNoteCount})
-                                        <c:set var="discNoteCount" value="${0}"/>
-                                    </c:if>
-                                </td><%-- N/A --%>
-                                <td class="table_cell">
                                     <a onmouseup="javascript:setImage('bt_View1','images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','images/bt_View_d.gif');" href="EnterDataForStudyEvent?eventId=${displayStudyEventBean.studyEvent.id}">
-                                        <img hspace="6" border="0" align="left" title="View" alt="View" src="images/bt_View.gif" name="bt_View1"/>
+                                        <span hspace="6" border="0" align="left" title="View" alt="View" class="icon icon-search" name="bt_View1"/>
                                     </a>
                                 </td>
                             </tr>
