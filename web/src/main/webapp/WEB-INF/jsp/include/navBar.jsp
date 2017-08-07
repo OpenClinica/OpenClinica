@@ -74,8 +74,24 @@
      <div class="oc_nav">
         <div class="nav-top-bar">
         <!-- Logo -->
-            <div class="logo"><a href="MainMenu"><img src="images/logo-color-on-dark.svg" alt="OpenClinica Logo" /></a></div>
+    
+            <div class="logo">
+                <c:set var="isLogo"/>
+                <c:set var="isHref"/>
+                
+                <c:if test="${param.isSpringController}">
+                    <c:set var="isHref" value="../MainMenu" />
+                    <c:set var="isLogo" value="../images/logo-color-on-dark.svg" />
+                </c:if>
 
+                <c:if test="${!param.isSpringController}">
+                    <c:set var="isHref" value="MainMenu" />
+                    <c:set var="isLogo" value="images/logo-color-on-dark.svg" />
+                </c:if>
+
+                <a href="${isHref}"><img src="${isLogo}" alt="OpenClinica Logo" /></a>
+            </div>
+            
             <div id="StudyInfo">
                 <c:choose>
                     <c:when test='${study.parentStudyId > 0}'>
