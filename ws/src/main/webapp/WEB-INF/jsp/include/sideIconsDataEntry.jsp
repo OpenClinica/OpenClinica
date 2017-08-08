@@ -4,6 +4,8 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="reswords"/>
 
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
+
 <tr id="sidebar_IconKey_open">
 		<td class="sidebar_tab">
 
@@ -13,11 +15,11 @@
 
 		<table border="0" cellpadding="4" cellspacing="0">
 			<tr>
-				<td><img src="images/icon_Note.gif"></td>
+				<td><span class="fa fa-bubble-red"></td>
 				<td><fmt:message key="discrepancy_note" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
-				<td><img src="images/icon_noNote.gif"></td>
+				<td><span class="fa fa-bubble-blue"></td>
 				<td><fmt:message key="add_discrepancy_note" bundle="${reswords}"/></td>
 			</tr>
 			<tr>

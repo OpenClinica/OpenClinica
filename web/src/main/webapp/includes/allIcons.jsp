@@ -12,6 +12,7 @@
 <link rel="stylesheet" href="../includes/styles.css" type="text/css">
 <%--<link rel="stylesheet" href="../includes/styles2.css" type="text/css">--%>
 
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 
 <script type="text/JavaScript" language="JavaScript" src="../includes/global_functions_javascript.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="../includes/Tabs.js"></script>
@@ -60,11 +61,11 @@
 				<td><fmt:message key="print" bundle="${resword}"/></td>
 			</tr>
 			<tr>
-				<td><img src="../images/icon_Note.gif"></td>
+				<td><span class="fa fa-bubble-red"></td>
 				<td><fmt:message key="discrepancy_note" bundle="${resword}"/></td>
 			</tr>
 			<tr>
-				<td><img src="../images/icon_noNote.gif"></td>
+				<td><span class="fa fa-bubble-blue"></td>
 				<td><fmt:message key="add_discrepancy_note" bundle="${resword}"/></td>
 			</tr>
 			<tr>

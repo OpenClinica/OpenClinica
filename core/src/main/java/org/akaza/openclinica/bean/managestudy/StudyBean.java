@@ -75,7 +75,7 @@ public class StudyBean extends AuditableEntityBean {
     private boolean resultsReference = false;
     private String schemaName = "";
     private StudyEnvEnum envType;
-    private String uuid;
+    private String studyEnvSiteUuid;
     private String studyEnvUuid;
 
     public String getStudyEnvUuid() {
@@ -288,12 +288,12 @@ public class StudyBean extends AuditableEntityBean {
         this.envType = envType;
     }
 
-    public String getUuid() {
-        return this.uuid;
+    public String getStudyEnvSiteUuid() {
+        return this.studyEnvSiteUuid;
     }
 
-    public void setUuid(String uuid) {
-        this.uuid = uuid;
+    public void setStudyEnvSiteUuid(String studyEnvSiteUuid) {
+        this.studyEnvSiteUuid = studyEnvSiteUuid;
     }
     /**
      * @param collaborators

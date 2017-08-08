@@ -46,7 +46,7 @@ public class SiteBuildServiceImpl implements SiteBuildService {
             site.setStatus(Status.AVAILABLE);
             site.setOwner(ownerUserAccount);
             site.setParentStudyId(parentStudy.getId());
-            site.setUuid(siteBean.getUuid());
+            site.setStudyEnvSiteUuid(siteBean.getStudyEnvSiteUuid());
             StudyBean createdSite = studyController.createStudyWithDatasource(site, dataSource);
             StudyUserRoleBean sub = null;
         } catch (Exception e) {

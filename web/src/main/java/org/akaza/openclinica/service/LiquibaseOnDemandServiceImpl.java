@@ -75,7 +75,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemaStudy.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             schemaStudy.setDateCreated(new Date());
             schemaStudy.setEnvType(studyInfoObject.getStudy().getEnvType());
-            schemaStudy.setUuid(studyInfoObject.getStudy().getUuid());
+            schemaStudy.setStudyEnvSiteUuid(studyInfoObject.getStudy().getStudyEnvSiteUuid());
             schemaStudy.setStudyEnvUuid(studyInfoObject.getStudy().getStudyEnvUuid());
             schemaServiceDao.setConnectionSchemaName(studyInfoObject.getSchema());
             studyDao.getCurrentSession().clear();

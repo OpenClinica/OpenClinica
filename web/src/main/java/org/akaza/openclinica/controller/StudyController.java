@@ -172,7 +172,6 @@ import java.util.regex.Pattern;
         String name = (String) map.get("briefTitle");
         String studyOid = (String) map.get("studyEnvOid");
         String studyEnvUuid = (String) map.get("studyEnvUuid");
-        String uuid = (String) map.get("uuid");
 
         Matcher m = Pattern.compile("(.+)\\((.+)\\)").matcher(studyOid);
         String envType = "";
@@ -207,12 +206,7 @@ import java.util.regex.Pattern;
         } else {
             studyOid = studyOid.trim();
         }
-        if (StringUtils.isEmpty(uuid)) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "uuid");
-            errorObjects.add(errorOBject);
-        } else {
-            uuid = uuid.trim();
-        }
+
         if (StringUtils.isEmpty(studyEnvUuid)) {
             ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "studyEnvUuid");
             errorObjects.add(errorOBject);
@@ -227,7 +221,6 @@ import java.util.regex.Pattern;
         request.setAttribute("uniqueProId", uniqueStudyID);
         request.setAttribute("name", name); // Brief Title
         request.setAttribute("oid", studyOid);
-        request.setAttribute("uuid", uuid);
         request.setAttribute("envType", envType);
         request.setAttribute("studyEnvUuid", studyEnvUuid);
         ResponseEntity<HashMap> responseEntity = processSSOUserContext(request, studyEnvUuid);
@@ -264,14 +257,6 @@ import java.util.regex.Pattern;
             errorObjects.add(errorOBject);
         }
 
-        Validator v3 = new Validator(request);
-        v3.addValidation("uuid", Validator.NO_BLANKS);
-        HashMap vError3 = v3.validate();
-        if (!vError3.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "uuid");
-            errorObjects.add(errorOBject);
-        }
-
         Validator v4 = new Validator(request);
         v4.addValidation("role", Validator.NO_LEADING_OR_TRAILING_SPACES);
         HashMap vError4 = v4.validate();
@@ -293,7 +278,6 @@ import java.util.regex.Pattern;
         study.setOc_oid(studyOid);
         study.setEnvType(StudyEnvEnum.valueOf(envType));
         study.setStudyEnvUuid(studyEnvUuid);
-        study.setUuid(uuid);
         Study byOidEnvType = studyDao.findByOidEnvType(studyOid, StudyEnvEnum.valueOf(envType));
         if (byOidEnvType != null && byOidEnvType.getOc_oid() != null) {
             return getResponseSuccess(byOidEnvType);
@@ -412,7 +396,10 @@ import java.util.regex.Pattern;
                         return null;
                     OCUserDTO userDTO = userInfo.getBody();
                     map.put("email", userDTO.getEmail());
-                    map.put("institution", userDTO.getOrganization());
+                    if (StringUtils.isEmpty(userDTO.getOrganization()))
+                        map.put("institution", "");
+                    else
+                        map.put("institution", userDTO.getOrganization());
                     map.put("fName", userDTO.getFirstName());
                     map.put("lName", userDTO.getLastName());
                     map.put("user_uuid", userDTO.getUuid());
@@ -502,11 +489,11 @@ import java.util.regex.Pattern;
     }
 
     /**
-     * @api {post} /pages/auth/api/v1/studies/:uniqueStudyId/sites Create a site
+     * @api {post} /pages/auth/api/v1/studies/:studyEnvUuid/sites Create a site
      * @apiName createNewSite
      * @apiPermission Authenticate using api-key. admin
      * @apiVersion 3.8.0
-     * @apiParam {String} uniqueProtococlId Study unique study ID.
+     * @apiParam {String} studyEnvUuid Study environment uuid.
      * @apiParam {String} briefTitle Brief Title .
      * @apiParam {String} principalInvestigator Principal Investigator Name.
      * @apiParam {Integer} expectedTotalEnrollment Expected Total Enrollment number
@@ -541,7 +528,7 @@ import java.util.regex.Pattern;
      * "principalInvestigator": "Principal Investigator Name",
      * "expectedTotalEnrollment": "10",
      * "errors": [
-     * { "field": "UniqueStudyId", "resource": "Site Object","code": "Unique Study Id exist in the System" }
+     * { "field": "studyEnvUuid", "resource": "Site Object","code": "Unique Study Id exist in the System" }
      * ],
      * "secondaryProId": "Secondary Study ID 1",
      * "siteOid": null,
@@ -552,7 +539,7 @@ import java.util.regex.Pattern;
      * { "role": "Monitor","username": "dm_normal"},
      * { "role": "Data Entry Person","username": "sd_root"}
      * ],
-     * "uniqueSiteStudyID": "Site Study ID",
+     * "studyEnvUuid": "Site Study ID",
      * "startDate": "2011-11-11"
      * }
      * @apiSuccessExample {json} Success-Response:
@@ -564,9 +551,9 @@ import java.util.regex.Pattern;
      * }
      */
 
-    @RequestMapping(value = "/{parentStudyID}/sites", method = RequestMethod.POST) public ResponseEntity<Object> createNewSites(HttpServletRequest request,
-            @RequestBody HashMap<String, Object> map, @PathVariable("parentStudyID") String parentStudyID) throws Exception {
-        logger.debug("Creating site(s) for study:" + parentStudyID);
+    @RequestMapping(value = "/{studyEnvUuid}/sites", method = RequestMethod.POST) public ResponseEntity<Object> createNewSites(HttpServletRequest request,
+            @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
+        logger.debug("Creating site(s) for study:" + studyEnvUuid);
         ArrayList<ErrorObject> errorObjects = new ArrayList();
         StudyBean siteBean = null;
         ResponseEntity<Object> response = null;
@@ -583,8 +570,7 @@ import java.util.regex.Pattern;
         String startDate = (String) map.get("startDate");
         String studyDateVerification = (String) map.get("studyDateVerification");
         String secondaryProId = (String) map.get("secondaryStudyID");
-        String studyEnvUuid = (String) map.get("studyEnvUuid");
-        String uuid = (String) map.get("uuid");
+        String studyEnvSiteUuid = (String) map.get("studyEnvSiteUuid");
         ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("assignUserRoles");
 
         ArrayList<UserRole> userList = new ArrayList<>();
@@ -707,14 +693,14 @@ import java.util.regex.Pattern;
             }
         }
 
-        StudyBean parentStudy = getStudyByUniqId(parentStudyID);
+        StudyBean parentStudy = getStudyByEnvId(studyEnvUuid);
         if (parentStudy == null) {
             ErrorObject errorOBject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Id",
-                    "Unique Study Study Id");
+                    "Study Env Uuid");
             errorObjects.add(errorOBject);
         } else if (parentStudy.getParentStudyId() != 0) {
             ErrorObject errorOBject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Study Id",
-                    "Unique Study Study Id");
+                    "Study Env Uuid");
             errorObjects.add(errorOBject);
         }
 
@@ -785,12 +771,12 @@ import java.util.regex.Pattern;
             siteBean = buildSiteBean(uniqueSiteStudyID, name, principalInvestigator, Integer.valueOf(expectedTotalEnrollment), formattedStartDate,
                     formattedStudyDate, secondaryProId, ownerUserAccount, parentStudy.getId());
             siteBean.setSchemaName(parentStudy.getSchemaName());
-            siteBean.setUuid(uuid);
+            siteBean.setStudyEnvSiteUuid(studyEnvSiteUuid);
             siteBean.setStudyEnvUuid(parentStudy.getStudyEnvUuid());
             StudyBean sBean = createStudy(siteBean, ownerUserAccount);
             // get the schema study
             request.setAttribute("requestSchema", parentStudy.getSchemaName());
-            StudyBean schemaStudy = getStudyByUniqId(parentStudyID);
+            StudyBean schemaStudy = getStudyByEnvId(studyEnvUuid);
             siteBuildService.process(schemaStudy, sBean, ownerUserAccount, userList);
             siteDTO.setSiteOid(sBean.getOid());
             siteDTO.setMessage(validation_passed_message);
@@ -1143,6 +1129,12 @@ import java.util.regex.Pattern;
     private StudyBean getStudyByUniqId(String uniqueId) {
         sdao = new StudyDAO(dataSource);
         StudyBean studyBean = (StudyBean) sdao.findByUniqueIdentifier(uniqueId);
+        return studyBean;
+    }
+
+    private StudyBean getStudyByEnvId(String envUuid) {
+        sdao = new StudyDAO(dataSource);
+        StudyBean studyBean = (StudyBean) sdao.findByStudyEnvUuid(envUuid);
         return studyBean;
     }
 
