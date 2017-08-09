@@ -216,8 +216,8 @@ function setYPos(id) {
 			<input type="hidden" name="typeId${parentId}" value="${param.typeId}"/>
 		</c:when>
 		<c:otherwise>
-			<div class="dnBoxCol1"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
-			<div class="dnBoxCol2"><div class="formfieldL_BG">
+			<div class="dnBoxCol1" style="display: none;"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
+			<div class="dnBoxCol2" style="display: none;"><div class="formfieldL_BG">
 				<c:set var="typeIdl" value="${discrepancyNote.discrepancyNoteTypeId}"/>
 				<c:choose>
 				<c:when test="${whichResStatus == 22 || whichResStatus == 1}">
