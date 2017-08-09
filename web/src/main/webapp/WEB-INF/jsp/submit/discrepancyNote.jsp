@@ -283,8 +283,8 @@ function setYPos(id) {
 		</c:choose>
 		
 		<span id="res1${parentId}">
-			<div class="dnBoxCol1"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
-			<div class="dnBoxCol2">
+			<div class="dnBoxCol1" style="display:none;"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
+			<div class="dnBoxCol2" style="display:none;">
 				<div class="formfieldL_BG">
 				<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
 			    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL">
