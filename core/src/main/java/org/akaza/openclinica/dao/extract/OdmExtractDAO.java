@@ -3540,9 +3540,10 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
     protected String getEventGroupItemWithUnitSql(String studyIds, String sedIds, String itemIds, String dateConstraint, int datasetItemStatusId,
             String studySubjectIds) {
         return "select cvit.*, mu.oc_oid as mu_oid from ("
-            + this.getEventGroupItemSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds)
-            + " )cvit left join (select item.item_id, mu.oc_oid from versioning_map vm, item, measurement_unit mu where vm.item_id in " + itemIds
-            + " and vm.item_id = item.item_id and item.units = mu.name )mu on cvit.item_id = mu.item_id";
+                + this.getEventGroupItemSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds)
+                + " )cvit left join (select item.item_id, mu.oc_oid from versioning_map vm, item, measurement_unit mu where vm.item_id in " + itemIds
+                + " and vm.item_id = item.item_id and item.units = mu.name )mu on cvit.item_id = mu.item_id"
+                + " ORDER BY cvit.event_crf_id, cvit.item_group_id, cvit.item_id, cvit.item_data_ordinal";
     }
 
     protected String getItemGroupAndItemMetaWithUnitSql(String crfVersionIds) {
