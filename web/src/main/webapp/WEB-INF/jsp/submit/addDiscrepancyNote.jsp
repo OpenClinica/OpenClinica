@@ -225,8 +225,8 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes"/></jsp:include>
 	</div>
 	
-	<div class="dnBoxCol1 dnBoxText"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
-	<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG">
+	<div class="dnBoxCol1 dnBoxText" style="display: none;"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
+	<div class="dnBoxCol2 dnBoxText" style="display: none;"><div class="formfieldL_BG">
 		<c:choose>
 		<c:when test="${parentId > 0}">
 			<input type="hidden" name="typeId" value="${param.typeId}"/>
@@ -268,8 +268,8 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 	</div></div>
 		
 	<span id="res1${parentId}">
-		<div class="dnBoxCol1 dnBoxText" style="display:none"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
-		<div class="dnBoxCol2 dnBoxText" style="display:none"><div class="formfieldL_BG">
+		<div class="dnBoxCol1 dnBoxText" style="display: none;"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert" >*</span></div>
+		<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG" style="display: none;">
 			<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
 		    <select name="resStatusId" id="resStatusId" class="formfieldL">
 				<c:set var="resStatuses" value="${resolutionStatuses}"/>
