@@ -14,5 +14,5 @@ import java.util.List;
  */
 public interface SiteBuildService {
     Logger logger = LoggerFactory.getLogger(SiteBuildService.class);
-    public void process(StudyBean parentStudy, StudyBean siteBean, UserAccountBean ownerUserAccount, List<UserRole> userList) throws Exception;
+    public void process(StudyBean parentStudy, StudyBean siteBean, UserAccountBean ownerUserAccount) throws Exception;
 }

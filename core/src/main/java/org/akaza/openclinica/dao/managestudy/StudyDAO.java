@@ -398,6 +398,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.setTypesExpected();
         HashMap variables = new HashMap();
         variables.put(new Integer(1), uuid);
+        variables.put(new Integer(2), uuid);
         ArrayList alist = this.select(digester.getQuery("findByStudyEnvUuid"), variables);
         Iterator it = alist.iterator();
 
@@ -466,8 +467,14 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         variables.put(new Integer(18), sb.getAgeMin());
         variables.put(new Integer(19), new Boolean(sb.getHealthyVolunteerAccepted()));
         variables.put(new Integer(20), sb.getSchemaName());
-        variables.put(new Integer(21), sb.getStudyEnvSiteUuid());
-        variables.put(new Integer(22), new Integer(sb.getId()));
+        if (sb.getStudyEnvUuid() == null) {
+            nullVars.put(new Integer(21), new Integer(TypeNames.STRING));
+            variables.put(new Integer(21), null);
+        } else {
+            variables.put(new Integer(21), sb.getStudyEnvUuid());
+        }
+        variables.put(new Integer(22), sb.getStudyEnvSiteUuid());
+        variables.put(new Integer(23), new Integer(sb.getId()));
         this.execute(digester.getQuery("createStepTwo"), variables, nullVars);
         return sb;
     }
@@ -602,7 +609,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         eb.setSchemaName((String) hm.get("schema_name"));
         if (StringUtils.isNotEmpty((String)hm.get("env_type")))
             eb.setEnvType(StudyEnvEnum.valueOf((String)hm.get("env_type")));
-        eb.setStudyEnvSiteUuid((String) hm.get("studyEnvSiteUuid"));
+        eb.setStudyEnvSiteUuid((String) hm.get("study_env_site_uuid"));
         eb.setStudyEnvUuid((String)hm.get("study_env_uuid"));
         return eb;
     }
