@@ -14,6 +14,7 @@ import org.akaza.openclinica.bean.oid.StudyOidGenerator;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.dao.core.CoreResources;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -1131,4 +1132,7 @@ public class StudyBean extends AuditableEntityBean {
         return parentStudyId > 0 ? true : false;
     }
 
+    public String getManager() {
+        return CoreResources.getStudyManager();
+    }
 }

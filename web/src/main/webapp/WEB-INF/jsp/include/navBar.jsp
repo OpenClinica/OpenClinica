@@ -83,26 +83,26 @@
                 <c:set var="isLogo" value="images/logo-color-on-dark.svg" />
             </c:if>
 
-            <a href="${isHref}"><img src="${isLogo}" alt="OpenClinica Logo" /></a>
-        </div>
-
-        <div id="StudyInfo">
-            <c:choose>
-                <c:when test='${study.parentStudyId > 0}'>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes"
-                          title="<c:out value='${study.parentStudyName}'/>"
-                          alt="<c:out value='${study.parentStudyName}'/>" ><c:out value="${study.abbreviatedParentStudyName}" /></a>
-                        :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.id}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
-                </c:when>
-                <c:otherwise>
-                    <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
-                </c:otherwise>
-            </c:choose>
-            (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;(<c:out value="${study.envType}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
-            &nbsp;&nbsp;|&nbsp;&nbsp;
-            <a href="#"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a>
-        </div>
+                <a href="${isHref}"><img src="${isLogo}" alt="OpenClinica Logo" /></a>
+            </div>
+            
+            <div id="StudyInfo">
+                <c:choose>
+                    <c:when test='${study.parentStudyId > 0}'>
+                        <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes"
+                            title="<c:out value='${study.parentStudyName}'/>"
+                            alt="<c:out value='${study.parentStudyName}'/>" ><c:out value="${study.abbreviatedParentStudyName}" /></a>
+                            :&nbsp;<a href="${urlPrefix}ViewSite?id=${study.id}" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                    </c:when>
+                    <c:otherwise>
+                        <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
+                    </c:otherwise>
+                </c:choose>
+                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
+                &nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a>
+            </div>
 
         <div id="UserInfo">
             <div id="userDropdown">

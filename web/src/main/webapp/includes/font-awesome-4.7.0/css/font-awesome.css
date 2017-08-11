@@ -548,17 +548,13 @@
   content: "\f075";
   margin: 0 10px 0 10px;
   padding: 0;
-  color: black;
+  color: #555555;
   background: none;
   border: none;
   box-shadow: none;
   opacity: 0.7; }
-  .btn-icon-only:hover, .btn-icon-only:focus, .btn-icon-only:active, .btn-icon-only.active, .btn-icon-only:disabled, .btn-icon-only.disabled {
-    background: none;
-    box-shadow: none; 
-  }
-  .btn-icon-only:hover {
-    color: #333333;
+  .fa-bubble-black:hover {
+    color: #555555;
     opacity: 0.5; 
   }
 }
@@ -611,17 +607,13 @@
   content: "\f075";
   margin: 0 10px 0 10px;
   padding: 0;
-  color: red;
+  color: #ff8080;
   background: none;
   border: none;
   box-shadow: none;
   opacity: 0.7; }
-  .btn-icon-only:hover, .btn-icon-only:focus, .btn-icon-only:active, .btn-icon-only.active, .btn-icon-only:disabled, .btn-icon-only.disabled {
-    background: none;
-    box-shadow: none; 
-  }
-  .btn-icon-only:hover {
-    color: #333333;
+  .fa-bubble-red:hover {
+    color: #ff8080;
     opacity: 0.5; 
   }
 }
