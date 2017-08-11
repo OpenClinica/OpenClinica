@@ -434,6 +434,10 @@ public class CoreResources implements ResourceLoaderAware {
 
     }
 
+    public static String getStudyManager(){
+        return DATAINFO.getProperty("smURL");
+    }
+
     private void setMailProps() {
 
         DATAINFO.setProperty("mail.host", DATAINFO.getProperty("mailHost"));

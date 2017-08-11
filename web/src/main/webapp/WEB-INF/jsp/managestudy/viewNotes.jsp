@@ -143,22 +143,22 @@
     <c:if test="${empty summaryMap}"><fmt:message key="There_are_no_discrepancy_notes" bundle="${resword}"/></c:if>
     <!-- NEW Summary-->
     <table border="0" cellspacing="0" class="summaryTable" style="width:600px;">
-        <tr><td>&nbsp;</td>
+        <tr><td><b>Status</b></td>
             <td>&nbsp;</td>
-            <td align="center"><strong>Query</strong></td>
+            <td align="center"><strong>Queries</strong></td>
         </tr>
-            <c:forEach var="status" items="${mapKeys}">
-                <tr>
-                    <td><strong>${status.name}</strong></td>
-                    <td><span class="${status.iconFilePath}" border="0" align="right"></td>
-                    <td align="center"> ${summaryMap[status.name]['Total']}</td>
-                </tr>
-            </c:forEach>
+        <c:forEach var="status" items="${mapKeys}">
+            <tr>
+                <td><strong>${status.name}</strong></td>
+                <td><span class="${status.iconFilePath}" border="0" align="right"></td>
+                <td align="center"> ${summaryMap[status.name]['Total']}</td>
+            </tr>
+        </c:forEach>
         <tr>
             <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
         </tr>
         <tr>
-            <td>&nbsp;</td><td>&nbsp;</td>
+            <td><b>Total</b></td><td>&nbsp;</td>
             <td align="center">${grandTotal}</td>
         </tr>
     </table>
