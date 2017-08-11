@@ -217,7 +217,7 @@
                                             </c:if></b>
                                     </div>
                                     <div style="float: right; padding-left: 30px;">
-                                    	<fmt:message key="Last_updated" bundle="${resword}"/>: <b><fmt:formatDate value="${note.value.lastDateUpdated}" pattern="${dteFormat}"/> by <c:out value="${note.value.owner.name}"/></b><br>
+                                    	<fmt:message key="Last_updated" bundle="${resword}"/>: <b><fmt:formatDate value="${note.value.lastDateUpdated}" pattern="${dteFormat}"/> by <c:out value="${note.value.lastUpdator.name}"/></b><br>
                                     	<fmt:message key="Assigned_to" bundle="${resword}"/>:&nbsp;&nbsp;  <b> <c:out value="${note.value.assignedUser.firstName}"/> <c:out value="${note.value.assignedUser.lastName}"/> (<c:out value ="${note.value.assignedUser.name}"/>)
                                     </div>
                                 </td>
