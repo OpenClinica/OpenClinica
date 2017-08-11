@@ -341,7 +341,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                                     <span id="flag_interviewer" name="flag_interviewer" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
                                 </c:when>
                                 <c:otherwise>
-                                    <span id="flag_interviewer" name="flag_interviewer" class="fa fa-bubble-blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
+                                    <span id="flag_interviewer" name="flag_interviewer" class="fa fa-bubble-black" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">
                                 </c:otherwise>
                             </c:choose>
                         </a>
@@ -427,7 +427,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                                     <span id="flag_interviewDate" name="flag_interviewDate" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                 </c:when>
                                 <c:otherwise>
-                                    <span id="flag_interviewDate" name="flag_interviewDate" class="fa fa-bubble-blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                    <span id="flag_interviewDate" name="flag_interviewDate" class="fa fa-bubble-black" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                 </c:otherwise>
                             </c:choose>
                         </a>
