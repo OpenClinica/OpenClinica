@@ -220,7 +220,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 <div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:<span class="alert">*</span></div>
 	<div class="dnBoxCol2 dnBoxText">
 		<div class="formtextareaXL4_BG">
-	  		<textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
+	  		<textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4"></textarea>
 		</div>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes"/></jsp:include>
 	</div>
