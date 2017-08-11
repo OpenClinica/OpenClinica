@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.dao.core.CoreResources;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -169,12 +170,6 @@ public class StudyBean extends AuditableEntityBean {
             identifier = identifier.substring(0, 22) + "...";
         }
         return identifier;
-    }
-
-    public String getStudyManager() {
-        String sm = CoreResources.returnStudyManager();
-        
-        return sm;
     }
 
     /**
@@ -1095,4 +1090,7 @@ public class StudyBean extends AuditableEntityBean {
         return parentStudyId > 0 ? true : false;
     }
 
+    public String getManager() {
+        return CoreResources.getStudyManager();
+    }
 }
