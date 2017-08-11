@@ -21,6 +21,7 @@ public class EnketoFormServlet extends SecureController {
     private static final long serialVersionUID = 6508949502349649137L;
 
     public static final String ORIGINATING_PAGE = "originatingPage";
+    public static final String STUDYSUBJECTID = "studySubjectId";
     public static final String MODE = "mode";
     public static final String FORM_URL1 = "formURL1";
     public static final String FORM_URL2 = "formURL2";
@@ -86,7 +87,9 @@ public class EnketoFormServlet extends SecureController {
 
         // request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
-
+        if (studyEvent != null) {
+            request.setAttribute(STUDYSUBJECTID, studyEvent.getStudySubject().getLabel());
+        }
         forwardPage(Page.ENKETO_FORM_SERVLET);
     }
 
