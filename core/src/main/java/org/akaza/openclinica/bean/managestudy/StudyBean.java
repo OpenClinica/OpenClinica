@@ -13,7 +13,6 @@ import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.oid.StudyOidGenerator;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.dao.core.CoreResources;
 
 import java.util.ArrayList;
 import java.util.Date;

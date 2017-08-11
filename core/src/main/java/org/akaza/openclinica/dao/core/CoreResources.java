@@ -383,8 +383,6 @@ public class CoreResources implements ResourceLoaderAware {
             DATAINFO.setProperty("designer.url", designerURL);
         }
 
-        String smURL = DATAINFO.getProperty("smURL");
-
         String xformEnabled = DATAINFO.getProperty("xformEnabled");
         if (xformEnabled == null || xformEnabled.isEmpty())
             DATAINFO.setProperty("xformEnabled", "");
@@ -408,12 +406,6 @@ public class CoreResources implements ResourceLoaderAware {
 
     }
 
-    public static String returnStudyManager(){
-        //String smURL = DATAINFO.getProperty("designerURL");
-        String smURL = DATAINFO.getProperty("smURL");
-        return smURL;
-    }
-
     private void setMailProps() {
 
         DATAINFO.setProperty("mail.host", DATAINFO.getProperty("mailHost"));
@@ -433,11 +425,6 @@ public class CoreResources implements ResourceLoaderAware {
     private void setRuleDesignerProps() {
 
         DATAINFO.setProperty("designer.url", DATAINFO.getProperty("designerURL"));
-    }
-
-    private void setRulesmProps() {
-
-        DATAINFO.setProperty("sm.url", DATAINFO.getProperty("smURL"));
     }
 
     public static void setSchema(Connection conn) throws SQLException {
