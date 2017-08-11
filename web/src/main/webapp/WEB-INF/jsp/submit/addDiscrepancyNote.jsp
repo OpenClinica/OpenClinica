@@ -12,6 +12,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 
 <html>
 <head>
@@ -121,7 +122,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 <body style="margin: 0px 12px 0px 12px;" onload="javascript:setStatus('<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
 <%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%>
 <div style="float: left;"><h1 class="title_manage"><c:out value="${entityName}"/>: Add Query</h1></div>
-<div style="float: right;"><a href="#" onclick="javascript:window.close();"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a></div>
+<div style="float: right;"><a href="#" onclick="javascript:window.close();"><i name="close_box" class="fa fa-times"></i></a></div>
 <div style="clear:both;"></div> 
 <div class="alert">
 <c:forEach var="message" items="${pageMessages}">
