@@ -69,25 +69,23 @@
 <div class="oc_nav">
     <div class="nav-top-bar">
         <!-- Logo -->
-        <div class="logo"><a href="MainMenu"><img src="images/logo-color-on-dark.svg" alt="OpenClinica Logo" /></a></div>
+        <div class="logo">
+            <c:set var="isLogo"/>
+            <c:set var="isHref"/>
 
-            <div class="logo">
-                <c:set var="isLogo"/>
-                <c:set var="isHref"/>
+            <c:if test="${param.isSpringController}">
+                <c:set var="isHref" value="../MainMenu" />
+                <c:set var="isLogo" value="../images/logo-color-on-dark.svg" />
+            </c:if>
 
-                <c:if test="${param.isSpringController}">
-                    <c:set var="isHref" value="../MainMenu" />
-                    <c:set var="isLogo" value="../images/logo-color-on-dark.svg" />
-                </c:if>
-
-                <c:if test="${!param.isSpringController}">
-                    <c:set var="isHref" value="MainMenu" />
-                    <c:set var="isLogo" value="images/logo-color-on-dark.svg" />
-                </c:if>
+            <c:if test="${!param.isSpringController}">
+                <c:set var="isHref" value="MainMenu" />
+                <c:set var="isLogo" value="images/logo-color-on-dark.svg" />
+            </c:if>
 
                 <a href="${isHref}"><img src="${isLogo}" alt="OpenClinica Logo" /></a>
             </div>
-
+            
             <div id="StudyInfo">
                 <c:choose>
                     <c:when test='${study.parentStudyId > 0}'>
@@ -103,7 +101,7 @@
                 (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
-                <a href="#"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a>
+                <a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a>
             </div>
 
         <div id="UserInfo">
@@ -113,8 +111,6 @@
                         <!-- First Tier Drop Down -->
                         <ul class="dropdown_BG">
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a></li>
-                            <li><a href="#">Account</a></li>
-                            <li><a href="#">Billing</a></li>
                             <li> <a href="${urlPrefix}pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
                         </ul>
                     </li>

@@ -12,6 +12,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 
 <html>
 <head>
@@ -121,7 +122,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 <body style="margin: 0px 12px 0px 12px;" onload="javascript:setStatus('<c:out value="${discrepancyNote.discrepancyNoteTypeId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
 <%-- needs to run at first to possibly gray out the drop down, tbh 02/2010--%>
 <div style="float: left;"><h1 class="title_manage"><c:out value="${entityName}"/>: Add Query</h1></div>
-<div style="float: right;"><a href="#" onclick="javascript:window.close();"><img name="close_box" alt="<fmt:message key="Close_Box" bundle="${resword}"/>" src="images/bt_Remove.gif" class="icon_dnBox"></a></div>
+<div style="float: right;"><a href="#" onclick="javascript:window.close();"><i name="close_box" class="fa fa-times"></i></a></div>
 <div style="clear:both;"></div> 
 <div class="alert">
 <c:forEach var="message" items="${pageMessages}">
@@ -220,13 +221,13 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 <div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:<span class="alert">*</span></div>
 	<div class="dnBoxCol2 dnBoxText">
 		<div class="formtextareaXL4_BG">
-	  		<textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
+	  		<textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4"></textarea>
 		</div>
 		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes"/></jsp:include>
 	</div>
 	
-	<div class="dnBoxCol1 dnBoxText"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
-	<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG">
+	<div class="dnBoxCol1 dnBoxText" style="display: none;"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
+	<div class="dnBoxCol2 dnBoxText" style="display: none;"><div class="formfieldL_BG">
 		<c:choose>
 		<c:when test="${parentId > 0}">
 			<input type="hidden" name="typeId" value="${param.typeId}"/>
@@ -268,8 +269,8 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 	</div></div>
 		
 	<span id="res1${parentId}">
-		<div class="dnBoxCol1 dnBoxText"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
-		<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG">
+		<div class="dnBoxCol1 dnBoxText" style="display: none;"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert" >*</span></div>
+		<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG" style="display: none;">
 			<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
 		    <select name="resStatusId" id="resStatusId" class="formfieldL">
 				<c:set var="resStatuses" value="${resolutionStatuses}"/>
