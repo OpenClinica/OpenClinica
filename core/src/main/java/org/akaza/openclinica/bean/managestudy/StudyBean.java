@@ -172,12 +172,6 @@ public class StudyBean extends AuditableEntityBean {
         return identifier;
     }
 
-    public String getStudyManager() {
-        String sm = CoreResources.returnStudyManager();
-        
-        return sm;
-    }
-
     /**
      * @return Returns the ageMax.
      */
@@ -1096,4 +1090,7 @@ public class StudyBean extends AuditableEntityBean {
         return parentStudyId > 0 ? true : false;
     }
 
+    public String getReturnToMyStudies() {
+        return CoreResources.getLinkStudies();
+    }
 }
