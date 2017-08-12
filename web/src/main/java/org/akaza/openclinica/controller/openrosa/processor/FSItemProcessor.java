@@ -180,6 +180,10 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
                     // Close discrepancy notes
                     closeItemDiscrepancyNotes(container, existingItemData);
+                } else {
+                    ItemData newItemData = createItemData(ig.getItem(), "", itemOrdinal, container);
+                    newItemData.setDeleted(true);
+                    newItemData = itemDataDao.saveOrUpdate(newItemData);
                 }
             }
             return;
