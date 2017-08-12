@@ -165,6 +165,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             for (ItemGroupMetadata ig : igms) {
                 ItemData existingItemData = itemDataDao.findByItemEventCrfOrdinal(ig.getItem().getItemId(), container.getEventCrf().getEventCrfId(),
                         itemOrdinal);
+                int maxRowCount = itemDataDao.getMaxCountByEventCrfGroup(container.getEventCrf().getEventCrfId(), ig.getItemGroup().getItemGroupId());
 
                 // ItemData existingItemData = lookupFieldItemData(itemGroup, itemOrdinal, container);
                 if (existingItemData != null) {
@@ -180,7 +181,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
                     // Close discrepancy notes
                     closeItemDiscrepancyNotes(container, existingItemData);
-                } else {
+                } else if (itemOrdinal < maxRowCount) {
                     ItemData newItemData = createItemData(ig.getItem(), "", itemOrdinal, container);
                     newItemData.setDeleted(true);
                     newItemData = itemDataDao.saveOrUpdate(newItemData);
