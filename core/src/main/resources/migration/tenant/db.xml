@@ -943,9 +943,6 @@
             <column name="is_durable" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
-            <column name="is_stateful" type="BOOLEAN">
-                <constraints nullable="false"/>
-            </column>
             <column name="requests_recovery" type="BOOLEAN">
                 <constraints nullable="false"/>
             </column>
