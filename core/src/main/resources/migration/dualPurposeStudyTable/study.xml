@@ -67,9 +67,12 @@
             </column>
             <column defaultValueNumeric="1" name="old_status_id" type="INT"/>
             <column name="study_env_uuid" type="VARCHAR(64)"/>
-            <column name="uuid" type="VARCHAR(64)"/>
+            <column name="study_env_site_uuid" type="VARCHAR(64)"/>
             <column name="env_type" type="VARCHAR(32)"/>
             <column name="schema_name" type="VARCHAR(64)"/>
         </createTable>
+        <createIndex indexName="index_study_env_site_uuid" tableName="study" unique="true">
+            <column name="study_env_site_uuid"/>
+        </createIndex>
     </changeSet>
 </databaseChangeLog>

@@ -82,6 +82,7 @@
 		<name>findByStudyEnvUuid</name>
 		<sql>SELECT s.* FROM study s
 			WHERE s.study_env_uuid = ?
+			or s.study_env_site_uuid = ?
 		</sql>
 	</query>
     <query>
@@ -128,7 +129,7 @@
 		SPONSOR=?, COLLABORATORS=?, MEDLINE_IDENTIFIER=?, results_reference=?,
 		URL=?,URL_DESCRIPTION=?, CONDITIONS=?, KEYWORDS=?, ELIGIBILITY=?,
 		GENDER=?, AGE_MAX=?, AGE_MIN=?, HEALTHY_VOLUNTEER_ACCEPTED=?,
-        SCHEMA_NAME=?, UUID=?
+        SCHEMA_NAME=?, STUDY_ENV_UUID=?, STUDY_ENV_SITE_UUID=?
 		WHERE STUDY_ID=?
       </sql>
 	</query>

@@ -108,7 +108,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             CoreResources.setRootUserAccountBean(request, dataSource);
                             request.getSession().setAttribute("userContextMap", userContextMap);
                             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-                            UserAccountBean ub = (UserAccountBean) userAccountDAO.findByApiKey(_username);
+                            UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid((String) userContextMap.get("userUuid"));
                             if (StringUtils.isNotEmpty(_username) && ub.getId() != 0) {
                                 Authentication authentication = new UsernamePasswordAuthenticationToken(_username, null,
                                         AuthorityUtils.createAuthorityList("ROLE_USER"));

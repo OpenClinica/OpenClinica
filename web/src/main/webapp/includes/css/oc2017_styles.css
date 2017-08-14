@@ -1,6 +1,5 @@
 /* Load web fonts */
 @import url("https://fonts.googleapis.com/css?family=Didact+Gothic|Open+Sans+Condensed:300,700|Open+Sans:400,400i,600,700,700i");
-@import url("fonts/icomoon.woff");
 html {
   box-sizing: border-box; }
 

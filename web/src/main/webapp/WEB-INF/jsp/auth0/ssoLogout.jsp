@@ -55,5 +55,5 @@
         // if the token is not in local storage, there is nothing to check (i.e. the user is already logged out)
         if (!localStorage.getItem('userToken')) return;
         getAuth0SSOData();
-    }, 10000);
+    }, 5000);
 </script>

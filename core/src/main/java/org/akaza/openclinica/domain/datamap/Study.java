@@ -95,7 +95,7 @@ public class Study   extends DataMapDomainObject {
 	private List<StudyModuleStatus> studyModuleStatuses ;
 	private Integer version;
 	private String schemaName;
-	private String uuid;
+	private String studyEnvSiteUuid;
 	private StudyEnvEnum envType;
 
 	@Column(name = "study_env_uuid", unique = false, nullable = false)
@@ -827,13 +827,13 @@ public class Study   extends DataMapDomainObject {
 	}
 
 
-	@Column(name = "uuid", length = 64)
-	public String getUuid() {
-		return this.uuid;
+	@Column(name = "studyEnvSiteUuid", length = 64)
+	public String getStudyEnvSiteUuid() {
+		return this.studyEnvSiteUuid;
 	}
 
-	public void setUuid(String uuid) {
-		this.uuid = uuid;
+	public void setStudyEnvSiteUuid(String studyEnvSiteUuid) {
+		this.studyEnvSiteUuid = studyEnvSiteUuid;
 	}
 
 }

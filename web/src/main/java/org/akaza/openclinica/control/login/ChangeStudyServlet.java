@@ -152,7 +152,10 @@ public class ChangeStudyServlet extends SecureController {
                     } else // should this be DEFAULT_TENANT_ID from CoreResources?
                         request.setAttribute("changeStudySchema", "public");
 
-                    request.setAttribute("studyEnvUuid", studyInfoObject.getStudyBean().getStudyEnvUuid());
+                    String studyEnvUuid = StringUtils.isNotEmpty(studyInfoObject.getStudyBean().getStudyEnvUuid()) ?
+                            studyInfoObject.getStudyBean().getStudyEnvUuid()
+                            : studyInfoObject.getStudyBean().getStudyEnvSiteUuid();
+                    request.setAttribute("studyEnvUuid", studyEnvUuid);
                     request.setAttribute("currentStudy", currentStudy);
                     return;
 

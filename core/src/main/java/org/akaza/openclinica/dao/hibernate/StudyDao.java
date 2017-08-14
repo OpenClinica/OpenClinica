@@ -40,7 +40,8 @@ public class StudyDao extends AbstractDomainDao<Study> {
 
     public Study findByStudyEnvUuid(String studyEnvUuid) {
         getSessionFactory().getStatistics().logSummary();
-        String query = " from Study do  where do.studyEnvUuid = :studyEnvUuid";
+        String query = " from Study do  where do.studyEnvUuid = :studyEnvUuid "
+                + "or do.studyEnvSiteUuid = :studyEnvUuid";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("studyEnvUuid", studyEnvUuid);
         return  (Study) q.uniqueResult();

@@ -33,7 +33,7 @@ public class SiteBuildServiceImpl implements SiteBuildService {
     @Autowired
     private DataSource dataSource;
 
-    public void process(StudyBean parentStudy, StudyBean siteBean, UserAccountBean ownerUserAccount, List<UserRole> userList) throws Exception  {
+    public void process(StudyBean parentStudy, StudyBean siteBean, UserAccountBean ownerUserAccount) throws Exception  {
         String schemaName = null;
         StudyBean site = new StudyBean();
 
@@ -43,10 +43,22 @@ public class SiteBuildServiceImpl implements SiteBuildService {
             site.setIdentifier(siteBean.getIdentifier());
             // generate OC id
             site.setOid(siteBean.getOid());
-            site.setStatus(Status.AVAILABLE);
+            site.setStatus(siteBean.getStatus());
+            site.setProtocolDateVerification(siteBean.getProtocolDateVerification());
+            site.setDatePlannedStart(siteBean.getDatePlannedStart());
             site.setOwner(ownerUserAccount);
             site.setParentStudyId(parentStudy.getId());
-            site.setUuid(siteBean.getUuid());
+            site.setStudyEnvSiteUuid(siteBean.getStudyEnvSiteUuid());
+            site.setExpectedTotalEnrollment(siteBean.getExpectedTotalEnrollment());
+            site.setPrincipalInvestigator(siteBean.getPrincipalInvestigator());
+            site.setFacilityCity(siteBean.getFacilityCity());
+            site.setFacilityState(siteBean.getFacilityState());
+            site.setFacilityZip(siteBean.getFacilityZip());
+            site.setFacilityCountry(siteBean.getFacilityCountry());
+            site.setFacilityContactName(siteBean.getFacilityContactName());
+            site.setFacilityContactPhone(siteBean.getFacilityContactPhone());
+            site.setFacilityContactEmail(siteBean.getFacilityContactEmail());
+            
             StudyBean createdSite = studyController.createStudyWithDatasource(site, dataSource);
             StudyUserRoleBean sub = null;
         } catch (Exception e) {

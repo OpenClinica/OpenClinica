@@ -172,7 +172,6 @@ import java.util.regex.Pattern;
         String name = (String) map.get("briefTitle");
         String studyOid = (String) map.get("studyEnvOid");
         String studyEnvUuid = (String) map.get("studyEnvUuid");
-        String uuid = (String) map.get("uuid");
 
         Matcher m = Pattern.compile("(.+)\\((.+)\\)").matcher(studyOid);
         String envType = "";
@@ -207,12 +206,7 @@ import java.util.regex.Pattern;
         } else {
             studyOid = studyOid.trim();
         }
-        if (StringUtils.isEmpty(uuid)) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "uuid");
-            errorObjects.add(errorOBject);
-        } else {
-            uuid = uuid.trim();
-        }
+
         if (StringUtils.isEmpty(studyEnvUuid)) {
             ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "studyEnvUuid");
             errorObjects.add(errorOBject);
@@ -227,7 +221,6 @@ import java.util.regex.Pattern;
         request.setAttribute("uniqueProId", uniqueStudyID);
         request.setAttribute("name", name); // Brief Title
         request.setAttribute("oid", studyOid);
-        request.setAttribute("uuid", uuid);
         request.setAttribute("envType", envType);
         request.setAttribute("studyEnvUuid", studyEnvUuid);
         ResponseEntity<HashMap> responseEntity = processSSOUserContext(request, studyEnvUuid);
@@ -264,14 +257,6 @@ import java.util.regex.Pattern;
             errorObjects.add(errorOBject);
         }
 
-        Validator v3 = new Validator(request);
-        v3.addValidation("uuid", Validator.NO_BLANKS);
-        HashMap vError3 = v3.validate();
-        if (!vError3.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "uuid");
-            errorObjects.add(errorOBject);
-        }
-
         Validator v4 = new Validator(request);
         v4.addValidation("role", Validator.NO_LEADING_OR_TRAILING_SPACES);
         HashMap vError4 = v4.validate();
@@ -293,7 +278,6 @@ import java.util.regex.Pattern;
         study.setOc_oid(studyOid);
         study.setEnvType(StudyEnvEnum.valueOf(envType));
         study.setStudyEnvUuid(studyEnvUuid);
-        study.setUuid(uuid);
         Study byOidEnvType = studyDao.findByOidEnvType(studyOid, StudyEnvEnum.valueOf(envType));
         if (byOidEnvType != null && byOidEnvType.getOc_oid() != null) {
             return getResponseSuccess(byOidEnvType);
@@ -412,7 +396,10 @@ import java.util.regex.Pattern;
                         return null;
                     OCUserDTO userDTO = userInfo.getBody();
                     map.put("email", userDTO.getEmail());
-                    map.put("institution", userDTO.getOrganization());
+                    if (StringUtils.isEmpty(userDTO.getOrganization()))
+                        map.put("institution", "");
+                    else
+                        map.put("institution", userDTO.getOrganization());
                     map.put("fName", userDTO.getFirstName());
                     map.put("lName", userDTO.getLastName());
                     map.put("user_uuid", userDTO.getUuid());
@@ -501,12 +488,40 @@ import java.util.regex.Pattern;
         return response;
     }
 
+    private FacilityInfo processFacilityInfo(HashMap<String, Object> map) {
+        FacilityInfo facilityInfo = new FacilityInfo();
+        String facilityCity = (String) map.get("facilityCity");
+        String facilityState = (String) map.get("facilityState");
+        String facilityZip = (String) map.get("facilityZip");
+        String facilityCountry = (String) map.get("facilityCountry");
+        String facilityContact = (String) map.get("facilityContact");
+        String facilityEmail = (String) map.get("facilityEmail");
+        String facilityPhone = (String) map.get("facilityPhone");
+
+        if (StringUtils.isNotEmpty(facilityCity))
+            facilityInfo.setFacilityCity(facilityCity.trim());
+        if (StringUtils.isNotEmpty(facilityState))
+            facilityInfo.setFacilityState(facilityState.trim());
+        if (StringUtils.isNotEmpty(facilityZip))
+            facilityInfo.setFacilityZip(facilityZip.trim());
+        if (StringUtils.isNotEmpty(facilityCountry))
+            facilityInfo.setFacilityCountry(facilityCountry.trim());
+        if (StringUtils.isNotEmpty(facilityContact))
+            facilityInfo.setFacilityContact(facilityContact.trim());
+        if (StringUtils.isNotEmpty(facilityEmail))
+            facilityInfo.setFacilityEmail(facilityEmail.trim());
+        if (StringUtils.isNotEmpty(facilityPhone))
+            facilityInfo.setFacilityPhone(facilityPhone.trim());
+
+        return facilityInfo;
+    }
+
     /**
-     * @api {post} /pages/auth/api/v1/studies/:uniqueStudyId/sites Create a site
+     * @api {post} /pages/auth/api/v1/studies/:studyEnvUuid/sites Create a site
      * @apiName createNewSite
      * @apiPermission Authenticate using api-key. admin
      * @apiVersion 3.8.0
-     * @apiParam {String} uniqueProtococlId Study unique study ID.
+     * @apiParam {String} studyEnvUuid Study environment uuid.
      * @apiParam {String} briefTitle Brief Title .
      * @apiParam {String} principalInvestigator Principal Investigator Name.
      * @apiParam {Integer} expectedTotalEnrollment Expected Total Enrollment number
@@ -541,7 +556,7 @@ import java.util.regex.Pattern;
      * "principalInvestigator": "Principal Investigator Name",
      * "expectedTotalEnrollment": "10",
      * "errors": [
-     * { "field": "UniqueStudyId", "resource": "Site Object","code": "Unique Study Id exist in the System" }
+     * { "field": "studyEnvUuid", "resource": "Site Object","code": "Unique Study Id exist in the System" }
      * ],
      * "secondaryProId": "Secondary Study ID 1",
      * "siteOid": null,
@@ -552,7 +567,7 @@ import java.util.regex.Pattern;
      * { "role": "Monitor","username": "dm_normal"},
      * { "role": "Data Entry Person","username": "sd_root"}
      * ],
-     * "uniqueSiteStudyID": "Site Study ID",
+     * "studyEnvUuid": "Site Study ID",
      * "startDate": "2011-11-11"
      * }
      * @apiSuccessExample {json} Success-Response:
@@ -564,9 +579,22 @@ import java.util.regex.Pattern;
      * }
      */
 
-    @RequestMapping(value = "/{parentStudyID}/sites", method = RequestMethod.POST) public ResponseEntity<Object> createNewSites(HttpServletRequest request,
-            @RequestBody HashMap<String, Object> map, @PathVariable("parentStudyID") String parentStudyID) throws Exception {
-        logger.debug("Creating site(s) for study:" + parentStudyID);
+   /* {
+
+        "uniqueIdentifier": "Site26 A",
+            "ocOid" :"S_TONY(TEST)",
+            "briefTitle": "Site26-A",
+            "briefSummary": "Vauge summary of events.",
+            "studyEnvSiteUuid": "07fe0825-8a42-4b4a-9ed3-91ac27e0a861",
+
+            "principalInvestigator": "Dr. Dorian",
+            "expectedTotalEnrollment": "100",
+            "status":"available|frozen|pending|locked"
+    }
+*/
+    @RequestMapping(value = "/{studyEnvUuid}/sites", method = RequestMethod.POST) public ResponseEntity<Object> createNewSites(HttpServletRequest request,
+            @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
+        logger.debug("Creating site(s) for study:" + studyEnvUuid);
         ArrayList<ErrorObject> errorObjects = new ArrayList();
         StudyBean siteBean = null;
         ResponseEntity<Object> response = null;
@@ -578,48 +606,20 @@ import java.util.regex.Pattern;
         ResourceBundleProvider.updateLocale(locale);
         String name = (String) map.get("briefTitle");
         String principalInvestigator = (String) map.get("principalInvestigator");
-        String uniqueSiteStudyID = (String) map.get("uniqueStudyID");
+        String uniqueIdentifier = (String) map.get("uniqueIdentifier");
         String expectedTotalEnrollment = (String) map.get("expectedTotalEnrollment");
+        String studyEnvSiteUuid = (String) map.get("studyEnvSiteUuid");
+        String ocOid = (String) map.get("ocOid");
+        String statusStr = (String) map.get("status");
+        FacilityInfo facilityInfo = processFacilityInfo(map);
+        String studyVerificationDate = (String) map.get("studyVerificationDate");
         String startDate = (String) map.get("startDate");
-        String studyDateVerification = (String) map.get("studyDateVerification");
-        String secondaryProId = (String) map.get("secondaryStudyID");
-        String studyEnvUuid = (String) map.get("studyEnvUuid");
-        String uuid = (String) map.get("uuid");
-        ArrayList<UserRole> assignUserRoles = (ArrayList<UserRole>) map.get("assignUserRoles");
 
-        ArrayList<UserRole> userList = new ArrayList<>();
-        if (assignUserRoles != null) {
-            for (Object userRole : assignUserRoles) {
-                UserRole uRole = new UserRole();
-                uRole.setUsername((String) ((HashMap<String, Object>) userRole).get("username"));
-                uRole.setRole((String) ((HashMap<String, Object>) userRole).get("role"));
-                udao = new UserAccountDAO(dataSource);
-                UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(uRole.getUsername());
-                if (assignedUserBean == null || !assignedUserBean.isActive()) {
-                    ErrorObject errorOBject = createErrorObject("Study Object", "The Assigned Username " + uRole.getUsername() + " is not a Valid User",
-                            "Assigned User");
-                    errorObjects.add(errorOBject);
-                }
-
-                ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
-
-                if (getSiteRole(uRole.getRole(), resterm) == null) {
-                    ErrorObject errorOBject = createErrorObject("Study Object", "Assigned Role for " + uRole.getUsername() + " is not a Valid Site Role",
-                            "Assigned Role");
-                    errorObjects.add(errorOBject);
-                }
-                userList.add(uRole);
-            }
-        }
-
-        SiteDTO siteDTO = buildSiteDTO(uniqueSiteStudyID, name, principalInvestigator, expectedTotalEnrollment, startDate, studyDateVerification,
-                secondaryProId, userList);
-
-        if (uniqueSiteStudyID == null) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "UniqueStudyID");
+        if (uniqueIdentifier == null) {
+            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "uniqueIdentifier");
             errorObjects.add(errorOBject);
         } else {
-            uniqueSiteStudyID = uniqueSiteStudyID.trim();
+            uniqueIdentifier = uniqueIdentifier.trim();
         }
         if (name == null) {
             ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "BriefTitle");
@@ -633,40 +633,45 @@ import java.util.regex.Pattern;
         } else {
             principalInvestigator = principalInvestigator.trim();
         }
-        if (startDate == null) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "StartDate");
-            errorObjects.add(errorOBject);
-        } else {
-            startDate = startDate.trim();
-        }
-        if (studyDateVerification == null) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "StudyDateVerification");
-            errorObjects.add(errorOBject);
-        } else {
-            studyDateVerification = studyDateVerification.trim();
-        }
+
         if (expectedTotalEnrollment == null) {
             ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "ExpectedTotalEnrollment");
             errorObjects.add(errorOBject);
         } else {
             expectedTotalEnrollment = expectedTotalEnrollment.trim();
         }
-        if (secondaryProId != null) {
-            secondaryProId = secondaryProId.trim();
+
+        if (studyEnvSiteUuid == null) {
+            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "studyEnvSiteUuid");
+            errorObjects.add(errorOBject);
+        } else {
+            studyEnvSiteUuid = studyEnvSiteUuid.trim();
         }
 
-        if (assignUserRoles == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "AssignUserRoles");
+        if (ocOid == null) {
+            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "ocOid");
+            errorObjects.add(errorOBject);
+        } else {
+            ocOid = ocOid.trim();
+        }
+        Status status = Status.getByName(statusStr);
+
+        if (status == null) {
+            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "status");
             errorObjects.add(errorOBject);
         }
 
-        request.setAttribute("uniqueProId", uniqueSiteStudyID);
+        Study envSiteUuidStudy = studyDao.findByStudyEnvUuid(studyEnvSiteUuid);
+        if (envSiteUuidStudy != null && envSiteUuidStudy.getStudyId() != 0) {
+            ErrorObject errorOBject = createErrorObject("Site Object", "studyEnvSiteUuid already exists", "studySiteEnvUuid");
+            errorObjects.add(errorOBject);
+        }
+        SiteDTO siteDTO = buildSiteDTO(uniqueIdentifier, name, principalInvestigator, expectedTotalEnrollment, status, facilityInfo);
+
+        request.setAttribute("uniqueProId", uniqueIdentifier);
         request.setAttribute("name", name);
         request.setAttribute("prinInvestigator", principalInvestigator);
         request.setAttribute("expectedTotalEnrollment", expectedTotalEnrollment);
-        request.setAttribute("startDate", startDate);
-        request.setAttribute("studyDateVerification", studyDateVerification);
-        request.setAttribute("secondProId", secondaryProId);
 
         String format = "yyyy-MM-dd";
         SimpleDateFormat formatter = null;
@@ -689,17 +694,17 @@ import java.util.regex.Pattern;
             }
         }
 
-        if (studyDateVerification != "" && studyDateVerification != null) {
+        if (studyVerificationDate != "" && studyVerificationDate != null) {
             try {
                 formatter = new SimpleDateFormat(format);
-                formattedStudyDate = formatter.parse(studyDateVerification);
+                formattedStudyDate = formatter.parse(studyVerificationDate);
             } catch (ParseException e) {
                 ErrorObject errorOBject = createErrorObject("Site Object", "The Study Verification Date format is not a valid 'yyyy-MM-dd' format",
                         "StudyDateVerification");
                 errorObjects.add(errorOBject);
             }
             if (formattedStudyDate != null) {
-                if (!studyDateVerification.equals(formatter.format(formattedStudyDate))) {
+                if (!studyVerificationDate.equals(formatter.format(formattedStudyDate))) {
                     ErrorObject errorOBject = createErrorObject("Site Object", "The Study Verification Date format is not a valid 'yyyy-MM-dd' format",
                             "StudyDateVerification");
                     errorObjects.add(errorOBject);
@@ -707,14 +712,14 @@ import java.util.regex.Pattern;
             }
         }
 
-        StudyBean parentStudy = getStudyByUniqId(parentStudyID);
+        StudyBean parentStudy = getStudyByEnvId(studyEnvUuid);
         if (parentStudy == null) {
             ErrorObject errorOBject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Id",
-                    "Unique Study Study Id");
+                    "Study Env Uuid");
             errorObjects.add(errorOBject);
         } else if (parentStudy.getParentStudyId() != 0) {
             ErrorObject errorOBject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Study Id",
-                    "Unique Study Study Id");
+                    "Study Env Uuid");
             errorObjects.add(errorOBject);
         }
 
@@ -780,47 +785,31 @@ import java.util.regex.Pattern;
 
         if (errorObjects != null && errorObjects.size() != 0) {
             siteDTO.setMessage(validation_failed_message);
-            response = new ResponseEntity(siteDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+            response = new ResponseEntity(siteDTO, HttpStatus.BAD_REQUEST);
         } else {
-            siteBean = buildSiteBean(uniqueSiteStudyID, name, principalInvestigator, Integer.valueOf(expectedTotalEnrollment), formattedStartDate,
-                    formattedStudyDate, secondaryProId, ownerUserAccount, parentStudy.getId());
+            siteBean = buildSiteBean(ocOid, uniqueIdentifier, name, principalInvestigator, Integer.valueOf(expectedTotalEnrollment),
+                    ownerUserAccount, parentStudy.getId(), status, facilityInfo, formattedStartDate, formattedStudyDate);
             siteBean.setSchemaName(parentStudy.getSchemaName());
-            siteBean.setUuid(uuid);
+            siteBean.setStudyEnvSiteUuid(studyEnvSiteUuid);
             siteBean.setStudyEnvUuid(parentStudy.getStudyEnvUuid());
             StudyBean sBean = createStudy(siteBean, ownerUserAccount);
             // get the schema study
             request.setAttribute("requestSchema", parentStudy.getSchemaName());
-            StudyBean schemaStudy = getStudyByUniqId(parentStudyID);
-            siteBuildService.process(schemaStudy, sBean, ownerUserAccount, userList);
+            StudyBean schemaStudy = getStudyByEnvId(studyEnvUuid);
+            siteBuildService.process(schemaStudy, sBean, ownerUserAccount);
             siteDTO.setSiteOid(sBean.getOid());
             siteDTO.setMessage(validation_passed_message);
             StudyUserRoleBean sub = null;
-            processUserList(userList, ownerUserAccount, sBean);
             ResponseSuccessSiteDTO responseSuccess = new ResponseSuccessSiteDTO();
             responseSuccess.setMessage(siteDTO.getMessage());
             responseSuccess.setSiteOid(siteDTO.getSiteOid());
             responseSuccess.setUniqueSiteStudyID(siteDTO.getUniqueSiteProtocolID());
 
-            response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
+            response = new ResponseEntity(responseSuccess, HttpStatus.OK);
 
         }
         return response;
 
-    }
-
-    public void processUserList(List<UserRole> userList, UserAccountBean ownerUserAccount, StudyBean sBean) {
-        StudyUserRoleBean sub;
-        ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
-        for (UserRole userRole : userList) {
-            sub = new StudyUserRoleBean();
-            sub.setRole(getSiteRole(userRole.getRole(), resterm));
-            sub.setStudyId(sBean.getId());
-            sub.setStatus(Status.AVAILABLE);
-            sub.setOwner(ownerUserAccount);
-            udao = new UserAccountDAO(dataSource);
-            UserAccountBean assignedUserBean = (UserAccountBean) udao.findByUserName(userRole.getUsername());
-            StudyUserRoleBean surb = createRole(assignedUserBean, sub, dataSource);
-        }
     }
 
     /**
@@ -1067,22 +1056,29 @@ import java.util.regex.Pattern;
         return sed;
     }
 
-    public StudyBean buildSiteBean(String uniqueSiteStudyId, String name, String principalInvestigator, int expectedTotalEnrollment, Date startDate,
-            Date studyDateVerification, String secondaryProId, UserAccountBean owner, int parentStudyId) {
+    public StudyBean buildSiteBean(String ocOid, String uniqueSiteStudyId, String name, String principalInvestigator, int expectedTotalEnrollment,
+            UserAccountBean owner, int parentStudyId, Status status, FacilityInfo facilityInfo,
+            Date startDate, Date approvalDate) {
 
         StudyBean study = new StudyBean();
         ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
-
-        study.setDatePlannedStart(startDate);
-        study.setProtocolDateVerification(studyDateVerification);
-        study.setSecondaryIdentifier(secondaryProId);
+        study.setOid(ocOid);
         study.setIdentifier(uniqueSiteStudyId);
         study.setName(name);
         study.setPrincipalInvestigator(principalInvestigator);
         study.setExpectedTotalEnrollment(expectedTotalEnrollment);
         study.setParentStudyId(parentStudyId);
         study.setOwner(owner);
-        study.setStatus(Status.AVAILABLE);
+        study.setStatus(status);
+        study.setDatePlannedStart(startDate);
+        study.setProtocolDateVerification(approvalDate);
+        study.setFacilityCity(facilityInfo.getFacilityCity());
+        study.setFacilityState(facilityInfo.getFacilityState());
+        study.setFacilityZip(facilityInfo.getFacilityZip());
+        study.setFacilityCountry(facilityInfo.getFacilityCountry());
+        study.setFacilityContactName(facilityInfo.getFacilityContact());
+        study.setFacilityContactPhone(facilityInfo.getFacilityPhone());
+        study.setFacilityContactEmail(facilityInfo.getFacilityEmail());
         return study;
     }
 
@@ -1143,6 +1139,12 @@ import java.util.regex.Pattern;
     private StudyBean getStudyByUniqId(String uniqueId) {
         sdao = new StudyDAO(dataSource);
         StudyBean studyBean = (StudyBean) sdao.findByUniqueIdentifier(uniqueId);
+        return studyBean;
+    }
+
+    private StudyBean getStudyByEnvId(String envUuid) {
+        sdao = new StudyDAO(dataSource);
+        StudyBean studyBean = (StudyBean) sdao.findByStudyEnvUuid(envUuid);
         return studyBean;
     }
 
@@ -1230,18 +1232,16 @@ import java.util.regex.Pattern;
         return studyDTO;
     }
 
-    public SiteDTO buildSiteDTO(String uniqueSiteStudyID, String name, String principalInvestigator, String expectedTotalEnrollment, String startDate,
-            String studyDateVerification, String secondaryProId, ArrayList<UserRole> userList) {
+    public SiteDTO buildSiteDTO(String uniqueSiteStudyID, String name, String principalInvestigator,
+            String expectedTotalEnrollment, Status status, FacilityInfo facilityInfo) {
 
         SiteDTO siteDTO = new SiteDTO();
         siteDTO.setUniqueSiteProtocolID(uniqueSiteStudyID);
         siteDTO.setBriefTitle(name);
         siteDTO.setPrincipalInvestigator(principalInvestigator);
         siteDTO.setExpectedTotalEnrollment(expectedTotalEnrollment);
-        siteDTO.setStartDate(startDate);
-        siteDTO.setSecondaryProId(secondaryProId);
-        siteDTO.setProtocolDateVerification(studyDateVerification);
-        siteDTO.setAssignUserRoles(userList);
+        siteDTO.setStatus(status);
+        siteDTO.setFacilityInfo(facilityInfo);
         return siteDTO;
     }
 
