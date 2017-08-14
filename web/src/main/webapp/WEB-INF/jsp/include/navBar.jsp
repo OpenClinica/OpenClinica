@@ -117,8 +117,6 @@
                         <!-- First Tier Drop Down -->
                         <ul class="dropdown_BG">
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a></li>
-                            <li><a href="#">Account</a></li>
-                            <li><a href="#">Billing</a></li>
                             <li> <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
                         </ul>
                         </li>
