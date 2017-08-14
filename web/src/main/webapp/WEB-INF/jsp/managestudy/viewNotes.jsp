@@ -147,13 +147,26 @@
             <td>&nbsp;</td>
             <td align="center"><strong>Queries</strong></td>
         </tr>
-        <c:forEach var="status" items="${mapKeys}">
-            <tr>
-                <td><strong>${status.name}</strong></td>
-                <td><span class="${status.iconFilePath}" border="0" align="right"></td>
-                <td align="center"> ${summaryMap[status.name]['Total']}</td>
-            </tr>
-        </c:forEach>
+        <tr>
+            <td><strong>New</strong></td>   
+            <td><i class="fa fa-bubble-red"></i></td>        
+            <td align="center"> ${summaryMap['New']['Total']}</td>
+        </tr>
+        <tr>
+            <td><strong>Updated</strong></td>  
+            <td><i class="fa fa-bubble-red"></i></td>   
+            <td align="center"> ${summaryMap['Updated']['Total']}</td>
+        </tr>
+        <tr>
+            <td><strong>Closed</strong></td>   
+            <td><i class="fa fa-bubble-black"></i></td>           
+            <td align="center"> ${summaryMap['Closed']['Total']}</td>
+        </tr>
+        <tr>
+            <td><strong>Closed Modified</strong></td>    
+            <td><i class="fa fa-bubble-black"></i></td>          
+            <td align="center"> ${summaryMap['Closed Modified']['Total']}</td>
+        </tr>
         <tr>
             <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
         </tr>
