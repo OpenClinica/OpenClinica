@@ -244,12 +244,6 @@ public class EnketoUrlService {
             editURL = eur.getView_iframe_url();
         }
 
-        // if (flavor.equals(QUERY_FLAVOR)) {
-        // editURL = eur.getEdit_url();
-        // } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
-        // editURL = eur.getEdit_iframe_url();
-        // }
-
         int hashIndex = editURL.lastIndexOf("#");
         String part1 = "";
         String part2 = "";
