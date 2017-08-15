@@ -44,9 +44,9 @@
 <tr id="sidebar_Instructions_open" style="display: none">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
-        <b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <fmt:message key="instructions" bundle="${resword}"/>
 
         <div class="sidebar_tab_content">
 
@@ -58,9 +58,9 @@
 <tr id="sidebar_Instructions_closed" style="display: all">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
-        <b><fmt:message key="instructions" bundle="${resword}"/></b>
+        <fmt:message key="instructions" bundle="${resword}"/>
 
     </td>
 </tr>
@@ -70,9 +70,7 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 <h1><span class="title_Manage"><fmt:message key="view_CRF_details" bundle="${resword}"/>
-<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/manage-crf#content-title-5242')">
-            <img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>">
-          </a>  </span></h1>
+</span></h1>
 <div style="width: 600px">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -121,19 +119,19 @@
                                    
                                     <a href="EnketoFormServlet?formLayoutId=<c:out value="${version.id}"/>&studyEventId=<c:out value="0"/>&eventCrfId=<c:out value="0"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"       
                                        onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
-                                            name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+                                       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
+                                            name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
                                 </td>
                                 <td>
   <a href="javascript:processPrintCRFRequest('rest/metadata/html/print/*/*/<c:out value="${version.oid}"/>')"
                                        onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
-                                            name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
+                                       onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><span
+                                            name="bt_Print1" class="icon icon-print" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
 
                                 </td>
                                 <td>
-                                    <a href="ViewCRFVersion?id=<c:out value="${version.id}"/>"><img
-                                            name="bt_Metadata" src="images/bt_Metadata.gif" border="0" alt="Metadata" title="Metadata" align="left" hspace="6"></a>
+                                    <a href="ViewCRFVersion?id=<c:out value="${version.id}"/>"><span
+                                            name="bt_Metadata" class="icon icon-pencil" border="0" alt="Metadata" title="Metadata" align="left" hspace="6"></a>
 
                                 </td>
                             </tr>
@@ -170,18 +168,18 @@
                     <td class="table_cell"><c:out value="${item.versions}"/></td>
                     <td class="table_cell">
                      <c:choose>
-     <c:when test="${empty item.arrErrorMesages}"><span class="aka_green_highlight"><b><fmt:message key="ok" bundle="${respage}"/></b></span>   	
+     <c:when test="${empty item.arrErrorMesages}"><span class="aka_green_highlight"><b><fmt:message key="ok" bundle="${respage}"/></b></span>       
     </c:when>
     <c:otherwise>
     <c:if test="${item.crfVersionStatus == 1 }"><span class="aka_red_highlight"><b><fmt:message key="problem" bundle="${respage}"/></b>
    <fmt:message key="problem_message" bundle="${respage}"/><br></c:if>
      <c:if test="${item.crfVersionStatus != 1 }">  <span class="aka_orange_highlight"><b><fmt:message key="warning" bundle="${respage}"/></b>
       <fmt:message key="warning_message" bundle="${respage}"/></c:if>
-  	<ul class="list_a_ul">
-  		<c:forEach var = "error" items="${item.arrErrorMesages}">
-  			<li class="list_a"><c:out value="${ error}"/>;</li>
-  		</c:forEach>
-  		</ul>
+    <ul class="list_a_ul">
+        <c:forEach var = "error" items="${item.arrErrorMesages}">
+            <li class="list_a"><c:out value="${ error}"/>;</li>
+        </c:forEach>
+        </ul>
     </c:otherwise>
     </c:choose>
                    
