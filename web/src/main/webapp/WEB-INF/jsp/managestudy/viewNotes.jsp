@@ -144,34 +144,24 @@
     <!-- NEW Summary-->
     <table border="0" cellspacing="0" class="summaryTable" style="width:600px;">
         <tr><td><b>Status</b></td>
-            <td>&nbsp;</td>
+            <td></td>
             <td align="center"><strong>Queries</strong></td>
         </tr>
+        <c:forEach var="status" items="${mapKeys}">
+            <c:if test="${(status.name != 'Resolution Proposed') && (status.name != 'Not Applicable')}">
+                <tr>
+                    <td><b>${status.name}</b></td>
+                    <td><span class="${status.iconFilePath}" border="0"></span></td>
+                    <td align="center">${summaryMap[status.name]['Total']}</td>    
+                </tr>  
+            </c:if>  
+        </c:forEach>
         <tr>
-            <td><strong>New</strong></td>   
-            <td><i class="fa fa-bubble-red"></i></td>        
-            <td align="center"> ${summaryMap['New']['Total']}</td>
+            <td>&nbsp;</td><td></td><td></td>
         </tr>
         <tr>
-            <td><strong>Updated</strong></td>  
-            <td><i class="fa fa-bubble-red"></i></td>   
-            <td align="center"> ${summaryMap['Updated']['Total']}</td>
-        </tr>
-        <tr>
-            <td><strong>Closed</strong></td>   
-            <td><i class="fa fa-bubble-black"></i></td>           
-            <td align="center"> ${summaryMap['Closed']['Total']}</td>
-        </tr>
-        <tr>
-            <td><strong>Closed Modified</strong></td>    
-            <td><i class="fa fa-bubble-black"></i></td>          
-            <td align="center"> ${summaryMap['Closed Modified']['Total']}</td>
-        </tr>
-        <tr>
-            <td>&nbsp;</td><td>&nbsp;</td><td>&nbsp;</td>
-        </tr>
-        <tr>
-            <td><b>Total</b></td><td>&nbsp;</td>
+            <td><b>Total</b></td>
+            <td></td>
             <td align="center">${grandTotal}</td>
         </tr>
     </table>
