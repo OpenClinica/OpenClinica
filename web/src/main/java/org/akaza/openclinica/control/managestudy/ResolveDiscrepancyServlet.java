@@ -102,6 +102,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String EVENT_CRF_ID = "ecId";
     private static final String STUDY_SUB_ID = "studySubjectId";
     public static final String ORIGINATING_PAGE = "originatingPage";
+    public static final String STUDYSUBJECTID = "studySubjectId";
 
     private static final String RESOLVING_NOTE = "resolving_note";
     private static final String RETURN_FROM_PROCESS_REQUEST = "returnFromProcess";
@@ -339,7 +340,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             request.setAttribute(EnketoFormServlet.FORM_URL1, part1);
             request.setAttribute(EnketoFormServlet.FORM_URL2, part2);
             request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module);
-
+            request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
         }
         return true;
     }
