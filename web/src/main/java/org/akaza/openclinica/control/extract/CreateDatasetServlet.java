@@ -35,6 +35,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.extract.FilterDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -498,7 +499,7 @@ public class CreateDatasetServlet extends SecureController {
                     logger.info("setting data set id here");
                     // may be easier to just set the dataset bean
                     // back into the session?
-
+                    request.setAttribute("extractProperties", CoreResources.getExtractProperties());
                     request.setAttribute("dataset", dsb);
 
                     forwardPage(Page.EXPORT_DATASETS);
