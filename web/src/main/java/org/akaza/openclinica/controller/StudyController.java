@@ -293,7 +293,7 @@ import java.util.regex.Pattern;
             studyEnvUuid = studyEnvUuid.trim();
         }
 
-        StudyParameterConfig studyParameterConfig = processStudyConfigParameters(map, errorObjects);
+    //    StudyParameterConfig studyParameterConfig = processStudyConfigParameters(map, errorObjects);
         Locale locale = new Locale("en_US");
         request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
         ResourceBundleProvider.updateLocale(locale);
@@ -368,7 +368,7 @@ import java.util.regex.Pattern;
         study.setExpectedTotalEnrollment((expectedTotalEnrollment));
         study.setProtocolType(studyType.toLowerCase());
         Study schemaStudy = createSchemaStudy(request, study, ownerUserAccount);
-        setStudyParameters(request, study, schemaStudy, studyParameterConfig);
+        //setStudyParameters(request, study, schemaStudy, studyParameterConfig);
         logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
 
         if (errorObjects != null && errorObjects.size() != 0) {
