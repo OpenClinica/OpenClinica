@@ -12,7 +12,7 @@ public class SiteDTO {
 	private String briefDescription;
 	private String principalInvestigator;
 
-	private String expectedTotalEnrollment;
+	private Integer expectedTotalEnrollment;
     private String siteOid;
     private ArrayList<ErrorObject> errors;
     private String message;
@@ -74,12 +74,12 @@ public class SiteDTO {
 	}
 
 
-	public String getExpectedTotalEnrollment() {
+	public Integer getExpectedTotalEnrollment() {
 		return expectedTotalEnrollment;
 	}
 
 
-	public void setExpectedTotalEnrollment(String expectedTotalEnrollment) {
+	public void setExpectedTotalEnrollment(Integer expectedTotalEnrollment) {
 		this.expectedTotalEnrollment = expectedTotalEnrollment;
 	}
 

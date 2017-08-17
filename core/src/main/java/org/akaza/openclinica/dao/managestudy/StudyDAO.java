@@ -192,7 +192,12 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         // variables.put(new Integer(19), sb.getCreatedDate());
         variables.put(new Integer(21), new Integer(sb.getUpdaterId()));// owner
         // id
-        variables.put(new Integer(22), sb.getUpdatedDate());// date updated
+        if (sb.getUpdatedDate() == null) {
+            nullVars.put(new Integer(22), new Integer(Types.DATE));
+            variables.put(new Integer(22), null);
+        } else {
+            variables.put(new Integer(22), sb.getUpdatedDate());
+        }
         variables.put(new Integer(23), new Integer(sb.getOldStatus().getId()));// study id
         // variables.put(new Integer(22), new Integer(1));
         // stop gap measure for owner and updater id

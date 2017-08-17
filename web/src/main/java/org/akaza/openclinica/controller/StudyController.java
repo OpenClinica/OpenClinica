@@ -7,6 +7,7 @@ import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.*;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import org.akaza.openclinica.controller.helper.OCUserDTO;
@@ -27,6 +28,7 @@ import org.akaza.openclinica.service.SchemaCleanupService;
 import org.akaza.openclinica.service.SiteBuildService;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.lang.StringUtils;
+import org.json.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +36,9 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -158,6 +163,38 @@ import java.util.regex.Pattern;
     }
 
 
+    private StudyParameterConfig processStudyConfigParameters(HashMap<String, Object> map, ArrayList<ErrorObject> errorObjects) {
+        StudyParameterConfig spc = new StudyParameterConfig();
+        String collectBirthDate = (String) map.get("collectDateOfBirth");
+        Boolean collectSex = (Boolean) map.get("collectSex");
+        String collectPersonId = (String) map.get("collectPersonId");
+        Boolean showSecondaryId = (Boolean) map.get("showSecondaryId");
+        if (collectBirthDate == null) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
+            errorObjects.add(errorOBject);
+        } else {
+            collectBirthDate = collectBirthDate.trim();
+        }
+        spc.setCollectDob(collectBirthDate);
+        if (collectSex == null) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "CollectSex");
+            errorObjects.add(errorOBject);
+        }
+        spc.setGenderRequired(Boolean.toString(collectSex));
+        if (collectPersonId == null) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "CollectPersonId");
+            errorObjects.add(errorOBject);
+        } else {
+            collectPersonId = collectPersonId.trim();
+        }
+        spc.setSubjectPersonIdRequired(collectPersonId);
+        if (showSecondaryId == null) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "ShowSecondaryId");
+            errorObjects.add(errorOBject);
+        }
+        spc.setSecondaryLabelViewable(Boolean.toString(showSecondaryId));
+        return spc;
+    }
     @RequestMapping(value = "/", method = RequestMethod.POST) public ResponseEntity<Object> createNewStudy(HttpServletRequest request,
             @RequestBody HashMap<String, Object> map) throws Exception {
         ArrayList<ErrorObject> errorObjects = new ArrayList();
@@ -172,6 +209,12 @@ import java.util.regex.Pattern;
         String name = (String) map.get("briefTitle");
         String studyOid = (String) map.get("studyEnvOid");
         String studyEnvUuid = (String) map.get("studyEnvUuid");
+        String description = (String) map.get("description");
+        String studyType = (String) map.get("type");
+        String phase = (String) map.get("phase");
+        String startDateStr = (String) map.get("expectedStartDate");
+        String endDateStr = (String) map.get("expectedEndDate");
+        Integer expectedTotalEnrollment = (Integer) map.get("expectedTotalEnrollment");
 
         Matcher m = Pattern.compile("(.+)\\((.+)\\)").matcher(studyOid);
         String envType = "";
@@ -200,6 +243,42 @@ import java.util.regex.Pattern;
         } else {
             name = name.trim();
         }
+        if (description == null) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "Description");
+            errorObjects.add(errorOBject);
+        } else {
+            description = description.trim();
+        }
+
+        if (expectedTotalEnrollment == null) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "ExpectedTotalEnrollment");
+            errorObjects.add(errorOBject);
+        }
+
+        if (startDateStr == null) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "StartDate");
+            errorObjects.add(errorOBject);
+        } else {
+            startDateStr = startDateStr.trim();
+        }
+
+        Date startDate = formatDateString(startDateStr, "StartDate", errorObjects);
+        if (endDateStr == null) {
+            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "EndDate");
+            errorObjects.add(errorOBject);
+        } else {
+            endDateStr = endDateStr.trim();
+        }
+        Date endDate = formatDateString(endDateStr, "EndDate", errorObjects);
+
+        if (studyType != null ) {
+            studyType = studyType.toLowerCase();
+            if (!verifyStudyTypeExist(studyType)) {
+                ErrorObject errorOBject = createErrorObject("Study Object", "Study Type is not Valid", "StudyType");
+                errorObjects.add(errorOBject);
+            }
+        }
+
         if (StringUtils.isEmpty(studyOid)) {
             ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "oid");
             errorObjects.add(errorOBject);
@@ -214,6 +293,7 @@ import java.util.regex.Pattern;
             studyEnvUuid = studyEnvUuid.trim();
         }
 
+        StudyParameterConfig studyParameterConfig = processStudyConfigParameters(map, errorObjects);
         Locale locale = new Locale("en_US");
         request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
         ResourceBundleProvider.updateLocale(locale);
@@ -278,11 +358,43 @@ import java.util.regex.Pattern;
         study.setOc_oid(studyOid);
         study.setEnvType(StudyEnvEnum.valueOf(envType));
         study.setStudyEnvUuid(studyEnvUuid);
+        study.setPhase(phase);
         Study byOidEnvType = studyDao.findByOidEnvType(studyOid, StudyEnvEnum.valueOf(envType));
         if (byOidEnvType != null && byOidEnvType.getOc_oid() != null) {
             return getResponseSuccess(byOidEnvType);
         }
+        study.setDatePlannedStart(startDate);
+        study.setDatePlannedEnd(endDate);
+        study.setExpectedTotalEnrollment((expectedTotalEnrollment));
+        study.setProtocolType(studyType.toLowerCase());
+        Study schemaStudy = createSchemaStudy(request, study, ownerUserAccount);
+        setStudyParameters(request, study, schemaStudy, studyParameterConfig);
+        logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
 
+        if (errorObjects != null && errorObjects.size() != 0) {
+            studyDTO.setMessage(validation_failed_message);
+            response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        } else {
+            studyDTO.setStudyOid(schemaStudy.getOc_oid());
+            studyDTO.setMessage(validation_passed_message);
+            studyDTO.setUniqueProtocolID(schemaStudy.getUniqueIdentifier());
+            logger.debug("study oc_id:" + schemaStudy.getOc_oid());
+
+            ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
+            responseSuccess.setMessage(studyDTO.getMessage());
+            responseSuccess.setStudyOid(studyDTO.getStudyOid());
+            responseSuccess.setUniqueStudyID(studyDTO.getUniqueProtocolID());
+            responseSuccess.setSchemaName(study.getSchemaName());
+            response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
+        }
+        request.getSession().setAttribute("userContextMap", null);
+        AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating study", "ACTIVE");
+        AsyncStudyHelper.put(uniqueStudyID, asyncStudyDone);
+
+        return response;
+
+    }
+    private Study createSchemaStudy(HttpServletRequest request, Study study, UserAccountBean ownerUserAccount) throws Exception {
         StudyInfoObject studyInfoObject = null;
         Study schemaStudy = null;
         try {
@@ -297,34 +409,41 @@ import java.util.regex.Pattern;
             }
             throw e;
         }
-
-        logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
-
-        if (errorObjects != null && errorObjects.size() != 0) {
-            studyDTO.setMessage(validation_failed_message);
-            response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-        } else {
-
-            studyDTO.setStudyOid(schemaStudy.getOc_oid());
-            studyDTO.setMessage(validation_passed_message);
-            studyDTO.setUniqueProtocolID(schemaStudy.getUniqueIdentifier());
-            logger.debug("study oc_id:" + schemaStudy.getOc_oid());
-
-            ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
-            responseSuccess.setMessage(studyDTO.getMessage());
-            responseSuccess.setStudyOid(studyDTO.getStudyOid());
-            responseSuccess.setUniqueStudyID(studyDTO.getUniqueProtocolID());
-            responseSuccess.setSchemaName(studyInfoObject.getSchema());
-            response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
-        }
-        request.getSession().setAttribute("userContextMap", null);
-        AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating study", "ACTIVE");
-        AsyncStudyHelper.put(uniqueStudyID, asyncStudyDone);
-
-        return response;
-
+        return schemaStudy;
     }
-
+    private void setStudyParameters(HttpServletRequest request, Study study, Study schemaStudy, StudyParameterConfig studyParameterConfig) {
+        String schema = CoreResources.getRequestSchema(request);
+        CoreResources.setRequestSchema(request, study.getSchemaName());
+        sdao = new StudyDAO(dataSource);
+        StudyBean sb = (StudyBean) sdao.findByPK(schemaStudy.getStudyId());
+        sb.setStudyParameterConfig(studyParameterConfig);
+        sdao.update(sb);
+        if (StringUtils.isNotEmpty(schema))
+            CoreResources.setRequestSchema(request, schema);
+    }
+    private Date formatDateString(String dateStr, String fieldName, List<ErrorObject> errorObjects) throws ParseException {
+        String format = "yyyy-MM-dd";
+        SimpleDateFormat formatter = null;
+        Date formattedDate = null;
+        if (dateStr != "" && dateStr != null) {
+            try {
+                formatter = new SimpleDateFormat(format);
+                formattedDate = formatter.parse(dateStr);
+            } catch (ParseException e) {
+                ErrorObject errorOBject = createErrorObject("Study Object",
+                        "The StartDate format is not a valid 'yyyy-MM-dd' format", "fieldName");
+                errorObjects.add(errorOBject);
+            }
+            if (formattedDate != null) {
+                if (!dateStr.equals(formatter.format(formattedDate))) {
+                    ErrorObject errorOBject = createErrorObject("Study Object",
+                            "The StartDate format is not a valid 'yyyy-MM-dd' format", fieldName);
+                    errorObjects.add(errorOBject);
+                }
+            }
+        }
+        return formattedDate;
+    }
 
     private ResponseEntity<Object> getResponseSuccess(Study existingStudy) {
 
@@ -607,7 +726,7 @@ import java.util.regex.Pattern;
         String name = (String) map.get("briefTitle");
         String principalInvestigator = (String) map.get("principalInvestigator");
         String uniqueIdentifier = (String) map.get("uniqueIdentifier");
-        String expectedTotalEnrollment = (String) map.get("expectedTotalEnrollment");
+        Integer expectedTotalEnrollment = (Integer) map.get("expectedTotalEnrollment");
         String studyEnvSiteUuid = (String) map.get("studyEnvSiteUuid");
         String ocOid = (String) map.get("ocOid");
         String statusStr = (String) map.get("status");
@@ -637,8 +756,6 @@ import java.util.regex.Pattern;
         if (expectedTotalEnrollment == null) {
             ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "ExpectedTotalEnrollment");
             errorObjects.add(errorOBject);
-        } else {
-            expectedTotalEnrollment = expectedTotalEnrollment.trim();
         }
 
         if (studyEnvSiteUuid == null) {
@@ -653,6 +770,12 @@ import java.util.regex.Pattern;
             errorObjects.add(errorOBject);
         } else {
             ocOid = ocOid.trim();
+        }
+        if (StringUtils.isEmpty(statusStr)) {
+            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "status");
+            errorObjects.add(errorOBject);
+        } else {
+            statusStr = statusStr.toLowerCase();
         }
         Status status = Status.getByName(statusStr);
 
@@ -776,8 +899,9 @@ import java.util.regex.Pattern;
             ErrorObject errorOBject = createErrorObject("Site Object", "PrincipleInvestigator Length exceeds the max length 255", "PrincipleInvestigator");
             errorObjects.add(errorOBject);
         }
-        if (request.getAttribute("expectedTotalEnrollment") != null && Integer.valueOf((String) request.getAttribute("expectedTotalEnrollment")) <= 0) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "ExpectedTotalEnrollment Length can't be negative", "ExpectedTotalEnrollment");
+        if ((request.getAttribute("expectedTotalEnrollment") != null)
+                && ((Integer) request.getAttribute("expectedTotalEnrollment") <= 0)) {
+            ErrorObject errorOBject = createErrorObject("Site Object", "ExpectedTotalEnrollment Length can't be negative or zero", "ExpectedTotalEnrollment");
             errorObjects.add(errorOBject);
         }
 
@@ -1024,7 +1148,9 @@ import java.util.regex.Pattern;
 
     public Boolean verifyStudyTypeExist(String studyType) {
         ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
-        if (!studyType.equals(resadmin.getString("interventional")) && !studyType.equals(resadmin.getString("observational"))) {
+        if (!studyType.equalsIgnoreCase(resadmin.getString("interventional"))
+                && !studyType.equalsIgnoreCase(resadmin.getString("observational"))
+                && !studyType.equalsIgnoreCase(resadmin.getString("other"))) {
             System.out.println("Study Type not supported");
             return false;
         }
@@ -1233,7 +1359,7 @@ import java.util.regex.Pattern;
     }
 
     public SiteDTO buildSiteDTO(String uniqueSiteStudyID, String name, String principalInvestigator,
-            String expectedTotalEnrollment, Status status, FacilityInfo facilityInfo) {
+            Integer expectedTotalEnrollment, Status status, FacilityInfo facilityInfo) {
 
         SiteDTO siteDTO = new SiteDTO();
         siteDTO.setUniqueSiteProtocolID(uniqueSiteStudyID);
