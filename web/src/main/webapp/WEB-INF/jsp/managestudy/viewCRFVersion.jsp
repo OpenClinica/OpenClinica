@@ -18,27 +18,27 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+    <fmt:message key="instructions" bundle="${resword}"/>
 
-		<div class="sidebar_tab_content">
+    <div class="sidebar_tab_content">
 
-		</div>
+    </div>
 
-		</td>
+    </td>
 
-	</tr>
-	<tr id="sidebar_Instructions_closed">
-		<td class="sidebar_tab">
+  </tr>
+  <tr id="sidebar_Instructions_closed">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+    <fmt:message key="instructions" bundle="${resword}"/>
 
-		</td>
+    </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
@@ -122,7 +122,7 @@
    <td class="table_cell"><c:out value="${group.meta.repeatNum}"/>&nbsp;</td>
    <td class="table_cell"><c:out value="${group.meta.repeatMax}"/>&nbsp;</td>
    <td class="table_cell">
-   		<c:choose>
+      <c:choose>
       <c:when test="${group.meta.showGroup==true}">
        <fmt:message key="yes" bundle="${resword}"/>
       </c:when>
@@ -188,10 +188,10 @@
    <tr valign="top">
     <c:choose>
     <c:when test="${item.id > 0}">
-    	<td class="table_cell"><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"><c:out value="${item.name}"/></a></td>
+      <td class="table_cell"><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"><c:out value="${item.name}"/></a></td>
     </c:when>
     <c:otherwise>
-    	<td class="table_cell"><c:out value="${item.name}"/></td>
+      <td class="table_cell"><c:out value="${item.name}"/></td>
     </c:otherwise>
     </c:choose>
     <td class="table_cell"><c:out value="${item.oid}"/>&nbsp;</td>
@@ -206,10 +206,10 @@
     <td class="table_cell"><c:out value="${item.description}"/>&nbsp;</td>
     <c:choose>
     <c:when test="${item.itemMeta.groupLabel != 'Ungrouped'}">
-    	<td class="table_cell"><c:out value="${item.itemMeta.groupLabel}"/></td>
+      <td class="table_cell"><c:out value="${item.itemMeta.groupLabel}"/></td>
     </c:when>
     <c:otherwise>
-    	<td class="table_cell"><c:out value=""/></td>
+      <td class="table_cell"><c:out value=""/></td>
     </c:otherwise>
     </c:choose>
     <td class="table_cell"><c:out value="${item.units}"/>&nbsp;</td>
@@ -226,15 +226,15 @@
       <c:set var="optionSize" value="${optionSize+1}"/>
     </c:forEach>
     <c:forEach var="option" items="${item.itemMeta.responseSet.options}">
-     	<c:choose>
-     		<c:when test="${optionSize > 1}">
-     			<c:out value="${option.text}"/>,
-     		</c:when>
-     		<c:otherwise>
-      			<c:out value="${option.text}"/>
-      		</c:otherwise>
-      	</c:choose>
-      	<c:set var="optionSize" value="${optionSize-1}"/>
+      <c:choose>
+        <c:when test="${optionSize > 1}">
+          <c:out value="${option.text}"/>,
+        </c:when>
+        <c:otherwise>
+            <c:out value="${option.text}"/>
+          </c:otherwise>
+        </c:choose>
+        <c:set var="optionSize" value="${optionSize-1}"/>
     </c:forEach>&nbsp;
     </td>
     <td class="table_cell">
@@ -243,15 +243,15 @@
       <c:set var="optionSize" value="${optionSize+1}"/>
     </c:forEach>
     <c:forEach var="option" items="${item.itemMeta.responseSet.options}">
-     	<c:choose>
-     		<c:when test="${optionSize > 1}">
-     			<c:out value="${option.value}"/>,
-     		</c:when>
-     		<c:otherwise>
-      			<c:out value="${option.value}"/>
-      		</c:otherwise>
-      	</c:choose>
-      	<c:set var="optionSize" value="${optionSize-1}"/>
+      <c:choose>
+        <c:when test="${optionSize > 1}">
+          <c:out value="${option.value}"/>,
+        </c:when>
+        <c:otherwise>
+            <c:out value="${option.value}"/>
+          </c:otherwise>
+        </c:choose>
+        <c:set var="optionSize" value="${optionSize-1}"/>
     </c:forEach>&nbsp;
     </td>
      <td class="table_cell">
