@@ -304,8 +304,9 @@
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject" bundle="${resword}"/></td>
    <td class="table_cell">
+
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.collectDob == '1'}">
+   <c:when test="${(studyToView.studyParameterConfig.collectDob == '1')}">
   <fmt:message key="yes" bundle="${resword}"/>
    </c:when>
    <c:when test="${studyToView.studyParameterConfig.collectDob == '2'}">
@@ -347,14 +348,15 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'required'}">
+   <c:when test="${(studyToView.studyParameterConfig.subjectPersonIdRequired == 'required')
+        or ((studyToView.studyParameterConfig.subjectPersonIdRequired == 'always'))}">
     <fmt:message key="required" bundle="${resword}"/>
    </c:when>
     <c:when test="${studyToView.studyParameterConfig.subjectPersonIdRequired == 'optional'}">
     <fmt:message key="optional" bundle="${resword}"/>
    </c:when>
    <c:otherwise>
-     <fmt:message key="not_used" bundle="${resword}"/>
+       <c:out value="${studyToView.studyParameterConfig.subjectPersonIdRequired}"/>
    </c:otherwise>
   </c:choose>
   </td>

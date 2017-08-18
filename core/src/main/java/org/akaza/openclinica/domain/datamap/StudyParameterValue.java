@@ -1,17 +1,7 @@
 package org.akaza.openclinica.domain.datamap;
 // Generated Jul 31, 2013 2:03:33 PM by Hibernate Tools 3.4.0.CR1
 
-import javax.persistence.AttributeOverride;
-import javax.persistence.AttributeOverrides;
-import javax.persistence.Column;
-import javax.persistence.EmbeddedId;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.Table;
+import javax.persistence.*;
 
 import org.akaza.openclinica.domain.AbstractMutableDomainObject;
 import org.akaza.openclinica.domain.DataMapDomainObject;
@@ -61,7 +51,7 @@ public class StudyParameterValue  extends DataMapDomainObject {
 	}
 
 	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "study_id", insertable = false, updatable = false)
+	@JoinColumn(name = "study_id")
 	public Study getStudy() {
 		return this.study;
 	}
@@ -70,8 +60,8 @@ public class StudyParameterValue  extends DataMapDomainObject {
 		this.study = study;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
-	@JoinColumn(name = "parameter", referencedColumnName = "handle", insertable = false, updatable = false)
+	@ManyToOne(cascade= CascadeType.ALL, fetch = FetchType.LAZY)
+	@JoinColumn(name = "parameter", referencedColumnName = "handle")
 	public StudyParameter getStudyParameter() {
 		return this.studyParameter;
 	}
@@ -80,7 +70,7 @@ public class StudyParameterValue  extends DataMapDomainObject {
 		this.studyParameter = studyParameter;
 	}
 
-	@Column(name = "value", insertable = false, updatable = false, length = 50)
+	@Column(name = "value", length = 50)
 	public String getValue() {
 		return this.value;
 	}
