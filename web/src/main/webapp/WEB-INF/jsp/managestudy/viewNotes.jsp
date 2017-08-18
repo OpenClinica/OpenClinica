@@ -143,10 +143,6 @@
     <c:if test="${empty summaryMap}"><fmt:message key="There_are_no_discrepancy_notes" bundle="${resword}"/></c:if>
     <!-- NEW Summary-->
     <table border="0" cellspacing="0" class="summaryTable" style="width:600px;">
-        <tr><td><b>Status</b></td>
-            <td></td>
-            <td align="center"><strong>Queries</strong></td>
-        </tr>
         <c:forEach var="status" items="${mapKeys}">
             <c:if test="${(status.name != 'Resolution Proposed') && (status.name != 'Not Applicable')}">
                 <tr>
