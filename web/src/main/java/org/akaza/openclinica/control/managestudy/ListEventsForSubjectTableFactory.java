@@ -114,7 +114,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(8, "icon icon-icon-sign");
 
         crfColumnImageIconPaths.put(0, "icon icon-file-excel red");
-        crfColumnImageIconPaths.put(1, "icon icon-clock2");
+        crfColumnImageIconPaths.put(1, "icon icon-doc");
         crfColumnImageIconPaths.put(2, "icon icon-pencil-squared orange");
         crfColumnImageIconPaths.put(3, "icon icon-icon-dataEntryCompleted orange");
         crfColumnImageIconPaths.put(4, "icon icon-icon-doubleDataEntry orange");
