@@ -72,9 +72,9 @@
 <h1><span class="title_manage"><fmt:message key="enter_or_validate_data" bundle="${resword}"/><c:out value="${studyEvent.studyEventDefinition.name}" /></span></h1>
 
 
-
+&nbsp;&nbsp;
 <a name="global"><a href="javascript:leftnavExpand('globalRecord');javascript:setImage('ExpandGroup5','images/bt_Collapse.gif');"><img
-  name="ExpandGroup5" src="images/bt_Expand.gif" border="0"></a></a></div>
+  name="ExpandGroup5" height="15px" src="images/bt_Expand.gif" border="0"></a></a></div>
 
 <div id="globalRecord">
 <div style="width: 350px">
@@ -97,7 +97,7 @@
                         <td class="table_tools">
                             &nbsp;
                             <c:if test="${studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && study.status.available && studyEvent.editable}">
-                                <a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"><span class="icon icon-pencil" border="0" align="left"></a>
+                                <a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"></a>
                                 &nbsp;
                                 <a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"><fmt:message key="edit_study_event" bundle="${resword}"/></a>
                             </c:if>
@@ -258,7 +258,6 @@
     <td class="table_header_row"><fmt:message key="version" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="validation" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
 </tr>
 <c:set var="rowCount" value="${0}" />
@@ -397,7 +396,7 @@
     </c:if>
     &nbsp;</td>
 
-<td class="table_cell">&nbsp;</td>
+
 
 <td class="table_cell">
     <table >

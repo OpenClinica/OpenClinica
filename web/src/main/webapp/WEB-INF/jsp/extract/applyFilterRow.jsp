@@ -36,13 +36,13 @@
 			<td>	
 				<a href="ApplyFilter?action=details&filterId=<c:out value="${currRow.bean.id}"/>"
 			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
-		    name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><spam 
+		    name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 		    </td><td>
 		    	<a href="ApplyFilter?action=validate&submit=Apply Filter&filterId=<c:out value="${currRow.bean.id}"/>"
 			onMouseDown="javascript:setImage('bt_Export1','images/bt_Export_d.gif');"
-			onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"><img 
-		    name="bt_Export1" src="images/bt_Export.gif" border="0" alt="<fmt:message key="apply_filter" bundle="${resword}"/>" title="<fmt:message key="apply_filter" bundle="${resword}"/>" align="left" hspace="6"></a>
+			onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"><span 
+		    name="bt_Export1" class="icon icon-upload" border="0" alt="<fmt:message key="apply_filter" bundle="${resword}"/>" title="<fmt:message key="apply_filter" bundle="${resword}"/>" align="left" hspace="6"></a>
 			</td>
 				
 			

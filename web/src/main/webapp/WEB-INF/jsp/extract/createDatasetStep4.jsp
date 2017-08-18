@@ -36,7 +36,7 @@
 		<fmt:message key="instructions" bundle="${resword}"/>
 		<c:if test="${newDataset.id>0}">
 		<div class="sidebar_tab_content">
-		<P><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/> <font color="red"><fmt:message key="name_description_required" bundle="${restext}"/></font></P>
+		<P><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/></P>
 		<p><fmt:message key="copy_dataset_by_change_name" bundle="${restext}"/></p>
 		</div>
 		</c:if>
@@ -101,18 +101,19 @@
 <p>Please enter the dataset properties in the fields below.  Be descriptive.  <font color="red">All fields are required.</font></p>
 -->
 
-<c:if test="${newDataset.id<=0}"><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/> <font color="red"><fmt:message key="name_description_required" bundle="${restext}"/></font></c:if>
+<c:if test="${newDataset.id<=0}"><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/> </c:if>
 
 <form action="CreateDataset" method="post">
 <input type="hidden" name="action" value="specifysubmit"/><br>
-<table>
+<table border="0">
 	<tr>
 
 		<td><fmt:message key="name" bundle="${resword}"/></td>
 
 		<td>
-			<input type="text" align="left" name="dsName" size="33" value="<c:out value='${dsName}' />"/>
+			<input autofocus="autofocus" type="text" align="left" name="dsName" size="40" value="<c:out value='${dsName}' />"/> 
 		</td>
+		<td>&nbsp;*</td>
 
 	</tr>
 	<tr>
@@ -128,8 +129,8 @@
 
 		<td>
 			<textarea name="dsDesc" cols="40" rows="4"><c:out value="${dsDesc}" /></textarea>
-
 		</td>
+		<td>&nbsp;*</td>
 	</tr>
 	<tr>
 		<td></td>
