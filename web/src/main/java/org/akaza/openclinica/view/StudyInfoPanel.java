@@ -684,7 +684,7 @@ public class StudyInfoPanel implements Serializable {
                     if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()) {
                         // logger.info("ecb id*******" + ecb.getId() +
                         // dedc.getEventCRF().getId());
-                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc'' alt='Not Started'/>", "<span class='alert'>"
+                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>", "<span class='alert'>"
                             + dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
                     } else {
                         displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>",

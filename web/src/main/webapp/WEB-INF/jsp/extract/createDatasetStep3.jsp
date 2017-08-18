@@ -34,7 +34,7 @@
 		<fmt:message key="instructions" bundle="${resword}"/>
 		<c:if test="${newDataset.id>0}">
 		<div class="sidebar_tab_content">
-		<P><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/> <font color="red"><fmt:message key="name_description_required" bundle="${restext}"/></font></P>
+		<P><fmt:message key="enter_dataset_properties_be_descriptive" bundle="${restext}"/></P>
 		<p><fmt:message key="copy_dataset_by_change_name" bundle="${restext}"/></p>
 		</div>
 		</c:if>

@@ -26,9 +26,9 @@
 <tr id="sidebar_Instructions_open" style="display: none">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+		<fmt:message key="instructions" bundle="${resword}"/>
 
 		<div class="sidebar_tab_content">
 		</div>
@@ -39,9 +39,9 @@
 	<tr id="sidebar_Instructions_closed" style="display: all">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+		<fmt:message key="instructions" bundle="${resword}"/>
 
 		</td>
   </tr>
@@ -87,7 +87,6 @@
 	  	<div class="formfieldXL_BG">
 	  	<input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL">
 	  	</div>
-	  	<br>
 	  	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include>
 	  </td>
 	  <td>
@@ -108,13 +107,13 @@
 	  <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
 	  <td valign="top">
 	  <A HREF="#" >
-	      <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger"/>
+	      <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger"/>
 	      <script type="text/javascript">
 	      Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger" });
 	      </script>
 	  </a>
 	  <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-	      <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=<c:out value="${studySub.id}"/>&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;"><img id="flag_enrollmentDate" name="flag_enrollmentDate" src="images/icon_noNote.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+	      <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=<c:out value="${studySub.id}"/>&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;"><span id="flag_enrollmentDate" name="flag_enrollmentDate" class="icon icon-flag blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
 	  </c:if>
 	  </td>
 	 </tr>
@@ -204,7 +203,6 @@
 
 </div>
 </c:if>
-<br>
  <input type="submit" name="Submit" value="<fmt:message key="confirm_changes" bundle="${resword}"/>" class="button_long">
  <input type="button" onclick="confirmCancel('ListStudySubjects');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 </form>

@@ -474,8 +474,7 @@
 
     </c:otherwise>
     </c:choose>
-        <a name="group"><a href="javascript:leftnavExpand('groups');">
-            <img id="excl_groups" src="images/bt_Expand.gif" border="0"> <fmt:message key="group" bundle="${resword}"/></a></a></div>
+</div>
 <div id="groups" style="display:none;">
     <div style="width: 600px">
         <!-- These DIVs define shaded box borders -->
