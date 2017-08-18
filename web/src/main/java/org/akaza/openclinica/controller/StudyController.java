@@ -8,6 +8,7 @@ import org.akaza.openclinica.bean.login.*;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import org.akaza.openclinica.controller.helper.OCUserDTO;
@@ -19,6 +20,7 @@ import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
@@ -293,7 +295,7 @@ import java.util.regex.Pattern;
             studyEnvUuid = studyEnvUuid.trim();
         }
 
-    //    StudyParameterConfig studyParameterConfig = processStudyConfigParameters(map, errorObjects);
+        StudyParameterConfig studyParameterConfig = processStudyConfigParameters(map, errorObjects);
         Locale locale = new Locale("en_US");
         request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
         ResourceBundleProvider.updateLocale(locale);
@@ -368,7 +370,7 @@ import java.util.regex.Pattern;
         study.setExpectedTotalEnrollment((expectedTotalEnrollment));
         study.setProtocolType(studyType.toLowerCase());
         Study schemaStudy = createSchemaStudy(request, study, ownerUserAccount);
-        //setStudyParameters(request, study, schemaStudy, studyParameterConfig);
+        setStudyParameters(request, study, schemaStudy, studyParameterConfig);
         logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
 
         if (errorObjects != null && errorObjects.size() != 0) {
@@ -411,13 +413,95 @@ import java.util.regex.Pattern;
         }
         return schemaStudy;
     }
+    private void updateParameter(StudyParameterValueDAO spvdao, StudyParameterValueBean spv) {
+        StudyParameterValueBean spv1 = spvdao.findByHandleAndStudy(spv.getStudyId(), spv.getParameter());
+        logger.debug("found parameter: " + spv.getParameter());
+        if (spv1.getId() > 0) {
+            spvdao.update(spv);
+            logger.debug("updating");
+        } else {
+            spvdao.create(spv);
+            logger.debug("creating");
+        }
+    }
     private void setStudyParameters(HttpServletRequest request, Study study, Study schemaStudy, StudyParameterConfig studyParameterConfig) {
         String schema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, study.getSchemaName());
         sdao = new StudyDAO(dataSource);
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+
         StudyBean sb = (StudyBean) sdao.findByPK(schemaStudy.getStudyId());
         sb.setStudyParameterConfig(studyParameterConfig);
-        sdao.update(sb);
+        StudyParameterValueBean spv = new StudyParameterValueBean();
+
+        spv.setStudyId(sb.getId());
+        spv.setParameter("collectDob");
+        int collectDob;
+        if (StringUtils.isEmpty(sb.getStudyParameterConfig().getCollectDob())) {
+            collectDob = 3;
+        } else {
+            switch (sb.getStudyParameterConfig().getCollectDob().toLowerCase()) {
+            case "always":
+                collectDob = 1;
+                break;
+            case "only the year":
+                collectDob = 2;
+                break;
+            default:
+                collectDob = 3;
+                break;
+            }
+        }
+        spv.setValue(new Integer(collectDob).toString());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("discrepancyManagement");
+        spv.setValue(sb.getStudyParameterConfig().getDiscrepancyManagement());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("genderRequired");
+        spv.setValue(sb.getStudyParameterConfig().getGenderRequired());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("subjectPersonIdRequired");
+        spv.setValue(sb.getStudyParameterConfig().getSubjectPersonIdRequired());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("interviewerNameRequired");
+        spv.setValue(sb.getStudyParameterConfig().getInterviewerNameRequired());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("interviewerNameDefault");
+        spv.setValue(sb.getStudyParameterConfig().getInterviewerNameDefault());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("interviewerNameEditable");
+        spv.setValue(sb.getStudyParameterConfig().getInterviewerNameEditable());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("interviewDateRequired");
+        spv.setValue(sb.getStudyParameterConfig().getInterviewDateRequired());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("interviewDateDefault");
+        spv.setValue(sb.getStudyParameterConfig().getInterviewDateDefault());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("interviewDateEditable");
+        spv.setValue(sb.getStudyParameterConfig().getInterviewDateEditable());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("subjectIdGeneration");
+        spv.setValue(sb.getStudyParameterConfig().getSubjectIdGeneration());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("subjectIdPrefixSuffix");
+        spv.setValue(sb.getStudyParameterConfig().getSubjectIdPrefixSuffix());
+        updateParameter(spvdao, spv);
+
+        spv.setParameter("personIdShownOnCRF");
+        spv.setValue(sb.getStudyParameterConfig().getPersonIdShownOnCRF());
+        updateParameter(spvdao, spv);
         if (StringUtils.isNotEmpty(schema))
             CoreResources.setRequestSchema(request, schema);
     }
@@ -915,7 +999,6 @@ import java.util.regex.Pattern;
                     ownerUserAccount, parentStudy.getId(), status, facilityInfo, formattedStartDate, formattedStudyDate);
             siteBean.setSchemaName(parentStudy.getSchemaName());
             siteBean.setStudyEnvSiteUuid(studyEnvSiteUuid);
-            siteBean.setStudyEnvUuid(parentStudy.getStudyEnvUuid());
             StudyBean sBean = createStudy(siteBean, ownerUserAccount);
             // get the schema study
             request.setAttribute("requestSchema", parentStudy.getSchemaName());

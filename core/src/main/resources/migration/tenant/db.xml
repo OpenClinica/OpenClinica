@@ -106,6 +106,7 @@
             <column name="login_attempt_date" type="TIMESTAMP(6) WITHOUT TIME ZONE"/>
             <column name="login_status_code" type="INT"/>
             <column name="version" type="INT"/>
+            <column name="details" type="VARCHAR(255)"/>
         </createTable>
     </changeSet>
     <changeSet author="yogi (generated)" id="1497972092906-11">

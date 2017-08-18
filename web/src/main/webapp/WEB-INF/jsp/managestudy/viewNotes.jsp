@@ -138,7 +138,7 @@
     <img name="ExpandGroup1" src="images/bt_Collapse.gif" border="0">
     <fmt:message key="hide_summary_statistics" bundle="${resword}"/></a>
 </div>
-<div style="display:block; width:600px;">
+<div  id="sumBox" style="display:block; width:600px;">
     <%--<h3>Summary statistics</h3>--%>
     <c:if test="${empty summaryMap}"><fmt:message key="There_are_no_discrepancy_notes" bundle="${resword}"/></c:if>
     <!-- NEW Summary-->
