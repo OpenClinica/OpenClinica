@@ -16,6 +16,7 @@ import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudyParameterDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -23,6 +24,8 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
+import org.akaza.openclinica.domain.datamap.StudyParameter;
+import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.LiquibaseOnDemandService;
@@ -30,7 +33,6 @@ import org.akaza.openclinica.service.SchemaCleanupService;
 import org.akaza.openclinica.service.SiteBuildService;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.lang.StringUtils;
-import org.json.HTTP;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -38,9 +40,6 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.transaction.annotation.Isolation;
-import org.springframework.transaction.annotation.Propagation;
-import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -68,6 +67,7 @@ import java.util.regex.Pattern;
     @Autowired private LiquibaseOnDemandService liquibaseOnDemandService;
     @Autowired private SiteBuildService siteBuildService;
     @Autowired private SchemaCleanupService schemaCleanupService;
+    @Autowired StudyParameterDao studyParameterDao;
 
     /**
      * @api {post} /pages/auth/api/v1/studies/ Create a study
@@ -424,87 +424,115 @@ import java.util.regex.Pattern;
             logger.debug("creating");
         }
     }
+
     private void setStudyParameters(HttpServletRequest request, Study study, Study schemaStudy, StudyParameterConfig studyParameterConfig) {
         String schema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, study.getSchemaName());
-        sdao = new StudyDAO(dataSource);
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        List<StudyParameterValue> studyParameterValues = new ArrayList<>();
 
-        StudyBean sb = (StudyBean) sdao.findByPK(schemaStudy.getStudyId());
-        sb.setStudyParameterConfig(studyParameterConfig);
-        StudyParameterValueBean spv = new StudyParameterValueBean();
-
-        spv.setStudyId(sb.getId());
-        spv.setParameter("collectDob");
-        int collectDob;
-        if (StringUtils.isEmpty(sb.getStudyParameterConfig().getCollectDob())) {
-            collectDob = 3;
+        schemaStudy.setStudyParameterValues(studyParameterValues);
+        StudyParameterValue collectDobValue = new StudyParameterValue();
+        collectDobValue.setStudy(schemaStudy);
+        StudyParameter collectDob = studyParameterDao.findByHandle("collectDob");
+        collectDobValue.setStudyParameter(collectDob);
+        if (StringUtils.isEmpty(studyParameterConfig.getCollectDob())) {
+            collectDobValue.setValue("3");
         } else {
-            switch (sb.getStudyParameterConfig().getCollectDob().toLowerCase()) {
+            switch (studyParameterConfig.getCollectDob().toLowerCase()) {
             case "always":
-                collectDob = 1;
+                collectDobValue.setValue("1");
                 break;
             case "only the year":
-                collectDob = 2;
+                collectDobValue.setValue("2");
                 break;
             default:
-                collectDob = 3;
+                collectDobValue.setValue("3");
                 break;
             }
         }
-        spv.setValue(new Integer(collectDob).toString());
-        updateParameter(spvdao, spv);
+        studyParameterValues.add(collectDobValue);
 
-        spv.setParameter("discrepancyManagement");
-        spv.setValue(sb.getStudyParameterConfig().getDiscrepancyManagement());
-        updateParameter(spvdao, spv);
+        StudyParameterValue discrepancyManagementValue = new StudyParameterValue();
+        discrepancyManagementValue.setStudy(schemaStudy);
+        StudyParameter discrepancyManagement = studyParameterDao.findByHandle("discrepancyManagement");
+        discrepancyManagementValue.setStudyParameter(discrepancyManagement);
+        discrepancyManagementValue.setValue(studyParameterConfig.getDiscrepancyManagement());
+        studyParameterValues.add(discrepancyManagementValue);
 
-        spv.setParameter("genderRequired");
-        spv.setValue(sb.getStudyParameterConfig().getGenderRequired());
-        updateParameter(spvdao, spv);
+        StudyParameterValue genderRequiredValue = new StudyParameterValue();
+        genderRequiredValue.setStudy(schemaStudy);
+        StudyParameter genderRequired = studyParameterDao.findByHandle("genderRequired");
+        genderRequiredValue.setStudyParameter(genderRequired);
+        genderRequiredValue.setValue(studyParameterConfig.getGenderRequired());
+        studyParameterValues.add(genderRequiredValue);
 
-        spv.setParameter("subjectPersonIdRequired");
-        spv.setValue(sb.getStudyParameterConfig().getSubjectPersonIdRequired());
-        updateParameter(spvdao, spv);
+        StudyParameterValue subjectPersonIdRequiredValue = new StudyParameterValue();
+        subjectPersonIdRequiredValue.setStudy(schemaStudy);
+        StudyParameter subjectPersonIdRequired = studyParameterDao.findByHandle("subjectPersonIdRequired");
+        subjectPersonIdRequiredValue.setStudyParameter(subjectPersonIdRequired);
+        subjectPersonIdRequiredValue.setValue(studyParameterConfig.getSubjectPersonIdRequired());
+        studyParameterValues.add(subjectPersonIdRequiredValue);
 
-        spv.setParameter("interviewerNameRequired");
-        spv.setValue(sb.getStudyParameterConfig().getInterviewerNameRequired());
-        updateParameter(spvdao, spv);
+        StudyParameterValue interviewerNameRequiredValue = new StudyParameterValue();
+        interviewerNameRequiredValue.setStudy(schemaStudy);
+        StudyParameter interviewerNameRequired = studyParameterDao.findByHandle("interviewerNameRequired");
+        interviewerNameRequiredValue.setStudyParameter(interviewerNameRequired);
+        interviewerNameRequiredValue.setValue(studyParameterConfig.getInterviewerNameRequired());
+        studyParameterValues.add(interviewerNameRequiredValue);
 
-        spv.setParameter("interviewerNameDefault");
-        spv.setValue(sb.getStudyParameterConfig().getInterviewerNameDefault());
-        updateParameter(spvdao, spv);
+        StudyParameterValue interviewerNameEditableValue = new StudyParameterValue();
+        interviewerNameEditableValue.setStudy(schemaStudy);
+        StudyParameter interviewerNameEditable = studyParameterDao.findByHandle("interviewerNameEditable");
+        interviewerNameEditableValue.setStudyParameter(interviewerNameEditable);
+        interviewerNameEditableValue.setValue(studyParameterConfig.getInterviewerNameEditable());
+        studyParameterValues.add(interviewerNameEditableValue);
 
-        spv.setParameter("interviewerNameEditable");
-        spv.setValue(sb.getStudyParameterConfig().getInterviewerNameEditable());
-        updateParameter(spvdao, spv);
+        StudyParameterValue interviewDateRequiredValue = new StudyParameterValue();
+        interviewDateRequiredValue.setStudy(schemaStudy);
+        StudyParameter interviewDateRequired = studyParameterDao.findByHandle("interviewDateRequired");
+        interviewDateRequiredValue.setStudyParameter(interviewDateRequired);
+        interviewDateRequiredValue.setValue(studyParameterConfig.getInterviewDateRequired());
+        studyParameterValues.add(interviewDateRequiredValue);
 
-        spv.setParameter("interviewDateRequired");
-        spv.setValue(sb.getStudyParameterConfig().getInterviewDateRequired());
-        updateParameter(spvdao, spv);
+        StudyParameterValue interviewDateDefaultValue = new StudyParameterValue();
+        interviewDateDefaultValue.setStudy(schemaStudy);
+        StudyParameter interviewDateDefault = studyParameterDao.findByHandle("interviewDateDefault");
+        interviewDateDefaultValue.setStudyParameter(interviewDateDefault);
+        interviewDateDefaultValue.setValue(studyParameterConfig.getInterviewDateDefault());
+        studyParameterValues.add(interviewDateDefaultValue);
 
-        spv.setParameter("interviewDateDefault");
-        spv.setValue(sb.getStudyParameterConfig().getInterviewDateDefault());
-        updateParameter(spvdao, spv);
+        StudyParameterValue interviewDateEditableValue = new StudyParameterValue();
+        interviewDateEditableValue.setStudy(schemaStudy);
+        StudyParameter interviewDateEditable = studyParameterDao.findByHandle("interviewDateEditable");
+        interviewDateEditableValue.setStudyParameter(interviewDateEditable);
+        interviewDateEditableValue.setValue(studyParameterConfig.getInterviewDateEditable());
+        studyParameterValues.add(interviewDateEditableValue);
 
-        spv.setParameter("interviewDateEditable");
-        spv.setValue(sb.getStudyParameterConfig().getInterviewDateEditable());
-        updateParameter(spvdao, spv);
+        StudyParameterValue subjectIdGenerationValue = new StudyParameterValue();
+        subjectIdGenerationValue.setStudy(schemaStudy);
+        StudyParameter subjectIdGeneration = studyParameterDao.findByHandle("subjectIdGeneration");
+        subjectIdGenerationValue.setStudyParameter(subjectIdGeneration);
+        subjectIdGenerationValue.setValue(studyParameterConfig.getSubjectIdGeneration());
+        studyParameterValues.add(subjectIdGenerationValue);
 
-        spv.setParameter("subjectIdGeneration");
-        spv.setValue(sb.getStudyParameterConfig().getSubjectIdGeneration());
-        updateParameter(spvdao, spv);
+        StudyParameterValue subjectIdPrefixSuffixValue = new StudyParameterValue();
+        subjectIdPrefixSuffixValue.setStudy(schemaStudy);
+        StudyParameter subjectIdPrefixSuffix = studyParameterDao.findByHandle("subjectIdPrefixSuffix");
+        subjectIdPrefixSuffixValue.setStudyParameter(subjectIdPrefixSuffix);
+        subjectIdPrefixSuffixValue.setValue(studyParameterConfig.getSubjectIdPrefixSuffix());
+        studyParameterValues.add(subjectIdPrefixSuffixValue);
 
-        spv.setParameter("subjectIdPrefixSuffix");
-        spv.setValue(sb.getStudyParameterConfig().getSubjectIdPrefixSuffix());
-        updateParameter(spvdao, spv);
-
-        spv.setParameter("personIdShownOnCRF");
-        spv.setValue(sb.getStudyParameterConfig().getPersonIdShownOnCRF());
-        updateParameter(spvdao, spv);
+        StudyParameterValue personIdShownOnCRFValue = new StudyParameterValue();
+        personIdShownOnCRFValue.setStudy(schemaStudy);
+        StudyParameter personIdShownOnCRF = studyParameterDao.findByHandle("personIdShownOnCRF");
+        personIdShownOnCRFValue.setStudyParameter(personIdShownOnCRF);
+        personIdShownOnCRFValue.setValue(studyParameterConfig.getPersonIdShownOnCRF());
+        studyParameterValues.add(personIdShownOnCRFValue);
+        studyDao.saveOrUpdate(schemaStudy);
         if (StringUtils.isNotEmpty(schema))
             CoreResources.setRequestSchema(request, schema);
     }
+
     private Date formatDateString(String dateStr, String fieldName, List<ErrorObject> errorObjects) throws ParseException {
         String format = "yyyy-MM-dd";
         SimpleDateFormat formatter = null;
@@ -703,18 +731,32 @@ import java.util.regex.Pattern;
 
         if (StringUtils.isNotEmpty(facilityCity))
             facilityInfo.setFacilityCity(facilityCity.trim());
+        else
+            facilityInfo.setFacilityCity("");
         if (StringUtils.isNotEmpty(facilityState))
             facilityInfo.setFacilityState(facilityState.trim());
+        else
+            facilityInfo.setFacilityState("");
         if (StringUtils.isNotEmpty(facilityZip))
             facilityInfo.setFacilityZip(facilityZip.trim());
+        else
+            facilityInfo.setFacilityZip("");
         if (StringUtils.isNotEmpty(facilityCountry))
             facilityInfo.setFacilityCountry(facilityCountry.trim());
+        else
+            facilityInfo.setFacilityCountry("");
         if (StringUtils.isNotEmpty(facilityContact))
             facilityInfo.setFacilityContact(facilityContact.trim());
+        else
+            facilityInfo.setFacilityContact("");
         if (StringUtils.isNotEmpty(facilityEmail))
             facilityInfo.setFacilityEmail(facilityEmail.trim());
+        else
+            facilityInfo.setFacilityEmail("");
         if (StringUtils.isNotEmpty(facilityPhone))
             facilityInfo.setFacilityPhone(facilityPhone.trim());
+        else
+            facilityInfo.setFacilityPhone("");
 
         return facilityInfo;
     }

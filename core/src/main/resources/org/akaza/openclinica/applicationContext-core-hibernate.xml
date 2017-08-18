@@ -238,6 +238,7 @@
     <bean id="versioningMapDao" class="org.akaza.openclinica.dao.hibernate.VersioningMapDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="itemGroupMetadataDao" class="org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="studyParameterValueDao" class="org.akaza.openclinica.dao.hibernate.StudyParameterValueDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="studyParameterDao" class="org.akaza.openclinica.dao.hibernate.StudyParameterDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="dnItemDataMapDao" class="org.akaza.openclinica.dao.hibernate.DnItemDataMapDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="completionStatusDao" class="org.akaza.openclinica.dao.hibernate.CompletionStatusDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="discrepancyNoteDao" class="org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao" parent="abstractDomainDao" autowire="byName" />

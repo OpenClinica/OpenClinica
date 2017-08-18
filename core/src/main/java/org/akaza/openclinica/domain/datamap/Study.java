@@ -771,14 +771,14 @@ public class Study   extends DataMapDomainObject {
 		this.datasets = datasets;
 	}*/
 
-	//@OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
-/*	public List<StudyParameterValue> getStudyParameterValues() {
+	@OneToMany(cascade=CascadeType.ALL, fetch = FetchType.LAZY, mappedBy = "study")
+	public List<StudyParameterValue> getStudyParameterValues() {
 		return this.studyParameterValues;
 	}
 
 	public void setStudyParameterValues(List<StudyParameterValue> studyParameterValues) {
 		this.studyParameterValues = studyParameterValues;
-	}*/
+	}
 
 	@OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
 	public List<StudySubject> getStudySubjects() {
