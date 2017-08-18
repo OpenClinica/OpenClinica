@@ -25,21 +25,21 @@
 	<td class="table_cell">
 	 <table border="0" cellpadding="0" cellspacing="0">
 	 <tr>
-	 	<td><a href="ViewSingleJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=<c:out value="${currRow.bean.groupName}" />"><img name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></a></td>
-		<td><a href="UpdateJobExport?tname=<c:out value="${currRow.bean.fullName}" />"><img name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="2"></a></td>
+	 	<td><a href="ViewSingleJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=<c:out value="${currRow.bean.groupName}" />"><span name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></a></td>
+		<td><a href="UpdateJobExport?tname=<c:out value="${currRow.bean.fullName}" />"><span name="bt_Edit1" class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="2"></a></td>
 		<td>
 		<c:choose>
 			<c:when test="${currRow.bean.active}">
-				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=0" onClick='return confirm("<fmt:message key="confirm_pausing_this_job" bundle="${restext}"/>");'><img border="0" title="<fmt:message key="remove" bundle="${resword}"/>" src="images/bt_Remove.gif" alt="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="2"/></a> 
+				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=0" onClick='return confirm("<fmt:message key="confirm_pausing_this_job" bundle="${restext}"/>");'><span border="0" title="<fmt:message key="remove" bundle="${resword}"/>" class="icon icon-cancel" alt="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="2"/></a> 
 			</c:when>
 			<c:otherwise>
-				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=0" onClick='return confirm("<fmt:message key="confirm_restoring_this_job" bundle="${restext}"/>");'><img border="0" title="<fmt:message key="restore" bundle="${resword}"/>" src="images/bt_Restore.gif" alt="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="2"/></a>
+				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&gname=0" onClick='return confirm("<fmt:message key="confirm_restoring_this_job" bundle="${restext}"/>");'><span border="0" title="<fmt:message key="restore" bundle="${resword}"/>" class="icon icon-ccw" alt="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="2"/></a>
 			</c:otherwise>
 		</c:choose>
 		</td>&nbsp;
 		<c:if test="${userBean.sysAdmin}">
 			<td>
-				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&del=y&gname=0" onClick='return confirm("<fmt:message key="confirm_deleting_this_job" bundle="${restext}"/>");'><img border="0" title="<fmt:message key="delete" bundle="${resword}"/>" src="images/bt_Delete.gif" alt="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="2"/></a>
+				<a href="PauseJob?tname=<c:out value="${currRow.bean.fullName}" />&del=y&gname=0" onClick='return confirm("<fmt:message key="confirm_deleting_this_job" bundle="${restext}"/>");'><span border="0" title="<fmt:message key="delete" bundle="${resword}"/>" class="icon icon-trash red" alt="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="2"/></a>
 			</td>
 		</c:if>
 	 </tr>

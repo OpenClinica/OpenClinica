@@ -107,19 +107,19 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(1, "icon icon-clock2");
         imageIconPaths.put(2, "icon icon-doc");
         imageIconPaths.put(3, "icon icon-icon-dataEntryCompleted orange");
-        imageIconPaths.put(4, "icon icon-ok");
+        imageIconPaths.put(4, "icon icon-checkbox-checked green");
         imageIconPaths.put(5, "icon icon-stop-circle red");
         imageIconPaths.put(6, "icon icon-redo");
         imageIconPaths.put(7, "icon icon-icon-locked");
         imageIconPaths.put(8, "icon icon-icon-sign");
 
         crfColumnImageIconPaths.put(0, "icon icon-file-excel red");
-        crfColumnImageIconPaths.put(1, "icon icon-clock2");
+        crfColumnImageIconPaths.put(1, "icon icon-doc");
         crfColumnImageIconPaths.put(2, "icon icon-pencil-squared orange");
         crfColumnImageIconPaths.put(3, "icon icon-icon-dataEntryCompleted orange");
         crfColumnImageIconPaths.put(4, "icon icon-icon-doubleDataEntry orange");
-        crfColumnImageIconPaths.put(5, "icon icon-ok");
-        crfColumnImageIconPaths.put(6, "icon icon-ok");
+        crfColumnImageIconPaths.put(5, "icon icon-checkbox-checked green");
+        crfColumnImageIconPaths.put(6, "icon icon-checkbox-checked green");
         crfColumnImageIconPaths.put(7, "icon icon-icon-locked");
         this.showMoreLink = showMoreLink;
     }
