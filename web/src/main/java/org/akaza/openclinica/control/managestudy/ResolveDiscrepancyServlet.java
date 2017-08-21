@@ -104,7 +104,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String INPUT_NOTE_ID = "noteId";
     private static final String CAN_ADMIN_EDIT = "canAdminEdit";
     private static final String EVENT_CRF_ID = "ecId";
-    private static final String STUDY_SUB_ID = "studySubjectId";
     public static final String ORIGINATING_PAGE = "originatingPage";
     public static final String STUDYSUBJECTID = "studySubjectId";
 
@@ -345,7 +344,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
             request.setAttribute(EnketoFormServlet.FORM_URL1, part1);
             request.setAttribute(EnketoFormServlet.FORM_URL2, part2);
             request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module);
-            request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
+            if (!flavor.equals(SINGLE_ITEM_FLAVOR)) {
+                request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
+            } else {
+                request.setAttribute(STUDYSUBJECTID, "");
+            }
         }
         return true;
     }
