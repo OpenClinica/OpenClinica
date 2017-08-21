@@ -412,6 +412,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             String value = "";
             DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) ((HashMap<Object, Object>) item).get("discrepancyNoteBean");
             HtmlBuilder builder = new HtmlBuilder();
+
+            StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
+            Integer studySubjectId = studySubjectBean.getId();
+            if (studySubjectId != null) {
+                StringBuilder url = new StringBuilder();
+                url.append(downloadNotesLinkBuilder(studySubjectBean));
+                value = url.toString();
+            }
             // for "view" as action
             // This createNoteURL uses the same method as in ResolveDiscrepancyServlet
             String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
@@ -423,13 +431,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
                 if (dnb.getEntityType() != "eventCrf") {
-                    builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
+                    builder.a().href("EnterDataForStudyEvent?eventId=" + studySubjectBean.getId());
                     builder.close();
                     builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                     builder.aEnd();
                 } else {
                     if (dnb.getStageId() == 5) {
-                        builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
+                        builder.a().href("EnterDataForStudyEvent?eventId=" + studySubjectBean.getId());
                         builder.close();
                         builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                         builder.aEnd();
@@ -437,13 +445,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 }
             }
 
-            StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
-            Integer studySubjectId = studySubjectBean.getId();
-            if (studySubjectId != null) {
-                StringBuilder url = new StringBuilder();
-                url.append(downloadNotesLinkBuilder(studySubjectBean));
-                value = url.toString();
-            }
+           
 
             return builder.toString();
         }
