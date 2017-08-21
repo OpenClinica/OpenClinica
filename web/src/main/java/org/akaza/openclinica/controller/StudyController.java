@@ -69,6 +69,10 @@ import java.util.regex.Pattern;
     @Autowired private SchemaCleanupService schemaCleanupService;
     @Autowired StudyParameterDao studyParameterDao;
 
+
+    private static final String validation_failed_message = "VALIDATION FAILED";
+    private static final String validation_passed_message = "SUCCESS";
+
     /**
      * @api {post} /pages/auth/api/v1/studies/ Create a study
      * @apiName createNewStudy
@@ -164,7 +168,6 @@ import java.util.regex.Pattern;
 
     }
 
-
     private StudyParameterConfig processStudyConfigParameters(HashMap<String, Object> map, ArrayList<ErrorObject> errorObjects) {
         StudyParameterConfig spc = new StudyParameterConfig();
         String collectBirthDate = (String) map.get("collectDateOfBirth");
@@ -172,205 +175,265 @@ import java.util.regex.Pattern;
         String collectPersonId = (String) map.get("collectPersonId");
         Boolean showSecondaryId = (Boolean) map.get("showSecondaryId");
         if (collectBirthDate == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
+            errorObjects.add(errorObject);
         } else {
             collectBirthDate = collectBirthDate.trim();
         }
         spc.setCollectDob(collectBirthDate);
         if (collectSex == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "CollectSex");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "CollectSex");
+            errorObjects.add(errorObject);
         }
         spc.setGenderRequired(Boolean.toString(collectSex));
         if (collectPersonId == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "CollectPersonId");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "CollectPersonId");
+            errorObjects.add(errorObject);
         } else {
             collectPersonId = collectPersonId.trim();
         }
         spc.setSubjectPersonIdRequired(collectPersonId);
         if (showSecondaryId == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "ShowSecondaryId");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "ShowSecondaryId");
+            errorObjects.add(errorObject);
         }
         spc.setSecondaryLabelViewable(Boolean.toString(showSecondaryId));
         return spc;
     }
-    @RequestMapping(value = "/", method = RequestMethod.POST) public ResponseEntity<Object> createNewStudy(HttpServletRequest request,
+    @RequestMapping(value = "/", method = RequestMethod.PUT) public ResponseEntity<Object> UpdateStudy(HttpServletRequest request,
             @RequestBody HashMap<String, Object> map) throws Exception {
         ArrayList<ErrorObject> errorObjects = new ArrayList();
+        StudyDTO studyDTO = new StudyDTO();
+        logger.info("In Update Study Settings");
+        ResponseEntity<Object> response = null;
+
+        StudyParameters parameters = new StudyParameters(map);
+        parameters.setParameters();
+        errorObjects = parameters.validateParameters(request);
+
+        // get the study to update
+        CoreResources.setRequestSchema(request, "public");
+        Study existingStudy = studyDao.findByStudyEnvUuid(parameters.studyEnvUuid);
+        if (existingStudy == null) {
+            ErrorObject errorObject = createErrorObject("Study Object", "Missing Study", "studyEnvUuid");
+            errorObjects.add(errorObject);
+        }
+
+        if (errorObjects != null && errorObjects.size() != 0) {
+            studyDTO.setErrors(errorObjects);
+            studyDTO.setMessage(validation_failed_message);
+            response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+            return response;
+        }
+        setChangeableStudySettings(existingStudy, parameters);
+        studyDao.saveOrUpdate(existingStudy);
+        String schema = existingStudy.getSchemaName();
+        CoreResources.setRequestSchema(request, schema);
+        Study schemaStudy = studyDao.findByStudyEnvUuid(existingStudy.getStudyEnvUuid());
+        setChangeableStudySettings(schemaStudy, parameters);
+        updateStudyConfigParameters(request, schemaStudy, parameters.studyParameterConfig);
+        ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
+        responseSuccess.setMessage(validation_passed_message);
+        responseSuccess.setStudyOid(schemaStudy.getOc_oid());
+        responseSuccess.setUniqueStudyID(schemaStudy.getUniqueIdentifier());
+        responseSuccess.setSchemaName(schema);
+        response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
+        return response;
+    }
+
+
+    private class StudyParameters {
+        HashMap<String, Object> map;
+        String uniqueStudyID;
+        String name;
+        String studyOid;
+        String studyEnvUuid;
+        String description;
+        String studyType;
+        String phase;
+        String startDateStr;
+        String endDateStr;
+        Integer expectedTotalEnrollment;
+        Date startDate;
+        Date endDate;
+        StudyParameterConfig studyParameterConfig;
+
+        public StudyParameters(HashMap<String, Object> map) {
+            this.map = map;
+        }
+
+        void setParameters() {
+            uniqueStudyID = (String) map.get("uniqueStudyID");
+            name = (String) map.get("briefTitle");
+            studyOid = (String) map.get("studyEnvOid");
+            studyEnvUuid = (String) map.get("studyEnvUuid");
+            description = (String) map.get("description");
+            studyType = (String) map.get("type");
+            phase = (String) map.get("phase");
+            startDateStr = (String) map.get("expectedStartDate");
+            endDateStr = (String) map.get("expectedEndDate");
+            expectedTotalEnrollment = (Integer) map.get("expectedTotalEnrollment");
+        }
+
+        ArrayList<ErrorObject> validateParameters(HttpServletRequest request) throws ParseException {
+            ArrayList<ErrorObject> errorObjects = new ArrayList();
+
+            if (StringUtils.isEmpty(uniqueStudyID)) {
+                ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "UniqueStudyID");
+                errorObjects.add(errorObject);
+            } else {
+                uniqueStudyID = uniqueStudyID.trim();
+            }
+            if (StringUtils.isEmpty(name)) {
+                ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
+                errorObjects.add(errorObject);
+            } else {
+                name = name.trim();
+            }
+            if (description == null) {
+                ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "Description");
+                errorObjects.add(errorObject);
+            } else {
+                description = description.trim();
+            }
+
+            if (expectedTotalEnrollment == null) {
+                ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "ExpectedTotalEnrollment");
+                errorObjects.add(errorObject);
+            }
+
+            if (startDateStr == null) {
+                ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "StartDate");
+                errorObjects.add(errorObject);
+            } else {
+                startDateStr = startDateStr.trim();
+            }
+            startDate = formatDateString(startDateStr, "StartDate", errorObjects);
+
+            if (endDateStr == null) {
+                ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "EndDate");
+                errorObjects.add(errorObject);
+            } else {
+                endDateStr = endDateStr.trim();
+            }
+            endDate = formatDateString(endDateStr, "EndDate", errorObjects);
+
+            if (studyType != null ) {
+                studyType = studyType.toLowerCase();
+                if (!verifyStudyTypeExist(studyType)) {
+                    ErrorObject errorObject = createErrorObject("Study Object", "Study Type is not Valid", "StudyType");
+                    errorObjects.add(errorObject);
+                }
+            }
+
+            if (StringUtils.isEmpty(studyOid)) {
+                ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "oid");
+                errorObjects.add(errorObject);
+            } else {
+                studyOid = studyOid.trim();
+            }
+
+            if (StringUtils.isEmpty(studyEnvUuid)) {
+                ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "studyEnvUuid");
+                errorObjects.add(errorObject);
+            } else {
+                studyEnvUuid = studyEnvUuid.trim();
+            }
+            studyParameterConfig = processStudyConfigParameters(map, errorObjects);
+            Locale locale = new Locale("en_US");
+            request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
+            ResourceBundleProvider.updateLocale(locale);
+
+            request.setAttribute("uniqueStudyID", uniqueStudyID);
+            request.setAttribute("name", name); // Brief Title
+            request.setAttribute("oid", studyOid);
+            request.setAttribute("studyEnvUuid", studyEnvUuid);
+            Validator v0 = new Validator(request);
+            v0.addValidation("name", Validator.NO_BLANKS);
+
+            HashMap vError0 = v0.validate();
+            if (!vError0.isEmpty()) {
+                ErrorObject errorObject = createErrorObject("Study Object", "This field cannot be blank.", "BriefTitle");
+                errorObjects.add(errorObject);
+            }
+
+            Validator v1 = new Validator(request);
+            v1.addValidation("uniqueStudyID", Validator.NO_BLANKS);
+            HashMap vError1 = v1.validate();
+            if (!vError1.isEmpty()) {
+                ErrorObject errorObject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueStudyId");
+                errorObjects.add(errorObject);
+            }
+
+            Validator v2 = new Validator(request);
+            v2.addValidation("oid", Validator.NO_BLANKS);
+            HashMap vError2 = v2.validate();
+            if (!vError2.isEmpty()) {
+                ErrorObject errorObject = createErrorObject("Study Object", "This field cannot be blank.", "oid");
+                errorObjects.add(errorObject);
+            }
+
+            return errorObjects;
+        }
+    }
+
+    @RequestMapping(value = "/", method = RequestMethod.POST) public ResponseEntity<Object> createNewStudy(HttpServletRequest request,
+            @RequestBody HashMap<String, Object> map) throws Exception {
         StudyDTO studyDTO = new StudyDTO();
         logger.info("In Create Study");
         ResponseEntity<Object> response = null;
 
-        String validation_failed_message = "VALIDATION FAILED";
-        String validation_passed_message = "SUCCESS";
-
-        String uniqueStudyID = (String) map.get("uniqueStudyID");
-        String name = (String) map.get("briefTitle");
-        String studyOid = (String) map.get("studyEnvOid");
-        String studyEnvUuid = (String) map.get("studyEnvUuid");
-        String description = (String) map.get("description");
-        String studyType = (String) map.get("type");
-        String phase = (String) map.get("phase");
-        String startDateStr = (String) map.get("expectedStartDate");
-        String endDateStr = (String) map.get("expectedEndDate");
-        Integer expectedTotalEnrollment = (Integer) map.get("expectedTotalEnrollment");
-
-        Matcher m = Pattern.compile("(.+)\\((.+)\\)").matcher(studyOid);
+        StudyParameters parameters = new StudyParameters(map);
+        parameters.setParameters();
+        ArrayList<ErrorObject> errorObjects = parameters.validateParameters(request);
+        Matcher m = Pattern.compile("(.+)\\((.+)\\)").matcher(parameters.studyOid);
         String envType = "";
         if (m.find()) {
             if (m.groupCount() != 2) {
-                ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "envType");
-                errorObjects.add(errorOBject);
+                ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "envType");
+                errorObjects.add(errorObject);
             } else {
                 envType = m.group(2);
             }
         }
 
         AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study Creation Started", "PENDING", LocalTime.now());
-        AsyncStudyHelper.put(uniqueStudyID, asyncStudyHelper);
+        AsyncStudyHelper.put(parameters.uniqueStudyID, asyncStudyHelper);
 
-
-        if (StringUtils.isEmpty(uniqueStudyID)) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "UniqueStudyID");
-            errorObjects.add(errorOBject);
-        } else {
-            uniqueStudyID = uniqueStudyID.trim();
-        }
-        if (StringUtils.isEmpty(name)) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "BriefTitle");
-            errorObjects.add(errorOBject);
-        } else {
-            name = name.trim();
-        }
-        if (description == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "Description");
-            errorObjects.add(errorOBject);
-        } else {
-            description = description.trim();
-        }
-
-        if (expectedTotalEnrollment == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "ExpectedTotalEnrollment");
-            errorObjects.add(errorOBject);
-        }
-
-        if (startDateStr == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "StartDate");
-            errorObjects.add(errorOBject);
-        } else {
-            startDateStr = startDateStr.trim();
-        }
-
-        Date startDate = formatDateString(startDateStr, "StartDate", errorObjects);
-        if (endDateStr == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "EndDate");
-            errorObjects.add(errorOBject);
-        } else {
-            endDateStr = endDateStr.trim();
-        }
-        Date endDate = formatDateString(endDateStr, "EndDate", errorObjects);
-
-        if (studyType != null ) {
-            studyType = studyType.toLowerCase();
-            if (!verifyStudyTypeExist(studyType)) {
-                ErrorObject errorOBject = createErrorObject("Study Object", "Study Type is not Valid", "StudyType");
-                errorObjects.add(errorOBject);
-            }
-        }
-
-        if (StringUtils.isEmpty(studyOid)) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "oid");
-            errorObjects.add(errorOBject);
-        } else {
-            studyOid = studyOid.trim();
-        }
-
-        if (StringUtils.isEmpty(studyEnvUuid)) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "Missing Field", "studyEnvUuid");
-            errorObjects.add(errorOBject);
-        } else {
-            studyEnvUuid = studyEnvUuid.trim();
-        }
-
-        StudyParameterConfig studyParameterConfig = processStudyConfigParameters(map, errorObjects);
-        Locale locale = new Locale("en_US");
-        request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
-        ResourceBundleProvider.updateLocale(locale);
-
-        request.setAttribute("uniqueProId", uniqueStudyID);
-        request.setAttribute("name", name); // Brief Title
-        request.setAttribute("oid", studyOid);
-        request.setAttribute("envType", envType);
-        request.setAttribute("studyEnvUuid", studyEnvUuid);
-        ResponseEntity<HashMap> responseEntity = processSSOUserContext(request, studyEnvUuid);
+        ResponseEntity<HashMap> responseEntity = processSSOUserContext(request, parameters.studyEnvUuid);
 
         UserAccountBean ownerUserAccount = getStudyOwnerAccountWithCreatedUser(request, responseEntity);
         if (ownerUserAccount == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type",
+            ErrorObject errorObject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type",
                     "Owner Account");
-            errorObjects.add(errorOBject);
+            errorObjects.add(errorObject);
 
-        }
-        Validator v0 = new Validator(request);
-        v0.addValidation("name", Validator.NO_BLANKS);
-
-        HashMap vError0 = v0.validate();
-        if (!vError0.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "BriefTitle");
-            errorObjects.add(errorOBject);
-        }
-
-        Validator v1 = new Validator(request);
-        v1.addValidation("uniqueProId", Validator.NO_BLANKS);
-        HashMap vError1 = v1.validate();
-        if (!vError1.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "UniqueStudyId");
-            errorObjects.add(errorOBject);
-        }
-
-        Validator v2 = new Validator(request);
-        v2.addValidation("oid", Validator.NO_BLANKS);
-        HashMap vError2 = v2.validate();
-        if (!vError2.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot be blank.", "oid");
-            errorObjects.add(errorOBject);
         }
 
         Validator v4 = new Validator(request);
         v4.addValidation("role", Validator.NO_LEADING_OR_TRAILING_SPACES);
         HashMap vError4 = v4.validate();
         if (!vError4.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "This field cannot have leading or trailing spaces.", "role");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Study Object", "This field cannot have leading or trailing spaces.", "role");
+            errorObjects.add(errorObject);
         }
 
         if (errorObjects != null && errorObjects.size() != 0) {
+            studyDTO.setErrors(errorObjects);
             studyDTO.setMessage(validation_failed_message);
             response = new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
             return response;
         }
-        studyDTO.setErrors(errorObjects);
 
         Study study = new Study();
-        study.setUniqueIdentifier(uniqueStudyID);
-        study.setName(name);
-        study.setOc_oid(studyOid);
+        setChangeableStudySettings(study, parameters);
         study.setEnvType(StudyEnvEnum.valueOf(envType));
-        study.setStudyEnvUuid(studyEnvUuid);
-        study.setPhase(phase);
-        Study byOidEnvType = studyDao.findByOidEnvType(studyOid, StudyEnvEnum.valueOf(envType));
+        Study byOidEnvType = studyDao.findByOidEnvType(parameters.studyOid, StudyEnvEnum.valueOf(envType));
         if (byOidEnvType != null && byOidEnvType.getOc_oid() != null) {
             return getResponseSuccess(byOidEnvType);
         }
-        study.setDatePlannedStart(startDate);
-        study.setDatePlannedEnd(endDate);
-        study.setExpectedTotalEnrollment((expectedTotalEnrollment));
-        study.setProtocolType(studyType.toLowerCase());
         Study schemaStudy = createSchemaStudy(request, study, ownerUserAccount);
-        setStudyParameters(request, study, schemaStudy, studyParameterConfig);
+        setStudyConfigParameters(request, study, schemaStudy, parameters.studyParameterConfig);
         logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
 
         if (errorObjects != null && errorObjects.size() != 0) {
@@ -391,11 +454,24 @@ import java.util.regex.Pattern;
         }
         request.getSession().setAttribute("userContextMap", null);
         AsyncStudyHelper asyncStudyDone = new AsyncStudyHelper("Finished creating study", "ACTIVE");
-        AsyncStudyHelper.put(uniqueStudyID, asyncStudyDone);
+        AsyncStudyHelper.put(parameters.uniqueStudyID, asyncStudyDone);
 
         return response;
 
     }
+
+    private void setChangeableStudySettings(Study study, StudyParameters parameters) {
+        study.setUniqueIdentifier(parameters.uniqueStudyID);
+        study.setName(parameters.name);
+        study.setOc_oid(parameters.studyOid);
+        study.setStudyEnvUuid(parameters.studyEnvUuid);
+        study.setPhase(parameters.phase);
+        study.setDatePlannedStart(parameters.startDate);
+        study.setDatePlannedEnd(parameters.endDate);
+        study.setExpectedTotalEnrollment(parameters.expectedTotalEnrollment);
+        study.setProtocolType(parameters.studyType.toLowerCase());
+    }
+
     private Study createSchemaStudy(HttpServletRequest request, Study study, UserAccountBean ownerUserAccount) throws Exception {
         StudyInfoObject studyInfoObject = null;
         Study schemaStudy = null;
@@ -413,19 +489,71 @@ import java.util.regex.Pattern;
         }
         return schemaStudy;
     }
-    private void updateParameter(StudyParameterValueDAO spvdao, StudyParameterValueBean spv) {
-        StudyParameterValueBean spv1 = spvdao.findByHandleAndStudy(spv.getStudyId(), spv.getParameter());
-        logger.debug("found parameter: " + spv.getParameter());
-        if (spv1.getId() > 0) {
-            spvdao.update(spv);
-            logger.debug("updating");
-        } else {
-            spvdao.create(spv);
-            logger.debug("creating");
+
+    private void updateStudyConfigParameters(HttpServletRequest request, Study schemaStudy, StudyParameterConfig studyParameterConfig) {
+        List<StudyParameterValue> studyParameterValues = schemaStudy.getStudyParameterValues();
+
+        for (StudyParameterValue spv: studyParameterValues) {
+            switch (spv.getStudyParameter().getHandle()) {
+                case "collectDob":
+                    String collectDobValue;
+                    if (StringUtils.isEmpty(studyParameterConfig.getCollectDob())) {
+                        collectDobValue = "3";
+                    } else {
+                        switch (studyParameterConfig.getCollectDob().toLowerCase()) {
+                        case "always":
+                            collectDobValue= "1";
+                            break;
+                        case "only the year":
+                            collectDobValue ="2";
+                            break;
+                        default:
+                            collectDobValue = "3";
+                            break;
+                        }
+                    }
+                    spv.setValue(collectDobValue);
+                    break;
+                case "discrepancyManagement":
+                    spv.setValue(studyParameterConfig.getDiscrepancyManagement());
+                    break;
+                case "genderRequired":
+                    spv.setValue(studyParameterConfig.getGenderRequired());
+                    break;
+                case "subjectPersonIdRequired":
+                    spv.setValue(studyParameterConfig.getSubjectPersonIdRequired());
+                    break;
+                case "interviewerNameRequired":
+                    spv.setValue(studyParameterConfig.getInterviewerNameRequired());
+                    break;
+                case "interviewerNameEditable":
+                    spv.setValue(studyParameterConfig.getInterviewerNameEditable());
+                    break;
+                case "interviewDateRequired":
+                    spv.setValue(studyParameterConfig.getInterviewDateRequired());
+                    break;
+                case "interviewDateDefault":
+                    spv.setValue(studyParameterConfig.getInterviewDateDefault());
+                    break;
+                case "interviewDateEditable":
+                    spv.setValue(studyParameterConfig.getInterviewDateEditable());
+                    break;
+                case "subjectIdGeneration":
+                    spv.setValue(studyParameterConfig.getSubjectIdGeneration());
+                    break;
+                case "subjectIdPrefixSuffix":
+                    spv.setValue(studyParameterConfig.getSubjectIdPrefixSuffix());
+                    break;
+                case "personIdShownOnCRF":
+                    spv.setValue(studyParameterConfig.getPersonIdShownOnCRF());
+                    break;
+
+            }
         }
+        studyDao.saveOrUpdate(schemaStudy);
     }
 
-    private void setStudyParameters(HttpServletRequest request, Study study, Study schemaStudy, StudyParameterConfig studyParameterConfig) {
+    private void setStudyConfigParameters(HttpServletRequest request, Study study, Study schemaStudy, StudyParameterConfig studyParameterConfig) {
         String schema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, study.getSchemaName());
         List<StudyParameterValue> studyParameterValues = new ArrayList<>();
@@ -542,15 +670,15 @@ import java.util.regex.Pattern;
                 formatter = new SimpleDateFormat(format);
                 formattedDate = formatter.parse(dateStr);
             } catch (ParseException e) {
-                ErrorObject errorOBject = createErrorObject("Study Object",
+                ErrorObject errorObject = createErrorObject("Study Object",
                         "The StartDate format is not a valid 'yyyy-MM-dd' format", "fieldName");
-                errorObjects.add(errorOBject);
+                errorObjects.add(errorObject);
             }
             if (formattedDate != null) {
                 if (!dateStr.equals(formatter.format(formattedDate))) {
-                    ErrorObject errorOBject = createErrorObject("Study Object",
+                    ErrorObject errorObject = createErrorObject("Study Object",
                             "The StartDate format is not a valid 'yyyy-MM-dd' format", fieldName);
-                    errorObjects.add(errorOBject);
+                    errorObjects.add(errorObject);
                 }
             }
         }
@@ -844,8 +972,6 @@ import java.util.regex.Pattern;
         StudyBean siteBean = null;
         ResponseEntity<Object> response = null;
 
-        String validation_failed_message = "VALIDATION FAILED";
-        String validation_passed_message = "SUCCESS";
         Locale locale = new Locale("en_US");
         request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
         ResourceBundleProvider.updateLocale(locale);
@@ -861,59 +987,59 @@ import java.util.regex.Pattern;
         String startDate = (String) map.get("startDate");
 
         if (uniqueIdentifier == null) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "uniqueIdentifier");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "Missing Field", "uniqueIdentifier");
+            errorObjects.add(errorObject);
         } else {
             uniqueIdentifier = uniqueIdentifier.trim();
         }
         if (name == null) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "BriefTitle");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "Missing Field", "BriefTitle");
+            errorObjects.add(errorObject);
         } else {
             name = name.trim();
         }
         if (principalInvestigator == null) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "PrincipalInvestigator");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "Missing Field", "PrincipalInvestigator");
+            errorObjects.add(errorObject);
         } else {
             principalInvestigator = principalInvestigator.trim();
         }
 
         if (expectedTotalEnrollment == null) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "ExpectedTotalEnrollment");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "Missing Field", "ExpectedTotalEnrollment");
+            errorObjects.add(errorObject);
         }
 
         if (studyEnvSiteUuid == null) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "studyEnvSiteUuid");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "Missing Field", "studyEnvSiteUuid");
+            errorObjects.add(errorObject);
         } else {
             studyEnvSiteUuid = studyEnvSiteUuid.trim();
         }
 
         if (ocOid == null) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "ocOid");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "Missing Field", "ocOid");
+            errorObjects.add(errorObject);
         } else {
             ocOid = ocOid.trim();
         }
         if (StringUtils.isEmpty(statusStr)) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "status");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "Missing Field", "status");
+            errorObjects.add(errorObject);
         } else {
             statusStr = statusStr.toLowerCase();
         }
         Status status = Status.getByName(statusStr);
 
         if (status == null) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "Missing Field", "status");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "Missing Field", "status");
+            errorObjects.add(errorObject);
         }
 
         Study envSiteUuidStudy = studyDao.findByStudyEnvUuid(studyEnvSiteUuid);
         if (envSiteUuidStudy != null && envSiteUuidStudy.getStudyId() != 0) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "studyEnvSiteUuid already exists", "studySiteEnvUuid");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "studyEnvSiteUuid already exists", "studySiteEnvUuid");
+            errorObjects.add(errorObject);
         }
         SiteDTO siteDTO = buildSiteDTO(uniqueIdentifier, name, principalInvestigator, expectedTotalEnrollment, status, facilityInfo);
 
@@ -932,13 +1058,13 @@ import java.util.regex.Pattern;
                 formatter = new SimpleDateFormat(format);
                 formattedStartDate = formatter.parse(startDate);
             } catch (ParseException e) {
-                ErrorObject errorOBject = createErrorObject("Site Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
-                errorObjects.add(errorOBject);
+                ErrorObject errorObject = createErrorObject("Site Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
+                errorObjects.add(errorObject);
             }
             if (formattedStartDate != null) {
                 if (!startDate.equals(formatter.format(formattedStartDate))) {
-                    ErrorObject errorOBject = createErrorObject("Site Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
-                    errorObjects.add(errorOBject);
+                    ErrorObject errorObject = createErrorObject("Site Object", "The StartDate format is not a valid 'yyyy-MM-dd' format", "StartDate");
+                    errorObjects.add(errorObject);
                 }
             }
         }
@@ -948,28 +1074,28 @@ import java.util.regex.Pattern;
                 formatter = new SimpleDateFormat(format);
                 formattedStudyDate = formatter.parse(studyVerificationDate);
             } catch (ParseException e) {
-                ErrorObject errorOBject = createErrorObject("Site Object", "The Study Verification Date format is not a valid 'yyyy-MM-dd' format",
+                ErrorObject errorObject = createErrorObject("Site Object", "The Study Verification Date format is not a valid 'yyyy-MM-dd' format",
                         "StudyDateVerification");
-                errorObjects.add(errorOBject);
+                errorObjects.add(errorObject);
             }
             if (formattedStudyDate != null) {
                 if (!studyVerificationDate.equals(formatter.format(formattedStudyDate))) {
-                    ErrorObject errorOBject = createErrorObject("Site Object", "The Study Verification Date format is not a valid 'yyyy-MM-dd' format",
+                    ErrorObject errorObject = createErrorObject("Site Object", "The Study Verification Date format is not a valid 'yyyy-MM-dd' format",
                             "StudyDateVerification");
-                    errorObjects.add(errorOBject);
+                    errorObjects.add(errorObject);
                 }
             }
         }
 
         StudyBean parentStudy = getStudyByEnvId(studyEnvUuid);
         if (parentStudy == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Id",
+            ErrorObject errorObject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Id",
                     "Study Env Uuid");
-            errorObjects.add(errorOBject);
+            errorObjects.add(errorObject);
         } else if (parentStudy.getParentStudyId() != 0) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Study Id",
+            ErrorObject errorObject = createErrorObject("Study Object", "The Study Study Id provided in the URL is not a valid Study Study Id",
                     "Study Env Uuid");
-            errorObjects.add(errorOBject);
+            errorObjects.add(errorObject);
         }
 
         UserAccountBean ownerUserAccount = null;
@@ -977,9 +1103,9 @@ import java.util.regex.Pattern;
         if (parentStudy != null) {
             ownerUserAccount = getSiteOwnerAccount(request, parentStudy);
             if (ownerUserAccount == null) {
-                ErrorObject errorOBject = createErrorObject("Site Object",
+                ErrorObject errorObject = createErrorObject("Site Object",
                         "The Owner User Account is not Valid Account or Does not have rights to Create Sites", "Owner Account");
-                errorObjects.add(errorOBject);
+                errorObjects.add(errorObject);
             }
         }
 
@@ -987,48 +1113,48 @@ import java.util.regex.Pattern;
         v1.addValidation("uniqueProId", Validator.NO_BLANKS);
         HashMap vError1 = v1.validate();
         if (!vError1.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "UniqueStudyId");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "This field cannot be blank.", "UniqueStudyId");
+            errorObjects.add(errorObject);
         }
         Validator v2 = new Validator(request);
         v2.addValidation("name", Validator.NO_BLANKS);
         HashMap vError2 = v2.validate();
         if (!vError2.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "BriefTitle");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "This field cannot be blank.", "BriefTitle");
+            errorObjects.add(errorObject);
         }
         Validator v3 = new Validator(request);
         v3.addValidation("prinInvestigator", Validator.NO_BLANKS);
         HashMap vError3 = v3.validate();
         if (!vError3.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "PrincipleInvestigator");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "This field cannot be blank.", "PrincipleInvestigator");
+            errorObjects.add(errorObject);
         }
 
         Validator v7 = new Validator(request);
         v7.addValidation("expectedTotalEnrollment", Validator.NO_BLANKS);
         HashMap vError7 = v7.validate();
         if (!vError7.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "This field cannot be blank.", "ExpectedTotalEnrollment");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "This field cannot be blank.", "ExpectedTotalEnrollment");
+            errorObjects.add(errorObject);
         }
 
         if (request.getAttribute("name") != null && ((String) request.getAttribute("name")).length() > 100) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "BriefTitle Length exceeds the max length 100", "BriefTitle");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "BriefTitle Length exceeds the max length 100", "BriefTitle");
+            errorObjects.add(errorObject);
         }
         if (request.getAttribute("uniqueProId") != null && ((String) request.getAttribute("uniqueProId")).length() > 30) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "UniqueStudyId Length exceeds the max length 30", "UniqueStudyId");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "UniqueStudyId Length exceeds the max length 30", "UniqueStudyId");
+            errorObjects.add(errorObject);
         }
         if (request.getAttribute("prinInvestigator") != null && ((String) request.getAttribute("prinInvestigator")).length() > 255) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "PrincipleInvestigator Length exceeds the max length 255", "PrincipleInvestigator");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "PrincipleInvestigator Length exceeds the max length 255", "PrincipleInvestigator");
+            errorObjects.add(errorObject);
         }
         if ((request.getAttribute("expectedTotalEnrollment") != null)
                 && ((Integer) request.getAttribute("expectedTotalEnrollment") <= 0)) {
-            ErrorObject errorOBject = createErrorObject("Site Object", "ExpectedTotalEnrollment Length can't be negative or zero", "ExpectedTotalEnrollment");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Site Object", "ExpectedTotalEnrollment Length can't be negative or zero", "ExpectedTotalEnrollment");
+            errorObjects.add(errorObject);
         }
 
         siteDTO.setErrors(errorObjects);
@@ -1118,9 +1244,6 @@ import java.util.regex.Pattern;
         request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
         ResourceBundleProvider.updateLocale(locale);
 
-        String validation_failed_message = "VALIDATION FAILED";
-        String validation_passed_message = "SUCCESS";
-
         String name = (String) map.get("name");
         String description = (String) map.get("description");
         String category = (String) map.get("category");
@@ -1130,47 +1253,47 @@ import java.util.regex.Pattern;
         EventDefinitionDTO eventDefinitionDTO = buildEventDefnDTO(name, description, category, repeating, type);
 
         if (name == null) {
-            ErrorObject errorOBject = createErrorObject("Event Definition Object", "Missing Field", "Name");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Event Definition Object", "Missing Field", "Name");
+            errorObjects.add(errorObject);
         } else {
             name = name.trim();
         }
         if (description == null) {
-            ErrorObject errorOBject = createErrorObject("Event Definition Object", "Missing Field", "Description");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Event Definition Object", "Missing Field", "Description");
+            errorObjects.add(errorObject);
         } else {
             description = description.trim();
         }
         if (category == null) {
-            ErrorObject errorOBject = createErrorObject("Event Definition Object", "Missing Field", "Category");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Event Definition Object", "Missing Field", "Category");
+            errorObjects.add(errorObject);
         } else {
             category = category.trim();
         }
         if (type == null) {
-            ErrorObject errorOBject = createErrorObject("Event Definition Object", "Missing Field", "Type");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Event Definition Object", "Missing Field", "Type");
+            errorObjects.add(errorObject);
         } else {
             type = type.trim();
         }
         if (repeating == null) {
-            ErrorObject errorOBject = createErrorObject("Event Definition Object", "Missing Field", "Repeating");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Event Definition Object", "Missing Field", "Repeating");
+            errorObjects.add(errorObject);
         } else {
             repeating = repeating.trim();
         }
         if (repeating != null) {
             if (!repeating.equalsIgnoreCase("true") && !repeating.equalsIgnoreCase("false")) {
-                ErrorObject errorOBject = createErrorObject("Event Definition Object", "Repeating Field should be Either 'True' or 'False'", "Repeating");
-                errorObjects.add(errorOBject);
+                ErrorObject errorObject = createErrorObject("Event Definition Object", "Repeating Field should be Either 'True' or 'False'", "Repeating");
+                errorObjects.add(errorObject);
             }
         }
 
         if (type != null) {
             if (!type.equalsIgnoreCase("scheduled") && !type.equalsIgnoreCase("unscheduled") && !type.equalsIgnoreCase("common")) {
-                ErrorObject errorOBject = createErrorObject("Event Definition Object", "Type Field should be Either 'Scheduled' , 'UnScheduled' or 'Common'",
+                ErrorObject errorObject = createErrorObject("Event Definition Object", "Type Field should be Either 'Scheduled' , 'UnScheduled' or 'Common'",
                         "Type");
-                errorObjects.add(errorOBject);
+                errorObjects.add(errorObject);
             }
         }
 
@@ -1182,28 +1305,28 @@ import java.util.regex.Pattern;
 
         StudyBean parentStudy = getStudyByUniqId(uniqueStudyID);
         if (parentStudy == null) {
-            ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Study Study Id provided in the URL is not a valid Study Id",
+            ErrorObject errorObject = createErrorObject("Event Definition Object", "The Study Study Id provided in the URL is not a valid Study Id",
                     "Unique Study Study Id");
-            errorObjects.add(errorOBject);
+            errorObjects.add(errorObject);
         } else if (parentStudy.getParentStudyId() != 0) {
-            ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Study Study Id provided in the URL is not a valid Study Study Id",
+            ErrorObject errorObject = createErrorObject("Event Definition Object", "The Study Study Id provided in the URL is not a valid Study Study Id",
                     "Unique Study Study Id");
-            errorObjects.add(errorOBject);
+            errorObjects.add(errorObject);
         }
 
         UserAccountBean ownerUserAccount = getStudyOwnerAccount(request);
         if (ownerUserAccount == null) {
-            ErrorObject errorOBject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type",
+            ErrorObject errorObject = createErrorObject("Study Object", "The Owner User Account is not Valid Account or Does not have Admin user type",
                     "Owner Account");
-            errorObjects.add(errorOBject);
+            errorObjects.add(errorObject);
         }
 
         Validator v1 = new Validator(request);
         v1.addValidation("name", Validator.NO_BLANKS);
         HashMap vError1 = v1.validate();
         if (!vError1.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Event Definition Object", "This field cannot be blank.", "Name");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Event Definition Object", "This field cannot be blank.", "Name");
+            errorObjects.add(errorObject);
         }
 
         if (name != null) {
@@ -1211,8 +1334,8 @@ import java.util.regex.Pattern;
             v2.addValidation("name", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
             HashMap vError2 = v2.validate();
             if (!vError2.isEmpty()) {
-                ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Length Should not exceed 2000.", "Name");
-                errorObjects.add(errorOBject);
+                ErrorObject errorObject = createErrorObject("Event Definition Object", "The Length Should not exceed 2000.", "Name");
+                errorObjects.add(errorObject);
             }
         }
         if (description != null) {
@@ -1220,8 +1343,8 @@ import java.util.regex.Pattern;
             v3.addValidation("description", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
             HashMap vError3 = v3.validate();
             if (!vError3.isEmpty()) {
-                ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Length Should not exceed 2000.", "Description");
-                errorObjects.add(errorOBject);
+                ErrorObject errorObject = createErrorObject("Event Definition Object", "The Length Should not exceed 2000.", "Description");
+                errorObjects.add(errorObject);
             }
         }
         if (category != null) {
@@ -1229,24 +1352,24 @@ import java.util.regex.Pattern;
             v4.addValidation("category", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
             HashMap vError4 = v4.validate();
             if (!vError4.isEmpty()) {
-                ErrorObject errorOBject = createErrorObject("Event Definition Object", "The Length Should not exceed 2000.", "Category");
-                errorObjects.add(errorOBject);
+                ErrorObject errorObject = createErrorObject("Event Definition Object", "The Length Should not exceed 2000.", "Category");
+                errorObjects.add(errorObject);
             }
         }
         Validator v5 = new Validator(request);
         v5.addValidation("repeating", Validator.NO_BLANKS);
         HashMap vError5 = v5.validate();
         if (!vError5.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Event Definition Object", "This field cannot be blank.", "Repeating");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Event Definition Object", "This field cannot be blank.", "Repeating");
+            errorObjects.add(errorObject);
         }
 
         Validator v6 = new Validator(request);
         v6.addValidation("type", Validator.NO_BLANKS);
         HashMap vError6 = v6.validate();
         if (!vError6.isEmpty()) {
-            ErrorObject errorOBject = createErrorObject("Event Definition Object", "This field cannot be blank.", "Type");
-            errorObjects.add(errorOBject);
+            ErrorObject errorObject = createErrorObject("Event Definition Object", "This field cannot be blank.", "Type");
+            errorObjects.add(errorObject);
         }
 
         eventDefinitionDTO.setErrors(errorObjects);
@@ -1551,11 +1674,11 @@ import java.util.regex.Pattern;
     }
 
     public ErrorObject createErrorObject(String resource, String code, String field) {
-        ErrorObject errorOBject = new ErrorObject();
-        errorOBject.setResource(resource);
-        errorOBject.setCode(code);
-        errorOBject.setField(field);
-        return errorOBject;
+        ErrorObject errorObject = new ErrorObject();
+        errorObject.setResource(resource);
+        errorObject.setCode(code);
+        errorObject.setField(field);
+        return errorObject;
     }
 
     public Role getStudyRole(String roleName, ResourceBundle resterm) {
