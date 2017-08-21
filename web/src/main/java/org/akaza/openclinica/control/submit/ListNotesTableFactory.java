@@ -265,7 +265,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 if (reterm.getString("New_and_Updated").equalsIgnoreCase(value)) {
                     value = 21 + "";
                 } else {
-                    value = ResolutionStatus.getByName(value).getId() + "";
+                    value = ResolutionStatus.getByNameResStatus(value).getId() + "";
                 }
             }
             //
@@ -308,7 +308,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         public ResolutionStatusDroplistFilterEditor() {
             ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
-            for (ResolutionStatus status : ResolutionStatus.list) {
+            for (ResolutionStatus status : ResolutionStatus.listResStatus) {
                 this.addOption(Integer.toString(status.getId()), status.getName());
             }
             this.addOption("1,2", reterm.getString("New_and_Updated"));
