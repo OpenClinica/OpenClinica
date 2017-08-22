@@ -233,6 +233,7 @@ public class ChangeStudyServlet extends SecureController {
             request.setAttribute("changeStudySchema", studySchema);
             StudyDAO sdaoStudy = new StudyDAO(sm.getDataSource());
             StudyBean study = sdaoStudy.findByStudyEnvUuid(studyEnvUuid);
+            study.setParentStudyName(currentPublicStudy.getParentStudyName());
             session.setAttribute("study", study);
             currentStudy = study;
             if (current.getParentStudyId() > 0) {

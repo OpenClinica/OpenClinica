@@ -472,6 +472,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 session.setAttribute("publicStudy", currentPublicStudy);
                 request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                 currentStudy = (StudyBean) sdao.findByUniqueIdentifier(currentPublicStudy.getIdentifier());
+                if (currentStudy != null)
+                    currentStudy.setParentStudyName(currentPublicStudy.getParentStudyName());
                 request.setAttribute("requestSchema", "public");
                 session.setAttribute("study", currentStudy);
             } else if (currentPublicStudy.getId() > 0) {
@@ -1217,8 +1219,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * allows the test case to call the outer class' private process() method.
      *
      * @author Bruce W. Perry 01/2008
-     * @see org.akaza.openclinica.servlettests.SecureControllerServletTest
-     * @see org.akaza.openclinica.servlettests.SecureControllerWrapper
      */
     public class SecureControllerTestDelegate {
 
