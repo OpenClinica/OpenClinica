@@ -12,13 +12,11 @@ import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.service.StudyParamsConfig;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
@@ -114,6 +112,8 @@ public class UpdateSubStudyServlet extends SecureController {
     private void confirmStudy() throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
+        
+        /*
         v.addValidation("name", Validator.NO_BLANKS);
         v.addValidation("uniqueProId", Validator.NO_BLANKS);
         // >> tbh
@@ -147,7 +147,9 @@ public class UpdateSubStudyServlet extends SecureController {
         errors = v.validate();
 
         // >> tbh
+        */
         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+        /*
         ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
         StudyBean oldStudy = (StudyBean) session.getAttribute("newStudy");
         for (StudyBean thisBean : allStudies) {
@@ -171,7 +173,7 @@ public class UpdateSubStudyServlet extends SecureController {
         if (fp.getInt("expectedTotalEnrollment") <= 0) {
             Validator.addError(errors, "expectedTotalEnrollment", respage.getString("expected_total_enrollment_must_be_a_positive_number"));
         }
-
+        */
         if (parentStudy.getStatus().equals(Status.LOCKED)) {
             if (fp.getInt("statusId") != Status.LOCKED.getId()) {
                 Validator.addError(errors, "statusId", respage.getString("study_locked_site_status_locked"));
@@ -564,6 +566,7 @@ public class UpdateSubStudyServlet extends SecureController {
          */
 
         // study.setCreatedDate(new Date());
+        /*
         study.setUpdatedDate(new Date());
         study.setUpdater(ub);
         sdao.update(study);
@@ -582,7 +585,7 @@ public class UpdateSubStudyServlet extends SecureController {
             // spv = (StudyParameterValueBean)spvdao.update(config.getValue());
 
         }
-
+        */
         submitSiteEventDefinitions(study);
 
         // session.removeAttribute("newStudy");
