@@ -173,7 +173,6 @@ import java.util.regex.Pattern;
         String collectBirthDate = (String) map.get("collectDateOfBirth");
         Boolean collectSex = (Boolean) map.get("collectSex");
         String collectPersonId = (String) map.get("collectPersonId");
-        Boolean showSecondaryId = (Boolean) map.get("showSecondaryId");
         if (collectBirthDate == null) {
             ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
             errorObjects.add(errorObject);
@@ -193,11 +192,6 @@ import java.util.regex.Pattern;
             collectPersonId = collectPersonId.trim();
         }
         spc.setSubjectPersonIdRequired(collectPersonId);
-        if (showSecondaryId == null) {
-            ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "ShowSecondaryId");
-            errorObjects.add(errorObject);
-        }
-        spc.setSecondaryLabelViewable(Boolean.toString(showSecondaryId));
         return spc;
     }
     @RequestMapping(value = "/", method = RequestMethod.PUT) public ResponseEntity<Object> UpdateStudy(HttpServletRequest request,
@@ -817,32 +811,6 @@ import java.util.regex.Pattern;
             }
             response = new ResponseEntity<Object>(asyncStudyHelper, httpStatus);
         }
-
-        return response;
-    }
-
-
-    private ResponseEntity<Object> processStudyAsync(HttpServletRequest request, String validation_passed_message, Study study,
-            UserAccountBean ownerUserAccount) throws Exception {
-        ResponseEntity<Object> response;
-        Locale locale = new Locale("en_US");
-        request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
-        ResourceBundleProvider.updateLocale(locale);
-        StudyInfoObject studyInfoObject = studyBuildService.process(request, study, ownerUserAccount);
-        AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study added to Public schema", "PENDING");
-        AsyncStudyHelper.put(study.getUniqueIdentifier(), asyncStudyHelper);
-        liquibaseOnDemandService.createForeignTables(studyInfoObject);
-        Study schemaStudy = liquibaseOnDemandService.process(studyInfoObject, studyInfoObject.getUb());
-
-        logger.debug("returning from liquibase study:" + schemaStudy.getStudyId());
-        logger.debug("study oc_id:" + schemaStudy.getOc_oid());
-
-        ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
-        responseSuccess.setMessage(validation_passed_message);
-        responseSuccess.setStudyOid(schemaStudy.getOc_oid());
-        responseSuccess.setUniqueStudyID(schemaStudy.getUniqueIdentifier());
-        responseSuccess.setSchemaName(studyInfoObject.getSchema());
-        response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 
         return response;
     }
