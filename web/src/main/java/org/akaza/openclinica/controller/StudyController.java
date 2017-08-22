@@ -1160,8 +1160,7 @@ import java.util.regex.Pattern;
             siteDTO.setMessage(validation_failed_message);
             response = new ResponseEntity(siteDTO, HttpStatus.BAD_REQUEST);
         } else {
-            siteBean = buildSiteBean(siteParameters.ocOid, siteParameters.uniqueIdentifier, siteParameters.name, siteParameters.principalInvestigator, siteParameters.expectedTotalEnrollment,
-                    siteParameters.ownerUserAccount, siteParameters.parentStudy.getId(), siteParameters.status, siteParameters.facilityInfo, siteParameters.formattedStartDate, siteParameters.formattedStudyDate);
+            siteBean = buildSiteBean(siteParameters);
             siteBean.setSchemaName(siteParameters.parentStudy.getSchemaName());
             siteBean.setStudyEnvSiteUuid(siteParameters.studyEnvSiteUuid);
             StudyBean sBean = createStudy(siteBean, siteParameters.ownerUserAccount);
@@ -1187,7 +1186,6 @@ import java.util.regex.Pattern;
     @RequestMapping(value = "/{studyEnvUuid}/sites", method = RequestMethod.PUT) public ResponseEntity<Object> updateSiteSettings(HttpServletRequest request,
             @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
         logger.debug("Updating site settings for study:" + studyEnvUuid);
-        StudyBean siteBean = null;
         ResponseEntity<Object> response = null;
 
         Locale locale = new Locale("en_US");
@@ -1197,8 +1195,8 @@ import java.util.regex.Pattern;
         siteParameters.setParameters();
         ArrayList<ErrorObject> errorObjects = siteParameters.validateParameters(request);
         Study envSiteUuidStudy = studyDao.findByStudyEnvUuid(siteParameters.studyEnvSiteUuid);
-        if (envSiteUuidStudy != null && envSiteUuidStudy.getStudyId() != 0) {
-            ErrorObject errorObject = createErrorObject("Site Object", "studyEnvSiteUuid already exists", "studySiteEnvUuid");
+        if (envSiteUuidStudy == null || envSiteUuidStudy.getStudyId() == 0) {
+            ErrorObject errorObject = createErrorObject("Site Object", "studyEnvSiteUuid does not exist", "studySiteEnvUuid");
             errorObjects.add(errorObject);
         }
         SiteDTO siteDTO = buildSiteDTO(siteParameters.uniqueIdentifier, siteParameters.name, siteParameters.principalInvestigator,
@@ -1209,18 +1207,15 @@ import java.util.regex.Pattern;
             siteDTO.setMessage(validation_failed_message);
             response = new ResponseEntity(siteDTO, HttpStatus.BAD_REQUEST);
         } else {
-            siteBean = buildSiteBean(siteParameters.ocOid, siteParameters.uniqueIdentifier, siteParameters.name, siteParameters.principalInvestigator, siteParameters.expectedTotalEnrollment,
-                    siteParameters.ownerUserAccount, siteParameters.parentStudy.getId(), siteParameters.status, siteParameters.facilityInfo, siteParameters.formattedStartDate, siteParameters.formattedStudyDate);
-            siteBean.setSchemaName(siteParameters.parentStudy.getSchemaName());
-            siteBean.setStudyEnvSiteUuid(siteParameters.studyEnvSiteUuid);
-            StudyBean sBean = createStudy(siteBean, siteParameters.ownerUserAccount);
+            sdao = new StudyDAO(dataSource);
+            StudyBean siteBean = sdao.findByStudyEnvUuid(siteParameters.studyEnvSiteUuid);
+            setChangeableSiteSettings(siteBean, siteParameters);
+            sdao.update(siteBean);
+
             // get the schema study
-            request.setAttribute("requestSchema", siteParameters.parentStudy.getSchemaName());
+            request.setAttribute("requestSchema", siteBean.getSchemaName());
             StudyBean schemaStudy = getStudyByEnvId(studyEnvUuid);
-            siteBuildService.process(schemaStudy, sBean, siteParameters.ownerUserAccount);
-            siteDTO.setSiteOid(sBean.getOid());
-            siteDTO.setMessage(validation_passed_message);
-            StudyUserRoleBean sub = null;
+            setChangeableSiteSettings(schemaStudy, siteParameters);
             ResponseSuccessSiteDTO responseSuccess = new ResponseSuccessSiteDTO();
             responseSuccess.setMessage(siteDTO.getMessage());
             responseSuccess.setSiteOid(siteDTO.getSiteOid());
@@ -1476,32 +1471,32 @@ import java.util.regex.Pattern;
         return sed;
     }
 
-    public StudyBean buildSiteBean(String ocOid, String uniqueSiteStudyId, String name, String principalInvestigator, int expectedTotalEnrollment,
-            UserAccountBean owner, int parentStudyId, Status status, FacilityInfo facilityInfo,
-            Date startDate, Date approvalDate) {
-
+    public StudyBean buildSiteBean(SiteParameters parameters) {
         StudyBean study = new StudyBean();
         ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
-        study.setOid(ocOid);
-        study.setIdentifier(uniqueSiteStudyId);
-        study.setName(name);
-        study.setPrincipalInvestigator(principalInvestigator);
-        study.setExpectedTotalEnrollment(expectedTotalEnrollment);
-        study.setParentStudyId(parentStudyId);
-        study.setOwner(owner);
-        study.setStatus(status);
-        study.setDatePlannedStart(startDate);
-        study.setProtocolDateVerification(approvalDate);
-        study.setFacilityCity(facilityInfo.getFacilityCity());
-        study.setFacilityState(facilityInfo.getFacilityState());
-        study.setFacilityZip(facilityInfo.getFacilityZip());
-        study.setFacilityCountry(facilityInfo.getFacilityCountry());
-        study.setFacilityContactName(facilityInfo.getFacilityContact());
-        study.setFacilityContactPhone(facilityInfo.getFacilityPhone());
-        study.setFacilityContactEmail(facilityInfo.getFacilityEmail());
+        study.setOid(parameters.ocOid);
+        study.setIdentifier(parameters.uniqueIdentifier);
+        study.setParentStudyId(parameters.parentStudy.getId());
+        study.setOwner(parameters.ownerUserAccount);
+        setChangeableSiteSettings(study, parameters);
         return study;
     }
 
+    public void setChangeableSiteSettings(StudyBean study, SiteParameters parameters) {
+        study.setName(parameters.name);
+        study.setPrincipalInvestigator(parameters.principalInvestigator);
+        study.setExpectedTotalEnrollment(parameters.expectedTotalEnrollment);
+        study.setStatus(parameters.status);
+        study.setDatePlannedStart(parameters.formattedStartDate);
+        study.setProtocolDateVerification(parameters.formattedStudyDate);
+        study.setFacilityCity(parameters.facilityInfo.getFacilityCity());
+        study.setFacilityState(parameters.facilityInfo.getFacilityState());
+        study.setFacilityZip(parameters.facilityInfo.getFacilityZip());
+        study.setFacilityCountry(parameters.facilityInfo.getFacilityCountry());
+        study.setFacilityContactName(parameters.facilityInfo.getFacilityContact());
+        study.setFacilityContactPhone(parameters.facilityInfo.getFacilityPhone());
+        study.setFacilityContactEmail(parameters.facilityInfo.getFacilityEmail());
+    }
     public StudyBean createStudy(StudyBean studyBean, UserAccountBean owner) {
         sdao = new StudyDAO(dataSource);
         StudyBean sBean = (StudyBean) sdao.create(studyBean);

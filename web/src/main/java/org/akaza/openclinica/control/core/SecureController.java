@@ -1219,8 +1219,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
      * allows the test case to call the outer class' private process() method.
      *
      * @author Bruce W. Perry 01/2008
-     * @see org.akaza.openclinica.servlettests.SecureControllerServletTest
-     * @see org.akaza.openclinica.servlettests.SecureControllerWrapper
      */
     public class SecureControllerTestDelegate {
 
