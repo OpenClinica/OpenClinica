@@ -105,7 +105,7 @@
                     </c:otherwise>
                 </c:choose>
                 (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
-                <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
+                <a href="${urlPrefix}ChangeStudy">Change</a>
                 
             </div>
 
