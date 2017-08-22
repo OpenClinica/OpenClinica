@@ -502,24 +502,7 @@
     </c:choose>
 </td>
 <td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
-<td class="table_cell">
-    <c:choose>
-        <c:when test="${!dec.eventDefinitionCRF.doubleEntry}">
-            n/a
-        </c:when>
-        <c:otherwise>
-            <c:choose>
-                <c:when test="${dec.stage.doubleDE || dec.stage.doubleDE_Complete || dec.stage.admin_Editing || dec.stage.locked}">
-                    <c:out value="${dec.eventCRF.updater.name}" />&nbsp;
-                </c:when>
-                <c:otherwise>
-                    &nbsp;
-                </c:otherwise>
-            </c:choose>
-        </c:otherwise>
-    </c:choose>
 
-</td>
 <td class="table_cell" style="width:180px;">
     <c:set var="actionQuery" value="" />
     <c:if test="${study.status.available}">

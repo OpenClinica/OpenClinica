@@ -105,7 +105,7 @@
                     </c:otherwise>
                 </c:choose>
                 (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
-                <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
+                <a href="${urlPrefix}ChangeStudy">Change</a>
                 
             </div>
 
@@ -307,7 +307,6 @@
             <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
             </c:when>
             <c:otherwise>
-                <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="AuditUserActivity?restore=true"><fmt:message key="user_audit_log" bundle="${resword}"/></a></div>
             </c:otherwise>
