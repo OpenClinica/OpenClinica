@@ -307,7 +307,6 @@
             <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
             </c:when>
             <c:otherwise>
-                <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="AuditUserActivity?restore=true"><fmt:message key="user_audit_log" bundle="${resword}"/></a></div>
             </c:otherwise>
