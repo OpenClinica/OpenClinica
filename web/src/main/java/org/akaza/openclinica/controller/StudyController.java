@@ -1202,7 +1202,7 @@ import java.util.regex.Pattern;
         SiteDTO siteDTO = buildSiteDTO(siteParameters.uniqueIdentifier, siteParameters.name, siteParameters.principalInvestigator,
                 siteParameters.expectedTotalEnrollment, siteParameters.status, siteParameters.facilityInfo);
         siteDTO.setErrors(errorObjects);
-
+        siteDTO.setSiteOid(envSiteUuidStudy.getOc_oid());
         if (errorObjects != null && errorObjects.size() != 0) {
             siteDTO.setMessage(validation_failed_message);
             response = new ResponseEntity(siteDTO, HttpStatus.BAD_REQUEST);
@@ -1214,13 +1214,14 @@ import java.util.regex.Pattern;
 
             // get the schema study
             request.setAttribute("requestSchema", siteBean.getSchemaName());
-            StudyBean schemaStudy = getStudyByEnvId(studyEnvUuid);
+            StudyBean schemaStudy = getStudyByEnvId(siteParameters.studyEnvSiteUuid);
             setChangeableSiteSettings(schemaStudy, siteParameters);
             ResponseSuccessSiteDTO responseSuccess = new ResponseSuccessSiteDTO();
+            sdao.update(schemaStudy);
+            siteDTO.setMessage(validation_passed_message);
             responseSuccess.setMessage(siteDTO.getMessage());
             responseSuccess.setSiteOid(siteDTO.getSiteOid());
             responseSuccess.setUniqueSiteStudyID(siteDTO.getUniqueSiteProtocolID());
-
             response = new ResponseEntity(responseSuccess, HttpStatus.OK);
 
         }
