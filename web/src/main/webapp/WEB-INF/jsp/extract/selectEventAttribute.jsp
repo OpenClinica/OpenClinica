@@ -63,18 +63,6 @@
 <input type="hidden" name="action" value="beginsubmit"/>
 <input type="hidden" name="crfId" value="0">
 <input type="hidden" name="eventAttr" value="1">
-
-   <p>
-    <c:choose>
-     <c:when test="${newDataset.showEventLocation}">
-       <input type="checkbox" checked name="location" value="yes">
-     </c:when>
-     <c:otherwise>
-       <input type="checkbox" name="location" value="yes">
-     </c:otherwise>
-    </c:choose>
-    <fmt:message key="event_location" bundle="${resword}"/>
-   </p>
    <p>
     <c:choose>
      <c:when test="${newDataset.showEventStart}">

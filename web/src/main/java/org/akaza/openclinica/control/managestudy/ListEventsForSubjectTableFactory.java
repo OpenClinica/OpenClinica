@@ -106,7 +106,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     public ListEventsForSubjectTableFactory(boolean showMoreLink) {
         imageIconPaths.put(1, "icon icon-clock2");
         imageIconPaths.put(2, "icon icon-doc");
-        imageIconPaths.put(3, "icon icon-icon-dataEntryCompleted orange");
+        imageIconPaths.put(3, "icon icon-pencil-squared orange");
         imageIconPaths.put(4, "icon icon-checkbox-checked green");
         imageIconPaths.put(5, "icon icon-stop-circle red");
         imageIconPaths.put(6, "icon icon-redo");
@@ -116,7 +116,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         crfColumnImageIconPaths.put(0, "icon icon-file-excel red");
         crfColumnImageIconPaths.put(1, "icon icon-doc");
         crfColumnImageIconPaths.put(2, "icon icon-pencil-squared orange");
-        crfColumnImageIconPaths.put(3, "icon icon-icon-dataEntryCompleted orange");
+        crfColumnImageIconPaths.put(3, "icon icon-pencil-squared orange");
         crfColumnImageIconPaths.put(4, "icon icon-icon-doubleDataEntry orange");
         crfColumnImageIconPaths.put(5, "icon icon-checkbox-checked green");
         crfColumnImageIconPaths.put(6, "icon icon-checkbox-checked green");
@@ -913,7 +913,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         eventDiv.append(subjectText).append(": ").append(studySubjectLabel).br();
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
-        eventDiv.append(resword.getString("status")).append(":").append(eventStatus.getName()).br();
+        eventDiv.append(resword.getString("status")).append(": ").append(eventStatus.getName()).br();
         eventDiv.tdEnd();
         eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
         linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);

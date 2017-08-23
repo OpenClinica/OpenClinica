@@ -72,9 +72,9 @@
 <h1><span class="title_manage"><fmt:message key="enter_or_validate_data" bundle="${resword}"/><c:out value="${studyEvent.studyEventDefinition.name}" /></span></h1>
 
 
-&nbsp;&nbsp;
+&nbsp;
 <a name="global"><a href="javascript:leftnavExpand('globalRecord');javascript:setImage('ExpandGroup5','images/bt_Collapse.gif');"><img
-  name="ExpandGroup5" height="15px" src="images/bt_Expand.gif" border="0"></a></a></div>
+  name="ExpandGroup5" height="20px" src="images/bt_Expand.gif" border="0"></a></a></div>
 
 <div id="globalRecord">
 <div style="width: 350px">
@@ -148,7 +148,7 @@
                                        <c:if test="${!study.status.locked}">
                                         <span style="float:right">
                                         <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-location'); return false;">
-                                        <span id="flag_location" name="flag_location" class="fa fa-bubble-black" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                        <span id="flag_location" name="flag_location" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                         </a></span>
                                        </c:if>
                                     </c:otherwise>
@@ -178,7 +178,7 @@
                                        <c:if test="${!study.status.locked}">
                                         <span style="float:right">
                                         <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=start_date&column=start_date&strErrMsg=','spanAlert-start_date'); return false;">
-                                            <span id="flag_start_date" name="flag_start_date" class="fa fa-bubble-black" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                            <span id="flag_start_date" name="flag_start_date" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                         </a></span>
                                        </c:if>
                                     </c:otherwise>
@@ -203,7 +203,7 @@
                                       <c:if test="${!study.status.locked}">
                                         <span style="float:right">
                                         <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=end_date&column=end_date&strErrMsg=','spanAlert-end_date'); return false;">
-                                        <span id="flag_end_date" name="flag_end_date" class="fa fa-bubble-black" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                        <span id="flag_end_date" name="flag_end_date" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                         </a></span>
                                       </c:if>
                                     </c:otherwise>
@@ -502,24 +502,7 @@
     </c:choose>
 </td>
 <td class="table_cell"><c:out value="${dec.eventCRF.owner.name}" />&nbsp;</td>
-<td class="table_cell">
-    <c:choose>
-        <c:when test="${!dec.eventDefinitionCRF.doubleEntry}">
-            n/a
-        </c:when>
-        <c:otherwise>
-            <c:choose>
-                <c:when test="${dec.stage.doubleDE || dec.stage.doubleDE_Complete || dec.stage.admin_Editing || dec.stage.locked}">
-                    <c:out value="${dec.eventCRF.updater.name}" />&nbsp;
-                </c:when>
-                <c:otherwise>
-                    &nbsp;
-                </c:otherwise>
-            </c:choose>
-        </c:otherwise>
-    </c:choose>
 
-</td>
 <td class="table_cell" style="width:180px;">
     <c:set var="actionQuery" value="" />
     <c:if test="${study.status.available}">

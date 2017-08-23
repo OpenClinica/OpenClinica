@@ -140,7 +140,7 @@
   </div></div></div></div></div></div></div></div>
   <br>
   <p>
-      <input type="submit" name="Submit" value="<fmt:message key="change_study" bundle="${resword}"/>" class="button_long">
+      <input type="submit" name="Submit" value="Change" class="button_long">
       <input type="button" onclick="confirmCancel('MainMenu');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 
   </p>
