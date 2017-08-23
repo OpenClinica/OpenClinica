@@ -446,17 +446,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
                     currentPublicStudy.setStudyParameters(studyParameters);
 
-                    StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-                    if (currentPublicStudy.getParentStudyId() <= 0) {// top study
-                        scs.setParametersForStudy(currentPublicStudy);
-
-                    } else {
-                        // YW <<
-                        currentPublicStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentPublicStudy.getParentStudyId())).getName());
-                        // YW >>
-                        scs.setParametersForSite(currentPublicStudy);
-                    }
-
                     // set up the panel here, tbh
                     panel.reset();
                     /*
