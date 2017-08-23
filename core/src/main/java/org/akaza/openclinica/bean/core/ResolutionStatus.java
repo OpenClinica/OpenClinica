@@ -81,6 +81,10 @@ public class ResolutionStatus extends Term {
 
     public static final List<ResolutionStatus> list = Arrays.asList(members);
 
+    private static final ResolutionStatus[] membersResStatus = { OPEN, UPDATED, CLOSED, CLOSED_MODIFIED };
+
+    public static final List<ResolutionStatus> listResStatus = Arrays.asList(membersResStatus);
+
     private List privileges;
 
     private ResolutionStatus(int id, String name, Privilege[] myPrivs, String path) {
@@ -100,6 +104,16 @@ public class ResolutionStatus extends Term {
     }
 
     public static ResolutionStatus getByName(String name) {
+        for (int i = 0; i < list.size(); i++) {
+            ResolutionStatus temp = list.get(i);
+            if (temp.getName().equals(name)) {
+                return temp;
+            }
+        }
+        return INVALID;
+    }
+
+    public static ResolutionStatus getByNameResStatus(String name) {
         for (int i = 0; i < list.size(); i++) {
             ResolutionStatus temp = list.get(i);
             if (temp.getName().equals(name)) {

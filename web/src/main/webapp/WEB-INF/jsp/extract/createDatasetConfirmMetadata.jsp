@@ -60,7 +60,7 @@
 <form action="CreateDataset" method="post">
 <input type="hidden" name="action" value="confirmall" />
 
-<table>
+<table border="0">
 	<tr>
 		<td class="text"><fmt:message key="name" bundle="${resword}"/></td>
 		<td class="text"><b><c:out value="${newDataset.name}" /></b>
@@ -103,8 +103,6 @@
 	<tr>
 		<td colspan="2" align="left">
 		  <input type="submit" name="btnSubmit" value="<fmt:message key="confirm_and_save" bundle="${resword}"/>" class="button_xlong"/>
-		</td>
-		<td>
 		  <input type="submit" name="btnSubmit" value="<fmt:message key="back" bundle="${resword}"/>" class="button_xlong"/>
 		</td>
 	</tr>
