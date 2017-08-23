@@ -76,15 +76,8 @@
 						<a href="<c:out value="${lastPageQuery}"/>"><img src="images/arrow_last.gif" border="0" alt="<fmt:message key="last_page" bundle="${resword}"/>" title="<fmt:message key="last_page" bundle="${resword}"/>"></a>
 					</c:if>
 				</td>
-			
-		</table>
-		</td>
-	
-	<!-- End Pagination cell -->
-	
-	<!-- Search cell (for multi-page tables) -->
 
-		<c:if test="${searchFormDisplayed != 0}">
+				<c:if test="${searchFormDisplayed != 0}">
 			<form action="<c:out value="${table.postAction}" />?module=${module}" method="POST">
 		</c:if>
 	
@@ -121,6 +114,15 @@
 					</td>
 				</tr>
 			</table>
+			
+		</table>
+		</td>
+	
+	<!-- End Pagination cell -->
+	
+	<!-- Search cell (for multi-page tables) -->
+
+		
 			<br/>
 
 		</td>
