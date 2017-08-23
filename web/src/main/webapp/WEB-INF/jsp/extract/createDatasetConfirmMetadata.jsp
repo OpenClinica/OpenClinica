@@ -60,7 +60,7 @@
 <form action="CreateDataset" method="post">
 <input type="hidden" name="action" value="confirmall" />
 
-<table border="1">
+<table border="0">
 	<tr>
 		<td class="text"><fmt:message key="name" bundle="${resword}"/></td>
 		<td class="text"><b><c:out value="${newDataset.name}" /></b>
