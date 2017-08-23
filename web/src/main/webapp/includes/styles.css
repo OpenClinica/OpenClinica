@@ -84,9 +84,6 @@ td {
 a:link {
   color: #3a6087; }
 
-a:visited {
-  color: #93397f; }
-
 a:hover {
   color: #090f14; }
 
@@ -193,8 +190,8 @@ a:hover {
     font-size: 0.875em; }
 
 .dropdown {
-  background-color: #ddd;
-  border: solid 1px #ddd;
+  background-color: #ccc;
+  border: solid 1px #ccc;
   font-family: inherit; }
 
 .taskLeftColumn,
@@ -288,14 +285,20 @@ a:hover {
 
 /*End of Dropdown Styling*/
 /* Misc*/
+form[action="CreateNewStudyEvent"] > div {
+  width: 850px; }
+
 form[action="CreateNewStudyEvent"] > a {
   margin: .5em 0;
   display: inline-block; }
 
-form[name="subjectForm"] a {
+form[action="CreateDataset"] input {
+  margin-top: 1em !important; }
+
+form[name="subjectForm"] a, form[action="UpdateStudySubject"] a {
   text-decoration: none; }
 
-form[name="subjectForm"] .formlabel, form[name="subjectForm"] input[type="text"], form[name="subjectForm"] select {
+form[name="subjectForm"] .formlabel, form[name="subjectForm"] input[type="text"], form[name="subjectForm"] select, form[action="UpdateStudySubject"] .formlabel, form[action="UpdateStudySubject"] input[type="text"], form[action="UpdateStudySubject"] select {
   display: block;
   margin-bottom: 1em;
   margin-right: 1em; }
@@ -336,12 +339,12 @@ td.table_actions > table {
   -ms-transform: translateY(-50%); }
 
 #searchFilterSDV {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #ccc;
   margin: 1em 0; }
   #searchFilterSDV #Tab1Selected, #searchFilterSDV #Tab2Selected, #searchFilterSDV #Tab1NotSelected, #searchFilterSDV #Tab2NotSelected {
     padding: .5em; }
   #searchFilterSDV span.tabtext {
-    background-color: #ddd;
+    background-color: #ccc;
     padding: .5em; }
 
 .summaryTable {
@@ -350,18 +353,18 @@ td.table_actions > table {
   margin: 1em 0;
   width: 75% !important; }
   .summaryTable td {
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #ccc;
     padding: .15em; }
 
 .shaded_table {
-  border: 1px solid #ddd;
+  border: 1px solid #ccc;
   margin: 1em 0; }
   .shaded_table tr:first-child td {
     border-top: 0; }
   .shaded_table td {
     padding: .25em;
-    border-top: 1px solid #ddd;
-    border-left: 1px solid #ddd;
+    border-top: 1px solid #ccc;
+    border-left: 1px solid #ccc;
     border-right: 0;
     border-bottom: 0; }
     .shaded_table td:first-child {
@@ -372,31 +375,34 @@ td.table_actions > table {
   font-size: .85rem;
   margin: 1em 0; }
   .tablebox_center tr:first-child td.table_cell {
-    border-top: 1px solid #ddd; }
+    border-top: 1px solid #ccc; }
   .tablebox_center tr:last-child > td.table_cell, .tablebox_center tr:last-child > td.table_cell_left {
-    border-bottom: 1px solid #ddd; }
+    border-bottom: 1px solid #ccc; }
   .tablebox_center td {
     padding: .25em;
+    vertical-align: top;
     width: auto; }
+    .tablebox_center td.table_divider {
+      border-bottom: 1px solid #ccc; }
     .tablebox_center td.table_cell_top {
-      border-top: 1px solid #ddd; }
+      border-top: 1px solid #ccc; }
     .tablebox_center td.table_cell, .tablebox_center td.table_cell_left, .tablebox_center td.table_cell_top {
       background-color: transparent;
-      border-bottom: 1px solid #ddd;
-      border-right: 1px solid #ddd; }
+      border-bottom: 1px solid #ccc;
+      border-right: 1px solid #ccc; }
       .tablebox_center td.table_cell:first-child, .tablebox_center td.table_cell_left:first-child, .tablebox_center td.table_cell_top:first-child {
-        border-left: 1px solid #ddd; }
+        border-left: 1px solid #ccc; }
       .tablebox_center td.table_cell table tr:first-child td.table_cell, .tablebox_center td.table_cell_left table tr:first-child td.table_cell, .tablebox_center td.table_cell_top table tr:first-child td.table_cell {
-        border-top: 1px solid #ddd; }
+        border-top: 1px solid #ccc; }
       .tablebox_center td.table_cell table tr td.table_cell:first-child, .tablebox_center td.table_cell_left table tr td.table_cell:first-child, .tablebox_center td.table_cell_top table tr td.table_cell:first-child {
-        border-left: 1px solid #ddd; }
+        border-left: 1px solid #ccc; }
     .tablebox_center td.table_header_row, .tablebox_center td.table_header_row_left, .tablebox_center td.table_header_column_top, .tablebox_center td.table_header_column {
-      background-color: #ddd;
+      background-color: #ccc;
       padding: .5em;
       border-right: 1px solid white;
       border-bottom: 1px solid white; }
       .tablebox_center td.table_header_row:last-child, .tablebox_center td.table_header_row_left:last-child, .tablebox_center td.table_header_column_top:last-child, .tablebox_center td.table_header_column:last-child {
-        border-right: 1px solid #ddd; }
+        border-right: 1px solid #ccc; }
     .tablebox_center td.table_cell_left {
       border-left: 1px solid #ccc; }
 
@@ -409,7 +415,7 @@ td.table_actions > table {
     text-decoration: none; }
   .textbox_center td {
     padding: .25em; }
-    .textbox_center td.table_cell, .textbox_center td.table_cell_left, .textbox_center td.table_header_column {
+    .textbox_center td.table_cell, .textbox_center td.table_cell_left, .textbox_center td.table_header_column, .textbox_center td.table_header_column_top {
       background-color: transparent;
       border-bottom: 1px solid #ccc;
       padding: .25em; }
@@ -494,7 +500,7 @@ td.table_actions > table {
   background-color: #e1ebf4; }
 
 .jmesa #studySiteStatistics, .jmesa #studyStatistics, .jmesa #subjectEventStatusStatistics, .jmesa #studySubjectStatusStatistics {
-  border-bottom: 1px solid #ddd;
+  border-bottom: 1px solid #ccc;
   margin: 0 2em 2em 0; }
 
 .jmesa table#userLogins tr td {
@@ -513,7 +519,7 @@ td.table_actions > table {
   min-width: 50%; }
 
 .jmesa .header td {
-  background-color: #ddd;
+  background-color: #ccc;
   border-right: solid 1px #fff;
   color: #333;
   font-family: 'Open Sans', arial, helvetica, sans-serif;
@@ -530,17 +536,31 @@ td.table_actions > table {
 .jmesa .highlight td {
   background-color: #f2e7b8; }
 
-.jmesa .odd td, .jmesa .even td, .jmesa .highlight td {
+.jmesa table:not(#studyAuditLogs) .odd > td, .jmesa table:not(#studyAuditLogs) .even > td, .jmesa table:not(#studyAuditLogs) .highlight > td {
+  padding: .25em .75em;
+  vertical-align: top; }
+
+.jmesa table:not(#studyAuditLogs) .odd td, .jmesa table:not(#studyAuditLogs) .even td, .jmesa table:not(#studyAuditLogs) .highlight td {
   border: none;
   font-family: 'Open Sans', arial, helvetica, sans-serif;
   font-weight: 400;
   hyphens: auto;
   line-height: 1.5em;
-  min-width: 2em;
-  padding: .15em .75em; }
+  min-width: 2em; }
 
-.jmesa .odd a, .jmesa .even a, .jmesa .highlight a {
+.jmesa table:not(#studyAuditLogs) .odd a, .jmesa table:not(#studyAuditLogs) .even a, .jmesa table:not(#studyAuditLogs) .highlight a {
   text-decoration: none; }
+
+.jmesa table#studyAuditLogs tbody.tbody tr.odd td, .jmesa table#studyAuditLogs tbody.tbody tr.even td, .jmesa table#studyAuditLogs tbody.tbody tr.highlight td {
+  border-top: 1px solid #ccc;
+  border-left: 1px solid #ccc;
+  border-right: 0;
+  border-bottom: 0; }
+  .jmesa table#studyAuditLogs tbody.tbody tr.odd td:last-child, .jmesa table#studyAuditLogs tbody.tbody tr.even td:last-child, .jmesa table#studyAuditLogs tbody.tbody tr.highlight td:last-child {
+    border-right: 1px solid #ccc; }
+
+.jmesa table#studyAuditLogs tbody.tbody tr.odd:last-child td, .jmesa table#studyAuditLogs tbody.tbody tr.even:last-child td, .jmesa table#studyAuditLogs tbody.tbody tr.highlight:last-child td {
+  border-bottom: 1px solid #ccc; }
 
 .ViewSubjectsPopup {
   box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.5);
@@ -602,7 +622,8 @@ div#subjectEvents {
 .vline, .vline_B {
   background-image: url(../images/leftbar_vline.gif);
   padding-top: 6px;
-  padding-left: 3px; }
+  padding-left: 3px;
+  padding-right: 5px; }
 
 .vline {
   background-repeat: repeat-y; }
@@ -629,6 +650,8 @@ table[width="160"] tr:nth-last-child(-n+2) td.sidebar_tab {
     margin-top: .5em; }
     .sidebar_tab_content span {
       color: #494D4B !important; }
+    .sidebar_tab_content table[width="110"] {
+      width: auto; }
 
 .tablee_tools:first-child {
   text-align: right; }

@@ -79,7 +79,6 @@
     <br><a href='SelectItems?eventAttr=1'><b><fmt:message key="event_attributes" bundle="${resword}"/></b></a><br><br>
     <a href='SelectItems?subAttr=1'><b><fmt:message key="subject_attributes" bundle="${resword}"/></b></a><br><br>
     <a href='SelectItems?CRFAttr=1'><b>CRF Attributes</b></a><br><br>
-    <a href='SelectItems?groupAttr=1'><b>Group Attributes</b></a><br><br>
     <%--
         <a href='SelectItems?discAttr=1'><b>Discrepancy Note Attributes</b></a><br><br>
     --%>

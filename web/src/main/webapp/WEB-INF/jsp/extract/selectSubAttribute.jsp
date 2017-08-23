@@ -95,7 +95,7 @@
      </c:otherwise>
    </c:choose>   
    <fmt:message key="gender" bundle="${resword}"/>
-   </p>se
+   </p>
    <!-- below added 07/09/2007, tbh -->
    <p>
    <c:choose>

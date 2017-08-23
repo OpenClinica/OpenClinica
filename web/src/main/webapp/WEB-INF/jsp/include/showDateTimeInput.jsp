@@ -93,7 +93,7 @@
 </div>
 </td>
 
-<td class="formlabel">:</td>
+<td class="formlabel" valign="top">:</td>
 
 <td valign="top">
 <div class="formfieldXS_BG">
