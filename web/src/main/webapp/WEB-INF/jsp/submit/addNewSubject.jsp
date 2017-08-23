@@ -170,23 +170,6 @@
 	  <input type="hidden" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>">
 	</c:otherwise>
 	</c:choose>
-
-	<tr>
-	  	<td class="formlabel" align="right"><fmt:message key="secondary_ID" bundle="${resword}"/></td>
-		<td valign="top">
-			<table border="0" cellpadding="0" cellspacing="0">
-				<tr>
-					<td valign="top"><div class="formfieldXL_BG">
-						<input onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" size="30" class="formfieldXL">
-					</div></td>
-					<td>&nbsp;</td>
-				</tr>
-				<tr>
-					<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>
-				</tr>
-			</table>
-		</td>
-	</tr>
 	<tr>
 		<td class="formlabel" align="right">
             <c:if test="${study.parentStudyId == 0}">
