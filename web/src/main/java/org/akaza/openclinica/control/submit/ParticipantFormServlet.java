@@ -21,24 +21,22 @@ public class ParticipantFormServlet extends SecureController {
         String formURL = null;
 
         // Build Enketo URL for CRF version.
-        if (currentStudy.getStudyParameterConfig().getParticipantPortal().equals("enabled")) {
-            EnketoCredentials credentials = getCredentials();
-            EnketoAPI enketo = new EnketoAPI(credentials);
-            formURL = enketo.getFormPreviewURL(crf_oid + QUERY_FLAVOR);
-            if (!formURL.equals("")) {
-                response.sendRedirect(formURL);
+        EnketoCredentials credentials = getCredentials();
+        EnketoAPI enketo = new EnketoAPI(credentials);
+        formURL = enketo.getFormPreviewURL(crf_oid + QUERY_FLAVOR);
+        if (!formURL.equals("")) {
+            response.sendRedirect(formURL);
+        } else {
+            if (credentials.getServerUrl() == null) {
+                addPageMessage(respage.getString("pform_preview_missing_url"));
             } else {
-                if (credentials.getServerUrl() == null) {
-                    addPageMessage(respage.getString("pform_preview_missing_url"));
+                if ((credentials.getApiKey() != null) && (credentials.getOcInstanceUrl() != null)) {
+                    addPageMessage(respage.getString("pform_preview_forbidden"));
                 } else {
-                    if ((credentials.getApiKey() != null) && (credentials.getOcInstanceUrl() != null)) {
-                        addPageMessage(respage.getString("pform_preview_forbidden"));
-                    } else {
-                        addPageMessage(respage.getString("participate_not_available"));
-                    }
+                    addPageMessage(respage.getString("participate_not_available"));
                 }
-                forwardPage(Page.MENU_SERVLET);
             }
+            forwardPage(Page.MENU_SERVLET);
         }
     }
 
