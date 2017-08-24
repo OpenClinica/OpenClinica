@@ -38,13 +38,11 @@ import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -511,11 +509,10 @@ public class OpenRosaSubmissionController {
 
         if (ssBean == null) {
             logger.debug("studyStatus: " + studyStatus);
-            if (studyStatus.equalsIgnoreCase("available"))
+            if (studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("frozen"))
                 accessPermission = true;
         } else {
-            logger.info("studyStatus: " + studyStatus
-                    + "  studySubjectStatus: " + ssBean.getStatus().getName());
+            logger.info("studyStatus: " + studyStatus + "  studySubjectStatus: " + ssBean.getStatus().getName());
             if (studyStatus.equalsIgnoreCase("available") && ssBean.getStatus() == Status.AVAILABLE)
                 accessPermission = true;
         }
