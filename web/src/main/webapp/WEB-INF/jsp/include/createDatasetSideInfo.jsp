@@ -67,13 +67,7 @@
 		<fmt:message key="info" bundle="${resword}"/>
 
 		</td>
-	</tr>   
-  
-  
-  
-  <c:if test="${panel.iconInfoShown}">
-	 <c:import url="../include/sideIcons.jsp"/>
-	</c:if>
+	</tr> 
 </table>	
  	
 </c:when>

@@ -529,11 +529,11 @@ public class StudyInfoPanel implements Serializable {
         if (stage.isInitialDE()) {
             answer = "<span class='icon icon-icon-doubleDataEntry orange' alt='Initial Data Entry'>";
         } else if (stage.isInitialDE_Complete()) {
-            answer = "<span class='icon icon-checkbox-checked green' alt='Initial Data Entry Complete'>";
+            answer = "<span class='icon icon-ok' alt='Initial Data Entry Complete'>";
         } else if (stage.isDoubleDE()) {
-            answer = "<span class='icon icon-icon-dataEntryCompleted orange' alt='Double Data Entry'>";
+            answer = "<span class='icon icon-icon-squared orange' alt='Double Data Entry'>";
         } else if (stage.isDoubleDE_Complete()) {
-            answer = "<span class='icon icon-checkbox-checked green' alt='Data Entry Complete'>";
+            answer = "<span class='icon icon-ok' alt='Data Entry Complete'>";
         } else if (stage.isAdmin_Editing()) {
             answer = "<span class='icon icon-pencil' alt='Administrative Editing'>";
         } else if (stage.isLocked()) {
@@ -684,7 +684,7 @@ public class StudyInfoPanel implements Serializable {
                     if (ecb != null && ecb.getId() == dedc.getEventCRF().getId()) {
                         // logger.info("ecb id*******" + ecb.getId() +
                         // dedc.getEventCRF().getId());
-                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc'' alt='Not Started'/>", "<span class='alert'>"
+                        displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>", "<span class='alert'>"
                             + dedc.getEdc().getCrf().getName() + "</span>", false, false, true));
                     } else {
                         displayData.add(new StudyInfoPanelLine("<span class='icon icon-doc' alt='Not Started'/>",

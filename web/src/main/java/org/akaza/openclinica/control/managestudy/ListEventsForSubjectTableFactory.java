@@ -106,20 +106,20 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     public ListEventsForSubjectTableFactory(boolean showMoreLink) {
         imageIconPaths.put(1, "icon icon-clock2");
         imageIconPaths.put(2, "icon icon-doc");
-        imageIconPaths.put(3, "icon icon-icon-dataEntryCompleted orange");
-        imageIconPaths.put(4, "icon icon-ok");
+        imageIconPaths.put(3, "icon icon-pencil-squared orange");
+        imageIconPaths.put(4, "icon icon-checkbox-checked green");
         imageIconPaths.put(5, "icon icon-stop-circle red");
         imageIconPaths.put(6, "icon icon-redo");
         imageIconPaths.put(7, "icon icon-icon-locked");
         imageIconPaths.put(8, "icon icon-icon-sign");
 
         crfColumnImageIconPaths.put(0, "icon icon-file-excel red");
-        crfColumnImageIconPaths.put(1, "icon icon-clock2");
+        crfColumnImageIconPaths.put(1, "icon icon-doc");
         crfColumnImageIconPaths.put(2, "icon icon-pencil-squared orange");
-        crfColumnImageIconPaths.put(3, "icon icon-icon-dataEntryCompleted orange");
+        crfColumnImageIconPaths.put(3, "icon icon-pencil-squared orange");
         crfColumnImageIconPaths.put(4, "icon icon-icon-doubleDataEntry orange");
-        crfColumnImageIconPaths.put(5, "icon icon-ok");
-        crfColumnImageIconPaths.put(6, "icon icon-ok");
+        crfColumnImageIconPaths.put(5, "icon icon-checkbox-checked green");
+        crfColumnImageIconPaths.put(6, "icon icon-checkbox-checked green");
         crfColumnImageIconPaths.put(7, "icon icon-icon-locked");
         this.showMoreLink = showMoreLink;
     }
@@ -823,32 +823,32 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     private String viewStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"javascript:openDocWindow('ViewStudySubject?id="+studySubject.getId());
-        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_Reassign1\"/></a>");
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"ViewStudySubject?id="+studySubject.getId());
+        builder.append("\"><span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
     }
 
     private String removeStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-cancel');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-cancel');\" href=\"javascript:openDocWindow('RemoveStudySubject?action=confirm&id="+studySubject.getId()+"&subjectId="+studySubject.getSubjectId()+"&studyId="+studySubject.getStudyId());
-        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Remove\" alt=\"View\" class=\"icon icon-cancel\" name=\"bt_Reassign1\"/></a>");
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-cancel');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-cancel');\" href=\"RemoveStudySubject?action=confirm&id="+studySubject.getId()+"&subjectId="+studySubject.getSubjectId()+"&studyId="+studySubject.getStudyId());
+        builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Remove\" alt=\"View\" class=\"icon icon-cancel\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
     }
 
     private String reAssignStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" href=\"javascript:openDocWindow('ReassignStudySubject?id="+studySubject.getId());
-        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Reassign\" alt=\"Reassign\" class=\"icon icon-icon-reassign\" name=\"bt_Reassign1\"/></a>");
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" href=\"ReassignStudySubject?id="+studySubject.getId());
+        builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Reassign\" alt=\"Reassign\" class=\"icon icon-icon-reassign\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
     }
 
     private String restoreStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"javascript:openDocWindow('RestoreStudySubject?action=confirm&id="+studySubject.getId() + "&subjectId"+studySubject.getSubjectId()+"&studyId="+studySubject.getStudyId());
-        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"RestoreStudySubject?action=confirm&id="+studySubject.getId() + "&subjectId"+studySubject.getSubjectId()+"&studyId="+studySubject.getStudyId());
+        builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
     }
@@ -913,7 +913,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         eventDiv.append(subjectText).append(": ").append(studySubjectLabel).br();
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
-        eventDiv.append(resword.getString("status")).append(":").append(eventStatus.getName()).br();
+        eventDiv.append(resword.getString("status")).append(": ").append(eventStatus.getName()).br();
         eventDiv.tdEnd();
         eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
         linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);

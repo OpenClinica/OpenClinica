@@ -106,7 +106,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "discrepancyNoteBean.resolutionStatus", "siteId",
+        tableFacade.setColumnProperties("studySubject.label","discrepancyNoteBean.createdDate","discrepancyNoteBean.resolutionStatus", "siteId",
                 "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus","discrepancyNoteBean.detailedNotes"
                 ,"actions");
 
@@ -121,14 +121,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("eventName"), resword.getString("event_name"), null, null, true, false);
         configureColumn(row.getColumn("crfName"), resword.getString("CRF"), null, null, true, false);
         configureColumn(row.getColumn("crfStatus"), resword.getString("CRF_status"), null, null, false, false);
-        //configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), new EntityNameCellEditor(), null, true, false);
-        //configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), resword.getString("detailed_notes"), null, null, true, false);
-        //configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"), new AssignedUserCellEditor(), null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.resolutionStatus"), resword.getString("resolution_status"), new ResolutionStatusCellEditor(),
                 resolutionStatusDropdown, true, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.disType"), resword.getString("type"), new DiscrepancyNoteTypeCellEditor(),
-                discrepancyNoteTypeDropdown, true, false);
+        configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), resword.getString("detailed_notes"), null, null, true, false);
+        
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
     }
@@ -137,7 +133,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         ListNotesTableToolbar toolbar = new ListNotesTableToolbar(showMoreLink);
         toolbar.setStudyHasDiscNotes(studyHasDiscNotes);
-        toolbar.setDiscNoteType(discNoteType);
+        
         toolbar.setResolutionStatus(resolutionStatus);
         toolbar.setModule(module);
         toolbar.setResword(resword);
@@ -206,7 +202,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
             h.put("studySubject", discrepancyNoteBean.getStudySub());
             h.put("studySubject.label", discrepancyNoteBean.getStudySub().getLabel());
-            h.put("discrepancyNoteBean.disType", discrepancyNoteBean.getDisType());
+            
             h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
             h.put("age", discrepancyNoteBean.getAge());
             h.put("days", discrepancyNoteBean.getDays());
@@ -218,11 +214,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("eventStartDate", discrepancyNoteBean.getEventStart());
             h.put("crfName", discrepancyNoteBean.getCrfName());
             h.put("crfStatus", discrepancyNoteBean.getCrfStatus());
-            //h.put("entityName", discrepancyNoteBean.getEntityName());
-            //h.put("entityValue", discrepancyNoteBean.getEntityValue());
-            h.put("discrepancyNoteBean", discrepancyNoteBean);
             h.put("discrepancyNoteBean.detailedNotes", discrepancyNoteBean.getDetailedNotes());
-            //h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());
+            h.put("discrepancyNoteBean", discrepancyNoteBean);
             
             theItems.add(h);
             setStudyHasDiscNotes(true);
@@ -272,7 +265,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 if (reterm.getString("New_and_Updated").equalsIgnoreCase(value)) {
                     value = 21 + "";
                 } else {
-                    value = ResolutionStatus.getByName(value).getId() + "";
+                    value = ResolutionStatus.getByNameResStatus(value).getId() + "";
                 }
             }
             //
@@ -315,7 +308,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         public ResolutionStatusDroplistFilterEditor() {
             ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
-            for (ResolutionStatus status : ResolutionStatus.list) {
+            for (ResolutionStatus status : ResolutionStatus.listResStatus) {
                 this.addOption(Integer.toString(status.getId()), status.getName());
             }
             this.addOption("1,2", reterm.getString("New_and_Updated"));
@@ -419,6 +412,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             String value = "";
             DiscrepancyNoteBean dnb = (DiscrepancyNoteBean) ((HashMap<Object, Object>) item).get("discrepancyNoteBean");
             HtmlBuilder builder = new HtmlBuilder();
+
+            StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
+            Integer studySubjectId = studySubjectBean.getId();
+            if (studySubjectId != null) {
+                StringBuilder url = new StringBuilder();
+                url.append(downloadNotesLinkBuilder(studySubjectBean));
+                value = url.toString();
+            }
             // for "view" as action
             // This createNoteURL uses the same method as in ResolveDiscrepancyServlet
             String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
@@ -430,13 +431,13 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
                 if (dnb.getEntityType() != "eventCrf") {
-                    builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
+                    builder.a().href("EnterDataForStudyEvent?eventId=" + studySubjectBean.getId());
                     builder.close();
                     builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                     builder.aEnd();
                 } else {
                     if (dnb.getStageId() == 5) {
-                        builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
+                        builder.a().href("EnterDataForStudyEvent?eventId=" + studySubjectBean.getId());
                         builder.close();
                         builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                         builder.aEnd();
@@ -444,13 +445,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 }
             }
 
-            StudySubjectBean studySubjectBean = (StudySubjectBean) ((HashMap<Object, Object>) item).get("studySubject");
-            Integer studySubjectId = studySubjectBean.getId();
-            if (studySubjectId != null) {
-                StringBuilder url = new StringBuilder();
-                url.append(downloadNotesLinkBuilder(studySubjectBean));
-                value = url.toString();
-            }
+           
 
             return builder.toString();
         }

@@ -15,12 +15,12 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
     <jsp:include page="../auth0/ssoLogout.jsp"/>
-    <script type="text/javascript">
-        $(document).ready(function () {
-            var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin=' + encodeURIComponent(window.location.protocol + '//' + window.location.host) + "${formURL2}";
-            iframe = document.getElementById("enketo");
-            iframe.setAttribute('src', fullEnketoURL);
-        });
+    <script type="text/javascript" language="javascript">
+    $(document).ready(function(){
+    	var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
+    	iframe = document.getElementById("enketo");
+        iframe.setAttribute('src', fullEnketoURL);
+    });
 
         window.addEventListener("message", receiveMessage, false);
         function receiveMessage(event) {

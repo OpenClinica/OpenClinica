@@ -98,12 +98,9 @@
                         <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
                     </c:otherwise>
                 </c:choose>
-                (<c:out value="${study.abbreviatedIdentifier}" />)
-                (<c:out value="${study.envType}" />)
-                &nbsp;&nbsp;|&nbsp;&nbsp;
+                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;(<c:out value="${study.envType}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
-                &nbsp;&nbsp;|&nbsp;&nbsp;
-                <a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a>
+
             </div>
 
         <div id="UserInfo">
@@ -112,6 +109,7 @@
                     <li><a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)<span class="icon icon-caret-down white"></span></a></a>
                         <!-- First Tier Drop Down -->
                         <ul class="dropdown_BG">
+                            <li><a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a></li>
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a></li>
                             <li> <a href="${urlPrefix}pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
                         </ul>
@@ -270,80 +268,79 @@
             <br clear="all">
         </c:if>
         <c:if test="${userRole.coordinator || userRole.director}">
-            <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
-            <div class="taskLeftColumn">
-                <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
-                <c:if test="${study.status.available}">
-                    <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
-                </c:if>
-                <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
-            </div>
-            <div class="taskRightColumn">
-                <c:if test="${!study.status.frozen && !study.status.locked}">
-                    <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
-                </c:if>
-                <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
-            </div>
-            <br clear="all">
-            <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
-            <div class="taskLeftColumn">
-                <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
-                <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-                    </c:when>
-                    <c:otherwise>
-                        <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-            <div class="taskRightColumn">
-                <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-                    </c:when>
-                    <c:otherwise>
-                        <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
-                        <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-                        <div class="taskLink"><a href="AuditUserActivity?restore=true"><fmt:message key="user_audit_log" bundle="${resword}"/></a></div>
-                    </c:otherwise>
-                </c:choose>
-            </div>
-            <br clear="all">
-            <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
-            <div class="taskLeftColumn">
-                <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
-            </div>
-            <div class="taskRightColumn">
-                <div class="taskLink"><a href="${urlPrefix}ViewAllJobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
-            </div>
-            <br clear="all">
-            <div class="taskGroup"><fmt:message key="nav_study_setup" bundle="${resword}"/></div>
-            <div class="taskLeftColumn">
-                <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div>
-                <c:choose>
-                    <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-                    </c:when>
-                    <c:otherwise>
-                        <div class="taskLink"><a href="${urlPrefix}pages/studymodule"><fmt:message key="nav_build_study" bundle="${resword}"/></a></div>
-                        <!-- <div class="taskLink"><a href="${urlPrefix}ListEventDefinition?read=true"><fmt:message key="nav_event_definitions" bundle="${resword}"/></a></div>  -->
-                    </c:otherwise>
-                </c:choose>
-            </div>
-            <div class="taskRightColumn">
-                <div class="taskLink"><a href="${urlPrefix}ListStudyUser"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
-                    <%--
-                    <c:choose>
-                        <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-                        </c:when>
-                        <c:otherwise>
-                            <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
-                        </c:otherwise>
-                    </c:choose>
-                     --%>
-            </div>
-            <br clear="all">
+        <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
+        <div class="taskLeftColumn">
+            <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
+            <c:if test="${study.status.available}">
+                <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+            </c:if>
+            <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
+        </div>
+        <div class="taskRightColumn">
+            <c:if test="${!study.status.frozen && !study.status.locked}">
+                <div class="taskLink"><a href="${urlPrefix}CreateNewStudyEvent"><fmt:message key="nav_schedule_event" bundle="${resword}"/></a></div>
+            </c:if>
+            <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="${urlPrefix}ImportCRFData"><fmt:message key="nav_import_data" bundle="${resword}"/></a></div>
+        </div>
+        <br clear="all">
+        <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
+        <div class="taskLeftColumn">
+            <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="${urlPrefix}ListSite"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
+            <c:choose>
+                <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                </c:when>
+                <c:otherwise>
+                    <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
+                </c:otherwise>
+            </c:choose>
+        </div>
+        <div class="taskRightColumn">
+        <c:choose>
+            <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+            </c:when>
+            <c:otherwise>
+                <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
+            </c:otherwise>
+        </c:choose>
+        </div>
+        <br clear="all">
+        <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
+        <div class="taskLeftColumn">
+            <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
+        </div>
+        <div class="taskRightColumn">
+            <div class="taskLink"><a href="${urlPrefix}ViewAllJobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
+        </div>
+        <br clear="all">
+        <div class="taskGroup"><fmt:message key="nav_study_setup" bundle="${resword}"/></div>
+        <div class="taskLeftColumn">
+            <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div>
+            <c:choose>
+                <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                </c:when>
+                <c:otherwise>
+                    <div class="taskLink"><a href="${urlPrefix}pages/studymodule"><fmt:message key="nav_build_study" bundle="${resword}"/></a></div>
+                    <!-- <div class="taskLink"><a href="${urlPrefix}ListEventDefinition?read=true"><fmt:message key="nav_event_definitions" bundle="${resword}"/></a></div>  -->
+                </c:otherwise>
+            </c:choose>
+        </div>
+        <div class="taskRightColumn">
+            <div class="taskLink"><a href="${urlPrefix}ListStudyUser"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
+            <%--
+            <c:choose>
+                <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
+                </c:when>
+                <c:otherwise>
+                    <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
+                </c:otherwise>
+            </c:choose>
+             --%>
+        </div>
+        <br clear="all">
         </c:if>
         <c:if test="${userBean.sysAdmin || userBean.techAdmin}">
             <div class="taskGroup"><fmt:message key="nav_administration" bundle="${resword}"/></div>

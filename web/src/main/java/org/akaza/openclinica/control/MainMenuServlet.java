@@ -7,7 +7,13 @@
  */
 package org.akaza.openclinica.control;
 
-import org.akaza.openclinica.bean.core.Role;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -21,12 +27,18 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.*;
+import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
+import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.service.StudyBuildServiceImpl;
@@ -36,12 +48,6 @@ import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
 
 /**
  * The main controller servlet for all the work behind study sites for
@@ -94,11 +100,11 @@ public class MainMenuServlet extends SecureController {
         StudyDAO sd = getStudyDAO();
         StudyBean study = sd.findByStudyEnvUuid(studyEnvUuid);
         if (study == null) {
-            CoreResources.setRequestSchema(currentSchema);
+            CoreResources.setRequestSchema(request,currentSchema);
             return;
         }
         currentPublicStudy = study;
-        CoreResources.setRequestSchema(currentPublicStudy.getSchemaName());
+        CoreResources.setRequestSchema(request, currentSchema);
         currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
         session.setAttribute("publicStudy", currentPublicStudy);
         session.setAttribute("study", currentStudy);

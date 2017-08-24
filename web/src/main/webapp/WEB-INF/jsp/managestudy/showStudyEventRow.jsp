@@ -21,16 +21,16 @@
      <td class="table_cell" width="20"><c:out value="${currRow.bean.studyEvent.subjectEventStatus.name}"/></td>
      <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
-		<tr>
+		
 		<td> 
         <a href="EnterDataForStudyEvent?eventId=<c:out value="${currRow.bean.studyEvent.id}"/>"
 		onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
 		onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
 		name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 		</td>
-		</tr>
-		<tr><td>&nbsp;</td></tr>
-		<tr>
+		
+		
+		
 		<td>
 		<c:if test="${(studySub.status.name != 'removed' && studySub.status.name != 'auto-removed' && !currRow.bean.studyEvent.status.deleted && currRow.bean.studyEvent.editable) && (study.status.available)}">
         <a href="UpdateStudyEvent?event_id=<c:out value="${currRow.bean.studyEvent.id}"/>&ss_id=<c:out value="${studySub.id}"/>"
@@ -39,9 +39,9 @@
 		name="bt_Edit1" class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
 		</c:if>
 		</td>
-		</tr>
-		<tr><td>&nbsp;</td></tr>
-		<tr>
+		
+		
+		
 		<td>
 		<c:choose>
          <c:when test="${!currRow.bean.studyEvent.status.deleted}">
@@ -63,8 +63,8 @@
         </c:choose>
 
         <c:if test="${currRow.bean.studyEvent.subjectEventStatus.scheduled && userRole.manageStudy && study.status.available}">
-            <tr><td>&nbsp;</td></tr>
-            <tr><td>
+            
+            <td>
                 <a href="DeleteStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
                  onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
                  onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
@@ -74,7 +74,7 @@
 
 
 		</td>
-       </tr>
+      
       </table>
      </td>
      <td class="table_cell">
@@ -203,14 +203,14 @@
 					</td>
 				</c:otherwise>
 				</c:choose>
-				<td class="table_cell" width="80">&nbsp;&nbsp;</td>
+				<td class="table_cell" width="80">;</td>
 				<td class="table_cell" width="140">
 				<table cellspacing="0" cellpadding="0" border="0">
 				<tr>
 				<c:choose>
 
 				 <c:when test="${dedc.status.name=='locked' || (currRow.bean.studyEvent.subjectEventStatus.signed && !userRole.manageStudy)}">
-				 	<td>&nbsp;</td>
+				 	
 				 </c:when>
 
 				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">
@@ -281,10 +281,10 @@
 		<td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
 		<c:choose>
 		 <c:when test="${dec.stage.initialDE}">
-		  <span class="icon icon-icon-dataEntryCompleted orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
+		  <span class=" icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
 		 </c:when>
 		 <c:when test="${dec.stage.initialDE_Complete}">
-		  <span class="icon icon-icon-dataEntryCompleted orange" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
+		  <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
 		 </c:when>
 		 <c:when test="${dec.stage.doubleDE}">
 		    <span class="icon icon-checkbox-checked green" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>" title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
@@ -354,7 +354,7 @@
                 </c:if>
 			<%-- locked status here --%>
     			<c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}">
-	    			&nbsp;
+	    			
 		    	</c:if>
     		</c:if>
 		</td>

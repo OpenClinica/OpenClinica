@@ -13,7 +13,9 @@ import java.io.File;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 
@@ -32,6 +34,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
@@ -51,6 +54,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.FormLayoutDAO;
@@ -100,8 +104,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String INPUT_NOTE_ID = "noteId";
     private static final String CAN_ADMIN_EDIT = "canAdminEdit";
     private static final String EVENT_CRF_ID = "ecId";
-    private static final String STUDY_SUB_ID = "studySubjectId";
     public static final String ORIGINATING_PAGE = "originatingPage";
+    public static final String STUDYSUBJECTID = "studySubjectId";
 
     private static final String RESOLVING_NOTE = "resolving_note";
     private static final String RETURN_FROM_PROCESS_REQUEST = "returnFromProcess";
@@ -197,6 +201,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             CRFBean crf = cdao.findByLayoutId(formLayout.getId());
 
             StudyEventDAO sedao = new StudyEventDAO(ds);
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(ds);
 
             StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
             StudySubjectBean ssb = (StudySubjectBean) ssdao.findByPK(ecb.getStudySubjectId());
@@ -231,7 +236,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             XformParser xformParser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
             VersioningMapDao versioningMapDao = (VersioningMapDao) SpringServletAccess.getApplicationContext(context).getBean("versioningMapDao");
             StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
-
+            StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
             // Cache the subject context for use during xform submission
             PFormCache cache = PFormCache.getInstance(context);
             PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
@@ -313,7 +318,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 uControls.add(itemUserControl);
                 uControls.add(itemCommentUserControl);
 
-                String xform = xformParser.marshall(buildSingleItemForm(item, uControls, binds, itext, instances));
+                String xform = xformParser.marshall(buildSingleItemForm(item, uControls, binds, itext, instances, seb, ssb, sed));
                 xform = xform.substring(0, xform.indexOf("<meta>")) + "<group_layout>" + "<" + item.getName() + "/><" + item.getName() + COMMENT + " "
                         + FS_QUERY_ATTRIBUTE + "=\"" + item.getName() + "\"/>" + "</group_layout>" + xform.substring(xform.indexOf("<meta>"));
 
@@ -339,7 +344,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
             request.setAttribute(EnketoFormServlet.FORM_URL1, part1);
             request.setAttribute(EnketoFormServlet.FORM_URL2, part2);
             request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module);
-
+            if (!flavor.equals(SINGLE_ITEM_FLAVOR)) {
+                request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
+            } else {
+                request.setAttribute(STUDYSUBJECTID, "");
+            }
         }
         return true;
     }
@@ -584,7 +593,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
     }
 
-    private Html buildSingleItemForm(ItemBean item, List<UserControl> userControls, List<Bind> binds, Itext itext, List<Instance> instances) {
+    private Html buildSingleItemForm(ItemBean item, List<UserControl> userControls, List<Bind> binds, Itext itext, List<Instance> instances, StudyEventBean seb,
+            StudySubjectBean ssb, StudyEventDefinitionBean sed) {
 
         Html html = new Html();
         Head head = new Head();
@@ -593,8 +603,16 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         // Set body
         Body body = new Body();
-        body.setUsercontrol(userControls);
-
+        Group group = new Group();
+        group.setRef("/form/group_layout");
+        Label metaLabel = new Label();
+        metaLabel.setLabel(resword.getString("subject_id") + ": " + ssb.getLabel() + "\n" + resword.getString("event_name") + ": " + sed.getName() + "\n"
+                + resword.getString("event_date") + ": " + formatDate(seb.getDateStarted()) + "\n\n ");
+        group.setLabel(metaLabel);
+        group.setUsercontrol(userControls);
+        List<Group> groups = new ArrayList<>();
+        groups.add(group);
+        body.setGroup(groups);
         // Build Instance
         Meta meta = new Meta();
         meta.setInstanceID("uuid:" + item.getName());
@@ -785,6 +803,12 @@ public class ResolveDiscrepancyServlet extends SecureController {
         bind.setRelevant(null);
         bind.setConstraintMsg(null);
         bind.setItemGroup(null);
+    }
+
+    private String formatDate(Date date) {
+        String format = resformat.getString("date_format_string");
+        SimpleDateFormat sdf = new SimpleDateFormat(format);
+        return sdf.format(date);
     }
 
 }

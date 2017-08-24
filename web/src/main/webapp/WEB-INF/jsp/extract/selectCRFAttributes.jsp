@@ -78,28 +78,7 @@
     </c:choose>
    <fmt:message key="version_name" bundle="${resword}"/>
    </p>
-   <p>
-    <c:choose>
-     <c:when test="${newDataset.showCRFinterviewerName}">
-       <input type="checkbox" checked name="interviewer" value="yes">  
-     </c:when>
-     <c:otherwise>
-       <input type="checkbox" name="interviewer" value="yes">
-     </c:otherwise>
-    </c:choose>   
-   <fmt:message key="interviewer_name" bundle="${resword}"/>
-   </p>
-   <p>
-    <c:choose>
-     <c:when test="${newDataset.showCRFinterviewerDate}">
-       <input type="checkbox" checked name="interviewer_date" value="yes">  
-     </c:when>
-     <c:otherwise>
-       <input type="checkbox" name="interviewer_date" value="yes">
-     </c:otherwise>
-    </c:choose>   
-   <fmt:message key="interview_date" bundle="${resword}"/>
-   </p>
+   
    
  
 <table border="0" cellpadding="0" cellspacing="0" >
