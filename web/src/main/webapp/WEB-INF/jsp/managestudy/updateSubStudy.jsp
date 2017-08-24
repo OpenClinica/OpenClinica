@@ -326,7 +326,7 @@ function updateThis(multiSelEle, count) {
 
 <br><br>
   <table border="0" cellpadding="0" cellspacing="0">
-  <tr><td><input type="submit" name="Submit" value="<fmt:message key="submit_site" bundle="${resword}"/>" class="button_long">
+  <tr><td><input type="submit" name="save" value="<fmt:message key="save" bundle="${resword}"/>" class="button_long">
     </td><td>
   <input type="button" onclick="confirmCancel('ListSite');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 	</td></tr></table>
