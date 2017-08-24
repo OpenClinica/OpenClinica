@@ -112,68 +112,8 @@ public class UpdateSubStudyServlet extends SecureController {
     private void confirmStudy() throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
-        
-        /*
-        v.addValidation("name", Validator.NO_BLANKS);
-        v.addValidation("uniqueProId", Validator.NO_BLANKS);
-        // >> tbh
-        // v.addValidation("description", Validator.NO_BLANKS);
-        // << tbh, #3943, 07/2009
-        v.addValidation("prinInvestigator", Validator.NO_BLANKS);
-        if (!StringUtil.isBlank(fp.getString(INPUT_START_DATE))) {
-            v.addValidation(INPUT_START_DATE, Validator.IS_A_DATE);
-        }
-        if (!StringUtil.isBlank(fp.getString(INPUT_END_DATE))) {
-            v.addValidation(INPUT_END_DATE, Validator.IS_A_DATE);
-        }
-        if (!StringUtil.isBlank(fp.getString(INPUT_VER_DATE))) {
-            v.addValidation(INPUT_VER_DATE, Validator.IS_A_DATE);
-        }
-        if (!StringUtil.isBlank(fp.getString("facConEmail"))) {
-            v.addValidation("facConEmail", Validator.IS_A_EMAIL);
-        }
-        // v.addValidation("statusId", Validator.IS_VALID_TERM);
-        v.addValidation("secondProId", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-        v.addValidation("facName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-        v.addValidation("facCity", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-        v.addValidation("facState", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 20);
-        v.addValidation("facZip", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
-        v.addValidation("facCountry", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 64);
-        v.addValidation("facConName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-        v.addValidation("facConDegree", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-        v.addValidation("facConPhone", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-        v.addValidation("facConEmail", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
 
-        errors = v.validate();
-
-        // >> tbh
-        */
         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-        /*
-        ArrayList<StudyBean> allStudies = (ArrayList<StudyBean>) studyDAO.findAll();
-        StudyBean oldStudy = (StudyBean) session.getAttribute("newStudy");
-        for (StudyBean thisBean : allStudies) {
-            if (fp.getString("uniqueProId").trim().equals(thisBean.getIdentifier()) && !thisBean.getIdentifier().equals(oldStudy.getIdentifier())) {
-                Validator.addError(errors, "uniqueProId", resexception.getString("unique_protocol_id_existed"));
-            }
-        }
-        // << tbh #3999 08/2009
-        if (fp.getString("name").trim().length() > 100) {
-            Validator.addError(errors, "name", resexception.getString("maximum_lenght_name_100"));
-        }
-        if (fp.getString("uniqueProId").trim().length() > 30) {
-            Validator.addError(errors, "uniqueProId", resexception.getString("maximum_lenght_unique_protocol_30"));
-        }
-        if (fp.getString("description").trim().length() > 255) {
-            Validator.addError(errors, "description", resexception.getString("maximum_lenght_brief_summary_255"));
-        }
-        if (fp.getString("prinInvestigator").trim().length() > 255) {
-            Validator.addError(errors, "prinInvestigator", resexception.getString("maximum_lenght_principal_investigator_255"));
-        }
-        if (fp.getInt("expectedTotalEnrollment") <= 0) {
-            Validator.addError(errors, "expectedTotalEnrollment", respage.getString("expected_total_enrollment_must_be_a_positive_number"));
-        }
-        */
         if (parentStudy.getStatus().equals(Status.LOCKED)) {
             if (fp.getInt("statusId") != Status.LOCKED.getId()) {
                 Validator.addError(errors, "statusId", respage.getString("study_locked_site_status_locked"));
@@ -205,28 +145,7 @@ public class UpdateSubStudyServlet extends SecureController {
             fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
             fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
             fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
-            /*
-             * try {
-             * local_df.parse(fp.getString(INPUT_START_DATE));
-             * fp.addPresetValue(INPUT_START_DATE, local_df.format(fp.getDate(INPUT_START_DATE)));
-             * } catch (ParseException pe) {
-             * fp.addPresetValue(INPUT_START_DATE, fp.getString(INPUT_START_DATE));
-             * }
-             * // tbh 3946 07/2009
-             * try {
-             * local_df.parse(fp.getString(INPUT_VER_DATE));
-             * fp.addPresetValue(INPUT_VER_DATE, local_df.format(fp.getDate(INPUT_VER_DATE)));
-             * } catch (ParseException pe) {
-             * fp.addPresetValue(INPUT_VER_DATE, fp.getString(INPUT_VER_DATE));
-             * }
-             * // >> tbh
-             * try {
-             * local_df.parse(fp.getString(INPUT_END_DATE));
-             * fp.addPresetValue(INPUT_END_DATE, local_df.format(fp.getDate(INPUT_END_DATE)));
-             * } catch (ParseException pe) {
-             * fp.addPresetValue(INPUT_END_DATE, fp.getString(INPUT_END_DATE));
-             * }
-             */
+
             setPresetValues(fp.getPresetValues());
             request.setAttribute("formMessages", errors);
             request.setAttribute("facRecruitStatusMap", CreateStudyServlet.facRecruitStatusMap);
@@ -549,43 +468,6 @@ public class UpdateSubStudyServlet extends SecureController {
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         StudyBean study = (StudyBean) session.getAttribute("newStudy");
         ArrayList parameters = study.getStudyParameters();
-        /*
-         * logger.info("study bean to be updated:\n");
-         * logger.info(study.getName()+ "\n" + study.getCreatedDate() + "\n" +
-         * study.getIdentifier() + "\n" + study.getParentStudyId()+ "\n" +
-         * study.getSummary()+ "\n" + study.getPrincipalInvestigator()+ "\n" +
-         * study.getDatePlannedStart()+ "\n" + study.getDatePlannedEnd()+ "\n" +
-         * study.getFacilityName()+ "\n" + study.getFacilityCity()+ "\n" +
-         * study.getFacilityState()+ "\n" + study.getFacilityZip()+ "\n" +
-         * study.getFacilityCountry()+ "\n" +
-         * study.getFacilityRecruitmentStatus()+ "\n" +
-         * study.getFacilityContactName()+ "\n" +
-         * study.getFacilityContactEmail()+ "\n" +
-         * study.getFacilityContactPhone()+ "\n" +
-         * study.getFacilityContactDegree());
-         */
-
-        // study.setCreatedDate(new Date());
-        /*
-        study.setUpdatedDate(new Date());
-        study.setUpdater(ub);
-        sdao.update(study);
-
-        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        for (int i = 0; i < parameters.size(); i++) {
-            StudyParamsConfig config = (StudyParamsConfig) parameters.get(i);
-            StudyParameterValueBean spv = config.getValue();
-
-            StudyParameterValueBean spv1 = spvdao.findByHandleAndStudy(spv.getStudyId(), spv.getParameter());
-            if (spv1.getId() > 0) {
-                spv = (StudyParameterValueBean) spvdao.update(spv);
-            } else {
-                spv = (StudyParameterValueBean) spvdao.create(spv);
-            }
-            // spv = (StudyParameterValueBean)spvdao.update(config.getValue());
-
-        }
-        */
         submitSiteEventDefinitions(study);
 
         // session.removeAttribute("newStudy");
