@@ -11,7 +11,6 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.rule.FileProperties;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -29,6 +28,7 @@ import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
@@ -509,11 +509,11 @@ public class OpenRosaSubmissionController {
 
         if (ssBean == null) {
             logger.debug("studyStatus: " + studyStatus);
-            if (studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("frozen"))
+            if (study.getStatus() == Status.AVAILABLE || study.getStatus() == Status.FROZEN)
                 accessPermission = true;
         } else {
             logger.info("studyStatus: " + studyStatus + "  studySubjectStatus: " + ssBean.getStatus().getName());
-            if (studyStatus.equalsIgnoreCase("available") && ssBean.getStatus() == Status.AVAILABLE)
+            if (study.getStatus() == Status.AVAILABLE && ssBean.getStatus() == org.akaza.openclinica.bean.core.Status.AVAILABLE)
                 accessPermission = true;
         }
         return accessPermission;
