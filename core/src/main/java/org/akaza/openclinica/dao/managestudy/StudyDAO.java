@@ -311,6 +311,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         variables.put(new Integer(22), new java.util.Date());
         variables.put(new Integer(23), new Integer(sb.getOwnerId()));
         variables.put(new Integer(24), getValidOid(sb));
+        variables.put(new Integer(25), sb.getEnvType().toString());
         // replace this with the owner id
         this.execute(digester.getQuery("createStepOne"), variables, nullVars);
         return sb;
@@ -612,8 +613,9 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         Integer oldStatusId = (Integer) hm.get("old_status_id");
         eb.setOldStatus(Status.get(oldStatusId));
         eb.setSchemaName((String) hm.get("schema_name"));
-        if (StringUtils.isNotEmpty((String)hm.get("env_type")))
-            eb.setEnvType(StudyEnvEnum.valueOf((String)hm.get("env_type")));
+        String envTypeStr = (String) hm.get("env_type");
+        if (StringUtils.isNotEmpty(envTypeStr))
+            eb.setEnvType(StudyEnvEnum.valueOf(envTypeStr.toUpperCase()));
         eb.setStudyEnvSiteUuid((String) hm.get("study_env_site_uuid"));
         eb.setStudyEnvUuid((String)hm.get("study_env_uuid"));
         return eb;

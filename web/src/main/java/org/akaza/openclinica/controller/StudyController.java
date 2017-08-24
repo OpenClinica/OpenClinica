@@ -387,7 +387,7 @@ import java.util.regex.Pattern;
                 ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "envType");
                 errorObjects.add(errorObject);
             } else {
-                envType = m.group(2);
+                envType = m.group(2).toUpperCase();
             }
         }
 
@@ -515,7 +515,7 @@ import java.util.regex.Pattern;
                     spv.setValue(studyParameterConfig.getGenderRequired());
                     break;
                 case "subjectPersonIdRequired":
-                    spv.setValue(studyParameterConfig.getSubjectPersonIdRequired());
+                    spv.setValue(handlePersonIdRequired(studyParameterConfig.getSubjectPersonIdRequired()));
                     break;
                 case "interviewerNameRequired":
                     spv.setValue(studyParameterConfig.getInterviewerNameRequired());
@@ -547,6 +547,23 @@ import java.util.regex.Pattern;
         studyDao.saveOrUpdate(schemaStudy);
     }
 
+    private String handlePersonIdRequired(String input) {
+        String outputStr ="";
+        switch(input.toLowerCase()) {
+        case "always":
+            outputStr = "required";
+            break;
+        case "optional":
+            outputStr = "optional";
+            break;
+        case "never":
+            outputStr = "never";
+            break;
+        default:
+            break;
+        }
+        return outputStr;
+    }
     private void setStudyConfigParameters(HttpServletRequest request, Study study, Study schemaStudy, StudyParameterConfig studyParameterConfig) {
         String schema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, study.getSchemaName());
@@ -592,7 +609,7 @@ import java.util.regex.Pattern;
         subjectPersonIdRequiredValue.setStudy(schemaStudy);
         StudyParameter subjectPersonIdRequired = studyParameterDao.findByHandle("subjectPersonIdRequired");
         subjectPersonIdRequiredValue.setStudyParameter(subjectPersonIdRequired);
-        subjectPersonIdRequiredValue.setValue(studyParameterConfig.getSubjectPersonIdRequired());
+        subjectPersonIdRequiredValue.setValue(handlePersonIdRequired(studyParameterConfig.getSubjectPersonIdRequired()));
         studyParameterValues.add(subjectPersonIdRequiredValue);
 
         StudyParameterValue interviewerNameRequiredValue = new StudyParameterValue();
@@ -1163,6 +1180,7 @@ import java.util.regex.Pattern;
             siteBean = buildSiteBean(siteParameters);
             siteBean.setSchemaName(siteParameters.parentStudy.getSchemaName());
             siteBean.setStudyEnvSiteUuid(siteParameters.studyEnvSiteUuid);
+            siteBean.setEnvType(siteParameters.parentStudy.getEnvType());
             StudyBean sBean = createStudy(siteBean, siteParameters.ownerUserAccount);
             // get the schema study
             request.setAttribute("requestSchema", siteParameters.parentStudy.getSchemaName());

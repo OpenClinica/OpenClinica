@@ -9,7 +9,7 @@ package org.akaza.openclinica.domain.datamap;
  */
 
 public enum StudyEnvEnum {
-    PROD("prod"),TEST("test");
+    PROD("PROD"),TEST("TEST");
     private String env;
     StudyEnvEnum(String env) {
         this.env = env;
