@@ -15,7 +15,7 @@
 <jsp:useBean scope="request" id="label" class="java.lang.String"/>
 
 <form name="subjectForm" action="AddNewSubject" method="post">
-<div style="width: 475px; height: 478px; overflow: scroll; background:#FFFFFF;">
+<div style="width: 475px; height: 478px; background:#FFFFFF;">
 <table border="0" cellpadding="0" >
 	<tr style="height:10px;">
 		<td width="35%"><h3>Add New Subject</h3></td>
