@@ -387,7 +387,7 @@ import java.util.regex.Pattern;
                 ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "envType");
                 errorObjects.add(errorObject);
             } else {
-                envType = m.group(2);
+                envType = m.group(2).toUpperCase();
             }
         }
 
@@ -1180,6 +1180,7 @@ import java.util.regex.Pattern;
             siteBean = buildSiteBean(siteParameters);
             siteBean.setSchemaName(siteParameters.parentStudy.getSchemaName());
             siteBean.setStudyEnvSiteUuid(siteParameters.studyEnvSiteUuid);
+            siteBean.setEnvType(siteParameters.parentStudy.getEnvType());
             StudyBean sBean = createStudy(siteBean, siteParameters.ownerUserAccount);
             // get the schema study
             request.setAttribute("requestSchema", siteParameters.parentStudy.getSchemaName());

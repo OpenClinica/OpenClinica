@@ -98,7 +98,9 @@
                         <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
                     </c:otherwise>
                 </c:choose>
-                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
+                (<c:out value="${study.abbreviatedIdentifier}" />)
+                (<c:out value="${study.envType}" />)
+                &nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a>
                 &nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a>
