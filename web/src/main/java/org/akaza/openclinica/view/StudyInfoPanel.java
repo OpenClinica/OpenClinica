@@ -529,11 +529,11 @@ public class StudyInfoPanel implements Serializable {
         if (stage.isInitialDE()) {
             answer = "<span class='icon icon-icon-doubleDataEntry orange' alt='Initial Data Entry'>";
         } else if (stage.isInitialDE_Complete()) {
-            answer = "<span class='icon icon-checkbox-checked green' alt='Initial Data Entry Complete'>";
+            answer = "<span class='icon icon-ok' alt='Initial Data Entry Complete'>";
         } else if (stage.isDoubleDE()) {
-            answer = "<span class='icon icon-icon-dataEntryCompleted orange' alt='Double Data Entry'>";
+            answer = "<span class='icon icon-icon-squared orange' alt='Double Data Entry'>";
         } else if (stage.isDoubleDE_Complete()) {
-            answer = "<span class='icon icon-checkbox-checked green' alt='Data Entry Complete'>";
+            answer = "<span class='icon icon-ok' alt='Data Entry Complete'>";
         } else if (stage.isAdmin_Editing()) {
             answer = "<span class='icon icon-pencil' alt='Administrative Editing'>";
         } else if (stage.isLocked()) {
