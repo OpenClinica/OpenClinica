@@ -209,6 +209,9 @@
 			</c:choose>
 		</td>
 	</tr>
+	<tr>
+		<td></td><td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studySubject"/></jsp:include></td>
+	</tr>
 
 	<tr>
 		<td></td><td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studySubject"/></jsp:include></td>
