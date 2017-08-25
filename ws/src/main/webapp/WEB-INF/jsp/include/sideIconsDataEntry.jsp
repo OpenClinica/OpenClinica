@@ -19,7 +19,7 @@
 				<td><fmt:message key="discrepancy_note" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
-				<td><span class="fa fa-bubble-black"></td>
+				<td><span class="fa fa-bubble-white"></td>
 				<td><fmt:message key="add_discrepancy_note" bundle="${reswords}"/></td>
 			</tr>
 			<tr>
