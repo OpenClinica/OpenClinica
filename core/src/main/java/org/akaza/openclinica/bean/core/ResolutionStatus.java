@@ -31,7 +31,7 @@ public class ResolutionStatus extends Term {
 
     public static final ResolutionStatus INVALID = new ResolutionStatus(0, "invalid", null, null);
 
-    public static final ResolutionStatus OPEN = new ResolutionStatus(1, "New", null, "fa fa-bubble-red");
+    public static final ResolutionStatus OPEN = new ResolutionStatus(1, "New", null, "fa fa-bubble-white");
 
     public static final ResolutionStatus UPDATED = new ResolutionStatus(2, "Updated", null, "fa fa-bubble-red");
 
