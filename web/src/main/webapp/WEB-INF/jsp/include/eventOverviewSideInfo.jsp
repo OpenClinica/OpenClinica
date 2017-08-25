@@ -56,7 +56,7 @@
 	 <c:out value="${studySubject.label}"/>
 	<br><br>
 
-	<b><fmt:message key="study_event" bundle="${resword}"/></b>: &nbsp;
+	<b><fmt:message key="study_event" bundle="${resword}"/>:</b> &nbsp;
 	<c:choose>
 	 <c:when test="${toc != null}">	 
 	  <a href="EnterDataForStudyEvent?eventId=<c:out value="${toc.studyEvent.id}"/>"><c:out value="${toc.studyEventDefinition.name}"/></a>
@@ -67,7 +67,7 @@
 	</c:choose>
 	<br><br>
 	
-     <b><fmt:message key="location" bundle="${resword}"/></b>: 
+     <b><fmt:message key="location" bundle="${resword}"/>:</b>
      <c:choose>
 	 <c:when test="${toc != null}">	 
 	   <c:out value="${toc.studyEvent.location}"/>
@@ -79,7 +79,7 @@
      <br><br>
      
      
-     <b><fmt:message key="start_date1" bundle="${resword}"/></b>:
+     <b><fmt:message key="start_date1" bundle="${resword}"/>:</b>&nbsp;
      <c:choose>
 	 <c:when test="${toc != null}">	 
 	    <fmt:formatDate value="${toc.studyEvent.dateStarted}" pattern="${dteFormat}"/>
