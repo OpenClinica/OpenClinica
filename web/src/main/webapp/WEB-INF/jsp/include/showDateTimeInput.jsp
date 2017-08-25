@@ -97,7 +97,7 @@
 
 <td valign="top">
 <div class="formfieldXS_BG">
-<select style="height:2em; name="<c:out value="${minuteFieldName}"/>" class="formfieldXS">
+<select style="height:2em;" name="<c:out value="${minuteFieldName}"/>" class="formfieldXS">
     <option value="<c:out value="-1"/>" ><c:out value=""/></option>
     <c:forEach var="currMinute" begin="0" end="59" step="1">
         <c:choose>

@@ -209,9 +209,6 @@
 			</c:choose>
 		</td>
 	</tr>
-	<tr>
-		<td></td><td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studySubject"/></jsp:include></td>
-	</tr>
 
 	<tr>
 		<td></td><td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studySubject"/></jsp:include></td>
@@ -420,7 +417,7 @@
 				<td>
                     <c:if test="${study.studyParameterConfig.eventLocationRequired == 'required'}">*</c:if>
                     <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=schLocation&column=location','spanAlert-locationScheduled0'); return false;">
-				    <span name="flag_schLocation" class="" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
+				    <span name="flag_schLocation" class="icon icon-flag blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if>
                 </td>
 			</tr>
 			<tr>
@@ -453,18 +450,18 @@
 		<td valign="top">
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
-				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="endScheduled0"/><c:param name="count" value=""/></c:import>
+				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="endScheduled0"/><c:param name="count" value="4"/></c:import>
 				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled0&column=end_date','spanAlert-endScheduled0'); return false;">
 				<span name="flag_endScheduled0" class="icon icon-flag blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
-			
-			</table>
 			<tr>
 				<td colspan="7">
-					<fmt:message key="leave_this_field_blank_if_not_applicable" bundle="${restext}"/><br/>
+					
 					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="endScheduled0" /></jsp:include>
 				</td>
 			</tr>
+			</table>
+			<fmt:message key="leave_this_field_blank_if_not_applicable" bundle="${restext}"/><br/>
 		</td>
 	</tr>
 </table>
@@ -580,14 +577,15 @@
 				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled1&column=end_date','spanAlert-endScheduled1'); return false;">
 				<span name="flag_endScheduled1" class="icon icon-flag blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
-			
-			</table>
 			<tr>
 				<td colspan="7">
-					<fmt:message key="leave_this_field_blank_if_not_applicable" bundle="${restext}"/><br/>
+					
 					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="endScheduled1" /></jsp:include>
 				</td>
 			</tr>
+
+			</table>
+			<fmt:message key="leave_this_field_blank_if_not_applicable" bundle="${restext}"/><br/>
 		</td>
 	</tr>
 </table>
@@ -704,14 +702,14 @@
 				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled2&column=end_date','spanAlert-endScheduled2'); return false;">
 				<span name="flag_endScheduled2" class="icon icon-flag blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
-		
-			</table>
-				<tr>
+			<tr>
 				<td colspan="7">
-					<fmt:message key="leave_this_field_blank_if_not_applicable" bundle="${restext}"/><br/>
+					
 					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="endScheduled2" /></jsp:include>
 				</td>
 			</tr>
+			</table>
+			<fmt:message key="leave_this_field_blank_if_not_applicable" bundle="${restext}"/><br/>
 		</td>
 	</tr>
 </table>
@@ -829,14 +827,14 @@
 				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=endScheduled3&column=end_date','spanAlert-endScheduled3'); return false;">
 				<span name="flag_endScheduled3" class="icon icon-flag blue" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
-			
-			</table>
 			<tr>
 				<td colspan="7">
-					<fmt:message key="leave_this_field_blank_if_not_applicable" bundle="${restext}"/><br/>
+					
 					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="endScheduled3" /></jsp:include>
 				</td>
 			</tr>
+			</table>
+			<fmt:message key="leave_this_field_blank_if_not_applicable" bundle="${restext}"/><br/>
 		</td>
 	</tr>
 </table>

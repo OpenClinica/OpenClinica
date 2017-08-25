@@ -49,7 +49,7 @@
 <tr id="sidebar_Instructions_open" style="display: none">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
         <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -63,12 +63,36 @@
 <tr id="sidebar_Instructions_closed" style="display: all">
     <td class="sidebar_tab">
 
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
         <fmt:message key="instructions" bundle="${resword}"/>
 
     </td>
 </tr>
+<tr id="sidebar_Instructions_open" style="display: none">
+    <td class="sidebar_tab">
+
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+
+        <fmt:message key="info" bundle="${resword}"/>
+
+        <div class="sidebar_tab_content">
+
+        </div>
+
+    </td>
+
+</tr>
+<tr id="sidebar_Instructions_closed" style="display: all">
+    <td class="sidebar_tab">
+
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+
+        <fmt:message key="info" bundle="${resword}"/>
+
+    </td>
+</tr>
+<c:import url="/WEB-INF/jsp/include/sideIconsSubject.jsp"/>
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>

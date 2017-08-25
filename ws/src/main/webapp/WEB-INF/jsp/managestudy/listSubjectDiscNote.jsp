@@ -118,7 +118,7 @@ applied on resolution status or type--%>
       alt="<fmt:message key="Resolved" bundle="${resterm}"/>" title="<fmt:message key="Resolved" bundle="${resterm}"/>"/></a> (<fmt:message key="Resolved" bundle="${resterm}"/>)&nbsp;
 
     <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=4&type=${param.type}"><span
-      name="icon_flagBlack" class="fa fa-bubble-black" border="0"
+      name="icon_flagBlack" class="fa fa-bubble-white" border="0"
       alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>"/></a> (<fmt:message key="Closed" bundle="${resterm}"/>)&nbsp;
 
     <a href="ListDiscNotesSubjectServlet?module=${module}&resolutionStatus=5&type=${param.type}"><span
