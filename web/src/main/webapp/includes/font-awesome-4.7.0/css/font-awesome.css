@@ -912,6 +912,15 @@
 }
 .fa-bubble-white:before {
   content: "\f0e5";
+  margin: 0 10px 0 10px;
+  padding: 0;
+  opacity: 0.7; }
+  .fa-bubble-white:hover {
+    opacity: 0.5; 
+  }
+}
+.fa-comment:before {
+  content: "\f075";
 }
 .fa-comments-o:before {
   content: "\f0e6";
