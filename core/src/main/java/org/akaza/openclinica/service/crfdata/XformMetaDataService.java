@@ -25,6 +25,7 @@ import org.akaza.openclinica.dao.hibernate.SectionDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.FormLayout;
@@ -153,6 +154,7 @@ public class XformMetaDataService {
         crfBean = (CrfBean) crfDao.findByOcOID(cmdObject.crf.getOcoid());
         if (crfBean != null) {
             crfBean.setUpdateId(cmdObject.ub.getId());
+            crfBean.setName(cmdObject.crf.getName());
             crfBean.setDateUpdated(new Date());
             crfBean = crfDao.saveOrUpdate(crfBean);
 
@@ -161,6 +163,11 @@ public class XformMetaDataService {
                 formLayout = new FormLayout();
                 formLayout = populateFormLayout(formLayout, crfBean, cmdObject);
                 formLayout = formLayoutDao.saveOrUpdate(formLayout);
+            } else {
+                if (!formLayout.getStatus().equals(Status.AVAILABLE)) {
+                    formLayout.setStatus(Status.AVAILABLE);
+                    formLayout = formLayoutDao.saveOrUpdate(formLayout);
+                }
             }
 
             crfVersion = crfVersionDao.findAllByCrfId(crfBean.getCrfId()).get(0);

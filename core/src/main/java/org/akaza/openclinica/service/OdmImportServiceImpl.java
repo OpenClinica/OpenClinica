@@ -87,7 +87,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.dataSource = dataSource;
     }
 
-    private void printOdm(ODM odm){
+    private void printOdm(ODM odm) {
         JAXBContext jaxbContext = null;
         try {
             jaxbContext = JAXBContext.newInstance(ODM.class);
@@ -106,9 +106,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 
         printOdm(odm);
 
-
-
-        CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(),dataSource);
+        CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(), dataSource);
 
         UserAccount userAccount = getCurrentUser();
         // TODO add validation to all entities
@@ -227,11 +225,28 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     private void saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Form[] fmCrfs) {
+
         for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
             String crfOid = odmFormDef.getOID();
             List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
             // String crfDescription = odmFormDef.getFormDetails().getDescription();
             String crfName = odmFormDef.getName();
+
+            CrfBean crfBean = getCrfDao().findByOcOID(crfOid);
+            if (crfBean != null) {
+                List<String> jsonLayoutOids = new ArrayList<>();
+                for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : formLayoutDefs) {
+                    jsonLayoutOids.add(formLayoutDef.getOID());
+                }
+                List<FormLayout> formLayouts = getFormLayoutDao().findAllByCrfId(crfBean.getCrfId());
+                for (FormLayout formLayout : formLayouts) {
+                    if (!jsonLayoutOids.contains(formLayout.getName()) && !formLayout.getStatus().equals(Status.LOCKED)) {
+                        formLayout.setStatus(Status.LOCKED);
+                        getFormLayoutDao().saveOrUpdate(formLayout);
+
+                    }
+                }
+            }
             saveOrUpdateCrfAndFormLayouts(crfOid, formLayoutDefs, fmCrfs, userAccount, study, crfName);
         }
 
@@ -251,6 +266,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 
         for (Form crf : fmCrfs) {
             if (crf.getOcoid().equals(crfOid)) {
+                crf.setName(crfName);
                 ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, currentStudy, ub, true, null);
                 xformService.executeIndividualCrf(eicObj);
             }
@@ -270,6 +286,9 @@ public class OdmImportServiceImpl implements OdmImportService {
                 studyEventDefinition.setOc_oid(odmStudyEventDef.getOID());
                 studyEventDefinition = getStudyEventDefDao().saveOrUpdate(populateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study));
             } else {
+                if (!studyEventDefinition.getStatus().equals(Status.AVAILABLE)) {
+                    studyEventDefinition.setStatus(Status.AVAILABLE);
+                }
                 studyEventDefinition = getStudyEventDefDao().saveOrUpdate(updateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study));
             }
             jsonEventList.add(studyEventDefinition);
@@ -290,14 +309,13 @@ public class OdmImportServiceImpl implements OdmImportService {
         String studyOid = odm.getStudy().get(0).getOID();
         Study study = getStudyDao().findByOcOID(studyOid);
 
-        if(study == null) {
+        if (study == null) {
             throw new RuntimeException("Study with this oid: " + studyOid + " doesn't exist. Please fix !!! ");
         }
 
-        //study = getStudyDao().saveOrUpdate(updateStudy(odmGlobalVariables, userAccount, study));
+        // study = getStudyDao().saveOrUpdate(updateStudy(odmGlobalVariables, userAccount, study));
         return study;
     }
-
 
     private Study saveOrUpdateStudy(ODM odm, UserAccount userAccount, ODMcomplexTypeDefinitionStudy odmStudy) {
         ODMcomplexTypeDefinitionGlobalVariables odmGlobalVariables = odmStudy.getGlobalVariables();
@@ -326,7 +344,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     private Study updateStudy(ODMcomplexTypeDefinitionGlobalVariables odmGlobalVariables, UserAccount userAccount, Study study) {
-        //study = populateStudy(odmGlobalVariables, userAccount, study);
+        // study = populateStudy(odmGlobalVariables, userAccount, study);
         study.setUpdateId(userAccount.getUserId());
         study.setDateUpdated(new Date());
         return study;
@@ -578,10 +596,9 @@ public class OdmImportServiceImpl implements OdmImportService {
             throw new RuntimeException("Something went wrong !!");
         }
 
-
-        if (buckets != null && buckets.length == 1){
+        if (buckets != null && buckets.length == 1) {
             forms = buckets[0].getForms();
-        }else{
+        } else {
             throw new RuntimeException("No forms found for this board");
         }
 
