@@ -139,7 +139,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 
                         eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
                                 studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(), study.getStudyId());
-
+                        if (eventDefinitionCrf != null && !eventDefinitionCrf.getStatusId().equals(Status.AVAILABLE.getCode()))
+                            eventDefinitionCrf.setStatusId(Status.AVAILABLE.getCode());
                         String defaultVersionName = null;
                         OCodmComplexTypeDefinitionConfigurationParameters conf = odmFormRef.getConfigurationParameters();
                         List<OCodmComplexTypeDefinitionFormLayoutRef> formLayoutRefs = odmFormRef.getFormLayoutRef();
