@@ -8,7 +8,6 @@ import org.akaza.openclinica.bean.login.*;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import org.akaza.openclinica.controller.helper.OCUserDTO;
@@ -21,7 +20,6 @@ import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.StudyParameter;
@@ -470,6 +468,7 @@ import java.util.regex.Pattern;
         StudyInfoObject studyInfoObject = null;
         Study schemaStudy = null;
         try {
+
             studyInfoObject = studyBuildService.process(request, study, ownerUserAccount);
             liquibaseOnDemandService.createForeignTables(studyInfoObject);
             schemaStudy = liquibaseOnDemandService.process(studyInfoObject, studyInfoObject.getUb());
