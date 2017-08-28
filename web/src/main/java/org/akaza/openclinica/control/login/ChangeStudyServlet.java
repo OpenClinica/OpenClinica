@@ -180,7 +180,8 @@ public class ChangeStudyServlet extends SecureController {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
         String studySchema = fp.getString("changeStudySchema", true);
-        request.setAttribute("changeStudySchema", "public");
+        request.setAttribute("requestSchema", "public");
+        request.setAttribute("changeStudySchema", null);
         String studyEnvUuid = fp.getString("studyEnvUuid", true);
         String prevStudyEnvUuid = currentStudy != null ? currentStudy.getStudyEnvUuid() : null;
 
@@ -202,10 +203,10 @@ public class ChangeStudyServlet extends SecureController {
                 int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
                 request.setAttribute("label", new Integer(nextLabel).toString());
             }
-
+            request.setAttribute("requestSchema", studySchema);
             StudyConfigService scs = new StudyConfigService(sm.getDataSource());
             if (current.getParentStudyId() <= 0) {// top study
-                scs.setParametersForStudy(current);
+                scs.setParametersForStudy(currentStudy);
 
             } else {
                 // YW <<
@@ -214,10 +215,11 @@ public class ChangeStudyServlet extends SecureController {
 
                 }
                 // YW 06-12-2007>>
-                scs.setParametersForSite(current);
+                scs.setParametersForSite(currentStudy);
 
             }
         }
+        request.setAttribute("requestSchema", "public");
         if (current.getStatus().equals(Status.DELETED) || current.getStatus().equals(Status.AUTO_DELETED)) {
             session.removeAttribute("studyWithRole");
             addPageMessage(restext.getString("study_choosed_removed_restore_first"));
@@ -234,6 +236,7 @@ public class ChangeStudyServlet extends SecureController {
             StudyDAO sdaoStudy = new StudyDAO(sm.getDataSource());
             StudyBean study = sdaoStudy.findByStudyEnvUuid(studyEnvUuid);
             study.setParentStudyName(currentPublicStudy.getParentStudyName());
+            study.setStudyParameterConfig(currentStudy.getStudyParameterConfig());
             session.setAttribute("study", study);
             currentStudy = study;
             if (current.getParentStudyId() > 0) {
