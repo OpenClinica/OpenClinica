@@ -78,8 +78,6 @@
 
 <fmt:message key="download_study_meta" bundle="${restext}"/>.
 
-<fmt:message key="opening_finished_may_save" bundle="${restext}"/>
-
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
 <br><br>
 <a href="javascript:leftnavExpand('overview');" style="text-decoration:none;">
