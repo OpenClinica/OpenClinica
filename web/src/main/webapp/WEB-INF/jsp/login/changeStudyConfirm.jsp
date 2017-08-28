@@ -45,8 +45,8 @@
 <form action="ChangeStudy" method="post">
 <input type="hidden" name="action" value="submit">
 <input type="hidden" name="studyId" value="<c:out value="${studyId}"/>">
-<p><fmt:message key="choosing_switch_to_study" bundle="${restext}"/>: <c:out value="${studyWithRole.studyName}"/> <fmt:message key="with_a_role_of" bundle="${restext}"/> <c:out value="${studyWithRole.role.description}"/>.
-<fmt:message key="the_study_site_status_is" bundle="${restext}"/> <c:out value="${currentStudy.status.name}"/></p>
+<p><fmt:message key="choosing_switch_to_study" bundle="${restext}"/>: <b><c:out value="${studyWithRole.studyName}"/> </b><fmt:message key="with_a_role_of" bundle="${restext}"/> <c:out value="${studyWithRole.role.description}"/>.
+<fmt:message key="the_study_site_status_is" bundle="${restext}"/> <c:out value="${currentStudy.status.name}"/>.</p>
 <br>
 <input type="submit" name="Submit" value="<fmt:message key="confirm" bundle="${resword}"/>" class="button_medium">
 

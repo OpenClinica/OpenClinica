@@ -73,15 +73,13 @@
 
 
  </script>
-<h1><span class="title_manage"><c:out value="${studyToView.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><span class=""></span></a></span></h1>
+<h1 style="margin: 0em; "><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1>
 
 
-<strong><fmt:message key="download_study_meta" bundle="${restext}"/>
-<a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');">
-<fmt:message key="here" bundle="${restext}"/></a>.
-<fmt:message key="opening_finished_may_save" bundle="${restext}"/>
- </strong>
-<fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
+<fmt:message key="download_study_meta" bundle="${restext}"/>.
+
+(For Study Subject OIDs select show more in the <a href="ListStudySubjects">Subject Matrix</a>).
+
 <br><br>
 <a href="javascript:leftnavExpand('overview');" style="text-decoration:none;">
     <img id="excl_overview" src="images/bt_Collapse.gif" border="0">
