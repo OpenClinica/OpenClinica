@@ -64,8 +64,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         boolean isUserUpdated;
 
         /***************************************** BEWARE***************************************************************
-         liquibase won't handle uppercase schema name! in OcLiquibase class,
-         c.setSchema(schema) won't do anything is the schema is uppercase
+         Postgres always creates schema in lowercase. If you try to setSchema to a connectxion with an uppercase schema name, it won't work.
+         Always change the schemaName to lowercase
          *
          */
         String schemaName = study.getOc_oid().replace("S_", "")
