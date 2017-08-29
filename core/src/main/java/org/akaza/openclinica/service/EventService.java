@@ -207,7 +207,7 @@ public class EventService implements EventServiceInterface {
         for (int j = 0; j < seList.size(); j++) {
             StudyEventBean seBean = (StudyEventBean) seList.get(j);
             // Getting Event CRFs
-            ArrayList ecrfList = getEventCRFDao().findAllByStudyEventAndCrfOrCrfVersionOid(seBean, crf.getOid());
+            ArrayList ecrfList = getEventCRFDao().findAllByStudyEventAndFormOrFormLayoutOid(seBean, crf.getOid());
             for (int k = 0; k < ecrfList.size(); k++) {
                 EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
                 ecrfBean.setOldStatus(ecrfBean.getStatus());
@@ -266,7 +266,7 @@ public class EventService implements EventServiceInterface {
         for (int j = 0; j < seList.size(); j++) {
             StudyEventBean seBean = (StudyEventBean) seList.get(j);
             // All Event CRFs
-            ArrayList ecrfList = getEventCRFDao().findAllByStudyEventAndCrfOrCrfVersionOid(seBean, crf.getOid());
+            ArrayList ecrfList = getEventCRFDao().findAllByStudyEventAndFormOrFormLayoutOid(seBean, crf.getOid());
             for (int k = 0; k < ecrfList.size(); k++) {
                 EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
                 ecrfBean.setStatus(ecrfBean.getOldStatus());
