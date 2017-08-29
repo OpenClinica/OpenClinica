@@ -53,7 +53,7 @@ public class SubmitDataServletTest extends TestCase {
     }
     
     // Scenario
-    // Data Entry Person (site) can access Notes & Discrepancies
+    // Data Entry Person (site) can access Queries
     public void test_SubmitDataServlet_MaySubmitData() {    	
     	UserAccountBean ub = new UserAccountBean();
     	//StudyUserRoleBean currentRole = new StudyUserRoleBean();

@@ -43,7 +43,7 @@ public abstract class AbstractItemProcessor {
         ResourceBundleProvider.updateLocale(container.getLocale());
         ResourceBundle resword = ResourceBundleProvider.getWordsBundle(container.getLocale());
 
-        // Notes & Discrepancies must be set to "closed" when event CRF is deleted
+        // Queries must be set to "closed" when event CRF is deleted
         // parentDiscrepancyNoteList is the list of the parent DNs records only
         List<DiscrepancyNote> parentDiscrepancyNoteList = discrepancyNoteDao.findParentNotesByItemData(itemData.getItemDataId());
         for (DiscrepancyNote parentDiscrepancyNote : parentDiscrepancyNoteList) {

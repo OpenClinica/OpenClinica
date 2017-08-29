@@ -167,7 +167,7 @@ public class DeleteEventCRFServlet extends SecureController {
                     if (ruleActionRunLog.size() != 0) {
                         getRuleActionRunLogDao().delete(itemdata.getId());
                     }
-                    // OC-6344 Notes & Discrepancies must be set to "closed" when event CRF is deleted
+                    // OC-6344 Queries must be set to "closed" when event CRF is deleted
                     // parentDiscrepancyNoteList is the list of the parent DNs records only
                     ArrayList<DiscrepancyNoteBean> parentDiscrepancyNoteList = getDnDao().findParentNotesOnlyByItemData(itemdata.getId());
                     for (DiscrepancyNoteBean parentDiscrepancyNote : parentDiscrepancyNoteList) {
