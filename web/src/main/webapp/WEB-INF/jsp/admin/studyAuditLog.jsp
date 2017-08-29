@@ -61,8 +61,7 @@
 
 
 <h1><span class="title_manage">
-<fmt:message key="view_study_log_for" bundle="${resword}"/> <c:out value="${study.name}"/>
-    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/study-audit-logs')">
+Audit Log for <c:out value="${study.name}"/>
         <c:choose>
         <c:when test="${module eq 'manage'}"><span class=""></span></c:when>
         <c:otherwise><span class=""></span></c:otherwise></c:choose></a>
