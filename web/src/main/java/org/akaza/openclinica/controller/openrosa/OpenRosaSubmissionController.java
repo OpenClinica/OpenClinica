@@ -403,6 +403,8 @@ public class OpenRosaSubmissionController {
 
         DataBinder dataBinder = new DataBinder(null);
         Errors errors = dataBinder.getBindingResult();
+        Study publicStudy = studyDao.findByOcOID(studyOID);
+        request.setAttribute("requestSchema", publicStudy.getSchemaName());
         Study study = studyDao.findByOcOID(studyOID);
         String requestBody = null;
         String instanceId = null;
