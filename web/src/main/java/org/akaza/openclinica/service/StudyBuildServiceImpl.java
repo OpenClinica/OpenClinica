@@ -68,8 +68,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
          Always change the schemaName to lowercase
          *
          */
-        String schemaName = study.getOc_oid().replace("S_", "")
-                .replaceAll("\\(", "").replaceAll("\\)", "").toLowerCase();
+        String schemaName = study.getOc_oid().replaceAll("\\(", "").replaceAll("\\)", "").toLowerCase();
         try {
             study.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
             study.setDateCreated(new Date());
@@ -96,31 +95,41 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     private String getOCRole(String givenRole, boolean siteFlag) {
         ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
         String key = null;
-        for (Iterator it = getRoles().iterator(); it.hasNext(); ) {
-            Role role = (Role) it.next();
-            switch (role.getId()) {
-            case 2:
-                key = "Study_Coordinator";
-                break;
-            case 3:
-                key = "Study_Director";
-                break;
-            case 4:
-                key = "Investigator";
-                break;
-            case 5:
-                key = "Data_Entry_Person";
-                break;
-            case 6:
-                key = "Monitor";
-                break;
-            default:
-                break;
-            // logger.info("No role matched when setting role description");
+        if (siteFlag) {
+            for (Iterator it = getRoles().iterator(); it.hasNext(); ) {
+                Role role = (Role) it.next();
+                String value = (String) Role.siteRoleMap.get(role.getId());
+                if (StringUtils.isNotEmpty(value))
+                    return value;
+                return "invalid";
             }
-            String value = resterm.getString(key).trim();
-            if (StringUtils.equals(givenRole, value))
-                return Role.getByDesc(value).getName();
+        } else {
+            for (Iterator it = getRoles().iterator(); it.hasNext(); ) {
+                Role role = (Role) it.next();
+                switch (role.getId()) {
+                case 2:
+                    key = "Study_Coordinator";
+                    break;
+                case 3:
+                    key = "Study_Director";
+                    break;
+                case 4:
+                    key = "Investigator";
+                    break;
+                case 5:
+                    key = "Data_Entry_Person";
+                    break;
+                case 6:
+                    key = "Monitor";
+                    break;
+                default:
+                    break;
+                // logger.info("No role matched when setting role description");
+                }
+                String value = resterm.getString(key).trim();
+                if (StringUtils.equals(givenRole, value))
+                    return Role.getByDesc(value).getName();
+            }
         }
         return null;
     }
@@ -146,7 +155,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             return studyEnvUuidProcessed;
 
         // check to see if the user has a role for this study
-        ArrayList<StudyUserRole> userRoles = studyUserRoleDao.findAllUserRolesByUserAccount(ub, currentPublicStudy.getId(), parentStudyId);
+        ArrayList<StudyUserRole> userRoles = studyUserRoleDao.findAllUserRolesByUserAccount(ub, currentPublicStudy.getId());
         if (userRoles.isEmpty()) {
             logger.error("Sorry you do not have a user role for this study:" + currentPublicStudy.getStudyEnvUuid());
             studyEnvUuidProcessed = true;
@@ -199,7 +208,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         if (userRoles == null)
             return studyUserRoleUpdated;
         for (StudyEnvironmentRoleDTO role: userRoles.getBody()) {
-            Study study = studyDao.findByStudyEnvUuid(role.getStudyEnvironmentUuid());
+            String uuidToFind = null;
+            if (StringUtils.isNotEmpty(role.getSiteUuid()))
+                uuidToFind = role.getSiteUuid();
+            else
+                uuidToFind = role.getStudyEnvironmentUuid();
+            Study study = studyDao.findByStudyEnvUuid(uuidToFind);
             if (study == null)
                 continue;
             Study parentStudy = study.getStudy();
@@ -211,9 +225,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             }
             UserAccount userAccount = new UserAccount();
             userAccount.setUserName(ub.getUserName());
-            ArrayList<StudyUserRole> byUserAccount = studyUserRoleDao.findAllUserRolesByUserAccount(userAccount, study.getStudyId(), toUpdate.getStudyId());
+            ArrayList<StudyUserRole> byUserAccount = studyUserRoleDao.findAllUserRolesByUserAccount(userAccount, study.getStudyId());
             String rolename = role.getRoleName();
-            String ocRole = getOCRole(rolename, false);
+            String ocRole = getOCRole(rolename, parentStudy != null ? true: false);
             if (byUserAccount.isEmpty()) {
                 StudyUserRole studyUserRole = new StudyUserRole();
                 StudyUserRoleId userRoleId = new StudyUserRoleId();
@@ -231,7 +245,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                     studyUserRoleUpdated = true;
             } else {
                 for (StudyUserRole sur : byUserAccount) {
-                    if (sur.getRoleName().equals(ocRole))
+                    if (sur.getRoleName() != null
+                            && sur.getRoleName().equals(ocRole))
                         continue;
                     else {
                         sur.setRoleName(ocRole);
