@@ -59,13 +59,12 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
         tableFacade.setColumnProperties("studySubject.label", "studySubject.secondaryLabel", "studySubject.oid", "subject.dateOfBirth",
-                "subject.uniqueIdentifier", "studySubject.owner", "studySubject.status", "actions");
+                 "studySubject.owner", "studySubject.status", "actions");
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null);
         configureColumn(row.getColumn("studySubject.secondaryLabel"), resword.getString("secondary_subject_ID"), null, null);
         configureColumn(row.getColumn("studySubject.oid"), resword.getString("study_subject_oid"), null, null);
         configureColumn(row.getColumn("subject.dateOfBirth"), resword.getString("date_of_birth"), new DateCellEditor(getDateFormat()), null);
-        configureColumn(row.getColumn("subject.uniqueIdentifier"), resword.getString("person_ID"), null, null);
         configureColumn(row.getColumn("studySubject.owner"), resword.getString("created_by"), new OwnerCellEditor(), null, true, false);
         configureColumn(row.getColumn("studySubject.status"), resword.getString("status"), new StatusCellEditor(), new StatusDroplistFilterEditor());
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";

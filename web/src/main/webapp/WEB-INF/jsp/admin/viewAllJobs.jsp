@@ -41,10 +41,11 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
-<h1><span class="title_manage"><fmt:message key="administer_all_jobs" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/brief-overview/jobs')"><span class=""></span></a></span></h1><br/>
+<h1 style="margin: 0em"><span class="title_manage">Scheduled Jobs<span class=""></span></a></span></h1><br/>
 
-<div class="homebox_bullets"><a href="ViewJob"><fmt:message key="view_all_export_data_jobs" bundle="${resword}"/></a></div>
-<div  class="homebox_bullets"> <a title="View all Jobs" href='pages/listCurrentScheduledJobs' onclick="javascript:HighlightTab(1);"><fmt:message key="view_currently_executing_data_export_jobs" bundle="${resword}"/></a></div>
+<div class="homebox_bullets"><a href="ViewJob" style="text-decoration: none" title="Currently executing...">Export data jobs</a></div><br/>
+<div  class="homebox_bullets"> <a style="text-decoration: none" href='ViewImportJob' onclick="javascript:HighlightTab(1);">Import data jobs</a></div><br/>
+<div  class="homebox_bullets"> <a style="text-decoration: none" title="View all Jobs" href='pages/listCurrentScheduledJobs' onclick="javascript:HighlightTab(1);">Currently executing export data jobs</a></div>
 <p></p>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 <jsp:useBean id="now" class="java.util.Date" />
