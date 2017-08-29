@@ -67,7 +67,7 @@ public class DefaultActionsEditor extends AbstractFilterEditor {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            html.a().href();
+            html.a().style("text-decoration: none").href();
             html.quote();
             html.append(getAction());
             html.quote().close();
@@ -89,7 +89,7 @@ public class DefaultActionsEditor extends AbstractFilterEditor {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            html.a().href();
+            html.a().style("text-decoration: none").href();
             html.quote();
             html.append(getAction());
             html.quote().close();
