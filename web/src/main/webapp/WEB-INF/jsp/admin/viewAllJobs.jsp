@@ -43,7 +43,7 @@
 
 <h1 style="margin: 0em"><span class="title_manage">Scheduled Jobs<span class=""></span></a></span></h1><br/>
 
-<div class="homebox_bullets"><a href="ViewJob" style="text-decoration: none">Export data jobs</a></div>
+<div class="homebox_bullets"><a href="ViewJob" style="text-decoration: none" title="Currently executing...">Export data jobs</a></div><br/>
 <div  class="homebox_bullets"> <a style="text-decoration: none" title="View all Jobs" href='pages/listCurrentScheduledJobs' onclick="javascript:HighlightTab(1);">Import data jobs</a></div>
 <p></p>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
