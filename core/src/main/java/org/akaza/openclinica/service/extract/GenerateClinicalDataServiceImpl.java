@@ -823,7 +823,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
             isActiveRoleAtSite = false;
         }
 
-        ArrayList<StudyUserRole> surlist = getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, publicStudy.getStudyId(), parentStudyId);
+        ArrayList<StudyUserRole> surlist = getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, publicStudy.getStudyId());
         if (surlist == null || surlist.size() == 0) {
             // Does not have permission to view study or site info / return null
             return null;
