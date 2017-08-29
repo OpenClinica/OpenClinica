@@ -40,6 +40,7 @@ import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.domain.datamap.Section;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.domain.datamap.VersioningMapId;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformContainer;
 import org.akaza.openclinica.domain.xform.XformGroup;
 import org.akaza.openclinica.domain.xform.XformItem;
@@ -164,8 +165,12 @@ public class XformMetaDataService {
                 formLayout = populateFormLayout(formLayout, crfBean, cmdObject);
                 formLayout = formLayoutDao.saveOrUpdate(formLayout);
             } else {
+
                 if (!formLayout.getStatus().equals(Status.AVAILABLE)) {
+                    UserAccount userAccount = userDao.findById(cmdObject.ub.getId());
                     formLayout.setStatus(Status.AVAILABLE);
+                    formLayout.setUserAccount(userAccount);
+                    formLayout.setDateCreated(new Date());
                     formLayout = formLayoutDao.saveOrUpdate(formLayout);
                 }
             }
@@ -627,5 +632,4 @@ public class XformMetaDataService {
             }
         }
     }
-
 }
