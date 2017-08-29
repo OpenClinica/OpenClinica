@@ -164,15 +164,12 @@ public class XformMetaDataService {
                 formLayout = new FormLayout();
                 formLayout = populateFormLayout(formLayout, crfBean, cmdObject);
                 formLayout = formLayoutDao.saveOrUpdate(formLayout);
-            } else {
-
-                if (!formLayout.getStatus().equals(Status.AVAILABLE)) {
-                    UserAccount userAccount = userDao.findById(cmdObject.ub.getId());
-                    formLayout.setStatus(Status.AVAILABLE);
-                    formLayout.setUserAccount(userAccount);
-                    formLayout.setDateCreated(new Date());
-                    formLayout = formLayoutDao.saveOrUpdate(formLayout);
-                }
+            } else if (!formLayout.getStatus().equals(Status.AVAILABLE)) {
+                UserAccount userAccount = userDao.findById(cmdObject.ub.getId());
+                formLayout.setStatus(Status.AVAILABLE);
+                formLayout.setUserAccount(userAccount);
+                formLayout.setDateCreated(new Date());
+                formLayout = formLayoutDao.saveOrUpdate(formLayout);
             }
 
             crfVersion = crfVersionDao.findAllByCrfId(crfBean.getCrfId()).get(0);
