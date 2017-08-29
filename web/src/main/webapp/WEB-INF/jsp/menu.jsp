@@ -116,8 +116,8 @@
 
 </c:if>
 <span class="table_title_Admin" style="line-height:15px;">
-<a style="text-decoration: none;" href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />"><p
-        style="padding-left:10px;">Notes & Discrepancies Assigned to Me: 0</p></a><br/><br/>
+<a style="text-decoration: none;" href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />"><p style="padding-left:10px;">Queries Assigned to Me
+				<span name="flag_start" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">: 0</p></a><br /><br />
 </span>
 
 <c:if test="${userRole.investigator || userRole.researchAssistant || userRole.researchAssistant2}">
