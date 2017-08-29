@@ -344,6 +344,13 @@
     </query>
     
     <query>
+        <name>findAllByStudyEventAndFormOrFormLayoutOid</name>
+        <sql>SELECT * FROM event_crf WHERE study_event_id=? AND form_layout_id in
+            ( select form_layout.form_layout_id from form_layout left outer join crf on crf.crf_id=form_layout.crf_id
+            where
+            form_layout.oc_oid=? or crf.oc_oid=?)</sql>
+    </query>
+    <query>
         <name>findAllByStudyEventAndCrfOrCrfVersionOid</name>
         <sql>SELECT * FROM event_crf WHERE study_event_id=? AND crf_version_id in
             ( select crf_version.crf_version_id from crf_version left outer join crf on crf.crf_id=crf_version.crf_id
