@@ -132,6 +132,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 true);
         configureColumn(row.getColumn("discrepancyNoteBean.updatedDate"), resword.getString("date_updated"), new DateCellEditor(getDateFormat()), null, true,
                 false);
+        configureColumn(row.getColumn("age"), resword.getString("days_open"), null, null);
+        configureColumn(row.getColumn("days"), resword.getString("days_since_updated"), null, null);
         configureColumn(row.getColumn("eventStartDate"), resword.getString("event_date"), new DateCellEditor(getDateFormat()), null, false, false);
         configureColumn(row.getColumn("eventName"), resword.getString("event_name"), null, null, true, false);
         configureColumn(row.getColumn("crfName"), resword.getString("CRF"), null, null, true, false);
