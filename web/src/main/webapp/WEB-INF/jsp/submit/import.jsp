@@ -96,7 +96,7 @@
 </div>
 
 <br clear="all">
-<input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
+<input type="submit" value="<fmt:message key="preview" bundle="${resword}"/>" class="button_long">
 <input type="button" onclick="goBack()"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
 
 </form>

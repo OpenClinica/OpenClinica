@@ -1250,7 +1250,7 @@ public class ExtractBean {
         buf.append("event crf count: " + seb.getEventCRFs().size() + " ");
         buf.append("study event bean location: " + seb.getLocation() + " ");
         buf.append("study event def id: " + seb.getStudyEventDefinitionId() + " ");
-        buf.append("study event date started: " + seb.getDateStarted() + " ");
+        buf.append("study Event Start Date: " + seb.getDateStarted() + " ");
         buf.append("study event date ended: " + seb.getDateEnded() + " ");
         buf.append("study event status: " + seb.getStatus().getName() + " ");
         buf.append("***** ***** *****\n");
