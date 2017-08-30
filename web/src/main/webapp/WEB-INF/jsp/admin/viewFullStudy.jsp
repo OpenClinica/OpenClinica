@@ -78,7 +78,7 @@
 
 <fmt:message key="download_study_meta" bundle="${restext}"/>.
 
-(For Study Subject OIDs select show more in the <a href="ListStudySubjects">Subject Matrix</a>).
+( <fmt:message key="" bundle="${restext}"/> <a href="ListStudySubjects">Subject Matrix</a>).
 
 <br><br>
 <a href="javascript:leftnavExpand('overview');" style="text-decoration:none;">
