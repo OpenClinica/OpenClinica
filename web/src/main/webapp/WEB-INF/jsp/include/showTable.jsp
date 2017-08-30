@@ -140,7 +140,7 @@
 				<tr>
 					<c:set var="isFirstLink" value="${true}" />
 					<c:if test="${table.filtered}">
-						<td class="table_tools"><a href="<c:out value="${removeFilterQuery}"/>"><fmt:message key="clear_search_keywords" bundle="${restext}"/></a></td>
+						<td class="table_tools"><a style="text-decoration: none" href="<c:out value="${removeFilterQuery}"/>"><fmt:message key="clear_search_keywords" bundle="${restext}"/></a></td>
 						<c:set var="isFirstLink" value="${false}" />
 					</c:if>
 					<c:forEach var="link" items="${table.links}">
@@ -150,10 +150,10 @@
 						
 						<c:choose>
 							<c:when test="${link.caption != 'OpenClinica CRF Library'}">
-								<td class="table_tools"><b><a href="<c:out value="${link.url}"/>"><c:out value="${link.caption}" /></a></b></td>
+								<td class="table_tools"><b><a style="text-decoration: none" href="<c:out value="${link.url}"/>"><c:out value="${link.caption}" /></a></b></td>
 							</c:when>
 							<c:otherwise>
-								<td class="table_tools"><b><a href="<c:out value="${link.url}"/>" target="_blank"><c:out value="${link.caption}" /></a></b></td>
+								<td class="table_tools"><b><a style="text-decoration: none" href="<c:out value="${link.url}"/>" target="_blank"><c:out value="${link.caption}" /></a></b></td>
 							</c:otherwise>
 						</c:choose>
 						<c:set var="isFirstLink" value="${false}" />
@@ -212,7 +212,7 @@
 						<td class="table_header_row">
 						</c:otherwise>
 						</c:choose>
-							<c:if test="${column.showLink}"><a href="<c:out value="${orderByQuery}"/>"></c:if>
+							<c:if test="${column.showLink}"><a style="text-decoration: none" href="<c:out value="${orderByQuery}"/>"></c:if>
             <%-- Alter header format to reduce table space--%>
             <c:choose>
             	<c:when test="${column.name eq 'Date Updated'}">
