@@ -283,16 +283,16 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             } else if ("discrepancyNoteBean.disType".equalsIgnoreCase(property)) {
                 ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
                 if (reterm.getString("Query_and_Failed_Validation_Check").equals(value)) {
-                    value = 31 + "";
+                    value = ListNotesFilter.filterDnTypeQueryAndFailedValidationCheck + "";
                 } else {
                     value = DiscrepancyNoteType.getByName(value).getId() + "";
                 }
             } else if ("discrepancyNoteBean.resolutionStatus".equalsIgnoreCase(property)) {
                 ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
                 if (reterm.getString("New_and_Updated").equalsIgnoreCase(value)) {
-                    value = 21 + "";
+                    value = ListNotesFilter.filterResStatusNewAndUpdated + "";
                 } else if (reterm.getString("Closed_And_Closed_Modified").equalsIgnoreCase(value)){
-                    value = 64 + "";
+                    value = ListNotesFilter.filterResStatusClosedAndClosedModified + "";
                 } else {
                     value = ResolutionStatus.getByNameResStatus(value).getId() + "";
                 }
