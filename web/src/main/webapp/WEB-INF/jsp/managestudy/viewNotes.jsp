@@ -131,14 +131,14 @@
 <br><br>
 --%>
 
-<div><a id="sumBoxParent" href="javascript:void(0)"
-        onclick="showSummaryBox('sumBox',document.getElementById('sumBoxParent'),
+<div><a style="text-decoration: none;" id="sumBoxParent" href="javascript:void(0)"
+        onclick="showSummaryBox('topTable',document.getElementById('sumBoxParent'),
         '<fmt:message key="show_summary_statistics" bundle="${resword}"/>',
         '<fmt:message key="hide_summary_statistics" bundle="${resword}"/>')">
     <img name="ExpandGroup1" src="images/bt_Collapse.gif" border="0">
     <fmt:message key="hide_summary_statistics" bundle="${resword}"/></a>
 </div>
-<div style="display:block; width:600px;">
+<div id="topTable" style="display:block; width:600px;">
     <%--<h3>Summary statistics</h3>--%>
     <c:if test="${empty summaryMap}"><fmt:message key="There_are_no_discrepancy_notes" bundle="${resword}"/></c:if>
     <!-- NEW Summary-->
