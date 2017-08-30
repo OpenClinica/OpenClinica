@@ -97,8 +97,8 @@
 				<tr>
 					<td valign="top">
 						<div class="formfieldM_BG">
-						<input name="ebl_filterKeyword" type="text" class="formfieldM" value="<c:out value="${table.keywordFilter}"/>" /> 
-						</div>
+						<input name="ebl_filterKeyword" onblur="if (this.value == '') this.value = ''" onfocus="if (this.value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') this.value = ''" type="text" class="formfieldM" value="<fmt:message key="study_subject_ID" bundle="${resword}"/>"" /> 
+						</div> 
 					</td>
 					<td valign="top">
 						<input type="submit" class="button_search" value="<fmt:message key="find" bundle="${resword}"/>" 
