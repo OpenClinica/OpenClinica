@@ -25,6 +25,7 @@ import org.akaza.openclinica.dao.hibernate.SectionDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.FormLayout;
@@ -39,6 +40,7 @@ import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.domain.datamap.Section;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.domain.datamap.VersioningMapId;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformContainer;
 import org.akaza.openclinica.domain.xform.XformGroup;
 import org.akaza.openclinica.domain.xform.XformItem;
@@ -153,6 +155,7 @@ public class XformMetaDataService {
         crfBean = (CrfBean) crfDao.findByOcOID(cmdObject.crf.getOcoid());
         if (crfBean != null) {
             crfBean.setUpdateId(cmdObject.ub.getId());
+            crfBean.setName(cmdObject.crf.getName());
             crfBean.setDateUpdated(new Date());
             crfBean = crfDao.saveOrUpdate(crfBean);
 
@@ -160,6 +163,12 @@ public class XformMetaDataService {
             if (formLayout == null) {
                 formLayout = new FormLayout();
                 formLayout = populateFormLayout(formLayout, crfBean, cmdObject);
+                formLayout = formLayoutDao.saveOrUpdate(formLayout);
+            } else if (!formLayout.getStatus().equals(Status.AVAILABLE)) {
+                UserAccount userAccount = userDao.findById(cmdObject.ub.getId());
+                formLayout.setStatus(Status.AVAILABLE);
+                formLayout.setUserAccount(userAccount);
+                formLayout.setDateCreated(new Date());
                 formLayout = formLayoutDao.saveOrUpdate(formLayout);
             }
 
@@ -620,5 +629,4 @@ public class XformMetaDataService {
             }
         }
     }
-
 }

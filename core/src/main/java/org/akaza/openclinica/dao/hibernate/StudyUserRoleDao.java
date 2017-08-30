@@ -17,13 +17,12 @@ public class StudyUserRoleDao extends CompositeIdAbstractDomainDao<StudyUserRole
     }
 
     @SuppressWarnings("unchecked")
-    public ArrayList<StudyUserRole> findAllUserRolesByUserAccount(UserAccount userAccount, int studyId, int parentStudyId) {
+    public ArrayList<StudyUserRole> findAllUserRolesByUserAccount(UserAccount userAccount, int studyId) {
         String query = "from " + getDomainClassName()
-                + "   where   user_name=:username  AND  status_id=1  AND  ( study_id=:studyId OR study_id=:parentStudyId) ";
+                + "   where   user_name=:username  AND  status_id=1  AND  study_id=:studyId";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
         q.setParameter("username", userAccount.getUserName());
-        q.setInteger("studyId", studyId);
-        q.setInteger("parentStudyId", parentStudyId);
+        q.setParameter("studyId", studyId);
         return (ArrayList<StudyUserRole>) q.list();
     }
 

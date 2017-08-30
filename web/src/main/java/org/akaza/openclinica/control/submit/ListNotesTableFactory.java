@@ -149,6 +149,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
     }
 
+
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         ListNotesTableToolbar toolbar = new ListNotesTableToolbar(showMoreLink);
@@ -222,7 +223,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
             h.put("studySubject", discrepancyNoteBean.getStudySub());
             h.put("studySubject.label", discrepancyNoteBean.getStudySub().getLabel());
-            
+            h.put("discrepancyNoteBean.disType", discrepancyNoteBean.getDisType());
             h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
             h.put("age", discrepancyNoteBean.getAge());
             h.put("days", discrepancyNoteBean.getDays());
@@ -240,8 +241,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("numberOfNotes", discrepancyNoteBean.getNumChildren());
             h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());
             h.put("discrepancyNoteBean.entityType", discrepancyNoteBean.getEntityType());
-            h.put("discrepancyNoteBean", discrepancyNoteBean);
-            
+
             theItems.add(h);
             setStudyHasDiscNotes(true);
         }
