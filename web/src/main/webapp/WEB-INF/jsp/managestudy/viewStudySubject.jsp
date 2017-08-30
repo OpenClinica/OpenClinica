@@ -211,7 +211,7 @@
                                 <c:choose>
                                     <c:when test="${hasUniqueIDNote eq 'yes'}">
                                         <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
-                                            <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                            <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="${uniqueIDNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                         </a>
 
                                     </c:when>
@@ -243,7 +243,7 @@
                                             <c:choose>
                                                 <c:when test="${hasDOBNote eq 'yes'}">
                                                     <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                                        <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                                     </a>
 
                                                 </c:when>
@@ -271,7 +271,7 @@
                                             <c:choose>
                                                 <c:when test="${hasDOBNote eq 'yes'}">
                                                     <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                                        <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                                     </a>
 
                                                 </c:when>
@@ -299,7 +299,7 @@
                                             <c:choose>
                                                 <c:when test="${hasDOBNote eq 'yes'}">
                                                     <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                                        <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                                     </a>
 
                                                 </c:when>
@@ -329,10 +329,14 @@
                             <%-- DN for Gender goes here --%>
                             <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
                                 <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
+                                <c:set var="isUpdated" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
+                                <c:set var="isClosed" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
+                                <c:set var="isClosedModified" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
+                                
                                 <c:choose>
                                     <c:when test="${hasGenderNote eq 'yes'}">
                                         <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
-                                            <span id="flag_gender" name="flag_gender" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                            <span id="flag_gender" name="flag_gender" class="${genderNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                         </a>
                                     </c:when>
                                     <c:otherwise>
@@ -370,7 +374,7 @@
                                     <c:choose>
                                         <c:when test="${hasEnrollmentNote eq 'yes'}">
                                             <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
-                                                <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                                <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="${enrollmentNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                             </a>
                                         </c:when>
                                         <c:otherwise>
