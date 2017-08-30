@@ -194,7 +194,7 @@
         </c:otherwise>
       </c:choose>
 
-  <fmt:message key="event_name" bundle="${resword}"/>: <c:out value="${eventView.definition.name}"/></span><br>
+  <b><fmt:message key="event_name" bundle="${resword}"/></b>: <c:out value="${eventView.definition.name}"/></span><br>
   <b><fmt:message key="event_type" bundle="${resword}"/></b>: <fmt:message key="${eventView.definition.type}" bundle="${resword}"/>,
   <c:choose>
      <c:when test="${eventView.definition.repeating}">
