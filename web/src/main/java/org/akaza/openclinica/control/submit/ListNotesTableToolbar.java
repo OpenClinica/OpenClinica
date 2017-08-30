@@ -128,10 +128,11 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         }
 
         /**
-         * @return Dynamically generate the indexes of studyGroupClasses. It
-         *         starts from 4 because there are 4 columns before study group
-         *         columns that will require to be hidden.
-         * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade,
+         * @return These indexes represent the 0-based column indexes on the Notes page.
+         *         Columns in this list are hidden by default and can be revealed by clicking 
+         *         a link in the table..
+         *         
+         * @see ListNotesTableFactory#configureColumns(org.jmesa.facade.TableFacade,
          *      java.util.Locale)
          */
         String getIndexes() {
