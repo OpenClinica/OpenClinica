@@ -77,18 +77,6 @@
    </c:otherwise>
   </c:choose>
  <fmt:message key="view_all_events_in" bundle="${resword}"/> <c:out value="${study.name}"/>
- <c:choose>
-   <c:when test="${userRole.manageStudy}">
-      <a>
-      <span class=""></span>
-      </a>
-   </c:when>
-   <c:otherwise>
-    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/view-events')">
-    <span class=""></span>
-    </a>
-   </c:otherwise>
-  </c:choose>
    <a href="javascript:openDocWindow('ViewStudyEvents?print=yes&<c:out value="${queryUrl}"/>')">
   <span class="icon icon-print"></a>
   </div>
