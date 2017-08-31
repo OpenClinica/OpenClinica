@@ -60,6 +60,8 @@
 </table>
 </div>
 
+<P><b><fmt:message key="note" bundle="${resword}"/>: </b><fmt:message key="export_dataset_download2" bundle="${restext}"/>
+
 </div></div></div></div></div></div></div></div>
 </div>
 
@@ -96,8 +98,6 @@
 	</td>
 </tr>
 </table>
-
-<P><b><fmt:message key="note" bundle="${resword}"/>: </b><fmt:message key="export_dataset_download2" bundle="${restext}"/>
 
 <P><b><fmt:message key="archive_of_exported_dataset_files" bundle="${resword}"/>:</b></P>
 
