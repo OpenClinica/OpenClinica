@@ -63,8 +63,6 @@
 </div></div></div></div></div></div></div></div>
 </div>
 
-<p><fmt:message key="export_dataset_download1" bundle="${restext}"/></p>
-
 <input type="hidden" name="datasetId" value="<c:out value="${dataset.id}"/>"/>
 <table border="0" cellpadding="5" width="625">
 <tr valign="top" width="100%">
