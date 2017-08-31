@@ -972,7 +972,7 @@ public class SDVUtil {
                     new StringBuilder("this.form.method='GET'; this.form.action='").append(request.getContextPath()).append("/pages/handleSDVGet").append("';")
                             .append("this.form.crfId.value='").append(crfBean.getId()).append("';").append("this.form.submit();");
 
-                actions.append("<input type=\"submit\" class=\"button_medium\" value=\"SDV\" name=\"sdvSubmit\" ").append("onclick=\"").append(
+                actions.append("<input type=\"submit\" class=\"button_medium\" value=\"Mark as SDV'd\" name=\"sdvSubmit\" ").append("onclick=\"").append(
                         jsCodeString.toString()).append("\" />");
             }
 
