@@ -162,7 +162,6 @@
 	</tr>
 
 </table>
-<p><fmt:message key="save_export_dataset_or_apply_filter" bundle="${restext}"/></p>
 <table>
   <tr>
 		<td>
