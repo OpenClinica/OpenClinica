@@ -41,7 +41,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="dataset" class="org.akaza.openclinica.bean.extract.DatasetBean"/>
 <jsp:useBean scope="request" id="filelist" class="java.util.ArrayList"/>
-<h1><span class="title_manage"><fmt:message key="download_data" bundle="${resword}"/>: <c:out value="${dataset.name}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/export-datasets')"><span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_format" bundle="${resword}"/></span></h1>
 
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -60,10 +60,10 @@
 </table>
 </div>
 
+<P><b><fmt:message key="note" bundle="${resword}"/>: </b><fmt:message key="export_dataset_download2" bundle="${restext}"/>
+
 </div></div></div></div></div></div></div></div>
 </div>
-
-<p><fmt:message key="export_dataset_download1" bundle="${restext}"/></p>
 
 <input type="hidden" name="datasetId" value="<c:out value="${dataset.id}"/>"/>
 <table border="0" cellpadding="5" width="625">
@@ -98,8 +98,6 @@
 	</td>
 </tr>
 </table>
-
-<P><b><fmt:message key="note" bundle="${resword}"/>: </b><fmt:message key="export_dataset_download2" bundle="${restext}"/>
 
 <P><b><fmt:message key="archive_of_exported_dataset_files" bundle="${resword}"/>:</b></P>
 

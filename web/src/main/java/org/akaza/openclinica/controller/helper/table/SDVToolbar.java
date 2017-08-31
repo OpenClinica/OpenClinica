@@ -67,18 +67,18 @@ public class SDVToolbar extends DefaultToolbar {
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
             if(showMoreLink){
-            html.a().id("showMore").href("javascript:hideCols('sdv',[" + getIndexes() + "],true);").close();
+            html.a().style("text-decoration:none;").id("showMore").href("javascript:hideCols('sdv',[" + getIndexes() + "],true);").close();
             html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
-            html.a().id("hide").style("display: none;").href("javascript:hideCols('sdv',[" + getIndexes() + "],false);").close();
+            html.a().id("hide").style("display: none;text-decoration:none;").href("javascript:hideCols('sdv',[" + getIndexes() + "],false);").close();
             html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
                 html.script().type("text/javascript").close().append(
                         "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('sdv',[" + getIndexes() + "],false);});").scriptEnd();
 
             }else{
-                html.a().id("showMore").style("display: none;").href("javascript:hideCols('sdv',[" + getIndexes() + "],true);").close();
+                html.a().id("showMore").style("display: none;text-decoration:none;").href("javascript:hideCols('sdv',[" + getIndexes() + "],true);").close();
                 html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
-                html.a().id("hide").href("javascript:hideCols('sdv',[" + getIndexes() + "],false);").close();
+                html.a().id("hide").style("text-decoration:none;").href("javascript:hideCols('sdv',[" + getIndexes() + "],false);").close();
                 html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
                 html.script().type("text/javascript").close().append(

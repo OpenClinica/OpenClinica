@@ -69,26 +69,7 @@
 <c:set var="restore" value="true"/>
 <c:if test="${sSdvRestore=='false'}"><c:set var="restore" value="false"/></c:if>
 
-<div id="searchFilterSDV">
-    <table border="0" cellpadding="0" cellspacing="0">
-        <tr>
-            <td valign="bottom" id="Tab1'">
-                <div id="Tab1NotSelected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
-                    <a class="tabtext" title="<fmt:message key="view_by_event_CRF" bundle="${resword}"/>" href='viewAllSubjectSDVtmp?studyId=${studyId}' onclick="javascript:HighlightTab(1);"><fmt:message key="view_by_event_CRF" bundle="${resword}"/></a></div></div></div></div>
-                <div id="Tab1Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_event_CRF" bundle="${resword}"/></span></div></div></div></div></td>
-              
-            <td valign="bottom" id="Tab2'">
-                <div id="Tab2Selected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
-                    <a class="tabtext" title="<fmt:message key="view_by_studysubjectID" bundle="${resword}"/>" href='viewSubjectAggregate?s_sdv_restore=${restore}&studyId=${studyId}' onclick="javascript:HighlightTab(2);"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></a></div></div></div></div>
-                <div id="Tab2NotSelected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></span></div></div></div></div></td>
-
-        </tr>
-    </table>
-    <script language="JavaScript">
-        HighlightTab(1);
-    </script>
-    </div>
-    <%--
+<%--
 <!-- These DIVs define shaded box borders -->
 <div id="startBox" class="box_T"><div class="box_L"><div class="box_R"><div class="box_B">
 <div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
