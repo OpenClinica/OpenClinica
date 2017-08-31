@@ -283,6 +283,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 Body body = html.getBody();
                 Head head = html.getHead();
                 Model model = head.getModel();
+
                 List<Bind> binds = model.getBind();
                 List<Instance> instances = model.getInstance();
                 binds = getBindElements(binds, item);
@@ -318,7 +319,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 uControls.add(itemUserControl);
                 uControls.add(itemCommentUserControl);
 
-                String xform = xformParser.marshall(buildSingleItemForm(item, uControls, binds, itext, instances, seb, ssb, sed));
+                String xform = xformParser.marshall(buildSingleItemForm(item, uControls, binds, itext, instances, seb, ssb, sed, head.getTitle()));
                 xform = xform.substring(0, xform.indexOf("<meta>")) + "<group_layout>" + "<" + item.getName() + "/><" + item.getName() + COMMENT + " "
                         + FS_QUERY_ATTRIBUTE + "=\"" + item.getName() + "\"/>" + "</group_layout>" + xform.substring(xform.indexOf("<meta>"));
 
@@ -594,7 +595,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     }
 
     private Html buildSingleItemForm(ItemBean item, List<UserControl> userControls, List<Bind> binds, Itext itext, List<Instance> instances, StudyEventBean seb,
-            StudySubjectBean ssb, StudyEventDefinitionBean sed) {
+            StudySubjectBean ssb, StudyEventDefinitionBean sed, String title) {
 
         Html html = new Html();
         Head head = new Head();
@@ -607,7 +608,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         group.setRef("/form/group_layout");
         Label metaLabel = new Label();
         metaLabel.setLabel(resword.getString("subject_id") + ": " + ssb.getLabel() + "\n" + resword.getString("event_name") + ": " + sed.getName() + "\n"
-                + resword.getString("event_date") + ": " + formatDate(seb.getDateStarted()) + "\n\n ");
+                + resword.getString("event_date") + ": " + formatDate(seb.getDateStarted()) + "\n" + resword.getString("form_title") + ": " + title + "\n\n ");
         group.setLabel(metaLabel);
         group.setUsercontrol(userControls);
         List<Group> groups = new ArrayList<>();
