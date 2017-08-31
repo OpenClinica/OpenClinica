@@ -1471,10 +1471,10 @@ public class SDVUtil {
             HtmlBuilder html = new HtmlBuilder();
             html.tr(1).styleClass("logic").close().td(1).colspan("100%").style("font-size: 12px;").close();
             html.append("<b>" + resword.getString("table_sdv_select") + "</b>&#160;&#160;");
-            html.append("<a name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,true)'>" + resword.getString("table_sdv_all"));
-            html.append(",</a>");
+            html.append("<a style='text-decoration:none;' name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,true)'>" + resword.getString("table_sdv_all"));
+            html.append("</a>");
             html.append("&#160;&#160;&#160;");
-            html.append("<a name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,false)'>" + resword.getString("table_sdv_none"));
+            html.append("<a style='text-decoration:none;' name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,false)'>" + resword.getString("table_sdv_none"));
             html.append("</a>");
             html.tdEnd().trEnd(1);
             return html.toString();
