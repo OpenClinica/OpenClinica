@@ -126,7 +126,7 @@ public class SDVUtil {
         CRF_STATUS_ICONS.put(2, "icon icon-pencil-squared orange");
         CRF_STATUS_ICONS.put(3, "icon icon-icon-dataEntryCompleted orange");
         CRF_STATUS_ICONS.put(4, "icon icon-icon-doubleDataEntry orange");
-        CRF_STATUS_ICONS.put(5, "icon icon-checkbox-checked green");
+        CRF_STATUS_ICONS.put(5, "icon icon-search");
         CRF_STATUS_ICONS.put(6, "icon icon-pencil-squared orange");
         CRF_STATUS_ICONS.put(7, "icon icon-lock");
     }
@@ -1013,7 +1013,7 @@ public class SDVUtil {
         String imgName = "";
         StringBuilder input = new StringBuilder("<input type=\"hidden\" statusId=\"");
         input.append(statusId).append("\" />");
-        builder.append("<center><span class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0'></center>");
+        builder.append("<center><span title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0'></center>");
         //"<input type=\"hidden\" statusId=\"1\" />"
         builder.append("</a>");
         builder.append(" ");
