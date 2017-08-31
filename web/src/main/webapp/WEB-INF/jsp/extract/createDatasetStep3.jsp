@@ -74,13 +74,9 @@
 : <c:out value="${newDataset.name}"/></span></h1>
 </c:when>
 <c:otherwise>
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="define_temporal_scope" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')"><span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="define_temporal_scope" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')"><span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1><br/>
 </c:otherwise>
 </c:choose>
-
-<p><fmt:message key="select_event_start_end_however" bundle="${restext}"/></p>
-
-<p><fmt:message key="not_filter_study_by_enrollment_leave_blank" bundle="${restext}"/></p>
 
 <form action="CreateDataset" method="post">
 <input type="hidden" name="action" value="scopesubmit"/>
@@ -180,5 +176,8 @@
 	</tr>
 </table>
 </form>
+<p><fmt:message key="select_event_start_end_however" bundle="${restext}"/></p>
+
+<p><fmt:message key="not_filter_study_by_enrollment_leave_blank" bundle="${restext}"/></p>
 
 <jsp:include page="../include/footer.jsp"/>
