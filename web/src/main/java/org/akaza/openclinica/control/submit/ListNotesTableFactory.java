@@ -452,21 +452,25 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             }
             // for "view" as action
             // This createNoteURL uses the same method as in ResolveDiscrepancyServlet
-            String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
-            builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
+            if (dnb.getEntityType().equals(DiscrepancyNoteBean.ITEM_DATA)) {
+                builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + SINGLE_ITEM_FLAVOR);
+            } else {
+                String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
+                builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
+            }
             builder.close();
             builder.append("<span title=\"View\" border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
             builder.append("&nbsp;");
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
                 if (dnb.getEntityType() != "eventCrf") {
-                    builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + SINGLE_ITEM_FLAVOR);
+                    builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
                     builder.close();
                     builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                     builder.aEnd();
                 } else {
                     if (dnb.getStageId() == 5) {
-                        builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + SINGLE_ITEM_FLAVOR);
+                        builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
                         builder.close();
                         builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                         builder.aEnd();
