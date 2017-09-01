@@ -20,6 +20,7 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.web.bean.StudyUserRoleRow;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -38,6 +39,8 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.function.Predicate;
+import java.util.stream.Stream;
 
 /**
  * Created by yogi on 11/10/16.
@@ -155,7 +158,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             return studyEnvUuidProcessed;
 
         // check to see if the user has a role for this study
-        ArrayList<StudyUserRole> userRoles = studyUserRoleDao.findAllUserRolesByUserAccount(ub, currentPublicStudy.getId());
+        ArrayList<StudyUserRole> userRoles = studyUserRoleDao.findAllUserRolesByUserAccountAndStudy(ub, currentPublicStudy.getId());
         if (userRoles.isEmpty()) {
             logger.error("Sorry you do not have a user role for this study:" + currentPublicStudy.getStudyEnvUuid());
             studyEnvUuidProcessed = true;
@@ -201,12 +204,28 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         } else
             return false;
     }
+    private void removeDeletedUserRoles(ArrayList<StudyUserRole> modifiedStudyUserRoles, Collection<StudyUserRole> existingStudyUserRoles) {
+        for (StudyUserRole sur : existingStudyUserRoles) {
+            if (sur == null)
+                continue;
+            Predicate<StudyUserRole> predicate = c-> c.getId().getStudyId().equals(sur.getId().getStudyId());
+            try {
+                StudyUserRole obj = modifiedStudyUserRoles.stream().filter(predicate).findFirst().get();
+            } catch (NoSuchElementException e) {
+                studyUserRoleDao.getCurrentSession().delete(sur);
+            }
+        }
+    }
+
     @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
     public boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId) {
         boolean studyUserRoleUpdated = false;
         ResponseEntity<StudyEnvironmentRoleDTO[]> userRoles = getUserRoles(request);
         if (userRoles == null)
             return studyUserRoleUpdated;
+        Collection<StudyUserRole> existingStudyUserRoles = studyUserRoleDao.findAllUserRolesByUserAccount(ub);
+        ArrayList<StudyUserRole> modifiedSURArray = new ArrayList<>();
+
         for (StudyEnvironmentRoleDTO role: userRoles.getBody()) {
             String uuidToFind = null;
             if (StringUtils.isNotEmpty(role.getSiteUuid()))
@@ -216,6 +235,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             Study study = studyDao.findByStudyEnvUuid(uuidToFind);
             if (study == null)
                 continue;
+
             Study parentStudy = study.getStudy();
             Study toUpdate = parentStudy == null ? study : study.getStudy();
             // set this as the active study
@@ -225,7 +245,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             }
             UserAccount userAccount = new UserAccount();
             userAccount.setUserName(ub.getUserName());
-            ArrayList<StudyUserRole> byUserAccount = studyUserRoleDao.findAllUserRolesByUserAccount(userAccount, study.getStudyId());
+            ArrayList<StudyUserRole> byUserAccount = studyUserRoleDao.findAllUserRolesByUserAccountAndStudy(userAccount, study.getStudyId());
             String rolename = role.getRoleName();
             String ocRole = getOCRole(rolename, parentStudy != null ? true: false);
             if (byUserAccount.isEmpty()) {
@@ -246,18 +266,22 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             } else {
                 for (StudyUserRole sur : byUserAccount) {
                     if (sur.getRoleName() != null
-                            && sur.getRoleName().equals(ocRole))
+                            && sur.getRoleName().equals(ocRole)) {
+                        modifiedSURArray.add(sur);
                         continue;
-                    else {
+                    } else {
                         sur.setRoleName(ocRole);
                         sur.setDateUpdated(new Date());
                         StudyUserRole studyUserRole = studyUserRoleDao.saveOrUpdate(sur);
+                        modifiedSURArray.add(studyUserRole);
                         if (userActiveStudyId == toUpdate.getStudyId())
                             studyUserRoleUpdated = true;
                     }
                 }
             }
         }
+        // remove all the roles that are not there for this user
+        removeDeletedUserRoles(modifiedSURArray, existingStudyUserRoles);
         return studyUserRoleUpdated;
     }
 
