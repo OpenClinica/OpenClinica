@@ -128,7 +128,7 @@ public class CallbackServiceImpl implements CallbackService {
             throw new Exception(error);
         }
         map.put("user_type", convertedUserType);
-        map.put("authorize_soap", "false");
+        map.put("authorize_soap", "true");
         map.put("email", user.getEmail());
         map.put("institution", "OC");
         CoreResources.setRootUserAccountBean(request, dataSource);
