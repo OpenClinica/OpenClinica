@@ -124,7 +124,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         if ("subject".equalsIgnoreCase(entityType)) {
             if (ub.isSysAdmin() || ub.isTechAdmin()) {
-                return Page.UPDATE_SUBJECT_SERVLET;
+                return Page.UPDATE_STUDY_SUBJECT_SERVLET;
             } else {
                 return Page.VIEW_STUDY_SUBJECT_SERVLET;
             }
