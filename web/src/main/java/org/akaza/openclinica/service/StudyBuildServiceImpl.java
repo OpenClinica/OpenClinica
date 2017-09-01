@@ -205,16 +205,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             return false;
     }
     private void removeDeletedUserRoles(ArrayList<StudyUserRole> modifiedStudyUserRoles, Collection<StudyUserRole> existingStudyUserRoles) {
-        for (StudyUserRole sur : existingStudyUserRoles) {
-            if (sur == null)
-                continue;
-            Predicate<StudyUserRole> predicate = c-> c.getId().getStudyId().equals(sur.getId().getStudyId());
-            try {
-                StudyUserRole obj = modifiedStudyUserRoles.stream().filter(predicate).findFirst().get();
-            } catch (NoSuchElementException e) {
-                studyUserRoleDao.getCurrentSession().delete(sur);
-            }
-        }
+        existingStudyUserRoles.removeIf(existingStudyUserRole -> modifiedStudyUserRoles.stream().anyMatch(
+                modifiedStudyUserRole -> existingStudyUserRole.getId().getStudyId().equals(modifiedStudyUserRole.getId().getStudyId())));
+        existingStudyUserRoles.forEach(studyToDelete -> studyUserRoleDao.getCurrentSession().delete(studyToDelete));
     }
 
     @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
