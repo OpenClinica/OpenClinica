@@ -11,7 +11,6 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
@@ -167,20 +166,16 @@ public class EnketoAPI {
         }
     }
 
-    public EnketoURLResponse registerAndGetEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode,
-            EventDefinitionCrf edc) {
+    public EnketoURLResponse registerAndGetEditURL(EditUrlObject editUrlObject) {
         EnketoURLResponse urlResponse = null;
         try {
             // Role role, Study parentStudy, StudyEvent studyEvent, String mode
-            urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor, role, parentStudy,
-                    studyEvent, mode, edc);
+            urlResponse = getEditURL(editUrlObject);
         } catch (Exception e) {
             if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized") || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
                 savePformRegistration();
                 try {
-                    urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor, role,
-                            parentStudy, studyEvent, mode, edc);
+                    urlResponse = getEditURL(editUrlObject);
                 } catch (Exception e1) {
                     logger.error(e.getMessage());
                     logger.error(ExceptionUtils.getStackTrace(e));
@@ -255,10 +250,22 @@ public class EnketoAPI {
         return accountExists;
     }
 
-    public EnketoURLResponse getEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode,
-            EventDefinitionCrf edc) throws Exception {
-        String crfOid = formLayout.getOcOid() + crfFlavor;
+    public EnketoURLResponse getEditURL(EditUrlObject editUrlObject) throws Exception {
+        String ecid = editUrlObject.ecid;
+        String crfOid = editUrlObject.formLayout.getOcOid() + editUrlObject.crfFlavor;
+        Study parentStudy = editUrlObject.parentStudy;
+        StudyEvent studyEvent = editUrlObject.studyEvent;
+        boolean markComplete = editUrlObject.markComplete;
+        EventDefinitionCrf edc = editUrlObject.edc;
+        Role role = editUrlObject.role;
+        String mode = editUrlObject.mode;
+        String flavor = editUrlObject.flavor;
+        List<FormLayoutMedia> mediaList = editUrlObject.mediaList;
+        String instance = editUrlObject.instance;
+        String redirect = editUrlObject.redirect;
+        String goTo = editUrlObject.goTo;
+        String studyOid = editUrlObject.studyOid;
+
         EnketoURLResponse urlResponse = null;
 
         if (enketoURL == null)
