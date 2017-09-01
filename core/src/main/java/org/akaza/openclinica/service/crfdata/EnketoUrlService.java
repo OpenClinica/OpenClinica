@@ -3,8 +3,6 @@ package org.akaza.openclinica.service.crfdata;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -21,13 +19,45 @@ import org.akaza.openclinica.core.form.xform.LogBean;
 import org.akaza.openclinica.core.form.xform.QueriesBean;
 import org.akaza.openclinica.core.form.xform.QueryBean;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
+import org.akaza.openclinica.dao.hibernate.CrfDao;
+import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
+import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
+import org.akaza.openclinica.dao.hibernate.ItemDataDao;
+import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
+import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
+import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
+import org.akaza.openclinica.dao.hibernate.ResponseTypeDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import org.akaza.openclinica.domain.datamap.CrfBean;
+import org.akaza.openclinica.domain.datamap.CrfVersion;
+import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
+import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
+import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
+import org.akaza.openclinica.domain.datamap.ItemGroup;
+import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
+import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.akaza.openclinica.service.crfdata.xform.EditUrlObject;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLResponse;
@@ -41,20 +71,6 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.stereotype.Service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-
-import javax.servlet.ServletContext;
-import java.io.File;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
@@ -140,6 +156,9 @@ public class EnketoUrlService {
     @Autowired
     private FormLayoutMediaDao formLayoutMediaDao;
 
+    @Autowired
+    private EventDefinitionCrfDao eventDefinitionCrfDao;
+
     public static final String FORM_CONTEXT = "ecid";
     ParticipantPortalRegistrar participantPortalRegistrar;
 
@@ -179,9 +198,9 @@ public class EnketoUrlService {
             goTo = "//" + subjectContext.getItemName();
 
         // Lookup relevant data
+
         eventDef = studyEventDefinitionDao.findByStudyEventDefinitionId(Integer.valueOf(subjectContext.getStudyEventDefinitionId()));
         StudyEvent studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
-        eventDef = studyEvent.getStudyEventDefinition();
         subject = studyEvent.getStudySubject();
 
         if (formLayout == null) {
@@ -214,10 +233,15 @@ public class EnketoUrlService {
         // Build redirect url
         String redirectUrl = CoreResources.getField("sysURL");
 
+        EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventDef.getStudyEventDefinitionId(),
+                formLayout.getCrf().getCrfId(), eventDef.getStudy().getStudyId());
+
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
-        EnketoURLResponse eur = enketo.registerAndGetEditURL(formLayout, crfFlavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
-                goTo, flavor, role, study, studyEvent, mode);
+        EditUrlObject editUrlObject = new EditUrlObject(formLayout, crfFlavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
+                mediaList, goTo, flavor, role, study, studyEvent, mode, edc);
+
+        EnketoURLResponse eur = enketo.registerAndGetEditURL(editUrlObject);
 
         if (eur.getEdit_url() != null) {
             editURL = eur.getEdit_url();

@@ -10,17 +10,20 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.service.pmanage.Authorization;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.http.*;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
+import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
@@ -62,7 +65,7 @@ public class EnketoAPI {
         this.enketoURL = credentials.getServerUrl();
         this.token = credentials.getApiKey();
         this.ocURL = credentials.getOcInstanceUrl();
-        this.userPasswdCombo =  new String(Base64.encodeBase64((CoreResources.getField("ocform.adminapikey") + ":").getBytes()));
+        this.userPasswdCombo = new String(Base64.encodeBase64((CoreResources.getField("ocform.adminapikey") + ":").getBytes()));
     }
 
     public String getOfflineFormURL(String crfOID) throws Exception {
@@ -146,8 +149,7 @@ public class EnketoAPI {
         try {
             urlResponse = getURL(url, crfOID);
         } catch (Exception e) {
-            if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized")
-                    || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
+            if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized") || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
                 savePformRegistration();
                 try {
                     urlResponse = getURL(url, crfOID);
@@ -164,21 +166,16 @@ public class EnketoAPI {
         }
     }
 
-
-    public EnketoURLResponse registerAndGetEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode) {
+    public EnketoURLResponse registerAndGetEditURL(EditUrlObject editUrlObject) {
         EnketoURLResponse urlResponse = null;
         try {
-            //  Role role, Study parentStudy, StudyEvent studyEvent, String mode
-            urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor,
-                    role, parentStudy, studyEvent, mode);
+            // Role role, Study parentStudy, StudyEvent studyEvent, String mode
+            urlResponse = getEditURL(editUrlObject);
         } catch (Exception e) {
-            if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized")
-                    || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
+            if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized") || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
                 savePformRegistration();
                 try {
-                    urlResponse = getEditURL(formLayout, crfFlavor, instance, ecid, redirect, markComplete, studyOid, mediaList, goTo, flavor,
-                            role, parentStudy, studyEvent, mode);
+                    urlResponse = getEditURL(editUrlObject);
                 } catch (Exception e1) {
                     logger.error(e.getMessage());
                     logger.error(ExceptionUtils.getStackTrace(e));
@@ -194,8 +191,7 @@ public class EnketoAPI {
     private EnketoURLResponse getURL(URL url, String crfOID) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
-        headers.add("Authorization", "Basic " +
-                new String(Base64.encodeBase64((token + ":").getBytes())));
+        headers.add("Authorization", "Basic " + new String(Base64.encodeBase64((token + ":").getBytes())));
         headers.add("Accept-Charset", "UTF-8");
         EnketoURLRequest body = new EnketoURLRequest(ocURL, crfOID);
         HttpEntity<EnketoURLRequest> request = new HttpEntity<EnketoURLRequest>(body, headers);
@@ -218,14 +214,12 @@ public class EnketoAPI {
 
         RestTemplate rest = new RestTemplate();
         ResponseEntity<EnketoAccountResponse> response = null;
-        if (!checkExistingEnketoAccount())
-        {
-            response = rest.postForEntity(enketoURL + "/accounts/api/v1/account", request,
-                    EnketoAccountResponse.class);
+        if (!checkExistingEnketoAccount()) {
+            response = rest.postForEntity(enketoURL + "/accounts/api/v1/account", request, EnketoAccountResponse.class);
         } else {
             try {
-                response = rest
-                        .exchange(enketoURL + "/accounts/api/v1/account", HttpMethod.PUT, request, EnketoAccountResponse.class, new HashMap<String, String>());
+                response = rest.exchange(enketoURL + "/accounts/api/v1/account", HttpMethod.PUT, request, EnketoAccountResponse.class,
+                        new HashMap<String, String>());
             } catch (Exception e) {
                 System.out.println(e.getMessage());
             }
@@ -233,8 +227,7 @@ public class EnketoAPI {
         return response.getBody();
     }
 
-    public boolean checkExistingEnketoAccount()
-    {
+    public boolean checkExistingEnketoAccount() {
         boolean accountExists = false;
 
         HttpHeaders headers = new HttpHeaders();
@@ -243,14 +236,13 @@ public class EnketoAPI {
         headers.add("Accept-Charset", "UTF-8");
         HttpEntity<EnketoAccountRequest> entity = new HttpEntity<EnketoAccountRequest>(headers);
 
-        try
-        {
+        try {
             RestTemplate rest = new RestTemplate();
-            ResponseEntity<EnketoAccountResponse> response = rest.exchange(CoreResources.getField("form.engine.url") +
-                            "/accounts/api/v1/account" + "?server_url=" + ocURL +
-                            "&api_key=" + token,
-                    HttpMethod.GET, entity, EnketoAccountResponse.class);
-            if (response.getBody().getCode() == 200) accountExists = true;
+            ResponseEntity<EnketoAccountResponse> response = rest.exchange(
+                    CoreResources.getField("form.engine.url") + "/accounts/api/v1/account" + "?server_url=" + ocURL + "&api_key=" + token, HttpMethod.GET,
+                    entity, EnketoAccountResponse.class);
+            if (response.getBody().getCode() == 200)
+                accountExists = true;
         } catch (Exception e) {
             logger.error(e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
@@ -258,11 +250,24 @@ public class EnketoAPI {
         return accountExists;
     }
 
-    public EnketoURLResponse getEditURL(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete,
-            String studyOid, List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode)
-            throws Exception {
-        String crfOid = formLayout.getOcOid() + crfFlavor;
+    public EnketoURLResponse getEditURL(EditUrlObject editUrlObject) throws Exception {
+        String ecid = editUrlObject.ecid;
+        String crfOid = editUrlObject.formLayout.getOcOid() + editUrlObject.crfFlavor;
+        Study parentStudy = editUrlObject.parentStudy;
+        StudyEvent studyEvent = editUrlObject.studyEvent;
+        boolean markComplete = editUrlObject.markComplete;
+        EventDefinitionCrf edc = editUrlObject.edc;
+        Role role = editUrlObject.role;
+        String mode = editUrlObject.mode;
+        String flavor = editUrlObject.flavor;
+        List<FormLayoutMedia> mediaList = editUrlObject.mediaList;
+        String instance = editUrlObject.instance;
+        String redirect = editUrlObject.redirect;
+        String goTo = editUrlObject.goTo;
+        String studyOid = editUrlObject.studyOid;
+
         EnketoURLResponse urlResponse = null;
+
         if (enketoURL == null)
             return null;
 
@@ -274,10 +279,12 @@ public class EnketoAPI {
             ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
             String instanceId = encoder.encodePassword(hashString, null);
             URL eURL = null;
-
             // https://jira.openclinica.com/browse/OC-8270 Open Form when event is locked
             // https://jira.openclinica.com/browse/OC-8269 Open Form when study is locked
-            if (parentStudy.getStatus().equals(Status.LOCKED) || studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId())) {
+            if (parentStudy.getStatus().equals(Status.LOCKED) || studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId())
+                    || studyEvent.getStatusId().equals(Status.DELETED.getCode()) || studyEvent.getStatusId().equals(Status.AUTO_DELETED.getCode())
+                    || edc.getStatusId().equals(Status.DELETED.getCode()) || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())) {
+
                 eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                 markComplete = false;
 
