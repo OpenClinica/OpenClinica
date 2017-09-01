@@ -10,6 +10,7 @@ package org.akaza.openclinica.control.managestudy;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
+import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -26,6 +27,7 @@ import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
+import org.akaza.openclinica.control.admin.UpdateSubjectServlet;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -42,6 +44,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * @author jxu Processes request to update a study subject
@@ -172,7 +175,23 @@ public class UpdateStudySubjectServlet extends SecureController {
                 studySubject.setUpdater(ub);
                 studySubdao.update(studySubject);
                 
+                
                 SubjectBean sub = (SubjectBean) session.getAttribute("subject");
+                if (! currentStudy.getStudyParameterConfig().getCollectDob().equals("3")){
+                    if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
+                    {
+                        String d_date = fp.getString(UpdateSubjectServlet.DATE_DOB_TO_SAVE);
+                        if ( !(d_date == null || d_date.trim().length()==0)){
+                            Date date_new = yformat.parse(fp.getString(UpdateSubjectServlet.DATE_DOB_TO_SAVE));
+                            sub.setDateOfBirth(date_new);
+                        }
+                    }
+                    if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1"))
+                    {
+                        Date date_new = local_df.parse(fp.getString(UpdateSubjectServlet.DATE_DOB_TO_SAVE));
+                        sub.setDateOfBirth(date_new);
+                    }
+                }
                 sub.setUpdater(ub);
                 sdao.update(sub);
 
@@ -296,7 +315,96 @@ public class UpdateStudySubjectServlet extends SecureController {
             subject.setDateOfBirth(fp.getDate("localBirthDate"));
             
             
+            
+            
+            
+            
+            // Validate Subject DOB
+            if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1")){
+                if (!StringUtil.isBlank(fp.getString(UpdateSubjectServlet.DATE_DOB))) {
+                    v.addValidation(UpdateSubjectServlet.DATE_DOB, Validator.IS_A_DATE);
+                    v.alwaysExecuteLastValidation(UpdateSubjectServlet.DATE_DOB);
+                }
+                else if (StringUtil.isBlank(fp.getString(UpdateSubjectServlet.DATE_DOB)) && subject.getDateOfBirth()!= null){
+                    Validator.addError(errors, UpdateSubjectServlet.DATE_DOB, resexception.getString("field_not_blank"));
+                }
+                if ( fp.getDate(UpdateSubjectServlet.DATE_DOB) != null){
+                    subject.setDateOfBirth(fp.getDate(UpdateSubjectServlet.DATE_DOB));
+                    String  converted_date = local_df.format(subject.getDateOfBirth());
+                    request.setAttribute(UpdateSubjectServlet.DATE_DOB_TO_SAVE, converted_date);    
+                }
+                
+            }
+            
+            else if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2")){
+                if (!StringUtils.isBlank(fp.getString(UpdateSubjectServlet.DATE_DOB))) {
+                   
+                    // if DOB was not updated (and originally entered as a full day, post it as is
+                    String submitted_date = fp.getString(UpdateSubjectServlet.DATE_DOB);
+                    
+                    
+                    boolean isTheSameDate = false;
+                    try{
+                        Date fakeDOB = yformat.parse(submitted_date);
+                        if(subject.getDateOfBirth() != null)
+                        {
+                        if (subject.getDateOfBirth().getYear() == (fakeDOB.getYear())){
+                            isTheSameDate=true;
+                            String  converted_date = yformat.format(subject.getDateOfBirth());
+                            request.setAttribute(UpdateSubjectServlet.DATE_DOB_TO_SAVE, converted_date);
+                         }
+                        }
+                    }catch(ParseException pe){
+                        logger.debug("update subject: cannot convert date " + submitted_date);
+                        //I am putting on Pradnya's request the link to code review with a long discussion
+                        //about what type of logging should be here: enjoy
+                        //https://dev.openclinica.com/crucible/cru/OC-117
+                    }
+                    
+                    if ( !isTheSameDate){
+                          
+                          v.addValidation(UpdateSubjectServlet.DATE_DOB, Validator.IS_AN_INTEGER);
+                          v.alwaysExecuteLastValidation(UpdateSubjectServlet.DATE_DOB);
+                          v.addValidation(UpdateSubjectServlet.DATE_DOB, Validator.COMPARES_TO_STATIC_VALUE, NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO, 1000);
 
+                        // get today's year
+                        Date today = new Date();
+                        Calendar c = Calendar.getInstance();
+                        c.setTime(today);
+                        int currentYear = c.get(Calendar.YEAR);
+                        v.addValidation(UpdateSubjectServlet.DATE_DOB, Validator.COMPARES_TO_STATIC_VALUE, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, currentYear);
+                        int yob = fp.getInt(UpdateSubjectServlet.DATE_DOB);
+                        Date fakeDate = new Date(yob);
+                        String dobString = yformat.format(fakeDate);
+                        try {
+                            
+                            Date fakeDOB = yformat.parse(dobString);
+                            if (yob != 0){subject.setDateOfBirth(fakeDOB);}
+                            request.setAttribute(UpdateSubjectServlet.DATE_DOB_TO_SAVE, yob);    
+                        } catch (ParseException pe) {
+                            logger.debug("Parse exception happened.");
+                          //I am putting on Pradnya's request the link to code review with a long discussion
+                            //about what type of logging should be here: enjoy
+                            //https://dev.openclinica.com/crucible/cru/OC-117
+                            Validator.addError(errors, UpdateSubjectServlet.DATE_DOB, resexception.getString("please_enter_a_valid_year_birth"));
+                        }
+                    }
+                    request.setAttribute(UpdateSubjectServlet.DATE_DOB, fp.getString(UpdateSubjectServlet.DATE_DOB));    
+                    
+                }
+                else{
+                    Validator.addError(errors, UpdateSubjectServlet.DATE_DOB, resexception.getString("field_not_blank"));
+                }
+            }
+
+            
+            
+            
+            
+            
+            
+            
+            
         }
         
         

@@ -54,6 +54,7 @@
 <form action="UpdateStudySubject" method="post">
 <input type="hidden" name="action" value="submit">
 <input type="hidden" name="id" value="<c:out value="${studySub.id}"/>">
+<input type="hidden" name="localBirthDateToSave" value="<c:out value="${localBirthDateToSave}"/>">
  <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
