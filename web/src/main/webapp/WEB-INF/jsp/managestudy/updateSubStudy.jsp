@@ -565,28 +565,6 @@ function updateThis(multiSelEle, count) {
 	    	</td>
 	    	<td></td>
 
-		    <td class="table_cell"><fmt:message key="double_data_entry" bundle="${resword}"/>:
-		    <c:choose>
-	            <c:when test="${edc.doubleEntry == true}">
-	                <input type="checkbox" checked name="doubleEntry<c:out value="${num}"/>" value="yes">
-	            </c:when>
-	            <c:otherwise>
-	                <input type="checkbox" name="doubleEntry<c:out value="${num}"/>" value="yes">
-            	</c:otherwise>
-        	</c:choose>
-		    </td>
-
-		    <td class="table_cell"><fmt:message key="password_required" bundle="${resword}"/>:
-		    <c:choose>
-	            <c:when test="${edc.electronicSignature == true}">
-	                <input type="checkbox" checked name="electronicSignature<c:out value="${num}"/>" value="yes">
-	            </c:when>
-	            <c:otherwise>
-	                <input type="checkbox" name="electronicSignature<c:out value="${num}"/>" value="yes">
-	            </c:otherwise>
-        	</c:choose>
-		    </td>
-
 		    <td class="table_cell" colspan="2"><fmt:message key="default_version" bundle="${resword}"/>:
 		    <select name="defaultVersionId<c:out value="${num}"/>" id="dv<c:out value="${num}"/>" onclick="updateVersionSelection('<c:out value="${selectedIds}"/>',document.getElementById('dv<c:out value="${num}"/>').selectedIndex, '<c:out value="${num}"/>')">
 	            <c:forEach var="version" items="${edc.versions}">
