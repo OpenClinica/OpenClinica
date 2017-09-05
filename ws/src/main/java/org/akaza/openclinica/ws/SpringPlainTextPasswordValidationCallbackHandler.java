@@ -124,8 +124,12 @@ public class SpringPlainTextPasswordValidationCallbackHandler extends AbstractCa
 
                 Auth0 auth = new Auth0(auth0Properties.getProperty("auth0.clientId"), auth0Properties.getProperty("auth0.domain"));
                 AuthenticationAPIClient client = auth.newAuthenticationAPIClient();
+                logger.info("Creating client login in SpringSecurityPlainTextPasswordValidator");
                 Credentials credentials = client.login(plainTextRequest.getUsername(), plainTextRequest.getPassword())
                         .setConnection(auth0Properties.getProperty("auth0.connection")).execute();
+                logger.info("client credentials in SpringSecurityPlainTextPasswordValidator:" + credentials);
+                logger.info("client access token in SpringSecurityPlainTextPasswordValidator:" + credentials.getAccessToken());
+                logger.info("user username/password in SpringSecurityPlainTextPasswordValidator:" + plainTextRequest.getUsername() + ":" + plainTextRequest.getPassword());
                 if (StringUtils.isNotEmpty(credentials.getAccessToken())) {
                     findOrCreateUser(plainTextRequest, credentials);
                     Authentication authentication = new UsernamePasswordAuthenticationToken(plainTextRequest.getUsername(), null,
@@ -154,11 +158,11 @@ public class SpringPlainTextPasswordValidationCallbackHandler extends AbstractCa
         if (StringUtils.isEmpty(ub.getName())) {
             ub = (UserAccountBean) userAccountDAO.findByUserName(plainTextRequest.getUsername());
         }
+        logger.info("User account:" + ub.getName());
         if (ub.getId() != 0)
             return ub;
-        else {
+        else
             return buildUserAccount(plainTextRequest, map);
-        }
     }
 
     private Map<String, Object> decode(String token) {
