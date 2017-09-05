@@ -312,10 +312,10 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 		  		<c:forEach var="user" items="${userAccounts}">
 		   		<c:choose>
 		     	<c:when test="${userAccountId1 == user.userAccountId}">
-		       		<option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.lastName}"/>, <c:out value="${user.firstName}"/> (<c:out value="${user.userName}"/>)
+		       		<option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
 		     	</c:when>
 		     	<c:otherwise>
-		       		<option value="<c:out value="${user.userAccountId}"/>"><c:out value="${user.lastName}"/>, <c:out value="${user.firstName}"/> (<c:out value="${user.userName}"/>)
+		       		<option value="<c:out value="${user.userAccountId}"/>"><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
 		     	</c:otherwise>
 		   		</c:choose>
 		 		</c:forEach>
