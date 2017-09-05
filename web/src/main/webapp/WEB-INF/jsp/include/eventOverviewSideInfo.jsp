@@ -67,18 +67,6 @@
 	</c:choose>
 	<br><br>
 	
-     <b><fmt:message key="location" bundle="${resword}"/>:</b>
-     <c:choose>
-	 <c:when test="${toc != null}">	 
-	   <c:out value="${toc.studyEvent.location}"/>
-	 </c:when>
-	 <c:otherwise>
-	  <c:out value="${studyEvent.location}"/>	   
-	 </c:otherwise>
-	</c:choose>    
-     <br><br>
-     
-     
      <b><fmt:message key="start_date1" bundle="${resword}"/>:</b>&nbsp;
      <c:choose>
 	 <c:when test="${toc != null}">	 
