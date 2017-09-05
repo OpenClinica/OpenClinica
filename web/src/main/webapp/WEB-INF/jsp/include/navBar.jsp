@@ -299,6 +299,7 @@
                 </c:when>
                 <c:otherwise>
                     <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div>
+                    
                 </c:otherwise>
             </c:choose>
         </div>
@@ -307,6 +308,8 @@
             <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
             </c:when>
             <c:otherwise>
+                <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="AuditUserActivity?restore=true"><fmt:message key="user_audit_log" bundle="${resword}"/></a></div>
             </c:otherwise>
