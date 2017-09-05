@@ -768,6 +768,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
                         roleInStudy.setStudyId(studyId.intValue());
                         roleInStudy.setRole(Role.INVALID);
                         roleInStudy.setStudyName(parent.getName());
+                        roleInStudy.setEnvType(parent.getEnvType().name());
                         subTreeRoles.add(roleInStudy);
                         parentAdded = true;
                     }
@@ -781,6 +782,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
                     StudyUserRoleBean roleInChild = new StudyUserRoleBean();
                     roleInChild.setStudyId(child.getId());
                     roleInChild.setStudyName(child.getName());
+                    roleInChild.setEnvType(roleInStudy.getEnvType());
                     roleInChild.setRole(roleInStudy.getRole());
                     roleInChild.setParentStudyId(studyId.intValue());
                     subTreeRoles.add(roleInChild);
