@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -190,8 +190,8 @@
          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include>
         </td>
     </tr>
-    
-    
+
+
     <c:if test="${study.studyParameterConfig.collectDob=='1' || study.studyParameterConfig.collectDob=='2' }">
     <tr valign="top">
         <td class="formlabel" >
