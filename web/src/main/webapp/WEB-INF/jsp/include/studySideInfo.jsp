@@ -55,16 +55,6 @@
        <fmt:message key="na" bundle="${resword}"/>
       </c:otherwise>
     </c:choose>
-    <br><br>
-
-    <b><fmt:message key="pi" bundle="${resword}"/>:</b>&nbsp; <c:out value="${study.principalInvestigator}"/>
-
-    <br><br>
-
-    <b><fmt:message key="protocol_verification" bundle="${resword}"/>:</b>&nbsp; 
-    <fmt:formatDate value="${study.protocolDateVerification}" pattern="${dteFormat}"/>  
-    
-
     </c:when>
    <c:otherwise>
    Your last active study/site was <c:out value="${study.name}"/>, but it has been deleted.

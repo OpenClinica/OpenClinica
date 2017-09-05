@@ -806,6 +806,20 @@
 .fa-flask:before {
   content: "\f0c3";
 }
+.fa-bubble-yellow:before {
+  content: "\f075";
+  margin: 0 10px 0 10px;
+  padding: 0;
+  color: yellow;
+  background: none;
+  border: none;
+  box-shadow: none;
+  opacity: 0.7; }
+  .fa-bubble-yellow:hover {
+    color: yellow;
+    opacity: 0.5; 
+  }
+}
 .fa-cut:before,
 .fa-scissors:before {
   content: "\f0c4";
@@ -828,6 +842,20 @@
 .fa-reorder:before,
 .fa-bars:before {
   content: "\f0c9";
+}
+.fa-bubble-gray:before {
+  content: "\f075";
+  margin: 0 10px 0 10px;
+  padding: 0;
+  color: gray;
+  background: none;
+  border: none;
+  box-shadow: none;
+  opacity: 0.7; }
+  .fa-bubble-gray:hover {
+    color: gray;
+    opacity: 0.5; 
+  }
 }
 .fa-list-ul:before {
   content: "\f0ca";

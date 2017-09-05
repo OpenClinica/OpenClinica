@@ -16,8 +16,6 @@
      </td>
      <td class="table_cell"><fmt:formatDate value="${currRow.bean.studyEvent.dateStarted}" pattern="${dteFormat}"/>
      </td>
-    
-     <td class="table_cell"><c:out value="${currRow.bean.studyEvent.location}"/></td>
      <td class="table_cell" width="20"><c:out value="${currRow.bean.studyEvent.subjectEventStatus.name}"/></td>
      <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
@@ -203,7 +201,7 @@
 					</td>
 				</c:otherwise>
 				</c:choose>
-				<td class="table_cell" width="80">;</td>
+				<td class="table_cell" width="80">&nbsp;&nbsp;</td>
 				<td class="table_cell" width="140">
 				<table cellspacing="0" cellpadding="0" border="0">
 				<tr>
