@@ -163,7 +163,6 @@ public class SpringPlainTextPasswordValidationCallbackHandler extends AbstractCa
             return ub;
         else
             return buildUserAccount(plainTextRequest, map);
-        }
     }
 
     private Map<String, Object> decode(String token) {
