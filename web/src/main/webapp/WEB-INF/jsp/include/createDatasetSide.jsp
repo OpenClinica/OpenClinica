@@ -27,11 +27,11 @@
                     <c:set var="newEvent" value="1"/>
                     <c:set var="eventCount" value="${eventCount+1}"/>
                     <tr>
-                        <td valign="top" width="10" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>');
-		          javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','images/bt_Collapse.gif');"><img
+                        <td valign="top" width="10" class="leftmenu" style="font-size: 12.8px;"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>');
+                  javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','images/bt_Collapse.gif');"><img
                           name="ExpandGroup<c:out value="${eventCount}"/>" src="images/bt_Expand.gif" border="0"></a></td>
-                        <td valign="top" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>');
-		            javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','images/bt_Collapse.gif');"><b><c:out value="${line.info}" escapeXml="false"/></b></a>
+                        <td valign="top" class="leftmenu" style="font-size: 12.8px;"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>');
+                    javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','images/bt_Collapse.gif');"><b><c:out value="${line.info}" escapeXml="false"/></b></a>
                         </td>
                     </tr>
                 </c:when>
@@ -55,13 +55,13 @@
                     <c:when test="${line.lastCRF}">
                         <td valign="top" class="vline_B">
                             <img src="images/leftbar_hline.gif"></td>
-                        <td valign="top" class="leftmenu" style="font-size:11px; color:#789EC5"><c:out value="${line.info}" escapeXml="false"/></td>
+                        <td valign="top" class="leftmenu" style="font-size:12.8px; color:#789EC5"><c:out value="${line.info}" escapeXml="false"/></td>
                     </c:when>
                     <c:otherwise>
                         <c:if test="${line.title=='CRF'}">
                             <td valign="top" class="vline">
                                 <img src="images/leftbar_hline.gif"></td>
-                            <td valign="top" class="leftmenu" style="font-size:11px; color:#789EC5"><c:out value="${line.info}" escapeXml="false"/></td>
+                            <td valign="top" class="leftmenu" style="font-size:12.8px; color:#789EC5"><c:out value="${line.info}" escapeXml="false"/></td>
                         </c:if>
                     </c:otherwise>
                 </c:choose>
@@ -78,7 +78,7 @@
 
     <br><a href='SelectItems?eventAttr=1'><b><fmt:message key="event_attributes" bundle="${resword}"/></b></a><br><br>
     <a href='SelectItems?subAttr=1'><b><fmt:message key="subject_attributes" bundle="${resword}"/></b></a><br><br>
-    <a href='SelectItems?CRFAttr=1'><b>CRF Attributes</b></a><br><br>
+    <a href='SelectItems?CRFAttr=1'><b><fmt:message key="CRF_attributes" bundle="${resword}"/></b></a><br><br>
     <%--
         <a href='SelectItems?discAttr=1'><b>Discrepancy Note Attributes</b></a><br><br>
     --%>

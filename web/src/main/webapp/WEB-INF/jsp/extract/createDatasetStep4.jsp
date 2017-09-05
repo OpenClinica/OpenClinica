@@ -84,10 +84,10 @@
 
 <c:choose>
 <c:when test="${newDataset.id>0}">
-<h1><span class="title_manage"><fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="specify_dataset_properties" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/edit-dataset')"><span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+<h1 ><span class="title_manage"><fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="specify_dataset_properties" bundle="${resword}"/>
 : <c:out value="${newDataset.name}"/></span></h1>
 </c:when>
-<c:otherwise><h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="specify_dataset_properties" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')"><span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<c:otherwise><h1 style="margin: 0em"><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="specify_dataset_properties" bundle="${resword}"/></span></h1>
 </c:otherwise>
 </c:choose>
 
@@ -146,27 +146,27 @@
 			<c:choose>
 			<c:when test="${newDataset.id<=0 || itemStatusId==1}">
 	 		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="1" checked></td>
-	   		    <td class="table_cell"><fmt:message key="completed_items" bundle="${resterm}"/></td></tr>
+	   		    <td class="table_cell" style="vertical-align:bottom;"><fmt:message key="completed_items" bundle="${resterm}"/></td></tr>
 	   		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="2"></td>
-	   		    <td class="table_cell"><fmt:message key="non_completed_items" bundle="${resterm}"/></td></tr>
+	   		    <td class="table_cell" style="vertical-align:bottom;"><fmt:message key="non_completed_items" bundle="${resterm}"/></td></tr>
 	   		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="3"></td>
-	   			<td class="table_cell"><fmt:message key="completed_and_non_completed_items" bundle="${resterm}"/></td></tr>
+	   			<td class="table_cell" style="vertical-align:bottom;"><fmt:message key="completed_and_non_completed_items" bundle="${resterm}"/></td></tr>
 	   		</c:when>
 	   			<c:when test="${itemStatusId==2}">
 	   		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="1"></td>
-	   		    <td class="table_cell"><fmt:message key="completed_items" bundle="${resterm}"/></td></tr>
+	   		    <td class="table_cell" style="vertical-align:bottom;"><fmt:message key="completed_items" bundle="${resterm}"/></td></tr>
 	   		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="2" checked></td>
-	   		    <td class="table_cell"><fmt:message key="non_completed_items" bundle="${resterm}"/></td></tr>
+	   		    <td class="table_cell" style="vertical-align:bottom;"><fmt:message key="non_completed_items" bundle="${resterm}"/></td></tr>
 	   		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="3"></td>
-	   			<td class="table_cell"><fmt:message key="completed_and_non_completed_items" bundle="${resterm}"/></td></tr>
+	   			<td class="table_cell" style="vertical-align:bottom;"><fmt:message key="completed_and_non_completed_items" bundle="${resterm}"/></td></tr>
 	   		</c:when>
 	   			<c:when test="${itemStatusId==3}">
 	   		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="1"></td>
-	   		    <td class="table_cell"><fmt:message key="completed_items" bundle="${resterm}"/></td></tr>
+	   		    <td class="table_cell" style="vertical-align:bottom;"><fmt:message key="completed_items" bundle="${resterm}"/></td></tr>
 	   		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="2"></td>
-	   		    <td class="table_cell"><fmt:message key="non_completed_items" bundle="${resterm}"/></td></tr>
+	   		    <td class="table_cell" style="vertical-align:bottom;"><fmt:message key="non_completed_items" bundle="${resterm}"/></td></tr>
 	   		<tr><td class="table_cell"><input type="radio" name="itemStatus" value="3" checked></td>
-	   			<td class="table_cell"><fmt:message key="completed_and_non_completed_items" bundle="${resterm}"/></td></tr>
+	   			<td class="table_cell" style="vertical-align:bottom;"><fmt:message key="completed_and_non_completed_items" bundle="${resterm}"/></td></tr>
 	   		</c:when>
 	   		</c:choose>
 	   	</table></div></div></div></div></div></div></div></div>

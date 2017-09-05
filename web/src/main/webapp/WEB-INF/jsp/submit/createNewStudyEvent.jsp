@@ -108,10 +108,8 @@
 	<c:when test="${requestStudySubject == requestStudySubjectFalse}">
 	
 <fmt:message key="schedule_study_event_for" bundle="${resword}"/><b> <c:out value="${chosenSubject.name}" /></b>
-        <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/schedule-event')">
-            <span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
-	</c:when>
-	<c:otherwise>
+ </c:when>
+<c:otherwise>
 	
 <fmt:message key="schedule_study_event_for" bundle="${resword}"/>
 <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/schedule-event#enterData')">
@@ -155,7 +153,6 @@
   
    //-->
 </script>
-<P><fmt:message key="field_required" bundle="${resword}"/></P>
 
 <form action="CreateNewStudyEvent" method="post">
 <jsp:include page="../include/showSubmitted.jsp" />
@@ -269,8 +266,8 @@
 				<c:param name="prefix" value="start"/>
 				<c:param name="count" value="1"/>
 				</c:import>
-
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) *<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=start&column=start_date','spanAlert-start'); return false;">
+				
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=start&column=start_date','spanAlert-start'); return false;">
 				<span name="flag_start" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
 			
@@ -437,7 +434,7 @@
 		  	<table border="0" cellpadding="0" cellspacing="0">
 			<tr>
 				<c:import url="../include/showDateTimeInput.jsp"><c:param name="prefix" value="startScheduled0"/><c:param name="count" value="3"/></c:import>
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)*<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled0&column=start_date','spanAlert-startScheduled0'); return false;">
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=startScheduled0&column=start_date','spanAlert-startScheduled0'); return false;">
 				<span name="flag_startScheduled0" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
 			<tr>

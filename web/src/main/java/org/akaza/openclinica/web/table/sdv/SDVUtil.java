@@ -126,7 +126,7 @@ public class SDVUtil {
         CRF_STATUS_ICONS.put(2, "icon icon-pencil-squared orange");
         CRF_STATUS_ICONS.put(3, "icon icon-icon-dataEntryCompleted orange");
         CRF_STATUS_ICONS.put(4, "icon icon-icon-doubleDataEntry orange");
-        CRF_STATUS_ICONS.put(5, "icon icon-checkbox-checked green");
+        CRF_STATUS_ICONS.put(5, "icon icon-search");
         CRF_STATUS_ICONS.put(6, "icon icon-pencil-squared orange");
         CRF_STATUS_ICONS.put(7, "icon icon-lock");
     }
@@ -972,7 +972,7 @@ public class SDVUtil {
                     new StringBuilder("this.form.method='GET'; this.form.action='").append(request.getContextPath()).append("/pages/handleSDVGet").append("';")
                             .append("this.form.crfId.value='").append(crfBean.getId()).append("';").append("this.form.submit();");
 
-                actions.append("<input type=\"submit\" class=\"button_medium\" value=\"SDV\" name=\"sdvSubmit\" ").append("onclick=\"").append(
+                actions.append("<input type=\"submit\" class=\"button_medium\" value=\"Mark as SDV'd\" name=\"sdvSubmit\" ").append("onclick=\"").append(
                         jsCodeString.toString()).append("\" />");
             }
 
@@ -1013,7 +1013,7 @@ public class SDVUtil {
         String imgName = "";
         StringBuilder input = new StringBuilder("<input type=\"hidden\" statusId=\"");
         input.append(statusId).append("\" />");
-        builder.append("<center><span class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0'></center>");
+        builder.append("<center><span title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0'></center>");
         //"<input type=\"hidden\" statusId=\"1\" />"
         builder.append("</a>");
         builder.append(" ");
@@ -1471,10 +1471,10 @@ public class SDVUtil {
             HtmlBuilder html = new HtmlBuilder();
             html.tr(1).styleClass("logic").close().td(1).colspan("100%").style("font-size: 12px;").close();
             html.append("<b>" + resword.getString("table_sdv_select") + "</b>&#160;&#160;");
-            html.append("<a name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,true)'>" + resword.getString("table_sdv_all"));
-            html.append(",</a>");
+            html.append("<a style='text-decoration:none;' name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,true)'>" + resword.getString("table_sdv_all"));
+            html.append("</a>");
             html.append("&#160;&#160;&#160;");
-            html.append("<a name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,false)'>" + resword.getString("table_sdv_none"));
+            html.append("<a style='text-decoration:none;' name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,false)'>" + resword.getString("table_sdv_none"));
             html.append("</a>");
             html.tdEnd().trEnd(1);
             return html.toString();

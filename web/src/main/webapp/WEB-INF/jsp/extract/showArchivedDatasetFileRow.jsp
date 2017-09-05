@@ -20,7 +20,7 @@
                  alt="<fmt:message key="download" bundle="${resword}"/>" title="<fmt:message key="download" bundle="${resword}"/>">
         </a>
         <a href="ExportDataset?action=delete&datasetId=<c:out value="${currRow.bean.datasetId}"/>&adfId=<c:out value="${currRow.bean.id}"/>">
-            <img name="bt_Delete1" src="images/bt_Delete.gif" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>"
+            <span name="bt_Delete1" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>"
                  title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"
                  onClick='return confirm("<fmt:message key="if_you_delete_this_dataset" bundle="${restext}"/>");'>
         </a>
