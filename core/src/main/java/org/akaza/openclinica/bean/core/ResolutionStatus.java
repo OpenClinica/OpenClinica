@@ -31,9 +31,9 @@ public class ResolutionStatus extends Term {
 
     public static final ResolutionStatus INVALID = new ResolutionStatus(0, "invalid", null, null);
 
-    public static final ResolutionStatus OPEN = new ResolutionStatus(1, "New", null, "fa fa-bubble-white");
+    public static final ResolutionStatus OPEN = new ResolutionStatus(1, "New", null, "fa fa-bubble-red");
 
-    public static final ResolutionStatus UPDATED = new ResolutionStatus(2, "Updated", null, "fa fa-bubble-red");
+    public static final ResolutionStatus UPDATED = new ResolutionStatus(2, "Updated", null, "fa fa-bubble-yellow");
 
     public static final ResolutionStatus RESOLVED = new ResolutionStatus(3, "Resolution_Proposed", null, "");
 
@@ -41,7 +41,7 @@ public class ResolutionStatus extends Term {
 
     public static final ResolutionStatus NOT_APPLICABLE = new ResolutionStatus(5, "Not_Applicable", null, "");
 
-    public static final ResolutionStatus CLOSED_MODIFIED = new ResolutionStatus(6, "Closed_Modified", null, "fa fa-bubble-black");
+    public static final ResolutionStatus CLOSED_MODIFIED = new ResolutionStatus(6, "Closed_Modified", null, "fa fa-bubble-gray");
 
     private String iconFilePath;
 
