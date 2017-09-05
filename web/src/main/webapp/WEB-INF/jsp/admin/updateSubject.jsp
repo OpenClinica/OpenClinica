@@ -9,7 +9,7 @@
 
 <jsp:include page="../include/admin-header.jsp"/>
 
-
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
@@ -76,7 +76,7 @@
        
         <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 		<a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=gender&column=gender','spanAlert-gender'); return false;">
-		<img name="flag_gender" src="images/<c:out value="${genderDNFlag}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+		<span name="flag_gender" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
 		</c:if>
 		 <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include>
 		</td>
@@ -106,7 +106,7 @@
 	  
 	  	<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
 		 <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySubId}&name=subject&id=<c:out value="${subjectToUpdate.id}"/>&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">
-		 <img name="flag_dateOfBirth" src="images/<c:out value="${birthDNFlag}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
+		 <span name="flag_dateOfBirth" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a>
 		</c:if>
 	  	</td>
 	</c:if>
@@ -122,7 +122,7 @@
 
 </div>
  <input type="submit" name="Submit" value="<fmt:message key="confirm" bundle="${resword}"/>" class="button_medium">
- <input type="button" onclick="confirmCancel('ListSubject');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
+ <input type="button" onclick="goBack()"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 </form>
 
 </body>

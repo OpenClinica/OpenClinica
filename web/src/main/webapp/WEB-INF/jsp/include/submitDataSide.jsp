@@ -24,18 +24,19 @@
 			  <c:set var="newEvent" value="1"/>
 			  <c:set var="eventCount" value="${eventCount+1}"/>
 			  <tr>
-	           <td valign="top" width="10" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>'); 
+	           <td valign="top" width="10" class="leftmenu"><a style="text-decoration: none" href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>'); 
 		          javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','images/bt_Collapse.gif');"><img 
 		          name="ExpandGroup<c:out value="${eventCount}"/>" src="images/bt_Expand.gif" border="0"></a></td>
 	            
 	            <c:choose>
                  <c:when test="${!line.current}">
-	              <td valign="top" class="leftmenu"><a href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>'); 
-		            javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','images/bt_Collapse.gif');"><b><c:out value="${line.info}" escapeXml="false"/></b></a>
+	              <td valign="top" class="leftmenu"><a style="text-decoration: none"
+	              href="javascript:leftnavExpand('leftnavSubRow_SubSection<c:out value="${eventCount}"/>'); 
+		            javascript:setImage('ExpandGroup<c:out value="${eventCount}"/>','images/bt_Collapse.gif');"><c:out value="${line.info}" escapeXml="false"/></a>
 		          </td>
 		         </c:when>
 		         <c:otherwise>
-		           <td valign="top" class="leftmenu"><b><span class='alert'><c:out value="${line.info}" escapeXml="false"/></span></b>
+		           <td valign="top" class="leftmenu"><span class='alert'><c:out value="${line.info}" escapeXml="false"/></span>
 		          </td>
 		         </c:otherwise>
 		        </c:choose> 
@@ -57,9 +58,8 @@
              <c:otherwise>
                <b><c:out value="${line.title}" escapeXml="false"/>: <c:out value="${line.info}" escapeXml="false"/></b>
                <c:if test="${line.title!='Study Events'}">
-                 <br/>
                </c:if>
-                <br/>
+                
              </c:otherwise>  
              </c:choose>           
              </c:if>

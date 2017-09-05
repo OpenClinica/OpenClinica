@@ -87,9 +87,9 @@ function notSelectAll() {
 </h1>
 </c:when>
 <c:otherwise>
-<h1>
+<h1 style="margin: 0em">
  <span class="title_manage">
-   <fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_items" bundle="${resword}"/>
+   <fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="filter_by_date" bundle="${resword}"/>
    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')">
    <span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
  </span>
@@ -103,8 +103,8 @@ function notSelectAll() {
 </jsp:include>
 --%>
 
-<p><fmt:message key="please_select_one_CRF_from_the" bundle="${restext}"/> <b><fmt:message key="left_side_info_panel" bundle="${restext}"/></b><fmt:message key="select_items_in_CRF_include_dataset" bundle="${restext}"/></p>
-<p><fmt:message key="click_event_subject_attributes_specify" bundle="${restext}"/></p>
+
+<p><fmt:message key="Select_a_CRF_to_choose_individual" bundle="${resword}"/> </p>
 <table border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td><img src="images/arrow_left.gif" alt="<fmt:message key="select_CRF_on_the_left" bundle="${restext}"/>" title="<fmt:message key="select_CRF_on_the_left" bundle="${restext}"/>"></td>
