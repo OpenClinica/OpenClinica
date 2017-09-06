@@ -44,7 +44,7 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 
 <h1 style="margin: 0em;"><span class="title_manage">
-<fmt:message key="manage_all_sites_in_study" bundle="${restext}"/> <c:out value="${study.name}"/></span></h1>
+<fmt:message key="manage_all_sites_in_study" bundle="${restext}"/> <c:out value="${study.name}"/></span></h1></br>
 
 <div class="homebox_bullets">
  <c:choose>

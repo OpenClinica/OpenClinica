@@ -80,7 +80,7 @@
    <a href="javascript:openDocWindow('ViewStudyEvents?print=yes&<c:out value="${queryUrl}"/>')">
   <span class="icon icon-print"></a>
   </div>
-  </h1>
+  </h1></span>
 
 
 <div style="width: 980px">
