@@ -57,10 +57,9 @@ public class Role extends Term {
 
     public static final Map sbsSiteRoleMap = new LinkedHashMap();
     static {
-        sbsSiteRoleMap.put("Data Manager", "tudy_Coordinator");
-        sbsSiteRoleMap.put("Study Director", "Study_Director");
-        sbsSiteRoleMap.put("Data Specialist", "investigator");
-        sbsSiteRoleMap.put("Data Entry Person", "Data_Entry_Person");
+        sbsSiteRoleMap.put("Data Manager", "coordinator");
+        sbsSiteRoleMap.put("Investigator", "Data Specialist");
+        sbsSiteRoleMap.put("Clinical Research Coordinator", "ra");
         sbsSiteRoleMap.put("Monitor", "monitor");
     }
 
