@@ -12,7 +12,7 @@
     <dependencies>
         <dependency>
             <groupId>com.auth0</groupId>
-            <artifactId>auth0-spring-security-mvc</artifactId>
+            <artifactId>mvc-auth-commons</artifactId>
         </dependency>
         <dependency>
             <groupId>${project.groupId}</groupId>

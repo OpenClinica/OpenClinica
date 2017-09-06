@@ -248,7 +248,7 @@
         </dependency>
 		<dependency>
 			<groupId>com.auth0</groupId>
-			<artifactId>auth0</artifactId>
+			<artifactId>mvc-auth-commons</artifactId>
 		</dependency>
 	</dependencies>
     <build>

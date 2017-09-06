@@ -465,13 +465,8 @@
             <!-- https://mvnrepository.com/artifact/com.auth0/auth0-spring-security-mvc -->
             <dependency>
                 <groupId>com.auth0</groupId>
-                <artifactId>auth0-spring-security-mvc</artifactId>
-                <version>1.3.0</version>
-            </dependency>
-            <dependency>
-                <groupId>com.auth0</groupId>
-                <artifactId>auth0</artifactId>
-                <version>0.4.0</version>
+                <artifactId>mvc-auth-commons</artifactId>
+                <version>1.0.0</version>
             </dependency>
             <dependency>
                 <groupId>org.springframework.ws</groupId>
