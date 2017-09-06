@@ -47,8 +47,6 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.util.StatusPrinter;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -103,29 +101,8 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import javax.ws.rs.*;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.StreamingOutput;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-import java.io.*;
-import java.net.FileNameMap;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.*;
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.util.StatusPrinter;
 
 @Path("/openrosa")
 @Component
@@ -413,7 +390,7 @@ public class OpenRosaServices {
 
         LinkedHashMap<String, Object> subjectContextCache = (LinkedHashMap<String, Object>) context.getAttribute("subjectContextCache");
         if (subjectContextCache != null) {
-            String userXml = getUserXml(context,studyOID);
+            String userXml = getUserXml(context, studyOID);
             userList.setHash((DigestUtils.md5Hex(userXml)));
         }
         userList.setFilename("users.xml");
@@ -531,8 +508,10 @@ public class OpenRosaServices {
             throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
+        StudyBean publicStudy = getPublicStudy(studyOID);
+        CoreResources.setRequestSchema(publicStudy.getSchemaName());
 
-        FormLayoutMedia media = formLayoutMediaDao.findById(Integer.valueOf(formLayoutMediaId));
+        FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutMediaId(Integer.valueOf(formLayoutMediaId));
 
         File image = new File(Utils.getCrfMediaSysPath() + media.getPath() + media.getName());
         FileInputStream fis = new FileInputStream(image);
@@ -568,6 +547,7 @@ public class OpenRosaServices {
             return null;
         request.setAttribute("studyOid", studyOID);
         String userXml = getUserXml(context, studyOID);
+
         ResponseBuilder builder = Response.ok(userXml);
         builder = builder.header("Content-Type", "text/xml");
         return builder.build();
@@ -942,17 +922,17 @@ public class OpenRosaServices {
         return accessPermission;
     }
 
-    private boolean mayProceedPreview( HttpServletRequest request, String studyOid) throws Exception {
+    private boolean mayProceedPreview(HttpServletRequest request, String studyOid) throws Exception {
         boolean accessPermission = false;
         StudyBean study = getParentStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         request.setAttribute("requestSchema", study.getSchemaName());
-       // PENDING ,
+        // PENDING ,
         // INACTIVE
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
-        logger.debug( "   studyStatus: " + studyStatus);
+        logger.debug("   studyStatus: " + studyStatus);
         if ((studyStatus.equalsIgnoreCase("available") || studyStatus.equalsIgnoreCase("pending") || studyStatus.equalsIgnoreCase("frozen")
-                        || studyStatus.equalsIgnoreCase("locked"))) {
+                || studyStatus.equalsIgnoreCase("locked"))) {
             accessPermission = true;
         }
         return accessPermission;
@@ -985,7 +965,7 @@ public class OpenRosaServices {
     }
 
     private StudyBean getParentPublicStudy(String studyOid) {
-        StudyBean resultBean =  null;
+        StudyBean resultBean = null;
         String schema = CoreResources.getRequestSchema();
         CoreResources.setRequestSchema("public");
         StudyBean study = getStudy(studyOid);
@@ -993,7 +973,7 @@ public class OpenRosaServices {
             resultBean = study;
         } else {
             StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
-            resultBean= parentStudy;
+            resultBean = parentStudy;
         }
         CoreResources.setRequestSchema(schema);
         return resultBean;
