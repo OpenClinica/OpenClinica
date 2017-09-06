@@ -1,15 +1,12 @@
 package org.akaza.openclinica.service;
 
-import com.auth0.Auth0User;
 import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.internal.LinkedTreeMap;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.UserAccountController;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
