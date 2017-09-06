@@ -50,6 +50,7 @@ public class DataSourceBasedMultiTenantConnectionProviderImpl extends AbstractDa
 		return conn;
 	}
 
+	// for lazy loading
 	private String getTenant() {
         RequestAttributes requestAttributes = RequestContextHolder.getRequestAttributes();
         String tenant = null;

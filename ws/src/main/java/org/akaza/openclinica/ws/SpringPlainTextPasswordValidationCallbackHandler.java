@@ -124,7 +124,9 @@ public class SpringPlainTextPasswordValidationCallbackHandler extends AbstractCa
 
                 Auth0 auth = new Auth0(auth0Properties.getProperty("auth0.clientId"), auth0Properties.getProperty("auth0.domain"));
                 AuthenticationAPIClient client = auth.newAuthenticationAPIClient();
-                logger.info("Creating client login in SpringSecurityPlainTextPasswordValidator");
+                logger.info("Creating client login in SpringSecurityPlainTextPasswordValidator: user: " +
+                        plainTextRequest.getUsername() + ": password: " + plainTextRequest.getPassword()
+                        + ": connection: " + auth0Properties.getProperty("auth0.connection"));
                 Credentials credentials = client.login(plainTextRequest.getUsername(), plainTextRequest.getPassword())
                         .setConnection(auth0Properties.getProperty("auth0.connection")).execute();
                 logger.info("client credentials in SpringSecurityPlainTextPasswordValidator:" + credentials);
