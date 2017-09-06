@@ -163,7 +163,6 @@
 
     <servlet>
         <servlet-name>pages</servlet-name>
-        <servlet-name>pages</servlet-name>
         <servlet-class>org.springframework.web.servlet.DispatcherServlet</servlet-class>
         <load-on-startup>2</load-on-startup>
 

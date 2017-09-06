@@ -91,7 +91,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                     } catch (UnsupportedEncodingException e) {
                         throw new Error("Couldn't retrieve authentication", e);
                     }
-                }else if (basic.equalsIgnoreCase("Bearer")) {
+                } else if (basic.equalsIgnoreCase("Bearer")) {
                     // TODO
                     // 1. connect to root and update roles
                     // 2. create new user if doesn't exist and update roles
