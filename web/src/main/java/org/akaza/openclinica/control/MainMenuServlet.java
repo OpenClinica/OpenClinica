@@ -35,6 +35,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -104,8 +105,12 @@ public class MainMenuServlet extends SecureController {
             return;
         }
         currentPublicStudy = study;
-        CoreResources.setRequestSchema(request, currentSchema);
+        CoreResources.setRequestSchema(request, study.getSchemaName());
         currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
+        
+        StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+        scs.setParametersForStudy(currentStudy);
+        
         session.setAttribute("publicStudy", currentPublicStudy);
         session.setAttribute("study", currentStudy);
 
