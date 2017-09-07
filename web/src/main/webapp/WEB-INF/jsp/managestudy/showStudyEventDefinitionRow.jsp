@@ -86,13 +86,12 @@
 
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
-		<tr>
-		 <td>
-	      <a href="ViewEventDefinition?id=<c:out value="${currRow.bean.id}"/>"
-			onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img 
-		    name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-		 </td>
+    <tr>
+     <td>
+        <a href="ViewEventDefinition?id=<c:out value="${currRow.bean.id}"/>"
+      onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
+      onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
+     </td>
      
      <c:if test="${study.parentStudyId <= 0 && readOnly != 'true' }"> 
      
@@ -101,32 +100,30 @@
         <c:when test="${currRow.bean.status.available}">
         <c:if test="${!study.status.locked}">
         <td><a href="InitUpdateEventDefinition?id=<c:out value="${currRow.bean.id}"/>"
-			onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
-			onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><img 
-			name="bt_Edit1" src="images/bt_Edit.gif" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
-		  </td>
+      onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
+      onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><span class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
+      </td>
         <td><a href="RemoveEventDefinition?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
-			onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-			onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><img 
-			name="bt_Remove1" src="images/bt_Remove.gif" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
-		</td>
+      onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
+      onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
+    </td>
         </c:if>
         <%--remove this for now until we clarify the new requirement-01/17/2008
-		<c:if test="${currRow.bean.lockable}">
-		  <td><a href="LockEventDefinition?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
-			onMouseDown="javascript:setImage('bt_Lock1','images/bt_Lock_d.gif');"
-			onMouseUp="javascript:setImage('bt_Lock1','images/bt_Lock.gif');"><img 
-			name="bt_Lock1" src="images/bt_Lock.gif" border="0" alt="<fmt:message key="lock" bundle="${resword}"/>" title="<fmt:message key="lock" bundle="${resword}"/>" align="left" hspace="6"></a>
-		  </td>
-		</c:if>  --%>      
+    <c:if test="${currRow.bean.lockable}">
+      <td><a href="LockEventDefinition?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
+      onMouseDown="javascript:setImage('bt_Lock1','images/bt_Lock_d.gif');"
+      onMouseUp="javascript:setImage('bt_Lock1','images/bt_Lock.gif');"><img 
+      name="bt_Lock1" src="images/bt_Lock.gif" border="0" alt="<fmt:message key="lock" bundle="${resword}"/>" title="<fmt:message key="lock" bundle="${resword}"/>" align="left" hspace="6"></a>
+      </td>
+    </c:if>  --%>      
         </c:when>
         <c:otherwise>
         <c:if test="${currRow.bean.status.deleted && (!study.status.locked)}">
          <td><a href="RestoreEventDefinition?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
-			onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
-			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img 
-			name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
-		 </td> 
+      onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
+      onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><img 
+      name="bt_Restore3" src="images/bt_Restore.gif" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>" align="left" hspace="6"></a>
+     </td> 
         
         </c:if>
         </c:otherwise>
@@ -135,10 +132,10 @@
       <%--
        <c:if test="${userBean.sysAdmin &&  currRow.bean.status.locked}">             
         <td><a href="UnlockEventDefinition?action=confirm&id=<c:out value="${currRow.bean.id}"/>"
-			onMouseDown="javascript:setImage('bt_Unlock1','images/bt_Unlock_d.gif');"
-			onMouseUp="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"><img 
-			name="bt_Unlock1" src="images/bt_Unlock.gif" border="0" alt="<fmt:message key="unlock" bundle="${resword}"/>" title="<fmt:message key="unlock" bundle="${resword}"/>" align="left" hspace="6"></a>
-		  </td>       
+      onMouseDown="javascript:setImage('bt_Unlock1','images/bt_Unlock_d.gif');"
+      onMouseUp="javascript:setImage('bt_Unlock1','images/bt_Unlock.gif');"><img 
+      name="bt_Unlock1" src="images/bt_Unlock.gif" border="0" alt="<fmt:message key="unlock" bundle="${resword}"/>" title="<fmt:message key="unlock" bundle="${resword}"/>" align="left" hspace="6"></a>
+      </td>       
        </c:if>--%>
     
     </c:if>
