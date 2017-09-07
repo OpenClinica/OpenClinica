@@ -108,8 +108,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.resolutionStatus", "siteId",
                 "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus",
-                "entityName", "entityValue", "discrepancyNoteBean.entityType", "discrepancyNoteBean.initialComment", "discrepancyNoteBean.detailedNotes",
-                "numberOfNotes", "discrepancyNoteBean.user", "actions");
+                "entityName", "entityValue", "discrepancyNoteBean.entityType", "discrepancyNoteBean.initialComment", "actions");
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
         configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, false);
@@ -124,9 +123,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("entityName"), resword.getString("entity_name"), new EntityNameCellEditor(), null, true, false);
         configureColumn(row.getColumn("entityValue"), resword.getString("entity_value"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.initialComment"), resword.getString("initial_comment"), null, null, true, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.detailedNotes"), resword.getString("detailed_notes"), null, null, false, false);
-        configureColumn(row.getColumn("numberOfNotes"), resword.getString("of_notes"), null, null, false, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"), new AssignedUserCellEditor(), null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.resolutionStatus"), resword.getString("resolution_status"), new ResolutionStatusCellEditor(),
                 resolutionStatusDropdown, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.entityType"), resword.getString("entity_type"), null, null, true, false);
@@ -225,8 +221,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("entityValue", discrepancyNoteBean.getEntityValue());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
             h.put("discrepancyNoteBean.initialComment", discrepancyNoteBean.getDescription());
-            h.put("numberOfNotes", discrepancyNoteBean.getNumChildren());
-            h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());
             h.put("discrepancyNoteBean.entityType", discrepancyNoteBean.getEntityType());
             h.put("discrepancyNoteBean.owner", discrepancyNoteBean.getOwner());
 
