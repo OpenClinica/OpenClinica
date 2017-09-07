@@ -1,15 +1,18 @@
 package org.akaza.openclinica.service;
 
-import com.auth0.Auth0User;
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.google.gson.internal.LinkedTreeMap;
+import java.util.HashMap;
+import java.util.Map;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.UserAccountController;
+import org.akaza.openclinica.controller.helper.OCUserDTO;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
@@ -17,15 +20,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import java.util.HashMap;
-import java.util.Map;
+import com.auth0.Auth0User;
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.google.gson.internal.LinkedTreeMap;
 
 /**
  * Created by yogi on 5/3/17.
@@ -95,14 +98,21 @@ public class CallbackServiceImpl implements CallbackService {
     }
 
     private UserAccountBean createUserAccount(HttpServletRequest request, Auth0User user, Map<String, Object> userContextMap ) throws Exception {
+        request.getSession().setAttribute("userContextMap", userContextMap);
+        ResponseEntity<OCUserDTO> sbsUserInfo = studyBuildService.getUserDetails(request);
+        OCUserDTO sbsUser = sbsUserInfo.getBody();
         HashMap<String, String> map = new HashMap<>();
         map.put("username", user.getNickname());
         if (StringUtils.isNotEmpty(user.getGivenName()))
             map.put("fName", user.getGivenName());
+        else if (StringUtils.isNotEmpty(sbsUser.getFirstName())) 
+            map.put("fName", sbsUser.getFirstName());
         else
             map.put("fName", "first");
         if (StringUtils.isNotEmpty(user.getFamilyName()))
             map.put("lName", user.getFamilyName());
+        else if (StringUtils.isNotEmpty(sbsUser.getLastName())) 
+            map.put("lName", sbsUser.getLastName());
         else
             map.put("lName", "last");
 

@@ -104,7 +104,7 @@ public class MainMenuServlet extends SecureController {
             return;
         }
         currentPublicStudy = study;
-        CoreResources.setRequestSchema(request, currentSchema);
+        CoreResources.setRequestSchema(request, study.getSchemaName());
         currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
         session.setAttribute("publicStudy", currentPublicStudy);
         session.setAttribute("study", currentStudy);

@@ -89,8 +89,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
 
     private ArrayList getRoles() {
-        ArrayList roles = Role.toArrayList();
-        roles.remove(Role.ADMIN);
+        ArrayList roles = Role.toStudyArrayList();
 
         return roles;
     }
@@ -99,13 +98,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         ResourceBundle resterm = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getTermsBundle();
         String key = null;
         if (siteFlag) {
-            for (Iterator it = getRoles().iterator(); it.hasNext(); ) {
-                Role role = (Role) it.next();
-                String value = (String) Role.siteRoleMap.get(role.getId());
-                if (StringUtils.isNotEmpty(value))
-                    return value;
-                return "invalid";
-            }
+            String value = (String) Role.sbsSiteRoleMap.get(givenRole);
+            if (StringUtils.isNotEmpty(value))
+                return value;
+            return "invalid";
         } else {
             for (Iterator it = getRoles().iterator(); it.hasNext(); ) {
                 Role role = (Role) it.next();
@@ -131,7 +127,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 }
                 String value = resterm.getString(key).trim();
                 if (StringUtils.equals(givenRole, value))
-                    return Role.getByDesc(value).getName();
+                    return Role.getByRoleDesc(value).getName();
             }
         }
         return null;
@@ -280,7 +276,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     private boolean createSchema(String schemaName) throws Exception {
         try {
-           schemaServiceDao.createStudySchema(schemaName);
+            schemaServiceDao.createStudySchema(schemaName);
         } catch (Exception e) {
             logger.error("Error while creating a liquibase schema:" + schemaName);
             logger.error(e.getMessage(), e);

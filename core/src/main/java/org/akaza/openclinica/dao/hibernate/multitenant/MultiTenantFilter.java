@@ -77,13 +77,6 @@ import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdent
         chain.doFilter(req, response);
     }
 
-    private String getSchemaFromStudyOid(String studyOid) {
-        DataSource ds = getDataSource();
-        StudyDAO studyDAO = new StudyDAO(ds);
-        StudyBean studyBean = studyDAO.findByUniqueIdentifier(studyOid);
-        return studyBean.getSchemaName();
-    }
-
     private String getRequestSchema(HttpServletRequest req, HttpSession session) {
         String tenant = null;
         String path = StringUtils.substringAfterLast(req.getRequestURI(), "/");

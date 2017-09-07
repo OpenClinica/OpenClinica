@@ -338,11 +338,11 @@
                 var qer = document.startForm<c:out value="${dedc.edc.crf.id}"/>.versionId<c:out value="${dedc.edc.crf.id}"/>.value;
                 document.startForm<c:out value="${dedc.edc.crf.id}"/>.formLayoutId.value=qer;
                 document.getElementById('ide1-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>').href =
-                    buildUrl(qer,'<c:out value="${studyEvent.id}"/>','<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${originatingPage}"/>' );
+                    buildUrl(qer,'<c:out value="${studyEvent.id}"/>','<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${originatingPage}"/>','<c:out value="edit"/>'  );
                         document.getElementById('ide2-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>').href =
-                    buildUrl(qer,'<c:out value="${studyEvent.id}"/>','<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${originatingPage}"/>' );
+                    buildUrl(qer,'<c:out value="${studyEvent.id}"/>','<c:out value="${dedc.eventCRF.id}"/>','<c:out value="${originatingPage}"/>','<c:out value="view"/>' );
             }
-                function buildUrl(formLayoutId, studyEventId, eventCRFStatusId, originatingPage,mode){
+                function buildUrl(formLayoutId, studyEventId, eventCRFStatusId, originatingPage , mode){
                      return "EnketoFormServlet?formLayoutId="+ formLayoutId +
                              "&studyEventId=" + studyEventId +
                              "&eventCrfId=" + eventCRFStatusId +
