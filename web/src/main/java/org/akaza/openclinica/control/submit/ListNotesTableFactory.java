@@ -433,7 +433,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             // builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
             builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + SINGLE_ITEM_FLAVOR);
             builder.close();
-            builder.append("<span title=\"View\" border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
+            builder.append("<span title=\"View Query Only\" border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
             builder.append("&nbsp;");
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
