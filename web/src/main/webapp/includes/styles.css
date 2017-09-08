@@ -189,7 +189,7 @@ a:hover {
   padding: .5em 1em 1em 1em;
   width: 100%;
   max-width: calc(100vw - 180px);
-  overflow-x: scroll; }
+}
 
 #bt_Home,
 #bt_SubmitData,
