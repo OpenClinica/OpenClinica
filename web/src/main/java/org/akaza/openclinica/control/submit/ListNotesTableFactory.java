@@ -78,7 +78,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private ItemDAO itemDao;
     private EventCRFDAO eventCRFDao;
     private StudyBean currentStudy;
-    private ResourceBundle resword;
+    private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
     private ResourceBundle resformat;
     private List<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
     private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
@@ -433,20 +433,20 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             // builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
             builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + SINGLE_ITEM_FLAVOR);
             builder.close();
-            builder.append("<span title=\"View Query Only\" border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
+            builder.append("<span title='" + resword.getString("View_Query_Only") + "' border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
             builder.append("&nbsp;");
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
                 if (dnb.getEntityType() != "eventCrf") {
                     builder.a().href("EnterDataForStudyEvent?eventId=" + studySubjectBean.getId());
                     builder.close();
-                    builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
+                    builder.append("<span title='" + resword.getString("View_Query_Within_Record") + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                     builder.aEnd();
                 } else {
                     if (dnb.getStageId() == 5) {
                         builder.a().href("EnterDataForStudyEvent?eventId=" + studySubjectBean.getId());
                         builder.close();
-                        builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
+                        builder.append("<span title='" + resword.getString("View_Query_Within_Record") + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                         builder.aEnd();
                     }
                 }
