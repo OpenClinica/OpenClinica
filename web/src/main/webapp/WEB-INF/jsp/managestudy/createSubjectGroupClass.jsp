@@ -12,7 +12,7 @@
 <tr id="sidebar_Instructions_open" style="display: none">
     <td class="sidebar_tab">
 
-    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><ispan class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
 
     <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -26,7 +26,7 @@
   <tr id="sidebar_Instructions_closed" style="display: all">
     <td class="sidebar_tab">
 
-    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
 
     <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -53,7 +53,7 @@
   }
    //-->
 </script>
-<h1><span class="title_manage"><fmt:message key="create_a_subject_group_class" bundle="${resword}"/> </span></h1><br/>
+<h1><span class="title_manage"><fmt:message key="create_a_subject_group_class" bundle="${resword}"/></span></h1>
 
 <form action="CreateSubjectGroupClass" method="post">
 * <fmt:message key="indicates_required_field" bundle="${resword}"/><br>

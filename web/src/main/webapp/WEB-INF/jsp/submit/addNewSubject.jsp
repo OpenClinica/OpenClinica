@@ -6,7 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 
 <jsp:include page="../include/submit-header.jsp"/>
 
@@ -136,7 +136,8 @@
 					<td valign="top"><div class="formfieldXL_BG">
 						<input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" size="30" class="formfieldXL">
 					</div></td>
-					<td>&nbsp;*</td>
+					<td>&nbsp;* <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+					<span class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></span></a></c:if></td>
 				</tr>
 			</table>
 		</td>
@@ -216,6 +217,11 @@
                         </script>
 
                     </a>
+					<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+					  <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
+					    <span class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></span>
+					  </a>
+					</c:if>
 					</td>
 				</tr>
 				<tr>
@@ -260,6 +266,10 @@
            <span class="formlabel">&nbsp;*</span>
         </c:when>
         </c:choose>
+        <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
+	        <a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
+	        <span class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></span></a>
+	    </c:if>
 	</td>
 	</tr>
 	
@@ -291,7 +301,8 @@
                     </a>
                     </td>
 					<td>
-				</td>
+					<%--(<fmt:message key="date_format" bundle="${resformat}"/>)--%> <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+					<span class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></span></a></c:if></td>
 				</tr>
 				
 			</table>
@@ -311,7 +322,8 @@
 					<td valign="top"><div class="formfieldM_BG">
 						<input onfocus="this.select()" type="text" name="yob" size="15" value="<c:out value="${yob}" />" class="formfieldM" />
 					</td>
-					<td>(<fmt:message key="date_format_year" bundle="${resformat}"/>) *</td>
+					<td>(<fmt:message key="date_format_year" bundle="${resformat}"/>) *<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a href="#" onClick="openDSNoteWindow('CreateDiscrepancyNote?name=subject&field=yob&column=date_of_birth','spanAlert-yob'); return false;">
+					<span class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></span></a></c:if></td>
 				</tr>
 				<tr>
 					<td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yob"/></jsp:include></td>

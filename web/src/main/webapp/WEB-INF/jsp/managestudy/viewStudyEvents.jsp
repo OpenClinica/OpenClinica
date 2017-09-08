@@ -74,13 +74,13 @@
    </c:when>
    <c:otherwise>
     <div class="title_manage">
-   </c:otherwise>
-  </c:choose>
- <fmt:message key="view_all_events_in" bundle="${resword}"/> <c:out value="${study.name}"/>
-   <a href="javascript:openDocWindow('ViewStudyEvents?print=yes&<c:out value="${queryUrl}"/>')">
-  <span class="icon icon-print"></a>
-  </div>
-  </h1></span>
+      </c:otherwise>
+      </c:choose>
+      <fmt:message key="view_all_events_in" bundle="${resword}"/> <c:out value="${study.name}"/>
+      <a href="javascript:openDocWindow('ViewStudyEvents?print=yes&<c:out value="${queryUrl}"/>')">
+      <span class="icon icon-print"></span></a>
+    </div>
+</h1>
 
 
 <div style="width: 980px">
