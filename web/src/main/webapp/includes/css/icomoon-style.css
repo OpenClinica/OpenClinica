@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('../fonts/icomoon.eot?qrwzmi');
-  src:  url('../fonts/icomoon.eot?qrwzmi#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon.ttf?qrwzmi') format('truetype'),
-    url('../fonts/icomoon.woff?qrwzmi') format('woff'),
-    url('../fonts/icomoon.svg?qrwzmi#icomoon') format('svg');
+  src:  url('../fonts/icomoon.eot?w30xif');
+  src:  url('../fonts/icomoon.eot?w30xif#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon.ttf?w30xif') format('truetype'),
+    url('../fonts/icomoon.woff?w30xif') format('woff'),
+    url('../fonts/icomoon.svg?w30xif#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,8 +24,26 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-icon-sdv-text:before {
-  content: "\e900";
+.icon-archive:before {
+  content: "\e914";
+}
+.icon-question-circle:before {
+  content: "\e912";
+}
+.icon-question:before {
+  content: "\e913";
+}
+.icon-caret-right:before {
+  content: "\e90e";
+}
+.icon-caret-left:before {
+  content: "\e90f";
+}
+.icon-caret-up:before {
+  content: "\e910";
+}
+.icon-caret-down:before {
+  content: "\e911";
 }
 .icon-doc:before {
   content: "\e800";
@@ -72,74 +90,73 @@
 .icon-print:before {
   content: "\e80e";
 }
+.icon-doc-text:before {
+  content: "\f0f6";
+}
+.icon-flag-empty:before {
+  content: "\f11d";
+}
+.icon-pencil-squared:before {
+  content: "\f14b";
+}
+.icon-file-excel:before {
+  content: "\f1c3";
+}
+.icon-trash:before {
+  content: "\f1f8";
+}
+.icon-stop-circle:before {
+  content: "\f28d";
+}
 .icon-icon-sign:before {
-  content: "\e901";
-}
-.icon-icon-reassign-old:before {
-  content: "\e902";
-}
-.icon-icon-stop:before {
-  content: "\e903";
-}
-.icon-icon-removeRole2:before {
-  content: "\e904";
-}
-.icon-icon-locked:before {
-  content: "\e905";
-}
-.icon-icon-reassign:before {
-  content: "\e906";
-}
-.icon-icon-dataEntryCompleted:before {
-  content: "\e907";
-}
-.icon-icon-newVersion:before {
-  content: "\e908";
+  content: "\e900";
+  color: #27ae60;
 }
 .icon-icon-sign2:before {
-  content: "\e909";
+  content: "\e908";
+  color: #27ae60;
 }
 .icon-icon-removeRole:before {
-  content: "\e90a";
+  content: "\e909";
 }
-.icon-icon-reassign2:before {
-  content: "\e90b";
+.icon-icon-removeRole2:before {
+  content: "\e903";
 }
-.icon-icon-unArchive:before {
-  content: "\e90c";
-}
-.icon-icon-unsavedData:before {
-  content: "\e90d";
+.icon-icon-stop:before {
+  content: "\e902";
 }
 .icon-icon-doubleDataEntry:before {
-  content: "\e90e";
+  content: "\e90d";
 }
-.icon-caret-right:before {
-  content: "\e90f";
+.icon-icon-unsavedData:before {
+  content: "\e90c";
 }
-.icon-caret-left:before {
-  content: "\e910";
+.icon-icon-unArchive:before {
+  content: "\e90b";
 }
-.icon-caret-up:before {
-  content: "\e911";
+.icon-icon-reassign2:before {
+  content: "\e90a";
 }
-.icon-caret-down:before {
-  content: "\e912";
+.icon-icon-reassign-old:before {
+  content: "\e901";
 }
-.icon-question-circle:before {
-  content: "\e913";
+.icon-icon-locked:before {
+  content: "\e904";
 }
-.icon-question:before {
-  content: "\e914";
+.icon-icon-reassign:before {
+  content: "\e905";
 }
-.icon-archive:before {
-  content: "\e915";
+.icon-icon-dataEntryCompleted:before {
+  content: "\e906";
 }
-.icon-clock2:before {
-  content: "\e94f";
+.icon-icon-newVersion:before {
+  content: "\e907";
 }
 .icon-redo:before {
   content: "\e966";
+}
+.icon-clock2:before {
+  content: "\e94f";
 }
 .icon-redo2:before {
   content: "\e968";
@@ -158,22 +175,4 @@
 }
 .icon-checkbox-checked:before {
   content: "\ea52";
-}
-.icon-doc-text:before {
-  content: "\f0f6";
-}
-.icon-flag-empty:before {
-  content: "\f11d";
-}
-.icon-pencil-squared:before {
-  content: "\f14b";
-}
-.icon-file-excel:before {
-  content: "\f1c3";
-}
-.icon-trash:before {
-  content: "\f1f8";
-}
-.icon-stop-circle:before {
-  content: "\f28d";
 }

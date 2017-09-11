@@ -1143,11 +1143,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String studySubjectLabel = studySubject.getLabel();
 
         eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).close();
-        eventDiv.append(subjectText).append(": ").append(studySubjectLabel).br();
-        eventDiv.append(eventText).append(": ").append(sed.getName()).br();
+        eventDiv.append(subjectText).append(" : ").append(studySubjectLabel).br();
+        eventDiv.append(eventText).append(" : ").append(sed.getName()).br();
 
         if (!sed.isRepeating()) {
-            eventDiv.append(resword.getString("status")).append(":").append(eventStatus.getName()).br();
+            eventDiv.br().bold().append(resword.getString("status")).append(" : ").append(eventStatus.getName()).br();
             eventDiv.tdEnd();
             eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
             linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
