@@ -1340,11 +1340,9 @@ function setImageInParentWin(strParentWinImageName,strParentWinImageFullPath) {
 
     if (window.opener && !window.opener.closed) {
         //alert(strParentWinImageName);
-        objImage = MM_findObjInParentWin(strParentWinImageName);
+        objImage = window.opener.document.getElementById(strParentWinImageName);
         if (objImage != null) {
-            //alert(objImage.name);
-            //alert(objImage.src);
-            objImage.src = strParentWinImageFullPath;
+            objImage.className = strParentWinImageFullPath;
         }
 
     }

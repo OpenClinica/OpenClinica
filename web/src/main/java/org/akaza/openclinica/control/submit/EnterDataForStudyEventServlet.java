@@ -71,14 +71,17 @@ public class EnterDataForStudyEventServlet extends SecureController {
     // property; this
     // value will be saved as a request attribute
     public final static String HAS_LOCATION_NOTE = "hasLocationNote";
+    public final static String LOCATION_NOTE = "locationNote";
     // The study event has an existing discrepancy note related to its start
     // date property; this
     // value will be saved as a request attribute
     public final static String HAS_START_DATE_NOTE = "hasStartDateNote";
+    public final static String START_DATE_NOTE = "startDateNote";
     // The study event has an existing discrepancy note related to its end date
     // property; this
     // value will be saved as a request attribute
     public final static String HAS_END_DATE_NOTE = "hasEndDateNote";
+    public final static String END_DATE_NOTE = "endDateNote";
 
     private StudyEventBean getStudyEvent(int eventId) throws Exception {
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
@@ -624,11 +627,14 @@ public class EnterDataForStudyEventServlet extends SecureController {
         for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
             if ("location".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
                 request.setAttribute(HAS_LOCATION_NOTE, "yes");
+                request.setAttribute(LOCATION_NOTE, discrepancyNoteBean);
             } else if ("start_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
                 request.setAttribute(HAS_START_DATE_NOTE, "yes");
+                request.setAttribute(START_DATE_NOTE, discrepancyNoteBean);
 
             } else if ("end_date".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
                 request.setAttribute(HAS_END_DATE_NOTE, "yes");
+                request.setAttribute(END_DATE_NOTE, discrepancyNoteBean);
             }
 
         }
