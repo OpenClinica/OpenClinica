@@ -850,7 +850,7 @@
 <td>
 <input type="submit" name="Submit" value="<fmt:message key="proceed_to_enter_data" bundle="${resword}"/>" class="button_long" />
 </td>
-<td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="javascript:myCancel();"/></td>
+<td><input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="javascript:goBack();"/></td>
 </tr></table>
 </form>
 <c:set var="role" value="${currentRole.role}" />

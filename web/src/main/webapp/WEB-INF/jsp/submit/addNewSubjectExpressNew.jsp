@@ -73,7 +73,7 @@
 <form name="subjectForm" action="AddNewSubject" method="post">
 <input type="hidden" name="subjectOverlay" value="true">
 
-<div style="width: 500px; height: 550px; background:#FFFFFF; cursor:default">
+<div style="width: 450px; height: 550px; background:#FFFFFF; cursor:default">
 <table border="0" cellpadding="0" align="center">
     <tr style="height:10px;">
         <center><h3><fmt:message key="add_new_subject" bundle="${resword}"/></h3></center>
@@ -83,7 +83,7 @@
         <td class="formlabel" align="left">
             <jsp:include page="../include/showSubmitted.jsp" />
             <input type="hidden" name="addWithEvent" value="1"/>
-            <fmt:message key="study_subject_ID" bundle="${resword}"/>:</td>
+            <fmt:message key="study_subject_ID" bundle="${resword}"/></td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
@@ -110,7 +110,7 @@
     <c:choose>
     <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
     <tr valign="top">
-        <td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
+        <td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/></td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
@@ -126,7 +126,7 @@
     </c:when>
     <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='optional'}">
     <tr valign="top">
-        <td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
+        <td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/></td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
@@ -150,7 +150,7 @@
     <tr valign="top" >
 
         <td class="formlabel" align="right">
-            <fmt:message key="enrollment_date" bundle="${resword}"/>:
+            <fmt:message key="enrollment_date" bundle="${resword}"/>
         </td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
@@ -181,7 +181,7 @@
 
     <tr valign="top">
         <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
-        <td class="formlabel" align="right"><fmt:message key="gender" bundle="${resword}"/>:</td>
+        <td class="formlabel" align="right"><fmt:message key="gender" bundle="${resword}"/></td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
@@ -228,7 +228,7 @@
     <c:choose>
     <c:when test="${study.studyParameterConfig.collectDob == '1'}">
     <tr valign="top">
-        <td class="formlabel" align="right"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td>
+        <td class="formlabel" align="right"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
@@ -257,7 +257,7 @@
     </c:when>
     <c:when test="${study.studyParameterConfig.collectDob == '2'}">
     <tr valign="top">
-        <td class="formlabel" align="right"><fmt:message key="year_of_birth" bundle="${resword}"/>:</td>
+        <td class="formlabel" align="right"><fmt:message key="year_of_birth" bundle="${resword}"/></td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
@@ -309,7 +309,7 @@
 </c:if>
 
     <tr valign="top">
-        <td class="formlabel" align="right"><fmt:message key="SED_2" bundle="${resword}"/>:</td>
+        <td class="formlabel" align="right"><fmt:message key="SED_2" bundle="${resword}"/></td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr><td>
@@ -336,7 +336,7 @@
 
     <tr valign="top">
         <td class="formlabel" align="right">
-            <fmt:message key="start_date" bundle="${resword}"/>:
+            <fmt:message key="start_date" bundle="${resword}"/>
         </td>
           <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">

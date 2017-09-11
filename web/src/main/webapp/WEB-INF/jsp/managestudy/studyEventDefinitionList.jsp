@@ -15,31 +15,31 @@
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
-		<td class="sidebar_tab">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-		<fmt:message key="instructions" bundle="${restext}"/>
+    <fmt:message key="instructions" bundle="${restext}"/>
 
-		<div class="sidebar_tab_content">
+    <div class="sidebar_tab_content">
         <fmt:message key="study_can_have_many_event_with_more_CRF" bundle="${restext}"/>
         <br><br>
         <fmt:message key="click_up_down_to_order" bundle="${restext}"/>
          <br><br>
         <fmt:message key="event_also_locked_prevent" bundle="${restext}"/>
-		</div>
+    </div>
 
-		</td>
+    </td>
 
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: none">
-		<td class="sidebar_tab">
+  </tr>
+  <tr id="sidebar_Instructions_closed" style="display: none">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
 
-		<fmt:message key="instructions" bundle="${restext}"/>
+    <fmt:message key="instructions" bundle="${restext}"/>
 
-		</td>
+    </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
@@ -47,13 +47,13 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope="request" id="defSize" type="java.lang.Integer" />
 <h1><span class="title_manage"><fmt:message key="manage_all_event_definitions_in_study" bundle="${restext}"/> <c:out value="${study.name}"/>
-    <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+    </span></h1>
 
 <div style="float:right;padding-right:6px;width:8%;clear:both">
    <a href="javascript:processPrintCRFRequest('rest/metadata/html/print/<c:out value="${study.oid}"/>/*/*')"
    onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-   onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
-   name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" title="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" align="left" hspace="6"></a>
+   onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><span
+   name="bt_Print1" class="icon icon-print" border="0" alt="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" title="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" align="left" hspace="6"></a>
    </div>
 <div style="clear:both">
 
