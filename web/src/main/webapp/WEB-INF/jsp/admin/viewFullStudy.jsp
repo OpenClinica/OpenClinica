@@ -73,12 +73,12 @@
 
 
  </script>
-<h1 style="margin: 0em; "><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1>
+<h1 style="margin: 0em; "><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1></br>
 
 
-<fmt:message key="download_study_meta" bundle="${restext}"/>.
+<fmt:message key="download_study_meta" bundle="${restext}"/>
 
-( <fmt:message key="" bundle="${restext}"/> <a href="ListStudySubjects">Subject Matrix</a>).
+(<a href="ListStudySubjects">Subject Matrix</a>).
 
 <br><br>
 <a href="javascript:leftnavExpand('overview');" style="text-decoration:none;">

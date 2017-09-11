@@ -114,7 +114,7 @@
             <div class="title_manage">
                 <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/>
            </div>
-        </h1>
+        </h1><br/>
         </td>
     </tr>
 </table>

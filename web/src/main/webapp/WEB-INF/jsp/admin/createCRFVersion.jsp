@@ -78,7 +78,7 @@
      </c:otherwise>
  </c:choose>
 </span>
-</h1>
+</h1><br/>
 
 <script type="text/JavaScript" language="JavaScript">
 <!--

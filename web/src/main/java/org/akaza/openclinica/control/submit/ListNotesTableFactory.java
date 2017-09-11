@@ -78,7 +78,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private ItemDAO itemDao;
     private EventCRFDAO eventCRFDao;
     private StudyBean currentStudy;
-    private ResourceBundle resword;
+    private ResourceBundle resword = ResourceBundleProvider.getWordsBundle();
     private ResourceBundle resformat;
     private List<DiscrepancyNoteBean> allNotes = new ArrayList<DiscrepancyNoteBean>();
     private ArrayList<StudyEventDefinitionBean> studyEventDefinitions;
@@ -108,20 +108,20 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         tableFacade.setColumnProperties("studySubject.label",
                 "discrepancyNoteBean.createdDate",
-                "discrepancyNoteBean.resolutionStatus", 
+                "discrepancyNoteBean.resolutionStatus",
                 "siteId",
-                "discrepancyNoteBean.updatedDate", 
-                "age", 
-                "days", 
-                "eventName", 
-                "eventStartDate", 
-                "crfName", 
+                "discrepancyNoteBean.updatedDate",
+                "age",
+                "days",
+                "eventName",
+                "eventStartDate",
+                "crfName",
                 "crfStatus",
                 "discrepancyNoteBean.detailedNotes",
-                "numberOfNotes", 
+                "numberOfNotes",
                 "discrepancyNoteBean.user",
-                "entityName", 
-                "entityValue", 
+                "entityName",
+                "entityValue",
                 "discrepancyNoteBean.entityType",
                 "actions");
 
@@ -146,7 +146,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("numberOfNotes"), resword.getString("of_notes"), null, null, false, false);
         configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"), new AssignedUserCellEditor(), null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.entityType"), resword.getString("entity_type"), null, null, true, false);
-        
+
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
     }
@@ -156,7 +156,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         ListNotesTableToolbar toolbar = new ListNotesTableToolbar(showMoreLink);
         toolbar.setStudyHasDiscNotes(studyHasDiscNotes);
-        
+
         toolbar.setResolutionStatus(resolutionStatus);
         toolbar.setModule(module);
         toolbar.setResword(resword);
@@ -225,7 +225,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
             h.put("studySubject", discrepancyNoteBean.getStudySub());
             h.put("studySubject.label", discrepancyNoteBean.getStudySub().getLabel());
-            h.put("discrepancyNoteBean.disType", discrepancyNoteBean.getDisType());
             h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
             h.put("age", discrepancyNoteBean.getAge());
             h.put("days", discrepancyNoteBean.getDays());
@@ -459,26 +458,26 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
             }
             builder.close();
-            builder.append("<span title=\"View\" border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
+            builder.append("<span title='" + resword.getString("View_Query_Only") + "' border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
             builder.append("&nbsp;");
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
                 if (dnb.getEntityType() != "eventCrf") {
                     builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
                     builder.close();
-                    builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
+                    builder.append("<span title='" + resword.getString("View_Query_Within_Record") + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                     builder.aEnd();
                 } else {
                     if (dnb.getStageId() == 5) {
                         builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
                         builder.close();
-                        builder.append("<span title=\"View within record\" border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
+                        builder.append("<span title='" + resword.getString("View_Query_Within_Record") + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
                         builder.aEnd();
                     }
                 }
             }
 
-           
+
 
             return builder.toString();
         }

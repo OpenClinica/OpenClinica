@@ -85,9 +85,9 @@
 <c:choose>
 <c:when test="${newDataset.id>0}">
 <h1 ><span class="title_manage"><fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="specify_dataset_properties" bundle="${resword}"/>
-: <c:out value="${newDataset.name}"/></span></h1>
+: <c:out value="${newDataset.name}"/></span></h1><br/>
 </c:when>
-<c:otherwise><h1 style="margin: 0em"><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="specify_dataset_properties" bundle="${resword}"/></span></h1>
+<c:otherwise><h1 style="margin: 0em"><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="specify_dataset_properties" bundle="${resword}"/></span></h1><br/>
 </c:otherwise>
 </c:choose>
 
