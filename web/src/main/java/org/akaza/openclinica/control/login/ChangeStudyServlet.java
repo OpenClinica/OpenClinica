@@ -237,7 +237,7 @@ public class ChangeStudyServlet extends SecureController {
             currentPublicStudy = newPublicStudy;
             // change user's active study id
             UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-            ub.setActiveStudyId(newStudy.getId());
+            ub.setActiveStudyId(newPublicStudy.getId());
             ub.setUpdater(ub);
             ub.setUpdatedDate(new java.util.Date());
             udao.update(ub);
