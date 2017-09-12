@@ -126,39 +126,10 @@
                         <td class="table_cell"><c:out value="${studyEvent.studyEventDefinition.name}"/>&nbsp;</td>
                     </tr>
                     <tr>
-                        <td class="table_header_column"><fmt:message key="location" bundle="${resword}"/></td>
-                        <td class="table_cell">
-                            <c:set var="eventLocation" value="${studyEvent.location}"/>
-                            <c:if test="${studyEvent.location eq ''}">
-                                <c:set var="eventLocation" value="N/A"/>
-                            </c:if>
-                            <span style="float:left">
-                                <c:out value="${eventLocation}"/>
-                            </span>
-                            <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-                                <c:set var="isNew" value="${hasLocationNote eq 'yes' ? 0 : 1}"/>
-                                <c:choose>
-                                    <c:when test="${hasLocationNote eq 'yes'}">
-                                     <span style="float:right"><a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg','spanAlert-location'); return false;">
-                                     <span id="flag_location" name="flag_location" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                                     </a>
-                                     </span>
-                                    </c:when>
-                                    <c:otherwise>
-                                       <c:if test="${!study.status.locked}">
-                                        <span style="float:right">
-                                        <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-location'); return false;">
-                                        <span id="flag_location" name="flag_location" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                                        </a></span>
-                                       </c:if>
-                                    </c:otherwise>
-                                </c:choose>
-                            </c:if></td>
-                    </tr>
-                    <tr>
                         <td class="table_header_column"><fmt:message key="study_subject_oid" bundle="${resword}"/></td>
                         <td class="table_cell"><c:out value="${studySubject.oid}"/></td>
                     </tr>
+                    
                     <tr>
                         <td class="table_divider" colspan="2">&nbsp;</td>
                     </tr>
