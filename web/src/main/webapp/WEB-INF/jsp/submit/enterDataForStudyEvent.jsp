@@ -129,7 +129,6 @@
                         <td class="table_header_column"><fmt:message key="study_subject_oid" bundle="${resword}"/></td>
                         <td class="table_cell"><c:out value="${studySubject.oid}"/></td>
                     </tr>
-                    
                     <tr>
                         <td class="table_divider" colspan="2">&nbsp;</td>
                     </tr>
@@ -228,7 +227,7 @@
     <td class="table_header_row_left"><fmt:message key="CRF_name" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="version" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="last_modified_by" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
 </tr>
 <c:set var="rowCount" value="${0}" />
@@ -347,7 +346,7 @@
     <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
         <c:choose>
             <c:when test="${dedc.eventCRF.id>0}">
-                <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-icon-dataEntryCompleted orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>"></td>
+                <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>"></td>
             </c:when>
             <c:otherwise>
                 <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>"></td>
@@ -447,10 +446,10 @@
 
     <c:choose>
         <c:when test="${dec.stage.initialDE}">
-            <span class="icon icon-icon-doubleDataEntry orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
+            <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
         </c:when>
         <c:when test="${dec.stage.initialDE_Complete}">
-            <span class="icon icon-icon-dataEntryCompleted orange" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
+            <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
         </c:when>
         <c:when test="${dec.stage.doubleDE}">
             <span class="icon icon-icon-doubleDataEntry orange" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>" title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
