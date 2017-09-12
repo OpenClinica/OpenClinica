@@ -76,9 +76,9 @@
 <h1 style="margin: 0em; "><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1></br>
 
 
-<fmt:message key="download_study_meta" bundle="${restext}"/>
-
-(<a href="ListStudySubjects">Subject Matrix</a>).
+<a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"><fmt:message key="download_study_meta" bundle="${restext}"/></a>.
+<fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
+<a href="ListStudySubjects">Subject Matrix</a>.
 
 <br><br>
 <a href="javascript:leftnavExpand('overview');" style="text-decoration:none;">
@@ -654,9 +654,9 @@
             <fmt:message key="${studyToView.studyParameterConfig.eventLocationRequired}" bundle="${resword}"/>
        </td>
     </tr>
-    
-    
-    <c:if test="${portalURL!= '' && portalURL!= null}">   
+
+
+    <c:if test="${portalURL!= '' && portalURL!= null}">
     <tr valign="top">
         <td class="table_header_column"><fmt:message key="participant_portal" bundle="${resword}"/></td>
         <td class="table_cell">
@@ -664,7 +664,7 @@
        </td>
       </tr>
    </c:if>
-    
+
 
     <c:if test="${moduleManager!= '' && moduleManager!= null}">
     <tr valign="top">
@@ -674,7 +674,7 @@
        </td>
       </tr>
    </c:if>
-    
+
 </table>
 
 </div>
