@@ -65,6 +65,4 @@
 <p></p>
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showSiteRow.jsp" /></c:import>
 <br><br>
-
-<div class="homebox_bullets"><a href="pages/studymodule"><fmt:message key="go_back_build_study_page" bundle="${resword}"/></a></div>
 <jsp:include page="../include/footer.jsp"/>

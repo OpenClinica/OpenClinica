@@ -126,36 +126,6 @@
                         <td class="table_cell"><c:out value="${studyEvent.studyEventDefinition.name}"/>&nbsp;</td>
                     </tr>
                     <tr>
-                        <td class="table_header_column"><fmt:message key="location" bundle="${resword}"/></td>
-                        <td class="table_cell">
-                            <c:set var="eventLocation" value="${studyEvent.location}"/>
-                            <c:if test="${studyEvent.location eq ''}">
-                                <c:set var="eventLocation" value="N/A"/>
-                            </c:if>
-                            <span style="float:left">
-                                <c:out value="${eventLocation}"/>
-                            </span>
-                            <c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}">
-                                <c:set var="isNew" value="${hasLocationNote eq 'yes' ? 0 : 1}"/>
-                                <c:choose>
-                                    <c:when test="${hasLocationNote eq 'yes'}">
-                                     <span style="float:right"><a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg','spanAlert-location'); return false;">
-                                     <span id="flag_location" name="flag_location" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                                     </a>
-                                     </span>
-                                    </c:when>
-                                    <c:otherwise>
-                                       <c:if test="${!study.status.locked}">
-                                        <span style="float:right">
-                                        <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&id=${studyEvent.id}&subjectId=${studySubject.id}&name=studyEvent&field=location&column=location&strErrMsg=','spanAlert-location'); return false;">
-                                        <span id="flag_location" name="flag_location" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                                        </a></span>
-                                       </c:if>
-                                    </c:otherwise>
-                                </c:choose>
-                            </c:if></td>
-                    </tr>
-                    <tr>
                         <td class="table_header_column"><fmt:message key="study_subject_oid" bundle="${resword}"/></td>
                         <td class="table_cell"><c:out value="${studySubject.oid}"/></td>
                     </tr>
@@ -257,7 +227,7 @@
     <td class="table_header_row_left"><fmt:message key="CRF_name" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="version" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="initial_data_entry" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="last_modified_by" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="actions" bundle="${resword}"/></td>
 </tr>
 <c:set var="rowCount" value="${0}" />
@@ -376,7 +346,7 @@
     <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
         <c:choose>
             <c:when test="${dedc.eventCRF.id>0}">
-                <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-icon-dataEntryCompleted orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>"></td>
+                <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>"></td>
             </c:when>
             <c:otherwise>
                 <td class="table_cell" bgcolor="#F5F5F5" align="center"><span class="icon icon-doc" alt="<fmt:message key="not_started" bundle="${resword}"/>" title="<fmt:message key="not_started" bundle="${resword}"/>"></td>
@@ -476,10 +446,10 @@
 
     <c:choose>
         <c:when test="${dec.stage.initialDE}">
-            <span class="icon icon-icon-doubleDataEntry orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
+            <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
         </c:when>
         <c:when test="${dec.stage.initialDE_Complete}">
-            <span class="icon icon-icon-dataEntryCompleted orange" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
+            <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
         </c:when>
         <c:when test="${dec.stage.doubleDE}">
             <span class="icon icon-icon-doubleDataEntry orange" alt="<fmt:message key="double_data_entry" bundle="${resword}"/>" title="<fmt:message key="double_data_entry" bundle="${resword}"/>">
