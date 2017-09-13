@@ -4,9 +4,13 @@ import java.util.Set;
 
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+
 public class PublishingDTO {
 
+    @JsonProperty("versionIds")
     private Set<Long> versionIds;
+    @JsonProperty("publishedEnvType")
     private StudyEnvEnum publishedEnvType;
 
     public Set<Long> getVersionIds() {

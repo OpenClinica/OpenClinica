@@ -266,10 +266,6 @@ public class OdmImportServiceImpl implements OdmImportService {
         }
         if (publishedVersions.size() != 0) {
             String fmUrl = getCoreResources().getField("formManager").trim() + "/api/xlsForm/setPublishedEnvironment";
-            // String fmUrl = "http://oc.local:8090/api/xlsForm/setPublishedEnvironment";
-            publishedVersions.add((long) 1);
-            publishedVersions.add((long) 2);
-
             RestTemplate restTemplate = new RestTemplate();
             PublishingDTO dto = new PublishingDTO();
             dto.setPublishedEnvType(study.getEnvType());

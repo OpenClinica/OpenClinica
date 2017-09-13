@@ -497,8 +497,6 @@ public class XformMetaDataService {
                             }
                             // Save meta-data in database
                             saveFormMetadata(eicObject, version, eicObject.container, formLayoutDef, fileLinks);
-                            if (version.getPublishedEnvType().equals(null) || version.getPublishedEnvType().equals(null))
-                                version.setPublishedEnvType(StudyEnvEnum.NOT_PUBLISHED);
                             StudyEnvEnum existingEnv = version.getPublishedEnvType();
                             StudyEnvEnum publishingEnv = eicObject.currentStudy.getEnvType();
 
