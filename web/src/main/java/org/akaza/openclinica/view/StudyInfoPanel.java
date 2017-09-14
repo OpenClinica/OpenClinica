@@ -527,7 +527,7 @@ public class StudyInfoPanel implements Serializable {
     public String getStageImageText(DataEntryStage stage) {
         String answer = "";
         if (stage.isInitialDE()) {
-            answer = "<span class='icon icon-icon-doubleDataEntry orange' alt='Initial Data Entry'>";
+            answer = "<span class='icon icon-pencil-squared orange' alt='Initial Data Entry'>";
         } else if (stage.isInitialDE_Complete()) {
             answer = "<span class='icon icon-ok' alt='Initial Data Entry Complete'>";
         } else if (stage.isDoubleDE()) {
