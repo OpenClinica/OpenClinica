@@ -360,16 +360,16 @@ td.table_actions > table {
   border: 1px solid #ccc;
   margin: 1em 0; }
   .shaded_table tr:first-child td {
-    border-top: 0; }
+    border-top: 1px solid #ccc; }
   .shaded_table td {
     padding: .25em;
     border-top: 1px solid #ccc;
     border-left: 1px solid #ccc;
-    border-right: 0;
-    border-bottom: 0; }
+    border-right: 1px solid #ccc;
+    border-bottom:1px solid #ccc ; }
     .shaded_table td:first-child {
-      border-left: 0;
-      border-top: 0; }
+      border-left: 1px solid #ccc;
+      border-top: 1px solid #ccc; }
 
 .tablebox_center {
   font-size: .85rem;
