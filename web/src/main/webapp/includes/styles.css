@@ -23,19 +23,21 @@ input[type="text"], input[type="password"] {
   input[type="text"].navSearch, input[type="password"].navSearch {
     width: 13em; }
 
-input[type="submit"]:not(.navSearchButton), input[type="button"]:not(.navSearchButton) {
-  background: #618ebb;
-  background: linear-gradient(to bottom, #618ebb 0%, #3e6891 100%);
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  color: white;
-  font-size: 1em;
-  border-radius: .25em;
-  border: 0;
-  padding: .4em .9em;
-  margin: 0 .25em; }
-  input[type="submit"]:not(.navSearchButton):hover, input[type="button"]:not(.navSearchButton):hover {
-    background: #3e6891;
-    background: linear-gradient(to top, #618ebb 0%, #3e6891 100%); }
+input[type="submit"], input[type="button"] {
+  -webkit-appearance: none; }
+  input[type="submit"]:not(.navSearchButton), input[type="button"]:not(.navSearchButton) {
+    background: #618ebb;
+    background: linear-gradient(to bottom, #618ebb 0%, #3e6891 100%);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 1em;
+    border-radius: .25em;
+    border: 0;
+    padding: .4em .9em;
+    margin: 0 .25em; }
+    input[type="submit"]:not(.navSearchButton):hover, input[type="button"]:not(.navSearchButton):hover {
+      background: #3e6891;
+      background: linear-gradient(to top, #618ebb 0%, #3e6891 100%); }
 
 .navSearchButton {
   background: #3e6891;
@@ -57,7 +59,7 @@ body {
   font-size: 100%;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   margin: 0;
-  overflow-x: hidden;
+  overflow-x: scroll;
   width: 100% !important; }
   body > table {
     margin: 0 auto;
@@ -207,7 +209,7 @@ a:hover {
   padding: .5em 1em 1em 1em;
   width: 100%;
   max-width: calc(100vw - 180px);
-  }
+  overflow-x: scroll; }
   .aka_revised_content form > div, .content form > div {
     min-width: 60% !important; }
 
@@ -360,16 +362,16 @@ td.table_actions > table {
   border: 1px solid #ccc;
   margin: 1em 0; }
   .shaded_table tr:first-child td {
-    border-top: 1px solid #ccc; }
+    border-top: 0; }
   .shaded_table td {
     padding: .25em;
     border-top: 1px solid #ccc;
     border-left: 1px solid #ccc;
-    border-right: 1px solid #ccc;
-    border-bottom:1px solid #ccc ; }
+    border-right: 0;
+    border-bottom: 0; }
     .shaded_table td:first-child {
-      border-left: 1px solid #ccc;
-      border-top: 1px solid #ccc; }
+      border-left: 0;
+      border-top: 0; }
 
 .tablebox_center {
   font-size: .85rem;
@@ -380,8 +382,7 @@ td.table_actions > table {
     border-bottom: 1px solid #ccc; }
   .tablebox_center td {
     padding: .25em;
-    vertical-align: top;
-    width: auto; }
+    vertical-align: top; }
     .tablebox_center td.table_divider {
       border-bottom: 1px solid #ccc; }
     .tablebox_center td.table_cell_top {
@@ -537,16 +538,17 @@ td.table_actions > table {
   background-color: #f2e7b8; }
 
 .jmesa table:not(#studyAuditLogs) .odd > td, .jmesa table:not(#studyAuditLogs) .even > td, .jmesa table:not(#studyAuditLogs) .highlight > td {
-  padding: .25em .75em;
   vertical-align: top; }
 
 .jmesa table:not(#studyAuditLogs) .odd td, .jmesa table:not(#studyAuditLogs) .even td, .jmesa table:not(#studyAuditLogs) .highlight td {
   border: none;
   font-family: 'Open Sans', arial, helvetica, sans-serif;
   font-weight: 400;
-  hyphens: auto;
+  hyphens: none;
   line-height: 1.5em;
-  min-width: 2em; }
+  min-width: 2em;
+  height: 2.25em;
+  padding: .25em .75em; }
 
 .jmesa table:not(#studyAuditLogs) .odd a, .jmesa table:not(#studyAuditLogs) .even a, .jmesa table:not(#studyAuditLogs) .highlight a {
   text-decoration: none; }
@@ -555,7 +557,8 @@ td.table_actions > table {
   border-top: 1px solid #ccc;
   border-left: 1px solid #ccc;
   border-right: 0;
-  border-bottom: 0; }
+  border-bottom: 0;
+  padding: .25em; }
   .jmesa table#studyAuditLogs tbody.tbody tr.odd td:last-child, .jmesa table#studyAuditLogs tbody.tbody tr.even td:last-child, .jmesa table#studyAuditLogs tbody.tbody tr.highlight td:last-child {
     border-right: 1px solid #ccc; }
 
@@ -585,39 +588,33 @@ div#subjectEvents {
     padding: 0;
     margin: 0;
     list-style: none;
-    position: relative; }
-
-#userDropdown ul li {
-  display: inline-block;
-  list-style-image: none; }
-
-#userDropdown a {
-  display: block;
-  padding: 0 10px;
-  color: white;
-  line-height: 30px;
-  text-decoration: none; }
-
-#userDropdown a:hover {
-  background-color: #618ebb;
-  color: white; }
-
-/* Hide Dropdowns by Default */
-#userDropdown ul ul {
-  background-color: #00344c;
-  display: none;
-  position: absolute; }
-
-/* Display Dropdowns on Hover */
-#userDropdown ul li:hover > ul {
-  display: inherit; }
-
-/* Fisrt Tier Dropdown */
-#userDropdown ul ul li {
-  width: 170px;
-  float: none;
-  display: list-item;
-  position: relative; }
+    position: relative;
+    /* Hide Dropdowns by Default */ }
+    #userDropdown ul li {
+      display: inline-block;
+      list-style-image: none;
+      /* Display Dropdowns on Hover */ }
+      #userDropdown ul li:hover > ul, #userDropdown ul li:focus > ul {
+        display: inherit; }
+    #userDropdown ul ul {
+      background-color: #00344c;
+      display: none;
+      position: absolute;
+      /* Fisrt Tier Dropdown */ }
+      #userDropdown ul ul li {
+        width: 170px;
+        float: none;
+        display: list-item;
+        position: relative; }
+  #userDropdown a {
+    display: block;
+    padding: 0 10px;
+    color: white;
+    line-height: 30px;
+    text-decoration: none; }
+    #userDropdown a:hover, #userDropdown a:focus {
+      background-color: #618ebb;
+      color: white; }
 
 .vline, .vline_B {
   background-image: url(../images/leftbar_vline.gif);
@@ -655,3 +652,30 @@ table[width="160"] tr:nth-last-child(-n+2) td.sidebar_tab {
 
 .tablee_tools:first-child {
   text-align: right; }
+
+form[action="ExportExcelStudySubjectAuditLog"] ~ table {
+  border: 0 !important; }
+  form[action="ExportExcelStudySubjectAuditLog"] ~ table tr:last-child td {
+    border-bottom: 1px solid #ccc; }
+  form[action="ExportExcelStudySubjectAuditLog"] ~ table td {
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-right: 0;
+    border-bottom: 0;
+    padding: .25em; }
+    form[action="ExportExcelStudySubjectAuditLog"] ~ table td:last-child {
+      border-right: 1px solid #ccc; }
+    form[action="ExportExcelStudySubjectAuditLog"] ~ table td table {
+      border: 0 !important; }
+  form[action="ExportExcelStudySubjectAuditLog"] ~ table table {
+    width: 100%; }
+    form[action="ExportExcelStudySubjectAuditLog"] ~ table table table {
+      width: 100%; }
+
+div#subjectSDV img[alt="Separator"] {
+  margin: 0 .75em; }
+
+div#subjectSDV table#sdv {
+  width: 90%; }
+  div#subjectSDV table#sdv thead tr.toolbar td {
+    padding: .5em 0; }
