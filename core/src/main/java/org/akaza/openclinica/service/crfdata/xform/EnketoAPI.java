@@ -10,6 +10,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.Status;
+import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Study;
@@ -265,7 +266,7 @@ public class EnketoAPI {
         String redirect = editUrlObject.redirect;
         String goTo = editUrlObject.goTo;
         String studyOid = editUrlObject.studyOid;
-
+        EventCrf eventCrf = editUrlObject.eventCrf;
         EnketoURLResponse urlResponse = null;
 
         if (enketoURL == null)
@@ -283,7 +284,8 @@ public class EnketoAPI {
             // https://jira.openclinica.com/browse/OC-8269 Open Form when study is locked
             if (parentStudy.getStatus().equals(Status.LOCKED) || studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId())
                     || studyEvent.getStatusId().equals(Status.DELETED.getCode()) || studyEvent.getStatusId().equals(Status.AUTO_DELETED.getCode())
-                    || edc.getStatusId().equals(Status.DELETED.getCode()) || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())) {
+                    || edc.getStatusId().equals(Status.DELETED.getCode()) || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())
+                    || eventCrf.getStatusId().equals(Status.DELETED.getCode()) || eventCrf.getStatusId().equals(Status.AUTO_DELETED.getCode())) {
 
                 eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                 markComplete = false;
