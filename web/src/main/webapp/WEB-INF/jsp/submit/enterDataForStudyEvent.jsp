@@ -446,7 +446,7 @@
 
     <c:choose>
         <c:when test="${dec.stage.initialDE}">
-            <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry" bundle="${resword}"/>">
+            <span class="icon icon-pencil-squared orange" alt="<fmt:message key="data_entry_started" bundle="${resword}"/>" title="<fmt:message key="data_entry_started" bundle="${resword}"/>">
         </c:when>
         <c:when test="${dec.stage.initialDE_Complete}">
             <span class="icon icon-pencil-squared orange" alt="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>" title="<fmt:message key="initial_data_entry_complete" bundle="${resword}"/>">
