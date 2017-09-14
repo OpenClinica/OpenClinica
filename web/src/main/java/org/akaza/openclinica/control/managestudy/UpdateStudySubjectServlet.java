@@ -170,6 +170,8 @@ public class UpdateStudySubjectServlet extends SecureController {
 
                 forwardPage(Page.UPDATE_STUDY_SUBJECT);
             } else if ("confirm".equalsIgnoreCase(action)) {
+                List<DiscrepancyNoteBean> discNotes = getDiscNotesForSubjectStudySubject(study, subject.getId(), studySub.getId());
+                setRequestAttributesForNotes(discNotes);
                 confirm(sgdao);
 
             } else if ("submit".equalsIgnoreCase(action)) {// submit to DB
@@ -403,7 +405,6 @@ public class UpdateStudySubjectServlet extends SecureController {
 
                 String uniqueIdentifier = fp.getString("uniqueIdentifier");
                 if (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("required") &&
-                        !(subject.getUniqueIdentifier() == null || subject.getUniqueIdentifier().isEmpty() ) &&
                         (uniqueIdentifier == null || uniqueIdentifier.isEmpty())) {
                     Validator.addError(manualErrors, "uniqueIdentifier", resexception.getString("field_not_blank"));
                     
