@@ -3,6 +3,7 @@ package org.akaza.openclinica.service.crfdata.xform;
 import java.util.List;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
@@ -25,10 +26,11 @@ public class EditUrlObject {
     StudyEvent studyEvent;
     String mode;
     EventDefinitionCrf edc;
+    EventCrf eventCrf;
 
     public EditUrlObject(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete, String studyOid,
             List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode,
-            EventDefinitionCrf edc) {
+            EventDefinitionCrf edc, EventCrf eventCrf) {
         super();
         this.formLayout = formLayout;
         this.crfFlavor = crfFlavor;
@@ -45,6 +47,7 @@ public class EditUrlObject {
         this.studyEvent = studyEvent;
         this.mode = mode;
         this.edc = edc;
+        this.eventCrf = eventCrf;
     }
 
 }

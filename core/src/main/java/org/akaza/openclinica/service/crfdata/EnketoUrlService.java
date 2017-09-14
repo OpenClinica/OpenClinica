@@ -239,7 +239,7 @@ public class EnketoUrlService {
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
         EditUrlObject editUrlObject = new EditUrlObject(formLayout, crfFlavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
-                mediaList, goTo, flavor, role, study, studyEvent, mode, edc);
+                mediaList, goTo, flavor, role, study, studyEvent, mode, edc, eventCrf);
 
         EnketoURLResponse eur = enketo.registerAndGetEditURL(editUrlObject);
 
