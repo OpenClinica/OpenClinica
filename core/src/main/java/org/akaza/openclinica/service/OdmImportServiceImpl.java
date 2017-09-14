@@ -3,7 +3,9 @@ package org.akaza.openclinica.service;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
@@ -237,7 +239,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     private void saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Form[] fmCrfs) {
-
+        Set<Long> publishedVersions = new HashSet<>();
         for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
             String crfOid = odmFormDef.getOID();
             List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
@@ -260,30 +262,45 @@ public class OdmImportServiceImpl implements OdmImportService {
                     }
                 }
             }
-            saveOrUpdateCrfAndFormLayouts(crfOid, formLayoutDefs, fmCrfs, userAccount, study, crfName);
+            saveOrUpdateCrfAndFormLayouts(crfOid, formLayoutDefs, fmCrfs, userAccount, study, crfName, publishedVersions);
+        }
+        if (publishedVersions.size() != 0) {
+            String fmUrl = getCoreResources().getField("formManager").trim() + "/api/xlsForm/setPublishedEnvironment";
+            RestTemplate restTemplate = new RestTemplate();
+            PublishingDTO dto = new PublishingDTO();
+            dto.setPublishedEnvType(study.getEnvType());
+            dto.setVersionIds(publishedVersions);
+
+            try {
+                restTemplate.postForObject(fmUrl, dto, PublishingDTO.class);
+            } catch (Exception e) {
+                logger.info(e.getMessage());
+                throw new RuntimeException("Something went wrong !!");
+            }
         }
 
     }
 
     private void saveOrUpdateCrfAndFormLayouts(String crfOid, List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs, Form[] fmCrfs,
-            UserAccount userAccount, Study study, String crfName) {
+            UserAccount userAccount, Study study, String crfName, Set<Long> publishedVersions) {
 
         DataBinder dataBinder = new DataBinder(new FormLayout());
         Errors errors = dataBinder.getBindingResult();
         StudyBean currentStudy = new StudyBean();
         currentStudy.setId(study.getStudyId());
+        currentStudy.setEnvType(study.getEnvType());
 
         UserAccountBean ub = new UserAccountBean();
         ub.setId(userAccount.getUserId());
         ub.setActiveStudyId(currentStudy.getId());
-
         for (Form crf : fmCrfs) {
             if (crf.getOcoid().equals(crfOid)) {
                 crf.setName(crfName);
                 ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, currentStudy, ub, true, null);
-                xformService.executeIndividualCrf(eicObj);
+                xformService.executeIndividualCrf(eicObj, publishedVersions);
             }
         }
+
     }
 
     private List<ODMcomplexTypeDefinitionStudyEventDef> saveOrUpdateEvent(UserAccount userAccount, Study study,

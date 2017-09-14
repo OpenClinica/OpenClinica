@@ -7,9 +7,11 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
@@ -38,6 +40,7 @@ import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.datamap.ResponseSet;
 import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.domain.datamap.Section;
+import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.domain.datamap.VersioningMapId;
 import org.akaza.openclinica.domain.user.UserAccount;
@@ -143,6 +146,8 @@ public class XformMetaDataService {
 
     @Autowired
     private XformParser xformParser;
+
+    private CoreResources coreResources;
 
     @Transactional
     public FormLayout createCRFMetaData(CrfMetaDataObject cmdObject) throws Exception {
@@ -448,7 +453,7 @@ public class XformMetaDataService {
         return fileItem;
     }
 
-    public void executeIndividualCrf(ExecuteIndividualCrfObject eicObject) {
+    public ExecuteIndividualCrfObject executeIndividualCrf(ExecuteIndividualCrfObject eicObject, Set<Long> publishedVersions) {
         for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : eicObject.formLayoutDefs) {
 
             List<String> fileLinks = null;
@@ -488,16 +493,24 @@ public class XformMetaDataService {
                             eicObject.setContainer(xformContainer);
 
                             if (eicObject.errors.hasErrors()) {
-                                return;
+                                return eicObject;
                             }
                             // Save meta-data in database
                             saveFormMetadata(eicObject, version, eicObject.container, formLayoutDef, fileLinks);
+                            StudyEnvEnum existingEnv = version.getPublishedEnvType();
+                            StudyEnvEnum publishingEnv = eicObject.currentStudy.getEnvType();
+
+                            if ((publishingEnv.equals(StudyEnvEnum.TEST) && existingEnv.equals(StudyEnvEnum.NOT_PUBLISHED))
+                                    || (publishingEnv.equals(StudyEnvEnum.PROD) && !existingEnv.equals(StudyEnvEnum.PROD))) {
+                                publishedVersions.add(version.getId());
+                            }
+
                         }
                     }
                 }
             }
         }
-
+        return eicObject;
     }
 
     public void saveFormMetadata(ExecuteIndividualCrfObject eicObj, FormVersion version, XformContainer container,
