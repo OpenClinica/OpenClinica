@@ -19,6 +19,7 @@ import java.util.Map;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -471,9 +472,10 @@ public class UpdateStudyEventServlet extends SecureController {
                 // YW >>
                 studyEvent.setLocation(fp.getString(INPUT_LOCATION));
 
-                logger.debug("update study event...");
+                logger.debug("update study event and discrepancy notes...");
                 studyEvent.setUpdater(ub);
                 studyEvent.setUpdatedDate(new Date());
+                updateClosedQueriesForUpdatedStudySubjectFields(studyEvent);
                 StudyEventBean updatedStudyEvent = (StudyEventBean) sedao.update(studyEvent);
 
 
@@ -670,6 +672,51 @@ public class UpdateStudyEventServlet extends SecureController {
 
     
     
+    private void updateClosedQueriesForUpdatedStudySubjectFields(StudyEventBean updatedStudyEvent) {
+        StudyEventDAO seDAO = new StudyEventDAO(sm.getDataSource());
+        StudyEventBean existingStudyEvent = (StudyEventBean) seDAO.findByPK(updatedStudyEvent.getId());
+        DiscrepancyNoteDAO dnDAO = new DiscrepancyNoteDAO(sm.getDataSource());
+        List<DiscrepancyNoteBean> existingNotes = dnDAO.findExistingNoteForStudyEvent(existingStudyEvent);
+        
+        for (DiscrepancyNoteBean existingNote : existingNotes) { 
+            if (existingNote.getColumn().equals("start_date") && existingNote.getResStatus().equals(ResolutionStatus.CLOSED) &&
+                    existingStudyEvent.getDateStarted().getTime() != updatedStudyEvent.getDateStarted().getTime()) {
+                existingNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());
+                DiscrepancyNoteBean childNote = createChildNote(existingNote);
+                dnDAO.create(childNote);
+                dnDAO.createMapping(childNote);
+                dnDAO.update(existingNote);
+            }
+
+            if (existingNote.getColumn().equals("end_date") && existingNote.getResStatus().equals(ResolutionStatus.CLOSED) &&
+                    existingStudyEvent.getDateEnded().getTime() != updatedStudyEvent.getDateEnded().getTime()) {
+                existingNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());
+                DiscrepancyNoteBean childNote = createChildNote(existingNote);
+                dnDAO.create(childNote);
+                dnDAO.createMapping(childNote);
+                dnDAO.update(existingNote);
+            }
+        }
+    }
+
+    private DiscrepancyNoteBean createChildNote(DiscrepancyNoteBean parent) {
+        DiscrepancyNoteBean child = new DiscrepancyNoteBean();
+        child.setParentDnId(parent.getId());
+        child.setDiscrepancyNoteTypeId(parent.getDiscrepancyNoteTypeId());
+        child.setDetailedNotes(resword.getString("closed_modified_message"));
+        child.setResolutionStatusId(parent.getResolutionStatusId());
+        child.setAssignedUserId(parent.getAssignedUserId());
+        child.setResStatus(parent.getResStatus());
+        child.setOwner(ub);
+        child.setStudyId(currentStudy.getId());
+        child.setEntityId(parent.getEntityId());
+        child.setEntityType(parent.getEntityType());
+        child.setColumn(parent.getColumn());
+        child.setField(parent.getField());
+
+        return child;
+    }
+
     private List<RuleSetBean> createRuleSet(StudySubjectBean ssub,
 			StudyEventDefinitionBean sed) {
     	
