@@ -17,7 +17,9 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <head>
 
-<title><fmt:message key="openclinica" bundle="${resword}"/></title>
+<title><fmt:message key="openclinica" bundle="${resword}"/></title> 
+<link rel="SHORTCUT ICON" href="images/favicon.ico" type="image/x-icon" />
+
 
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
  <meta http-equiv="X-UA-Compatible" content="IE=8" />
