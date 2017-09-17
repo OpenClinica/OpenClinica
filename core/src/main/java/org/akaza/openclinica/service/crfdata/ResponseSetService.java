@@ -1,10 +1,14 @@
 package org.akaza.openclinica.service.crfdata;
 
+import java.util.HashMap;
+import java.util.Map;
+
 import org.akaza.openclinica.dao.hibernate.ResponseSetDao;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.ResponseSet;
 import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.domain.xform.XformItem;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,23 +31,55 @@ public class ResponseSetService {
 
         ResponseSet responseSet = responseSetDao.findByLabelVersion(xformItem.getItemName(), crfVersion.getCrfVersionId());
         String optionText = xformItem.getOptionsText();
-        if (responseSet == null) {
-            // Create the response set
-            responseSet = new ResponseSet();
-            responseSet.setLabel(xformItem.getItemName());
+        String optionValues = xformItem.getOptionsValues();
+        if (optionText != null && optionValues != null) {
 
-            if (optionText != null) {
+            if (responseSet == null) {
+                // Create the response set
+                responseSet = new ResponseSet();
+                responseSet.setLabel(xformItem.getItemName());
+
                 responseSet.setOptionsText(optionText);
-                responseSet.setOptionsValues(xformItem.getOptionsValues());
+                responseSet.setOptionsValues(optionValues);
                 responseSet.setResponseType(responseType);
                 responseSet.setVersionId(crfVersion.getCrfVersionId());
                 responseSet = responseSetDao.saveOrUpdate(responseSet);
-            }
 
-        } else {
-            if (optionText != null) {
-                responseSet.setOptionsText(optionText);
-                responseSet.setOptionsValues(xformItem.getOptionsValues());
+            } else {
+                String[] newOptionValues = optionValues.split("(?<!\\\\),");
+                String[] newOptionText = optionText.split("(?<!\\\\),");
+
+                String[] existingOptionValues = responseSet.getOptionsValues().split("(?<!\\\\),");
+                String[] existingOptionText = responseSet.getOptionsText().split("(?<!\\\\),");
+
+                Map<String, String> newOptionMap = new HashMap<>();
+                for (int i = 0; i < newOptionValues.length; i++) {
+                    newOptionMap.put(newOptionValues[i], newOptionText[i]);
+                }
+
+                Map<String, String> existingOptionMap = new HashMap<>();
+                for (int i = 0; i < existingOptionValues.length; i++) {
+                    existingOptionMap.put(existingOptionValues[i], existingOptionText[i]);
+                }
+
+                for (Map.Entry<String, String> entry : newOptionMap.entrySet()) {
+                    existingOptionMap.put(entry.getKey(), entry.getValue());
+                }
+
+                String optValues = "";
+                String optText = "";
+                for (Map.Entry<String, String> entry : existingOptionMap.entrySet()) {
+                    optValues = optValues + entry.getKey() + ",";
+                    optText = optText + entry.getValue() + ",";
+                }
+                if (!StringUtils.isEmpty(optText))
+                    optText = optText.substring(0, optText.length() - 1);
+
+                if (!StringUtils.isEmpty(optValues))
+                    optValues = optValues.substring(0, optValues.length() - 1);
+
+                responseSet.setOptionsText(optText);
+                responseSet.setOptionsValues(optValues);
                 responseSet.setResponseType(responseType);
                 responseSet = responseSetDao.saveOrUpdate(responseSet);
             }

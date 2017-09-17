@@ -253,7 +253,7 @@ public class EnketoAPI {
 
     public EnketoURLResponse getEditURL(EditUrlObject editUrlObject) throws Exception {
         String ecid = editUrlObject.ecid;
-        String crfOid = editUrlObject.formLayout.getOcOid() + editUrlObject.crfFlavor;
+        String crfOid = editUrlObject.crfOid;
         Study parentStudy = editUrlObject.parentStudy;
         StudyEvent studyEvent = editUrlObject.studyEvent;
         boolean markComplete = editUrlObject.markComplete;

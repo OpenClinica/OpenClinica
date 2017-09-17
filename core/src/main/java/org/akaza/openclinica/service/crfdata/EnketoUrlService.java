@@ -94,6 +94,7 @@ public class EnketoUrlService {
     public static final String COMMENT = "comment";
     public static final String AUDIT = "audit";
     public static final String ITEMDATA = "item_data";
+    public static final String DASH = "-";
 
     @Autowired
     @Qualifier("dataSource")
@@ -167,7 +168,7 @@ public class EnketoUrlService {
     StudyDAO sdao;
 
     public String getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String flavor, Role role,
-            String mode) throws Exception {
+            String mode, String hash) throws Exception {
         // Call Enketo api to get edit url
         Study parentStudy = enketoCredentials.getParentStudy(studyOid);
         studyOid = parentStudy.getOc_oid();
@@ -176,7 +177,8 @@ public class EnketoUrlService {
         if (subjectContext.getStudyEventId() != null) {
             studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
         }
-        return enketo.getFormURL(subjectContext.getFormLayoutOid() + flavor, studyOid, role, parentStudy, studyEvent, mode) + "?ecid=" + subjectContextKey;
+        return enketo.getFormURL(subjectContext.getFormLayoutOid() + DASH + hash + flavor, studyOid, role, parentStudy, studyEvent, mode) + "?ecid="
+                + subjectContextKey;
 
     }
 
@@ -218,13 +220,16 @@ public class EnketoUrlService {
         // Load populated instance
         String populatedInstance = "";
         String crfFlavor = "";
+        String crfOid = "";
         if (flavor.equals(QUERY_FLAVOR)) {
             populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, flavor);
             crfFlavor = flavor;
+            crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
             crfFlavor = flavor + "[" + idb.getId() + "]";
             markComplete = false;
+            crfOid = formLayout.getOcOid() + crfFlavor;
         }
 
         // Call Enketo api to get edit url
@@ -238,7 +243,7 @@ public class EnketoUrlService {
 
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
-        EditUrlObject editUrlObject = new EditUrlObject(formLayout, crfFlavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
+        EditUrlObject editUrlObject = new EditUrlObject(formLayout, crfOid, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
                 mediaList, goTo, flavor, role, study, studyEvent, mode, edc, eventCrf);
 
         EnketoURLResponse eur = enketo.registerAndGetEditURL(editUrlObject);

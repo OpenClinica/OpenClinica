@@ -3,6 +3,8 @@ package org.akaza.openclinica.service.crfdata;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -50,6 +52,7 @@ import org.akaza.openclinica.domain.xform.XformItem;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.dto.FormVersion;
+import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
 import org.apache.commons.io.IOUtils;
@@ -520,7 +523,7 @@ public class XformMetaDataService {
             try {
                 FormLayout formLayout = createCRFMetaData(
                         new CrfMetaDataObject(eicObj.form, version, container, eicObj.getCurrentStudy(), eicObj.ub, eicObj.errors, formLayoutDef.getURL()));
-                saveFormArtifactsInOCDataDirectory(fileLinks, eicObj.form.getOcoid(), version.getOcoid());
+                saveFormArtifactsInOCDataDirectory(fileLinks, eicObj.form.getOcoid(), version.getOcoid(), formLayout);
                 saveMediaFiles(fileLinks, eicObj.form.getOcoid(), formLayout);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
@@ -534,7 +537,7 @@ public class XformMetaDataService {
         }
     }
 
-    public void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, String crfOid, String formLayoutOid) throws IOException {
+    public void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, String crfOid, String formLayoutOid, FormLayout formLayout) throws IOException {
         // Create the directory structure for saving the media
         String dir = Utils.getCrfMediaFilePath(crfOid, formLayoutOid);
         if (!new File(dir).exists()) {
@@ -548,11 +551,11 @@ public class XformMetaDataService {
             if (startIndex != -1) {
                 fileName = fileLink.substring(startIndex + 1);
             }
-            saveAttachedFiles(fileLink, dir, fileName);
+            saveAttachedFiles(fileLink, dir, fileName, formLayout);
         }
     }
 
-    public void saveAttachedFiles(String uri, String dir, String fileName) throws IOException {
+    public void saveAttachedFiles(String uri, String dir, String fileName, FormLayout formLayout) throws IOException {
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new ByteArrayHttpMessageConverter());
         HttpHeaders headers = new HttpHeaders();
@@ -561,9 +564,19 @@ public class XformMetaDataService {
 
         ResponseEntity<byte[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, byte[].class, "1");
 
+        File file = new File(dir + File.separator + fileName);
         if (response.getStatusCode().equals(HttpStatus.OK)) {
-            FileOutputStream output = new FileOutputStream(new File(dir + File.separator + fileName));
+            FileOutputStream output = new FileOutputStream(file);
             IOUtils.write(response.getBody(), output);
+        }
+
+        if (fileName.equals(FORM_SUFFIX)) {
+            String xformOutput = new String(Files.readAllBytes(Paths.get(file.getPath())));
+            String hash = DigestUtils.md5Hex(xformOutput);
+            if (formLayout.getXform() == null || !formLayout.getXform().equals(hash)) {
+                formLayout.setXform(DigestUtils.md5Hex(xformOutput));
+                formLayoutDao.saveOrUpdate(formLayout);
+            }
         }
     }
 
@@ -575,7 +588,7 @@ public class XformMetaDataService {
         formLayout.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
         formLayout.setRevisionNotes(cmdObject.version.getDescription());
         formLayout.setOcOid(cmdObject.version.getOcoid());
-        formLayout.setXform(null);
+        // formLayout.setXform(null);
         formLayout.setXformName(cmdObject.container.getInstanceName());
         formLayout.setUrl(cmdObject.formLayoutUrl);
         return formLayout;
