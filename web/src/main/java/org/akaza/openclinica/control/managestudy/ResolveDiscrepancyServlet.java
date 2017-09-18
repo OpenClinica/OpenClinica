@@ -333,7 +333,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (ecb.getId() > 0) {
                 formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role, EDIT_MODE);
             } else {
-                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE);
+                String hash = formLayout.getXform();
+                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash);
             }
             int hashIndex = formUrl.lastIndexOf("#");
             String part1 = formUrl;

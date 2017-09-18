@@ -12,7 +12,7 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 
 public class EditUrlObject {
     FormLayout formLayout;
-    String crfFlavor;
+    String crfOid;
     String instance;
     String ecid;
     String redirect;
@@ -28,12 +28,12 @@ public class EditUrlObject {
     EventDefinitionCrf edc;
     EventCrf eventCrf;
 
-    public EditUrlObject(FormLayout formLayout, String crfFlavor, String instance, String ecid, String redirect, boolean markComplete, String studyOid,
+    public EditUrlObject(FormLayout formLayout, String crfOid, String instance, String ecid, String redirect, boolean markComplete, String studyOid,
             List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode,
             EventDefinitionCrf edc, EventCrf eventCrf) {
         super();
         this.formLayout = formLayout;
-        this.crfFlavor = crfFlavor;
+        this.crfOid = crfOid;
         this.instance = instance;
         this.ecid = ecid;
         this.redirect = redirect;

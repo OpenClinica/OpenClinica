@@ -152,6 +152,7 @@ public class OpenRosaServices {
     public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     public static final String NO_FLAVOR = "";
     public static final String SVG = ".svg";
+    public static final String DASH = "-";
 
     public static final String FORM_CONTEXT = "ecid";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
@@ -226,11 +227,13 @@ public class OpenRosaServices {
                             // TODO: them.
 
                             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
-                            form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid());
+                            form.setDownloadURL(
+                                    urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + DASH + formLayout.getXform());
 
                             List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
                             if (mediaList != null && mediaList.size() > 0) {
-                                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid());
+                                form.setManifestURL(
+                                        urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + DASH + formLayout.getXform());
                             }
                             formList.add(form);
                         }
@@ -326,16 +329,18 @@ public class OpenRosaServices {
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
             List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
             if (flavor.equals(QUERY_FLAVOR)) {
-                form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + QUERY_FLAVOR);
-                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + QUERY_FLAVOR);
-                form.setFormID(formLayout.getOcOid() + QUERY_FLAVOR);
+                form.setDownloadURL(
+                        urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + DASH + formLayout.getXform() + QUERY_FLAVOR);
+                form.setManifestURL(
+                        urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + DASH + formLayout.getXform() + QUERY_FLAVOR);
+                form.setFormID(formLayout.getOcOid() + DASH + formLayout.getXform() + QUERY_FLAVOR);
             } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
                 form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + attribute);
                 form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + attribute);
                 form.setFormID(formLayout.getOcOid() + attribute);
             } else {
-                form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid());
-                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid());
+                form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + DASH + formLayout.getXform());
+                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + DASH + formLayout.getXform());
             }
             formList.add(form);
 
@@ -982,15 +987,7 @@ public class OpenRosaServices {
     private String getFormLayoutOid(String uniqueId) {
         if (uniqueId.endsWith(QUERY_FLAVOR)) {
             uniqueId = uniqueId.substring(0, uniqueId.length() - QUERY_FLAVOR.length());
-        } else if (uniqueId.contains(SINGLE_ITEM_FLAVOR)) {
-            uniqueId = uniqueId.substring(0, uniqueId.indexOf(SINGLE_ITEM_FLAVOR));
-        }
-        return uniqueId;
-    }
-
-    private String getCrfVersionOid(String uniqueId) {
-        if (uniqueId.endsWith(QUERY_FLAVOR)) {
-            uniqueId = uniqueId.substring(0, uniqueId.length() - QUERY_FLAVOR.length());
+            uniqueId = uniqueId.substring(0, uniqueId.lastIndexOf(DASH));
         } else if (uniqueId.contains(SINGLE_ITEM_FLAVOR)) {
             uniqueId = uniqueId.substring(0, uniqueId.indexOf(SINGLE_ITEM_FLAVOR));
         }
