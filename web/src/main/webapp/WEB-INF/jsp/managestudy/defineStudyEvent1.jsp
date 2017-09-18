@@ -58,7 +58,7 @@
   }
    //-->
 </script>
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
 <fmt:message key="create_SED_for"  bundle="${resword}"/> <c:out value="${study.name}"/>
 </span></h1>
 	<ol>

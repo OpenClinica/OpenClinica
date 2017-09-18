@@ -40,7 +40,7 @@
 
 <jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='request' id='interventions' class='java.util.ArrayList'/>
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
 <fmt:message key="confirm_study" bundle="${resword}"/>
 </span></h1>
 

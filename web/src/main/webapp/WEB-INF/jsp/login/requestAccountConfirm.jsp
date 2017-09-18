@@ -13,7 +13,7 @@
 
 <jsp:include page="../login-include/request-sidebar.jsp"/>
 <!-- Main Content Area -->
-<h1>
+<h1 style="margin:0em">
 <fmt:message key="confirm_your_user_account_information" bundle="${resword}"/>
 </h1>
 <P><fmt:message key="please_check_the_information_below_if_no_errors" bundle="${restext}"/>

@@ -62,7 +62,7 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
 <fmt:message key="view_all_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
 </span></h1>
 

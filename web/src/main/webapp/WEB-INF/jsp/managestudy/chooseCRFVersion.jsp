@@ -43,7 +43,7 @@
 		</td>
   </tr><jsp:include page="../include/sideInfo.jsp"/>
   
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
 <fmt:message key="choose_CRF_version" bundle="${resword}"/>
 
  

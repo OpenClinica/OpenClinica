@@ -68,7 +68,7 @@
 </c:forEach>
 <!-- the object inside the array is StudySubjectBean-->
 
-<h1><c:choose>
+<h1 style="margin:0em"><c:choose>
    <c:when test="${userRole.manageStudy}">
      <div class="title_manage">
    </c:when>

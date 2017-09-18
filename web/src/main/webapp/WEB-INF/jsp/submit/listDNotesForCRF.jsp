@@ -79,7 +79,7 @@
 
 
 
-<h1>
+<h1 style="margin:0em">
 <c:choose>
    <c:when test="${userRole.manageStudy && module=='manage'}">
     <span class="title_manage">

@@ -26,7 +26,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
 
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
 <c:choose>
 <c:when test="${newDataset.id<=0}">
 <fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="view_selected_items" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>

@@ -20,7 +20,7 @@
 </head>
 <body>
 
-  <!--<h1>OpenClinica</h1>-->
+  <!--<h1 style="margin:0em">OpenClinica</h1>-->
 
   <div id="content">
 

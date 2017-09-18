@@ -39,7 +39,7 @@
 
 <jsp:useBean scope='session' id='study' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 
-<h1><span class="title_manage"><fmt:message key="confirm_to_remove_a_subject_group_class"  bundle="${resword}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="confirm_to_remove_a_subject_group_class"  bundle="${resword}"/></span></h1>
 <p><fmt:message key="confirm_deletion_of_this_subject_group_class"  bundle="${resword}"/> <c:out value="${study.name}"/>.</p>
 
 <!-- These DIVs define shaded box borders -->

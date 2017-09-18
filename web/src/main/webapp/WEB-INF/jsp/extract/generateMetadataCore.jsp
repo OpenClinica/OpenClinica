@@ -38,7 +38,7 @@ function init() {
 <BODY onLoad="init();" class="popup_BG">
 <div id="waitpage"> 
 
-<h1><span class="title_manage"> <fmt:message key="page_loading_please_wait" bundle="${restext}"/> </span></h1>
+<h1 style="margin:0em"><span class="title_manage"> <fmt:message key="page_loading_please_wait" bundle="${restext}"/> </span></h1>
 
 </div> 
 

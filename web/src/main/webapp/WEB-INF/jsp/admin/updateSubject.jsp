@@ -42,7 +42,7 @@
 
 <body class="aka_bodywidth" onload="<c:if test='${popUpURL != ""}'>openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>">
 
-<h1><span class="title_manage"><fmt:message key="update_subject_details" bundle="${resword}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="update_subject_details" bundle="${resword}"/></span></h1>
 <P><fmt:message key="field_required" bundle="${resword}"/></P>
 <form action="UpdateSubject" method="post">
 <input type="hidden" name="action" value="confirm">

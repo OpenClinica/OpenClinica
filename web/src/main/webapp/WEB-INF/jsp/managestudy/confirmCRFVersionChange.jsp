@@ -42,7 +42,7 @@
   
   
   
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
 <fmt:message key="confirm_CRF_version" bundle="${resword}"/>
  
 </span></h1>

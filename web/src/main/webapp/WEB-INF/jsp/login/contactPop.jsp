@@ -5,7 +5,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <!-- Main Content Area -->
 <div align="justify" style="width: 630px; height: 340px;; background:#FFFFFF; padding:5px 8px 0px 8px">
-<h1><span class="title_manage"><fmt:message key="contact_openclinica_administrator" bundle="${restext}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="contact_openclinica_administrator" bundle="${restext}"/></span></h1>
 <p><fmt:message key="fill_out_form_to_contact" bundle="${restext}"/></p>
 <p><fmt:message key="all_fields_are_required" bundle="${resword}"/></p>
 

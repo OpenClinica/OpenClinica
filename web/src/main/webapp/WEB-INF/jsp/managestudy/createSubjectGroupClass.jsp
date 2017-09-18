@@ -53,7 +53,7 @@
   }
    //-->
 </script>
-<h1><span class="title_manage"><fmt:message key="create_a_subject_group_class" bundle="${resword}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="create_a_subject_group_class" bundle="${resword}"/></span></h1>
 
 <form action="CreateSubjectGroupClass" method="post">
 * <fmt:message key="indicates_required_field" bundle="${resword}"/><br>

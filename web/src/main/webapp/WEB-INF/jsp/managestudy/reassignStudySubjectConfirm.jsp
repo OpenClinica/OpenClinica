@@ -48,7 +48,7 @@
 <table>
 <tr>
     <td>
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
 <fmt:message key="confirm_reassign_study_subject" bundle="${restext}"/>
 </span></h1>
 

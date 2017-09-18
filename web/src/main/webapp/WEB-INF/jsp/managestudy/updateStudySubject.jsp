@@ -59,12 +59,12 @@
 
 <c:choose>
 <c:when test="${userBean.sysAdmin || userBean.techAdmin || userRole.manageStudy}">
-    <h1><span class="title_manage">
+    <h1 style="margin:0em"><span class="title_manage">
     <fmt:message key="update_study_subject_details" bundle="${resword}"/>
     </span></h1>
 </c:when>
 <c:otherwise>
-    <h1><span class="title_manage">
+    <h1 style="margin:0em"><span class="title_manage">
     <fmt:message key="assign_subject_to_group" bundle="${resworkflow}"/>
     </span></h1>
 </c:otherwise>

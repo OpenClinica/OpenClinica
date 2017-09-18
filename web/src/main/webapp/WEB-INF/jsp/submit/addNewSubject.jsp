@@ -83,7 +83,7 @@
 </c:forEach>
 
 
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
 <c:out value="${study.name}" />:
     <fmt:message key="add_subject" bundle="${resword}"/>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/add-subject')">

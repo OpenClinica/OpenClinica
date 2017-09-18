@@ -55,7 +55,7 @@
     }
 </script>
 
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
 <fmt:message key="currently_executing_data_export_jobs" bundle="${resword}"/>
 </span></h1>
 

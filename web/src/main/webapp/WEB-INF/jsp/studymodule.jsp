@@ -140,7 +140,7 @@
 
   <form action="studymodule" method="post">
   <div>
-      <h1><span class="title_manage"><c:out value="${currentStudy.name}"/>&nbsp;
+      <h1 style="margin:0em"><span class="title_manage"><c:out value="${currentStudy.name}"/>&nbsp;
         <span class=""></span></a>
       </span></h1><br/>
   </div>
@@ -722,7 +722,7 @@
 <c:if test="${portalURL!= '' && portalURL!= null}">
     <div align="left" id="requestParticipateForm" class="participate-registration-div">
         <form action="studymodule/${currentStudy.oid}/register" method="post">
-            <h1>
+            <h1 style="margin:0em">
                 <fmt:message key="participate_reg_title" bundle="${resword}"/>
                 <a href="javascript:openDocWindow('https://docs.openclinica.com/participate/activate-openclinica-participate-your-study')">
                     <span border="0" title="Help" alt="Help" class=""/>
@@ -751,7 +751,7 @@
  <c:if test="${moduleManager!= '' && moduleManager!= null}">
     <div align="left" id="requestRandomizationForm" class="randomization-registration-div">
         <form action="studymodule/${currentStudy.oid}/randomize" method="post">
-            <h1>
+            <h1 style="margin:0em">
                 <fmt:message key="randomization_reg_title" bundle="${resword}"/>
             </h1>
             <p class="randomization-text"><fmt:message key="randomization_reg_instructions_part1" bundle="${resword}"/></p>

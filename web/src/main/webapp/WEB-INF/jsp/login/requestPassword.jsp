@@ -11,7 +11,7 @@
 
 <jsp:include page="../login-include/request-sidebar.jsp"/>
 <!-- Main Content Area -->
-<h1><fmt:message key="request_password_form" bundle="${resword}"/></h1>
+<h1 style="margin:0em"><fmt:message key="request_password_form" bundle="${resword}"/></h1>
 <jsp:include page="../login-include/login-alertbox.jsp"/>
 <p><fmt:message key="you_must_be_an_openClinica_member_to_receive_a_password" bundle="${resword}"/></p>
 <form action="RequestPassword" method="post">

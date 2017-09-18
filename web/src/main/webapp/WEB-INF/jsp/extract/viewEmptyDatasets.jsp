@@ -12,7 +12,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="datasets" class="java.util.ArrayList"/>
 
-<h1><span class="title_manage"><fmt:message key="view_datasets" bundle="${resword}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="view_datasets" bundle="${resword}"/></span></h1>
 
 <P><jsp:include page="../include/showPageMessages.jsp"/></P>
 

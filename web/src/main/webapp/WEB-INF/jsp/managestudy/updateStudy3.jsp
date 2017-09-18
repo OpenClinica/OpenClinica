@@ -66,7 +66,7 @@
   }
    //-->
 </script>
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
 <fmt:message key="update_study_details_continue" bundle="${resword}"/>
 </span></h1>
 <span class="title_Admin"><p><b><fmt:message key="section_b_study_status" bundle="${resword}"/> - <fmt:message key="design_details" bundle="${resword}"/> - <fmt:message key="interventional" bundle="${resword}"/></b></p></span>

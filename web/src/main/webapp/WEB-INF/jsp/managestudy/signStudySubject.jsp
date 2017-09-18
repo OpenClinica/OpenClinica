@@ -102,7 +102,7 @@
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr><td>
-        <h1>
+        <h1 style="margin:0em">
             <c:choose>
             <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
             <div class="title_manage">

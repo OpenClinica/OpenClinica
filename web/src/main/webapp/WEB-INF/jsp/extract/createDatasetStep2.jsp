@@ -69,7 +69,7 @@ function notSelectAll() {
 
 <c:choose>
 <c:when test="${newDataset.id>0}">
-<h1>
+<h1 style="margin:0em">
  <span class="title_manage">
    <fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="select_items" bundle="${resword}"/>
    <c:choose>

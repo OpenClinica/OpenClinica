@@ -39,7 +39,7 @@
 <jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope ="request" id="studyPhaseMap" class="java.util.HashMap"/>
 <jsp:useBean scope="request" id="statuses" class="java.util.ArrayList"/>
-<h1><span class="title_manage"><fmt:message key="create_a_new_study_continue" bundle="${resword}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="create_a_new_study_continue" bundle="${resword}"/></span></h1>
 <script type="text/JavaScript" language="JavaScript">
   <!--
 <%-- function myCancel() {

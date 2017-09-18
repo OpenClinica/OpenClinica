@@ -25,7 +25,7 @@
 <body>
 <div class="headerDiv">
 <%-- This section was cut-and-pasted from the existing print JSP --%>
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
   <c:out value="${crfBean.name}" /> <c:out value="${crfVersionBean.name}" /></span>
   <c:if test="${studySubject != null && studySubject.id>0}">
     <c:choose>

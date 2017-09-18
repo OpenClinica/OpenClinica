@@ -86,7 +86,7 @@ applied on resolution status or type--%>
 
 
 
-<h1>
+<h1 style="margin:0em">
     <c:choose>
     <c:when test="${module eq 'manage'}"><span class="title_manage"></c:when>
     <c:otherwise><span class="title_manage"></c:otherwise>

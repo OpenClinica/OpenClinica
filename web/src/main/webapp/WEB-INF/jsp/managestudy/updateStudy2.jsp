@@ -59,7 +59,7 @@
   }
    //-->
 </script>
-<h1><span class="title_manage">
+<h1 style="margin:0em"><span class="title_manage">
 <fmt:message key="update_study_details_continue" bundle="${resword}"/>
 </span></h1>
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>

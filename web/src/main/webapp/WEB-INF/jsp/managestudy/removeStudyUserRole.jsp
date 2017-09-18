@@ -42,7 +42,7 @@
 <jsp:useBean scope="request" id="uRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
 <jsp:useBean scope="request" id="uStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 
-<h1><span class="title_manage"><fmt:message key="remove_user_role" bundle="${resword}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="remove_user_role" bundle="${resword}"/></span></h1>
 
 <form action="RemoveStudyUserRole" method="post">
 <input type="hidden" name="action" value="submit">

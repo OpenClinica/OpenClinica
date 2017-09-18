@@ -38,7 +38,7 @@
 <jsp:include page="../include/createDatasetSideInfo.jsp"/>
 
 
-<h1><span class="title_manage"><fmt:message key="edit_dataset" bundle="${resword}"/>: <c:out value='${dataset.name}'/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/edit-dataset')"><span class="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="edit_dataset" bundle="${resword}"/>: <c:out value='${dataset.name}'/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/edit-dataset')"><span class="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 
 <form action="EditDataset" method="post">
 <input type="hidden" name="action" value="validate"/>

@@ -15,7 +15,7 @@
 <jsp:include page="../login-include/request-sidebar.jsp"/>
 <!-- Main Content Area -->
 
-<h1><fmt:message key="request_an_openclinica_user_account" bundle="${resword}"/></h1>
+<h1 style="margin:0em"><fmt:message key="request_an_openclinica_user_account" bundle="${resword}"/></h1>
 <P>
 <fmt:message key="please_provide_the_information_below_to_request" bundle="${resword}"/>
 <p>

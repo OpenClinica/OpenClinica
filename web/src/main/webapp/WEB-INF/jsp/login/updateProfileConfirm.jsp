@@ -36,7 +36,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 <jsp:useBean scope="session" id="userBean11" class="org.akaza.openclinica.bean.login.UserAccountBean"/>
-<h1><span class="title_manage"><fmt:message key="confirm_user_profile_updates" bundle="${resword}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="confirm_user_profile_updates" bundle="${resword}"/></span></h1>
 
 <form action="UpdateProfile?action=submit" method="post">
 <!-- These DIVs define shaded box borders -->

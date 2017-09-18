@@ -43,7 +43,7 @@
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
 <jsp:useBean scope="request" id="subjectAgeAtEvent" class="java.lang.String"/>
 
-<h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_subject_attributes" bundle="${resword}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_subject_attributes" bundle="${resword}"/></span></h1>
 
 <P><jsp:include page="../showInfo.jsp"/></P>
 

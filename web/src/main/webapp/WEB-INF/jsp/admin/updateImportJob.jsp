@@ -48,7 +48,7 @@
 <jsp:useBean scope='request' id='study_name' class='java.lang.String'/>
 <jsp:useBean scope='request' id='contactEmail' class='java.lang.String'/>
 
-<h1><span class="title_manage"><fmt:message key="update_scheduled_job" bundle="${resword}"/>: <fmt:message key="import_data" bundle="${resword}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="update_scheduled_job" bundle="${resword}"/>: <fmt:message key="import_data" bundle="${resword}"/></span></h1>
 <p>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 <jsp:useBean id="now" class="java.util.Date" />

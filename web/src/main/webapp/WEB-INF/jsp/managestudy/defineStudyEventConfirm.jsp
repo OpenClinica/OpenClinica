@@ -41,7 +41,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='definition' class='org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean'/>
 <jsp:useBean scope='request' id='eventDefinitionCRFs' class='java.util.ArrayList'/>
-<h1><span class="title_manage"><fmt:message key="confirm_event_definition_creation"  bundle="${resword}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="confirm_event_definition_creation"  bundle="${resword}"/></span></h1>
 
 
 		<br>

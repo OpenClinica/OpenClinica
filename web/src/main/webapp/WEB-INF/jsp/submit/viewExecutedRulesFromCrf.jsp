@@ -54,7 +54,7 @@
 <jsp:useBean scope='request' id='ruleSet' class='org.akaza.openclinica.domain.rule.RuleSetBean'/>
 <jsp:useBean scope='request' id='result' class='java.util.HashMap'/>
 
-<h1><c:choose>
+<h1 style="margin:0em"><c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
 <span class="title_manage">
 </c:when>

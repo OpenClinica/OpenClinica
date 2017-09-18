@@ -51,10 +51,10 @@
 
 <c:choose>      
  <c:when test="${fromListSite=='yes'}">
-  <h1><span class="title_manage">
+  <h1 style="margin:0em"><span class="title_manage">
  </c:when>
  <c:otherwise>
-   <h1><span class="title_Admin">
+   <h1 style="margin:0em"><span class="title_Admin">
  </c:otherwise>
 </c:choose>
 <fmt:message key="confirm_removal_of_site"  bundle="${resword}"/></span></h1>

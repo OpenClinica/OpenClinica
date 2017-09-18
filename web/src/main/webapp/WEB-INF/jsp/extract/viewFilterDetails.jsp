@@ -11,7 +11,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="filter" class="org.akaza.openclinica.bean.extract.FilterBean"/>
 
-<h1><span class="title_manage"><fmt:message key="view_filter_details" bundle="${resword}"/>: <c:out value="${filter.name}"/></span></h1>
+<h1 style="margin:0em"><span class="title_manage"><fmt:message key="view_filter_details" bundle="${resword}"/>: <c:out value="${filter.name}"/></span></h1>
 
 <P><jsp:include page="../showInfo.jsp"/></P>
 
