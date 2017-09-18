@@ -268,7 +268,7 @@
 				</c:import>
 				
 				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=start&column=start_date','spanAlert-start'); return false;">
-				<span name="flag_start" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
+				* <span name="flag_start" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"></a></c:if></td>
 			</tr>
 			
 			</table>

@@ -879,8 +879,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private String restoreStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"javascript:openDocWindow(RestoreStudySubject?action=confirm&id="+studySubject.getId()+"&subjectId" + studySubject.getSubjectId()+"&studyId"+studySubject.getStudyId());
-        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"RestoreStudySubject?action=confirm&id=" + studySubject.getId() + "&subjectId=" + studySubject.getSubjectId() + "&studyId="
+                        + studySubject.getStudyId());
+        builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
 

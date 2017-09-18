@@ -76,9 +76,9 @@
 <h1 style="margin: 0em; "><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1></br>
 
 
-<a href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"><fmt:message key="download_study_meta" bundle="${restext}"/></a>.
+<a style="text-decoration:none" href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"><fmt:message key="download_study_meta" bundle="${restext}"/></a>.
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
-<a href="ListStudySubjects">Subject Matrix</a>.
+<a style="text-decoration:none" href="ListStudySubjects">Subject Matrix</a>.
 
 <br><br>
 <a href="javascript:leftnavExpand('overview');" style="text-decoration:none;">
@@ -94,7 +94,7 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="name" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.name}"/>
   </td></tr>
-  <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><fmt:message key="unique_protocol_ID" bundle="${resword}"/></a>:</td><td class="table_cell">
+  <tr valign="top"><td class="table_header_column"><a style="text-decoration:none" href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><fmt:message key="unique_protocol_ID" bundle="${resword}"/></a>:</td><td class="table_cell">
   <c:out value="${studyToView.identifier}"/>
   </td></tr>
    <tr valign="top"><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_cell">
