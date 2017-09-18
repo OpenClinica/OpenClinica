@@ -360,7 +360,7 @@
             <div class="taskLink"><a href="${urlPrefix}UpdateProfile"><fmt:message key="nav_update_profile" bundle="${resword}"/></a></div>
         </div>
         <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}j_spring_security_logout"><fmt:message key="nav_log_out" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="${urlPrefix}pages/logout"><fmt:message key="nav_log_out" bundle="${resword}"/></a></div>
 
         </div>
 
