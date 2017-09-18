@@ -69,7 +69,7 @@
 <jsp:useBean scope="request" id="uncompletedEventDefinitionCRFs" class="java.util.ArrayList" />
 <jsp:useBean scope="request" id="displayEventCRFs" class="java.util.ArrayList" />
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="enter_or_validate_data" bundle="${resword}"/><c:out value="${studyEvent.studyEventDefinition.name}" /></span></h1><br/>
+<h1><span class="title_manage"><fmt:message key="enter_or_validate_data" bundle="${resword}"/><c:out value="${studyEvent.studyEventDefinition.name}" /></span></h1><br/>
 
 
 &nbsp;

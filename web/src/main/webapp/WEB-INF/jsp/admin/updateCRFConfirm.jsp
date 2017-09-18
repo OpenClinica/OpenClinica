@@ -44,7 +44,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="confirm_CRF_details" bundle="${resword}"/> </span></h1>
+<h1><span class="title_manage"><fmt:message key="confirm_CRF_details" bundle="${resword}"/> </span></h1>
 
 <form action="UpdateCRF" method="post">
 <input type="hidden" name="action" value="submit">

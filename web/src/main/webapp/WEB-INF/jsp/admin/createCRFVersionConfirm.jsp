@@ -55,7 +55,7 @@
 <jsp:useBean scope='session' id='crfName' class='java.lang.String'/>
 
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="check_CRF_version_data" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="check_CRF_version_data" bundle="${resword}"/></span></h1>
 
 
 <c:choose>

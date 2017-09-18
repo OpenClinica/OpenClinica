@@ -44,7 +44,7 @@
 <jsp:useBean scope="session" id="userBean1" class="org.akaza.openclinica.bean.login.UserAccountBean"/>
 
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
     <fmt:message key="change_user_profile" bundle="${resword}"/>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/working-openclinica')"><span class=""></span></a></span></h1><br/>
 <strong>

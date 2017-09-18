@@ -13,7 +13,7 @@
 <jsp:useBean scope="session" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
 
 <body>
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <c:out value="${section.crf.name}" /> <c:out value="${section.crfVersion.name}" /></span>
 <c:if test="${studySubject != null && studySubject.id>0}">
   <c:choose>

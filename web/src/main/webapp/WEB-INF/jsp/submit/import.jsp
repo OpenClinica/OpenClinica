@@ -54,10 +54,10 @@
 
 <c:choose>
 	<c:when test="${userBean.sysAdmin && module=='admin'}">
-		<h1 style="margin:0em"><span class="title_manage">
+		<h1><span class="title_manage">
 	</c:when>
 	<c:otherwise>
-		<h1 style="margin:0em">
+		<h1>
 		<span class="title_submit">
 	</c:otherwise>
 </c:choose>

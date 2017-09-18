@@ -67,7 +67,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='crfName' class='java.lang.String'/>
 
-<h1 style="margin:0em">
+<h1>
 <span class="title_manage">
  <c:choose>
      <c:when test="${empty crfName}">

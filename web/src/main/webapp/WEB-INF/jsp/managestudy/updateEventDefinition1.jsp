@@ -87,7 +87,7 @@
 
     //-->
 </script>
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="update_SED" bundle="${resword}"/>
 </span></h1>
 <ol>

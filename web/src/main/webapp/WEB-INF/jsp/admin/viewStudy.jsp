@@ -56,7 +56,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope='request' id='studyToView' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
-<h1 style="margin:0em"><div class="title_manage"><fmt:message key="view_study_metadata" bundle="${resword}"/>
+<h1><div class="title_manage"><fmt:message key="view_study_metadata" bundle="${resword}"/>
 </div></h1></br>
 
 <div style="width: 600px">

@@ -42,7 +42,7 @@
 <jsp:useBean scope='request' id='events' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='subjectToRemove' class='org.akaza.openclinica.bean.submit.SubjectBean'/>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="confirm_removal_of_subject" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="confirm_removal_of_subject" bundle="${resword}"/></span></h1>
 
 <div class="table_title_Admin"><fmt:message key="you_choose_to_remove_the_following_subject" bundle="${restext}"/>:</div>
 <div style="width: 600px">

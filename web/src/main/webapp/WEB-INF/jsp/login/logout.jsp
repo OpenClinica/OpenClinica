@@ -32,6 +32,6 @@
     });
 
 </script>
-<center><h1 style="margin:0em"><fmt:message key="logging_out" bundle="${resword}"/></h1></center>
+<center><h1><fmt:message key="logging_out" bundle="${resword}"/></h1></center>
 </body>
 </html>

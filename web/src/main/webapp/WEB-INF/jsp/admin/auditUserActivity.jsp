@@ -61,7 +61,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
-<h1 style="margin:0em"><span class="title_Manage"><fmt:message key="audit_user_activity" bundle="${resword}"/></span></h1>
+<h1><span class="title_Manage"><fmt:message key="audit_user_activity" bundle="${resword}"/></span></h1>
 
 <jsp:useBean id="now" class="java.util.Date" />
 <P><I><fmt:message key="server_time_info" bundle="${resword}"/> <fmt:formatDate value="${now}" pattern="yyyy-MM-dd hh:mm"/>.</I></P>

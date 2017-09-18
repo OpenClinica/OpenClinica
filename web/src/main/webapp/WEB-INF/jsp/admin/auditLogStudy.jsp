@@ -28,7 +28,7 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 <c:set var="dtetmeFormat"><fmt:message key="date_time_format_string" bundle="${resformat}"/></c:set>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="view_study_log_for" bundle="${resword}"/> <c:out value="${study.name}"/>
 </span></h1>
 

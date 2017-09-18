@@ -16,7 +16,7 @@
 <jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="delete_CRF_from_event" bundle="${resword}"/>
 </span></h1>
 <p>

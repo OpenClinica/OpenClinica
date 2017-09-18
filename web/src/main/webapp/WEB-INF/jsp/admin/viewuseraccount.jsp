@@ -45,7 +45,7 @@
 <jsp:useBean scope='request' id='user' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="view_user_account" bundle="${resword}"/>
 </span></h1>
 

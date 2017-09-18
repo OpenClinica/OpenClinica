@@ -44,7 +44,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='ruleSet' class='org.akaza.openclinica.domain.rule.RuleSetBean'/>
 
-<h1 style="margin:0em"><c:choose>
+<h1><c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
 <span class="title_manage">
 </c:when>

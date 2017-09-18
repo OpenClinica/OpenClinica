@@ -58,7 +58,7 @@
   }
    //-->
 </script>
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
     <c:choose>
         <c:when test="${study.parentStudyId > 0}">
             <fmt:message key="assign_users_to_current_site" bundle="${resword}"/>

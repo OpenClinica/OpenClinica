@@ -40,7 +40,7 @@
 <jsp:useBean scope="request" id="subjectToUpdate" class="org.akaza.openclinica.bean.submit.SubjectBean" />
 
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="confirm_subject_details" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="confirm_subject_details" bundle="${resword}"/></span></h1>
 <P><fmt:message key="field_required" bundle="${resword}"/></P>
 <form action="UpdateSubject" method="post">
 <input type="hidden" name="action" value="submit">

@@ -46,7 +46,7 @@
 <jsp:useBean scope="session" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 <jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
 <jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="reassign_study_subject" bundle="${resworkflow}"/> 
 </span></h1>
 <p><fmt:message key="you_choose_to_reassign_the_following_subject2" bundle="${restext}"/></p>

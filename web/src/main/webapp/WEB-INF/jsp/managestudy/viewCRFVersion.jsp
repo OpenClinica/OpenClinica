@@ -47,10 +47,10 @@
 <jsp:useBean scope='request' id='version' class='org.akaza.openclinica.bean.submit.FormLayoutBean'/>
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="view_CRF_version_details" bundle="${resword}"/>: <c:out value="${crfname}"/> <c:out value="${version.name}"/>  </span></h1>
+<h1><span class="title_manage"><fmt:message key="view_CRF_version_details" bundle="${resword}"/>: <c:out value="${crfname}"/> <c:out value="${version.name}"/>  </span></h1>
 </c:when>
 <c:otherwise>
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="view_CRF_version_details" bundle="${resword}"/>: <c:out value="${crfname}"/> <c:out value="${version.name}"/> </span></h1>
+<h1><span class="title_manage"><fmt:message key="view_CRF_version_details" bundle="${resword}"/>: <c:out value="${crfname}"/> <c:out value="${version.name}"/> </span></h1>
 </c:otherwise>
 </c:choose>
 

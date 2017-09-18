@@ -60,7 +60,7 @@
   }
    //-->
 </script>
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="define_study_event"  bundle="${resword}"/> - <fmt:message key="select_CRFs"  bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="define_study_event"  bundle="${resword}"/> - <fmt:message key="select_CRFs"  bundle="${resword}"/></span></h1>
 
 <p><fmt:message key="select_CRFs_to_define_study_event" bundle="${restext}"/></p>
 <br>

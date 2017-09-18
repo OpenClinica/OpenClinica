@@ -45,7 +45,7 @@
 <jsp:useBean scope='request' id='eventDefinitionCRFs' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='events' class='java.util.ArrayList'/>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="confirm_unlocking_event_definition"  bundle="${resword}"/> </span></h1>
+<h1><span class="title_manage"><fmt:message key="confirm_unlocking_event_definition"  bundle="${resword}"/> </span></h1>
 
 <p>
 <fmt:message key="confirm_unlock_of_this_SED_from_study"  bundle="${resword}"/> <c:out value="${study.name}"/>. 

@@ -44,7 +44,7 @@
 <jsp:useBean scope="request" id="uRole" class="org.akaza.openclinica.bean.login.StudyUserRoleBean"/>
 <jsp:useBean scope="request" id="roles" class="java.util.LinkedHashMap"/>
 <jsp:useBean scope="request" id="studies" class="java.util.ArrayList"/>
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="set_user_role" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="set_user_role" bundle="${resword}"/></span></h1>
 
 <p><fmt:message key="choose_a_study_from_the_following_study" bundle="${resword}"/></p>
 <form action="SetUserRole" method="post">

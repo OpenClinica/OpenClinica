@@ -117,7 +117,7 @@
        //-->
  </script>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="update_study_details" bundle="${resword}"/> <c:out value="${studyToView.name}"/>
 </span></h1>
 <c:set var="startDate" value="" />

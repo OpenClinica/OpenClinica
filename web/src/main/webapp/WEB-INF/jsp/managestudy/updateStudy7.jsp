@@ -55,7 +55,7 @@
   }
    //-->
 </script>
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="update_study_details_continue" bundle="${resword}"/>
 </span></h1>
 

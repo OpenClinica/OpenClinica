@@ -26,7 +26,7 @@
 	</c:otherwise>
 </c:choose>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="an_error_has_ocurred" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="an_error_has_ocurred" bundle="${resword}"/></span></h1>
 
 <font class="bodytext">
 <c:set var="referer" value="MainMenu"/>

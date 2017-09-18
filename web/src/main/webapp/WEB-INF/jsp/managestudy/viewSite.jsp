@@ -87,15 +87,15 @@
 
 <c:choose>
   <c:when test="${fromListSite=='yes'}">
- <h1 style="margin:0em"><span class="title_manage"><fmt:message key="view_site_details" bundle="${resworkflow}"/>: <c:out value="${siteToView.name}"/></span></h1>
+ <h1><span class="title_manage"><fmt:message key="view_site_details" bundle="${resworkflow}"/>: <c:out value="${siteToView.name}"/></span></h1>
 </c:when>
 <c:otherwise>
   <c:choose>
     <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin}">
-      <h1 style="margin:0em"><span class="title_manage"><fmt:message key="view_site_details" bundle="${resworkflow}"/></span></h1>
+      <h1><span class="title_manage"><fmt:message key="view_site_details" bundle="${resworkflow}"/></span></h1>
     </c:when>
     <c:otherwise>
-       <h1 style="margin:0em"><span class="title_manage"><fmt:message key="view_site_details" bundle="${resworkflow}"/></span></h1>
+       <h1><span class="title_manage"><fmt:message key="view_site_details" bundle="${resworkflow}"/></span></h1>
     </c:otherwise>
    </c:choose>
 </c:otherwise>

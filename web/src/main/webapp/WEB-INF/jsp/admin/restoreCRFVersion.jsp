@@ -44,7 +44,7 @@
 <jsp:useBean scope='request' id='eventCRFs' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='versionToRestore' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="confirm_restore_of_CRF_version" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="confirm_restore_of_CRF_version" bundle="${resword}"/></span></h1>
 
 <p><fmt:message key="you_choose_to_restore_the_following_CRF_version" bundle="${resword}"/>:</p>
 <div style="width: 600px">

@@ -53,7 +53,7 @@
 	</c:choose>
 </c:forEach>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="edit_filter" bundle="${restext}"/>: <c:out value="${filter.name}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="edit_filter" bundle="${restext}"/>: <c:out value="${filter.name}"/></span></h1>
 <P><jsp:include page="../include/showPageMessages.jsp"/></P>
 
 <form action="EditFilter">

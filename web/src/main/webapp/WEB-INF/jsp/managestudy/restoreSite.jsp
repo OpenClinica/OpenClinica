@@ -50,10 +50,10 @@
 
 <c:choose>
  <c:when test="${fromListSite=='yes'}">
-  <h1 style="margin:0em"><span class="title_manage">
+  <h1><span class="title_manage">
  </c:when>
  <c:otherwise>
-   <h1 style="margin:0em"><span class="title_manage">
+   <h1><span class="title_manage">
  </c:otherwise>
 </c:choose>
 <fmt:message key="confirm_restore_of_site"  bundle="${resword}"/></span></h1>

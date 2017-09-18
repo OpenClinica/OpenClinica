@@ -37,7 +37,7 @@
 	</c:otherwise>
 </c:choose>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="404_error_msg_header" bundle="${resword}"/></span></h1> 
+<h1><span class="title_manage"><fmt:message key="404_error_msg_header" bundle="${resword}"/></span></h1> 
 <c:if test="${! empty formMessages}">
     <!-- initial position for data entry error messages; we'll
     improve the style as well -->

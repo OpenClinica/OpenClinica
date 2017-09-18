@@ -81,7 +81,7 @@ function reportBug(versionNumber) {
 
 <div ID="login">
     <form action="<c:url value='/j_spring_security_check'/>" method="post">
-        <h1 style="margin:0em"><fmt:message key="login" bundle="${resword}"/></h1>
+        <h1><fmt:message key="login" bundle="${resword}"/></h1>
         <b><fmt:message key="user_name" bundle="${resword}"/>:</b>
         <div class="loginbox_BG"><input type="text" name="j_username" class="loginbox"/></div>
 
@@ -93,7 +93,7 @@ function reportBug(versionNumber) {
 	
 	<!--<div ID="login">
 	<form name="myform" action="j_security_check" focus="j_username" method=POST>
-	<h1 style="margin:0em"><fmt:message key="login" bundle="${resword}"/></h1>
+	<h1><fmt:message key="login" bundle="${resword}"/></h1>
 
 	<b><fmt:message key="user_name" bundle="${resword}"/>:</b>
 	<div class="loginbox_BG">

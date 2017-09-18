@@ -44,22 +44,22 @@
 <th width=100%>
         <table class="infotab" cellpadding="0" cellspacing="0">
             <tr>
-                <td width="20%"><h1 style="margin:0em"><fmt:message key="study_name" bundle="${resword}"/></h1> </td>
-                <td width="20%"><h1 style="margin:0em"><fmt:message key="event_definition_name" bundle="${resword}"/></h1></td>
-                <td width="20%"><h1 style="margin:0em"><fmt:message key="site" bundle="${resword}"/></h1></td>
-                <td width="20%"><h1 style="margin:0em"><fmt:message key="study_subject_ID" bundle="${resword}"/></h1></td>
-                <td width="20%"><h1 style="margin:0em"><fmt:message key="date_interviewed" bundle="${resword}"/></h1></td>
-                <td width="15%"><h1 style="margin:0em">Global ID </h1></td>
-                <td width="10%"><h1 style="margin:0em"><fmt:message key="interviewer_name" bundle="${resword}"/></h1></td>
+                <td width="20%"><h1><fmt:message key="study_name" bundle="${resword}"/></h1> </td>
+                <td width="20%"><h1><fmt:message key="event_definition_name" bundle="${resword}"/></h1></td>
+                <td width="20%"><h1><fmt:message key="site" bundle="${resword}"/></h1></td>
+                <td width="20%"><h1><fmt:message key="study_subject_ID" bundle="${resword}"/></h1></td>
+                <td width="20%"><h1><fmt:message key="date_interviewed" bundle="${resword}"/></h1></td>
+                <td width="15%"><h1>Global ID </h1></td>
+                <td width="10%"><h1><fmt:message key="interviewer_name" bundle="${resword}"/></h1></td>
             </tr>
             <tr>
-                <td><h1 style="margin:0em"><c:out value="${studyName}"/></h1></td>
-                <td><h1 style="margin:0em"><c:out value="${item.key.name}"/></h1></td>
-                <td><h1 style="margin:0em">&nbsp;<c:out value="${site}"/></h1></td>
-                <td>&nbsp;<h1 style="margin:0em"></h1></td>
-                <td>&nbsp;<h1 style="margin:0em"></h1></td>
-                <td>&nbsp;<h1 style="margin:0em"></h1></td>
-                <td>&nbsp;<h1 style="margin:0em"></h1></td>
+                <td><h1><c:out value="${studyName}"/></h1></td>
+                <td><h1><c:out value="${item.key.name}"/></h1></td>
+                <td><h1>&nbsp;<c:out value="${site}"/></h1></td>
+                <td>&nbsp;<h1></h1></td>
+                <td>&nbsp;<h1></h1></td>
+                <td>&nbsp;<h1></h1></td>
+                <td>&nbsp;<h1></h1></td>
             </tr>
         </table>
     <br>
@@ -70,7 +70,7 @@
 <td width="100%">
     <c:forEach var="printCrfBean" items="${item.value}" varStatus="status">
     <div style="padding-left:10px;padding-bottom:20px;padding-top:10px;page-break-after:always" >
-<h1 style="margin:0em">
+<h1>
 <c:out value="${printCrfBean.crfBean.name}" /> <c:out value="${printCrfBean.crfVersionBean.name}" />
 </h1>
     <c:choose>

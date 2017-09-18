@@ -48,10 +48,10 @@
 <jsp:useBean scope='request' id='studySubId' type='java.lang.String'/>
 <c:choose>
 <c:when test="${userBean.sysAdmin}">
-  <h1 style="margin:0em"><span class="title_manage">
+  <h1><span class="title_manage">
 </c:when>
 <c:otherwise>
-  <h1 style="margin:0em"><span class="title_manage">
+  <h1><span class="title_manage">
 </c:otherwise>
 </c:choose>
 <fmt:message key="view_event_CRF_properties" bundle="${resworkflow}"/>: <c:out value="${studySub.label}"/> - <c:out value="${crf.name}"/></span></h1>

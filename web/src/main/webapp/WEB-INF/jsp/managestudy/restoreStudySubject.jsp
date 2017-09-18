@@ -41,7 +41,7 @@
 <jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
 <jsp:useBean scope="request" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 <jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="restore_subject_to_study" bundle="${resword}"/>
 </span></h1>
 

@@ -51,13 +51,13 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
-	<h1 style="margin:0em"><span class="title_manage"><fmt:message key="administer_CRFs2" bundle="${resworkflow}"/>
+	<h1><span class="title_manage"><fmt:message key="administer_CRFs2" bundle="${resworkflow}"/>
         <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/administer-crfs-crf-template#content-title-2991')">
             <span class=""></span></a>
 </span></h1>
 </c:when>
 <c:otherwise>
-	<h1 style="margin:0em"><span class="title_manage"><fmt:message key="manage_CRFs2" bundle="${resworkflow}"/>
+	<h1><span class="title_manage"><fmt:message key="manage_CRFs2" bundle="${resworkflow}"/>
         <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/manage-crf')">
 		<span class=""></span></a>
 </span></h1>

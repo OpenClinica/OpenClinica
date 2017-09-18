@@ -44,7 +44,7 @@
 <jsp:useBean scope="request" id="items" class="java.util.ArrayList"/>
 <jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="restore_CRF_to_event"  bundle="${resword}"/>
 </span></h1>
 <p><fmt:message key="confirm_restore_of_this_CRF_to_event"  bundle="${resword}"/> <c:out value="${event.studyEventDefinition.name}"/> (<fmt:message key="date_started" bundle="${resword}"/>:<fmt:formatDate value="${event.dateStarted}" pattern="${dteFormat}"/>). <fmt:message key="all_data_associated_with_the_CRF_in_this_event_will_be_restored"  bundle="${resword}"/></p>

@@ -99,7 +99,7 @@
   }
    //-->
 </script>
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="edit_a_user_account" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="edit_a_user_account" bundle="${resword}"/></span></h1>
 
 
 <form action="EditUserAccount" method="post">

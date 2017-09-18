@@ -99,7 +99,7 @@
     </c:if>
 </c:forEach>
 
-<h1 style="margin:0em"> <span class="title_manage">
+<h1> <span class="title_manage">
    <fmt:message key="test_rules_title" bundle="${resword}" /></span></h1>
 
 

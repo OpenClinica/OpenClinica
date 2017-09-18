@@ -69,7 +69,7 @@
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='message' class='java.lang.String'/>
 
-<h1 style="margin:0em"><c:choose>
+<h1><c:choose>
         <c:when test="${module eq 'manage'}"><span class="title_manage"></c:when>
         <c:otherwise><span class="title_manage"></c:otherwise>
         </c:choose>

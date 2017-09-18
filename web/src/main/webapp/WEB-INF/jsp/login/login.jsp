@@ -88,7 +88,7 @@
             <!-- Login box contents -->
                 <div ID="login">
                     <form action="<c:url value='/j_spring_security_check'/>" method="post">
-                    <h1 style="margin:0em"><fmt:message key="login" bundle="${resword}"/></h1>
+                    <h1><fmt:message key="login" bundle="${resword}"/></h1>
                     <b><fmt:message key="user_name" bundle="${resword}"/></b>
                         <div class="formfieldM_BG">
                             <input style="width:200px;height:30px" type="text" id="username" name="j_username" class="formfieldM">
@@ -111,7 +111,7 @@
             <td class="loginBox">
             <div ID="newsBox">
                 <!-- News box contents -->
-                <h1 style="margin:0em"><fmt:message key="news" bundle="${resword}"/></h1><fmt:message key="loading" bundle="${resword}"/> ...
+                <h1><fmt:message key="news" bundle="${resword}"/></h1><fmt:message key="loading" bundle="${resword}"/> ...
                 <!-- End News box contents -->
             </div>
             </td>

@@ -58,7 +58,7 @@
 
 
 
-<h1 style="margin:0em">
+<h1>
 	<span class="title_manage"> <fmt:message
 			key="batch_crf_version_migration_for" bundle="${resworkflow}"/>&nbsp;<c:out value="${crf.name}"/>
 	</span>

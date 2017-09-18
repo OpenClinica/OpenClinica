@@ -76,7 +76,7 @@
 <jsp:include page="include/sideInfo.jsp"/>
 
 
-<h1 style="margin:0em">
+<h1>
     <span class="title_manage" style="line-height:35px;">
         <fmt:message key="welcome_to" bundle="${restext}"/>
             <c:choose>

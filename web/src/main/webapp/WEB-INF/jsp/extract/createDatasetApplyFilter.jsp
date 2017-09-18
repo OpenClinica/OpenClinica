@@ -13,7 +13,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="create_datasets" bundle="${resword}"/>: <fmt:message key="dataset_filters_applied" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="create_datasets" bundle="${resword}"/>: <fmt:message key="dataset_filters_applied" bundle="${resword}"/></span></h1>
 
 <P><jsp:include page="../showInfo.jsp"/></P>
 <p><fmt:message key="select_filters_to_apply" bundle="${restext}"/></p>

@@ -42,7 +42,7 @@
 <jsp:useBean scope='session' id='definition' class='org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean'/>
 <jsp:useBean scope='request' id='sdvOptions' class='java.util.ArrayList'/>
 <jsp:useBean scope='session' id='eventDefinitionCRFs' class='java.util.ArrayList'/>
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="define_study_event"  bundle="${resword}"/> - <fmt:message key="selected_CRFs"  bundle="${resword}"/> - <fmt:message key="selected_default_version"  bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="define_study_event"  bundle="${resword}"/> - <fmt:message key="selected_CRFs"  bundle="${resword}"/> - <fmt:message key="selected_default_version"  bundle="${resword}"/></span></h1>
 <script type="text/JavaScript" language="JavaScript">
     <!--
     function myCancel() {

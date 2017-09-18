@@ -11,7 +11,7 @@
 
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="view_scheduled_task" bundle="${resword}"/>
 </span></h1>
 <a href="ViewScheduler?action=create"><fmt:message key="click_here_to_start_up" bundle="${restext}"/></a>

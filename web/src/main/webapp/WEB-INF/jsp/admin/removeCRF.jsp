@@ -44,7 +44,7 @@
 <jsp:useBean scope='request' id='eventCRFs' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='crfToRemove' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="confirm_removal_of_CRF" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="confirm_removal_of_CRF" bundle="${resword}"/></span></h1>
 
 <p><fmt:message key="you_choose_to_remove_the_following_CRF" bundle="${restext}"/>:</p>
 <div style="width: 600px">

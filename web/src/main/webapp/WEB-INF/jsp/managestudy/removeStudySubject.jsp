@@ -50,7 +50,7 @@
 <jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
 <jsp:useBean scope="request" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 <jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="remove_subject_from_Study"  bundle="${resword}"/>
 </span></h1>
 

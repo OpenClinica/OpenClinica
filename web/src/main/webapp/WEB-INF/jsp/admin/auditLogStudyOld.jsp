@@ -14,7 +14,7 @@
 
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="view_study_log_for" bundle="${resword}">
 	<fmt:param value="${study.name}"/>
 </fmt:message> 

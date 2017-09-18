@@ -47,7 +47,7 @@
 <jsp:useBean scope="session" id="openQueries" class="java.util.HashMap"/>
 <jsp:useBean scope='session' id='version' class='org.akaza.openclinica.bean.submit.CRFVersionBean'/>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="create_a_new_CRF_version" bundle="${resword}"/> - <fmt:message key="check_item_names" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="create_a_new_CRF_version" bundle="${resword}"/> - <fmt:message key="check_item_names" bundle="${resword}"/></span></h1>
 
 <%--this information is to be changed--%>
 <fmt:message key="item_names_are_shared_across_different_versions" bundle="${resword}"/>

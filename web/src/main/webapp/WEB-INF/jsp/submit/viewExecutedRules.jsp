@@ -62,7 +62,7 @@
 <jsp:useBean scope='request' id='ruleSet' class='org.akaza.openclinica.domain.rule.RuleSetBean'/>
 <jsp:useBean scope='request' id='ruleSetResult' class='java.util.ArrayList'/>
 
-<h1 style="margin:0em"><c:choose>
+<h1><c:choose>
 <c:when test="${userBean.sysAdmin && module=='admin'}">
 <span class="title_manage">
 </c:when>

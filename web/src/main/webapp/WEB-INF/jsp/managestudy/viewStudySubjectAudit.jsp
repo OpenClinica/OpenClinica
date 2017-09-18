@@ -29,7 +29,7 @@
 <form action="ExportExcelStudySubjectAuditLog">
 <input type="hidden" value="<c:out value="${id}"/>" name="id"/><br>    
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
     <c:out value="${studySub.label}"/> <fmt:message key="audit_logs" bundle="${resword}"/></span>
     <input type="image" src="images/bt_Download.gif"  border="0" width="24 " height="15" alt="<fmt:message key="download_spreadsheet" bundle="${resword}"/>" title="<fmt:message key="download_spreadsheet" bundle="${resword}"/>"/><br>   
 </h1>

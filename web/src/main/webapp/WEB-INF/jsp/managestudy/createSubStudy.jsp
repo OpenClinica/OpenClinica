@@ -125,7 +125,7 @@ function updateThis(multiSelEle, count) {
         }
 </script>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="create_a_new_site" bundle="${resword}"/></span></h1><br/>
+<h1><span class="title_manage"><fmt:message key="create_a_new_site" bundle="${resword}"/></span></h1><br/>
 
 <form action="CreateSubStudy" method="post">
 * <fmt:message key="indicates_required_field" bundle="${resword}"/><br>

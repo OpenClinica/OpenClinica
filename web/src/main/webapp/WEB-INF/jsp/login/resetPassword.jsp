@@ -9,7 +9,7 @@
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-migrate-1.1.1.js'/>"></script>
 <jsp:useBean scope="request" id="mustChangePass" class="java.lang.String"/>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="reset_password" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="reset_password" bundle="${resword}"/></span></h1>
 <jsp:include page="../login-include/login-alertbox.jsp"/>
 
 <form action="ResetPassword" method="post">

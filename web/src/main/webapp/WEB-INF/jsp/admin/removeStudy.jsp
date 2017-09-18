@@ -43,7 +43,7 @@
 <jsp:useBean scope='request' id='subjectsToRemove' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='definitionsToRemove' class='java.util.ArrayList'/>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="confirm_removal_of_study" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="confirm_removal_of_study" bundle="${resword}"/></span></h1>
 
 <p><fmt:message key="you_choose_to_remove_the_following_study" bundle="${restext}"/>:</p>
 <div style="width: 600px">

@@ -49,7 +49,7 @@
 <jsp:useBean scope ="session" id="interventions" class="java.util.ArrayList"/>
 <jsp:useBean scope ="request" id="interventionError" class="java.lang.String"/>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="create_a_new_study_continue" bundle="${resword}"/>
 </span></h1>
 <script type="text/JavaScript" language="JavaScript">

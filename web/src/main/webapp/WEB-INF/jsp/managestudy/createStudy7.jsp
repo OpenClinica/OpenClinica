@@ -39,7 +39,7 @@
 
 <jsp:useBean scope='session' id='newStudy' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="create_a_new_study_continue" bundle="${resword}"/>
 </span></h1>
 <script type="text/JavaScript" language="JavaScript">

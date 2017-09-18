@@ -59,7 +59,7 @@
     }
 </script></div>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="sdv_sdv_for" bundle="${resword}"/> <c:out value="${study.name}"/>
     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data')">
         <span class=""></span></a>

@@ -32,7 +32,7 @@ body {
 <tr>
 <td>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="listLdapUsers.header.title" bundle="${resword}"/>
 </span></h1>
 

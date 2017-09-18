@@ -39,7 +39,7 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="openclinica_enterprise" bundle="${resworkflow}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="openclinica_enterprise" bundle="${resworkflow}"/></span></h1>
 
 
 <fmt:message key="openclinica_enterprise_is_an_enhaced_version" bundle="${restext}"/>

@@ -39,7 +39,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
 
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_CRF_attributes" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_CRF_attributes" bundle="${resword}"/></span></h1>
 
 <P><jsp:include page="../showInfo.jsp"/></P>
 

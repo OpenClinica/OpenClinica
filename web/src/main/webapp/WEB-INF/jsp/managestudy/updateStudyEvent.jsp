@@ -78,7 +78,7 @@
   }
    //-->
 </script>
-<h1 style="margin:0em"><c:choose>
+<h1><c:choose>
  <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
   <div class="title_manage">
 </c:when>

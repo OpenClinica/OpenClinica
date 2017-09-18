@@ -11,7 +11,7 @@
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 
 <!-- Preview CRF Version for <c:out value="${section.crf.name}" /> <c:out value="${section.crfVersion.name}" /> -->
 <c:if test="${studySubject != null && studySubject.id>0}">

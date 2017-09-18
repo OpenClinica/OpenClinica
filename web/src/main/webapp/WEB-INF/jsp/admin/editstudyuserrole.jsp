@@ -41,7 +41,7 @@
 <jsp:useBean scope='request' id='chosenRoleId' type='java.lang.Integer' />
 <jsp:useBean scope="request" id="roles" class="java.util.LinkedHashMap"/>
 
-<h1 style="margin:0em"><span class="title_manage">
+<h1><span class="title_manage">
 <fmt:message key="modify_role_for" bundle="${restext}">
 	<fmt:param value="${userName}"/>
 	<fmt:param value="${studyUserRole.studyName}"/>

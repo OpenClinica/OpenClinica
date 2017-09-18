@@ -13,7 +13,7 @@
 
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 <jsp:useBean scope='request' id='auditUserBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
- <h1 style="margin:0em"><span class="title_manage">
+ <h1><span class="title_manage">
  <fmt:message key="view_user_log_for" bundle="${resword}"/>
  <c:out value="${auditUserBean.name}"/> (<c:out value="${auditUserBean.firstName}"/>&nbsp;<c:out value="${auditUserBean.lastName}"/>)
  </span></h1>

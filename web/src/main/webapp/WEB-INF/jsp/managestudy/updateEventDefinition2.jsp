@@ -58,7 +58,7 @@
   }
    //-->
 </script>
-<h1 style="margin:0em"><span class="title_manage"><fmt:message key="update_SED" bundle="${resword}"/> - <fmt:message key="add_CRFs" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="update_SED" bundle="${resword}"/> - <fmt:message key="add_CRFs" bundle="${resword}"/></span></h1>
 
 <form name="crfForm" action="AddCRFToDefinition"  method="post">
     <input type="hidden" name="actionName" value="next">

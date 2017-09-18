@@ -42,7 +42,7 @@
 <jsp:useBean scope='request' id='logmsg' class='java.lang.String'/>
 
 <jsp:useBean scope='request' id='filename' class='java.lang.String'/>
-<h1 style="margin:0em"><span class="title_manage">View Log: <c:out value="${filename}"/>
+<h1><span class="title_manage">View Log: <c:out value="${filename}"/>
 </span></h1>
 <p>
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
