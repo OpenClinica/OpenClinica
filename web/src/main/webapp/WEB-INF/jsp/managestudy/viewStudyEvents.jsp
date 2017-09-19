@@ -89,7 +89,7 @@
 <div class="textbox_center">
 <form method="POST" action="ViewStudyEvents" name="control">
 <jsp:include page="../include/showSubmitted.jsp" />
-<br/>
+
 <table border="0" cellpadding="0" cellspacing="0" >
 <tr valign="top"><b><fmt:message key="filter_events_by" bundle="${resword}"/>:</b></tr>
 </table>
