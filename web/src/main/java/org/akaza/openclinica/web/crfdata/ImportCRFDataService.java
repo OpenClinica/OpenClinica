@@ -985,15 +985,8 @@ public class ImportCRFDataService {
                             ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
                             if (formDataBeans != null) {
                                 for (FormDataBean formDataBean : formDataBeans) {
-                                    ArrayList<FormLayoutBean> formLayoutBeans = new ArrayList<>();
                                     String formOid = formDataBean.getFormOID();
-                                    CRFBean crfBean = crfDAO.findByOid(formOid);
-                                    if(crfBean != null){
-                                        FormLayoutBean formLayoutBean =  (FormLayoutBean) formLayoutDAO.findByFullName(formDataBean.getFormLayoutName(),crfBean.getName());
-                                        if (formLayoutBean != null){
-                                            formLayoutBeans.add(formLayoutBean);
-                                        }
-                                    }
+                                    ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean,ds);
                                     // ideally we should look to compare
                                     // versions within
                                     // seds;
