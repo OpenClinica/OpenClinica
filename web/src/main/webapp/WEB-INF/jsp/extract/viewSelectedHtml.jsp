@@ -188,33 +188,11 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 <tr>
  <td class="table_header_column_top"><fmt:message key="CRF_version" bundle="${resword}"/></td>
- <td class="table_header_column_top"><fmt:message key="interviewer_name" bundle="${resword}"/></td>
- <td class="table_header_column_top"><fmt:message key="interview_date" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="CRF_status" bundle="${resword}"/></td>
  </tr>
  <tr>
  <td class="table_cell"><c:choose>
      <c:when test="${newDataset.showCRFversion}">
-       <fmt:message key="yes" bundle="${resword}"/>
-     </c:when>
-     <c:otherwise>
-       <fmt:message key="no" bundle="${resword}"/>
-     </c:otherwise>
-    </c:choose>
-   </td>
-   <td class="table_cell">
-   <c:choose>
-     <c:when test="${newDataset.showCRFinterviewerName}">
-       <fmt:message key="yes" bundle="${resword}"/>
-     </c:when>
-     <c:otherwise>
-       <fmt:message key="no" bundle="${resword}"/>
-     </c:otherwise>
-    </c:choose>
-   </td>
-   <td class="table_cell">
-     <c:choose>
-     <c:when test="${newDataset.showCRFinterviewerDate}">
        <fmt:message key="yes" bundle="${resword}"/>
      </c:when>
      <c:otherwise>
