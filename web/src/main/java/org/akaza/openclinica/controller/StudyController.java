@@ -9,6 +9,8 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.controller.dto.SiteStatusDTO;
+import org.akaza.openclinica.controller.dto.StudyEnvStatusDTO;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import org.akaza.openclinica.controller.helper.OCUserDTO;
 import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
@@ -154,29 +156,92 @@ public class StudyController {
      * }
      */
 
-    @RequestMapping(value = "/{studyOid}/changeStatus/{status}", method = RequestMethod.POST)
+    @RequestMapping(value = "/{studyEnvUuid}/status", method = RequestMethod.PUT)
     public ResponseEntity<Object> changeStudyStatus(
-            @PathVariable("studyOid") String studyOid, @PathVariable("status") int status, HttpServletRequest request) {
-        UserAccountBean ub = getStudyOwnerAccount(request);
+            @RequestBody HashMap<String, Object> requestDTO,
+            @PathVariable("studyEnvUuid") String studyEnvUuid,
+            HttpServletRequest request) {
 
+        ResponseEntity response = null;
+        ArrayList<ErrorObject> errorObjects = new ArrayList<ErrorObject>();
+        StudyDTO studyDTO = new StudyDTO();
+
+        // Set the locale, status object needs this
+        Locale locale = new Locale("en_US");
+        request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
+        ResourceBundleProvider.updateLocale(locale);
+
+        UserAccountBean ub = getStudyOwnerAccount(request);
         if (ub == null)
             return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
+
+        // Get public study
         StudyDAO studyDAO = new StudyDAO(dataSource);
-        StudyBean currentPublicStudy = studyDAO.findByOid(studyOid);
-        String schema = currentPublicStudy.getSchemaName();
-        CoreResources.setRequestSchema(request, schema);
-        StudyDAO studyDAO1 = new StudyDAO(dataSource);
-        StudyBean currentStudy = studyDAO1.findByOid(studyOid);
-        currentStudy.setOldStatus(currentPublicStudy.getStatus());
-        currentStudy.setStatus(org.akaza.openclinica.bean.core.Status.get(status));
+        StudyBean currentPublicStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
+        // Get tenant study
+        String tenantSchema = currentPublicStudy.getSchemaName();
+        CoreResources.setRequestSchema(request, tenantSchema);
+        StudyBean currentStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
+        // Validate study exists
+        if (currentPublicStudy == null || currentStudy == null) {
+            ErrorObject errorObject = createErrorObject("Study Object", "Missing or invalid", "studyEnvUuid");
+            errorObjects.add(errorObject);
+            studyDTO.setErrors(errorObjects);
+            studyDTO.setMessage(validation_failed_message);
+            return new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+        // Get Status object from requestDTO
+        Status status = getStatus((String) requestDTO.get("status"));
+        // Validate status field
+        if (status == null ) {
+            ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "status");
+            errorObjects.add(errorObject);
+            studyDTO.setErrors(errorObjects);
+            studyDTO.setMessage(validation_failed_message);
+            return new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        } else if (!status.equals(Status.PENDING)
+                && !status.equals(Status.AVAILABLE)
+                && !status.equals(Status.FROZEN)
+                && !status.equals(Status.LOCKED) ){
+            ErrorObject errorObject = createErrorObject("Study Object", "Invalid status", "status");
+            errorObjects.add(errorObject);
+            studyDTO.setErrors(errorObjects);
+            studyDTO.setMessage(validation_failed_message);
+            return new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
+
+        // Update tenant study & sites
+        currentStudy.setOldStatus(currentStudy.getStatus());
+        currentStudy.setStatus(status);
         studyDAO.updateStudyStatus(currentStudy);
         ArrayList siteList = (ArrayList) studyDAO.findAllByParent(currentStudy.getId());
         if (siteList.size() > 0) {
             studyDAO.updateSitesStatus(currentStudy);
         }
 
-        return new ResponseEntity<Object>("Success", HttpStatus.OK);
+        // Update public study & sites
+        CoreResources.setRequestSchema(request, "public");
+        currentPublicStudy.setOldStatus(currentPublicStudy.getStatus());
+        currentPublicStudy.setStatus(status);
+        studyDAO.updateStudyStatus(currentPublicStudy);
+        ArrayList publicSiteList = (ArrayList) studyDAO.findAllByParent(currentPublicStudy.getId());
+        if (publicSiteList.size() > 0) {
+            studyDAO.updateSitesStatus(currentPublicStudy);
+        }
 
+        StudyEnvStatusDTO studyEnvStatusDTO = new StudyEnvStatusDTO();
+        studyEnvStatusDTO.setStudyEnvUuid(currentPublicStudy.getStudyEnvUuid());
+        studyEnvStatusDTO.setStatus(currentPublicStudy.getStatus().getName());
+        ArrayList updatedPublicSiteList = (ArrayList) studyDAO.findAllByParent(currentPublicStudy.getId());
+        for(StudyBean site:  (ArrayList<StudyBean>)updatedPublicSiteList){
+            SiteStatusDTO siteStatusDTO = new SiteStatusDTO();
+            siteStatusDTO.setSiteUuid(site.getStudyEnvSiteUuid());
+            siteStatusDTO.setStatus(site.getStatus().getName());
+            studyEnvStatusDTO.getSiteStatuses().add(siteStatusDTO);
+        }
+
+        return  new ResponseEntity(studyEnvStatusDTO, org.springframework.http.HttpStatus.OK);
     }
 
     private StudyParameterConfig processStudyConfigParameters(HashMap<String, Object> map, ArrayList<ErrorObject> errorObjects) {
@@ -1809,6 +1874,18 @@ public class StudyController {
             return Role.RESEARCHASSISTANT2;
         } else
             return null;
+    }
+
+
+    private Status getStatus(String myStatus) {
+
+        Status statusObj = null;
+
+        if (myStatus != null) {
+            myStatus = myStatus.equals("DESIGN") ? "PENDING" : myStatus;
+            statusObj = Status.getByName(myStatus.toLowerCase());
+        }
+        return statusObj;
     }
 
 }
