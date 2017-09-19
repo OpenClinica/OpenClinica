@@ -224,13 +224,12 @@ public class EnketoUrlService {
         if (flavor.equals(QUERY_FLAVOR)) {
             populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, flavor);
             crfFlavor = flavor;
-            crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
             crfFlavor = flavor + "[" + idb.getId() + "]";
             markComplete = false;
-            crfOid = formLayout.getOcOid() + crfFlavor;
         }
+        crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
 
         // Call Enketo api to get edit url
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
