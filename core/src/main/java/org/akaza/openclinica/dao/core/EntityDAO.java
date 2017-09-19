@@ -433,18 +433,23 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
     	Connection con = null;
     	execute( query,  variables,  nullVars,  con) ;
     }
-    	   
+
     public void execute(String query, HashMap variables, HashMap nullVars, Connection con) {
         clearSignals();
 
         boolean isTrasactional = false;
-        if (con != null){isTrasactional = true;}
-       
-       	 PreparedStatement ps = null;
+        if (con != null) {
+            isTrasactional = true;
+        }
+
+        PreparedStatement ps = null;
         PreparedStatementFactory psf = new PreparedStatementFactory(variables, nullVars);
         try {
-        	if ( !isTrasactional){ con = ds.getConnection();             CoreResources.setSchema(con);}
-           if (con.isClosed()) {
+            if (!isTrasactional) {
+                con = ds.getConnection();
+                CoreResources.setSchema(con);
+            }
+            if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: EntityDAO.execute!");
                 throw new SQLException();
@@ -466,8 +471,11 @@ public abstract class EntityDAO<K extends String,V extends ArrayList> implements
                 logger.error(sqle.getMessage(), sqle);
             }
         } finally {
-        	 if ( !isTrasactional) {this.closeIfNecessary(con, ps);}
-             else {closePreparedStatement(ps);}
+            if (!isTrasactional) {
+                this.closeIfNecessary(con, ps);
+            } else {
+                closePreparedStatement(ps);
+            }
         }
     }
 
