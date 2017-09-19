@@ -83,6 +83,19 @@ td {
   font-size: inherit;
   line-height: inherit; }
 
+a{
+  text-decoration: none;
+}
+
+.statusSide{
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+}
+
+.eventSide{
+  color:#494D4B !important; 
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;"
+}
+
 a:link {
   color: #3a6087; }
 
