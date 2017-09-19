@@ -335,9 +335,11 @@ public class OpenRosaServices {
                         urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + DASH + formLayout.getXform() + QUERY_FLAVOR);
                 form.setFormID(formLayout.getOcOid() + DASH + formLayout.getXform() + QUERY_FLAVOR);
             } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
-                form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + attribute);
-                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + attribute);
-                form.setFormID(formLayout.getOcOid() + attribute);
+                form.setDownloadURL(
+                        urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + DASH + formLayout.getXform() + attribute);
+                form.setManifestURL(
+                        urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + DASH + formLayout.getXform() + attribute);
+                form.setFormID(formLayout.getOcOid() + DASH + formLayout.getXform() + attribute);
             } else {
                 form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formId=" + formLayout.getOcOid() + DASH + formLayout.getXform());
                 form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?formId=" + formLayout.getOcOid() + DASH + formLayout.getXform());
@@ -987,10 +989,10 @@ public class OpenRosaServices {
     private String getFormLayoutOid(String uniqueId) {
         if (uniqueId.endsWith(QUERY_FLAVOR)) {
             uniqueId = uniqueId.substring(0, uniqueId.length() - QUERY_FLAVOR.length());
-            uniqueId = uniqueId.substring(0, uniqueId.lastIndexOf(DASH));
         } else if (uniqueId.contains(SINGLE_ITEM_FLAVOR)) {
             uniqueId = uniqueId.substring(0, uniqueId.indexOf(SINGLE_ITEM_FLAVOR));
         }
+        uniqueId = uniqueId.substring(0, uniqueId.lastIndexOf(DASH));
         return uniqueId;
     }
 
