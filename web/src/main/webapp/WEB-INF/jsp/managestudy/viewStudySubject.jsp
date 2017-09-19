@@ -110,7 +110,7 @@
 
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
     <tr><td>
-        <h1 style="margin: 0em">
+        <h1>
             <div class="title_manage">
                 <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/>
            </div>

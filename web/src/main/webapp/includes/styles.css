@@ -72,7 +72,7 @@ h1 {
   color: #ED7800;
   font-family: 'Didact Gothic', Helvetica, Arial, sans-serif;
   font-size: 1.5em;
-  margin: 0 .25em; }
+  margin: 0; }
 
 li:not(div#bt_Home) {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
@@ -82,6 +82,19 @@ li:not(div#bt_Home) {
 td {
   font-size: inherit;
   line-height: inherit; }
+
+a{
+  text-decoration: none;
+}
+
+.statusSide{
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+}
+
+.eventSide{
+  color:#494D4B !important; 
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;"
+}
 
 a:link {
   color: #3a6087; }

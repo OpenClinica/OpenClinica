@@ -54,27 +54,24 @@
 
 
 <script language="JavaScript">
+  function leftnavExpand(strLeftNavRowElementName){
+     var objLeftNavRowElement;
 
-         function leftnavExpand(strLeftNavRowElementName){
-         var objLeftNavRowElement;
-
-           objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-           if (objLeftNavRowElement != null) {
-             if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-             objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
-               objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-               if(objLeftNavRowElement.display == "none"){
-                   objExCl.src = "images/bt_Expand.gif";
-               }else{
-                   objExCl.src = "images/bt_Collapse.gif";
-               }
+       objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+       if (objLeftNavRowElement != null) {
+         if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
+         objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
+           objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
+           if(objLeftNavRowElement.display == "none"){
+               objExCl.src = "images/bt_Expand.gif";
+           }else{
+               objExCl.src = "images/bt_Collapse.gif";
            }
-           }
+       }
+  }
+</script>
 
-
- </script>
-<h1 style="margin: 0em; "><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1></br>
-
+<h1><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1></br>
 
 <a style="text-decoration:none" href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"><fmt:message key="download_study_meta" bundle="${restext}"/></a>.
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>

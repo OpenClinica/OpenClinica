@@ -67,7 +67,7 @@ h1 {
   color: #ED7800;
   font-family: 'Didact Gothic', Helvetica, Arial, sans-serif;
   font-size: 1.5em;
-  margin: 0 .25em; }
+  margin: 0; }
   h1 span.icon-question-circle {
     font-size: .75em; }
 
