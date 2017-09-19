@@ -87,12 +87,12 @@ function notSelectAll() {
 </h1>
 </c:when>
 <c:otherwise>
-<h1 style="margin: 0em">
- <span class="title_manage">
-   <fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="filter_by_date" bundle="${resword}"/>
-   <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')">
-   <span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
- </span>
+<h1>
+  <span class="title_manage">
+     <fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="filter_by_date" bundle="${resword}"/>
+     <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')">
+     <span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+  </span>
 </h1>
 </c:otherwise>
 </c:choose>
