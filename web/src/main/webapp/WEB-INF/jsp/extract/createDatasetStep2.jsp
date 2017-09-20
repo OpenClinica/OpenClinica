@@ -105,22 +105,6 @@ function notSelectAll() {
 
 
 <p><fmt:message key="Select_a_CRF_to_choose_individual" bundle="${resword}"/> </p>
-<table border="0" cellpadding="0" cellspacing="0">
-  <tr>
-    <td><img src="images/arrow_left.gif" alt="<fmt:message key="select_CRF_on_the_left" bundle="${restext}"/>" title="<fmt:message key="select_CRF_on_the_left" bundle="${restext}"/>"></td>
-    <td>
-      <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-    <div class="textbox_center" align="center">
-      <span class="title_extract">
-         <b><fmt:message key="use_task_pane_to_select_CRF" bundle="${restext}"/></b>
-      </span>
-    </div>
-
-  </div></div></div></div></div></div></div></div>
-
-    </td>
-  </tr>
-</table>
 
 <c:if test="${crf != null && crf.id>0}">
 

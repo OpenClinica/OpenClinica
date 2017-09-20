@@ -41,14 +41,6 @@
 
 <h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_CRF_attributes" bundle="${resword}"/></span></h1>
 
-<P><jsp:include page="../showInfo.jsp"/></P>
-
-<jsp:include page="createDatasetBoxes.jsp" flush="true">
-<jsp:param name="selectStudyEvents" value="1"/>
-</jsp:include>
-
-<P><jsp:include page="../showMessage.jsp"/></P>
-
 <fmt:message key="instructions_extract_select_CRF_and_group" bundle="${resword}"/>
 
 <form action="CreateDataset" method="post" name="cl">

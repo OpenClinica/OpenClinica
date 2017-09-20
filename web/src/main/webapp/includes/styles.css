@@ -59,7 +59,7 @@ body {
   font-size: 100%;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   margin: 0;
-  overflow-x: scroll;
+  overflow-x: hidden;
   width: 100% !important; }
   body > table {
     margin: 0 auto;
