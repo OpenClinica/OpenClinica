@@ -65,7 +65,7 @@
 
 <input type="hidden" name="datasetId" value="<c:out value="${dataset.id}"/>"/>
 <table border="0" cellpadding="5" width="625">
-<tr valign="top" width="100%"><p><b><fmt:message key="note" bundle="${resword}"/>: </b><fmt:message key="export_dataset_download2" bundle="${restext}"/></p></tr>
+<tr valign="top" width="100%"><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><fmt:message key="note" bundle="${resword}"/>: </b><fmt:message key="export_dataset_download2" bundle="${restext}"/></p></tr>
 <tr valign="top" width="100%">
     <td class="text" >
 	<ul><%-- <li><a href="ExportDataset?action=html&datasetId=<c:out value="${dataset.id}"/>"><fmt:message key="view_as_HTML" bundle="${resword}"/></a></li> --%>
