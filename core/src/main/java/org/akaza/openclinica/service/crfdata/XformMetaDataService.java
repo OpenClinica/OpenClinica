@@ -13,6 +13,7 @@ import java.util.Set;
 
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
@@ -86,6 +87,7 @@ public class XformMetaDataService {
     public static final String INSTANCE_SUFFIX = "instance.tpl";
     public static final String INSTANCEQUERIES_SUFFIX = "instance-queries.tpl";
     public static final String FORMQUERIES_SUFFIX = "form-queries.xml";
+    public static final String FORMPREVIEW_SUFFIX = "form-preview.xml";
     public static final String XLS_SUFFIX = ".xls";
 
     public static final String GEOPOINT_DATATYPE = "geopoint";
@@ -432,7 +434,7 @@ public class XformMetaDataService {
             try {
                 String disposition = response.getHeaders().get("Content-Disposition").get(0);
                 fileName = disposition.replaceFirst("(?i)^.*filename=\"([^\"]+)\".*$", "$1");
-                String dir = Utils.getCrfMediaFilePath(crfOid, formLayoutOid);
+                String dir = Utils.getCrfMediaFilePathOrig(crfOid, formLayoutOid);
                 if (!new File(dir).exists()) {
                     new File(dir).mkdirs();
                     logger.debug("Made the directory " + dir);
@@ -523,8 +525,8 @@ public class XformMetaDataService {
             try {
                 FormLayout formLayout = createCRFMetaData(
                         new CrfMetaDataObject(eicObj.form, version, container, eicObj.getCurrentStudy(), eicObj.ub, eicObj.errors, formLayoutDef.getURL()));
-                saveFormArtifactsInOCDataDirectory(fileLinks, eicObj.form.getOcoid(), version.getOcoid(), formLayout);
-                saveMediaFiles(fileLinks, eicObj.form.getOcoid(), formLayout);
+                saveFormArtifactsInOCDataDirectory(fileLinks, eicObj.getCurrentStudy(), eicObj.form.getOcoid(), version.getOcoid(), formLayout);
+                saveMediaFiles(fileLinks, eicObj.getCurrentStudy(), eicObj.form.getOcoid(), formLayout);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -537,9 +539,10 @@ public class XformMetaDataService {
         }
     }
 
-    public void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, String crfOid, String formLayoutOid, FormLayout formLayout) throws IOException {
+    public void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, StudyBean study, String crfOid, String formLayoutOid, FormLayout formLayout)
+            throws IOException {
         // Create the directory structure for saving the media
-        String dir = Utils.getCrfMediaFilePath(crfOid, formLayoutOid);
+        String dir = Utils.getCrfMediaPath(study.getOid(), crfOid, formLayoutOid);
         if (!new File(dir).exists()) {
             new File(dir).mkdirs();
             logger.debug("Made the directory " + dir);
@@ -631,9 +634,9 @@ public class XformMetaDataService {
         return section;
     }
 
-    private void saveMediaFiles(List<String> fileLinks, String crfOid, FormLayout formLayout) throws IOException {
+    private void saveMediaFiles(List<String> fileLinks, StudyBean study, String crfOid, FormLayout formLayout) throws IOException {
         // Create the directory structure for saving the media
-        String dir = Utils.getCrfMediaFilePathWithoutSysPath(crfOid, formLayout.getOcOid());
+        String dir = Utils.getCrfMediaPath(study.getOid(), crfOid, formLayout.getOcOid());
         for (String fileLink : fileLinks) {
             String fileName = "";
             int startIndex = fileLink.lastIndexOf('/');
@@ -641,7 +644,8 @@ public class XformMetaDataService {
                 fileName = fileLink.substring(startIndex + 1);
             }
             if (!fileLink.endsWith(FORM_SUFFIX) && !fileLink.endsWith(INSTANCEQUERIES_SUFFIX) && !fileLink.endsWith(FORMQUERIES_SUFFIX)
-                    && !fileLink.endsWith(XLS_SUFFIX) && !fileLink.endsWith(INSTANCE_SUFFIX) && !fileLink.endsWith(VERSION)) {
+                    && !fileLink.endsWith(XLS_SUFFIX) && !fileLink.endsWith(INSTANCE_SUFFIX) && !fileLink.endsWith(VERSION)
+                    && !fileLink.endsWith(FORMPREVIEW_SUFFIX)) {
 
                 FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutIdFileNameForNoteTypeMedia(formLayout.getFormLayoutId(), fileName, dir);
                 if (media == null) {

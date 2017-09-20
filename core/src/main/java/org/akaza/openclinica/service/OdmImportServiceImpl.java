@@ -289,6 +289,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         StudyBean currentStudy = new StudyBean();
         currentStudy.setId(study.getStudyId());
         currentStudy.setEnvType(study.getEnvType());
+        currentStudy.setOid(study.getOc_oid());
 
         UserAccountBean ub = new UserAccountBean();
         ub.setId(userAccount.getUserId());

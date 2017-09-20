@@ -267,7 +267,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                     formLayout = (FormLayoutBean) fldao.findByPK(vms.get(0).getFormLayout().getFormLayoutId());
                 // Get Original formLayout file from data directory
                 String xformOutput = "";
-                String directoryPath = Utils.getCrfMediaFilePath(crf.getOid(), formLayout.getOid());
+                String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(currentStudy.getOid(), crf.getOid(), formLayout.getOid());
                 File dir = new File(directoryPath);
                 File[] directoryListing = dir.listFiles();
                 if (directoryListing != null) {
