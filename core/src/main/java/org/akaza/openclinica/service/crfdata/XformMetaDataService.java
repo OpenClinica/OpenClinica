@@ -434,7 +434,7 @@ public class XformMetaDataService {
             try {
                 String disposition = response.getHeaders().get("Content-Disposition").get(0);
                 fileName = disposition.replaceFirst("(?i)^.*filename=\"([^\"]+)\".*$", "$1");
-                String dir = Utils.getCrfMediaFilePathOrig(crfOid, formLayoutOid);
+                String dir = Utils.getCrfMediaFilePath(crfOid, formLayoutOid);
                 if (!new File(dir).exists()) {
                     new File(dir).mkdirs();
                     logger.debug("Made the directory " + dir);
