@@ -309,7 +309,7 @@
 
 		<input type="hidden" name="dsStatus" value="1"/>
 
-			<input type="submit" name="remove" value=" <fmt:message key="continue" bundle="${resword}"/>" class="button_xlong"/>
+			<input type="submit" name="remove" value=" <fmt:message key="confirm_and_save" bundle="${resword}"/>" class="button_xlong"/>
             <input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 
         </td>
