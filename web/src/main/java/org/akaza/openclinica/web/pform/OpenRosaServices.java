@@ -297,7 +297,7 @@ public class OpenRosaServices {
             attribute = uniqueId.substring(uniqueId.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
-            String directoryPath = Utils.getCrfMediaFilePath(crf.getOcOid(), formLayout.getOcOid());
+            String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, crf.getOcOid(), formLayout.getOcOid());
             File dir = new File(directoryPath);
             File[] directoryListing = dir.listFiles();
             if (directoryListing != null) {
@@ -385,7 +385,7 @@ public class OpenRosaServices {
 
                 MediaFile mediaFile = new MediaFile();
                 mediaFile.setFilename(media.getName());
-                File image = new File(Utils.getCrfMediaSysPath() + media.getPath() + media.getName());
+                File image = new File(Utils.getFilePath() + media.getPath() + media.getName());
                 mediaFile.setHash(DigestUtils.md5Hex(media.getName()) + Double.toString(image.length()));
                 mediaFile.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadMedia?formLayoutMediaId=" + media.getFormLayoutMediaId());
                 manifest.add(mediaFile);
@@ -469,7 +469,7 @@ public class OpenRosaServices {
             String attribute = uniqueId.substring(uniqueId.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
-            String directoryPath = Utils.getCrfMediaFilePath(crf.getOcOid(), formLayout.getOcOid());
+            String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, crf.getOcOid(), formLayout.getOcOid());
             File dir = new File(directoryPath);
             File[] directoryListing = dir.listFiles();
             if (directoryListing != null) {
@@ -520,7 +520,7 @@ public class OpenRosaServices {
 
         FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutMediaId(Integer.valueOf(formLayoutMediaId));
 
-        File image = new File(Utils.getCrfMediaSysPath() + media.getPath() + media.getName());
+        File image = new File(Utils.getFilePath() + media.getPath() + media.getName());
         FileInputStream fis = new FileInputStream(image);
         StreamingOutput stream = new MediaStreamingOutput(fis);
         ResponseBuilder builder = Response.ok(stream);

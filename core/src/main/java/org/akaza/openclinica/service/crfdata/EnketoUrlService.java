@@ -414,7 +414,7 @@ public class EnketoUrlService {
         }
         String templateStr = null;
         CrfBean crfBean = crfDao.findById(formLayout.getCrf().getCrfId());
-        String directoryPath = Utils.getCrfMediaFilePath(crfBean.getOcOid(), formLayout.getOcOid());
+        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOid, crfBean.getOcOid(), formLayout.getOcOid());
         File dir = new File(directoryPath);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {
