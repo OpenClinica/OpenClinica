@@ -542,7 +542,7 @@ public class XformMetaDataService {
     public void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, StudyBean study, String crfOid, String formLayoutOid, FormLayout formLayout)
             throws IOException {
         // Create the directory structure for saving the media
-        String dir = Utils.getCrfMediaPath(study.getOid(), crfOid, formLayoutOid);
+        String dir = Utils.getFilePath() + Utils.getCrfMediaPath(study.getOid(), crfOid, formLayoutOid);
         if (!new File(dir).exists()) {
             new File(dir).mkdirs();
             logger.debug("Made the directory " + dir);
