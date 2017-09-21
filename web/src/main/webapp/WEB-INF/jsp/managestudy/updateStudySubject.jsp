@@ -88,12 +88,12 @@
       </td>
       <td>
         <div class="formfieldXL_BG">
-        <input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL">
+        <input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL">*
         </div>
         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include>
       </td>
       <td>
-       &nbsp;*
+       
       </td>
       </tr>
 
@@ -108,14 +108,17 @@
       <td>
       <div class="formfieldXL_BG">
 
-      <input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" class="formfieldXL" id="enrollmentDateField"></div>
-      <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
-      <td valign="top">
-      <a href="#" >
-          <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger"/>
-          <script type="text/javascript">
+        <input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" class="formfieldXL" id="enrollmentDateField">
+        <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger"/>
+          <script type="text/javascript"> 
           Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger" });
           </script>
+      </div>
+      <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
+      <td valign="top">
+      
+      <a href="#" >
+          
       </a>&nbsp;*
                             <%-- DN for enrollment date goes here --%>
                             <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
