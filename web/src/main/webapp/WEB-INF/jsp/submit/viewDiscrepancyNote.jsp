@@ -319,18 +319,6 @@
 
 <c:if test="${!study.status.locked}">
     <div style="clear:both;"></div>
-    <c:choose>
-    <c:when test="${boxToShow==0}">
-        <p id="p">
-            <a href="javascript:showOnly('box<c:out value='${0}'/>New');javascript:removeText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');" id="a0"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a>
-        </p>
-    </c:when>
-    <c:otherwise>
-        <p id="p">
-            <a href="javascript:showOnly('box<c:out value='${0}'/>New');javascript:removeText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');" id="a0"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a>
-        </p>
-    </c:otherwise>
-    </c:choose>
     <c:import url="./discrepancyNote.jsp">
         <c:param name="parentId" value="0"/>
         <c:param name="entityId" value="${id}"/>                
