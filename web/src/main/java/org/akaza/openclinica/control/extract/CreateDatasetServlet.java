@@ -439,22 +439,7 @@ public class CreateDatasetServlet extends SecureController {
                 request.setAttribute("defaultStart", local_df.parse(local_df.format(ddate)));
                 request.setAttribute("defaultEnd", getLastDayOfMonth(2100, 12));
 
-                session.setAttribute("newDataset", dsb);
-                forwardPage(Page.CONFIRM_DATASET);
-            }
-
-        } else if ("confirmall".equalsIgnoreCase(action)) {
-            String submit = fp.getString("btnSubmit");
-            logger.info("reached confirm all");
-            if (!resword.getString("confirm_and_save").equalsIgnoreCase(submit)) {
-                // we're going back, so we should not destroy the
-                // data we've created, tbh
-                // session.removeAttribute("newDataset");
-                // session.removeAttribute("newFilter");
-                forwardPage(Page.CREATE_DATASET_4);
-            } else {
                 DatasetDAO ddao = new DatasetDAO(sm.getDataSource());
-                DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
                 dsb.setStudyId(this.currentStudy.getId());
 
                 dsb.setOwner(ub);
@@ -486,16 +471,11 @@ public class CreateDatasetServlet extends SecureController {
                         forwardPage(Page.EXTRACT_DATASETS_MAIN);
                     }
                 }
-                // YW >>
-
-                logger.info("setting data set id here");
-                // may be easier to just set the dataset bean
-                // back into the session?
-                request.setAttribute("extractProperties", CoreResources.getExtractProperties());
                 request.setAttribute("dataset", dsb);
-
+                request.setAttribute("extractProperties", CoreResources.getExtractProperties());
                 forwardPage(Page.EXPORT_DATASETS);
             }
+
         } else {
             // refine this bit to catch errors, hopefully
             addPageMessage(restext.getString("creating_new_dataset_cancelled"));
