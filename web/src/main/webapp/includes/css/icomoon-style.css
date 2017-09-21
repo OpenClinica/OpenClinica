@@ -56,6 +56,7 @@
 }
 .icon-calendar:before {
   content: "\e809";
+  background-color: #fff;
 }
 .icon-plus:before {
   content: "\e80a";

@@ -111,13 +111,12 @@
       <input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" class="formfieldXL" id="enrollmentDateField"></div>
       <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
       <td valign="top">
-      &nbsp;*
-      <A HREF="#" >
+      <a href="#" >
           <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger"/>
           <script type="text/javascript">
           Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger" });
           </script>
-      </a>
+      </a>&nbsp;*
                             <%-- DN for enrollment date goes here --%>
                             <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
                                 <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
