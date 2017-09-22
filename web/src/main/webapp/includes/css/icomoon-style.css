@@ -58,6 +58,9 @@
   content: "\e809";
   background-color: #fff;
 }
+.icon-calendarGB:before {
+  content: "\e809";
+}
 .icon-plus:before {
   content: "\e80a";
 }
