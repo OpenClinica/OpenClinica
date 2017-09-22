@@ -1,20 +1,40 @@
 package org.akaza.openclinica.job;
   
-import java.util.HashMap;
-import java.util.Map;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.COUNT;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.DATASET_ID;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.DELETE_OLD;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.EMAIL;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.EP_BEAN;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.EXTRACT_PROPERTY;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.FAILURE_MESSAGE;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.LOCALE;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_FILE_NAME;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_FILE_PATH;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_PROC_DELETE_OLD;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_PROC_EXPORT_NAME;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_PROC_LOCATION;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.POST_PROC_ZIP;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.STUDY_ID;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.SUCCESS_MESSAGE;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.TENANT_SCHEMA;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.USER_ID;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.XML_FILE_PATH;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.XSLT_PATH;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.XSL_FILE_PATH;
+import static org.akaza.openclinica.service.extract.XsltTriggerService.ZIPPED;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
-import org.springframework.context.annotation.*;
-import org.springframework.scheduling.quartz.CronTriggerFactoryBean;
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.EnableAspectJAutoProxy;
+import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Scope;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
-import org.springframework.scheduling.quartz.MethodInvokingJobDetailFactoryBean;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
-
-import static org.akaza.openclinica.service.extract.XsltTriggerService.*;
 
 @Configuration
 @EnableAspectJAutoProxy
@@ -23,7 +43,8 @@ public class QuartzConfiguration {
 	@Scope("prototype")
     @Lazy
     public SimpleTriggerFactoryBean simpleTriggerFactoryBean(String xslFile, String xmlFile, String endFilePath,
-            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt, String xsltPath){
+            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt, String xsltPath,
+            StudyBean currentPublicStudy, StudyBean currentStudy){
 		SimpleTriggerFactoryBean triggerFactoryBean = new SimpleTriggerFactoryBean();
 
 		triggerFactoryBean.setBeanName("trigger1");
@@ -44,7 +65,8 @@ public class QuartzConfiguration {
 
 		jobDataMap.put(EXTRACT_PROPERTY, epBean.getId());
 		jobDataMap.put(USER_ID, userAccountBean.getId());
-		jobDataMap.put(STUDY_ID, userAccountBean.getActiveStudyId());
+        jobDataMap.put(STUDY_ID, currentStudy.getId());
+        jobDataMap.put(TENANT_SCHEMA, currentPublicStudy.getSchemaName());
 		jobDataMap.put(LOCALE, locale);
 		jobDataMap.put(DATASET_ID, datasetId);
 		jobDataMap.put(EMAIL, userAccountBean.getEmail());
