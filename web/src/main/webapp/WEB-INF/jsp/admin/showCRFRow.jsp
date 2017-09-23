@@ -39,18 +39,13 @@
         </td>
         <c:choose>
           <c:when test="${currRow.bean.status.available}">
-            <td><a href="InitCreateCRFVersion?module=<c:out value="${module}"/>&crfId=<c:out value="${currRow.bean.id}"/>&name=<c:out value="${currRow.bean.name}"/>"
-                   onMouseDown="javascript:setImage('bt_NewVersion1','images/bt_NewVersion_d.gif');"
-                   onMouseUp="javascript:setImage('bt_NewVersion1','icon icon-icon-newVersion');"><span
-              name="bt_NewVersion1" class="icon icon-icon-newVersion" border="0" alt="<fmt:message key="create_new_version" bundle="${resword}"/>" title="<fmt:message key="create_new_version" bundle="${resword}"/>" align="left" hspace="6"></a>
-            </td>
-                  <c:if test="${module=='manage'}">
-        <td><a href="BatchCRFMigration?module=<c:out value="${module}"/>&crfId=<c:out value="${currRow.bean.id}"/>"
+        <c:if test="${module=='manage'}">
+          <td><a href="BatchCRFMigration?module=<c:out value="${module}"/>&crfId=<c:out value="${currRow.bean.id}"/>"
                    onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
                    onMouseUp="javascript:setImage('bt_Reassign','icon icon-icon-reassign');"><span
                    name="Reassign" class="icon icon-icon-reassign" border="0" alt="<fmt:message key="batch_crf_version_migration" bundle="${resword}"/>" title="<fmt:message key="batch_crf_version_migration" bundle="${resword}"/>" align="left" hspace="6"></a>
-               </td>                        
-                  </c:if>
+            </td>                        
+          </c:if>
           </c:when>
           <c:otherwise>
             <td><a href="RestoreCRF?module=<c:out value="${module}"/>&action=confirm&id=<c:out value="${currRow.bean.id}"/>"
