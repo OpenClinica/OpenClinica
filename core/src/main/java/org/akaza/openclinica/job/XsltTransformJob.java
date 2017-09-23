@@ -64,6 +64,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
+import org.springframework.util.StringUtils;
 /**
  * Xalan Transform Job, an XSLT transform job using the Xalan classes
  *
@@ -84,6 +85,7 @@ public class XsltTransformJob extends QuartzJobBean {
     public static final String EXTRACT_PROPERTY = "extractProperty";
     public static final String LOCALE = "locale";
     public static final String STUDY_ID = "studyId";
+    public static final String TENANT_SCHEMA = "tenantSchema";
     public static final String ZIPPED = "zipped";
     public static final String DELETE_OLD = "deleteOld";
     public static final String SUCCESS_MESSAGE = "SUCCESS_MESSAGE";
@@ -112,7 +114,8 @@ public class XsltTransformJob extends QuartzJobBean {
     @Override
     protected void executeInternal(JobExecutionContext context) {
         logger.info("Job " + context.getJobDetail().getDescription() + " started.");
-        initDependencies(context.getScheduler());
+        JobDataMap dataMap = context.getMergedJobDataMap();
+        initDependencies(context.getScheduler(),dataMap);
         // need to generate a Locale for emailing users with i18n
         // TODO make dynamic?
         Locale locale = new Locale("en-US");
@@ -122,7 +125,6 @@ public class XsltTransformJob extends QuartzJobBean {
         Boolean zipped = true;
         Boolean deleteOld = true;
         Boolean exceptions = false;
-        JobDataMap dataMap = context.getMergedJobDataMap();
         String localeStr = dataMap.getString(LOCALE);
         String[] doNotDeleteUntilExtract = new String[4];
         int cnt = dataMap.getInt("count");
@@ -563,12 +565,14 @@ public class XsltTransformJob extends QuartzJobBean {
      * Initializes the dependencies of this job with the components from the Spring application context.
      *
      * @param scheduler
+     * @param dataMap 
      */
-    private void initDependencies(Scheduler scheduler) {
+    private void initDependencies(Scheduler scheduler, JobDataMap dataMap) {
         try {
             ApplicationContext ctx = (ApplicationContext) scheduler.getContext().get("applicationContext");
             DataSource dataSource = ctx.getBean(DataSource.class);
-            CoreResources.tenantSchema.set(scheduler.getSchedulerName());
+            if (StringUtils.isEmpty(dataMap.getString(TENANT_SCHEMA))) CoreResources.tenantSchema.set(scheduler.getSchedulerName());
+            else CoreResources.tenantSchema.set(dataMap.getString(TENANT_SCHEMA));
             mailSender = ctx.getBean(OpenClinicaMailSender.class);
             auditEventDAO = ctx.getBean(AuditEventDAO.class);
             datasetDao = ctx.getBean(DatasetDAO.class);

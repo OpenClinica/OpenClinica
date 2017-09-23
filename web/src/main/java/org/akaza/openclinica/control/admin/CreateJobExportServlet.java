@@ -1,8 +1,15 @@
 package org.akaza.openclinica.control.admin;
 
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+
 import java.io.File;
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.Calendar;
+import java.util.Collection;
+import java.util.Date;
+import java.util.GregorianCalendar;
+import java.util.HashMap;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 
@@ -30,8 +37,6 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.scheduling.quartz.JobDetailFactoryBean;
-import static org.quartz.TriggerBuilder.*;
-import static org.quartz.SimpleScheduleBuilder.*;
 /**
  *
  * @author thickerson
@@ -136,9 +141,10 @@ public class CreateJobExportServlet extends SecureController {
             forwardPage(Page.CREATE_JOB_EXPORT);
         } else if ("confirmall".equalsIgnoreCase(action)) {
             // collect form information
-            Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals("DEFAULT"));
-            String[] triggerNames = triggerKeys.stream().toArray(String[]::new);
-            HashMap errors = validateForm(fp, request, triggerNames, "");
+            XsltTriggerService xsltService = new XsltTriggerService();
+            Set<TriggerKey> triggerKeySet = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltService.getTriggerGroupNameForExportJobs()));
+            TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
+            HashMap errors = validateForm(fp, request, triggerKeys, "");
 
             if (!errors.isEmpty()) {
                 // set errors to request
@@ -190,7 +196,6 @@ public class CreateJobExportServlet extends SecureController {
                 epBean.setDoNotDelFiles(temp);
                 epBean.setExportFileName(temp);
 
-                XsltTriggerService xsltService = new XsltTriggerService();
                 String generalFileDir = SQLInitServlet.getField("filePath");
 
                 generalFileDir = generalFileDir + "datasets" + File.separator + dsBean.getId() + File.separator + sdfDir.format(new java.util.Date());
@@ -224,15 +229,25 @@ public class CreateJobExportServlet extends SecureController {
                         endFilePath + File.separator,
                         exportFileName,
                         dsBean.getId(),
-                        epBean, userBean, LocaleResolver.getLocale(request).getLanguage(),cnt,  SQLInitServlet.getField("filePath") + "xslt", xsltService.getTriggerGroupNameForExportJobs());
+                        epBean, 
+                        userBean, 
+                        LocaleResolver.getLocale(request).getLanguage(),
+                        cnt,  
+                        SQLInitServlet.getField("filePath") + "xslt", 
+                        xsltService.getTriggerGroupNameForExportJobs(),
+                        currentPublicStudy,
+                        currentStudy);
 
                 //Updating the original trigger with user given inputs
-                trigger.getTriggerBuilder().withSchedule(simpleSchedule().withRepeatCount(64000)
-                        .withIntervalInSeconds(new Integer(period).intValue())
+                trigger = trigger.getTriggerBuilder()
+                        .withIdentity(jobName, xsltService.getTriggerGroupNameForExportJobs())
+                        .withSchedule(simpleSchedule().withRepeatCount(64000)
+                        .withIntervalInSeconds(XsltTriggerService.getIntervalTimeInSeconds(period))
                         .withMisfireHandlingInstructionNextWithExistingCount())
                         .startAt(startDateTime)
-                        .forJob(jobName)
-                        .withDescription(jobDesc);
+                        .forJob(jobName,xsltService.getTriggerGroupNameForExportJobs())
+                        .withDescription(jobDesc)
+                        .build();
                 trigger.getJobDataMap().put(XsltTriggerService.EMAIL, email);
                 trigger.getJobDataMap().put(XsltTriggerService.PERIOD, period);
                 trigger.getJobDataMap().put(XsltTriggerService.EXPORT_FORMAT, epBean.getFiledescription());
@@ -242,11 +257,11 @@ public class CreateJobExportServlet extends SecureController {
 
                 JobDetailFactoryBean JobDetailFactoryBean = new JobDetailFactoryBean();
                 JobDetailFactoryBean.setGroup(xsltService.getTriggerGroupNameForExportJobs());
-                JobDetailFactoryBean.setName(trigger.getKey().getName());
+                JobDetailFactoryBean.setName(jobName);
                 JobDetailFactoryBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
                 JobDetailFactoryBean.setJobDataMap(trigger.getJobDataMap());
                 JobDetailFactoryBean.setDurability(true); // need durability?
-
+                JobDetailFactoryBean.afterPropertiesSet();
 
                 // set to the scheduler
                 try {
@@ -271,7 +286,7 @@ public class CreateJobExportServlet extends SecureController {
         }
     }
 
-    public HashMap validateForm(FormProcessor fp, HttpServletRequest request, String[] triggerNames, String properName) {
+    public HashMap validateForm(FormProcessor fp, HttpServletRequest request, TriggerKey[] triggerKeys, String properName) {
         Validator v = new Validator(request);
         v.addValidation(JOB_NAME, Validator.NO_BLANKS);
         v.addValidation(JOB_NAME, Validator.NO_LEADING_OR_TRAILING_SPACES);
@@ -291,8 +306,8 @@ public class CreateJobExportServlet extends SecureController {
             // errors.put(TAB, "Error Message - Pick one of the below");
             v.addError(errors, FORMAT_ID, "Please pick at least one.");
         }
-        for (String triggerName : triggerNames) {
-            if (triggerName.equals(fp.getString(JOB_NAME)) && !triggerName.equals(properName)) {
+        for (TriggerKey triggerKey : triggerKeys) {
+            if (triggerKey.getName().equals(fp.getString(JOB_NAME)) && !triggerKey.getName().equals(properName)) {
                 v.addError(errors, JOB_NAME, "A job with that name already exists.  Please pick another name.");
             }
         }
