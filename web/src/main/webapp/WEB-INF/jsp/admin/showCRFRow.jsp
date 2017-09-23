@@ -45,11 +45,6 @@
                    onMouseDown="javascript:setImage('bt_Edit1','images/bt_Edit_d.gif');"
                    onMouseUp="javascript:setImage('bt_Edit1','images/bt_Edit.gif');"><span class="icon icon-pencil" border="0" alt="<fmt:message key="edit" bundle="${resword}"/>" title="<fmt:message key="edit" bundle="${resword}"/>" align="left" hspace="6"></a>
               </td>
-              <td><a href="RemoveCRF?module=<c:out value="${module}"/>&action=confirm&id=<c:out value="${currRow.bean.id}"/>"
-                     onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                     onMouseUp="javascript:setImage('bt_Remove1','icon icon-cancel');"><span
-                name="bt_Remove1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
-              </td>
             </c:if>
             <td><a href="InitCreateCRFVersion?module=<c:out value="${module}"/>&crfId=<c:out value="${currRow.bean.id}"/>&name=<c:out value="${currRow.bean.name}"/>"
                    onMouseDown="javascript:setImage('bt_NewVersion1','images/bt_NewVersion_d.gif');"
@@ -139,12 +134,7 @@
           </c:if>
           <c:if test="${userBean.sysAdmin || (userRole.manageStudy && userBean.name==version.owner.name)}">
             <c:choose>
-              <c:when test="${version.status.available}">
-                <td><a href="RemoveCRFVersion?module=<c:out value="${module}"/>&action=confirm&id=<c:out value="${version.id}"/>"
-                       onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
-                       onMouseUp="javascript:setImage('bt_Remove1','icon icon-cancel');"><span
-                  name="bt_Remove1" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>" align="left" hspace="6"></a>
-                </td>                
+              <c:when test="${version.status.available}">               
               </c:when>
               <c:when test="${version.status.name == 'removed'}">
                 <td><a href="RestoreCRFVersion?module=<c:out value="${module}"/>&action=confirm&id=<c:out value="${version.id}"/>"
