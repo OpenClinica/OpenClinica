@@ -156,11 +156,6 @@
             </c:choose>
           </c:if>
           <c:if test="${userBean.sysAdmin}">
-            <td><a href="DeleteCRFVersion?module=<c:out value="${module}"/>&action=confirm&verId=<c:out value="${version.id}"/>"
-                   onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
-                   onMouseUp="javascript:setImage('bt_Delete1','icon icon-trash red');"><span
-              name="bt_Delete1" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
-            </td>
           </c:if>
         </tr>
       </table>
