@@ -53,6 +53,7 @@ import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -252,6 +253,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setItemRepeatGroupName(igBean.getLayoutGroupPath());
             subjectContext.setStudyEventId(String.valueOf(seb.getId()));
             String contextHash = cache.putSubjectContext(subjectContext);
+            StudyBean parentStudyBean = getParentStudy(currentStudy.getOid(), ds);
 
             if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
                 // This section is for version migration ,where item does not exist in the current formLayout
@@ -266,8 +268,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 if (!itemExistInFormLayout)
                     formLayout = (FormLayoutBean) fldao.findByPK(vms.get(0).getFormLayout().getFormLayoutId());
                 // Get Original formLayout file from data directory
+
                 String xformOutput = "";
-                String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(currentStudy.getOid(), crf.getOid(), formLayout.getOid());
+                String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(parentStudyBean.getOid(), crf.getOid(), formLayout.getOid());
                 File dir = new File(directoryPath);
                 File[] directoryListing = dir.listFiles();
                 if (directoryListing != null) {
@@ -813,4 +816,14 @@ public class ResolveDiscrepancyServlet extends SecureController {
         return sdf.format(date);
     }
 
+    private StudyBean getParentStudy(String studyOid, DataSource ds) {
+        StudyDAO sdao = new StudyDAO(ds);
+        StudyBean study = (StudyBean) sdao.findByOid(studyOid);
+        if (study.getParentStudyId() == 0) {
+            return study;
+        } else {
+            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            return parentStudy;
+        }
+    }
 }
