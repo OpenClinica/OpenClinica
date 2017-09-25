@@ -44,8 +44,8 @@
             <c:if test="${module=='manage'}">
               <td><a href="BatchCRFMigration?module=<c:out value="${module}"/>&crfId=<c:out value="${currRow.bean.id}"/>"
                    onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
-                   onMouseUp="javascript:setImage('bt_Reassign','icon icon-icon-reassign');"><span
-                   name="Reassign" class="icon icon-icon-reassign" border="0" alt="<fmt:message key="batch_crf_version_migration" bundle="${resword}"/>" title="<fmt:message key="batch_crf_version_migration" bundle="${resword}"/>" align="left" hspace="6"></a>
+                   onMouseUp="javascript:setImage('bt_Reassign','icon icon-icon-reassign3');"><span
+                   name="Reassign" class="icon icon-icon-reassign3" border="0" alt="<fmt:message key="batch_crf_version_migration" bundle="${resword}"/>" title="<fmt:message key="batch_crf_version_migration" bundle="${resword}"/>" align="left" hspace="6"></a>
                </td>                        
             </c:if>
           </c:when>
