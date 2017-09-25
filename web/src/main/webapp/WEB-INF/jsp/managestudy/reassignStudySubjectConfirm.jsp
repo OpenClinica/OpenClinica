@@ -45,12 +45,13 @@
 
 <jsp:useBean scope="request" id="newStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 <jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
-<table>
-<tr>
-    <td>
+
 <h1><span class="title_manage">
-<fmt:message key="confirm_reassign_study_subject" bundle="${restext}"/>
+<fmt:message key="confirm_reassign_study_subject" bundle="${restext}"/> [<c:out value="${studySub.id}"/>]
 </span></h1>
+
+<table>
+
 
 <form action="ReassignStudySubject" method="post">
 <input type="hidden" name="action" value="submit">

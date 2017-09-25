@@ -80,7 +80,7 @@ View
                     <td><fmt:message key="restore" bundle="${reswords}"/></td>
                 </tr>
                 <tr>
-                    <td>&nbsp;<span class="icon icon-icon-reassign2"></span></td>
+                    <td>&nbsp;<span class="icon icon-icon-reassign3"></span></td>
                     <td><fmt:message key="reassign" bundle="${reswords}"/></td>
                 </tr>
                 <tr>
