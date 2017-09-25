@@ -248,12 +248,6 @@
 
 		         </a>
                  </td>
-
-		         <td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${formLayoutOID}')"
-			     onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-			     onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><span
-		         name="bt_Print1" class="icon icon-print" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>" align="left" hspace="6"></a></td>
 <!-- study.status != locked &&  study.status != frozen, Event CRF - not 'locked' or 'skipped', user='Study Director' or 'Data Manager' or 'admin' -->
 <c:if test="${dedc.eventCRF.id>0 && 
  (userRole.director || userRole.coordinator) && study.status.available 
@@ -363,12 +357,6 @@
 			onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
 		    name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 
-		 </td>
-		 <td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.formLayout.oid}')"
-			onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-			onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><span
-		    name="bt_Print1" class="icon icon-print" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
 		 </td>
 		<c:choose>
 		<c:when test="${!dec.eventCRF.status.deleted}">

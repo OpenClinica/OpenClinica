@@ -407,24 +407,7 @@
                    onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
                   name="bt_View1" align="left" class="icon icon-search" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></span></a>&nbsp;
-            </td><td >
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${crfVersionOID}')"
-
-               onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-               onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><span
-              name="bt_Print1" align="left" class="icon icon-print" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>"  hspace="2"></span></a>&nbsp;
-
-      <c:if test="${ study.status.available   &&
-        (userRole.director || userRole.coordinator)
-        && !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)
-        && dedc.eventCRF.id>0}">
-
-    <a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dedc.eventCRF.crf.id}" />&crfName=<c:out value="${dedc.eventCRF.crf.name}" />&formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}" />&formLayoutName=<c:out value="${dedc.eventCRF.formLayout.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCRFId=<c:out value="${dedc.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dedc.edc.id}" />"
-   onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
-   onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><span
-      name="Reassign" class="icon icon-icon-reassign" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="6"></span></a>
-                </c:if>
-        </td>
+            </td>
         </tr>
     </table>
     </form>
@@ -501,12 +484,6 @@
                onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
               ><span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="2"></span></a>
-</td><td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.formLayout.oid}')"
-
-               onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-               onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-              ><span name="bt_Print<c:out value="${rowCount}"/>" class="icon icon-print" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></span></a>
 </td>
 
             <c:if test="${(studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed') && (study.status.available)}">
@@ -522,12 +499,7 @@
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
               ><span name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></span></a>
-</td><td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.formLayout.oid}')"
-               onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-               onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-              ><span name="bt_Print<c:out value="${rowCount}"/>" class="icon icon-print" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></span></a>
-  </td>
+</td>
 
         </c:when>
         <c:otherwise>
@@ -567,14 +539,6 @@
                onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
               ><span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="2"></span></a>
-              </td>
-
-           <td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySubject.oid}/${studyEvent.studyEventDefinition.oid}<c:if test="${studyEvent.studyEventDefinition.repeating}">[${studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.formLayout.oid}')"
-
-               onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-               onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-              ><span name="bt_Print<c:out value="${rowCount}"/>" class="icon icon-print" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></span></a>
               </td>
 
             <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
