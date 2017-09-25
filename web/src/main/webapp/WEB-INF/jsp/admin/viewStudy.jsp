@@ -138,25 +138,9 @@
   <c:out value="${studyToView.status.name}"/>
    </td></tr>
 
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="purpose" bundle="${resword}"/>:</td><td class="table_cell">
-   <c:out value="${studyToView.purpose}"/>
-  </td></tr>
-
   <c:choose>
   <c:when test="${studyToView.protocolTypeKey=='interventional'}">
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="allocation" bundle="${resword}"/>:</td><td class="table_cell">
-   <c:out value="${studyToView.allocation}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="masking" bundle="${resword}"/>:</td><td class="table_cell">
-    <c:out value="${studyToView.masking}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="control" bundle="${resword}"/>:</td><td class="table_cell">
-    <c:out value="${studyToView.control}"/>&nbsp;
-  </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="assignment" bundle="${resword}"/>:</td><td class="table_cell">
    <c:out value="${studyToView.assignment}"/>&nbsp;
