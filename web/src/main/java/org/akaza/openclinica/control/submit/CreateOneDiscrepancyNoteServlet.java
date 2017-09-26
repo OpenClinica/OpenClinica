@@ -6,6 +6,14 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
+import javax.servlet.http.HttpSession;
+
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -36,14 +44,7 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-
-import javax.servlet.http.HttpSession;
+import org.apache.commons.lang.StringUtils;
 
 /**
  * Create a discrepancy note
@@ -327,7 +328,8 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
                      */
 
                     String emailBodyString = message.toString();
-                    sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),study.getName(), dn.getEntityName()), emailBodyString, true, null,
+                    String entityName = getEntityName(dn);
+                    sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),study.getName(), entityName), emailBodyString, true, null,
                             null, true);
                 }
 
@@ -474,5 +476,35 @@ public class CreateOneDiscrepancyNoteServlet extends SecureController {
         return origin;
     }
 
-
+    private String getEntityName(DiscrepancyNoteBean note) {
+        String entityType="";
+        if (!StringUtils.isBlank(note.getEntityType())) {
+            if ("itemData".equalsIgnoreCase(note.getEntityType())) {
+                return note.getEntityName();
+            } 
+            if (!StringUtils.isBlank(note.getColumn())) {
+                if ("studySub".equalsIgnoreCase(note.getEntityType())) {
+                    if ("enrollment_date".equalsIgnoreCase(note.getColumn())) {
+                        entityType = resword.getString("enrollment_date");
+                    }
+                } else if ("subject".equalsIgnoreCase(note.getEntityType())) {
+                    if ("gender".equalsIgnoreCase(note.getColumn())) {
+                        entityType = resword.getString("gender");
+                    } else if ("date_of_birth".equalsIgnoreCase(note.getColumn())) {
+                        entityType = resword.getString("date_of_birth");
+                    } else if ("unique_identifier".equalsIgnoreCase(note.getColumn())) {
+                        entityType = resword.getString("unique_identifier");
+                    }
+                } else if ("studyEvent".equalsIgnoreCase(note.getEntityType())) {
+                    if ("start_date".equalsIgnoreCase(note.getColumn())) {
+                        entityType = resword.getString("start_date");
+                    } else if ("end_date".equalsIgnoreCase(note.getColumn())) {
+                        entityType = resword.getString("end_date");
+                    }
+                }
+            }
+        }
+        return entityType;
+        
+    }
 }
