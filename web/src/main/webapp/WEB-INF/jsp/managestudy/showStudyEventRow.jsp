@@ -86,6 +86,13 @@
 	  <c:otherwise>
 
       <table border="0" cellpadding="0" cellspacing="0">
+      <tr valign="top">
+			<td class="table_cell" width="180" style="background-color: #ccc;"><center><fmt:message key="name" bundle="${resword}"/></center></td>
+			<td class="table_cell" width="180" style="background-color: #ccc;"><center><fmt:message key="version" bundle="${resword}"/></center></td>
+			<td class="table_cell" width="180" style="background-color: #ccc;"><center><fmt:message key="status" bundle="${resword}"/></center></td>
+			<td class="table_cell" width="180" style="background-color: #ccc;"><center><fmt:message key="update" bundle="${resword}"/></center></td>
+			<td class="table_cell" width="180" style="background-color: #ccc;"><center><fmt:message key="actions" bundle="${resword}"/></center></td>
+		</tr>
 
 	  <c:forEach var="dedc" items="${currRow.bean.uncompletedCRFs}">
 
