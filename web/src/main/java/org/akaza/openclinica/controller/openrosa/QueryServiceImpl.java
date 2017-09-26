@@ -277,13 +277,12 @@ public class QueryServiceImpl implements QueryService {
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("disc_note_info"));
         message.append(respage.getString("email_body_separator"));
-        message.append(MessageFormat.format(respage.getString("mailDNParameters1"), helperBean.getDn().getDescription(), helperBean.getDn().getDetailedNotes(),
-                helperBean.getUserAccount().getUserName()));
+        message.append(MessageFormat.format(respage.getString("mailDNParameters1"), helperBean.getDn().getDetailedNotes(), helperBean.getUserAccount().getUserName()));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("entity_information"));
         message.append(respage.getString("email_body_separator"));
         message.append(
-                MessageFormat.format(respage.getString("mailDNParameters2"), helperBean.getDn().getStudy().getName(), helperBean.getDn().getDescription()));
+                MessageFormat.format(respage.getString("mailDNParameters2"), helperBean.getDn().getStudy().getName(), helperBean.getContainer().getSubject().getLabel()));
 
         if (!("studySub".equalsIgnoreCase(helperBean.getDn().getEntityType()) || "subject".equalsIgnoreCase(helperBean.getDn().getEntityType()))) {
             message.append(MessageFormat.format(respage.getString("mailDNParameters3"),
