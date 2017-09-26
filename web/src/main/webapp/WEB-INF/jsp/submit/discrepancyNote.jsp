@@ -358,8 +358,8 @@ function setYPos(id) {
 			<span id="user2${parentId}" style="display:block">
 		</c:otherwise>
 		</c:choose>
-			<div class="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>:</div>
-			<div class="dnBoxCol2"><input name="sendEmail${parentId}" value="1" type="checkbox"/></div>
+			<div class="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>: <input name="sendEmail${parentId}" value="1" type="checkbox"/></div>
+			<br/>
 		</span>
 		
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
