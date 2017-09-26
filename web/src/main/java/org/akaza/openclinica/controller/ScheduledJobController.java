@@ -1,7 +1,15 @@
 package org.akaza.openclinica.controller;
 
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
+
 import java.text.SimpleDateFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -14,7 +22,13 @@ import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobTableFactory;
 import org.akaza.openclinica.web.table.scheduledjobs.ScheduledJobs;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.jmesa.facade.TableFacade;
-import org.quartz.*;
+import org.quartz.JobExecutionContext;
+import org.quartz.JobKey;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
+import org.quartz.SimpleTrigger;
+import org.quartz.Trigger;
+import org.quartz.TriggerKey;
 import org.quartz.impl.matchers.GroupMatcher;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -25,9 +39,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
-import static org.quartz.TriggerBuilder.newTrigger;
 
 /**
  *
@@ -57,7 +68,7 @@ public class ScheduledJobController {
         Locale locale = LocaleResolver.getLocale(request);
         ResourceBundleProvider.updateLocale(locale);
         ModelMap gridMap = new ModelMap();
-        String[] triggerNames;
+        TriggerKey[] triggerKeys;
 
         boolean showMoreLink = false;
         if(request.getParameter("showMoreLink")!=null){
@@ -96,15 +107,15 @@ public class ScheduledJobController {
         int index1 =0;
         for (String triggerGroup : triggerGroups) {
             logger.debug("Group: " + triggerGroup + " contains the following triggers");
-            Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
+            Set<TriggerKey> triggerKeySet = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(triggerGroup));
 
-            triggerNames = triggerKeys.stream().toArray(String[]::new);
+            triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
             
-            for (String triggerName : triggerNames) {
-               Trigger.TriggerState state = scheduler.getTriggerState(TriggerKey.triggerKey(triggerName, triggerGroup));
-               logger.debug("- " + triggerName);
+            for (TriggerKey triggerKey : triggerKeys) {
+               Trigger.TriggerState state = scheduler.getTriggerState(triggerKey);
+               logger.debug("- " + triggerKey.getName());
                if (state != Trigger.TriggerState.PAUSED) {
-               simpleTriggers.add(index1,(SimpleTrigger) scheduler.getTrigger(TriggerKey.triggerKey(triggerName, triggerGroup)));
+               simpleTriggers.add(index1,(SimpleTrigger) scheduler.getTrigger(triggerKey));
                  index1++;
                }
             }
@@ -196,14 +207,18 @@ public class ScheduledJobController {
         }
 
         scheduler.pauseJob(JobKey.jobKey(theJobName, theJobGroupName));
+        
         SimpleTrigger newTrigger = (SimpleTrigger) newTrigger()
+                .withIdentity(triggerName, triggerGroupName)
                 .forJob(theJobName, theJobGroupName)
                 .startAt(startTime)
-                .withSchedule(simpleSchedule().withRepeatCount(oldTrigger.getRepeatCount()).withIntervalInSeconds(new Long(oldTrigger.getRepeatInterval()).intValue())
-                        .withMisfireHandlingInstructionNextWithRemainingCount());
-
-
-        newTrigger.getTriggerBuilder().usingJobData(oldTrigger.getJobDataMap());
+                .withSchedule(simpleSchedule()
+                    .withRepeatCount(oldTrigger.getRepeatCount())
+                    .withIntervalInMilliseconds(oldTrigger.getRepeatInterval())
+                    .withMisfireHandlingInstructionNextWithRemainingCount())
+                .withDescription(oldTrigger.getDescription())
+                .usingJobData(oldTrigger.getJobDataMap())
+                .build();
 
 
         scheduler.unscheduleJob(TriggerKey.triggerKey(triggerName,triggerGroupName));// these are the jobs which are from extract data and are not not required to be rescheduled.
@@ -225,6 +240,7 @@ public class ScheduledJobController {
             JobDetailFactoryBean.setJobClass(org.akaza.openclinica.job.XsltStatefulJob.class);
             JobDetailFactoryBean.setJobDataMap(newTrigger.getJobDataMap());
             JobDetailFactoryBean.setDurability(true); // need durability?
+            JobDetailFactoryBean.afterPropertiesSet();
 
 
            scheduler.deleteJob(JobKey.jobKey(theJobName, theJobGroupName));
