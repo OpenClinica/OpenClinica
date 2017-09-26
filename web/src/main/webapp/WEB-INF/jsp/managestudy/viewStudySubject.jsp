@@ -603,27 +603,6 @@
 
 <!-- Table Actions row (pagination, search, tools) -->
 
-<tr>
-
-    <!-- Table Tools/Actions cell -->
-
-    <td align="right" valign="top" class="table_actions">
-        <table border="0" cellpadding="0" cellspacing="0">
-            <tr>
-                <td class="table_tools">
-                    <c:if test="${userBean.sysAdmin}">
-                        <c:if test="${study.status.available}">
-                            <a style="text-decoration: none" href="UpdateSubject?id=<c:out value="${subject.id}"/>&studySubId=<c:out value="${studySub.id}"/>&action=show"><fmt:message key="edit_record" bundle="${resword}"/></a>
-                        </c:if>
-                    </c:if>
-                </td>
-            </tr>
-        </table>
-    </td>
-
-    <!-- End Table Tools/Actions cell -->
-</tr>
-
 <!-- end Table Actions row (pagination, search, tools) -->
 
 <tr>
