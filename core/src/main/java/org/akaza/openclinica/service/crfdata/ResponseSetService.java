@@ -34,6 +34,13 @@ public class ResponseSetService {
         String optionValues = xformItem.getOptionsValues();
         if (optionText != null && optionValues != null) {
 
+            String[] newOptionValues = optionValues.split("(?<!\\\\),", -1);
+            String[] newOptionText = optionText.split("(?<!\\\\),", -1);
+            if (newOptionValues.length != newOptionText.length) {
+                errors.rejectValue("name", "xform_validation_error", "Mismatch count for response Options");
+                logger.info("Mistach count for reponse option value and text");
+            }
+
             if (responseSet == null) {
                 // Create the response set
                 responseSet = new ResponseSet();
@@ -46,11 +53,9 @@ public class ResponseSetService {
                 responseSet = responseSetDao.saveOrUpdate(responseSet);
 
             } else {
-                String[] newOptionValues = optionValues.split("(?<!\\\\),");
-                String[] newOptionText = optionText.split("(?<!\\\\),");
 
-                String[] existingOptionValues = responseSet.getOptionsValues().split("(?<!\\\\),");
-                String[] existingOptionText = responseSet.getOptionsText().split("(?<!\\\\),");
+                String[] existingOptionValues = responseSet.getOptionsValues().split("(?<!\\\\),", -1);
+                String[] existingOptionText = responseSet.getOptionsText().split("(?<!\\\\),", -1);
 
                 Map<String, String> newOptionMap = new HashMap<>();
                 for (int i = 0; i < newOptionValues.length; i++) {
@@ -78,10 +83,12 @@ public class ResponseSetService {
                 if (!StringUtils.isEmpty(optValues))
                     optValues = optValues.substring(0, optValues.length() - 1);
 
-                responseSet.setOptionsText(optText);
-                responseSet.setOptionsValues(optValues);
-                responseSet.setResponseType(responseType);
-                responseSet = responseSetDao.saveOrUpdate(responseSet);
+                if (!optText.equals(responseSet.getOptionsText()) || !optValues.equals(responseSet.getOptionsValues())) {
+                    responseSet.setOptionsText(optText);
+                    responseSet.setOptionsValues(optValues);
+                    responseSet.setResponseType(responseType);
+                    responseSet = responseSetDao.saveOrUpdate(responseSet);
+                }
             }
         }
         return responseSet;
