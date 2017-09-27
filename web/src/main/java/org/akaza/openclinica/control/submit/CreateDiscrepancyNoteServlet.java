@@ -737,8 +737,15 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         }
 
                     }
-                    note = (DiscrepancyNoteBean) dndao.create(note);
+                    String entityName ="";
+                    if (!StringUtils.isBlank(note.getEntityType()) && !"itemData".equalsIgnoreCase(note.getEntityType())
+                            && !StringUtils.isBlank((String)request.getAttribute("entityName"))) {
+                            entityName = (String)request.getAttribute("entityName");
+                    } else {
+                        entityName=note.getEntityName();
+                    }
 
+                    note = (DiscrepancyNoteBean) dndao.create(note);
                     dndao.createMapping(note);
 
                     request.setAttribute(DIS_NOTE, note);
@@ -834,7 +841,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         message.append(respage.getString("email_footer"));
 
                         String emailBodyString = message.toString();
-                        sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),study.getName(), note.getEntityName()), emailBodyString, true, null,
+                        sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),study.getName(), entityName), emailBodyString, true, null,
                                 null, true);
 
                     } else {
