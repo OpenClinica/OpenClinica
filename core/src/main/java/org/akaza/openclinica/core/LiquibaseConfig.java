@@ -3,10 +3,8 @@ package org.akaza.openclinica.core;
 import liquibase.integration.spring.SpringLiquibase;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.*;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -31,6 +29,7 @@ public class LiquibaseConfig {
 
     @Bean
     @DependsOn ("coreResources")
+    @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
     public OCCommonTablesSpringLiquibase liquibaseSchemaCommonTables() {
         OCCommonTablesSpringLiquibase liquibase = new OCCommonTablesSpringLiquibase();
         liquibase.setDataSource(dataSource);
