@@ -267,8 +267,7 @@
 				<c:param name="count" value="1"/>
 				</c:import>
 				
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=start&column=start_date','spanAlert-start'); return false;">
-				*</a></c:if></td>
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>) *</td>
 			</tr>
 			
 			</table>
@@ -289,8 +288,7 @@
 				<c:param name="count" value="2"/>
 				</c:import>
 
-				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)<c:if test="${study.studyParameterConfig.discrepancyManagement=='true'}"><a onClick="openDSNoteWindow('CreateDiscrepancyNote?subjectId=${chosenSubject.id}&name=studyEvent&field=end&column=end_date','spanAlert-end'); return false;">
-				</a></c:if></td>
+				<td>(<fmt:message key="date_time_format" bundle="${resformat}"/>)</td>
 			</tr>
 			
 			</table>
