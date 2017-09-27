@@ -14,6 +14,9 @@ import java.util.List;
 
 /**
  * Created by yogi on 3/16/17.
+ * This class is not Thread safe multiple threads accessing this class
+ * specially when creating new schemas via SBS will cause issues if singleton.
+ * @Bean initialized with session scope.
  */
 public class OCCommonTablesSpringLiquibase extends SpringLiquibase {
     @Autowired DataSource dataSource;
