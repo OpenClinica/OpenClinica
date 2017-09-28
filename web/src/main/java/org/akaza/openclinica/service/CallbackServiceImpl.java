@@ -46,8 +46,8 @@ public class CallbackServiceImpl implements CallbackService {
         logger.info("Callback for user:" + _username);
         if (StringUtils.isEmpty(_username))
             return null;
-        Map<String, Object> userContextMap = getUserContextMap(user);
-        String userUuid = (String) userContextMap.get("userUuid");
+        UserContext userContext = getUserContextMap(user);
+        String userUuid = user.getUserId();
         UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid(userUuid);
         if (StringUtils.isEmpty(ub.getName())) {
             ub = (UserAccountBean) userAccountDAO.findByUserName(_username);
@@ -56,6 +56,7 @@ public class CallbackServiceImpl implements CallbackService {
             userAccountDAO.update(ub);
             updateStudyUsername(ub, user);
         }
+        Map<String, Object> userContextMap = new HashMap<>();
         if (ub.getId() == 0) {
             ub = createUserAccount(request, user, userContextMap);
         }
@@ -69,7 +70,6 @@ public class CallbackServiceImpl implements CallbackService {
 
     @Modifying
     private void updateStudyUsername(UserAccountBean ub, Auth0User user) {
-        Map<String, Object> appMetadata = user.getAppMetadata();
         Query query=studyUserRoleDao.getCurrentSession().createQuery("update StudyUserRole set id.userName=:userName where id.userName=:prevUser");
         logger.info("update StudyUserRole set id.userName=" + user.getNickname() + " where id.userName=" + user.getUserId());
         query.setParameter("userName", user.getNickname());
@@ -78,12 +78,9 @@ public class CallbackServiceImpl implements CallbackService {
         logger.info(modifications + " studyUserRole rows have been updated from user:" + ub.getName() + " to user:" + user.getNickname());
     }
 
-    public Map<String, Object> getUserContextMap(Auth0User user)  throws Exception {
-        Map<String, Object> appMetadata = user.getAppMetadata();
-        Object userContext = appMetadata.get("userContext");
-        String toJson = objectMapper.writeValueAsString(userContext);
-        Map<String, Object> userContextMap = objectMapper.readValue(toJson, Map.class);
-        return userContextMap;
+    public UserContext getUserContextMap(Auth0User user)  throws Exception {
+        UserContext userContext = user.getUserContext();
+        return userContext;
     }
     @Modifying
     private boolean updateStudyUserRoles(HttpServletRequest request, UserAccountBean ub, Auth0User user, Map<String, Object> userContextMap) throws Exception {
@@ -105,11 +102,10 @@ public class CallbackServiceImpl implements CallbackService {
 
         map.put("role_name", "Data Manager");
         map.put("user_uuid", (String) userContextMap.get("userUuid"));
-        Map<String, Object> appMetadata = user.getAppMetadata();
-        Object userType = appMetadata.get("userContext");
-        LinkedTreeMap<String, String> userTypeMap = (LinkedTreeMap<String, String>) userType;
+        UserContext userContext = user.getUserContext();
+        String userType = userContext.getUserType();
         String convertedUserType = null;
-        switch ((String) userTypeMap.get("userType")) {
+        switch (userType) {
         case "Business Admin":
             convertedUserType = UserType.SYSADMIN.getName();
             break;
@@ -120,7 +116,7 @@ public class CallbackServiceImpl implements CallbackService {
             convertedUserType = UserType.USER.getName();
             break;
         default:
-            String error = "Invalid userType:" + (String) userTypeMap.get("userType");
+            String error = "Invalid userType:" + userType;
             logger.error(error);
             throw new Exception(error);
         }
