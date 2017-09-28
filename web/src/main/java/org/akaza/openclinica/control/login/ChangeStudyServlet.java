@@ -108,6 +108,8 @@ public class ChangeStudyServlet extends SecureController {
             if (study != null && study.getStatus().equals(Status.PENDING)) {
                 sr.setStatus(study.getStatus());
             }
+            if (study.isPublished() == false)
+                continue;
             studyList.add(study);
             validStudies.add(sr);
         }
