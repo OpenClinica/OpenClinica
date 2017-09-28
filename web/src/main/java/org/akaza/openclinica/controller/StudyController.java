@@ -171,7 +171,7 @@ public class StudyController {
         request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
         ResourceBundleProvider.updateLocale(locale);
 
-        UserAccountBean ub = getStudyOwnerAccount(request);
+        UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
         if (ub == null)
             return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
 
@@ -189,6 +189,11 @@ public class StudyController {
             studyDTO.setErrors(errorObjects);
             studyDTO.setMessage(validation_failed_message);
             return new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+        if (ub != null){
+            if (!isDataManagerOrStudyDirector(ub,currentPublicStudy)){
+                return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
+            }
         }
         // Get Status object from requestDTO
         Status status = getStatus((String) requestDTO.get("status"));
@@ -1699,6 +1704,18 @@ public class StudyController {
         sdao = new StudyDAO(dataSource);
         StudyBean studyBean = (StudyBean) sdao.findByStudyEnvUuid(envUuid);
         return studyBean;
+    }
+
+    public Boolean isDataManagerOrStudyDirector(UserAccountBean userAccount, StudyBean currentStudy){
+
+        long result = userAccount.getRoles()
+                .stream()
+                .filter(role -> currentStudy.getId() == (role.getStudyId())
+                        && (role.getRole().equals(Role.STUDYDIRECTOR)
+                                || role.getRole().equals(Role.COORDINATOR)))
+                .count();
+
+        return result > 0;
     }
 
 
