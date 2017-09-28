@@ -28,8 +28,8 @@ public class LiquibaseConfig {
     }
 
     @Bean
-    @DependsOn ("coreResources")
-    @Scope(value = WebApplicationContext.SCOPE_SESSION, proxyMode = ScopedProxyMode.TARGET_CLASS)
+    @DependsOn ({"coreResources", "createPostgresAppServer"})
+    @Scope(value = "prototype")
     public OCCommonTablesSpringLiquibase liquibaseSchemaCommonTables() {
         OCCommonTablesSpringLiquibase liquibase = new OCCommonTablesSpringLiquibase();
         liquibase.setDataSource(dataSource);
@@ -39,7 +39,7 @@ public class LiquibaseConfig {
     }
     
     @Bean
-    @DependsOn ("coreResources")
+    @DependsOn ({"coreResources", "liquibaseSchemaCommonTables"})
     public SpringLiquibase liquibasePublicSchema() {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource);

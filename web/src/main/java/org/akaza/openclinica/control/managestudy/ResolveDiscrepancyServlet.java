@@ -450,7 +450,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 p.setFileName(p.getFileName() + "?fromViewNotes=1");
             }
             String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
-            setPopUpURL(createNoteURL);
+            setPopUpURL("");
         }
 
         if (!goNext) {

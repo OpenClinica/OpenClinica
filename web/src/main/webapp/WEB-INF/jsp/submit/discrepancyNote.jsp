@@ -27,7 +27,10 @@ function showOnly(strLeftNavRowElementName){
     }
 }
 
-function boxShowWithDefault(id, index, defaultId, defaultValue){
+function boxShowWithDefault(id, index, defaultId, defaultValue, instructions){
+    var msgDiv = document.getElementById('instructionsbox'+id);
+    msgDiv.innerHTML = instructions;
+
 	showOnly("box"+id);
 	var objSelect = MM_findObj("resStatusId"+id);
 	if(objSelect != null) {
@@ -190,7 +193,7 @@ function setYPos(id) {
 	<div class="textbox_center">
 	<table border="0" width="580">
 		<c:if test="${parentId>0}">
-			<div style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
+			<div id="instructions${boxId}" style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
 		</c:if>
 		<div style="float:right">
 			<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/notes-and-discrepancies')"><i class="fa fa-question"></i></a>
