@@ -94,10 +94,7 @@
 
 <br clear="all">
 <input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
-<p><a href="pages/studymodule"><fmt:message key="import_rules_back_to_study_build" bundle="${resword}"/></a></p>
 </form>
-
-
 
 <span class="table_title_Admin"><fmt:message key="rule_import_getting_started" bundle="${resterm}"/></span>
 <div>&nbsp;</div>
