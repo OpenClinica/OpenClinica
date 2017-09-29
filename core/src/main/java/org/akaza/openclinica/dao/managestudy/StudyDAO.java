@@ -116,6 +116,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.setTypeExpected(58, TypeNames.STRING);// studyEnvSiteUuid
         this.setTypeExpected(59, TypeNames.STRING);// env type
         this.setTypeExpected(60, TypeNames.STRING);// study env uuid
+        this.setTypeExpected(61, TypeNames.BOOL);// published
     }
 
     /**
@@ -480,7 +481,8 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
             variables.put(new Integer(21), sb.getStudyEnvUuid());
         }
         variables.put(new Integer(22), sb.getStudyEnvSiteUuid());
-        variables.put(new Integer(23), new Integer(sb.getId()));
+        variables.put(new Integer(23), sb.isPublished());
+        variables.put(new Integer(24), new Integer(sb.getId()));
         this.execute(digester.getQuery("createStepTwo"), variables, nullVars);
         return sb;
     }
@@ -618,6 +620,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
             eb.setEnvType(StudyEnvEnum.valueOf(envTypeStr.toUpperCase()));
         eb.setStudyEnvSiteUuid((String) hm.get("study_env_site_uuid"));
         eb.setStudyEnvUuid((String)hm.get("study_env_uuid"));
+        eb.setPublished(((Boolean) hm.get("published")).booleanValue());
         return eb;
     }
 

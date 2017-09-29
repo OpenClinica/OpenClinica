@@ -116,8 +116,8 @@ public class OdmImportServiceImpl implements OdmImportService {
         UserAccount userAccount = getCurrentUser();
         // TODO add validation to all entities
         ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
-        Study study = updateStudy(odm, userAccount, odmStudy, errors);
-
+        Study study = retrieveStudy(odm, userAccount, odmStudy, errors);
+        Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
         Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(boardId, errors);
 
         StudyEventDefinition studyEventDefinition = null;
@@ -220,6 +220,9 @@ public class OdmImportServiceImpl implements OdmImportService {
         if (errors.hasErrors()) {
             throw new CustomRuntimeException("There are errors with publishing", errors);
         }
+        CoreResources.setRequestSchema("public");
+        publicStudy.setPublished(true);
+        studyDao.saveOrUpdate(publicStudy);
 
     }
 
@@ -356,8 +359,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         return odmStudyEventDefs;
     }
 
-    private Study updateStudy(ODM odm, UserAccount userAccount, ODMcomplexTypeDefinitionStudy odmStudy, Errors errors) {
-        ODMcomplexTypeDefinitionGlobalVariables odmGlobalVariables = odmStudy.getGlobalVariables();
+    private Study retrieveStudy(ODM odm, UserAccount userAccount, ODMcomplexTypeDefinitionStudy odmStudy, Errors errors) {
         String studyOid = odm.getStudy().get(0).getOID();
         Study study = getStudyDao().findByOcOID(studyOid);
 
@@ -365,53 +367,7 @@ public class OdmImportServiceImpl implements OdmImportService {
             errors.rejectValue("name", "environment_error", "Environment is not available - FAILED");
             logger.info("Study with this oid: " + studyOid + " doesn't exist. Please fix !!! ");
         }
-
-        // study = getStudyDao().saveOrUpdate(updateStudy(odmGlobalVariables, userAccount, study));
         return study;
-    }
-
-    private Study saveOrUpdateStudy(ODM odm, UserAccount userAccount, ODMcomplexTypeDefinitionStudy odmStudy) {
-        ODMcomplexTypeDefinitionGlobalVariables odmGlobalVariables = odmStudy.getGlobalVariables();
-        String studyOid = odm.getStudy().get(0).getOID();
-        Study study = getStudyDao().findByOcOID(studyOid);
-
-        if (study == null || study.getStudyId() == 0) {
-            study = new Study();
-            study.setOc_oid(studyOid);
-            study.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-            study = getStudyDao().saveOrUpdate(populateStudy(odmGlobalVariables, userAccount, study));
-        } else {
-            study = getStudyDao().saveOrUpdate(updateStudy(odmGlobalVariables, userAccount, study));
-        }
-        return study;
-    }
-
-    private Study populateStudy(ODMcomplexTypeDefinitionGlobalVariables odmGlobalVariables, UserAccount userAccount, Study study) {
-        study.setUniqueIdentifier(odmGlobalVariables.getProtocolName().getValue());
-        study.setName(odmGlobalVariables.getStudyName().getValue());
-        // study.setSummary(odmGlobalVariables.getStudyDescription().getValue());
-        study.setSummary("This is the summary");
-        study.setUserAccount(userAccount);
-        study.setDateCreated(new Date());
-        return study;
-    }
-
-    private Study updateStudy(ODMcomplexTypeDefinitionGlobalVariables odmGlobalVariables, UserAccount userAccount, Study study) {
-        // study = populateStudy(odmGlobalVariables, userAccount, study);
-        study.setUpdateId(userAccount.getUserId());
-        study.setDateUpdated(new Date());
-        return study;
-    }
-
-    private StudyUserRole populateUserRole(Study study, UserAccount userAccount, StudyUserRole sur, StudyUserRoleId surId) {
-        surId.setUserName(userAccount.getUserName());
-        sur.setRoleName(Role.STUDYDIRECTOR.getName());
-        surId.setStudyId(study.getStudyId());
-        sur.setStatusId(1);
-        sur.setOwnerId(userAccount.getUserId());
-        sur.setDateCreated(new Date());
-        sur.setId(surId);
-        return sur;
     }
 
     private StudyEventDefinition populateEvent(ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef, UserAccount userAccount,
