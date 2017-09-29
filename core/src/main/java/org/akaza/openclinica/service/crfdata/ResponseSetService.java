@@ -37,57 +37,69 @@ public class ResponseSetService {
             String[] newOptionValues = optionValues.split("(?<!\\\\),", -1);
             String[] newOptionText = optionText.split("(?<!\\\\),", -1);
             if (newOptionValues.length != newOptionText.length) {
-                errors.rejectValue("name", "xform_validation_error", "Mismatch count for response Options");
-                logger.info("Mistach count for reponse option value and text");
-            }
-
-            if (responseSet == null) {
-                // Create the response set
-                responseSet = new ResponseSet();
-                responseSet.setLabel(xformItem.getItemName());
-
-                responseSet.setOptionsText(optionText);
-                responseSet.setOptionsValues(optionValues);
-                responseSet.setResponseType(responseType);
-                responseSet.setVersionId(crfVersion.getCrfVersionId());
-                responseSet = responseSetDao.saveOrUpdate(responseSet);
-
-            } else {
-
-                String[] existingOptionValues = responseSet.getOptionsValues().split("(?<!\\\\),", -1);
-                String[] existingOptionText = responseSet.getOptionsText().split("(?<!\\\\),", -1);
-
-                Map<String, String> newOptionMap = new HashMap<>();
-                for (int i = 0; i < newOptionValues.length; i++) {
-                    newOptionMap.put(newOptionValues[i], newOptionText[i]);
-                }
-
-                Map<String, String> existingOptionMap = new HashMap<>();
-                for (int i = 0; i < existingOptionValues.length; i++) {
-                    existingOptionMap.put(existingOptionValues[i], existingOptionText[i]);
-                }
-
-                for (Map.Entry<String, String> entry : newOptionMap.entrySet()) {
-                    existingOptionMap.put(entry.getKey(), entry.getValue());
-                }
-
-                String optValues = "";
-                String optText = "";
-                for (Map.Entry<String, String> entry : existingOptionMap.entrySet()) {
-                    optValues = optValues + entry.getKey() + ",";
-                    optText = optText + entry.getValue() + ",";
-                }
-                if (!StringUtils.isEmpty(optText))
-                    optText = optText.substring(0, optText.length() - 1);
-
-                if (!StringUtils.isEmpty(optValues))
-                    optValues = optValues.substring(0, optValues.length() - 1);
-
-                if (!optText.equals(responseSet.getOptionsText()) || !optValues.equals(responseSet.getOptionsValues())) {
-                    responseSet.setOptionsText(optText);
-                    responseSet.setOptionsValues(optValues);
+                errors.rejectValue("name", "xform_validation_error", "Form <" + crfVersion.getCrf().getName()
+                        + "> does not have a valid list of options in choice list for Element<" + xformItem.getItemName() + "> - FAILED");
+                logger.info("Form <" + crfVersion.getCrf().getName() + "> does not have a valid list of options in choice list for Element<"
+                        + xformItem.getItemName() + "> - FAILED");
+                if (responseSet == null) {
+                    // Create the response set
+                    responseSet = new ResponseSet();
+                    responseSet.setLabel(xformItem.getItemName());
+                    responseSet.setOptionsText("");
+                    responseSet.setOptionsValues("");
                     responseSet.setResponseType(responseType);
+                    responseSet.setVersionId(crfVersion.getCrfVersionId());
                     responseSet = responseSetDao.saveOrUpdate(responseSet);
+                }
+            } else {
+                if (responseSet == null) {
+                    // Create the response set
+                    responseSet = new ResponseSet();
+                    responseSet.setLabel(xformItem.getItemName());
+
+                    responseSet.setOptionsText(optionText);
+                    responseSet.setOptionsValues(optionValues);
+                    responseSet.setResponseType(responseType);
+                    responseSet.setVersionId(crfVersion.getCrfVersionId());
+                    responseSet = responseSetDao.saveOrUpdate(responseSet);
+
+                } else {
+
+                    String[] existingOptionValues = responseSet.getOptionsValues().split("(?<!\\\\),", -1);
+                    String[] existingOptionText = responseSet.getOptionsText().split("(?<!\\\\),", -1);
+
+                    Map<String, String> newOptionMap = new HashMap<>();
+                    for (int i = 0; i < newOptionValues.length; i++) {
+                        newOptionMap.put(newOptionValues[i], newOptionText[i]);
+                    }
+
+                    Map<String, String> existingOptionMap = new HashMap<>();
+                    for (int i = 0; i < existingOptionValues.length; i++) {
+                        existingOptionMap.put(existingOptionValues[i], existingOptionText[i]);
+                    }
+
+                    for (Map.Entry<String, String> entry : newOptionMap.entrySet()) {
+                        existingOptionMap.put(entry.getKey(), entry.getValue());
+                    }
+
+                    String optValues = "";
+                    String optText = "";
+                    for (Map.Entry<String, String> entry : existingOptionMap.entrySet()) {
+                        optValues = optValues + entry.getKey() + ",";
+                        optText = optText + entry.getValue() + ",";
+                    }
+                    if (!StringUtils.isEmpty(optText))
+                        optText = optText.substring(0, optText.length() - 1);
+
+                    if (!StringUtils.isEmpty(optValues))
+                        optValues = optValues.substring(0, optValues.length() - 1);
+
+                    if (!optText.equals(responseSet.getOptionsText()) || !optValues.equals(responseSet.getOptionsValues())) {
+                        responseSet.setOptionsText(optText);
+                        responseSet.setOptionsValues(optValues);
+                        responseSet.setResponseType(responseType);
+                        responseSet = responseSetDao.saveOrUpdate(responseSet);
+                    }
                 }
             }
         }

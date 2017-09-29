@@ -211,11 +211,6 @@ public class XformMetaDataService {
             }
         }
         createGroups(cmdObject.container, crfBean, crfVersion, formLayout, section, cmdObject.ub, cmdObject.errors);
-
-        if (cmdObject.errors.hasErrors()) {
-            logger.error("Encounter validation errors while saving CRF.  Rolling back transaction.");
-            throw new RuntimeException("Encountered validation errors while saving CRF.");
-        }
         return formLayout;
     }
 
@@ -476,41 +471,36 @@ public class XformMetaDataService {
                             }
                         }
 
-                        if (!eicObject.errors.hasErrors()) {
-                            ObjectMapper mapper = new ObjectMapper();
-                            TypeReference<List<XformGroup>> mapType = new TypeReference<List<XformGroup>>() {
-                            };
-                            List<XformGroup> jsonList = null;
-                            try {
-                                jsonList = mapper.readValue(vForm, mapType);
-                            } catch (JsonParseException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            } catch (JsonMappingException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            } catch (IOException e) {
-                                // TODO Auto-generated catch block
-                                e.printStackTrace();
-                            }
-                            XformContainer xformContainer = new XformContainer();
-                            xformContainer.setGroups(jsonList);
-                            eicObject.setContainer(xformContainer);
-
-                            if (eicObject.errors.hasErrors()) {
-                                return eicObject;
-                            }
-                            // Save meta-data in database
-                            saveFormMetadata(eicObject, version, eicObject.container, formLayoutDef, fileLinks);
-                            StudyEnvEnum existingEnv = version.getPublishedEnvType();
-                            StudyEnvEnum publishingEnv = eicObject.currentStudy.getEnvType();
-
-                            if ((publishingEnv.equals(StudyEnvEnum.TEST) && existingEnv.equals(StudyEnvEnum.NOT_PUBLISHED))
-                                    || (publishingEnv.equals(StudyEnvEnum.PROD) && !existingEnv.equals(StudyEnvEnum.PROD))) {
-                                publishedVersions.add(version.getId());
-                            }
-
+                        ObjectMapper mapper = new ObjectMapper();
+                        TypeReference<List<XformGroup>> mapType = new TypeReference<List<XformGroup>>() {
+                        };
+                        List<XformGroup> jsonList = null;
+                        try {
+                            jsonList = mapper.readValue(vForm, mapType);
+                        } catch (JsonParseException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (JsonMappingException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
+                        } catch (IOException e) {
+                            // TODO Auto-generated catch block
+                            e.printStackTrace();
                         }
+                        XformContainer xformContainer = new XformContainer();
+                        xformContainer.setGroups(jsonList);
+                        eicObject.setContainer(xformContainer);
+
+                        // Save meta-data in database
+                        saveFormMetadata(eicObject, version, eicObject.container, formLayoutDef, fileLinks);
+                        StudyEnvEnum existingEnv = version.getPublishedEnvType();
+                        StudyEnvEnum publishingEnv = eicObject.currentStudy.getEnvType();
+
+                        if ((publishingEnv.equals(StudyEnvEnum.TEST) && existingEnv.equals(StudyEnvEnum.NOT_PUBLISHED))
+                                || (publishingEnv.equals(StudyEnvEnum.PROD) && !existingEnv.equals(StudyEnvEnum.PROD))) {
+                            publishedVersions.add(version.getId());
+                        }
+
                     }
                 }
             }
@@ -534,8 +524,6 @@ public class XformMetaDataService {
         } catch (RuntimeException e) {
             logger.error("Error encountered while saving CRF: " + e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
-            if (!eicObj.errors.hasErrors())
-                throw e;
         }
     }
 
