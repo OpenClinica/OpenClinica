@@ -37,8 +37,8 @@ public class ResponseSetService {
             String[] newOptionValues = optionValues.split("(?<!\\\\),", -1);
             String[] newOptionText = optionText.split("(?<!\\\\),", -1);
             if (newOptionValues.length != newOptionText.length) {
-                errors.rejectValue("name", "xform_validation_error", "Form <" + crfVersion.getCrf().getName()
-                        + "> does not have a valid list of options in choice list for Element<" + xformItem.getItemName() + "> - FAILED");
+                errors.rejectValue("name", "xform_validation_error", "Element \"" + xformItem.getItemName() + "\" on Form \"" + crfVersion.getCrf().getName()
+                        + "\" does not have a valid list of choice options - FAILED");
                 logger.info("Form <" + crfVersion.getCrf().getName() + "> does not have a valid list of options in choice list for Element<"
                         + xformItem.getItemName() + "> - FAILED");
                 if (responseSet == null) {

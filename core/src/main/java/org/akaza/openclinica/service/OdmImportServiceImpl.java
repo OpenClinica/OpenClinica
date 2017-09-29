@@ -12,7 +12,6 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -35,8 +34,6 @@ import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-import org.akaza.openclinica.domain.datamap.StudyUserRole;
-import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
@@ -47,7 +44,6 @@ import org.cdisc.ns.odm.v130.EventType;
 import org.cdisc.ns.odm.v130.ODM;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormDef;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormRef;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionGlobalVariables;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionMetaDataVersion;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudy;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudyEventDef;
@@ -169,8 +165,8 @@ public class OdmImportServiceImpl implements OdmImportService {
                                         formName = odmFormDef.getName();
                                     }
                                 }
-                                errors.rejectValue("name", "missing_default_version_error", "No default version has been selected for Form <" + formName
-                                        + "> in Event <" + odmStudyEventDef.getName() + "> - FAILED");
+                                errors.rejectValue("name", "missing_default_version_error", "No default version has been selected for Form \"" + formName
+                                        + "\" in Event \"" + odmStudyEventDef.getName() + "\" - FAILED");
                                 logger.info("No default version has been selected for Form <" + formName + "> in Event <" + odmStudyEventDef.getName()
                                         + "> - FAILED");
                                 defaultVersionName = formLayoutRefs.get(0).getOID();
@@ -263,7 +259,7 @@ public class OdmImportServiceImpl implements OdmImportService {
             String crfOid = odmFormDef.getOID();
             List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
             if (formLayoutDefs.size() == 0) {
-                errors.rejectValue("name", "form_upload_error", "No Excel definition has been uploaded for Form <" + odmFormDef.getName() + "> - FAILED");
+                errors.rejectValue("name", "form_upload_error", "No Excel definition has been uploaded for Form \"" + odmFormDef.getName() + "\" - FAILED");
                 logger.info("No Excel definition has been uploaded for Form <" + odmFormDef.getName() + "> - FAILED");
             }
 
