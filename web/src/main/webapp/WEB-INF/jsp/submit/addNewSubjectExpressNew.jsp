@@ -74,7 +74,7 @@
 <form name="subjectForm" action="AddNewSubject" method="post">
 <input type="hidden" name="subjectOverlay" value="true">
 
-<div style="width: 100%; height: 400px; background:#FFFFFF; cursor:default">
+<div style="height: 400px; width:400px; background:#FFFFFF; cursor:default">
 <table border="0" cellpadding="0" align="center">
     <tr style="height:10px;">
         <td class="formlabel" align="left"><h3 class="addNewSubjectTitle"><fmt:message key="add_new_subject" bundle="${resword}"/></h3></td>
