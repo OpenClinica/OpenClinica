@@ -1619,6 +1619,7 @@ public class StudyController {
         study.setOid(parameters.ocOid);
         study.setIdentifier(parameters.uniqueIdentifier);
         study.setParentStudyId(parameters.parentStudy.getId());
+        study.setPublished(parameters.parentStudy.isPublished());
         study.setOwner(parameters.ownerUserAccount);
         setChangeableSiteSettings(study, parameters);
         return study;

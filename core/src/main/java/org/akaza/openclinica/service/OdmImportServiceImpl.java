@@ -216,10 +216,28 @@ public class OdmImportServiceImpl implements OdmImportService {
         if (errors.hasErrors()) {
             throw new CustomRuntimeException("There are errors with publishing", errors);
         }
-        CoreResources.setRequestSchema("public");
-        publicStudy.setPublished(true);
-        studyDao.saveOrUpdate(publicStudy);
 
+        //updateStudypublishedFlag(getStudyDao().findByStudyEnvUuid(study.getStudyEnvUuid()));
+        updatePublicStudypublishedFlag(publicStudy);
+
+    }
+
+    private void updatePublicStudypublishedFlag(Study publicStudy){
+        publicStudy.setPublished(true);
+        studyDao.updatePublicStudy(publicStudy);
+        for(Study publicStudySite: publicStudy.getStudies()){
+            publicStudySite.setPublished(true);
+            studyDao.updatePublicStudy(publicStudySite);
+        }
+    }
+
+    private void updateStudypublishedFlag(Study study){
+        study.setPublished(true);
+        studyDao.saveOrUpdate(study);
+        for(Study publicStudySite: study.getStudies()){
+            publicStudySite.setPublished(true);
+            studyDao.saveOrUpdate(publicStudySite);
+        }
     }
 
     private void saveOrUpdateEDCTag(EDCTagDTO edcTagObj, StudyEventDefinition studyEventDefinition, CrfBean crf) {
