@@ -47,7 +47,7 @@
 <jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
 
 <h1><span class="title_manage">
-<fmt:message key="confirm_reassign_study_subject" bundle="${restext}"/> [<c:out value="${studySub.id}"/>]
+<fmt:message key="confirm_reassign_study_subject" bundle="${restext}"/> <c:out value="${studySub.id}"/>
 </span></h1>
 
 <table>

@@ -230,6 +230,7 @@
                                 <td class="aka_header_border" width="25%"><fmt:message key="of_notes" bundle="${resword}"/>: <b><c:out value="${note.value.numChildren}" /></b></td>
                             </tr>
                         </table>
+
                         <table border="0" cellpadding="0" cellspacing="0" width="600" id="thread<c:out value="${count}"/>">
 
                             <!-- Spacer row --->
@@ -256,14 +257,18 @@
                                         <c:out value="${child.detailedNotes}"/>
                                     </td>
                                 </tr>
+                        </table>
 
-                                <c:if test="${!status.last}">
-                                    <!-- Spacer row --->
-                                    <tr>
-                                        <td class="table_header_row_left" colspan="4"  style="border-top-width: 1px; border-top-color: #CCCCCC; font-size: 1px; line-height: 4px; height: 6px; padding: 0px;">&nbsp;</td>
-                                    </tr>
-                                </c:if>
-
+                        <table>
+                            <tr>
+                                <td width="50%"></td>
+                                <td>
+                                    <c:if test="${!status.last}">
+                                        <!-- Spacer row --->
+                                        <tr>
+                                            <td class="table_header_row_left" colspan="4"  style="border-top-width: 1px; border-top-color: #CCCCCC; font-size: 1px; line-height: 4px; height: 6px; padding: 0px;">&nbsp;</td>
+                                        </tr>
+                                    </c:if>
                             </c:forEach>
                             <c:set var="showDNBox" value="n"/>
                             <c:if test="${!study.status.locked}">
@@ -285,16 +290,12 @@
                                         <br>
                                         <c:set var="showDNBox" value="y"/>
                                     </c:if>
-                                </td>
-                                </tr>
-                                <tr>
-                                    <td class="table_cell_left" id="msg${note.value.id}">
-                                    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${note.value.id}"/></jsp:include>  
-                                    </td>
-                                </tr>
-                            </c:if>
-                        </table>
+                            </td>
+                        </tr>
+                    </table>    
+                        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${note.value.id}"/></jsp:include> 
                     </div>
+
                 </div></div></div></div></div></div></div></div>
                 
             </td>

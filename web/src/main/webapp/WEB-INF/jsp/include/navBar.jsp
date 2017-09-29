@@ -299,7 +299,7 @@
                 </c:when>
                 <c:otherwise>
                     <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a>
-                    </div><div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
+                    </div><div class="taskLink"></div>
                 </c:otherwise>
             </c:choose>
         </div>
@@ -308,9 +308,8 @@
             <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
             </c:when>
             <c:otherwise>
-                <div class="taskLink"><a href="${urlPrefix}ListSubjectGroupClass?read=true"><fmt:message key="nav_groups" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="AuditUserActivity?restore=true"><fmt:message key="user_audit_log" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div>
             </c:otherwise>
         </c:choose>
@@ -321,9 +320,7 @@
             <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
             <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
         </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewAllJobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
-        </div>
+        
         <br clear="all">
         <div class="taskGroup"><fmt:message key="nav_study_setup" bundle="${resword}"/></div>
         <div class="taskLeftColumn">

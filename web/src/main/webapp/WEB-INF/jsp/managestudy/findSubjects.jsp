@@ -74,11 +74,12 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 
-<h1><span class="title_manage">
-<fmt:message key="view_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
-<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/subject-matrix')">
-     <span class="" ></span></a>
-</span></h1><br/>
+<h1>   
+    <span class="title_manage">
+        <fmt:message key="view_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
+    </span>
+</h1>
+<br/>
 
 <div id="findSubjectsDiv">
     <form  action="${pageContext.request.contextPath}/ListStudySubjects">
