@@ -6,6 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 
 <jsp:useBean id="id" scope="request" class="java.lang.String"/>
@@ -268,26 +269,26 @@
                                             <td class="table_header_row_left" colspan="4"  style="border-top-width: 1px; border-top-color: #CCCCCC; font-size: 1px; line-height: 4px; height: 6px; padding: 0px;">&nbsp;</td>
                                         </tr>
                                     </c:if>
-
-                                    </c:forEach>
-                                    <c:set var="showDNBox" value="n"/>
-                                    <c:if test="${!study.status.locked}">
-                                        <c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4 && whichResStatus == '22')}">
-                                            <c:set var="sindex" value="0"/>
-                                            <c:forEach var="status" items="${resolutionStatuses}">
-                                                <c:choose>
-                                                <c:when test="${status.id == 2}">
-                                                    <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
-                                                </c:when>
-                                                <c:when test="${status.id == 4}">
-                                                    <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="close_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
-                                                </c:when>
-                                                </c:choose>
-                                                <c:set var="sindex" value="${sindex+1}"/>
-                                            </c:forEach>
-                                            <br>
-                                            <c:set var="showDNBox" value="y"/>
-                                        </c:if>
+                            </c:forEach>
+                            <c:set var="showDNBox" value="n"/>
+                            <c:if test="${!study.status.locked}">
+                                <tr>
+                                <td class="table_cell_left" colspan="4" align="right">
+                                    <c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4 && whichResStatus == '22')}">
+                                        <c:set var="sindex" value="0"/>
+                                        <c:forEach var="status" items="${resolutionStatuses}">
+                                            <c:choose>
+                                            <c:when test="${status.id == 2}">
+                                                <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>','<fmt:message key="update_this_Discrepancy_Note" bundle="${restext}"/>');/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
+                                            </c:when>
+                                            <c:when test="${status.id == 4}">
+                                                <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="close_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>','<fmt:message key="close_this_Discrepancy_Note" bundle="${restext}"/>');"/>
+                                            </c:when>
+                                            </c:choose>
+                                            <c:set var="sindex" value="${sindex+1}"/>
+                                        </c:forEach>
+                                        <br>
+                                        <c:set var="showDNBox" value="y"/>
                                     </c:if>
                             </td>
                         </tr>

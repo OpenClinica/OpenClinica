@@ -97,7 +97,7 @@ public class Study   extends DataMapDomainObject {
 	private String schemaName;
 	private String studyEnvSiteUuid;
 	private StudyEnvEnum envType;
-
+	private boolean published;
 	@Column(name = "study_env_uuid", unique = false, nullable = false)
 	public String getStudyEnvUuid() {
 		return studyEnvUuid;
@@ -834,6 +834,14 @@ public class Study   extends DataMapDomainObject {
 
 	public void setStudyEnvSiteUuid(String studyEnvSiteUuid) {
 		this.studyEnvSiteUuid = studyEnvSiteUuid;
+	}
+
+	@Column(name = "published")
+	public boolean isPublished() {
+		return published;
+	}
+	public void setPublished(boolean published) {
+		this.published = published;
 	}
 
 }
