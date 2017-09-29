@@ -26,14 +26,18 @@
     <xs:element name="RuleRef" type="RuleRefType"/>
     <xs:complexType name="RuleRefType">
         <xs:sequence>
+            <!--
             <xs:element ref="DiscrepancyNoteAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="EmailAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="ShowAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="HideAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="InsertAction" minOccurs="0" maxOccurs="unbounded"/>
+            -->
             <xs:element ref="EventAction" minOccurs="0" maxOccurs="unbounded"/>
             <xs:element ref="NotificationAction" minOccurs="0" maxOccurs="unbounded"/>
+            <!--
             <xs:element ref="RandomizeAction" minOccurs="0" maxOccurs="unbounded"/>
+            -->
         </xs:sequence>
         <xs:attributeGroup ref="RuleRefAttributeType"/>
     </xs:complexType>
