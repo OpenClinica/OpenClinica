@@ -157,10 +157,8 @@ $.noConflict();
 <!-- <td  class="table_cell"  > <c:out value="${version.status.name}" />&nbsp;</td>-->
 <td  class="table_cell"  style="text-align:center;" ><c:if test="${version.id == formLayoutId}">X</c:if>&nbsp;</td>
 <td  class="table_cell"  >
-<a onmouseup="javascript:setImage('bt_View1','../../images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');" 
-href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&formLayoutId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes','','','')">
-<span hspace="6" border="0" align="left" title="View" alt="View" class="icon icon-search" name="bt_View1">
-</a>
+<a href="../../ParticipantFormServlet?crfOID=<c:out value="${version.oid}"/>" target="_blank"><span
+ name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 <a onmouseup="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" onmousedown="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" 
 href="#" onclick="window.openNewWindow('../../ViewCRFVersion?id=<c:out value="${version.id}"/>','','','')">
 <span border="0" align="left" title="Metadata" alt="Metadata" class="icon icon-icon-dataEntryCompleted orange" name="bt_Metadata">
