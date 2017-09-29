@@ -96,7 +96,6 @@
 <input type="submit" value="<fmt:message key="continue" bundle="${resword}"/>" class="button_long">
 </form>
 
-<span class="table_title_Admin"><fmt:message key="rule_import_getting_started" bundle="${resterm}"/></span>
 <div>&nbsp;</div>
 <div class="homebox_bullets"><a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/rules')"><fmt:message key="rule_import_rules_documentation" bundle="${resterm}"/></a></div><br/>
  
