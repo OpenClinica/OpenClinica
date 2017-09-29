@@ -99,6 +99,9 @@ a{
 a:link {
   color: #3a6087; }
 
+a:visited {
+  color: #3a6087; }
+
 a:hover {
   color: #090f14; }
 
@@ -316,7 +319,8 @@ form[name="subjectForm"] a, form[action="UpdateStudySubject"] a {
 form[name="subjectForm"] .formlabel, form[name="subjectForm"] input[type="text"], form[name="subjectForm"] select, form[action="UpdateStudySubject"] .formlabel, form[action="UpdateStudySubject"] input[type="text"], form[action="UpdateStudySubject"] select {
   display: block;
   margin-bottom: 1em;
-  margin-right: 1em; }
+  margin-right: 1em;
+  padding-left: 10px; }
 
 #findSubjects tr td div {
   width: auto !important; }
@@ -742,7 +746,7 @@ div#subjectSDV table#sdv {
 
 .form-control {
     display: block;
-    width: 100%;
+    width: 90%;
     padding: .5rem .75rem;
     font-size: 1rem;
     line-height: 1.25;
@@ -771,5 +775,5 @@ div#subjectSDV table#sdv {
     justify-content: flex-end;
     padding-top: 15px;
     border-top: 1px solid #eceeef;
-    width: 200px;
+    width: 197px;
 }
