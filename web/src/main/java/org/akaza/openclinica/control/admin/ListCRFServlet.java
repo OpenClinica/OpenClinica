@@ -144,14 +144,12 @@ public class ListCRFServlet extends SecureController {
         // BWP 3281: make the "owner" column sortable; table.hideColumnLink(7);
         table.hideColumnLink(8);
         table.setQuery("ListCRF", new HashMap());
-        table.addLink(resword.getString("blank_CRF_template"), "DownloadVersionSpreadSheet?template=1");
         // YW << add "Enterprise CRF Catalog" link
         String crfCatalogField = "crfCatalog";
         // table.addLink(resword.getString("openclinica_CRF_catalog"),
         // SQLInitServlet.getEnterpriseField(crfCatalogField));
         // YW >>
         // TODO add i18n links to the above, tbh
-        table.addLink(resword.getString("create_a_new_CRF"), "CreateCRFVersion?module=" + module);
         table.setRows(allRows);
         table.computeDisplay();
 
