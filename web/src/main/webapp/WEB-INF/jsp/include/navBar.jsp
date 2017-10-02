@@ -323,54 +323,6 @@
             <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div> 
         </div>   
         <br clear="all">
-        <div class="taskGroup"><fmt:message key="nav_study_setup" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div>
-            <c:choose>
-                <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-                </c:when>
-                <c:otherwise>
-                    <div class="taskLink"><a href="${urlPrefix}pages/studymodule"><fmt:message key="nav_build_study" bundle="${resword}"/></a></div>
-                    <!-- <div class="taskLink"><a href="${urlPrefix}ListEventDefinition?read=true"><fmt:message key="nav_event_definitions" bundle="${resword}"/></a></div>  -->
-                </c:otherwise>
-            </c:choose>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListStudyUser"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
-            <%--
-            <c:choose>
-                <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-                </c:when>
-                <c:otherwise>
-                    <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
-                </c:otherwise>
-            </c:choose>
-             --%>
-        </div>
-        <br clear="all">
         </c:if>
-        <c:if test="${userBean.sysAdmin || userBean.techAdmin}">
-        <div class="taskGroup"><fmt:message key="nav_administration" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListStudy"><fmt:message key="nav_studies" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ListUserAccounts"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListCRF?module=admin"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ListSubject"><fmt:message key="nav_subjects" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        </c:if>
-        <div class="taskGroup"><fmt:message key="nav_other" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}UpdateProfile"><fmt:message key="nav_update_profile" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}j_spring_security_logout"><fmt:message key="nav_log_out" bundle="${resword}"/></a></div>
-
-        </div>
-
-        <br clear="all">
-        <div></div>
     </div>
 </div>
