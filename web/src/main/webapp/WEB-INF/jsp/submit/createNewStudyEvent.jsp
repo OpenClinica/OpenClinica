@@ -104,7 +104,7 @@
 </c:forEach>
 
 <h1><span class="title_manage">
-	<fmt:message key="schedule_study_event_for" bundle="${resword}"/> <c:out value="${chosenSubject.id}"/>
+	<fmt:message key="schedule_study_event" bundle="${resword}"/>
 </h1><br/>
 
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>
