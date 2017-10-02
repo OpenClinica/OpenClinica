@@ -215,16 +215,11 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 <h3 class="title_manage">Add Query</h3>
 
 <!-- dn box -->
-<div style="width: 418;">	
+<div style="width: 668;">	
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="textbox_center">
-<div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:<span class="alert">*</span></div>
-	<div class="dnBoxCol2 dnBoxText">
-		<div class="formtextareaXL4_BG">
-	  		<textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4"></textarea>
-		</div>
-		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes"/></jsp:include>
-	</div>
+
+	
 	
 	<div class="dnBoxCol1 dnBoxText" style="display: none;"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
 	<div class="dnBoxCol2 dnBoxText" style="display: none;"><div class="formfieldL_BG">
@@ -297,32 +292,8 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 		<span id="user1" style="display:block">
   	</c:otherwise>
 	</c:choose>
-		<div class="dnBoxCol1 dnBoxText"><fmt:message key="assign_to_user" bundle="${resword}"/>:</div>
-		<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG">
-			<c:choose>
-			<c:when test='${discrepancyNote.assignedUserId != ""}'>
-				<c:set var="userAccountId1" value="${discrepancyNote.assignedUserId}"/>
-			</c:when>
-			<c:otherwise>
-				<c:set var="userAccountId1" value="0"/>
-			</c:otherwise>
-			</c:choose>
-			<select name="userAccountId" id="userAccountId" class="formfieldL" >
-				<option value="0">
-		  		<c:forEach var="user" items="${userAccounts}">
-		   		<c:choose>
-		     	<c:when test="${userAccountId1 == user.userAccountId}">
-		       		<option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
-		     	</c:when>
-		     	<c:otherwise>
-		       		<option value="<c:out value="${user.userAccountId}"/>"><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
-		     	</c:otherwise>
-		   		</c:choose>
-		 		</c:forEach>
-			</select>
-			</div>
-		  	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userAccountId"/></jsp:include>
-		</div>
+	
+
 	</span>
 		
 	<c:choose>
@@ -333,8 +304,58 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 		<span id="user2" style="display:block">
 	</c:otherwise>
 	</c:choose>
-	<div class="dnBoxCol1 dnBoxText"><fmt:message key="email_assigned_user" bundle="${resword}"/>: <input name="sendEmail" value="1" type="checkbox"/></div>
-	<br/>	
+	<table border="0">
+		<tr>
+			<td>
+				<div class="dnBoxCol1 dnBoxText"><fmt:message key="detailed_note" bundle="${resword}"/>:<span class="alert">*</span></div>
+			</td>
+			<td>
+				<div class="dnBoxCol2 dnBoxText">
+					<div class="formtextareaXL4_BG">
+				  		<textarea name="detailedDes" rows="4" cols="50" class="formtextareaXL4"></textarea>
+					</div>
+					<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes"/></jsp:include>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td>
+				<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG">
+				<fmt:message key="assign_to_user" bundle="${resword}"/>:
+				<c:choose>
+				<c:when test='${discrepancyNote.assignedUserId != ""}'>
+					<c:set var="userAccountId1" value="${discrepancyNote.assignedUserId}"/>
+				</c:when>
+				<c:otherwise>
+					<c:set var="userAccountId1" value="0"/>
+				</c:otherwise>
+				</c:choose>
+			</td>
+			<td>
+				<select name="userAccountId" id="userAccountId" class="formfieldL" >
+					<option value="0">
+			  		<c:forEach var="user" items="${userAccounts}">
+			   		<c:choose>
+			     	<c:when test="${userAccountId1 == user.userAccountId}">
+			       		<option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
+			     	</c:when>
+			     	<c:otherwise>
+			       		<option value="<c:out value="${user.userAccountId}"/>"><c:out value="${user.firstName}"/> <c:out value="${user.lastName}"/> (<c:out value="${user.userName}"/>)
+			     	</c:otherwise>
+			   		</c:choose>
+			 		</c:forEach>
+				</select>
+				</div>
+			  	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userAccountId"/></jsp:include>
+				</div>
+			</td>
+		</tr>
+		<tr>
+			<td><div class="dnBoxCol1 dnBoxText"><fmt:message key="email_assigned_user" bundle="${resword}"/>: </div></td>
+			<td><input name="sendEmail" value="1" type="checkbox"/></td>
+		</tr>
+	</table>
+		
 	</span>
 	
 	<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
