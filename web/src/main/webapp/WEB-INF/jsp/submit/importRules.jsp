@@ -89,9 +89,9 @@
 </form>
 
 <div>&nbsp;</div>
-<div class="homebox_bullets"><a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/rules')"><fmt:message key="rule_import_rules_documentation" bundle="${resterm}"/></a></div></br>
+<div class="homebox_bullets"><a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/rules')"><b><fmt:message key="rule_import_rules_documentation" bundle="${resterm}"/></b></a></div></br>
 <!--<div class="homebox_bullets"><a href="ImportRule?action=downloadtemplateWithNotes"><fmt:message key="rule_import_all_actions_with_notes" bundle="${resterm}"/></a></div><br/> -->
-<div class="homebox_bullets"><a href="ImportRule?action=downloadtemplate"><fmt:message key="rule_import_all_actions_without_notes" bundle="${resterm}"/></a></div>
+<div class="homebox_bullets"><a href="ImportRule?action=downloadtemplate"><b><fmt:message key="rule_import_all_actions_without_notes" bundle="${resterm}"/></b></a></div>
 
 <!-- @pgawade 13-April-2011 - Fix for issue #8877: Removed the Rule Designer link from import Rule Data page
 as the link is provided on Build Study page tasks -> Create Rules -> Actions  
