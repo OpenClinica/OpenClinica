@@ -317,10 +317,11 @@
         <br clear="all">
         <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
             <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
         </div>
-        
+        <div class="taskRightColumn">
+            <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div> 
+        </div>   
         <br clear="all">
         <div class="taskGroup"><fmt:message key="nav_study_setup" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
