@@ -395,8 +395,10 @@ public class XformMetaDataService {
     private ResponseType getResponseType(XformItem xformItem) {
         String responseType = xformItem.getItemDataType();
 
-        if (responseType.equals("string"))
+        if (responseType.equals("string") && !xformItem.isCalculate())
             return responseTypeDao.findByResponseTypeName("text");
+        else if (responseType.equals("string") && xformItem.isCalculate())
+            return responseTypeDao.findByResponseTypeName("calculation");
         else if (responseType.equals("int"))
             return responseTypeDao.findByResponseTypeName("text");
         else if (responseType.equals("decimal"))
@@ -409,8 +411,6 @@ public class XformMetaDataService {
             return responseTypeDao.findByResponseTypeName("radio");
         else if (responseType.equals("binary"))
             return responseTypeDao.findByResponseTypeName("file");
-        else if (responseType.equals("calculate"))
-            return responseTypeDao.findByResponseTypeName("calculation");
         else
             return null;
     }
