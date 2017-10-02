@@ -236,6 +236,7 @@ public class BatchCRFMigrationController implements Runnable {
         fillHelperObject(helperObject);
         helperObject.setRequest(request);
         ReportLog reportLog = helperObject.getReportLog();
+        helperObject.setSchema((String)request.getAttribute("requestSchema"));
 
         String pageMessages = null;
         if (reportLog.getSubjectCount() != 0 && reportLog.getEventCrfCount() != 0 && reportLog.getErrors().size() == 0) {
@@ -387,7 +388,10 @@ public class BatchCRFMigrationController implements Runnable {
             helperObject.setReportLog(reportLog);
             return new ResponseEntity<HelperObject>(helperObject, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
         }
-        StudyUserRoleBean suRole = uadao().findRoleByUserNameAndStudyId(userAccountBean.getName(), stBean.getId());
+        // Get public study when you want to get the roles
+        StudyUserRoleBean suRole = uadao().findRoleByUserNameAndStudyId(userAccountBean.getName(),
+                CoreResources.getPublicStudy(stBean.getOid(),dataSource).getId());
+
         Role r = suRole.getRole();
         if (suRole == null || !(r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR))) {
             reportLog.getErrors().add(resterms.getString("You_do_not_have_permission_to_perform_CRF_version_migration_in_this_study"));
@@ -694,6 +698,10 @@ public class BatchCRFMigrationController implements Runnable {
 
     @Override
     public void run() {
+
+        // Assign
+        CoreResources.tenantSchema.set(helperObject.getSchema());
+
         dataSource = helperObject.getDataSource();
         cBean = helperObject.getcBean();
         reportLog = helperObject.getReportLog();
@@ -702,6 +710,8 @@ public class BatchCRFMigrationController implements Runnable {
         userAccountBean = helperObject.getUserAccountBean();
         openClinicaMailSender = helperObject.getOpenClinicaMailSender();
         sessionFactory = helperObject.getSessionFactory();
+
+
 
         Session session = sessionFactory.openSession();
         Transaction tx = session.beginTransaction();
