@@ -49,6 +49,15 @@
 </style>
 
 <!-- then instructions-->
+<div id="box" class="dialog">
+<span id="mbm">
+    <br>
+     <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
+   </span><br>
+    <div style="text-align:center; width:100%;">
+        <button onclick="hm('box');">OK</button>
+    </div>
+</div>
 <tr id="sidebar_Instructions_open" style="display: all">
     <td class="sidebar_tab">
 
