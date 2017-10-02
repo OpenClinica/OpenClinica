@@ -1,10 +1,38 @@
 package org.akaza.openclinica.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.*;
+import org.akaza.openclinica.bean.login.ErrorObject;
+import org.akaza.openclinica.bean.login.EventDefinitionDTO;
+import org.akaza.openclinica.bean.login.FacilityInfo;
+import org.akaza.openclinica.bean.login.ResponseSuccessEventDefDTO;
+import org.akaza.openclinica.bean.login.ResponseSuccessSiteDTO;
+import org.akaza.openclinica.bean.login.ResponseSuccessStudyDTO;
+import org.akaza.openclinica.bean.login.SiteDTO;
+import org.akaza.openclinica.bean.login.StudyDTO;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.login.UserRole;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
@@ -40,17 +68,11 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studies")
@@ -614,7 +636,7 @@ public class StudyController {
                             case "always":
                                 collectDobValue = "1";
                                 break;
-                            case "only the year":
+                            case "only_the_year":
                                 collectDobValue = "2";
                                 break;
                             default:
@@ -698,7 +720,7 @@ public class StudyController {
                 case "always":
                     collectDobValue.setValue("1");
                     break;
-                case "only the year":
+                case "only_the_year":
                     collectDobValue.setValue("2");
                     break;
                 default:
