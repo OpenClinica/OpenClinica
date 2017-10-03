@@ -7,6 +7,10 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -16,10 +20,6 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Locale;
 
 /**
  * View the uploaded data and verify what is going to be saved into the system
@@ -75,7 +75,8 @@ public class VerifyImportedRuleServlet extends SecureController {
             addPageMessage(mf.format(arguments));
             ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
             session.setAttribute("pageMessages", pageMessages);
-            response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE.getFileName());
+            String redirect = request.getContextPath() + Page.LIST_RULE_SETS_SERVLET.getFileName() +"?read=true";
+            response.sendRedirect(redirect);
         }
     }
 
