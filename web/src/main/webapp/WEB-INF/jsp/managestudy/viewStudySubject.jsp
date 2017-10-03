@@ -2,58 +2,69 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
 
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 
-<jsp:include page="../include/submit-header.jsp"/>
-<!-- move the alert message to the sidebar-->
-<jsp:include page="../include/sideAlert.jsp"/>
-
-<link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
+<c:choose>
+    <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
+        <c:import url="../include/admin-header.jsp"/>
+    </c:when>
+    <c:otherwise>
+        <c:choose>
+            <c:when test="${userRole.manageStudy && module=='manage'}">
+                <c:import url="../include/managestudy-header.jsp"/>
+            </c:when>
+            <c:otherwise>
+                <c:import url="../include/submit-header.jsp"/>
+            </c:otherwise>
+        </c:choose>
+    </c:otherwise>
+</c:choose>
 
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
-<%-- <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa-original.js"></script> --%>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
+<script type="text/javascript" language="javascript">
+    function studySubjectResource()  { return "${study.oid}/${studySub.oid}"; }
 
-<script type="text/javascript">
-    function onInvokeAction(id,action) {
-        if(id.indexOf('findSubjects') == -1)  {
-        setExportToLimit(id, '');
-        }
-        createHiddenInputFieldsForLimitAndSubmit(id);
-    }
-    function onInvokeExportAction(id) {
-        var parameterString = createParameterStringForLimit(id);
-        location.href = '${pageContext.request.contextPath}/ListStudySubjects?'+ parameterString;
-    }
-
-    jQuery(document).ready(function() {
-        jQuery('#addSubject').click(function() {
-            jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
+    function checkCRFLocked(ecId, url){
+        jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
+            if(data == 'true'){
+                window.location = url;
+            }else{
+                alert(data);return false;
+            }
         });
-
-        jQuery('#cancel').click(function() {
-            jQuery.unblockUI();
-            return false;
+    }
+    
+    function checkCRFLockedInitial(ecId, formName){
+        if(ecId==0) {formName.submit(); return;}
+        jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
+            if(data == 'true'){
+                formName.submit();
+            }else{
+                alert(data);
+            }
         });
-    });
+    }
 </script>
 
+<!-- move the alert message to the sidebar-->
+<jsp:include page="../include/sideAlert.jsp"/>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
     <td class="sidebar_tab">
 
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray"></span></a>
 
-        <fmt:message key="instructions" bundle="${resword}"/>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
         <div class="sidebar_tab_content">
-
         </div>
 
     </td>
@@ -64,22 +75,44 @@
 
         <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray"></span></a>
 
-        <fmt:message key="instructions" bundle="${resword}"/>
+        <fmt:message key="instructions" bundle="${restext}"/>
 
     </td>
 </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
-<jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
+<jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
+<jsp:useBean scope="request" id="subjectStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="parentStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
+<jsp:useBean scope="request" id="children" class="java.util.ArrayList"/>
+<jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
+<jsp:useBean scope="request" id="groups" class="java.util.ArrayList"/>
+<jsp:useBean scope="request" id="from" class="java.lang.String"/>
 
+<script language="JavaScript">
+    function leftnavExpand(strLeftNavRowElementName){
+      var objLeftNavRowElement;
 
-<h1>   
-    <span class="title_manage">
+      objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+      if (objLeftNavRowElement != null) {
+        if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
+          objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
+          objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
+          if(objLeftNavRowElement.display == "none"){
+              objExCl.src = "images/bt_Expand.gif";
+          }else{
+              objExCl.src = "images/bt_Collapse.gif";
+          }
+        }
+      }
+</script>
+
+<h1>
+    <span class="title manage">
         <fmt:message key="view_subject" bundle="${restext}"/> <c:out value="${studySub.id}"/>
     </span>
 </h1>
-<br/>
 
 <%-- <p>
     <a href="#events"><fmt:message key="events" bundle="${resword}"/></a> &nbsp; &nbsp; &nbsp;
@@ -169,8 +202,8 @@
 
                                 <c:choose>
                                     <c:when test="${hasUniqueIDNote eq 'yes'}">
-                                        <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
-                                            <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="${uniqueIDNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                        <a href="#" style="text-decoration: none"  style="text-decoration: none" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+                                            <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                         </a>
 
                                     </c:when>
@@ -201,8 +234,8 @@
 
                                             <c:choose>
                                                 <c:when test="${hasDOBNote eq 'yes'}">
-                                                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                                    <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                                                        <span id="flag_dob" name="flag_dob" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                                     </a>
 
                                                 </c:when>
@@ -229,8 +262,8 @@
 
                                             <c:choose>
                                                 <c:when test="${hasDOBNote eq 'yes'}">
-                                                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                                    <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                                                        <span id="flag_dob" name="flag_dob" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                                     </a>
 
                                                 </c:when>
@@ -257,8 +290,8 @@
 
                                             <c:choose>
                                                 <c:when test="${hasDOBNote eq 'yes'}">
-                                                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                                    <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                                                        <span id="flag_dob" name="flag_dob" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                                     </a>
 
                                                 </c:when>
@@ -288,14 +321,10 @@
                             <%-- DN for Gender goes here --%>
                             <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
                                 <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
-                                <c:set var="isUpdated" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
-                                <c:set var="isClosed" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
-                                <c:set var="isClosedModified" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
-
                                 <c:choose>
                                     <c:when test="${hasGenderNote eq 'yes'}">
-                                        <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
-                                            <span id="flag_gender" name="flag_gender" class="${genderNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                        <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
+                                            <span id="flag_gender" name="flag_gender" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                         </a>
                                     </c:when>
                                     <c:otherwise>
@@ -332,8 +361,8 @@
                                 <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
                                     <c:choose>
                                         <c:when test="${hasEnrollmentNote eq 'yes'}">
-                                            <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
-                                                <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="${enrollmentNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
+                                            <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
+                                                <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="fa fa-bubble-red" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                                             </a>
                                         </c:when>
                                         <c:otherwise>
@@ -564,6 +593,27 @@
 <table border="0" cellpadding="0" cellspacing="0" width="330">
 
 <!-- Table Actions row (pagination, search, tools) -->
+
+<tr>
+
+    <!-- Table Tools/Actions cell -->
+
+    <td align="right" valign="top" class="table_actions">
+        <table border="0" cellpadding="0" cellspacing="0">
+            <tr>
+                <td class="table_tools">
+                    <c:if test="${userBean.sysAdmin}">
+                        <c:if test="${study.status.available}">
+                            <a style="text-decoration: none" href="UpdateSubject?id=<c:out value="${subject.id}"/>&studySubId=<c:out value="${studySub.id}"/>&action=show"><fmt:message key="edit_record" bundle="${resword}"/></a>
+                        </c:if>
+                    </c:if>
+                </td>
+            </tr>
+        </table>
+    </td>
+
+    <!-- End Table Tools/Actions cell -->
+</tr>
 
 <!-- end Table Actions row (pagination, search, tools) -->
 
