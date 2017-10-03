@@ -87,6 +87,34 @@ a{
   text-decoration: none;
 }
 
+#ol{
+    background-image: url(overlay.png);
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="overlay.png", sizingMethod="scale");
+}
+#box {
+    display:none
+}
+
+#ol{
+    background-image: url(overlay.png);
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="overlay.png", sizingMethod="scale");
+}
+
+#mbox{
+    background-color:#eeeeee;
+    padding:15px;
+    border:2px outset #666;
+}
+
+#mbm{
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: bold;
+    float:right;
+    padding-bottom:5px;
+}
+
 .statusSide{
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
 }
