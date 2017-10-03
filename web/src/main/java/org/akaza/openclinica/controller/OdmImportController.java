@@ -25,7 +25,7 @@ public class OdmImportController {
             odmImportServiceImpl.importOdm(odm, boardId);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (CustomRuntimeException e) {
-            return new ResponseEntity<>(e.getErrors(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
         }
 
     }
