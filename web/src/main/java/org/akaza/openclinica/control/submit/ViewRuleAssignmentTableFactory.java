@@ -889,8 +889,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     private String removeLinkBuilder(Integer ruleSetRuleId, Integer ruleSetId) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-cancel');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-cancel');\" href=\"javascript:openDocWindow('UpdateRuleSetRule?action=remove&ruleSetRuleId="+ruleSetRuleId+"&ruleSetId="+ruleSetId);
-        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Remove\" alt=\"View\" class=\"icon icon-cancel\" name=\"bt_Reassign1\"/></a>");
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-cancel');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-cancel');\" href=\"UpdateRuleSetRule?action=remove&ruleSetRuleId="+ruleSetRuleId+"&ruleSetId="+ruleSetId);
+        builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Remove\" alt=\"View\" class=\"icon icon-cancel\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
 
@@ -898,8 +898,8 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     private String restoreLinkBuilder(Integer ruleSetRuleId, Integer ruleSetId) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"javascript:openDocWindow('UpdateRuleSetRule?action=restore&ruleSetRuleId="+ruleSetRuleId+"&ruleSetId"+ruleSetId);
-        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"UpdateRuleSetRule?action=restore&ruleSetRuleId="+ruleSetRuleId+"&ruleSetId"+ruleSetId);
+        builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
 

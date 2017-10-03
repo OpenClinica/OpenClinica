@@ -375,7 +375,12 @@ public class EnketoUrlService {
                             ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
                             String itemValue = getItemValue(itemData, crfVersion);
                             hashMap.put(igm.getItem().getName(), itemData != null ? itemValue : "");
-                            if (flavor.equals(QUERY_FLAVOR)) {
+
+                            ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(igm.getItem().getItemId(),
+                                    crfVersion.getCrfVersionId());
+                            Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
+
+                            if (flavor.equals(QUERY_FLAVOR) && responseTypeId != 8) {
                                 if (itemData != null) {
                                     ObjectMapper mapper = new ObjectMapper();
                                     QueriesBean queriesBean = buildQueryElement(itemData);
@@ -400,7 +405,10 @@ public class EnketoUrlService {
                     ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
                     String itemValue = getItemValue(itemData, crfVersion);
                     data.put(igm.getItem().getName(), itemData != null ? itemValue : "");
-                    if (flavor.equals(QUERY_FLAVOR)) {
+                    ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(igm.getItem().getItemId(), crfVersion.getCrfVersionId());
+                    Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
+
+                    if (flavor.equals(QUERY_FLAVOR) && responseTypeId != 8) {
                         if (itemData != null) {
                             ObjectMapper mapper = new ObjectMapper();
                             QueriesBean queriesBean = buildQueryElement(itemData);
