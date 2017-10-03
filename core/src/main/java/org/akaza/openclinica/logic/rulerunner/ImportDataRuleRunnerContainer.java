@@ -1,10 +1,12 @@
 package org.akaza.openclinica.logic.rulerunner;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
@@ -12,10 +14,12 @@ import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
@@ -89,7 +93,8 @@ public class ImportDataRuleRunnerContainer {
                 if(cvs.containsKey(cvOid))
                     crfVersion = cvs.get(cvOid);
                 else {
-                    crfVersion = new CRFVersionDAO<String, ArrayList>(ds).findByOid(cvOid);
+                    // crfVersion = new CRFVersionDAO<String, ArrayList>(ds).findByOid(cvOid);
+                    crfVersion = getFormVersionBeans(formDataBean,ds);
                     cvs.put(cvOid, crfVersion);
                 }
                 String sedOrd = studyEventDataBean.getStudyEventRepeatKey();
@@ -241,4 +246,19 @@ public class ImportDataRuleRunnerContainer {
     public void setShouldRunRules(Boolean shouldRunRules) {
         this.shouldRunRules = shouldRunRules;
     }
+
+    private CRFVersionBean getFormVersionBeans(FormDataBean formDataBean, DataSource ds){
+        CRFVersionDAO formVersionDAO = new CRFVersionDAO(ds);
+        CRFDAO crfDAO = new CRFDAO(ds);
+        CRFVersionBean crfVersionBean = null;
+
+        String formOid = formDataBean.getFormOID();
+        CRFBean crfBean = crfDAO.findByOid(formOid);
+        if(crfBean != null){
+            crfVersionBean =  (CRFVersionBean) formVersionDAO.findByFullName(formDataBean.getFormLayoutName(),crfBean.getName());
+        }
+
+        return crfVersionBean;
+    }
+
 }
