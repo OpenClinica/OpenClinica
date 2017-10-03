@@ -28,7 +28,7 @@ public class LiquibaseConfig {
     }
 
     @Bean
-    @DependsOn ({"coreResources", "createPostgresAppServer"})
+    @DependsOn ("createPostgresAppServer")
     @Scope(value = "prototype")
     public OCCommonTablesSpringLiquibase liquibaseSchemaCommonTables() {
         OCCommonTablesSpringLiquibase liquibase = new OCCommonTablesSpringLiquibase();
@@ -39,7 +39,7 @@ public class LiquibaseConfig {
     }
     
     @Bean
-    @DependsOn ({"coreResources", "liquibaseSchemaCommonTables"})
+    @DependsOn ("liquibaseSchemaCommonTables")
     public SpringLiquibase liquibasePublicSchema() {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource);
@@ -51,7 +51,7 @@ public class LiquibaseConfig {
 
 
     @Bean
-    @DependsOn ("coreResources")
+    @DependsOn ("liquibasePublicSchema")
     public OCSpringLiquibase liquibaseForeignTables() {
         OCSpringLiquibase liquibase = new OCSpringLiquibase();
         liquibase.setDataSource(dataSource);
@@ -60,7 +60,7 @@ public class LiquibaseConfig {
     }
 
     @Bean
-    @DependsOn ("coreResources")
+    @DependsOn ("liquibaseForeignTables")
     public OCMultiTenantSpringLiquibase liquibase() {
         OCMultiTenantSpringLiquibase liquibase = new OCMultiTenantSpringLiquibase();
         liquibase.setDataSource(dataSource);
