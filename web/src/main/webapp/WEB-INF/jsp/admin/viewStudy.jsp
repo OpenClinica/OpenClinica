@@ -180,35 +180,9 @@
   <c:out value="${studyToView.facilityContactEmail}"/>&nbsp;
   </td></tr>
 
-
-
    <tr bgcolor="#F5F5F5"><td class="table_header_column" colspan="2" ><b><fmt:message key="section" bundle="${resword}"/> E: <fmt:message key="related_infomation" bundle="${resword}"/></b></td></tr>
 
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="medline_identifier_references" bundle="${resword}"/></td><td class="table_cell">
-  <c:out value="${studyToView.medlineIdentifier}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="results_reference" bundle="${resword}"/></td><td class="table_cell">
-  <c:choose>
-    <c:when test="${studyToView.resultsReference == true}">
-     <fmt:message key="yes" bundle="${resword}"/>
-    </c:when>
-    <c:otherwise>
-      <fmt:message key="no" bundle="${resword}"/>
-    </c:otherwise>
-   </c:choose>
- </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="URL_reference" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.url}"/>&nbsp;
- </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="URL_description" bundle="${resword}"/></td><td class="table_cell">
-  <c:out value="${studyToView.urlDescription}"/>&nbsp;
-  </td></tr>
-
-<tr bgcolor="#F5F5F5"><td class="table_header_column" colspan="2"><b><fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="study_parameter_configuration" bundle="${resword}"/></b></td></tr>
+  <tr bgcolor="#F5F5F5"><td class="table_header_column" colspan="2"><b><fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="study_parameter_configuration" bundle="${resword}"/></b></td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject" bundle="${resword}"/></td>
    <td class="table_cell">
