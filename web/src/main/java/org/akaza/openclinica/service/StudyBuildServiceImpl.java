@@ -1,6 +1,5 @@
 package org.akaza.openclinica.service;
 
-import com.auth0.Auth0User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.core.Role;
@@ -20,7 +19,6 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.web.bean.StudyUserRoleRow;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
@@ -39,8 +37,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.function.Predicate;
-import java.util.stream.Stream;
 
 /**
  * Created by yogi on 11/10/16.

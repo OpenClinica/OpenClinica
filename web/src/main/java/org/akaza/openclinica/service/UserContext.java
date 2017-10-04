@@ -10,6 +10,7 @@ public class UserContext {
     String userType;
     public UserContext(Claim contextClaim) {
         this.contextClaim = contextClaim;
+
     }
 
     public String getUserType() {

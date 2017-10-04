@@ -23,7 +23,7 @@ public class TokenAuthentication extends AbstractAuthenticationToken {
     }
 
     private static Collection<? extends GrantedAuthority> readAuthorities(DecodedJWT jwt) {
-        Claim contextClaim = jwt.getClaim("http://com.openclinica/userConext");
+        Claim contextClaim = jwt.getClaim("http://com.openclinica/userContext");
         if (contextClaim.isNull()) {
             return Collections.emptyList();
         }
@@ -48,10 +48,8 @@ public class TokenAuthentication extends AbstractAuthenticationToken {
 
     @Override
     public void setAuthenticated(boolean authenticated) {
-        if (authenticated) {
-            throw new IllegalArgumentException("Create a new Authentication object to authenticate");
-        }
-        invalidated = true;
+        setAuthenticated(true);
+        invalidated = !authenticated;
     }
 
     @Override

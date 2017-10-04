@@ -20,6 +20,8 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
     @NotNull
     private String email;
 
+    private String phoneNumber;
+
     @NotNull
     private String username;
 
@@ -58,6 +60,14 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
 
     public void setEmail(String email) {
         this.email = email;
+    }
+
+    public String getPhoneNumber() {
+        return phoneNumber;
+    }
+
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getUsername() {
@@ -115,12 +125,14 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
     @Override
     public String toString() {
         return "OCUserDTO{" +
-                ", uuid='" + uuid + "'" +
-                ", firstName='" + firstName + "'" +
-                ", lastName='" + lastName + "'" +
-                ", externalUserId='" + externalUserId + "'" +
-                ", organization='" + organization + "'" +
-                '}';
+                ", uuid='" + getUuid() + "'" +
+                ", firstName='" + getFirstName() + "'" +
+                ", lastName='" + getLastName() + "'" +
+                ", username='" + getUsername() + "'" +
+                ", email='" + getEmail() + "'" +
+                ", phoneNumber='" + getPhoneNumber() + "'" +
+                ", externalUserId='" + getExternalUserId() + "'" +
+                ", organization='" + getOrganization() + "'" +
+                "}";
     }
 }
-

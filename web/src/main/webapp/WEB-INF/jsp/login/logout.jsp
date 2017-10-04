@@ -10,28 +10,10 @@
     <meta charset="utf-8">
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
-    <title>Home Page</title>
+    <title>Logout Page</title>
     <script src="http://code.jquery.com/jquery.js"></script>
-    <script src="//cdn.auth0.com/js/auth0/8.8/auth0.min.js"></script>
 </head>
-<body onload="logout()">
-
-<script type="text/javascript">
-    function logout() {
-        webAuth.logout({
-            client_id: '${clientId}',
-            returnTo: '${fn:replace(pageContext.request.requestURL, pageContext.request.requestURI, '')}${logoutEndpoint}'
-        });
-    }
-    // check SSO status
-    var webAuth = new auth0.WebAuth({
-        domain: '${domain}',
-        clientID: '${clientId}',
-        audience: 'https://www.openclinica.com',
-        responseType: 'code'
-    });
-
-</script>
-<center><h1><fmt:message key="logging_out" bundle="${resword}"/></h1></center>
+<body>
+<h1>Logout successful</h1>
 </body>
 </html>

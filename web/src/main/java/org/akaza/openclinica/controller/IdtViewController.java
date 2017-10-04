@@ -77,9 +77,6 @@ public class IdtViewController {
     ServletContext context;
 
     @Autowired
-    AuthenticationManager authenticationManager;
-
-    @Autowired
     IdtViewDao idtViewDao;
 
     @Autowired

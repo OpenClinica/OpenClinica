@@ -1,6 +1,5 @@
 package org.akaza.openclinica.service;
 
-import com.auth0.Auth0User;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
 

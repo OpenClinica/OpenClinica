@@ -1,9 +1,9 @@
 package org.akaza.openclinica.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.UserAccountController;
+import org.akaza.openclinica.controller.helper.OCUserDTO;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
@@ -14,6 +14,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.jpa.repository.Modifying;
+import org.springframework.http.ResponseEntity;
+import org.springframework.security.oauth2.common.util.JsonParser;
+import org.springframework.security.oauth2.common.util.JsonParserFactory;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -38,25 +41,25 @@ public class CallbackServiceImpl implements CallbackService {
     @Autowired private StudyBuildService studyBuildService;
     @Autowired private UserAccountDAO userAccountDAO;
 
-    private ObjectMapper objectMapper = new ObjectMapper();
+    private JsonParser objectMapper = JsonParserFactory.create();
     @Override
     public UserAccountHelper isCallbackSuccessful(HttpServletRequest request, Auth0User user) throws Exception {
         UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-        String _username = user.getNickname();
-        logger.info("Callback for user:" + _username);
-        if (StringUtils.isEmpty(_username))
+        UserContext userContext = user.getUserContext();
+
+        Map<String, Object> userContextMap = userContext.contextClaim.asMap();
+        request.getSession().setAttribute("userContextMap", userContextMap);
+        String userUuid = (String) userContextMap.get("userUuid");
+        getUserDetails(request, userContextMap, user);
+        logger.info("Callback for user:" + userUuid);
+        if (StringUtils.isEmpty(userUuid))
             return null;
-        UserContext userContext = getUserContextMap(user);
-        String userUuid = user.getUserId();
         UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid(userUuid);
-        if (StringUtils.isEmpty(ub.getName())) {
-            ub = (UserAccountBean) userAccountDAO.findByUserName(_username);
-        } else {
-            ub.setName(_username);
+        if (StringUtils.isNotEmpty(ub.getName())) {
+            ub.setUserUuid(userUuid);
             userAccountDAO.update(ub);
             updateStudyUsername(ub, user);
         }
-        Map<String, Object> userContextMap = new HashMap<>();
         if (ub.getId() == 0) {
             ub = createUserAccount(request, user, userContextMap);
         }
@@ -64,6 +67,14 @@ public class CallbackServiceImpl implements CallbackService {
         return new UserAccountHelper(ub, isUserUpdated);
     }
 
+    public void getUserDetails(HttpServletRequest request, Map<String, Object> userContextMap, Auth0User user) {
+        ResponseEntity<OCUserDTO> userDetails = studyBuildService.getUserDetails(request);
+        OCUserDTO userDTO = userDetails.getBody();
+        user.setEmail(userDTO.getEmail());
+        user.setNickname(userDTO.getUsername());
+        user.setGivenName(userDTO.getFirstName());
+        user.setFamilyName(userDTO.getLastName());
+    }
     public UserAccountBean getUpdatedUser(UserAccountBean ub) {
         return (UserAccountBean) userAccountDAO.findByUserName(ub.getName());
     }
@@ -84,7 +95,6 @@ public class CallbackServiceImpl implements CallbackService {
     }
     @Modifying
     private boolean updateStudyUserRoles(HttpServletRequest request, UserAccountBean ub, Auth0User user, Map<String, Object> userContextMap) throws Exception {
-        request.getSession().setAttribute("userContextMap", userContextMap);
         return studyBuildService.saveStudyEnvRoles(request, ub);
     }
 
