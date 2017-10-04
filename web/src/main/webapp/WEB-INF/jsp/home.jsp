@@ -7,7 +7,7 @@
     <meta http-equiv="X-UA-Compatible" content="IE=edge">
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Home Page</title>
-    <script src="http://code.jquery.com/jquery.js"></script>
+    <script src="//code.jquery.com/jquery.js"></script>
     <script src="//cdn.auth0.com/js/auth0/8.8/auth0.min.js"></script>
 </head>
 <body>
