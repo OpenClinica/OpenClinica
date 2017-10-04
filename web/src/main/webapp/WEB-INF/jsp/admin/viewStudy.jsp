@@ -65,21 +65,14 @@
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr bgcolor="#F5F5F5"><td class="table_header_column" colspan="2"><b><fmt:message key="section" bundle="${resword}"/> A: <fmt:message key="study_description" bundle="${resword}"/></b></td></tr>
+  
   <tr valign="top"><td class="table_header_column"><fmt:message key="brief_title" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.name}"/>
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="official_title" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.officialTitle}"/>&nbsp;
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="unique_protocol_ID" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.identifier}"/>
   </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="secondary_IDs" bundle="${resword}"/>:</td><td class="table_cell">
-   <c:out value="${studyToView.secondaryIdentifier}"/>&nbsp;
-   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.principalInvestigator}"/>
@@ -87,18 +80,6 @@
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="brief_summary" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.summary}"/>
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="protocol_detailed_description" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.protocolDescription}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="sponsor" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.sponsor}"/>
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="collaborators" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.collaborators}"/>&nbsp;
   </td></tr>
 
   <tr bgcolor="#F5F5F5"><td class="table_header_column" colspan="2"><b><fmt:message key="section" bundle="${resword}"/> B: <fmt:message key="study_status_and_design" bundle="${resword}"/></b></td></tr>
@@ -284,7 +265,7 @@
   <c:out value="${studyToView.urlDescription}"/>&nbsp;
   </td></tr>
 
-<tr bgcolor="#F5F5F5"><td class="table_header_column" colspan="2"><fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="study_parameter_configuration" bundle="${resword}"/></td></tr>
+<tr bgcolor="#F5F5F5"><td class="table_header_column" colspan="2"><b><fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="study_parameter_configuration" bundle="${resword}"/></b></td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject" bundle="${resword}"/></td>
    <td class="table_cell">
