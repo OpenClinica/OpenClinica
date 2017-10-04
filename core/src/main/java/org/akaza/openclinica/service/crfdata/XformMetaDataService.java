@@ -394,11 +394,17 @@ public class XformMetaDataService {
 
     private ResponseType getResponseType(XformItem xformItem) {
         String responseType = xformItem.getItemDataType();
+        String readOnly = "";
+        String relevant = "";
+        if (xformItem.getReadonly() != null)
+            readOnly = xformItem.getReadonly();
+        if (xformItem.getRelevant() != null)
+            relevant = xformItem.getRelevant();
 
-        if (responseType.equals("string") && !xformItem.isCalculate())
-            return responseTypeDao.findByResponseTypeName("text");
-        else if (responseType.equals("string") && xformItem.isCalculate())
+        if (xformItem.isCalculate() && !readOnly.equals("true()") && !relevant.equals("false()"))
             return responseTypeDao.findByResponseTypeName("calculation");
+        else if (responseType.equals("string"))
+            return responseTypeDao.findByResponseTypeName("text");
         else if (responseType.equals("int"))
             return responseTypeDao.findByResponseTypeName("text");
         else if (responseType.equals("decimal"))
