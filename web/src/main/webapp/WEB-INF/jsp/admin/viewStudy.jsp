@@ -138,20 +138,6 @@
   </td></tr>
 
   </c:when>
-  <c:otherwise>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="duration" bundle="${resword}"/>:</td><td class="table_cell">
-   <c:out value="${studyToView.duration}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="selection" bundle="${resword}"/></td><td class="table_cell">
-  <c:out value="${studyToView.selection}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="timing" bundle="${resword}"/></td><td class="table_cell">
-  <c:out value="${studyToView.timing}"/>&nbsp;
-  </td></tr>
-
-  </c:otherwise>
   </c:choose>
 
   <tr bgcolor="#F5F5F5"><td class="table_header_column" colspan="2"><b><fmt:message key="section" bundle="${resword}"/> C: <fmt:message key="conditions_and_eligibility" bundle="${resword}"/></b></td></tr>
