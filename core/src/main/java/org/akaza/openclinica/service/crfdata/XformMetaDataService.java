@@ -401,7 +401,7 @@ public class XformMetaDataService {
         if (xformItem.getRelevant() != null)
             relevant = xformItem.getRelevant();
 
-        if (xformItem.isCalculate() && !readOnly.equals("true()") && !relevant.equals("false()"))
+        if ((xformItem.isCalculate() && !readOnly.equals("true()") && !relevant.equals("false()")) || (xformItem.isCalculate() && relevant.equals("false()")))
             return responseTypeDao.findByResponseTypeName("calculation");
         else if (responseType.equals("string"))
             return responseTypeDao.findByResponseTypeName("text");
