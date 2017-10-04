@@ -97,7 +97,7 @@
 				<tr>
 					<td valign="top">
 						<div class="formfieldM_BG">
-						<input name="ebl_filterKeyword" onblur="if (this.value == '') this.value = ''" onfocus="if (this.value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') this.value = ''" type="text" class="formfieldM" value="<fmt:message key="study_subject_ID" bundle="${resword}"/>"" /> 
+						<input name="ebl_filterKeyword" type="text" class="formfieldM" value="" /> 
 						</div> 
 					</td>
 					<td valign="top">
