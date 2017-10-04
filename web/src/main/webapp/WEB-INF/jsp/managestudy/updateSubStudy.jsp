@@ -100,7 +100,7 @@ function updateThis(multiSelEle, count) {
 	</c:when>
 	<c:otherwise>
 	&nbsp&nbsp&nbsp&nbsp<b><a href="javascript:leftnavExpand('sed<c:out value="${defCount}"/>');">
-    <img id="excl_sed<c:out value="${defCount}"/>" src="images/bt_Expand.gif" border="0"> <c:out value="${def.name}"/></b></a>
+    <img id="excl_sed<c:out value="${defCount}"/>" src="images/bt_Expand.gif" border="0" width="12px"> <c:out value="${def.name}"/></b></a>
 	</c:otherwise>
 	</c:choose>
 	
