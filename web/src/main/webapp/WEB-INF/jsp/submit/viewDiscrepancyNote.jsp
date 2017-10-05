@@ -190,7 +190,7 @@
 <c:set var="count" value="${1}"/>
 <!-- Thread Heading -->
 <c:forEach var="note" items="${discrepancyNotes}">
-<table border="0" cellpadding="0" cellspacing="0">
+<table border="0" cellpadding="0" cellspacing="0" align="left">
     <tbody>
         <tr>
             <td>
@@ -274,7 +274,7 @@
             </td>
         </tr>
              
-        <table border="0" style="padding-left: 330px;">
+        <table border="0" style="padding-left: 330px;" align="left">
             <c:if test="${!study.status.locked}">
                 <tr>
                 <td class="table_cell_left" colspan="4" align="left">
@@ -283,10 +283,10 @@
                         <c:forEach var="status" items="${resolutionStatuses}">
                             <c:choose>
                             <c:when test="${status.id == 2}">
-                                <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
+                                <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>','<fmt:message key="update_this_Discrepancy_Note" bundle="${restext}"/>');/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
                             </c:when>
                             <c:when test="${status.id == 4}">
-                                <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="close_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
+                                <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="close_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>','<fmt:message key="close_this_Discrepancy_Note" bundle="${restext}"/>');"/>
                             </c:when>
                             </c:choose>
                             <c:set var="sindex" value="${sindex+1}"/>
@@ -320,30 +320,6 @@
 </table>
 <c:set var="count" value="${count+1}"/>
 </c:forEach>
-
-<c:if test="${!study.status.locked}">
-    <div style="clear:both;"></div>
-    <c:choose>
-    <c:when test="${boxToShow==0}">
-        <p id="p">
-            <a href="javascript:showOnly('box<c:out value='${0}'/>New');javascript:removeText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');" id="a0"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a>
-        </p>
-    </c:when>
-    <c:otherwise>
-        <p id="p">
-            <a href="javascript:showOnly('box<c:out value='${0}'/>New');javascript:removeText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');" id="a0"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a>
-        </p>
-    </c:otherwise>
-    </c:choose>
-    <c:import url="./discrepancyNote.jsp">
-        <c:param name="parentId" value="0"/>
-        <c:param name="entityId" value="${id}"/>                
-        <c:param name="entityType" value="${name}"/>                
-        <c:param name="field" value="${field}"/>                
-        <c:param name="column" value="${column}"/>
-        <c:param name="boxId" value="box${0}New"/>
-    </c:import>
-</c:if>  
 
 <div style="clear:both;"></div>
 <div id="audit">
