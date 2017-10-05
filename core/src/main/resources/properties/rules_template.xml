@@ -1,58 +1,29 @@
 <RuleImport>
 	<RuleAssignment>
 		<Target Context="OC_RULES_V1"></Target>
-	  		<!-- <RunOnSchedule Time="17:00"/> -->	  
+		<!-- To run a rule at a scheduled time, remove the first 4 characters and the last three characters from the following line. -->
+		<!-- <RunOnSchedule Time="17:00"/> -->
 		<RuleRef OID="">
-		
-			<DiscrepancyNoteAction IfExpressionEvaluates="true">
-				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
-                <Message></Message>
-			</DiscrepancyNoteAction>
-			
-			<EmailAction IfExpressionEvaluates="true">
-				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true" />
-                <Message></Message>
-                <To></To>
-			</EmailAction>
-			
-			<InsertAction IfExpressionEvaluates="true">
-				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="true"/>
-				<DestinationProperty OID="" Value="">
-					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
-				</DestinationProperty>
-			</InsertAction>			
 
 			<NotificationAction IfExpressionEvaluates="true">
-                <To></To>
-                <Subject></Subject>
-                <Message></Message>
+				<To></To>
+				<Subject></Subject>
+				<Message></Message>
 			</NotificationAction>
-			
-			<ShowAction IfExpressionEvaluates="true">
-				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
-                <Message></Message>
-				<DestinationProperty OID=""/>
-			</ShowAction>	
-					
-			<HideAction IfExpressionEvaluates="false">
-				<Run AdministrativeDataEntry="true" InitialDataEntry="true" DoubleDataEntry="true" ImportDataEntry="false" Batch="false" />
-                <Message></Message>
-				<DestinationProperty OID=""/>
-			</HideAction>
-						
+
 			<EventAction IfExpressionEvaluates="true" OID="">
 				<RunOnStatus not_scheduled="true" scheduled="true" data_entry_started="false" completed="false"  skipped="false" stopped="false"/>
 				<EventDestination Property="STARTDATE">
 					<ValueExpression Context="OC_RULES_V1"></ValueExpression>
 				</EventDestination>
 			</EventAction>
-			
+
 		</RuleRef>
 	</RuleAssignment>
-	
+
 	<RuleDef OID="" Name="">
 		<Description></Description>
 		<Expression></Expression>
 	</RuleDef>
-	
-</RuleImport>
+
+</RuleImport>o
