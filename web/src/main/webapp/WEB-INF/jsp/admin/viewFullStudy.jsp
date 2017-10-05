@@ -284,29 +284,6 @@
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="medline_identifier_references" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.medlineIdentifier}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="results_reference" bundle="${resword}"/></td><td class="table_cell">
-  <c:choose>
-    <c:when test="${studyToView.resultsReference == true}">
-  <fmt:message key="yes" bundle="${resword}"/>
-    </c:when>
-    <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-    </c:otherwise>
-   </c:choose>
- </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="URL_reference" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.url}"/>&nbsp;
- </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="URL_description" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.urlDescription}"/>&nbsp;
-  </td></tr>
-
 </table>
 
 </div>
@@ -696,3 +673,4 @@
 </div>
 
 <jsp:include page="../include/footer.jsp"/>
+F
