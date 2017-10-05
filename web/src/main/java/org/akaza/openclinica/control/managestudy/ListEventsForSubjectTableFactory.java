@@ -105,7 +105,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     public ListEventsForSubjectTableFactory(boolean showMoreLink) {
         imageIconPaths.put(1, "icon icon-clock2");
-        imageIconPaths.put(2, "icon icon-doc");
+        imageIconPaths.put(2, "icon icon-clock");
         imageIconPaths.put(3, "icon icon-pencil-squared orange");
         imageIconPaths.put(4, "icon icon-checkbox-checked green");
         imageIconPaths.put(5, "icon icon-stop-circle red");

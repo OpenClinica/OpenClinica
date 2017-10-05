@@ -145,6 +145,9 @@
 .icon-clock2:before {
   content: "\e94f";
 }
+.icon-clock:before {
+  content: "\e94e";
+}
 .icon-redo:before {
   content: "\e966";
 }
