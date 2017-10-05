@@ -222,40 +222,6 @@
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
-<tr valign="top"><td class="table_header_column"><fmt:message key="conditions" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.conditions}"/>&nbsp;
- </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="keywords" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.keywords}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="eligibility" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.eligibility}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="gender" bundle="${resword}"/>:</td><td class="table_cell">
-    <c:out value="${studyToView.gender}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="minimun_age" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.ageMin}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="maximun_age" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.ageMax}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="healthy_volunteers_accepted" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:choose>
-    <c:when test="${studyToView.healthyVolunteerAccepted == true}">
-  <fmt:message key="yes" bundle="${resword}"/>
-    </c:when>
-    <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-    </c:otherwise>
-   </c:choose>
- </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="expected_total_enrollment" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.expectedTotalEnrollment}"/>&nbsp;
