@@ -303,7 +303,8 @@ public class ImportCRFDataService {
                 for (FormDataBean formDataBean : formDataBeans) {
                     FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
 
-                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID());
+                    ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean,ds);
+
                     for (FormLayoutBean formLayoutBean : formLayoutBeans) {
 
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
