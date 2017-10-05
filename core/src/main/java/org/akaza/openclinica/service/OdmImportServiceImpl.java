@@ -36,6 +36,7 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParser;
+import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.dto.Bucket;
@@ -59,6 +60,7 @@ import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.client.RestTemplate;
 
 public class OdmImportServiceImpl implements OdmImportService {
@@ -217,7 +219,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 
         }
         if (errors.hasErrors()) {
-            throw new CustomRuntimeException("There are errors with publishing", errors);
+            List<ErrorObj> errList = getErrorList(errors.getAllErrors());
+            throw new CustomRuntimeException("There are errors with publishing", errList);
         }
         return study;
     }
@@ -632,4 +635,12 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.eventService = eventService;
     }
 
+    private List<ErrorObj> getErrorList(List<ObjectError> objErrors) {
+        List<ErrorObj> err = new ArrayList<>();
+        for (ObjectError er : objErrors) {
+            ErrorObj obj = new ErrorObj(er.getCode(), er.getDefaultMessage());
+            err.add(obj);
+        }
+        return err;
+    }
 }
