@@ -13,6 +13,9 @@ select, input, textarea {
 textarea {
   width: 100%; }
 
+table, td {
+  font-size: 100%; }
+
 input[type="text"], input[type="password"] {
   background-color: white;
   display: inline-block;
@@ -120,7 +123,7 @@ a{
 }
 
 .eventSide{
-  color:#494D4B !important; 
+  color:#494D4B !important;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;"
 }
 
@@ -197,6 +200,14 @@ a:hover {
     font-size: 1.25rem; }
 
 /* navigation */
+.status-tag {
+  border-radius: .15em;
+  padding: .15em .25em; }
+  .status-tag .status-test {
+    background-color: #ED7800; }
+  .status-tag .status-prod {
+    background-color: #06C279; }
+
 .logo {
   display: inline-block;
   float: left;
@@ -331,6 +342,14 @@ a:hover {
 
 /*End of Dropdown Styling*/
 /* Misc*/
+.blockUI.blockMsg.blockPage {
+  width: auto !important;
+  padding: 1em !important;
+  top: 50% !important;
+  left: 50% !important;
+  margin: 0 auto !important;
+  transform: translate(-50%, -50%); }
+
 form[action="CreateNewStudyEvent"] > div {
   width: 850px; }
 
@@ -403,20 +422,24 @@ td.table_actions > table {
     border-bottom: 1px solid #ccc;
     padding: .15em; }
 
-.shaded_table {
-  border: 1px solid #ccc;
+table.shaded_table {
+  border: 0;
   margin: 1em 0; }
-  .shaded_table tr:first-child td {
-    border-top: 0; }
-  .shaded_table td {
+  table.shaded_table table {
+    border: 1px solid #ccc; }
+  table.shaded_table td {
     padding: .25em;
     border-top: 1px solid #ccc;
     border-left: 1px solid #ccc;
     border-right: 0;
     border-bottom: 0; }
-    .shaded_table td:first-child {
-      border-left: 0;
+    table.shaded_table td:first-child {
+      border-left: 0; }
+    table.shaded_table td.table_header_row {
+      background-color: #f1f1f1;
       border-top: 0; }
+  table.shaded_table > tbody > tr > td {
+    border: 0; }
 
 .tablebox_center {
   font-size: .85rem;
@@ -451,6 +474,13 @@ td.table_actions > table {
         border-right: 1px solid #ccc; }
     .tablebox_center td.table_cell_left {
       border-left: 1px solid #ccc; }
+
+form[action="UpdateSubStudy"] .textbox_center tr[bgcolor="#F5F5F5"] {
+  background-color: #fff !important; }
+
+form[action="UpdateSubStudy"] .textbox_center td.table_cell, form[action="UpdateSubStudy"] .textbox_center td.table_cell_left, form[action="UpdateSubStudy"] .textbox_center td.table_header_column, form[action="UpdateSubStudy"] .textbox_center td.table_header_column_top {
+  border-bottom: 0px !important; }
+
 
 .textbox_center {
   background-color: #f1f1f1;

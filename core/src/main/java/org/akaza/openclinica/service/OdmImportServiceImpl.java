@@ -100,20 +100,23 @@ public class OdmImportServiceImpl implements OdmImportService {
         }
     }
 
+    public void importOdm(ODM odm, String boardId) {
+        Study study = importOdmToOC(odm, boardId);
+        Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
+        updatePublicStudypublishedFlag(publicStudy);
+    }
+
     @Transactional
-    public void importOdmToOC(ODM odm, String boardId) {
+    private Study importOdmToOC(ODM odm, String boardId) {
         DataBinder dataBinder = new DataBinder(new Study());
         Errors errors = dataBinder.getBindingResult();
-
         printOdm(odm);
-
         CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(), dataSource);
 
         UserAccount userAccount = getCurrentUser();
         // TODO add validation to all entities
         ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
         Study study = retrieveStudy(odm, userAccount, odmStudy, errors);
-        Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
         Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(boardId, errors);
 
         StudyEventDefinition studyEventDefinition = null;
@@ -216,25 +219,22 @@ public class OdmImportServiceImpl implements OdmImportService {
         if (errors.hasErrors()) {
             throw new CustomRuntimeException("There are errors with publishing", errors);
         }
-
-        //updateStudypublishedFlag(getStudyDao().findByStudyEnvUuid(study.getStudyEnvUuid()));
-        updatePublicStudypublishedFlag(publicStudy);
-
+        return study;
     }
 
-    private void updatePublicStudypublishedFlag(Study publicStudy){
+    private void updatePublicStudypublishedFlag(Study publicStudy) {
         publicStudy.setPublished(true);
         studyDao.updatePublicStudy(publicStudy);
-        for(Study publicStudySite: publicStudy.getStudies()){
+        for (Study publicStudySite : publicStudy.getStudies()) {
             publicStudySite.setPublished(true);
             studyDao.updatePublicStudy(publicStudySite);
         }
     }
 
-    private void updateStudypublishedFlag(Study study){
+    private void updateStudypublishedFlag(Study study) {
         study.setPublished(true);
         studyDao.saveOrUpdate(study);
-        for(Study publicStudySite: study.getStudies()){
+        for (Study publicStudySite : study.getStudies()) {
             publicStudySite.setPublished(true);
             studyDao.saveOrUpdate(publicStudySite);
         }

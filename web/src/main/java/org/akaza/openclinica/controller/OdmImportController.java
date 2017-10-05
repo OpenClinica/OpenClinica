@@ -22,10 +22,10 @@ public class OdmImportController {
     public ResponseEntity<Object> importOdmToOC(@RequestBody org.cdisc.ns.odm.v130.ODM odm, @PathVariable("boardId") String boardId) throws Exception {
 
         try {
-            odmImportServiceImpl.importOdmToOC(odm, boardId);
+            odmImportServiceImpl.importOdm(odm, boardId);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (CustomRuntimeException e) {
-            return new ResponseEntity<>(e.getErrors(), HttpStatus.BAD_REQUEST);
+            return new ResponseEntity<>(e, HttpStatus.BAD_REQUEST);
         }
 
     }

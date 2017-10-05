@@ -100,7 +100,7 @@ function updateThis(multiSelEle, count) {
 	</c:when>
 	<c:otherwise>
 	&nbsp&nbsp&nbsp&nbsp<b><a href="javascript:leftnavExpand('sed<c:out value="${defCount}"/>');">
-    <img id="excl_sed<c:out value="${defCount}"/>" src="images/bt_Expand.gif" border="0"> <c:out value="${def.name}"/></b></a>
+    <img id="excl_sed<c:out value="${defCount}"/>" src="images/bt_Expand.gif" border="0" width="12px"> <c:out value="${def.name}"/></b></a>
 	</c:otherwise>
 	</c:choose>
 	
@@ -116,7 +116,7 @@ function updateThis(multiSelEle, count) {
 	<!-- These DIVs define shaded box borders -->
  	<div style="width: 100%">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-	<div class="textbox_center">
+	<div class="textbox_center" style="display: none;">
 	<table border="0" cellpadding="0" cellspacing="0">
 		<tr><td class="table_header_column" colspan="3">Name</td><td><c:out value="${def.name}"/></td></tr>
 		<tr><td class="table_header_column" colspan="3">Description</td><td><c:out value="${def.description}"/></td></tr>
@@ -217,7 +217,7 @@ function updateThis(multiSelEle, count) {
 	        </c:choose>
 		    </td>
 
-		    <td class="table_cell" colspan="6"><fmt:message key="sdv_option" bundle="${resword}"/>:
+		    <td class="table_cell" colspan="6" style="display: none;"><fmt:message key="sdv_option" bundle="${resword}"/>:
 		    <select name="sdvOption<c:out value="${num}"/>">
 	            <c:set var="index" value="1"/>
 	            <c:forEach var="sdv" items="${sdvOptions}">

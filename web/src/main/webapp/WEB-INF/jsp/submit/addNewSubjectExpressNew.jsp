@@ -74,7 +74,7 @@
 <form name="subjectForm" action="AddNewSubject" method="post">
 <input type="hidden" name="subjectOverlay" value="true">
 
-<div style="height: 400px; width:400px; background:#FFFFFF; cursor:default">
+<div style="height: 475px; width:400px; background:#FFFFFF; cursor:default">
 <table border="0" cellpadding="0" align="center">
     <tr style="height:10px;">
         <td class="formlabel" align="left"><h3 class="addNewSubjectTitle"><fmt:message key="add_new_subject" bundle="${resword}"/></h3></td>
@@ -110,17 +110,41 @@
             </table>
         </td>
     </tr>
+    
+    <c:if test="${study.studyParameterConfig.secondaryLabelViewable =='true'}">
+    <tr valign="top">
+        <td class="formlabel" align="left">
+            <span class="addNewStudyLayout"><fmt:message key="secondary_ID" bundle="${resword}"/></span>
+        </td>
+        <td valign="top">
+            <table border="0" cellpadding="0" cellspacing="0">
+                <tr>        
+                    <td valign="top"><div class="formfieldXL_BG">
+                        <input class="form-control" onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" width="30" class="formfieldXL">
+                    </div></td>
+                    <td>&nbsp;</td>
+                </tr>
+                <tr>        
+                    <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>        
+                </tr>       
+            </table>        
+        </td>       
+    </tr>
+    </c:if>
+
     <c:choose>
     <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
     <tr valign="top">
-        <td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/></td>
+        <td class="formlabel" align="left">
+            <span class="addNewStudyLayout"><fmt:message key="person_ID" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
+        </td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td valign="top"><div class="formfieldXL_BG">
-                        <input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL">
+                        <input class="form-control" onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL">
                     </div></td>
-                    <td>&nbsp;*</td>
+                    <td>&nbsp;</td>
                 </tr>
                 <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
             </table>
@@ -129,12 +153,14 @@
     </c:when>
     <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='optional'}">
     <tr valign="top">
-        <td class="formlabel" align="right"><fmt:message key="person_ID" bundle="${resword}"/></td>
+        <td class="formlabel" align="left">
+            <span class="addNewStudyLayout"><fmt:message key="person_ID" bundle="${resword}"/></span>
+        </td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
                     <td valign="top"><div class="formfieldXL_BG">
-                        <input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL">
+                        <input class="form-control" onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL">
                     </div></td>
                     <td>&nbsp;</td>
                 </tr>
@@ -181,7 +207,14 @@
 
     <tr valign="top">
         <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
-        <td class="formlabel" align="left"><span class="addNewStudyLayout"><fmt:message key="gender" bundle="${resword}"/></span></td>
+        <td class="formlabel" align="left">
+            <span class="addNewStudyLayout"><fmt:message key="gender" bundle="${resword}"/></span>
+            <c:choose>
+                <c:when test="${study.studyParameterConfig.genderRequired !='false'}">
+                   &nbsp;<small class="required">*</small>
+                </c:when>
+            </c:choose>
+        </td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
@@ -208,13 +241,6 @@
                             </c:choose>
                             </select></div>
                 </td>
-    <td align="left">
-        <c:choose>
-        <c:when test="${study.studyParameterConfig.genderRequired !='false'}">
-           <span class="formlabel">&nbsp;*</span>
-        </c:when>
-        </c:choose>
-    </td>
     </tr>
     </table>
         </td>
@@ -228,24 +254,21 @@
     <c:choose>
     <c:when test="${study.studyParameterConfig.collectDob == '1'}">
     <tr valign="top">
-        <td class="formlabel" align="right"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
+        <td class="formlabel" align="left"><span class="addNewStudyLayout"><fmt:message key="date_of_birth" bundle="${resword}"/></span>&nbsp;<small class="required">*</small></td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td valign="top"><div class="formfieldM_BG">
-                        <input onfocus="this.select()" type="text" name="dob" size="16" value="<c:out value="${dob}" />" class="formfieldM" id="dobField" />
-                         <a href="#">
-                            <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
+                    <td valign="top">
+                        <a href="#">
+                            <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
                             <script type="text/javascript">
                             Calendar.setup({inputField  : "dobField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger", customPX: 300, customPY: 10 });
                             </script>
-                        </a>
-                        *
+                        </a>    
                     </td>
                     <td>
-                   
+                        <input onfocus="this.select()" type="text" name="dob" size="16" value="<c:out value="${dob}" />" class="formfieldM form-control" id="dobField" />
                     </td>
-                    
                 </tr>
             </table>
         </td>
@@ -257,7 +280,7 @@
     </c:when>
     <c:when test="${study.studyParameterConfig.collectDob == '2'}">
     <tr valign="top">
-        <td class="formlabel" align="right"><fmt:message key="year_of_birth" bundle="${resword}"/></td>
+        <td class="formlabel" align="left"><span class="addNewStudyLayout"><fmt:message key="year_of_birth" bundle="${resword}"/></span></td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
