@@ -132,17 +132,9 @@
   <c:out value="${studyToView.name}"/>
   </td></tr>
 
-  <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#OfficialTitle" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#OfficialTitle'); return false;"><fmt:message key="official_title" bundle="${resword}"/></a>:</td><td class="table_cell">
-  <c:out value="${studyToView.officialTitle}"/>&nbsp;
-  </td></tr>
-
   <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><fmt:message key="unique_protocol_ID" bundle="${resword}"/></a>:</td><td class="table_cell">
   <c:out value="${studyToView.identifier}"/>
   </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#SecondaryIds'); return false;"><fmt:message key="secondary_IDs" bundle="${resword}"/></a>:</td><td class="table_cell">
-   <c:out value="${studyToView.secondaryIdentifier}"/>&nbsp;
-   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.principalInvestigator}"/>
@@ -150,18 +142,6 @@
 
   <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary'); return false;"><fmt:message key="brief_summary" bundle="${resword}"/></a>:</td><td class="table_cell">
   <c:out value="${studyToView.summary}"/>
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="protocol_detailed_description" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.protocolDescription}"/>&nbsp;
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#LeadSponsor" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#LeadSponsor'); return false;"><fmt:message key="sponsor" bundle="${resword}"/></a>:</td><td class="table_cell">
-  <c:out value="${studyToView.sponsor}"/>
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="collaborators" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.collaborators}"/>&nbsp;
   </td></tr>
   </table>
 </div>
