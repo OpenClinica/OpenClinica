@@ -316,19 +316,6 @@
 
   </td></tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="allow_discrepancy_management" bundle="${resword}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.discrepancyManagement == 'true'}">
-  <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-
   <tr valign="top"><td class="table_header_column"><fmt:message key="gender_required" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
@@ -358,22 +345,6 @@
   </td>
   </tr>
 
-   <tr valign="top"><td class="table_header_column"><fmt:message key="how_generete_study_subject_ID" bundle="${restext}"/></td>
-   <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.subjectIdGeneration == 'manual'}">
-    <fmt:message key="manual_entry" bundle="${resword}"/>
-   </c:when>
-    <c:when test="${studyToView.studyParameterConfig.subjectIdGeneration == 'auto editable'}">
-    <fmt:message key="auto_generated_and_editable" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-     <fmt:message key="auto_generated_and_non_editable" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-
   <!--
    <tr valign="top"><td class="table_header_column"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/></td>
    <td class="table_cell">
@@ -388,149 +359,6 @@
   </td>
   </tr>
   -->
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="show_person_id_on_crf_header" bundle="${resword}"/></td>
-   <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.personIdShownOnCRF == 'true'}">
-    <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-    <fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-   <tr valign="top">
-       <td class="table_header_column"><fmt:message key="when_entering_data_entry_interviewer" bundle="${resword}"/></td>
-       <td class="table_cell">
-            <c:choose>
-       <c:when test="${   studyToView.studyParameterConfig.interviewerNameRequired == 'yes' }">
-       <fmt:message key="yes" bundle="${resword}"/>
-
-       </c:when>
-       <c:when test="${studyToView.studyParameterConfig.interviewerNameRequired == 'no' }">
-            <fmt:message key="no" bundle="${resword}"/>
-      </c:when>
-       <c:otherwise>
-       <fmt:message key="not_used" bundle="${resword}"/>
-         </c:otherwise>
-      </c:choose>
-      </td>
-   </tr>
-
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_default_as_blank" bundle="${restext}"/></td>
-
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewerNameDefault== 'blank'}">
-   <fmt:message key="blank" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="pre_populated_from_study_event" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_editable" bundle="${restext}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewerNameEditable== 'true'}">
-  <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="forced_reason_for_change" bundle="${resword}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.adminForcedReasonForChange == 'true'}">
-  <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-
-  <tr valign="top">
-      <td class="table_header_column"><fmt:message key="interview_date_required" bundle="${restext}"/></td>
-      <td class="table_cell">
-           <c:choose>
-       <c:when test="${  studyToView.studyParameterConfig.interviewDateRequired == 'yes'}">
-       <fmt:message key="yes" bundle="${resword}"/>
-
-       </c:when>
-      <c:when test="${studyToView.studyParameterConfig.interviewDateRequired == 'no'  }">
-            <fmt:message key="no" bundle="${resword}"/>
-      </c:when>
-       <c:otherwise>
-       <fmt:message key="not_used" bundle="${resword}"/>
-         </c:otherwise>
-      </c:choose>
-      </td>
-  </tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_default_as_blank" bundle="${restext}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewDateDefault== 'blank'}">
-   <fmt:message key="blank" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="pre_populated_from_study_event" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_editable" bundle="${restext}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.interviewDateEditable== 'true'}">
-  <fmt:message key="yes" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-   <fmt:message key="no" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
-  </tr>
-    <tr valign="top">
-        <td class="table_header_column"><fmt:message key="event_location_required" bundle="${resword}"/></td>
-        <td class="table_cell">
-            <fmt:message key="${studyToView.studyParameterConfig.eventLocationRequired}" bundle="${resword}"/>
-       </td>
-    </tr>
-
-
-    <c:if test="${portalURL!= '' && portalURL!= null}">
-    <tr valign="top">
-        <td class="table_header_column"><fmt:message key="participant_portal" bundle="${resword}"/></td>
-        <td class="table_cell">
-            <fmt:message key="${studyToView.studyParameterConfig.participantPortal}" bundle="${resword}"/>
-       </td>
-      </tr>
-   </c:if>
-
-
-    <c:if test="${moduleManager!= '' && moduleManager!= null}">
-    <tr valign="top">
-        <td class="table_header_column"><fmt:message key="randomization" bundle="${resword}"/></td>
-        <td class="table_cell">
-            <fmt:message key="${studyToView.studyParameterConfig.randomization}" bundle="${resword}"/>
-       </td>
-      </tr>
-   </c:if>
-
 </table>
 
 </div>
