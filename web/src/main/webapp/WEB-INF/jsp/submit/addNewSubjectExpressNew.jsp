@@ -207,7 +207,14 @@
 
     <tr valign="top">
         <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
-        <td class="formlabel" align="left"><span class="addNewStudyLayout"><fmt:message key="gender" bundle="${resword}"/></span></td>
+        <td class="formlabel" align="left">
+            <span class="addNewStudyLayout"><fmt:message key="gender" bundle="${resword}"/></span>
+            <c:choose>
+                <c:when test="${study.studyParameterConfig.genderRequired !='false'}">
+                   &nbsp;<small class="required">*</small>
+                </c:when>
+            </c:choose>
+        </td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
@@ -234,13 +241,6 @@
                             </c:choose>
                             </select></div>
                 </td>
-    <td align="left">
-        <c:choose>
-        <c:when test="${study.studyParameterConfig.genderRequired !='false'}">
-           <span class="formlabel">&nbsp;*</span>
-        </c:when>
-        </c:choose>
-    </td>
     </tr>
     </table>
         </td>
@@ -254,24 +254,21 @@
     <c:choose>
     <c:when test="${study.studyParameterConfig.collectDob == '1'}">
     <tr valign="top">
-        <td class="formlabel" align="right"><fmt:message key="date_of_birth" bundle="${resword}"/></td>
+        <td class="formlabel" align="left"><span class="addNewStudyLayout"><fmt:message key="date_of_birth" bundle="${resword}"/></span>&nbsp;<small class="required">*</small></td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
-                    <td valign="top"><div class="formfieldM_BG">
-                        <input onfocus="this.select()" type="text" name="dob" size="16" value="<c:out value="${dob}" />" class="formfieldM" id="dobField" />
-                         <a href="#">
-                            <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
+                    <td valign="top">
+                        <a href="#">
+                            <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
                             <script type="text/javascript">
                             Calendar.setup({inputField  : "dobField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger", customPX: 300, customPY: 10 });
                             </script>
-                        </a>
-                        *
+                        </a>    
                     </td>
                     <td>
-                   
+                        <input onfocus="this.select()" type="text" name="dob" size="16" value="<c:out value="${dob}" />" class="formfieldM form-control" id="dobField" />
                     </td>
-                    
                 </tr>
             </table>
         </td>
@@ -283,7 +280,7 @@
     </c:when>
     <c:when test="${study.studyParameterConfig.collectDob == '2'}">
     <tr valign="top">
-        <td class="formlabel" align="right"><fmt:message key="year_of_birth" bundle="${resword}"/></td>
+        <td class="formlabel" align="left"><span class="addNewStudyLayout"><fmt:message key="year_of_birth" bundle="${resword}"/></span></td>
         <td valign="top">
             <table border="0" cellpadding="0" cellspacing="0">
                 <tr>
