@@ -345,10 +345,7 @@ a:hover {
 .blockUI.blockMsg.blockPage {
   width: auto !important;
   padding: 1em !important;
-  top: 50% !important;
-  left: 50% !important;
-  margin: 0 auto !important;
-  transform: translate(-50%, -50%); }
+}
 
 form[action="CreateNewStudyEvent"] > div {
   width: 850px; }
@@ -804,7 +801,7 @@ div#subjectSDV table#sdv {
 
 .form-control {
     display: block;
-    width: 90%;
+    width: 95%;
     padding: .5rem .75rem;
     font-size: 1rem;
     line-height: 1.25;
