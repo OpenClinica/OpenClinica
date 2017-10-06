@@ -96,11 +96,11 @@
                                 <td valign="top"><div class="formfieldXL_BG">
                                 <c:choose>
                                  <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
-                                  <input class="form-control" onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45" class="formfield" disabled>
+                                  <input onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45" class="formfield form-control" disabled>
                                   <input class="form-control" type="hidden" name="label" value="<c:out value="${label}"/>">
                                  </c:when>
                                  <c:otherwise>
-                                   <input class="form-control" onfocus="this.select()" type="text" name="label" value="<c:out value="${label}"/>" width="30" class="formfieldXL">
+                                   <input onfocus="this.select()" type="text" name="label" value="<c:out value="${label}"/>" width="30" class="formfieldXL form-control">
                                  </c:otherwise>
                                 </c:choose>
                                 </div></td>
@@ -122,7 +122,7 @@
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>        
                                 <td valign="top"><div class="formfieldXL_BG">
-                                    <input class="form-control" onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" width="30" class="formfieldXL">
+                                    <input onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" width="30" class="formfieldXL form-control">
                                 </div></td>
                             </tr>
                             <tr>        
@@ -143,7 +143,7 @@
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
                                 <td valign="top"><div class="formfieldXL_BG">
-                                    <input class="form-control" onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL">
+                                    <input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL form-control">
                                 </div></td>
                             </tr>
                             <tr>
@@ -162,7 +162,7 @@
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
                                 <td valign="top"><div class="formfieldXL_BG">
-                                    <input class="form-control" onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL">
+                                    <input onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL form-control">
                                 </div></td>
                             </tr>
                             <tr>
@@ -178,14 +178,13 @@
                 </c:choose>
 
                 <tr valign="top" >
-
                     <td class="formlabel" align="left">
                         <span class="addNewStudyLayout"><fmt:message key="enrollment_date" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
                     </td>
                     <td valign="top">
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
-                                <td valign="top" class="icon-container" class="icon-container">
+                                <td valign="top" class="icon-container">
                                     <a href="#">
                                          <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
                                             <script type="text/javascript">
@@ -195,7 +194,7 @@
                                             
                                 </td>
                                 <td class="icon-input-container">
-                                    <input class="form-control" onfocus="this.select()" type="text" name="enrollmentDate" size="16" value="<c:out value="${enrollmentDate}" />" class="formfieldM" id="enrollmentDateField" />
+                                    <input onfocus="this.select()" type="text" name="enrollmentDate" size="16" value="<c:out value="${enrollmentDate}" />" class="formfieldM form-control" id="enrollmentDateField" />
                                 </td>
                             </tr>
                             <tr>
@@ -363,14 +362,13 @@
                             <tr>
                                 <td valign="top" class="icon-container">
                                      <a href="#">
-
                                          <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2"/></a>
                                          <script type="text/javascript">
                                          Calendar.setup({inputField  : "enrollmentDateField2", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger2" ,customPX: 300, customPY: 10 });
                                          </script>
                                 </td>
                                 <td class="icon-input-container">
-                                    <input class="form-control" type="text" name="startDate" size="15" value="<c:out value="${startDate}" />" class="formfieldM" id="enrollmentDateField2" />
+                                    <input type="text" name="startDate" size="15" value="<c:out value="${startDate}" />" class="formfieldM form-control" id="enrollmentDateField2" />
                                 </td>
                             </tr>
                             <tr>

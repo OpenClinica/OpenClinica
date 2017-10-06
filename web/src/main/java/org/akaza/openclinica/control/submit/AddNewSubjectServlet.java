@@ -311,8 +311,7 @@ public class AddNewSubjectServlet extends SecureController {
                 if (subjectWithSameId.isActive()) { // ||
                     // subjectWithSameIdInParent.isActive())
                     // {
-                    Validator.addError(errors, INPUT_UNIQUE_IDENTIFIER, resexception.getString("subject_with_person_ID") + " " + uniqueIdentifier + " "
-                        + resexception.getString("is_already_enrolled_in_this_study"));
+                    Validator.addError(errors, INPUT_UNIQUE_IDENTIFIER, resexception.getString("subject_with_person_ID"));
 
                     subjectWithSameIdInCurrentStudyTree = true;
                     logger.info("just added unique id in study tree");
@@ -333,8 +332,7 @@ public class AddNewSubjectServlet extends SecureController {
                         // parent study
                         subjectWithSameId = sdao.findByUniqueIdentifierAndStudy(uniqueIdentifier, currentStudy.getParentStudyId());
                         if (subjectWithSameId.isActive()) {
-                            Validator.addError(errors, INPUT_UNIQUE_IDENTIFIER, resexception.getString("this_subject_with_person_ID") + " " + uniqueIdentifier
-                                + resexception.getString("has_already_enrolled_parent_study"));
+                            Validator.addError(errors, INPUT_UNIQUE_IDENTIFIER, resexception.getString("this_subject_with_person_ID"));
 
                             subjectWithSameIdInCurrentStudyTree = true;
                         } else {
@@ -342,8 +340,7 @@ public class AddNewSubjectServlet extends SecureController {
                             // with the same id in other sites of the same study
                             subjectWithSameId = sdao.findByUniqueIdentifierAndParentStudy(uniqueIdentifier, currentStudy.getParentStudyId());
                             if (subjectWithSameId.isActive()) {
-                                Validator.addError(errors, INPUT_UNIQUE_IDENTIFIER, resexception.getString("this_subject_with_person_ID") + " "
-                                    + uniqueIdentifier + resexception.getString("has_already_enrolled_site_study"));
+                                Validator.addError(errors, INPUT_UNIQUE_IDENTIFIER, resexception.getString("this_subject_with_person_ID"));
 
                                 subjectWithSameIdInCurrentStudyTree = true;
                             }

@@ -120,11 +120,12 @@
             <div id="UserInfo">
                 <div id="userDropdown">
                     <ul>
-                        <li><a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)<span class="icon icon-caret-down white"></span></a></a>
+                        <li><a href="#"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)<span class="icon icon-caret-down white"></span></a></a>
                         <!-- First Tier Drop Down -->
                         <ul class="dropdown_BG">
                             <li><a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a></li>
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a></li>
+                            <li> <a href="${urlPrefix}pages/UpdateProfile"><fmt:message key="nav_update_profile" bundle="${resword}"/></a></li>
                             <li> <a href="${urlPrefix}pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
                         </ul>
                         </li>
