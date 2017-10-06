@@ -405,8 +405,8 @@ public class CoreResources implements ResourceLoaderAware {
         DATAINFO.setProperty("walkmeURL", walkmeURL);
 
         String piwikURL = DATAINFO.getProperty("piwik.url");
-        if (walkmeURL == null || walkmeURL.isEmpty())
-            walkmeURL = "https://ineedapiwik.url";
+        if (piwikURL == null || piwikURL.isEmpty())
+            piwikURL = "https://ineedapiwik.url";
         DATAINFO.setProperty("piwikURL", piwikURL);
 
         DATAINFO.setProperty("show_unique_id", "1");
