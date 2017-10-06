@@ -91,7 +91,7 @@
                         <input class="form-control" type="hidden" name="addWithEvent" value="1"/><span class="addNewStudyLayout">
                         <fmt:message key="study_subject_ID" bundle="${resword}"/></span>&nbsp;<small class="required">*</small></td>
                     <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
                                 <td valign="top"><div class="formfieldXL_BG">
                                 <c:choose>
@@ -119,12 +119,11 @@
                         <span class="addNewStudyLayout"><fmt:message key="secondary_ID" bundle="${resword}"/></span>
                     </td>
                     <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>        
                                 <td valign="top"><div class="formfieldXL_BG">
                                     <input class="form-control" onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" width="30" class="formfieldXL">
                                 </div></td>
-                                <td>&nbsp;</td>
                             </tr>
                             <tr>        
                                 <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>        
@@ -141,14 +140,15 @@
                         <span class="addNewStudyLayout"><fmt:message key="person_ID" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
                     </td>
                     <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
                                 <td valign="top"><div class="formfieldXL_BG">
                                     <input class="form-control" onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL">
                                 </div></td>
-                                <td>&nbsp;</td>
                             </tr>
-                            <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
+                            <tr>
+                                <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
+                            </tr>
                         </table>
                     </td>
                 </tr>
@@ -159,15 +159,14 @@
                         <span class="addNewStudyLayout"><fmt:message key="person_ID" bundle="${resword}"/></span>
                     </td>
                     <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
                                 <td valign="top"><div class="formfieldXL_BG">
                                     <input class="form-control" onfocus="this.select()" type="text" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>" width="30" class="formfieldXL">
                                 </div></td>
-                                <td>&nbsp;</td>
                             </tr>
                             <tr>
-                                <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
+                                <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include></td>
                             </tr>
                         </table>
                     </td>
@@ -184,9 +183,9 @@
                         <span class="addNewStudyLayout"><fmt:message key="enrollment_date" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
                     </td>
                     <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
-                                <td valign="top">
+                                <td valign="top" class="icon-container" class="icon-container">
                                     <a href="#">
                                          <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
                                             <script type="text/javascript">
@@ -195,17 +194,16 @@
                                         </a>
                                             
                                 </td>
-                                <td>
+                                <td class="icon-input-container">
                                     <input class="form-control" onfocus="this.select()" type="text" name="enrollmentDate" size="16" value="<c:out value="${enrollmentDate}" />" class="formfieldM" id="enrollmentDateField" />
                                 </td>
                             </tr>
-                           
+                            <tr>
+                                <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
+                            </tr>
                         </table>
                     </td>
                 </tr>
-                 <tr>
-                                <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
-                            </tr>
 
                 <tr valign="top">
                     <c:if test="${study.studyParameterConfig.genderRequired !='not used'}">
@@ -242,14 +240,14 @@
                                             </c:otherwise>
                                         </c:choose>
                                         </select></div>
-                            </td>
-                </tr>
-                </table>
+                                </td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include></td>
+                            </tr>
+                        </table>
                     </td>
                 </c:if>
-                </tr>
-                <tr>
-                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include></td>
                 </tr>
 
 
@@ -258,9 +256,9 @@
                 <tr valign="top">
                     <td class="formlabel" align="left"><span class="addNewStudyLayout"><fmt:message key="date_of_birth" bundle="${resword}"/></span>&nbsp;<small class="required">*</small></td>
                     <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
-                                <td valign="top">
+                                <td valign="top" class="icon-container">
                                     <a href="#">
                                         <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
                                         <script type="text/javascript">
@@ -268,15 +266,15 @@
                                         </script>
                                     </a>    
                                 </td>
-                                <td>
+                                <td class="icon-input-container">
                                     <input onfocus="this.select()" type="text" name="dob" size="16" value="<c:out value="${dob}" />" class="formfieldM form-control" id="dobField" />
                                 </td>
                             </tr>
+                            <tr>
+                                <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dob"/></jsp:include></td>
+                            </tr>
                         </table>
                     </td>
-                </tr>
-                <tr>
-                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="dob"/></jsp:include></td>
                 </tr>
 
                 </c:when>
@@ -284,18 +282,18 @@
                 <tr valign="top">
                     <td class="formlabel" align="left"><span class="addNewStudyLayout"><fmt:message key="year_of_birth" bundle="${resword}"/></span>&nbsp;<small class="required">*</small></td>
                     <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
                                 <td valign="top"><div class="formfieldM_BG">
                                     <input onfocus="this.select()" type="text" name="yob" size="15" value="<c:out value="${yob}" />" class="formfieldM form-control" />
                                 </td>
                                 <td class="formlabel" align="left">(<fmt:message key="date_format_year" bundle="${resformat}"/>)</td>
                             </tr>
+                            <tr>
+                                <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yob"/></jsp:include></td>
+                            </tr>
                         </table>
                     </td>
-                </tr>
-                <tr>
-                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="yob"/></jsp:include></td>
                 </tr>
 
               </c:when>
@@ -305,7 +303,7 @@
              </c:choose>
             <c:if test="${(!empty studyGroupClasses)}">
                 <tr valign="top">
-                  <td class="formlabel" align="right"><fmt:message key="subject_group_class" bundle="${resword}"/>:
+                  <td class="formlabel" align="left"><span class="addNewStudyLayout"><fmt:message key="subject_group_class" bundle="${resword}"/></span>
                   <td class="table_cell">
                   <c:set var="count" value="0"/>
                   <table border="0" cellpadding="0">
@@ -349,13 +347,11 @@
                                 </div>
                                 </td>
                             </tr>
-                            
-
+                            <tr>
+                                <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyEventDefinition"/></jsp:include></td>
+                            </tr>
                         </table>
                     </td>
-                </tr>
-                <tr>
-                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="studyEventDefinition"/></jsp:include></td>
                 </tr>
 
                 <tr valign="top">
@@ -363,9 +359,9 @@
                         <span class="addNewStudyLayout"><fmt:message key="start_date" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
                     </td>
                     <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
-                                <td valign="top">
+                                <td valign="top" class="icon-container">
                                      <a href="#">
 
                                          <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2"/></a>
@@ -373,46 +369,49 @@
                                          Calendar.setup({inputField  : "enrollmentDateField2", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger2" ,customPX: 300, customPY: 10 });
                                          </script>
                                 </td>
-                                <td>
+                                <td class="icon-input-container">
                                     <input class="form-control" type="text" name="startDate" size="15" value="<c:out value="${startDate}" />" class="formfieldM" id="enrollmentDateField2" />
                                 </td>
                             </tr>
-                        </table>
-                    </td>
-                </tr>
-                   <tr>
-                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDate"/></jsp:include></td>
-                    </tr>
-                <c:choose>
-                <c:when test="${study.studyParameterConfig.eventLocationRequired == 'required'}">
-                <tr valign="top">
-                    <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
-                    <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
-                                <td valign="top"><div class="formfieldXL_BG">
-                                   <input type="text" name="location"size="50" value="<c:out value="${location}"/>" class="formfieldXL">
-                                </div></td>
-                                <td>&nbsp;*</td>
+                                <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="startDate"/></jsp:include></td>
                             </tr>
                         </table>
                     </td>
                 </tr>
-                <tr>
-                    <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include></td>
+                
+                <c:choose>
+                <c:when test="${study.studyParameterConfig.eventLocationRequired == 'required'}">
+                <tr valign="top">
+                    <td class="formlabel" align="left">
+                        <span class="addNewStudyLayout"><fmt:message key="location" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
+                    </td>
+                    <td valign="top">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
+                            <tr>
+                                <td valign="top"><div class="formfieldXL_BG">
+                                   <input type="text" name="location"size="50" value="<c:out value="${location}"/>" class="formfieldXL form-control">
+                                </div></td>
+                            </tr>
+                            <tr>
+                                <td colspan="2"><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="location"/></jsp:include></td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
 
                 </c:when>
                 <c:when test="${study.studyParameterConfig.eventLocationRequired == 'optional'}">
                 <tr valign="top">
-                    <td class="formlabel"><fmt:message key="location" bundle="${resword}"/>:</td>
+                    <td class="formlabel" align="left">
+                        <span class="addNewStudyLayout"><fmt:message key="location" bundle="${resword}"/></span>
+                    </td>
                     <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
                                 <td valign="top"><div class="formfieldXL_BG">
-                                   <input type="text" name="location"size="50" class="formfieldXL">
+                                   <input type="text" name="location"size="50" class="formfieldXL form-control">
                                 </div></td>
-                                <td>&nbsp;</td>
                             </tr>
                         </table>
                     </td>
@@ -422,6 +421,7 @@
                     <input type="hidden" name="location" value=""/>
                 </c:otherwise>
                 </c:choose>
+                
             </table>
             </div>
         </td>

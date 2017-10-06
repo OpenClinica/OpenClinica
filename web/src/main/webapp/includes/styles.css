@@ -834,3 +834,30 @@ div#subjectSDV table#sdv {
     padding-top: 15px;
     border-top: 1px solid #eceeef;
 }
+
+.alert.small {
+  line-height: 3px;
+  margin-bottom: 10px;
+  font-size: small;
+  text-align: left;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-width tr {
+  text-align: left;
+}
+
+.full-width td.icon-container {
+  width: 32px;
+}
+
+.full-width td.icon-input-container input {
+  height: 32px;
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -2px;
+}
