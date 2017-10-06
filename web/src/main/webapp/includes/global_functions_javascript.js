@@ -1839,17 +1839,3 @@ if(BrowserDetect.browser=='Explorer' && BrowserDetect.version<7)
 	document.write('.dropdown { background-image: url(images/dropdown_BG.gif); }');
 	document.write('</style>');
 }
-
-
-// Walkme snippet
-(function() {
-    var walkme = document.createElement('script');
-    walkme.type = 'text/javascript';
-    walkme.async = true;
-    walkme.src = '${walkme.url}';
-    var s = document.getElementsByTagName('script')[0];
-    s.parentNode.insertBefore(walkme, s);
-    window._walkmeConfig = {
-        smartLoad: true
-    };
-})();

@@ -7,12 +7,20 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <script language="JavaScript">
-        /*function reportBug() {
-            var bugtrack = "https://www.openclinica.com/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
-            var user= "<c:out value="${userBean.name}"/>";
-            bugtrack = bugtrack + user+ "&url=" + window.location.href;
-            openDocWindow(bugtrack);
-        }*/
+
+        // Walkme snippet
+        (function() {
+            var walkme = document.createElement('script');
+            walkme.type = 'text/javascript';
+            walkme.async = true;
+            walkme.src = '<c:out value="${sessionScope.walkmeURL}" />';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(walkme, s);
+            window._walkmeConfig = {
+                smartLoad: true
+            };
+        })();
+
         function confirmCancel(pageName){
             var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
             if(confirm1){
@@ -74,11 +82,11 @@
      <div class="oc_nav">
         <div class="nav-top-bar">
         <!-- Logo -->
-    
+
             <div class="logo">
                 <c:set var="isLogo"/>
                 <c:set var="isHref"/>
-                
+
                 <c:if test="${param.isSpringController}">
                     <c:set var="isHref" value="../MainMenu" />
                     <c:set var="isLogo" value="../images/logo-color-on-dark.svg" />
@@ -91,7 +99,7 @@
 
                 <a href="${isHref}"><img src="${isLogo}" alt="OpenClinica Logo" /></a>
             </div>
-            
+
             <div id="StudyInfo">
                 <c:choose>
                     <c:when test='${study.parentStudyId > 0}'>
@@ -106,7 +114,7 @@
                 </c:choose>
                 (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;(<c:out value="${study.envType}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy">Change</a>
-                
+
             </div>
 
             <div id="UserInfo">
@@ -319,8 +327,8 @@
             <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
         </div>
         <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div> 
-        </div>   
+            <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
+        </div>
         <br clear="all">
         </c:if>
     </div>
