@@ -16,7 +16,6 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.Date;
 import java.util.HashMap;
-import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.TimeZone;
 
@@ -395,11 +394,9 @@ public class OpenRosaServices {
         // Add user list
         MediaFile userList = new MediaFile();
 
-        LinkedHashMap<String, Object> subjectContextCache = (LinkedHashMap<String, Object>) context.getAttribute("subjectContextCache");
-        if (subjectContextCache != null) {
-            String userXml = getUserXml(context, studyOID);
-            userList.setHash((DigestUtils.md5Hex(userXml)));
-        }
+        String userXml = getUserXml(context, studyOID);
+        userList.setHash((DigestUtils.md5Hex(userXml)));
+
         userList.setFilename("users.xml");
         userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers");
         manifest.add(userList);
@@ -860,11 +857,7 @@ public class OpenRosaServices {
     }
 
     private String getUserXml(ServletContext context, String studyOID) throws Exception {
-        HashMap<String, String> value = getSubjectContextCacheValue(context, studyOID);
-        String studySubjectOid = "";
-        if (value != null) {
-            studySubjectOid = value.get("studySubjectOID");
-        }
+        String studySubjectOid = (String) context.getAttribute("SS_OID");
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -1012,28 +1005,6 @@ public class OpenRosaServices {
 
     public void setXformParserHelper(XformParserHelper xformParserHelper) {
         this.xformParserHelper = xformParserHelper;
-    }
-
-    @SuppressWarnings("unchecked")
-    private HashMap<String, String> getSubjectContextCacheValue(ServletContext context, String studyOid) {
-        LinkedHashMap<String, Object> subjectContextCache = (LinkedHashMap<String, Object>) context.getAttribute("subjectContextCache");
-        String lastKey = null;
-        // the cache has to be studyOid based to accommodate for multiple studies
-        HashMap<String, String> resultMap = null;
-        if (subjectContextCache != null) {
-            for (String key : subjectContextCache.keySet()) {
-                resultMap = (HashMap<String, String>) subjectContextCache.get(key);
-                String resultStudyOid = (String) resultMap.get("studyOid");
-                if (StringUtils.equals(resultStudyOid, studyOid)) {
-                    break;
-                }
-                lastKey = key;
-            }
-            if (resultMap == null) {
-                resultMap = (HashMap<String, String>) subjectContextCache.get(lastKey);
-            }
-        }
-        return resultMap;
     }
 
 }
