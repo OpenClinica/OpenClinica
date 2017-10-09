@@ -29,7 +29,7 @@
 <h1><span class="title_manage"><fmt:message key="an_error_has_ocurred" bundle="${resword}"/></span></h1>
 
 <font class="bodytext">
-<c:set var="referer" value="MainMenu"/>
+<c:set var="referer" value="${pageContext.request.contextPath}/MainMenu"/>
 <c:forEach var="refererValue" items="${pageContext.request.headerNames}">
 	<c:if test="${refererValue eq 'referer'}">
 		<!-- found it! -->
