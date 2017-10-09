@@ -768,68 +768,7 @@
 
         </sql>
     </changeSet>
-    <changeSet author="sidr" id="2015-08-18-OC-2886" runOnChange="true">
-        <preConditions onFail="MARK_RAN">
-            <dbms type="postgresql" />
-            <!--<runningAs username="clinica" />-->
-        </preConditions>
-        <sql splitStatements="false">
 
-            CREATE OR REPLACE FUNCTION event_crf_version_change_trigger() RETURNS "trigger"
-            AS 'DECLARE
-            pk INTEGER;
-            crf_old_name TEXT;
-            crf_new_name TEXT;
-
-            BEGIN
-            IF (TG_OP = ''UPDATE'') THEN
-            IF(OLD.form_layout_id <![CDATA[<>]]> NEW.form_layout_id) THEN
-            /*---------------*/
-
-            SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
-            SELECT INTO crf_old_name fl.name FROM form_layout fl WHERE fl.form_layout_id = OLD.form_layout_id;
-            SELECT INTO crf_new_name fl.name FROM form_layout fl WHERE fl.form_layout_id = NEW.form_layout_id;
-
-
-
-
-            INSERT INTO audit_log_event(
-            audit_id,
-            audit_date,
-            audit_table,
-            user_id ,
-            entity_id ,
-            entity_name ,
-            audit_log_event_type_id ,
-            old_value ,
-            new_value ,
-            event_crf_id ,
-            study_event_id
-            )
-
-            VALUES (
-            pk,
-            now(),
-            ''event_crf'',
-            NEW.update_id,
-            OLD.event_crf_id,
-            ''CRF version'',
-            ''33'',
-            crf_old_name,
-            crf_new_name,
-            OLD.event_crf_id,
-            OLD.study_event_id
-            );
-            /*---------------*/
-            END IF;
-            RETURN NULL;  /*return values ignored for ''after'' triggers*/
-            END IF;
-            RETURN NULL;  /*return values ignored for ''after'' triggers*/
-            END;
-            '
-            LANGUAGE plpgsql;
-        </sql>
-    </changeSet>
     <changeSet author="kkrumlian" id="2015-11-17-6829-2" runOnChange="true">
         <preConditions onFail="MARK_RAN">
             <dbms type="postgresql" />
@@ -927,12 +866,12 @@
 
             BEGIN
             IF (TG_OP = ''UPDATE'') THEN
-            IF(OLD.crf_version_id <![CDATA[<>]]> NEW.crf_version_id) THEN
+            IF(OLD.form_layout_id <![CDATA[<>]]> NEW.form_layout_id) THEN
             /*---------------*/
 
             SELECT INTO pk NEXTVAL(''audit_log_event_audit_id_seq'');
-            SELECT INTO crf_old_name cf.name FROM crf_version cf WHERE cf.crf_version_id = OLD.crf_version_id;
-            SELECT INTO crf_new_name cf.name FROM crf_version cf WHERE cf.crf_version_id = NEW.crf_version_id;
+            SELECT INTO crf_old_name fl.name FROM form_layout fl WHERE fl.form_layout_id = OLD.form_layout_id;
+            SELECT INTO crf_new_name fl.name FROM form_layout fl WHERE fl.form_layout_id = NEW.form_layout_id;
 
 
 
