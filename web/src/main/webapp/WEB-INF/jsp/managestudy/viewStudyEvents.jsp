@@ -74,13 +74,13 @@
    </c:when>
    <c:otherwise>
     <div class="title_manage">
-   </c:otherwise>
-  </c:choose>
- <fmt:message key="view_all_events_in" bundle="${resword}"/> <c:out value="${study.name}"/>
-   <a href="javascript:openDocWindow('ViewStudyEvents?print=yes&<c:out value="${queryUrl}"/>')">
-  <span class="icon icon-print"></a>
-  </div>
-  </h1>
+      </c:otherwise>
+      </c:choose>
+      <fmt:message key="view_all_events_in" bundle="${resword}"/> <c:out value="${study.name}"/>
+      <a href="javascript:openDocWindow('ViewStudyEvents?print=yes&<c:out value="${queryUrl}"/>')">
+      <span class="icon icon-print"></span></a>
+    </div>
+</h1>
 
 
 <div style="width: 980px">
@@ -89,14 +89,14 @@
 <div class="textbox_center">
 <form method="POST" action="ViewStudyEvents" name="control">
 <jsp:include page="../include/showSubmitted.jsp" />
-<br/>
+
 <table border="0" cellpadding="0" cellspacing="0" >
 <tr valign="top"><b><fmt:message key="filter_events_by" bundle="${resword}"/>:</b></tr>
 </table>
 
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
-    <td><fmt:message key="study_event_definition" bundle="${resword}"/>&nbsp;&nbsp;&nbsp;</td>
+    <td align="right"><fmt:message key="study_event_definition" bundle="${resword}"/></td>
     <td>
       <div class="formfieldL_BG">
       <c:set var="definitionId1" value="${definitionId}"/>
@@ -115,7 +115,7 @@
       </select> </div>
     </td>
     <td></td><td>&nbsp;&nbsp;</td>
-    <td>Status</td>
+    <td align="right"><fmt:message key="status" bundle="${resword}"/></td>
     <td>
       <div class="formfieldM_BG">
       <c:set var="status1" value="${statusId}"/>
@@ -140,7 +140,7 @@
   
   <tr><td></td></tr>
   <tr>
-    <td>Date Started</td>
+    <td align="right"><fmt:message key="date_started" bundle="${resword}"/></td>
     <td>
       <div class="formfieldS_BG">
        <input type="text" name="startDate" value="<c:out value="${startDate}"/>" class="formfieldS" id="startDateField"></div>
@@ -154,7 +154,7 @@
       </a>
       (<fmt:message key="date_format" bundle="${resformat}"/>)
     </td><td>&nbsp;&nbsp;</td>
-    <td>Date Ended</td>
+    <td align="right"><fmt:message key="date_ended" bundle="${resword}"/></td>
     <td>
         <div class="formfieldS_BG">
           <input type="text" name="endDate" value="<c:out value="${endDate}"/>" class="formfieldS" id="endDateField"></div>

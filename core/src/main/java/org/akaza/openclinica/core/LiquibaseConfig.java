@@ -3,10 +3,8 @@ package org.akaza.openclinica.core;
 import liquibase.integration.spring.SpringLiquibase;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.annotation.Bean;
-import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.DependsOn;
-import org.springframework.context.annotation.Scope;
+import org.springframework.context.annotation.*;
+import org.springframework.web.context.WebApplicationContext;
 
 import javax.sql.DataSource;
 import java.util.ArrayList;
@@ -30,7 +28,8 @@ public class LiquibaseConfig {
     }
 
     @Bean
-    @DependsOn ("coreResources")
+    @DependsOn ("createPostgresAppServer")
+    @Scope(value = "prototype")
     public OCCommonTablesSpringLiquibase liquibaseSchemaCommonTables() {
         OCCommonTablesSpringLiquibase liquibase = new OCCommonTablesSpringLiquibase();
         liquibase.setDataSource(dataSource);
@@ -40,7 +39,7 @@ public class LiquibaseConfig {
     }
     
     @Bean
-    @DependsOn ("coreResources")
+    @DependsOn ("liquibaseSchemaCommonTables")
     public SpringLiquibase liquibasePublicSchema() {
         SpringLiquibase liquibase = new SpringLiquibase();
         liquibase.setDataSource(dataSource);
@@ -52,7 +51,7 @@ public class LiquibaseConfig {
 
 
     @Bean
-    @DependsOn ("coreResources")
+    @DependsOn ("liquibasePublicSchema")
     public OCSpringLiquibase liquibaseForeignTables() {
         OCSpringLiquibase liquibase = new OCSpringLiquibase();
         liquibase.setDataSource(dataSource);
@@ -61,7 +60,7 @@ public class LiquibaseConfig {
     }
 
     @Bean
-    @DependsOn ("coreResources")
+    @DependsOn ("liquibaseForeignTables")
     public OCMultiTenantSpringLiquibase liquibase() {
         OCMultiTenantSpringLiquibase liquibase = new OCMultiTenantSpringLiquibase();
         liquibase.setDataSource(dataSource);

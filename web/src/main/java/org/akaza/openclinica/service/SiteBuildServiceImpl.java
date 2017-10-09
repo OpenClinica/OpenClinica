@@ -48,6 +48,7 @@ public class SiteBuildServiceImpl implements SiteBuildService {
             site.setDatePlannedStart(siteBean.getDatePlannedStart());
             site.setOwner(ownerUserAccount);
             site.setParentStudyId(parentStudy.getId());
+            site.setPublished(parentStudy.isPublished());
             site.setStudyEnvSiteUuid(siteBean.getStudyEnvSiteUuid());
             site.setEnvType(siteBean.getEnvType());
             site.setExpectedTotalEnrollment(siteBean.getExpectedTotalEnrollment());

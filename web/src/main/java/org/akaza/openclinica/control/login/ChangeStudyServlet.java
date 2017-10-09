@@ -7,6 +7,11 @@
  */
 package org.akaza.openclinica.control.login;
 
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -41,11 +46,6 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
-
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * @author jxu
@@ -108,6 +108,8 @@ public class ChangeStudyServlet extends SecureController {
             if (study != null && study.getStatus().equals(Status.PENDING)) {
                 sr.setStatus(study.getStatus());
             }
+            if (study.isPublished() == false)
+                continue;
             studyList.add(study);
             validStudies.add(sr);
         }
@@ -179,67 +181,76 @@ public class ChangeStudyServlet extends SecureController {
     private void changeStudy() throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
-        String studySchema = fp.getString("changeStudySchema", true);
+        String newStudySchema = fp.getString("changeStudySchema", true);
         request.setAttribute("requestSchema", "public");
         request.setAttribute("changeStudySchema", null);
         String studyEnvUuid = fp.getString("studyEnvUuid", true);
         String prevStudyEnvUuid = currentStudy != null ? currentStudy.getStudyEnvUuid() : null;
-
+        
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        StudyBean current = sdao.findByStudyEnvUuid(studyEnvUuid);
 
-        // reset study parameters -jxu 02/09/2007
+        String oldStudySchema = null;
+        if (currentStudy.getParentStudyId() <= 0) {
+            oldStudySchema = sdao.findByStudyEnvUuid(currentStudy.getStudyEnvUuid()).getSchemaName();
+        } else {
+            oldStudySchema = sdao.findByStudyEnvUuid(currentStudy.getStudyEnvSiteUuid()).getSchemaName();
+        }
+        
+        StudyBean newPublicStudy = sdao.findByStudyEnvUuid(studyEnvUuid);
+        request.setAttribute("changeStudySchema", newStudySchema);
+        StudyBean newStudy = sdao.findByStudyEnvUuid(studyEnvUuid); 
+
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+        ArrayList studyParameters = spvdao.findParamConfigByStudy(newStudy); 
+        newStudy.setStudyParameters(studyParameters);
+        request.setAttribute("changeStudySchema", null);
 
-        ArrayList studyParameters = spvdao.findParamConfigByStudy(current);
-        current.setStudyParameters(studyParameters);
-
-        if (currentStudy != null) {
+        if (currentStudy != null) { 
             int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+            request.setAttribute("requestSchema", oldStudySchema); 
             StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
-            current.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
-            String idSetting = current.getStudyParameterConfig().getSubjectIdGeneration();
+            newStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
+            request.setAttribute("requestSchema", "public");
+            String idSetting = newStudy.getStudyParameterConfig().getSubjectIdGeneration();
             if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
+                request.setAttribute("changeStudySchema", newStudySchema);
                 int nextLabel = this.getStudySubjectDAO().findTheGreatestLabel() + 1;
                 request.setAttribute("label", new Integer(nextLabel).toString());
+                request.setAttribute("changeStudySchema", null);
             }
-            request.setAttribute("requestSchema", studySchema);
+            request.setAttribute("requestSchema", newStudySchema); //schema we are changing to.
             StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-            if (current.getParentStudyId() <= 0) {// top study
-                scs.setParametersForStudy(currentStudy);
-
+            if (newStudy.getParentStudyId() <= 0) {// top study
+                scs.setParametersForStudy(newStudy); 
             } else {
-                // YW <<
-                if (current.getParentStudyId() > 0) {
-                    current.setParentStudyName((sdao.findByPK(current.getParentStudyId())).getName());
-
+                if (newStudy.getParentStudyId() > 0) {
+                    newStudy.setParentStudyName((sdao.findByPK(newStudy.getParentStudyId())).getName());
                 }
-                // YW 06-12-2007>>
-                scs.setParametersForSite(currentStudy);
+                scs.setParametersForSite(newStudy);
 
             }
         }
         request.setAttribute("requestSchema", "public");
-        if (current.getStatus().equals(Status.DELETED) || current.getStatus().equals(Status.AUTO_DELETED)) {
+        if (newStudy.getStatus().equals(Status.DELETED) || newStudy.getStatus().equals(Status.AUTO_DELETED)) {
             session.removeAttribute("studyWithRole");
             addPageMessage(restext.getString("study_choosed_removed_restore_first"));
         } else {
-            session.setAttribute("publicStudy", current);
-            currentPublicStudy = current;
+            session.setAttribute("publicStudy", newPublicStudy);
+            currentPublicStudy = newPublicStudy;
             // change user's active study id
             UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-            ub.setActiveStudyId(current.getId());
+            ub.setActiveStudyId(newPublicStudy.getId());
             ub.setUpdater(ub);
             ub.setUpdatedDate(new java.util.Date());
             udao.update(ub);
-            request.setAttribute("changeStudySchema", studySchema);
+            request.setAttribute("changeStudySchema", newStudySchema);
             StudyDAO sdaoStudy = new StudyDAO(sm.getDataSource());
             StudyBean study = sdaoStudy.findByStudyEnvUuid(studyEnvUuid);
-            study.setParentStudyName(currentStudy.getParentStudyName());
-            study.setStudyParameterConfig(currentStudy.getStudyParameterConfig());
+            study.setParentStudyName(newStudy.getParentStudyName());
+            study.setStudyParameterConfig(newStudy.getStudyParameterConfig());
             session.setAttribute("study", study);
             currentStudy = study;
-            if (current.getParentStudyId() > 0) {
+            if (newStudy.getParentStudyId() > 0) {
                 /*
                  * The Role decription will be set depending on whether the user
                  * logged in at study lever or site level. issue-2422

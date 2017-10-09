@@ -91,6 +91,10 @@
         <field name="FormOID" type="java.lang.String">
             <bind-xml name="FormOID" node="attribute"/>
         </field>
+
+        <field name="FormLayoutName" type="java.lang.String">
+            <bind-xml name="OpenClinica:FormLayoutOID" node="attribute"/>
+        </field>
        
         <field name="EventCRFStatus" type="java.lang.String">
             <bind-xml name="OpenClinica:Status" node="attribute"/>

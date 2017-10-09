@@ -12,6 +12,7 @@ import java.util.Date;
 import java.util.Locale;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -35,6 +36,7 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
 import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -104,8 +106,12 @@ public class MainMenuServlet extends SecureController {
             return;
         }
         currentPublicStudy = study;
-        CoreResources.setRequestSchema(request, currentSchema);
+        CoreResources.setRequestSchema(request, study.getSchemaName());
         currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
+        
+        StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+        scs.setParametersForStudy(currentStudy);
+        
         session.setAttribute("publicStudy", currentPublicStudy);
         session.setAttribute("study", currentStudy);
 
@@ -120,12 +126,6 @@ public class MainMenuServlet extends SecureController {
         if (ub.getActiveStudyId() == parentStudyId)
             return;
         ub.setActiveStudyId(parentStudyId);
-    }
-
-
-    public String processExternalReturnUrl(HttpServletRequest request) {
-        String externReturnUrl = (String) request.getParameter("externReturnUrl");
-        return externReturnUrl;
     }
 
     @Override public void processRequest() throws Exception {
@@ -147,7 +147,6 @@ public class MainMenuServlet extends SecureController {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
         processSpecificStudyEnvUuid(request, ub1);
-        String externalReturnUrl = processExternalReturnUrl(request);
         ub1.setLastVisitDate(new Date(System.currentTimeMillis()));
         // have to actually set the above to a timestamp? tbh
         ub1.setOwner(ub1);
@@ -213,10 +212,6 @@ public class MainMenuServlet extends SecureController {
         if (currentRole.isMonitor()) {
             setupSubjectSDVTable();
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
-            if (currentStudy.getStatus().isPending()) {
-                response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE.getFileName());
-                return;
-            }
             setupStudySiteStatisticsTable();
             setupSubjectEventStatusStatisticsTable();
             setupStudySubjectStatusStatisticsTable();
@@ -225,10 +220,8 @@ public class MainMenuServlet extends SecureController {
             }
 
         }
-        if (StringUtils.isNotEmpty(externalReturnUrl))
-            response.sendRedirect(externalReturnUrl);
-        else
-            forwardPage(Page.MENU);
+
+        forwardPage(Page.MENU);
     }
 
     private void setupSubjectSDVTable() {

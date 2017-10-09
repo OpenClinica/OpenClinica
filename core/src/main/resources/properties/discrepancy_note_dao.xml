@@ -691,13 +691,25 @@
         <name>findByStudyEvent</name>
         <sql>
             select dn.resolution_status_id,count(dn.resolution_status_id) from discrepancy_note dn,dn_item_data_map didm,event_crf ec,item_data ed,study_event se
-			  where
-			  SE.study_event_id = ec.study_event_id
-			  AND EC.event_crf_id = ed.event_crf_id
-			  AND ed.item_data_id = didm.item_data_id
-			  AND didm.discrepancy_note_id = dn.discrepancy_note_id
-			  AND se.study_event_id = ?
-			  AND dn.parent_dn_id is null
+              where
+              SE.study_event_id = ec.study_event_id
+              AND EC.event_crf_id = ed.event_crf_id
+              AND ed.item_data_id = didm.item_data_id
+              AND didm.discrepancy_note_id = dn.discrepancy_note_id
+              AND se.study_event_id = ?
+              AND dn.parent_dn_id is null
+        </sql>
+    </query>
+    <query>
+        <name>findExistingNotesForStudyEvent</name>
+        <sql>
+            select dn.*,dsem.column_name,se.study_event_id 
+            from discrepancy_note dn,dn_study_event_map dsem,study_event se
+              where
+              SE.study_event_id = dsem.study_event_id
+              AND dsem.discrepancy_note_id = dn.discrepancy_note_id
+              AND se.study_event_id = ?
+              AND dn.parent_dn_id is null
         </sql>
     </query>
     <query>

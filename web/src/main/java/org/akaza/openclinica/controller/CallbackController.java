@@ -4,6 +4,7 @@ import com.auth0.IdentityVerificationException;
 import com.auth0.SessionUtils;
 import com.auth0.Tokens;
 import com.auth0.jwt.JWT;
+import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.config.TokenAuthentication;
@@ -60,6 +61,7 @@ public class CallbackController {
             } else {
                 Tokens tokens = controller.handle(req);
                 DecodedJWT decodedJWT = JWT.decode(tokens.getAccessToken());
+
                 TokenAuthentication tokenAuth = new TokenAuthentication(decodedJWT);
                 SecurityContextHolder.getContext().setAuthentication(tokenAuth);
                 req.getSession().setAttribute("accessToken", tokens.getAccessToken());

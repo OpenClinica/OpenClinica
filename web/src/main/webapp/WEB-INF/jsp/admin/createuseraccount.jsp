@@ -116,7 +116,7 @@
  }
 </script>
 
-<h1><span class="title_manage"><fmt:message key="create_a_user_account" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="create_a_user_account" bundle="${resword}"/></span></h1><br/>
 
 <fmt:message key="field_required" bundle="${resword}"/>
 <form action="CreateUserAccount" method="post">

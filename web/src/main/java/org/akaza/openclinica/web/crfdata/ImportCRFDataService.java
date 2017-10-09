@@ -51,6 +51,7 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -127,10 +128,9 @@ public class ImportCRFDataService {
                     return null;
                 }
                 for (FormDataBean formDataBean : formDataBeans) {
-                    FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+                    ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
 
-                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID());
                     for (FormLayoutBean formLayoutBean : formLayoutBeans) {
                         ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByCRFId(formLayoutBean.getCrfId());
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
@@ -234,10 +234,7 @@ public class ImportCRFDataService {
                     return true;
                 }
                 for (FormDataBean formDataBean : formDataBeans) {
-
-                    FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
-
-                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID());
+                    ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
                     for (FormLayoutBean formLayoutBean : formLayoutBeans) {
 
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
@@ -373,6 +370,7 @@ public class ImportCRFDataService {
         StudyBean studyBean = studyDAO.findByOid(odmContainer.getCrfDataPostImportContainer().getStudyOID());
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
+        CRFDAO crfDAO = new CRFDAO(ds);
         HashMap<String, ItemDataBean> blankCheck = new HashMap<String, ItemDataBean>();
         String hardValidatorErrorMsgs = "";
 
@@ -411,10 +409,10 @@ public class ImportCRFDataService {
                 for (FormDataBean formDataBean : formDataBeans) {
                     Map<String, Integer> groupMaxOrdinals = new HashMap<String, Integer>();
                     displayItemBeanWrapper = null;
-                    FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
 
                     EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
-                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID());
+                    ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
+
                     FormLayoutBean formLayoutBean = formLayoutBeans.get(0);
                     ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
                     if ((formLayoutBeans == null) || (formLayoutBeans.size() == 0)) {
@@ -446,7 +444,6 @@ public class ImportCRFDataService {
                             // also need to create a group name checker here for
                             // correctness, tbh
                             for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
-                                ArrayList<ItemBean> blankCheckItems = new ArrayList<ItemBean>();
                                 ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
                                 logger.debug("iterating through group beans: " + itemGroupDataBean.getItemGroupOID());
                                 // put a checker in here
@@ -496,7 +493,6 @@ public class ImportCRFDataService {
                                             }
                                         }
                                         ItemDataBean itemDataBean = createItemDataBean(itemBean, eventCRFBean, importItemDataBean.getValue(), ub, groupOrdinal);
-                                        blankCheckItems.add(itemBean);
                                         String newKey = groupOrdinal + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
                                                 + subjectDataBean.getSubjectOID();
                                         blankCheck.put(newKey, itemDataBean);
@@ -543,40 +539,10 @@ public class ImportCRFDataService {
                                 // is an entry with nongroup towards the
                                 // end. Refer: MANTIS 6113
 
-                                for (int i = 1; i <= groupMaxOrdinals.get(itemGroupDataBean.getItemGroupOID()); i++) {
-                                    for (ItemBean itemBean : blankCheckItems) {
-                                        String newKey = i + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
-                                                + subjectDataBean.getSubjectOID();
-                                        if (blankCheck.get(newKey) == null) {
-                                            // if it already exists, Do Not Add It.
-                                            ItemDataBean itemDataCheck = getItemDataDao().findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(),
-                                                    eventCRFBean.getId(), i);
-                                            logger.debug("found item data bean id: " + itemDataCheck.getId() + " for ordinal " + i);
-                                            if (itemDataCheck.getId() == 0) {
-                                                ItemDataBean blank = createItemDataBean(itemBean, eventCRFBean, "", ub, i);
-                                                DisplayItemBean displayItemBean = new DisplayItemBean();
-                                                displayItemBean.setItem(itemBean);
-                                                displayItemBean.setData(blank);
-                                                // displayItemBean.setMetadata(metadataBean);
-                                                // set event def crf?
-                                                displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
-                                                String eventCRFRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
-                                                // if you do indeed leave off this in the XML it will pass but return
-                                                // 'null'
-
-                                                displayItemBeans.add(displayItemBean);
-                                                logger.debug("... adding display item bean");
-                                            }
-                                        }
-                                        logger.debug("found a blank at " + i + ", adding " + blankCheckItems.size() + " blank items");
-                                    }
-                                }
-                                blankCheckItems = new ArrayList<ItemBean>();
                             } // end item group data beans
 
                         } // matches if on permittedCRFIDs
 
-                        CRFDAO crfDAO = new CRFDAO(ds);
                         CRFBean crfBean = crfDAO.findByLayoutId(formLayoutBean.getCrfId());
                         // seems like an extravagance, but is not contained in crf
                         // version or event crf bean
@@ -931,7 +897,8 @@ public class ImportCRFDataService {
                 logger.debug("unknown study OID");
                 throw new OpenClinicaException("Unknown Study OID", "");
 
-            } else if (studyBean.getId() != currentStudyId) {
+                // } else if (studyBean.getId() != currentStudyId) {
+            } else if (!CoreResources.isPublicStudySameAsTenantStudy(studyBean, currentStudyId, ds)) {
                 mf.applyPattern(respage.getString("your_current_study_is_not_the_same_as"));
                 Object[] arguments = { studyBean.getName() };
                 //
@@ -949,6 +916,7 @@ public class ImportCRFDataService {
             FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
             ItemGroupDAO itemGroupDAO = new ItemGroupDAO(ds);
             ItemDAO itemDAO = new ItemDAO(ds);
+            CRFDAO crfDAO = new CRFDAO(ds);
 
             if (subjectDataBeans != null) {// need to do this so as not to
                 // throw the exception below and
@@ -987,7 +955,7 @@ public class ImportCRFDataService {
                             if (formDataBeans != null) {
                                 for (FormDataBean formDataBean : formDataBeans) {
                                     String formOid = formDataBean.getFormOID();
-                                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formOid);
+                                    ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
                                     // ideally we should look to compare
                                     // versions within
                                     // seds;
@@ -1135,6 +1103,23 @@ public class ImportCRFDataService {
     private ItemDataDAO getItemDataDao() {
         itemDataDao = this.itemDataDao != null ? itemDataDao : new ItemDataDAO(ds);
         return itemDataDao;
+    }
+
+    private ArrayList<FormLayoutBean> getFormLayoutBeans(FormDataBean formDataBean, DataSource ds) {
+        FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
+        CRFDAO crfDAO = new CRFDAO(ds);
+        ArrayList<FormLayoutBean> formLayoutBeans = new ArrayList<>();
+
+        String formOid = formDataBean.getFormOID();
+        CRFBean crfBean = crfDAO.findByOid(formOid);
+        if (crfBean != null) {
+            FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByFullName(formDataBean.getFormLayoutName(), crfBean.getName());
+            if (formLayoutBean != null) {
+                formLayoutBeans.add(formLayoutBean);
+            }
+        }
+
+        return formLayoutBeans;
     }
 
 }

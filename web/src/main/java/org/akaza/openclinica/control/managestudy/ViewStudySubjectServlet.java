@@ -311,7 +311,7 @@ public class ViewStudySubjectServlet extends SecureController {
             // date, desc
             ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
 
-            String[] columns = { resword.getString("event") + " (" + resword.getString("occurrence_number") + ")", resword.getString("start_date1"), resword.getString("status"), resword.getString("event_actions"), resword.getString("CRFs_atrib") };
+            String[] columns = { resword.getString("event") + " (" + resword.getString("occurrence_number") + ")", resword.getString("start_date1"), resword.getString("status"), resword.getString("event_actions"), resword.getString("CRFs") };
             table.setColumns(new ArrayList(Arrays.asList(columns)));
             table.hideColumnLink(4);
             table.hideColumnLink(5);

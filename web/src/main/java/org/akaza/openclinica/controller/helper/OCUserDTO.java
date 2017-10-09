@@ -7,6 +7,7 @@ import java.util.Objects;
 /**
  * A DTO for the OCUser entity.
  */
+@com.fasterxml.jackson.annotation.JsonIgnoreProperties (ignoreUnknown = true)
 public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
 
     private String uuid;

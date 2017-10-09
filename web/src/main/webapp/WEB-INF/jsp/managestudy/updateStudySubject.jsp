@@ -12,10 +12,10 @@
 
 <c:choose>
 <c:when test="${userBean.sysAdmin || userBean.techAdmin || userRole.manageStudy}">
-	<jsp:include page="../include/managestudy-header.jsp"/>
+    <jsp:include page="../include/managestudy-header.jsp"/>
 </c:when>
 <c:otherwise>
-	<jsp:include page="../include/home-header.jsp"/>
+    <jsp:include page="../include/home-header.jsp"/>
 </c:otherwise>
 </c:choose>
 <%-- <jsp:include page="../include/managestudy-header.jsp"/> --%>
@@ -26,26 +26,26 @@
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+        <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
 
-		<fmt:message key="instructions" bundle="${resword}"/>
+        <fmt:message key="instructions" bundle="${resword}"/>
 
-		<div class="sidebar_tab_content">
-		</div>
+        <div class="sidebar_tab_content">
+        </div>
 
-		</td>
+        </td>
 
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
+    </tr>
+    <tr id="sidebar_Instructions_closed" style="display: all">
+        <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
 
-		<fmt:message key="instructions" bundle="${resword}"/>
+        <fmt:message key="instructions" bundle="${resword}"/>
 
-		</td>
+        </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
@@ -55,18 +55,18 @@
 <body class="aka_bodywidth" onload=
   "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});};
         <c:if test='${popUpURL != ""}'>
-		openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>">
+        openDNoteWindow('<c:out value="${popUpURL}" />');</c:if>">
 
 <c:choose>
 <c:when test="${userBean.sysAdmin || userBean.techAdmin || userRole.manageStudy}">
-	<h1><span class="title_manage">
-	<fmt:message key="update_study_subject_details" bundle="${resword}"/>
-	</span></h1>
+    <h1><span class="title_manage">
+    <fmt:message key="update_study_subject_details" bundle="${resword}"/>
+    </span></h1>
 </c:when>
 <c:otherwise>
-	<h1><span class="title_manage">
-	<fmt:message key="assign_subject_to_group" bundle="${resworkflow}"/>
-	</span></h1>
+    <h1><span class="title_manage">
+    <fmt:message key="assign_subject_to_group" bundle="${resworkflow}"/>
+    </span></h1>
 </c:otherwise>
 </c:choose>
 
@@ -76,47 +76,50 @@
 <c:choose>
 <c:when test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy || userRole.investigator 
     || (study.parentStudyId > 0 && userRole.researchAssistant ||study.parentStudyId > 0 && userRole.researchAssistant2)}">
-	 <div style="width: 550px">
-	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+     <div style="width: 550px">
+    <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-	<div class="tablebox_center">
-	<table border="0" cellpadding="0" cellspacing="0">
+    <div class="tablebox_center">
+    <table border="0" cellpadding="0" cellspacing="0">
 
-	  <tr valign="top">
-	  <td class="formlabel">
-	  	<fmt:message key="study_subject_ID" bundle="${resword}"/>:
-	  </td>
-	  <td>
-	  	<div class="formfieldXL_BG">
-	  	<input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL">
-	  	</div>
-	  	<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include>
-	  </td>
-	  <td>
-	  	<fmt:message key="field_required" bundle="${resword}"/>
-	  </td>
-	  </tr>
+      <tr valign="top">
+      <td class="formlabel">
+        <fmt:message key="study_subject_ID" bundle="${resword}"/>:
+      </td>
+      <td>
+        <div class="formfieldXL_BG">
+        <input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL">*
+        </div>
+        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include>
+      </td>
+      <td>
+       
+      </td>
+      </tr>
 
-	  <tr valign="top">
-	  <td class="formlabel"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="text" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" class="formfieldXL"></div>
-	  	<td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>	  
-	  </td>
-	  </tr>
+      <tr valign="top">
+      <td class="formlabel"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="text" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" class="formfieldXL"></div>
+        <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>      
+      </td>
+      </tr>
 
-	  <tr valign="top">
-	  <td class="formlabel"><fmt:message key="enrollment_date" bundle="${resword}"/>:</td>
-	  <td>
-	  <div class="formfieldXL_BG">
+      <tr valign="top">
+      <td class="formlabel"><fmt:message key="enrollment_date" bundle="${resword}"/>:</td>
+      <td>
+      <div class="formfieldXL_BG">
 
-	  <input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" class="formfieldXL" id="enrollmentDateField"></div>
-	  <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
-	  <td valign="top">
-	  <A HREF="#" >
-	      <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger"/>
-	      <script type="text/javascript">
-	      Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger" });
-	      </script>
-	  </a>
+        <input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" class="formfieldXL" id="enrollmentDateField">
+        <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger"/>
+          <script type="text/javascript"> 
+          Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger" });
+          </script>
+      </div>
+      <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
+      <td valign="top">
+      
+      <a href="#" >
+          
+      </a>&nbsp;*
                             <%-- DN for enrollment date goes here --%>
                             <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
                                 <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
@@ -133,8 +136,8 @@
                                         </c:otherwise>
                                     </c:choose>
                                 </c:if>
-	  </td>
-	 </tr>
+      </td>
+     </tr>
 
     <c:if test="${study.studyParameterConfig.subjectPersonIdRequired=='required' || study.studyParameterConfig.subjectPersonIdRequired=='optional'}">
         <tr valign="top">
@@ -144,6 +147,7 @@
               <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include>
             </td>
             <td>
+              <c:if test="${study.studyParameterConfig.subjectPersonIdRequired == 'required'}">&nbsp;*</c:if>
               <%-- DN for person ID goes here --%>
               <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
                 <c:set var="isNew" value="${hasUniqueIDNote eq 'yes' ? 0 : 1}"/>
@@ -170,7 +174,7 @@
           <input type="radio" name="gender" <c:if test="${subject.gender == 109}">checked</c:if> value="m"><fmt:message key="male" bundle="${resword}"/>
           <input type="radio" name="gender" <c:if test="${subject.gender == 102}">checked</c:if> value="f"><fmt:message key="female" bundle="${resword}"/>
           <input type="radio" name="gender"  <c:if test="${!(subject.gender == 109 || subject.gender == 102)}">checked</c:if> value=" "><fmt:message key="not_specified" bundle="${resword}"/>
-
+          <c:if test="${study.studyParameterConfig.genderRequired}">&nbsp;*</c:if>
               <%-- DN for gender goes here --%>
               <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
                 <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
@@ -226,56 +230,64 @@
                 </c:choose>
               </c:if>
         </td>
+        </tr>
+     <tr valign="top">
+      <td></td><td></td><td><Br><fmt:message key="field_required" bundle="${resword}"/></td>
+      </tr>
+
     </c:if>
 
-	</table>
-	</div>
-	</div></div></div></div></div></div></div></div>
-	</div>
+    </table>
+    </div>
+    </div></div></div></div></div></div></div></div>
+    </div>
 </c:when>
 <c:otherwise>
-	<div style="width: 300px">
-	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
+    <div style="width: 400px">
+    <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
-	<div class="tablebox_center">
-	<table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <div class="tablebox_center">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
 
-	  <tr valign="top"><td class="table_header_column"><fmt:message key="label" bundle="${resword}"/>:</td><td class="table_cell">
-	  <input type="text" name="label" value="<c:out value="${studySub.label}"/>" disabled="disabled" class="formfieldM">
-	  </td></tr>
+      <tr valign="top"><td class="table_header_column"><fmt:message key="label" bundle="${resword}"/>:</td><td class="table_cell">
+      <input type="text" name="label" value="<c:out value="${studySub.label}"/>" disabled="disabled" class="formfieldM">
+      </td></tr>
 
-	  <tr valign="top"><td class="table_header_column"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td class="table_cell">
-	  <input type="text" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" disabled="disabled" class="formfieldM">
-	  </td></tr>
+      <tr valign="top"><td class="table_header_column"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td class="table_cell">
+      <input type="text" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" disabled="disabled" class="formfieldM">
+      </td></tr>
 
       <tr valign="top"><td class="table_header_column"><fmt:message key="enrollment_date" bundle="${resword}"/>:</td><td class="table_cell">
       <input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" disabled="disabled" class="formfieldM" id="enrollmentDateField">
       </td></tr>
 
-	<c:if test="${study.studyParameterConfig.subjectPersonIdRequired=='required' || study.studyParameterConfig.subjectPersonIdRequired=='optional'}">
-	    <tr valign="top">
-	        <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
-	        <td colspan="2">
-	          <div class="formfieldXL_BG"><input type="text" name="uniqueIdentifier" value="<c:out value="${subject.uniqueIdentifier}"/>" class="formfieldXL"></div>
-	          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include>
-	        </td>
-	    </tr>
-	</c:if>
+    <c:if test="${study.studyParameterConfig.subjectPersonIdRequired=='required' || study.studyParameterConfig.subjectPersonIdRequired=='optional'}">
+        <tr valign="top">
+            <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
+            <td class="table_cell">
+              <input type="text" name="uniqueIdentifier" disabled="disabled" value="<c:out value="${subject.uniqueIdentifier}"/>" class="formfieldXL">
+            </td>
+        </tr>
+    </c:if>
 
       <tr valign="top"><td class="table_header_column"><fmt:message key="gender" bundle="${resword}"/>:</td><td class="table_cell">
-      <input type="text" name="gender" value="<c:out value="${studySub.label}"/>" disabled="disabled" class="formfieldM">
+          <input type="radio" name="gender" disabled="disabled" <c:if test="${subject.gender == 109}">checked</c:if> value="m"><fmt:message key="male" bundle="${resword}"/>
+          <input type="radio" name="gender" disabled="disabled" <c:if test="${subject.gender == 102}">checked</c:if> value="f"><fmt:message key="female" bundle="${resword}"/>
+          <input type="radio" name="gender" disabled="disabled"  <c:if test="${!(subject.gender == 109 || subject.gender == 102)}">checked</c:if> value=" "><fmt:message key="not_specified" bundle="${resword}"/>
       </td></tr>
 
+      <c:if test="${study.studyParameterConfig.collectDob=='1' || study.studyParameterConfig.collectDob=='2' }">
       <tr valign="top"><td class="table_header_column"><fmt:message key="date_of_birth" bundle="${resword}"/>:</td><td class="table_cell">
-      <input type="text" name="dob" value="<c:out value="${studySub.label}"/>" disabled="disabled" class="formfieldM">
+      <input type="text" name="localBirthDate" disabled="disabled" value="<c:out value="${localBirthDate}"/>" class="formfieldM">
       </td></tr>
+      </c:if>
 
-	 </table>
+     </table>
 
-	 </div>
-	</div></div></div></div></div></div></div></div>
+     </div>
+    </div></div></div></div></div></div></div></div>
 
-	</div>
+    </div>
 </c:otherwise>
 </c:choose>
 
@@ -289,42 +301,42 @@
 <table border="0" cellpadding="0">
 
   <tr valign="top">
-	<td class="formlabel"><fmt:message key="subject_group_class" bundle="${resword}"/>:
-	<td class="table_cell">
-	<c:set var="count" value="0"/>
-	<table border="0" cellpadding="0">
-	  <c:forEach var="group" items="${groups}">
-	  <tr valign="top">
-	   <td><b><c:out value="${group.name}"/></b></td>
-	   <td><div class="formfieldM_BG"> <select name="studyGroupId<c:out value="${count}"/>" class="formfieldM">
-	    	<c:if test="${group.subjectAssignment=='Optional'}">
-	    	  <option value="0">--</option>
-	    	</c:if>
-	    	<c:forEach var="sg" items="${group.studyGroups}">
-	    	  <c:choose>
-				<c:when test="${group.studyGroupId == sg.id}">
-					<option value="<c:out value="${sg.id}" />" selected><c:out value="${sg.name}"/></option>
-				</c:when>
-				<c:otherwise>
-				    <option value="<c:out value="${sg.id}"/>"><c:out value="${sg.name}"/></option>
-				</c:otherwise>
-			 </c:choose>
-	    	</c:forEach>
-	    	</select></div>
-	    	<c:if test="${group.subjectAssignment=='Required'}">
-	    	  <td align="left">*</td>
-	    	</c:if>
-	    	</td></tr>
-	    	<tr valign="top">
-	    	<td><fmt:message key="notes" bundle="${resword}"/>:</td>
-	    	<td>
-	    	<div class="formfieldXL_BG"><input type="text" class="formfieldXL" name="notes<c:out value="${count}"/>"  value="<c:out value="${group.groupNotes}"/>"></div>
-	          <c:import url="../showMessage.jsp"><c:param name="key" value="notes${count}" /></c:import>
-	        </td></tr>
-	       <c:set var="count" value="${count+1}"/>
-	  </c:forEach>
-	  </table>
-	</td>
+    <td class="formlabel"><fmt:message key="subject_group_class" bundle="${resword}"/>:
+    <td class="table_cell">
+    <c:set var="count" value="0"/>
+    <table border="0" cellpadding="0">
+      <c:forEach var="group" items="${groups}">
+      <tr valign="top">
+       <td><b><c:out value="${group.name}"/></b></td>
+       <td><div class="formfieldM_BG"> <select name="studyGroupId<c:out value="${count}"/>" class="formfieldM">
+            <c:if test="${group.subjectAssignment=='Optional'}">
+              <option value="0">--</option>
+            </c:if>
+            <c:forEach var="sg" items="${group.studyGroups}">
+              <c:choose>
+                <c:when test="${group.studyGroupId == sg.id}">
+                    <option value="<c:out value="${sg.id}" />" selected><c:out value="${sg.name}"/></option>
+                </c:when>
+                <c:otherwise>
+                    <option value="<c:out value="${sg.id}"/>"><c:out value="${sg.name}"/></option>
+                </c:otherwise>
+             </c:choose>
+            </c:forEach>
+            </select></div>
+            <c:if test="${group.subjectAssignment=='Required'}">
+              <td align="left">*</td>
+            </c:if>
+            </td></tr>
+            <tr valign="top">
+            <td><fmt:message key="notes" bundle="${resword}"/>:</td>
+            <td>
+            <div class="formfieldXL_BG"><input type="text" class="formfieldXL" name="notes<c:out value="${count}"/>"  value="<c:out value="${group.groupNotes}"/>"></div>
+              <c:import url="../showMessage.jsp"><c:param name="key" value="notes${count}" /></c:import>
+            </td></tr>
+           <c:set var="count" value="${count+1}"/>
+      </c:forEach>
+      </table>
+    </td>
   </tr>
 
 
@@ -336,7 +348,10 @@
 
 </div>
 </c:if>
+<c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy || userRole.investigator 
+    || (study.parentStudyId > 0 && userRole.researchAssistant ||study.parentStudyId > 0 && userRole.researchAssistant2)}">
  <input type="submit" name="Submit" value="<fmt:message key="confirm_changes" bundle="${resword}"/>" class="button_long">
+ </c:if>
  <a href="javascript:history.back()"><input type="button"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></a>
 </form>
 <DIV ID="testdiv1" STYLE="position:absolute;visibility:hidden;background-color:white;layer-background-color:white;"></DIV>

@@ -138,377 +138,349 @@ public class CreateDatasetServlet extends SecureController {
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
         String action = fp.getString("action");
-        if (StringUtil.isBlank(action)) {
-            
-            
-            // step 1 -- instructions, and continue button
-            session.setAttribute("newDataset", new DatasetBean());
-            session.setAttribute("allItems", new ArrayList());
-            session.setAttribute("crf", new CRFBean());
-            session.setAttribute("allSelectedItems", new ArrayList());
-            forwardPage(Page.CREATE_DATASET_1);
+        if (StringUtil.isBlank(action)) resetProcess();
 
-        } else {
-            StudyBean studyWithEventDefs = currentStudy;
+        StudyBean studyWithEventDefs = currentStudy;
+        if (currentStudy.getParentStudyId() > 0) {
+            studyWithEventDefs = new StudyBean();
+            studyWithEventDefs.setId(currentStudy.getParentStudyId());
+        }
+        if (StringUtil.isBlank(action) || "begin".equalsIgnoreCase(action)) {
+            // step 2 -- select study events/crfs
+
+            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+            StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+            EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+            StudyBean studyWithEventDefinitions = currentStudy;
             if (currentStudy.getParentStudyId() > 0) {
-                studyWithEventDefs = new StudyBean();
-                studyWithEventDefs.setId(currentStudy.getParentStudyId());
+                studyWithEventDefinitions = new StudyBean();
+                studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
+
             }
-            if ("begin".equalsIgnoreCase(action)) {
-                // step 2 -- select study events/crfs
+            ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
 
-                StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-                StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-                StudyBean studyWithEventDefinitions = currentStudy;
+            CRFDAO crfdao = new CRFDAO(sm.getDataSource());
+            HashMap events = new LinkedHashMap();
+            for (int i = 0; i < seds.size(); i++) {
+                StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seds.get(i);
+                ArrayList<CRFBean> crfs = (ArrayList<CRFBean>) crfdao.findAllActiveByDefinition(sed);
+
                 if (currentStudy.getParentStudyId() > 0) {
-                    studyWithEventDefinitions = new StudyBean();
-                    studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
-
+                    // sift through these CRFs and see which ones are hidden
+                    HideCRFManager hideCRFs = HideCRFManager.createHideCRFManager();
+                    crfs = hideCRFs.removeHiddenCRFBeans(studyWithEventDefinitions, sed, crfs, sm.getDataSource());
                 }
-                ArrayList seds = seddao.findAllActiveByStudy(studyWithEventDefinitions);
 
-                CRFDAO crfdao = new CRFDAO(sm.getDataSource());
-                HashMap events = new LinkedHashMap();
-                for (int i = 0; i < seds.size(); i++) {
-                    StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seds.get(i);
-                    ArrayList<CRFBean> crfs = (ArrayList<CRFBean>) crfdao.findAllActiveByDefinition(sed);
-
-                    if (currentStudy.getParentStudyId() > 0) {
-                        // sift through these CRFs and see which ones are hidden
-                        HideCRFManager hideCRFs = HideCRFManager.createHideCRFManager();
-                        crfs = hideCRFs.removeHiddenCRFBeans(studyWithEventDefinitions, sed, crfs, sm.getDataSource());
-                    }
-
-                    if (!crfs.isEmpty()) {
-                        events.put(sed, crfs);
-                    }
+                if (!crfs.isEmpty()) {
+                    events.put(sed, crfs);
                 }
-                // logger.info("how many events =" +
-                // events.keySet().size());
-                // determine if events are empty or not, redirect to view
-                // datasets
-                if (events.isEmpty()) {
-                    addPageMessage(respage.getString("not_have_study_definitions_assigned"));
-                    forwardPage(Page.CREATE_DATASET_1);
-                } else {
-                    crfdao = new CRFDAO(sm.getDataSource());
-                    ItemDAO idao = new ItemDAO(sm.getDataSource());
-                    ArrayList sedItemIds = CreateDatasetServlet.allSedItemIdsInStudy(events, crfdao, idao);
+            }
+            // logger.info("how many events =" +
+            // events.keySet().size());
+            // determine if events are empty or not, redirect to view
+            // datasets
+            if (events.isEmpty()) {
+                addPageMessage(respage.getString("not_have_study_definitions_assigned"));
+                resetProcess();
+                forwardPage(Page.MENU_SERVLET);
+            } else {
+                crfdao = new CRFDAO(sm.getDataSource());
+                ItemDAO idao = new ItemDAO(sm.getDataSource());
+                ArrayList sedItemIds = CreateDatasetServlet.allSedItemIdsInStudy(events, crfdao, idao);
 
-                    session.setAttribute("numberOfStudyItems", Integer.toString(sedItemIds.size()));
-                    request.setAttribute("eventlist", events);
+                session.setAttribute("numberOfStudyItems", Integer.toString(sedItemIds.size()));
+                request.setAttribute("eventlist", events);
 
-                    session.setAttribute(EVENTS_FOR_CREATE_DATASET, events);
-                    session.setAttribute("newDataset", new DatasetBean());
-                    session.setAttribute("allItems", new ArrayList());
-                    session.setAttribute("crf", new CRFBean());
+                session.setAttribute(EVENTS_FOR_CREATE_DATASET, events);
+                session.setAttribute("newDataset", new DatasetBean());
+                session.setAttribute("allItems", new ArrayList());
+                session.setAttribute("crf", new CRFBean());
+                forwardPage(Page.CREATE_DATASET_2);
+            }
+
+        } else if ("beginsubmit".equalsIgnoreCase(action)) {
+            String saveItems = fp.getString(SAVE_BUTTON);
+            String saveContinue = fp.getString(SAVE_CONTINUE_BUTTON);
+            DatasetBean db = (DatasetBean) session.getAttribute("newDataset");
+            if (db == null) {
+                db = new DatasetBean();
+            }
+            extractIdsFromForm(db);
+            extractEventIds(db);
+            session.setAttribute("newDataset", db);
+            // session.setAttribute("itemSelectedNum",db.getItemIds().size()
+            // +"");
+            if (!StringUtil.isBlank(saveItems)) {
+                request.setAttribute("eventlist", session.getAttribute(EVENTS_FOR_CREATE_DATASET));
+                // BWP 3095>>
+                String summary = respage.getString("you_have_selected") + " " + db.getItemIds().size() + " " + respage.getString("items_so_far");
+                summary += genAttMsg(db);
+                addPageMessage(summary);
+
+                int crfId = fp.getInt("crfId");
+                if (crfId > 0) {
+                    // user choose a crf and select items
                     forwardPage(Page.CREATE_DATASET_2);
+                } else {
+                    ArrayList sgclasses = (ArrayList) session.getAttribute("allSelectedGroups");
+                    if (sgclasses == null || sgclasses.size() == 0) {
+                        sgclasses = setUpStudyGroups();
+                    }
+                    session.setAttribute("allSelectedGroups", sgclasses);
+                    request.setAttribute("allSelectedGroups", sgclasses);
+                    // TODO push out list of subject groups here???
+                    // form submitted from "view selected item ' or
+                    // attribute page, so
+                    // forward back to "view selected item " page
+                    forwardPage(Page.CREATE_DATASET_VIEW_SELECTED);
                 }
-
-            } else if ("beginsubmit".equalsIgnoreCase(action)) {
-                String saveItems = fp.getString(SAVE_BUTTON);
-                String saveContinue = fp.getString(SAVE_CONTINUE_BUTTON);
-                DatasetBean db = (DatasetBean) session.getAttribute("newDataset");
-                if (db == null) {
-                    db = new DatasetBean();
-                }
-                extractIdsFromForm(db);
-                extractEventIds(db);
-                session.setAttribute("newDataset", db);
-                // session.setAttribute("itemSelectedNum",db.getItemIds().size()
-                // +"");
-                if (!StringUtil.isBlank(saveItems)) {
+            } else {
+                if (db.getItemIds().size() == 0) {
                     request.setAttribute("eventlist", session.getAttribute(EVENTS_FOR_CREATE_DATASET));
-                    // BWP 3095>>
-                    String summary = respage.getString("you_have_selected") + " " + db.getItemIds().size() + " " + respage.getString("items_so_far");
+                    addPageMessage(respage.getString("should_select_one_item_to_create_dataset"));
+                    forwardPage(Page.CREATE_DATASET_2);
+                } else {
+
+                    String summary =
+                        respage.getString("you_have_selected") + " " + db.getItemIds().size() + " " + respage.getString("items_totally_for_this_dataset");
+
                     summary += genAttMsg(db);
                     addPageMessage(summary);
 
-                    int crfId = fp.getInt("crfId");
-                    if (crfId > 0) {
-                        // user choose a crf and select items
-                        forwardPage(Page.CREATE_DATASET_2);
-                    } else {
-                        ArrayList sgclasses = (ArrayList) session.getAttribute("allSelectedGroups");
-                        if (sgclasses == null || sgclasses.size() == 0) {
-                            sgclasses = setUpStudyGroups();
-                        }
-                        session.setAttribute("allSelectedGroups", sgclasses);
-                        request.setAttribute("allSelectedGroups", sgclasses);
-                        // TODO push out list of subject groups here???
-                        // form submitted from "view selected item ' or
-                        // attribute page, so
-                        // forward back to "view selected item " page
-                        forwardPage(Page.CREATE_DATASET_VIEW_SELECTED);
-                    }
-                } else {
-                    if (db.getItemIds().size() == 0) {
-                        request.setAttribute("eventlist", session.getAttribute(EVENTS_FOR_CREATE_DATASET));
-                        addPageMessage(respage.getString("should_select_one_item_to_create_dataset"));
-                        forwardPage(Page.CREATE_DATASET_2);
-                    } else {
-
-                        String summary =
-                            respage.getString("you_have_selected") + " " + db.getItemIds().size() + " " + respage.getString("items_totally_for_this_dataset");
-
-                        summary += genAttMsg(db);
-                        addPageMessage(summary);
-
-                        fp.addPresetValue("firstmonth", 0);// 0 means using
-                        // default month
-                        fp.addPresetValue("firstyear", 1900);
-                        fp.addPresetValue("lastmonth", 0);
-                        fp.addPresetValue("lastyear", 2100);
-                        setPresetValues(fp.getPresetValues());
-                        logger.warn("found preset values while setting date: " + fp.getPresetValues().toString());
-                        request.setAttribute(BEAN_MONTHS, getMonths());
-                        request.setAttribute(BEAN_YEARS, getYears());
-
-                        forwardPage(Page.CREATE_DATASET_3);
-                    }
-                }
-
-            } else if ("scopesubmit".equalsIgnoreCase(action)) {
-                ArrayList months = getMonths();
-                ArrayList years = getYears();
-
-                int firstMonth = fp.getInt("firstmonth");
-                int firstYear = fp.getInt("firstyear");
-                int lastMonth = fp.getInt("lastmonth");
-                int lastYear = fp.getInt("lastyear");
-                if (fp.getInt("firstmonth") == 0) {
-                    firstMonth = 1;// default value
-                }
-                if (fp.getInt("lastmonth") == 0) {
-                    lastMonth = 12;// default value
-                }
-
-                errors = new HashMap();
-                if (fp.getInt("firstmonth") > 0 && firstYear == 1900) {
-                    Validator.addError(errors, "firstmonth", restext.getString("if_specify_month_also_specify_year"));
-
-                }
-                if (fp.getInt("lastmonth") > 0 && lastYear == 2100) {
-                    Validator.addError(errors, "lastmonth", restext.getString("if_specify_month_also_specify_year"));
-
-                }
-                Date dateStart = getFirstDayOfMonth(firstYear, firstMonth);
-                Date dateEnd = getLastDayOfMonth(lastYear, lastMonth);
-
-                if (dateEnd.compareTo(dateStart) < 0) {
-                    Validator.addError(errors, "firstmonth", restext.getString("the_from_should_be_come_before_to"));
-                }
-
-                if (!errors.isEmpty()) {
-                    String fieldNames[] = { "firstmonth", "firstyear", "lastmonth", "lastyear" };
-                    fp.setCurrentIntValuesAsPreset(fieldNames);
-
-                    setInputMessages(errors);
-                    addPageMessage(respage.getString("errors_in_submission_see_below"));
+                    fp.addPresetValue("firstmonth", 0);// 0 means using
+                    // default month
+                    fp.addPresetValue("firstyear", 1900);
+                    fp.addPresetValue("lastmonth", 0);
+                    fp.addPresetValue("lastyear", 2100);
                     setPresetValues(fp.getPresetValues());
-
+                    logger.warn("found preset values while setting date: " + fp.getPresetValues().toString());
                     request.setAttribute(BEAN_MONTHS, getMonths());
                     request.setAttribute(BEAN_YEARS, getYears());
 
                     forwardPage(Page.CREATE_DATASET_3);
-                } else {
-                    DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
-
-                    dsb.setDateStart(dateStart);
-                    dsb.setDateEnd(dateEnd);
-                    session.setAttribute("newDataset", dsb);
-
-                    if (fp.getString("submit").equals(resword.getString("continue_to_apply_filter"))) {
-                        // FilterDAO fdao = new FilterDAO(sm.getDataSource());
-                        // Collection filters = fdao.findAll();
-                        // TODO make findAllByProject
-                        // request.setAttribute("filters",filters);
-                        EntityBeanTable table = getFilterTable();
-                        session.setAttribute("partOfCreateDataset", new Integer(1));
-                        // to be used in createFiltersThree servlet, tbh
-                        request.setAttribute("table", table);
-                        forwardPage(Page.APPLY_FILTER);
-                    } else {
-                        request.setAttribute("statuses", Status.toActiveArrayList());
-                        // YW, 2-20-2008 <<these attributes will show on the
-                        // CREATE_DATASET_4
-                        String temp = dsb.getODMMetaDataVersionOid();
-                        request.setAttribute("mdvOID", temp != null && temp.length() > 0 ? temp : "v1.0.0");
-                        temp = dsb.getODMMetaDataVersionName();
-                        request.setAttribute("mdvName", temp != null && temp.length() > 0 ? temp : "MetaDataVersion_v1.0.0");
-                        request.setAttribute("mdvPrevStudy", dsb.getODMPriorStudyOid());
-                        request.setAttribute("mdvPrevOID", dsb.getODMPriorMetaDataVersionOid());
-                        // YW >>
-                        forwardPage(Page.CREATE_DATASET_4);
-                    }
                 }
-            } else if ("specifysubmit".equalsIgnoreCase(action)) {
-                Validator v = new Validator(request);
-
-                v.addValidation("dsName", Validator.NO_BLANKS);
-                v.addValidation("dsName", Validator.NO_SEMI_COLONS_OR_COLONS);
-                v.addValidation("dsDesc", Validator.NO_BLANKS);
-                v.addValidation("dsStatus", Validator.IS_VALID_TERM, TermType.STATUS);
-
-                v.addValidation("dsName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-                v.addValidation("dsDesc", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-
-                String mdvOID = fp.getString("mdvOID");
-                String mdvName = fp.getString("mdvName");
-                String mdvPrevStudy = fp.getString("mdvPrevStudy");
-                if (mdvPrevStudy != null && mdvPrevStudy.length() > 0) {
-                    v.addValidation("mdvPrevOID", Validator.NO_BLANKS);
-                }
-                String mdvPrevOID = fp.getString("mdvPrevOID");
-
-                errors = v.validate();
-
-                String dsName = fp.getString("dsName");
-                if (!StringUtil.isBlank(dsName)) {
-                    // YW, << 3-19-2008
-                    if (dsName.contains("/") || dsName.contains("\\")) {
-                        v.addError(errors, "dsName", restext.getString("slash_not_allowed"));
-                    }
-                    // 2-20-2008, no check for editing dataset
-                    if (((DatasetBean) session.getAttribute("newDataset")).getId() <= 0) {
-                        // YW >>
-                        // logger.info("dsName" + fp.getString("dsName"));
-                        DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
-                        DatasetBean dsBean = (DatasetBean) dsdao.findByNameAndStudy(fp.getString("dsName").trim(), currentStudy);
-                        if (dsBean.getId() > 0) {
-                            Validator.addError(errors, "dsName", restext.getString("dataset_name_used_by_another_choose_unique"));
-                        }
-                    }
-                }
-
-                if (!errors.isEmpty()) {
-                    String fieldNames[] = { "dsName", "dsDesc" };
-                    fp.setCurrentStringValuesAsPreset(fieldNames);
-                    fp.addPresetValue("dsStatusId", fp.getInt("dsStatus"));
-                    fp.addPresetValue("mdvOID", mdvOID);
-                    fp.addPresetValue("mdvName", mdvName);
-                    fp.addPresetValue("mdvPrevStudy", mdvPrevStudy);
-                    fp.addPresetValue("mdvPrevOID", mdvPrevOID);
-
-                    addPageMessage(respage.getString("errors_in_submission_see_below"));
-                    setInputMessages(errors);
-                    setPresetValues(fp.getPresetValues());
-
-                    request.setAttribute("statuses", Status.toActiveArrayList());
-                    forwardPage(Page.CREATE_DATASET_4);
-                } else {
-                    session.setAttribute("mdvOID", mdvOID);
-                    session.setAttribute("mdvName", mdvName);
-                    session.setAttribute("mdvPrevStudy", mdvPrevStudy);
-                    session.setAttribute("mdvPrevOID", mdvPrevOID);
-                    if (mdvPrevOID != null && mdvPrevOID.length() > 0 && (mdvPrevStudy == null || mdvPrevStudy.length() <= 0)) {
-                        mdvPrevStudy = currentStudy.getId() + "";
-                    }
-                    DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
-                    dsb.setSQLStatement(dsb.generateQuery());
-                    String dbName = SQLInitServlet.getField("dataBase");
-                    if ("oracle".equals(dbName)) {
-                        dsb.setSQLStatement(dsb.generateOracleQuery());
-                    }
-                    // TODO set up oracle syntax for the query, grab the
-                    // database
-                    // from the session manager and feed it to the dataset bean
-                    // possibly done, tbh 1/4/2005
-
-                    // TODO look for the filter here, re-create the sql
-                    // statement
-                    // and put it in here
-                    // possibly done need to test, tbh 1/7/2005
-                    FilterBean fb = (FilterBean) session.getAttribute("newFilter");
-                    if (fb != null) {
-                        // FilterDAO fDAO = new FilterDAO(sm.getDataSource());
-                        dsb.setSQLStatement(dsb.getSQLStatement() + " " + fb.getSQLStatement());
-                    }
-                    // YW 2-21-2008 << editing dataset becomes creating a new
-                    // dataset if dataset name has been changed.
-                    if (dsb.getId() > 0 && !dsb.getName().equals(fp.getString("dsName"))) {
-                        dsb.setId(0);
-                    }
-                    // YW >>
-                    dsb.setODMMetaDataVersionName(mdvName);
-                    dsb.setODMMetaDataVersionOid(mdvOID);
-                    dsb.setODMPriorMetaDataVersionOid(mdvPrevOID);
-                    dsb.setODMPriorStudyOid(mdvPrevStudy);
-                    dsb.setName(fp.getString("dsName"));
-                    dsb.setDescription(fp.getString("dsDesc"));
-                    dsb.setStatus(Status.get(fp.getInt("dsStatus")));
-                    dsb.setDatasetItemStatus(DatasetItemStatus.get(fp.getInt("itemStatus")));
-                    session.removeAttribute("partOfCreateDataset");
-                    Date ddate = new SimpleDateFormat("MM/dd/yyyy").parse("01/01/1900");
-                    // done to remove the set up of going to get the filter, tbh
-                    // set up dataset here, grab primary key???!!!???
-                    // added by jxu
-                    request.setAttribute("defaultStart", local_df.parse(local_df.format(ddate)));
-                    request.setAttribute("defaultEnd", getLastDayOfMonth(2100, 12));
-
-                    session.setAttribute("newDataset", dsb);
-                    forwardPage(Page.CONFIRM_DATASET);
-                }
-
-            } else if ("confirmall".equalsIgnoreCase(action)) {
-                String submit = fp.getString("btnSubmit");
-                logger.info("reached confirm all");
-                if (!resword.getString("confirm_and_save").equalsIgnoreCase(submit)) {
-                    // we're going back, so we should not destroy the
-                    // data we've created, tbh
-                    // session.removeAttribute("newDataset");
-                    // session.removeAttribute("newFilter");
-                    forwardPage(Page.CREATE_DATASET_4);
-                } else {
-                    DatasetDAO ddao = new DatasetDAO(sm.getDataSource());
-                    DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
-                    dsb.setStudyId(this.currentStudy.getId());
-
-                    dsb.setOwner(ub);
-                    // dsb.setOwnerId(ub.getId());
-                    //
-                    // at this point, dataset itemId will still be kept
-                    // uniquely.
-                    dsb = finalUpateDatasetBean(dsb);
-                    if (dsb.getId() == 0) {
-                        // if the bean hasn't been created already that is...
-                        logger.info("*** about to create the dataset bean");
-                        dsb = (DatasetBean) ddao.create(dsb);
-                        logger.info("created dataset bean: " + dsb.getId() + ", name: " + dsb.getName());
-                        if (!dsb.isActive()) {
-                            addPageMessage(restext.getString("problem_creating_dataset_try_again"));
-                            forwardPage(Page.EXTRACT_DATASETS_MAIN);
-                        }
-                    }
-                    // YW, 2-20-2008 << for editing existing dataset
-                    else if (dsb.getId() > 0) {
-                        dsb = (DatasetBean) ddao.updateAll(dsb);
-                        if (!dsb.isActive()) {
-                            addPageMessage(restext.getString("problem_creating_dataset_try_again"));
-                            forwardPage(Page.EXTRACT_DATASETS_MAIN);
-                        }
-                        dsb = (DatasetBean) ddao.updateGroupMap(dsb);
-                        if (!dsb.isActive()) {
-                            addPageMessage(restext.getString("problem_updating_subject_group_class_when_updating_dataset"));
-                            forwardPage(Page.EXTRACT_DATASETS_MAIN);
-                        }
-                    }
-                    // YW >>
-
-                    logger.info("setting data set id here");
-                    // may be easier to just set the dataset bean
-                    // back into the session?
-                    request.setAttribute("extractProperties", CoreResources.getExtractProperties());
-                    request.setAttribute("dataset", dsb);
-
-                    forwardPage(Page.EXPORT_DATASETS);
-                }
-            } else {
-                // refine this bit to catch errors, hopefully
-                addPageMessage(restext.getString("creating_new_dataset_cancelled"));
-                forwardPage(Page.CREATE_DATASET_1);
             }
+
+        } else if ("scopesubmit".equalsIgnoreCase(action)) {
+            ArrayList months = getMonths();
+            ArrayList years = getYears();
+
+            int firstMonth = fp.getInt("firstmonth");
+            int firstYear = fp.getInt("firstyear");
+            int lastMonth = fp.getInt("lastmonth");
+            int lastYear = fp.getInt("lastyear");
+            if (fp.getInt("firstmonth") == 0) {
+                firstMonth = 1;// default value
+            }
+            if (fp.getInt("lastmonth") == 0) {
+                lastMonth = 12;// default value
+            }
+
+            errors = new HashMap();
+            if (fp.getInt("firstmonth") > 0 && firstYear == 1900) {
+                Validator.addError(errors, "firstmonth", restext.getString("if_specify_month_also_specify_year"));
+
+            }
+            if (fp.getInt("lastmonth") > 0 && lastYear == 2100) {
+                Validator.addError(errors, "lastmonth", restext.getString("if_specify_month_also_specify_year"));
+
+            }
+            Date dateStart = getFirstDayOfMonth(firstYear, firstMonth);
+            Date dateEnd = getLastDayOfMonth(lastYear, lastMonth);
+
+            if (dateEnd.compareTo(dateStart) < 0) {
+                Validator.addError(errors, "firstmonth", restext.getString("the_from_should_be_come_before_to"));
+            }
+
+            if (!errors.isEmpty()) {
+                String fieldNames[] = { "firstmonth", "firstyear", "lastmonth", "lastyear" };
+                fp.setCurrentIntValuesAsPreset(fieldNames);
+
+                setInputMessages(errors);
+                addPageMessage(respage.getString("errors_in_submission_see_below"));
+                setPresetValues(fp.getPresetValues());
+
+                request.setAttribute(BEAN_MONTHS, getMonths());
+                request.setAttribute(BEAN_YEARS, getYears());
+
+                forwardPage(Page.CREATE_DATASET_3);
+            } else {
+                DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
+
+                dsb.setDateStart(dateStart);
+                dsb.setDateEnd(dateEnd);
+                session.setAttribute("newDataset", dsb);
+
+                if (fp.getString("submit").equals(resword.getString("continue_to_apply_filter"))) {
+                    // FilterDAO fdao = new FilterDAO(sm.getDataSource());
+                    // Collection filters = fdao.findAll();
+                    // TODO make findAllByProject
+                    // request.setAttribute("filters",filters);
+                    EntityBeanTable table = getFilterTable();
+                    session.setAttribute("partOfCreateDataset", new Integer(1));
+                    // to be used in createFiltersThree servlet, tbh
+                    request.setAttribute("table", table);
+                    forwardPage(Page.APPLY_FILTER);
+                } else {
+                    request.setAttribute("statuses", Status.toActiveArrayList());
+                    // YW, 2-20-2008 <<these attributes will show on the
+                    // CREATE_DATASET_4
+                    String temp = dsb.getODMMetaDataVersionOid();
+                    request.setAttribute("mdvOID", temp != null && temp.length() > 0 ? temp : "v1.0.0");
+                    temp = dsb.getODMMetaDataVersionName();
+                    request.setAttribute("mdvName", temp != null && temp.length() > 0 ? temp : "MetaDataVersion_v1.0.0");
+                    request.setAttribute("mdvPrevStudy", dsb.getODMPriorStudyOid());
+                    request.setAttribute("mdvPrevOID", dsb.getODMPriorMetaDataVersionOid());
+                    // YW >>
+                    forwardPage(Page.CREATE_DATASET_4);
+                }
+            }
+        } else if ("specifysubmit".equalsIgnoreCase(action)) {
+            Validator v = new Validator(request);
+
+            v.addValidation("dsName", Validator.NO_BLANKS);
+            v.addValidation("dsName", Validator.NO_SEMI_COLONS_OR_COLONS);
+            v.addValidation("dsDesc", Validator.NO_BLANKS);
+            v.addValidation("dsStatus", Validator.IS_VALID_TERM, TermType.STATUS);
+
+            v.addValidation("dsName", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+            v.addValidation("dsDesc", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+
+            String mdvOID = fp.getString("mdvOID");
+            String mdvName = fp.getString("mdvName");
+            String mdvPrevStudy = fp.getString("mdvPrevStudy");
+            if (mdvPrevStudy != null && mdvPrevStudy.length() > 0) {
+                v.addValidation("mdvPrevOID", Validator.NO_BLANKS);
+            }
+            String mdvPrevOID = fp.getString("mdvPrevOID");
+
+            errors = v.validate();
+
+            String dsName = fp.getString("dsName");
+            if (!StringUtil.isBlank(dsName)) {
+                // YW, << 3-19-2008
+                if (dsName.contains("/") || dsName.contains("\\")) {
+                    v.addError(errors, "dsName", restext.getString("slash_not_allowed"));
+                }
+                // 2-20-2008, no check for editing dataset
+                if (((DatasetBean) session.getAttribute("newDataset")).getId() <= 0) {
+                    // YW >>
+                    // logger.info("dsName" + fp.getString("dsName"));
+                    DatasetDAO dsdao = new DatasetDAO(sm.getDataSource());
+                    DatasetBean dsBean = (DatasetBean) dsdao.findByNameAndStudy(fp.getString("dsName").trim(), currentStudy);
+                    if (dsBean.getId() > 0) {
+                        Validator.addError(errors, "dsName", restext.getString("dataset_name_used_by_another_choose_unique"));
+                    }
+                }
+            }
+
+            if (!errors.isEmpty()) {
+                String fieldNames[] = { "dsName", "dsDesc" };
+                fp.setCurrentStringValuesAsPreset(fieldNames);
+                fp.addPresetValue("dsStatusId", fp.getInt("dsStatus"));
+                fp.addPresetValue("mdvOID", mdvOID);
+                fp.addPresetValue("mdvName", mdvName);
+                fp.addPresetValue("mdvPrevStudy", mdvPrevStudy);
+                fp.addPresetValue("mdvPrevOID", mdvPrevOID);
+
+                addPageMessage(respage.getString("errors_in_submission_see_below"));
+                setInputMessages(errors);
+                setPresetValues(fp.getPresetValues());
+
+                request.setAttribute("statuses", Status.toActiveArrayList());
+                forwardPage(Page.CREATE_DATASET_4);
+            } else {
+                session.setAttribute("mdvOID", mdvOID);
+                session.setAttribute("mdvName", mdvName);
+                session.setAttribute("mdvPrevStudy", mdvPrevStudy);
+                session.setAttribute("mdvPrevOID", mdvPrevOID);
+                if (mdvPrevOID != null && mdvPrevOID.length() > 0 && (mdvPrevStudy == null || mdvPrevStudy.length() <= 0)) {
+                    mdvPrevStudy = currentStudy.getId() + "";
+                }
+                DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
+                dsb.setSQLStatement(dsb.generateQuery());
+                String dbName = SQLInitServlet.getField("dataBase");
+                if ("oracle".equals(dbName)) {
+                    dsb.setSQLStatement(dsb.generateOracleQuery());
+                }
+                // TODO set up oracle syntax for the query, grab the
+                // database
+                // from the session manager and feed it to the dataset bean
+                // possibly done, tbh 1/4/2005
+
+                // TODO look for the filter here, re-create the sql
+                // statement
+                // and put it in here
+                // possibly done need to test, tbh 1/7/2005
+                FilterBean fb = (FilterBean) session.getAttribute("newFilter");
+                if (fb != null) {
+                    // FilterDAO fDAO = new FilterDAO(sm.getDataSource());
+                    dsb.setSQLStatement(dsb.getSQLStatement() + " " + fb.getSQLStatement());
+                }
+                // YW 2-21-2008 << editing dataset becomes creating a new
+                // dataset if dataset name has been changed.
+                if (dsb.getId() > 0 && !dsb.getName().equals(fp.getString("dsName"))) {
+                    dsb.setId(0);
+                }
+                // YW >>
+                dsb.setODMMetaDataVersionName(mdvName);
+                dsb.setODMMetaDataVersionOid(mdvOID);
+                dsb.setODMPriorMetaDataVersionOid(mdvPrevOID);
+                dsb.setODMPriorStudyOid(mdvPrevStudy);
+                dsb.setName(fp.getString("dsName"));
+                dsb.setDescription(fp.getString("dsDesc"));
+                dsb.setStatus(Status.get(fp.getInt("dsStatus")));
+                dsb.setDatasetItemStatus(DatasetItemStatus.get(fp.getInt("itemStatus")));
+                session.removeAttribute("partOfCreateDataset");
+                Date ddate = new SimpleDateFormat("MM/dd/yyyy").parse("01/01/1900");
+                // done to remove the set up of going to get the filter, tbh
+                // set up dataset here, grab primary key???!!!???
+                // added by jxu
+                request.setAttribute("defaultStart", local_df.parse(local_df.format(ddate)));
+                request.setAttribute("defaultEnd", getLastDayOfMonth(2100, 12));
+
+                DatasetDAO ddao = new DatasetDAO(sm.getDataSource());
+                dsb.setStudyId(this.currentStudy.getId());
+
+                dsb.setOwner(ub);
+                // dsb.setOwnerId(ub.getId());
+                //
+                // at this point, dataset itemId will still be kept
+                // uniquely.
+                dsb = finalUpateDatasetBean(dsb);
+                if (dsb.getId() == 0) {
+                    // if the bean hasn't been created already that is...
+                    logger.info("*** about to create the dataset bean");
+                    dsb = (DatasetBean) ddao.create(dsb);
+                    logger.info("created dataset bean: " + dsb.getId() + ", name: " + dsb.getName());
+                    if (!dsb.isActive()) {
+                        addPageMessage(restext.getString("problem_creating_dataset_try_again"));
+                        forwardPage(Page.EXTRACT_DATASETS_MAIN);
+                    }
+                }
+                // YW, 2-20-2008 << for editing existing dataset
+                else if (dsb.getId() > 0) {
+                    dsb = (DatasetBean) ddao.updateAll(dsb);
+                    if (!dsb.isActive()) {
+                        addPageMessage(restext.getString("problem_creating_dataset_try_again"));
+                        forwardPage(Page.EXTRACT_DATASETS_MAIN);
+                    }
+                    dsb = (DatasetBean) ddao.updateGroupMap(dsb);
+                    if (!dsb.isActive()) {
+                        addPageMessage(restext.getString("problem_updating_subject_group_class_when_updating_dataset"));
+                        forwardPage(Page.EXTRACT_DATASETS_MAIN);
+                    }
+                }
+                request.setAttribute("dataset", dsb);
+                request.setAttribute("extractProperties", CoreResources.getExtractProperties());
+                forwardPage(Page.EXPORT_DATASETS);
+            }
+
+        } else {
+            // refine this bit to catch errors, hopefully
+            addPageMessage(restext.getString("creating_new_dataset_cancelled"));
+            resetProcess();
+            forwardPage(Page.CREATE_DATASET_2);
         }
     }
 
@@ -708,6 +680,12 @@ public class CreateDatasetServlet extends SecureController {
         return new Date(c.getTimeInMillis());
     }
 
+    private void resetProcess() {
+        session.setAttribute("newDataset", new DatasetBean());
+        session.setAttribute("allItems", new ArrayList());
+        session.setAttribute("crf", new CRFBean());
+        session.setAttribute("allSelectedItems", new ArrayList());
+    }
     private ArrayList getMonths() {
         ArrayList answer = new ArrayList();
 

@@ -12,8 +12,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <title>Logout Page</title>
     <script src="http://code.jquery.com/jquery.js"></script>
+    <script type="text/javascript">
+        sessionStorage.setItem("returnUrl", '${returnUrl}');
+        window.location ='${logoutUrl}';
+    </script>
 </head>
 <body>
-<h1>Logout successful</h1>
 </body>
 </html>

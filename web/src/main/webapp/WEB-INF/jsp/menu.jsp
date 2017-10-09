@@ -49,6 +49,15 @@
 </style>
 
 <!-- then instructions-->
+<div id="box" class="dialog">
+<span id="mbm">
+    <br>
+     <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
+   </span><br>
+    <div style="text-align:center; width:100%;">
+        <button onclick="hm('box');">OK</button>
+    </div>
+</div>
 <tr id="sidebar_Instructions_open" style="display: all">
     <td class="sidebar_tab">
 
@@ -117,7 +126,7 @@
 </c:if>
 <span class="table_title_Admin" style="line-height:15px;">
 <a style="text-decoration: none;" href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />"><p style="padding-left:10px;"><fmt:message key="notes_assigned_to_me" bundle="${restext}"/>
-				<span name="flag_start" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>">: 0</p></a><br /><br />
+				<span name="flag_start" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"> 0</p></a><br /><br />
 </span>
 
 <c:if test="${userRole.investigator || userRole.researchAssistant || userRole.researchAssistant2}">

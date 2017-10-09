@@ -24,6 +24,11 @@
     </c:choose>
     <c:out value="${study.name}"/></a>
 
+    <br><br>  
+
+    <b><fmt:message key="status" bundle="${resword}"/>:</b>&nbsp;
+    <c:out value="${study.status.name}"/>
+
     <br><br>    
     <c:if test="${studySubject != null}">
     <b><a href="ViewStudySubject?id=<c:out value="${studySubject.id}"/>"><fmt:message key="study_subject_ID" bundle="${resword}"/></a>:</b>&nbsp; <c:out value="${studySubject.label}"/>

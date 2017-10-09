@@ -225,7 +225,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     media.setName(itemValue);
                     media.setFormLayout(formLayout);
                     media.setEventCrfId(container.getEventCrf().getEventCrfId());
-                    media.setPath("/" + container.getStudy().getOc_oid() + "/");
+                    media.setPath("attached_files/" + container.getStudy().getOc_oid() + "/");
 
                     formLayoutMediaDao.saveOrUpdate(media);
                 }

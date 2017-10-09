@@ -512,6 +512,11 @@ public class CoreResources implements ResourceLoaderAware {
         return null;
     }
 
+    public static Boolean isPublicStudySameAsTenantStudy (StudyBean tenantStudy, int publicStudyID, DataSource ds) {
+        StudyBean publicStudy = getPublicStudy(tenantStudy.getOid(), ds);
+        return publicStudy.getId() == publicStudyID;
+    }
+
     public static StudyBean getPublicStudy (String ocId, DataSource ds) {
         StudyDAO studyDAO = new StudyDAO(ds);
         HttpServletRequest request = getRequest();

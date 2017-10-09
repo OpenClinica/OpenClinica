@@ -56,6 +56,10 @@
 }
 .icon-calendar:before {
   content: "\e809";
+  background-color: #fff;
+}
+.icon-calendarGB:before {
+  content: "\e809";
 }
 .icon-plus:before {
   content: "\e80a";
@@ -104,6 +108,9 @@
 }
 .icon-icon-reassign2:before {
   content: "\e90b";
+}
+.icon-icon-reassign3:before {
+  content: "\e916";
 }
 .icon-icon-unArchive:before {
   content: "\e90c";

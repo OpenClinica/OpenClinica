@@ -69,7 +69,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
          */
         String schemaName = study.getOc_oid().replaceAll("\\(", "").replaceAll("\\)", "").toLowerCase();
         try {
-            study.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
+            study.setStatus(study.getStatus());
             study.setDateCreated(new Date());
             study.setSchemaName(schemaName);
             Integer studyId = (Integer) studyDao.save(study);

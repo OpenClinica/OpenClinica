@@ -533,7 +533,7 @@ public class SDVController {
             { resourceBundle.getString("study_subject_ID"), resourceBundle.getString("person_ID"), resourceBundle.getString("secondary_ID"),
               resourceBundle.getString("event_name"), resourceBundle.getString("event_date"), resourceBundle.getString("enrollment_date"),
               resourceBundle.getString("subject_status"),resourceBundle.getString("CRF_name")+" / "+resourceBundle.getString("version"),
-              resourceBundle.getString("CRF_status"),resourceBundle.getString("last_updated_date"), resourceBundle.getString("last_updated_by"),
+              resourceBundle.getString("view_CRF"),resourceBundle.getString("last_updated_date"), resourceBundle.getString("last_updated_by"),
               resourceBundle.getString("SDV_status")+" / "+resourceBundle.getString("actions") };
 
         setTitles(allTitles, table);

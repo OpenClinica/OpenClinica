@@ -1,20 +1,5 @@
 package org.akaza.openclinica.web.filter;
 
-import java.io.IOException;
-import java.io.UnsupportedEncodingException;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.Map;
-import java.util.StringTokenizer;
-
-import javax.servlet.FilterChain;
-import javax.servlet.ServletException;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
-import com.openclinica.jwtverifier.authentication.UserContext;
-import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -33,13 +18,21 @@ import org.springframework.security.oauth2.common.exceptions.InvalidTokenExcepti
 import org.springframework.security.oauth2.common.util.JsonParser;
 import org.springframework.security.oauth2.common.util.JsonParserFactory;
 import org.springframework.web.filter.OncePerRequestFilter;
-
 import sun.security.rsa.RSAPublicKeyImpl;
 
+import javax.servlet.FilterChain;
+import javax.servlet.ServletException;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import java.io.IOException;
 import java.io.InputStream;
+import java.io.UnsupportedEncodingException;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
-import java.util.logging.Logger;
+import java.util.LinkedHashMap;
+import java.util.Map;
+import java.util.StringTokenizer;
 
 /**
  * Created by krikorkrumlian on 8/7/15.

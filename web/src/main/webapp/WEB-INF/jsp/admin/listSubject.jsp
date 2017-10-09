@@ -60,7 +60,7 @@
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
-<h1><span class="title_manage"><fmt:message key="administer_subjects" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/administer-subjects')"><span class=""></span></a></span></h1>
+<h1><span class="title_manage"><fmt:message key="administer_subjects" bundle="${resworkflow}"/></span></h1><br/>
 
 <form  action="${pageContext.request.contextPath}/ListSubject">
         <input type="hidden" name="module" value="submit">

@@ -54,31 +54,28 @@
 
 
 <script language="JavaScript">
+  function leftnavExpand(strLeftNavRowElementName){
+     var objLeftNavRowElement;
 
-         function leftnavExpand(strLeftNavRowElementName){
-         var objLeftNavRowElement;
-
-           objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
-           if (objLeftNavRowElement != null) {
-             if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
-             objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
-               objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-               if(objLeftNavRowElement.display == "none"){
-                   objExCl.src = "images/bt_Expand.gif";
-               }else{
-                   objExCl.src = "images/bt_Collapse.gif";
-               }
+       objLeftNavRowElement = MM_findObj(strLeftNavRowElementName);
+       if (objLeftNavRowElement != null) {
+         if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
+         objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
+           objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
+           if(objLeftNavRowElement.display == "none"){
+               objExCl.src = "images/bt_Expand.gif";
+           }else{
+               objExCl.src = "images/bt_Collapse.gif";
            }
-           }
+       }
+  }
+</script>
 
+<h1><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1></br>
 
- </script>
-<h1 style="margin: 0em; "><span class="title_manage"><c:out value="${studyToView.name}"/></span></h1>
-
-
-<fmt:message key="download_study_meta" bundle="${restext}"/>.
-
-( <fmt:message key="" bundle="${restext}"/> <a href="ListStudySubjects">Subject Matrix</a>).
+<a style="text-decoration:none" href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"><fmt:message key="download_study_meta" bundle="${restext}"/></a>.
+<fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
+<a style="text-decoration:none" href="ListStudySubjects">Subject Matrix</a>.
 
 <br><br>
 <a href="javascript:leftnavExpand('overview');" style="text-decoration:none;">
@@ -94,7 +91,7 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="name" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.name}"/>
   </td></tr>
-  <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><fmt:message key="unique_protocol_ID" bundle="${resword}"/></a>:</td><td class="table_cell">
+  <tr valign="top"><td class="table_header_column"><a style="text-decoration:none" href="http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#PrimaryId'); return false;"><fmt:message key="unique_protocol_ID" bundle="${resword}"/></a>:</td><td class="table_cell">
   <c:out value="${studyToView.identifier}"/>
   </td></tr>
    <tr valign="top"><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_cell">
@@ -654,9 +651,9 @@
             <fmt:message key="${studyToView.studyParameterConfig.eventLocationRequired}" bundle="${resword}"/>
        </td>
     </tr>
-    
-    
-    <c:if test="${portalURL!= '' && portalURL!= null}">   
+
+
+    <c:if test="${portalURL!= '' && portalURL!= null}">
     <tr valign="top">
         <td class="table_header_column"><fmt:message key="participant_portal" bundle="${resword}"/></td>
         <td class="table_cell">
@@ -664,7 +661,7 @@
        </td>
       </tr>
    </c:if>
-    
+
 
     <c:if test="${moduleManager!= '' && moduleManager!= null}">
     <tr valign="top">
@@ -674,7 +671,7 @@
        </td>
       </tr>
    </c:if>
-    
+
 </table>
 
 </div>

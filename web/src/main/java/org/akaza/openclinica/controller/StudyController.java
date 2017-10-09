@@ -1,14 +1,44 @@
 package org.akaza.openclinica.controller;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.time.LocalTime;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Map;
+import java.util.ResourceBundle;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.*;
+import org.akaza.openclinica.bean.login.ErrorObject;
+import org.akaza.openclinica.bean.login.EventDefinitionDTO;
+import org.akaza.openclinica.bean.login.FacilityInfo;
+import org.akaza.openclinica.bean.login.ResponseSuccessEventDefDTO;
+import org.akaza.openclinica.bean.login.ResponseSuccessSiteDTO;
+import org.akaza.openclinica.bean.login.ResponseSuccessStudyDTO;
+import org.akaza.openclinica.bean.login.SiteDTO;
+import org.akaza.openclinica.bean.login.StudyDTO;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.login.UserRole;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.controller.dto.SiteStatusDTO;
+import org.akaza.openclinica.controller.dto.StudyEnvStatusDTO;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
 import org.akaza.openclinica.controller.helper.OCUserDTO;
 import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
@@ -38,34 +68,40 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalTime;
-import java.util.*;
-import java.util.regex.Matcher;
-import java.util.regex.Pattern;
-
-@Controller @RequestMapping(value = "/auth/api/v1/studies") public class StudyController {
+@Controller
+@RequestMapping(value = "/auth/api/v1/studies")
+public class StudyController {
 
     public static ResourceBundle resadmin, resaudit, resexception, resformat, respage, resterm, restext, resword, resworkflow;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    @Autowired UserAccountController userAccountController;
+    @Autowired
+    UserAccountController userAccountController;
     UserAccountDAO udao;
     StudyDAO sdao;
     StudyEventDefinitionDAO seddao;
-    @Autowired @Qualifier("dataSource") private DataSource dataSource;
-    @Autowired private StudyDao studyDao;
-    @Autowired private StudyUserRoleDao studyUserRoleDao;
-    @Autowired private StudyBuildService studyBuildService;
-    @Autowired private LiquibaseOnDemandService liquibaseOnDemandService;
-    @Autowired private SiteBuildService siteBuildService;
-    @Autowired private SchemaCleanupService schemaCleanupService;
-    @Autowired StudyParameterDao studyParameterDao;
+    @Autowired
+    @Qualifier("dataSource")
+    private DataSource dataSource;
+    @Autowired
+    private StudyDao studyDao;
+    @Autowired
+    private StudyUserRoleDao studyUserRoleDao;
+    @Autowired
+    private StudyBuildService studyBuildService;
+    @Autowired
+    private LiquibaseOnDemandService liquibaseOnDemandService;
+    @Autowired
+    private SiteBuildService siteBuildService;
+    @Autowired
+    private SchemaCleanupService schemaCleanupService;
+    @Autowired
+    StudyParameterDao studyParameterDao;
 
 
     private static final String validation_failed_message = "VALIDATION FAILED";
@@ -142,28 +178,97 @@ import java.util.regex.Pattern;
      * }
      */
 
-    @RequestMapping(value = "/{studyOid}/changeStatus/{status}", method = RequestMethod.POST) public ResponseEntity<Object> changeStudyStatus(
-            @PathVariable("studyOid") String studyOid, @PathVariable("status") int status, HttpServletRequest request) {
-        UserAccountBean ub = getStudyOwnerAccount(request);
+    @RequestMapping(value = "/{studyEnvUuid}/status", method = RequestMethod.PUT)
+    public ResponseEntity<Object> changeStudyStatus(
+            @RequestBody HashMap<String, Object> requestDTO,
+            @PathVariable("studyEnvUuid") String studyEnvUuid,
+            HttpServletRequest request) {
 
+        ResponseEntity response = null;
+        ArrayList<ErrorObject> errorObjects = new ArrayList<ErrorObject>();
+        StudyDTO studyDTO = new StudyDTO();
+
+        // Set the locale, status object needs this
+        Locale locale = new Locale("en_US");
+        request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
+        ResourceBundleProvider.updateLocale(locale);
+
+        UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
         if (ub == null)
             return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
+
+        // Get public study
         StudyDAO studyDAO = new StudyDAO(dataSource);
-        StudyBean currentPublicStudy = studyDAO.findByOid(studyOid);
-        String schema = currentPublicStudy.getSchemaName();
-        CoreResources.setRequestSchema(request, schema);
-        StudyDAO studyDAO1 = new StudyDAO(dataSource);
-        StudyBean currentStudy = studyDAO1.findByOid(studyOid);
-        currentStudy.setOldStatus(currentPublicStudy.getStatus());
-        currentStudy.setStatus(Status.get(status));
+        StudyBean currentPublicStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
+        // Get tenant study
+        String tenantSchema = currentPublicStudy.getSchemaName();
+        CoreResources.setRequestSchema(request, tenantSchema);
+        StudyBean currentStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
+        // Validate study exists
+        if (currentPublicStudy == null || currentStudy == null) {
+            ErrorObject errorObject = createErrorObject("Study Object", "Missing or invalid", "studyEnvUuid");
+            errorObjects.add(errorObject);
+            studyDTO.setErrors(errorObjects);
+            studyDTO.setMessage(validation_failed_message);
+            return new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+        if (ub != null){
+            if (!isDataManagerOrStudyDirector(ub,currentPublicStudy)){
+                return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
+            }
+        }
+        // Get Status object from requestDTO
+        Status status = getStatus((String) requestDTO.get("status"));
+        // Validate status field
+        if (status == null ) {
+            ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "status");
+            errorObjects.add(errorObject);
+            studyDTO.setErrors(errorObjects);
+            studyDTO.setMessage(validation_failed_message);
+            return new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        } else if (!status.equals(Status.PENDING)
+                && !status.equals(Status.AVAILABLE)
+                && !status.equals(Status.FROZEN)
+                && !status.equals(Status.LOCKED) ){
+            ErrorObject errorObject = createErrorObject("Study Object", "Invalid status", "status");
+            errorObjects.add(errorObject);
+            studyDTO.setErrors(errorObjects);
+            studyDTO.setMessage(validation_failed_message);
+            return new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        }
+
+
+        // Update tenant study & sites
+        currentStudy.setOldStatus(currentStudy.getStatus());
+        currentStudy.setStatus(status);
         studyDAO.updateStudyStatus(currentStudy);
         ArrayList siteList = (ArrayList) studyDAO.findAllByParent(currentStudy.getId());
         if (siteList.size() > 0) {
             studyDAO.updateSitesStatus(currentStudy);
         }
 
-        return new ResponseEntity<Object>("Success", HttpStatus.OK);
+        // Update public study & sites
+        CoreResources.setRequestSchema(request, "public");
+        currentPublicStudy.setOldStatus(currentPublicStudy.getStatus());
+        currentPublicStudy.setStatus(status);
+        studyDAO.updateStudyStatus(currentPublicStudy);
+        ArrayList publicSiteList = (ArrayList) studyDAO.findAllByParent(currentPublicStudy.getId());
+        if (publicSiteList.size() > 0) {
+            studyDAO.updateSitesStatus(currentPublicStudy);
+        }
 
+        StudyEnvStatusDTO studyEnvStatusDTO = new StudyEnvStatusDTO();
+        studyEnvStatusDTO.setStudyEnvUuid(currentPublicStudy.getStudyEnvUuid());
+        studyEnvStatusDTO.setStatus(currentPublicStudy.getStatus().getName());
+        ArrayList updatedPublicSiteList = (ArrayList) studyDAO.findAllByParent(currentPublicStudy.getId());
+        for(StudyBean site:  (ArrayList<StudyBean>)updatedPublicSiteList){
+            SiteStatusDTO siteStatusDTO = new SiteStatusDTO();
+            siteStatusDTO.setSiteUuid(site.getStudyEnvSiteUuid());
+            siteStatusDTO.setStatus(site.getStatus().getName());
+            studyEnvStatusDTO.getSiteStatuses().add(siteStatusDTO);
+        }
+
+        return  new ResponseEntity(studyEnvStatusDTO, org.springframework.http.HttpStatus.OK);
     }
 
     private StudyParameterConfig processStudyConfigParameters(HashMap<String, Object> map, ArrayList<ErrorObject> errorObjects) {
@@ -192,8 +297,10 @@ import java.util.regex.Pattern;
         spc.setSubjectPersonIdRequired(collectPersonId);
         return spc;
     }
-    @RequestMapping(value = "/", method = RequestMethod.PUT) public ResponseEntity<Object> UpdateStudy(HttpServletRequest request,
-            @RequestBody HashMap<String, Object> map) throws Exception {
+
+    @RequestMapping(value = "/", method = RequestMethod.PUT)
+    public ResponseEntity<Object> UpdateStudy(HttpServletRequest request,
+                                              @RequestBody HashMap<String, Object> map) throws Exception {
         ArrayList<ErrorObject> errorObjects = new ArrayList();
         StudyDTO studyDTO = new StudyDTO();
         logger.info("In Update Study Settings");
@@ -249,6 +356,8 @@ import java.util.regex.Pattern;
         Date startDate;
         Date endDate;
         StudyParameterConfig studyParameterConfig;
+        org.akaza.openclinica.domain.Status status;
+
 
         public StudyParameters(HashMap<String, Object> map) {
             this.map = map;
@@ -265,6 +374,19 @@ import java.util.regex.Pattern;
             startDateStr = (String) map.get("expectedStartDate");
             endDateStr = (String) map.get("expectedEndDate");
             expectedTotalEnrollment = (Integer) map.get("expectedTotalEnrollment");
+            status = setStatus((String) map.get("status"));
+        }
+
+        org.akaza.openclinica.domain.Status setStatus(String myStatus) {
+
+            // set status object if no status pass default it to "PENDING"
+            org.akaza.openclinica.domain.Status statusObj = org.akaza.openclinica.domain.Status.PENDING;
+
+            if (myStatus != null) {
+                myStatus = myStatus.equals("DESIGN") ? "PENDING" : myStatus;
+                statusObj = org.akaza.openclinica.domain.Status.getByName(myStatus);
+            }
+            return statusObj;
         }
 
         ArrayList<ErrorObject> validateParameters(HttpServletRequest request) throws ParseException {
@@ -310,7 +432,7 @@ import java.util.regex.Pattern;
             }
             endDate = formatDateString(endDateStr, "EndDate", errorObjects);
 
-            if (studyType != null ) {
+            if (studyType != null) {
                 studyType = studyType.toLowerCase();
                 if (!verifyStudyTypeExist(studyType)) {
                     ErrorObject errorObject = createErrorObject("Study Object", "Study Type is not Valid", "StudyType");
@@ -331,6 +453,18 @@ import java.util.regex.Pattern;
             } else {
                 studyEnvUuid = studyEnvUuid.trim();
             }
+
+            if (status == null ) {
+                ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "status");
+                errorObjects.add(errorObject);
+            } else if (!status.equals(org.akaza.openclinica.domain.Status.PENDING)
+                    && !status.equals(org.akaza.openclinica.domain.Status.AVAILABLE)
+                    && !status.equals(org.akaza.openclinica.domain.Status.FROZEN)
+                    && !status.equals(org.akaza.openclinica.domain.Status.LOCKED) ){
+                ErrorObject errorObject = createErrorObject("Study Object", "Invalid status", "status");
+                errorObjects.add(errorObject);
+            }
+
             studyParameterConfig = processStudyConfigParameters(map, errorObjects);
             Locale locale = new Locale("en_US");
             request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
@@ -369,8 +503,9 @@ import java.util.regex.Pattern;
         }
     }
 
-    @RequestMapping(value = "/", method = RequestMethod.POST) public ResponseEntity<Object> createNewStudy(HttpServletRequest request,
-            @RequestBody HashMap<String, Object> map) throws Exception {
+    @RequestMapping(value = "/", method = RequestMethod.POST)
+    public ResponseEntity<Object> createNewStudy(HttpServletRequest request,
+                                                 @RequestBody HashMap<String, Object> map) throws Exception {
         StudyDTO studyDTO = new StudyDTO();
         logger.info("In Create Study");
         ResponseEntity<Object> response = null;
@@ -462,6 +597,10 @@ import java.util.regex.Pattern;
         study.setDatePlannedEnd(parameters.endDate);
         study.setExpectedTotalEnrollment(parameters.expectedTotalEnrollment);
         study.setProtocolType(parameters.studyType.toLowerCase());
+        if(study.getStatus() != null){
+            study.setOldStatusId(study.getStatus().getCode());
+        }
+        study.setStatus(parameters.status);
     }
 
     private Study createSchemaStudy(HttpServletRequest request, Study study, UserAccountBean ownerUserAccount) throws Exception {
@@ -486,7 +625,7 @@ import java.util.regex.Pattern;
     private void updateStudyConfigParameters(HttpServletRequest request, Study schemaStudy, StudyParameterConfig studyParameterConfig) {
         List<StudyParameterValue> studyParameterValues = schemaStudy.getStudyParameterValues();
 
-        for (StudyParameterValue spv: studyParameterValues) {
+        for (StudyParameterValue spv : studyParameterValues) {
             switch (spv.getStudyParameter().getHandle()) {
                 case "collectDob":
                     String collectDobValue;
@@ -494,15 +633,15 @@ import java.util.regex.Pattern;
                         collectDobValue = "3";
                     } else {
                         switch (studyParameterConfig.getCollectDob().toLowerCase()) {
-                        case "always":
-                            collectDobValue= "1";
-                            break;
-                        case "only the year":
-                            collectDobValue ="2";
-                            break;
-                        default:
-                            collectDobValue = "3";
-                            break;
+                            case "always":
+                                collectDobValue = "1";
+                                break;
+                            case "only_the_year":
+                                collectDobValue = "2";
+                                break;
+                            default:
+                                collectDobValue = "3";
+                                break;
                         }
                     }
                     spv.setValue(collectDobValue);
@@ -547,22 +686,23 @@ import java.util.regex.Pattern;
     }
 
     private String handlePersonIdRequired(String input) {
-        String outputStr ="";
-        switch(input.toLowerCase()) {
-        case "always":
-            outputStr = "required";
-            break;
-        case "optional":
-            outputStr = "optional";
-            break;
-        case "never":
-            outputStr = "never";
-            break;
-        default:
-            break;
+        String outputStr = "";
+        switch (input.toLowerCase()) {
+            case "always":
+                outputStr = "required";
+                break;
+            case "optional":
+                outputStr = "optional";
+                break;
+            case "never":
+                outputStr = "never";
+                break;
+            default:
+                break;
         }
         return outputStr;
     }
+
     private void setStudyConfigParameters(HttpServletRequest request, Study study, Study schemaStudy, StudyParameterConfig studyParameterConfig) {
         String schema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, study.getSchemaName());
@@ -577,15 +717,15 @@ import java.util.regex.Pattern;
             collectDobValue.setValue("3");
         } else {
             switch (studyParameterConfig.getCollectDob().toLowerCase()) {
-            case "always":
-                collectDobValue.setValue("1");
-                break;
-            case "only the year":
-                collectDobValue.setValue("2");
-                break;
-            default:
-                collectDobValue.setValue("3");
-                break;
+                case "always":
+                    collectDobValue.setValue("1");
+                    break;
+                case "only_the_year":
+                    collectDobValue.setValue("2");
+                    break;
+                default:
+                    collectDobValue.setValue("3");
+                    break;
             }
         }
         studyParameterValues.add(collectDobValue);
@@ -748,17 +888,17 @@ import java.util.regex.Pattern;
         HashMap<String, String> map = new HashMap<>();
         ArrayList<LinkedHashMap<String, String>> roles = new ArrayList<>();
 
-        for (StudyEnvironmentRoleDTO role: studyUserRoles.getBody()) {
-            LinkedHashMap<String,String> studyRole = new LinkedHashMap<>();
-            studyRole.put("roleName",role.getRoleName());
-            studyRole.put("studyEnvUuid",role.getStudyEnvironmentUuid());
+        for (StudyEnvironmentRoleDTO role : studyUserRoles.getBody()) {
+            LinkedHashMap<String, String> studyRole = new LinkedHashMap<>();
+            studyRole.put("roleName", role.getRoleName());
+            studyRole.put("studyEnvUuid", role.getStudyEnvironmentUuid());
             roles.add(studyRole);
             if (role.getStudyEnvironmentUuid().equals(studyEnvUuid)) {
                 map.put("role_name", role.getRoleName());
                 UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
                 String userUuid = (String) userContextMap.get("userUuid");
                 if ((ub == null || ub.getId() == 0)
-                    || (StringUtils.isNotEmpty(userUuid) &&
+                        || (StringUtils.isNotEmpty(userUuid) &&
                         StringUtils.equals(ub.getUserUuid(), userUuid) != true)) {
                     ResponseEntity<OCUserDTO> userInfo = studyBuildService.getUserDetails(request);
                     if (userInfo == null)
@@ -782,28 +922,29 @@ import java.util.regex.Pattern;
                 }
             }
         }
-        userContextMap.put("roles",roles);
+        userContextMap.put("roles", roles);
         switch ((String) userContextMap.get("userType")) {
-        case "Business Admin":
-            map.put("user_type", UserType.SYSADMIN.getName());
-            break;
-        case "Tech Admin":
-            map.put("user_type", UserType.TECHADMIN.getName());
-            break;
-        case "User":
-            map.put("user_type", UserType.USER.getName());
-            break;
-        default:
-            String error = "Invalid userType:" + (String) userContextMap.get("userType");
-            logger.error(error);
-            throw new Exception(error);
+            case "Business Admin":
+                map.put("user_type", UserType.SYSADMIN.getName());
+                break;
+            case "Tech Admin":
+                map.put("user_type", UserType.TECHADMIN.getName());
+                break;
+            case "User":
+                map.put("user_type", UserType.USER.getName());
+                break;
+            default:
+                String error = "Invalid userType:" + (String) userContextMap.get("userType");
+                logger.error(error);
+                throw new Exception(error);
         }
         map.put("authorize_soap", "false");
         return map;
     }
 
-    @RequestMapping(value = "/asyncStudyStatus", method = RequestMethod.GET) public ResponseEntity<Object> getAyncStudyStatus(HttpServletRequest request,
-            @RequestParam("uniqueId") String uniqueId) throws Exception {
+    @RequestMapping(value = "/asyncStudyStatus", method = RequestMethod.GET)
+    public ResponseEntity<Object> getAyncStudyStatus(HttpServletRequest request,
+                                                     @RequestParam("uniqueId") String uniqueId) throws Exception {
         ResponseEntity<Object> response;
 
         AsyncStudyHelper asyncStudyHelper = AsyncStudyHelper.get(uniqueId);
@@ -909,6 +1050,7 @@ import java.util.regex.Pattern;
             studyVerificationDate = (String) map.get("studyVerificationDate");
             startDate = (String) map.get("startDate");
         }
+
         ArrayList<ErrorObject> validateParameters(HttpServletRequest request) throws ParseException {
             ArrayList<ErrorObject> errorObjects = new ArrayList();
 
@@ -1075,6 +1217,7 @@ import java.util.regex.Pattern;
         }
 
     }
+
     /**
      * @api {post} /pages/auth/api/v1/studies/:studyEnvUuid/sites Create a site
      * @apiName createNewSite
@@ -1151,8 +1294,9 @@ import java.util.regex.Pattern;
             "status":"available|frozen|pending|locked"
     }
 */
-    @RequestMapping(value = "/{studyEnvUuid}/sites", method = RequestMethod.POST) public ResponseEntity<Object> createNewSites(HttpServletRequest request,
-            @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
+    @RequestMapping(value = "/{studyEnvUuid}/sites", method = RequestMethod.POST)
+    public ResponseEntity<Object> createNewSites(HttpServletRequest request,
+                                                 @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
         logger.debug("Creating site(s) for study:" + studyEnvUuid);
         StudyBean siteBean = null;
         ResponseEntity<Object> response = null;
@@ -1200,8 +1344,9 @@ import java.util.regex.Pattern;
 
     }
 
-    @RequestMapping(value = "/{studyEnvUuid}/sites", method = RequestMethod.PUT) public ResponseEntity<Object> updateSiteSettings(HttpServletRequest request,
-            @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
+    @RequestMapping(value = "/{studyEnvUuid}/sites", method = RequestMethod.PUT)
+    public ResponseEntity<Object> updateSiteSettings(HttpServletRequest request,
+                                                     @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
         logger.debug("Updating site settings for study:" + studyEnvUuid);
         ResponseEntity<Object> response = null;
 
@@ -1291,7 +1436,8 @@ import java.util.regex.Pattern;
      * "eventDefOid": "SE_EVENTNAME"
      * }
      */
-    @RequestMapping(value = "/{uniqueStudyID}/eventdefinitions", method = RequestMethod.POST) public ResponseEntity<Object> createEventDefinition(
+    @RequestMapping(value = "/{uniqueStudyID}/eventdefinitions", method = RequestMethod.POST)
+    public ResponseEntity<Object> createEventDefinition(
             HttpServletRequest request, @RequestBody HashMap<String, Object> map, @PathVariable("uniqueStudyID") String uniqueStudyID) throws Exception {
         logger.debug("In Create Event Definition ");
         StudyBean publicStudy = getStudyByUniqId(uniqueStudyID);
@@ -1465,7 +1611,7 @@ import java.util.regex.Pattern;
     }
 
     public StudyEventDefinitionBean buildEventDefBean(String name, String description, String category, String type, String repeating, UserAccountBean owner,
-            StudyBean parentStudy) {
+                                                      StudyBean parentStudy) {
 
         StudyEventDefinitionBean sed = new StudyEventDefinitionBean();
         seddao = new StudyEventDefinitionDAO(dataSource);
@@ -1495,6 +1641,7 @@ import java.util.regex.Pattern;
         study.setOid(parameters.ocOid);
         study.setIdentifier(parameters.uniqueIdentifier);
         study.setParentStudyId(parameters.parentStudy.getId());
+        study.setPublished(parameters.parentStudy.isPublished());
         study.setOwner(parameters.ownerUserAccount);
         setChangeableSiteSettings(study, parameters);
         return study;
@@ -1515,6 +1662,7 @@ import java.util.regex.Pattern;
         study.setFacilityContactPhone(parameters.facilityInfo.getFacilityPhone());
         study.setFacilityContactEmail(parameters.facilityInfo.getFacilityEmail());
     }
+
     public StudyBean createStudy(StudyBean studyBean, UserAccountBean owner) {
         sdao = new StudyDAO(dataSource);
         StudyBean sBean = (StudyBean) sdao.create(studyBean);
@@ -1581,6 +1729,18 @@ import java.util.regex.Pattern;
         return studyBean;
     }
 
+    public Boolean isDataManagerOrStudyDirector(UserAccountBean userAccount, StudyBean currentStudy){
+
+        long result = userAccount.getRoles()
+                .stream()
+                .filter(role -> currentStudy.getId() == (role.getStudyId())
+                        && (role.getRole().equals(Role.STUDYDIRECTOR)
+                                || role.getRole().equals(Role.COORDINATOR)))
+                .count();
+
+        return result > 0;
+    }
+
 
     public UserAccountBean getStudyOwnerAccount(HttpServletRequest request) {
         UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -1625,7 +1785,7 @@ import java.util.regex.Pattern;
     }
 
     public StudyDTO buildStudyDTO(String uniqueStudyID, String name, String briefSummary, String principalInvestigator, String sponsor,
-            String expectedTotalEnrollment, String studyType, String status, String startDate, ArrayList<UserRole> userList) {
+                                  String expectedTotalEnrollment, String studyType, String status, String startDate, ArrayList<UserRole> userList) {
         if (status != null) {
             if (status.equals(""))
                 status = "design";
@@ -1654,7 +1814,7 @@ import java.util.regex.Pattern;
     }
 
     public SiteDTO buildSiteDTO(String uniqueSiteStudyID, String name, String principalInvestigator,
-            Integer expectedTotalEnrollment, Status status, FacilityInfo facilityInfo) {
+                                Integer expectedTotalEnrollment, Status status, FacilityInfo facilityInfo) {
 
         SiteDTO siteDTO = new SiteDTO();
         siteDTO.setUniqueSiteProtocolID(uniqueSiteStudyID);
@@ -1678,7 +1838,7 @@ import java.util.regex.Pattern;
     }
 
     public StudyBean buildStudyBean(String uniqueStudyId, String name, String briefSummary, String principalInvestigator, String sponsor,
-            int expectedTotalEnrollment, String studyType, String status, Date startDate, UserAccountBean owner) {
+                                    int expectedTotalEnrollment, String studyType, String status, Date startDate, UserAccountBean owner) {
 
         StudyBean study = new StudyBean();
         ResourceBundle resadmin = org.akaza.openclinica.i18n.util.ResourceBundleProvider.getAdminBundle();
@@ -1754,6 +1914,18 @@ import java.util.regex.Pattern;
             return Role.RESEARCHASSISTANT2;
         } else
             return null;
+    }
+
+
+    private Status getStatus(String myStatus) {
+
+        Status statusObj = null;
+
+        if (myStatus != null) {
+            myStatus = myStatus.equals("DESIGN") ? "PENDING" : myStatus;
+            statusObj = Status.getByName(myStatus.toLowerCase());
+        }
+        return statusObj;
     }
 
 }

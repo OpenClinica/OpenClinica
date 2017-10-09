@@ -131,7 +131,7 @@
                                 </td>
                                 <td>
                                     <a href="ViewCRFVersion?id=<c:out value="${version.id}"/>"><span
-                                            name="bt_Metadata" class="icon icon-pencil" border="0" alt="Metadata" title="Metadata" align="left" hspace="6"></a>
+                                            name="bt_Metadata" class="icon icon-icon-doubleDataEntry orange" border="0" alt="Metadata" title="Metadata" align="left" hspace="6"></a>
 
                                 </td>
                             </tr>

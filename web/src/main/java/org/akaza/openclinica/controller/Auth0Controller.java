@@ -40,7 +40,7 @@ public class Auth0Controller {
     public String buildAuthorizeUrl(HttpServletRequest request, boolean sso) {
         int port = request.getServerPort();
         String portStr ="";
-        if (port != 80) {
+        if (port != 80 && port != 443) {
             portStr = ":" + port;
         }
         String redirectUri = request.getScheme() + "://" + request.getServerName() + portStr + request.getContextPath() + "/pages/callback";

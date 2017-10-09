@@ -21,11 +21,13 @@ import java.io.UnsupportedEncodingException;
 
 @SuppressWarnings("unused")
 @Configuration
-@EnableWebSecurity
+@EnableWebSecurity (debug = false)
+@EnableGlobalMethodSecurity(prePostEnabled = true)
 @PropertySources({
         @PropertySource("classpath:auth0.properties")
 })
-@EnableGlobalMethodSecurity(securedEnabled = true, jsr250Enabled = true)
+@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+
 public class AppConfig extends WebSecurityConfigurerAdapter {
     /**
      * This is your auth0 domain (tenant you have created when registering with auth0 - account name)
@@ -84,6 +86,7 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers(securedRoute).hasAnyAuthority("ROLE_USER")
                 .antMatchers(securedRoute).authenticated();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER);
+        http.csrf().disable();
     }
 
     public String getDomain() {
