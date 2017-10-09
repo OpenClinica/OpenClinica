@@ -180,7 +180,7 @@
   <c:out value="${studyToView.facilityContactEmail}"/>&nbsp;
   </td></tr>
 
-  <tr bgcolor="#F5F5F5"><td class="table_header_column" colspan="2"><b><fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="study_parameter_configuration" bundle="${resword}"/></b></td></tr>
+  <tr bgcolor="#F5F5F5"><td class="table_header_column" colspan="2"><b><fmt:message key="section" bundle="${resword}"/> E: <fmt:message key="study_parameter_configuration" bundle="${resword}"/></b></td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject" bundle="${resword}"/></td>
    <td class="table_cell">
