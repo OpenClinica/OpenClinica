@@ -1,21 +1,23 @@
 package org.akaza.openclinica.service;
 
-import org.springframework.validation.Errors;
+import java.util.List;
+
+import org.akaza.openclinica.service.crfdata.ErrorObj;
 
 public class CustomRuntimeException extends RuntimeException {
-    private Errors errors;
+    List<ErrorObj> errList;
 
-    public CustomRuntimeException(String message, Errors errors) {
+    public CustomRuntimeException(String message, List<ErrorObj> errList) {
         super(message);
-        this.errors = errors;
+        this.errList = errList;
     }
 
-    public Errors getErrors() {
-        return errors;
+    public List<ErrorObj> getErrList() {
+        return errList;
     }
 
-    public void setErrors(Errors errors) {
-        this.errors = errors;
+    public void setErrList(List<ErrorObj> errList) {
+        this.errList = errList;
     }
 
 }

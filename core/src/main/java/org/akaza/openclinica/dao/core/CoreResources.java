@@ -399,6 +399,16 @@ public class CoreResources implements ResourceLoaderAware {
             supportURL = "https://www.openclinica.com/support";
         DATAINFO.setProperty("supportURL", supportURL);
 
+        String walkmeURL = DATAINFO.getProperty("walkme.url");
+        if (walkmeURL == null || walkmeURL.isEmpty())
+            walkmeURL = "https://ineedawalkme.url";
+        DATAINFO.setProperty("walkmeURL", walkmeURL);
+
+        String piwikURL = DATAINFO.getProperty("piwik.url");
+        if (piwikURL == null || piwikURL.isEmpty())
+            piwikURL = "https://ineedapiwik.url";
+        DATAINFO.setProperty("piwikURL", piwikURL);
+
         DATAINFO.setProperty("show_unique_id", "1");
 
         DATAINFO.setProperty("auth_mode", "password");
@@ -707,7 +717,7 @@ public class CoreResources implements ResourceLoaderAware {
         }
 
         /*
-         * 
+         *
          * for (Resource r: resources) { File f = new File(dest, r.getFilename()); if(!f.exists()){ out = new
          * FileOutputStream(f); IOUtils.copy(r.getInputStream(), out); out.close(); } }
          */

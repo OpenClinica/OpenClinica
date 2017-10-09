@@ -572,7 +572,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
             workbook.write();
             workbook.close();
             session.setAttribute("subject", null);
-            session.setAttribute("study", null);
             session.setAttribute("studySub", null);
             session.setAttribute("studyEventAudits", null);
             session.setAttribute("studySubjectAudits", null);
