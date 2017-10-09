@@ -51,6 +51,6 @@
 		<jsp:include page="include/footer.jsp"/>
 	</c:when>
 	<c:otherwise>
-		<jsp:include page="login-include/login-footer.jsp"/>
+		<jsp:include page="login-include/error-login-footer.jsp"/>
 	</c:otherwise>
 </c:choose>
