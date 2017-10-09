@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ page import="org.akaza.openclinica.i18n.util.ResourceBundleProvider" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
@@ -112,7 +113,7 @@
                         <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
                     </c:otherwise>
                 </c:choose>
-                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;(<c:out value="${study.envType}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
+                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;<span class="stat-tag status-${fn:toLowerCase(study.envType)}"></span>&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy">Change</a>
 
             </div>

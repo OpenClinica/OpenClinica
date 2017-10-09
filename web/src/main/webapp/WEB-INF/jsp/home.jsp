@@ -13,6 +13,17 @@
 <body>
 
 <script type="text/javascript">
+    function getParameterByName(name, url) {
+        if (!url) url = window.location.href;
+        name = name.replace(/[\[\]]/g, "\\$&");
+        var regex = new RegExp("[?&]" + name + "(=([^&#]*)|&|#|$)"),
+            results = regex.exec(url);
+        if (!results) return null;
+        if (!results[2]) return '';
+        return decodeURIComponent(results[2].replace(/\+/g, " "));
+    }
+
+
     // hide the page in case there is an SSO session (to avoid flickering)
     $('body').hide();
     var auth0Logout = function () {
@@ -23,13 +34,15 @@
         return auth0.logout(options, {version: 'v2'});
     };
     <sec:authorize var="authenticated" access="isAuthenticated()" />
-    var urlParams = new URLSearchParams(window.location.search);
-    var extUrl = urlParams.get('externalReturnUrl');
+    //var urlParams = new URLSearchParams(window.location.search);
+    //var extUrl = urlParams.get('externalReturnUrl');
+    var extUrl = getParameterByName('externalReturnUrl');
     var studyParam = '';
     if (extUrl != null && extUrl.indexOf("?studyEnvUuid=") > 0) {
         studyParam = extUrl.substr(extUrl.indexOf("?studyEnvUuid="));
     } else {
-        var tempStudy = urlParams.get('studyEnvUuid');
+        //var tempStudy = urlParams.get('studyEnvUuid');
+        var tempStudy = getParameterByName('studyEnvUuid');
         if (tempStudy != null) {
             studyParam = "?studyEnvUuid=" + tempStudy;
         }
