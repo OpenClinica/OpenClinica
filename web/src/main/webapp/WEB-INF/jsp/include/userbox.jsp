@@ -89,7 +89,7 @@
 
 				<div style="position: absolute; z-index: 3;">
 				<span class="logout"><a href="ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a></span>
-				<span class="logout"><a href="pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></span>
+				<span class="logout"><a href="${pageContext.request.contextPath}/pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></span>
 	          	</div>
 	          	<br>
 				</div>
