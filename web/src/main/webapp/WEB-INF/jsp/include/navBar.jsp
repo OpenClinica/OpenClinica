@@ -126,7 +126,6 @@
                         <ul class="dropdown_BG">
                             <li><a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a></li>
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a></li>
-                            <li> <a href="${urlPrefix}pages/UpdateProfile"><fmt:message key="nav_update_profile" bundle="${resword}"/></a></li>
                             <li> <a href="${urlPrefix}pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
                         </ul>
                         </li>
