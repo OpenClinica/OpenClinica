@@ -459,7 +459,7 @@
    <td class="table_cell_left">
     <c:out value="${user.userName}"/>
    </td>
-    <td class="table_cell"><c:out value="${user.firstName}"/></td>F:
+    <td class="table_cell"><c:out value="${user.firstName}"/></td>
       <td class="table_cell"><c:out value="${user.lastName}"/></td>
       <td class="table_cell"><c:out value="${user.role.description}"/></td>
       <td class="table_cell"><c:out value="${user.studyName}"/></td>
@@ -484,4 +484,3 @@
 </div>
 
 <jsp:include page="../include/footer.jsp"/>
-F
