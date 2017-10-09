@@ -276,7 +276,7 @@
 <br>
 
 <a href="javascript:leftnavExpand('sectionf');" style="text-decoration:none;">
-    <img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> F: <fmt:message key="study_parameter_configuration" bundle="${resword}"/>]</span></a>
+    <img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> E: <fmt:message key="study_parameter_configuration" bundle="${resword}"/>]</span></a>
 <div id="sectionf" style="display:none ">
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -459,7 +459,7 @@
    <td class="table_cell_left">
     <c:out value="${user.userName}"/>
    </td>
-    <td class="table_cell"><c:out value="${user.firstName}"/></td>
+    <td class="table_cell"><c:out value="${user.firstName}"/></td>F:
       <td class="table_cell"><c:out value="${user.lastName}"/></td>
       <td class="table_cell"><c:out value="${user.role.description}"/></td>
       <td class="table_cell"><c:out value="${user.studyName}"/></td>
