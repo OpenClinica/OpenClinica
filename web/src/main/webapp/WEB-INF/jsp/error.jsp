@@ -21,7 +21,7 @@
 
 		<jsp:include page="include/userbox-inactive.jsp"/>
 		<table border="0" cellpadding=0" cellspacing="0">
-			<tr><td class="sidebar" valign="top"><br><b><a href="pages/logout"><fmt:message key="logout" bundle="${restext}"/></a></b></br></td>
+			<tr><td class="sidebar" valign="top"><br><b><a href="${pageContext.request.contextPath}/pages/logout"><fmt:message key="logout" bundle="${restext}"/></a></b></br></td>
 				<td class="content" valign="top">
 	</c:otherwise>
 </c:choose>
