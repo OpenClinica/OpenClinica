@@ -1116,7 +1116,7 @@ public class ImportCRFDataService {
         CRFBean crfBean = crfDAO.findByOid(formOid);
         if (crfBean != null) {
             FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByFullName(formDataBean.getFormLayoutName(), crfBean.getName());
-            if (formLayoutBean != null) {
+            if (formLayoutBean != null && formLayoutBean.getId() != 0) {
                 formLayoutBeans.add(formLayoutBean);
             }
         }
