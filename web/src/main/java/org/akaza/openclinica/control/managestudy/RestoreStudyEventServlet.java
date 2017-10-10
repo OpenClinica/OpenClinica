@@ -7,6 +7,10 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -19,6 +23,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -31,18 +36,15 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-
 /**
  * @author jxu
  *
- * Restores a removed study event and all its data
+ *         Restores a removed study event and all its data
  */
 public class RestoreStudyEventServlet extends SecureController {
     /**
@@ -88,7 +90,7 @@ public class RestoreStudyEventServlet extends SecureController {
             Status s = studySub.getStatus();
             if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
                 addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be") + resterm.getString("restored") + "."
-                    + respage.getString("study_subject_has_been_deleted"));
+                        + respage.getString("study_subject_has_been_deleted"));
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
@@ -110,7 +112,7 @@ public class RestoreStudyEventServlet extends SecureController {
             if ("confirm".equalsIgnoreCase(action)) {
                 if (event.getStatus().equals(Status.AVAILABLE)) {
                     addPageMessage(respage.getString("this_event_is_already_available_for_study") + " "
-                        + respage.getString("please_contact_sysadmin_for_more_information"));
+                            + respage.getString("please_contact_sysadmin_for_more_information"));
                     request.setAttribute("id", new Integer(studySubId).toString());
                     forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
                     return;
@@ -141,13 +143,20 @@ public class RestoreStudyEventServlet extends SecureController {
 
                 // restore event crfs
                 EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+                EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+                FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
+                CRFDAO cdao = new CRFDAO(sm.getDataSource());
 
                 ArrayList eventCRFs = ecdao.findAllByStudyEvent(event);
 
                 ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
                 for (int k = 0; k < eventCRFs.size(); k++) {
                     EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                    if (eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
+                    FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(eventCRF.getFormLayoutId());
+                    CRFBean crf = (CRFBean) cdao.findByPK(formLayout.getCrfId());
+                    EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(sed.getId(), crf.getId(), study.getId());
+
+                    if (eventCRF.getStatus().equals(Status.AUTO_DELETED) && edc.getStatus().equals(Status.AVAILABLE)) {
                         eventCRF.setStatus(Status.AVAILABLE);
                         eventCRF.setUpdater(ub);
                         eventCRF.setUpdatedDate(new Date());
@@ -166,12 +175,11 @@ public class RestoreStudyEventServlet extends SecureController {
                     }
                 }
 
-                String emailBody =
-                    respage.getString("the_event") + event.getStudyEventDefinition().getName() + " " + respage.getString("has_been_restored_to_the_study")
-                        + " " + study.getName() + ".";
+                String emailBody = respage.getString("the_event") + event.getStudyEventDefinition().getName() + " "
+                        + respage.getString("has_been_restored_to_the_study") + " " + study.getName() + ".";
 
                 addPageMessage(emailBody);
-//                sendEmail(emailBody);
+                // sendEmail(emailBody);
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }

@@ -111,13 +111,6 @@ public class EventProcessor implements Processor {
         } else
             container.setStudyEvent(existingEvent);
 
-        // Create event crf if it doesn't exist
-        if (studyEventDefinition.getStatus() != Status.AVAILABLE) {
-            logger.info("This Crf Version has a Status Not available in this Study Event Defn");
-            errors.reject("This Crf Version has a Status Not available in this Study Event Defn");
-            throw new Exception("This Crf Version has a Status Not available in this Study Event Defn");
-        }
-
         EventCrf existingEventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(container.getStudyEvent().getStudyEventId(),
                 container.getSubject().getStudySubjectId(), container.getFormLayout().getCrf().getCrfId());
         if (existingEventCrf == null) {

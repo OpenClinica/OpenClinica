@@ -75,7 +75,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
             int studyId = Integer.valueOf(idString.trim()).intValue();
             StudyBean study = (StudyBean) sdao.findByPK(studyId);
 
-            checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
+            checkRoleByUserAndStudy(ub, study, sdao);
 
             String parentStudyName = "";
             StudyBean parent = new StudyBean();

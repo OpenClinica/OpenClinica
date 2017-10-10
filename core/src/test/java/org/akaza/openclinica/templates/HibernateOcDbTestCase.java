@@ -2,8 +2,10 @@ package org.akaza.openclinica.templates;
 
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.apache.commons.dbcp.BasicDataSource;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.dbunit.DataSourceBasedDBTestCase;
+import org.dbunit.DataSourceDatabaseTester;
+import org.dbunit.IDatabaseTester;
 import org.dbunit.database.DatabaseConfig;
 import org.dbunit.dataset.IDataSet;
 import org.dbunit.dataset.xml.FlatXmlDataSetBuilder;
@@ -85,6 +87,11 @@ public abstract class HibernateOcDbTestCase extends DataSourceBasedDBTestCase {
         // TODO Auto-generated method stub
         super.setUp();
 
+    }
+    @Override
+    protected IDatabaseTester newDatabaseTester() {
+        logger.debug("newDatabaseTester() - start");
+        return new DataSourceDatabaseTester(this.getDataSource(), "public");
     }
 
     private void setUpContext() {

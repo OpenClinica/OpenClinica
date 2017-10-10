@@ -1,9 +1,9 @@
 package org.akaza.openclinica.bean.submit.crfdata;
 
-import java.util.ArrayList;
-
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
+
+import java.util.ArrayList;
 
 public class FormDataBean {
     private ArrayList<ImportItemGroupDataBean> itemGroupData;
@@ -11,9 +11,10 @@ public class FormDataBean {
     private DiscrepancyNotesBean discrepancyNotes;
     private String formOID;
     private String EventCRFStatus;
+    private String formLayoutName;
 
     public FormDataBean() {
-        itemGroupData = new ArrayList<ImportItemGroupDataBean>();
+        itemGroupData = new ArrayList<>();
         auditLogs = new AuditLogsBean();
         discrepancyNotes = new DiscrepancyNotesBean();
     }
@@ -56,5 +57,13 @@ public class FormDataBean {
 
     public void setDiscrepancyNotes(DiscrepancyNotesBean discrepancyNotes) {
         this.discrepancyNotes = discrepancyNotes;
+    }
+
+    public String getFormLayoutName() {
+        return formLayoutName;
+    }
+
+    public void setFormLayoutName(String formLayoutName) {
+        this.formLayoutName = formLayoutName;
     }
 }

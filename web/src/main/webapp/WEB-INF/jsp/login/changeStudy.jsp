@@ -38,13 +38,13 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope="request" id="studies" class="java.util.ArrayList"/>
-<jsp:useBean scope="session" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="session" id="publicStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 
 <h1><span class="title_manage"><fmt:message key="change_your_current_study" bundle="${restext}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/working-openclinica')"><span class=""></span></a></span></h1>
 
 <c:choose>
- <c:when test="${study != null && study.id>0}">
-  <p><fmt:message key="your_current_active_study_is" bundle="${restext}"/> <c:out value="${study.name}"/>,
+ <c:when test="${publicStudy != null && publicStudy.id>0}">
+  <p><fmt:message key="your_current_active_study_is" bundle="${restext}"/> <c:out value="${publicStudy.name}"/>,
    <c:choose>
     <c:when test="${!userRole.invalid}">
      <fmt:message key="with_a_role_of" bundle="${restext}"/> <c:out value="${userRole.role.description}"/>.
@@ -72,7 +72,7 @@
        <c:forEach var="studyRole" items="${studies}">
            <c:set var="statusId" value="${studyRole.status.id}"/>
         <c:choose>
-         <c:when test="${study.id == studyRole.studyId}">
+         <c:when test="${publicStudy.id == studyRole.studyId}">
 
            <c:choose>
             <c:when test="${studyRole.parentStudyId > 0}">
@@ -80,7 +80,7 @@
                  <tr>
                    <td class="table_cell">&nbsp;&nbsp;<img src="images/bullet.gif">
                    <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>
-                   <c:out value="${studyRole.studyName}"/>
+                       <c:out value="${studyRole.studyName}"/> (<c:out value="${studyRole.envType}"/>)
                        <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
                        (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>) </td>
                  </tr>
@@ -91,11 +91,11 @@
                  <tr>
                  <td class="table_cell">
                      <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>">
-                 <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
+                     <b><c:out value="${studyRole.studyName}"/> (<c:out value="${studyRole.envType}"/>) (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">
-                 <tr><td class="table_cell"><b>&nbsp;<c:out value="${studyRole.studyName}"/></b></td></tr>
+                    <tr><td class="table_cell"><b>&nbsp;<c:out value="${studyRole.studyName}"/></b></td></tr>
                </c:if>
             </c:otherwise>
            </c:choose>
@@ -111,6 +111,7 @@
                       <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>
                       <c:out value="${studyRole.studyName}"/>
                       <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
+                      (<c:out value="${studyRole.envType}"/>)
                       (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</td>
                  </tr>
                </c:if>
@@ -120,7 +121,7 @@
                  <tr>
                   <td class="table_cell">
                       <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>">
-                  <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
+                      <b><c:out value="${studyRole.studyName}"/> (<c:out value="${studyRole.envType}"/>) (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">

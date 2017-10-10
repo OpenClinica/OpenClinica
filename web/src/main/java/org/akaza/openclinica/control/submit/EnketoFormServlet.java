@@ -9,6 +9,7 @@ import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
@@ -56,24 +57,30 @@ public class EnketoFormServlet extends SecureController {
         PFormCacheSubjectContextEntry subjectContext = new PFormCacheSubjectContextEntry();
         String contextHash = null;
         if (studyEvent != null) {
-            subjectContext.setStudySubjectOid(studyEvent.getStudySubject().getOcOid());
+            StudySubject studySubject = studyEvent.getStudySubject();
+            subjectContext.setStudySubjectOid(studySubject.getOcOid());
             subjectContext.setStudyEventDefinitionId(String.valueOf(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId()));
             subjectContext.setOrdinal(String.valueOf(studyEvent.getSampleOrdinal()));
             subjectContext.setStudyEventId(String.valueOf(studyEvent.getStudyEventId()));
+            context.setAttribute("SS_OID", studySubject.getOcOid());
+        } else {
+            context.setAttribute("SS_OID", "");
         }
         subjectContext.setFormLayoutOid(formLayout.getOcOid());
         subjectContext.setUserAccountId(String.valueOf(ub.getId()));
+        subjectContext.setStudyOid((currentStudy.getOid()));
+
         contextHash = cache.putSubjectContext(subjectContext);
 
         Study parentStudy = enketoCredentials.getParentStudy(currentStudy.getOid());
-
         StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         Role role = currentRole.getRole();
 
         if (Integer.valueOf(eventCrfId) > 0) {
             formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout, QUERY_FLAVOR, null, role, mode);
         } else if (Integer.valueOf(eventCrfId) == 0) {
-            formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, parentStudy.getOc_oid(), QUERY_FLAVOR, role, mode);
+            String hash = formLayout.getXform();
+            formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, parentStudy.getOc_oid(), QUERY_FLAVOR, role, mode, hash);
         }
         int hashIndex = formUrl.lastIndexOf("#");
         String part1 = formUrl;

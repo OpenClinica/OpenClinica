@@ -12,6 +12,13 @@ public class FormLayoutMediaDao extends AbstractDomainDao<FormLayoutMedia> {
         return FormLayoutMedia.class;
     }
 
+    public FormLayoutMedia findByFormLayoutMediaId(int formLayoutMediaId) {
+        String query = "from " + getDomainClassName() + " flm  where flm.formLayoutMediaId = :formLayoutMediaId ";
+        Query q = getCurrentSession().createQuery(query);
+        q.setInteger("formLayoutMediaId", formLayoutMediaId);
+        return (FormLayoutMedia) q.uniqueResult();
+    }
+
     public ArrayList<FormLayoutMedia> findByFormLayoutIdForNoteTypeMedia(int formLayoutId) {
         String query = "from " + getDomainClassName()
                 + " form_layout_media  where form_layout_media.formLayout.formLayoutId = :formlayoutid and form_layout_media.eventCrfId=0 ";

@@ -1,21 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" standalone="no"?>
 <databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">    
-  <include  file="migration/2.5/release.xml"/> 
-  <include  file="migration/3.0/release.xml"/>
-  <include  file="migration/amethyst/release.xml"/>   
-  <include  file="migration/customDevelopment/release.xml"/>   
-  <include  file="migration/3.2/release.xml"/>
-  <include  file="migration/3.3/release.xml"/>  
-  <include  file="migration/3.4/release.xml"/>  
-  <include  file="migration/3.5/release.xml"/>  
-  <include  file="migration/3.6/release.xml"/>  
-  <include  file="migration/3.7/release.xml"/>
-  <include  file="migration/3.8/release.xml"/>
-  <include  file="migration/3.9/release.xml"/>  
-  <include  file="migration/3.10/release.xml"/>  
-  <include  file="migration/3.11/release.xml"/>
-  <include  file="migration/quartz2_schema_update/release.xml"/>
-  <include  file="migration/3.12/release.xml"/>  
-  <include  file="migration/4.0/release.xml"/>
+  <include  file="migration/tenant/release.xml"/>
 </databaseChangeLog> 
 

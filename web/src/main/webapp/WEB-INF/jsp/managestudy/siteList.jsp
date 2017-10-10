@@ -43,26 +43,13 @@
 
 <jsp:useBean scope='request' id='table' class='org.akaza.openclinica.web.bean.EntityBeanTable'/>
 
-<h1 style="margin: 0em;"><span class="title_manage">
-<fmt:message key="manage_all_sites_in_study" bundle="${restext}"/> <c:out value="${study.name}"/></span></h1></br>
-
-<div class="homebox_bullets">
- <c:choose>
-   <c:when test="${study.parentStudyId>0}">
-	 <a href="ViewSite?id=<c:out value="${study.id}"/>">
-   </c:when>
-   <c:otherwise>
-	 <a href="ViewStudy?id=<c:out value="${study.id}"/>">
-   </c:otherwise>
-</c:choose>
-<fmt:message key="view_current_study_details" bundle="${restext}"/></a>
-</div>
+<h1><span class="title_manage">
+<fmt:message key="manage_all_sites_in_study" bundle="${restext}"/> <c:out value="${study.name}"/></span></h1>
 <%-- 
    <c:if test="${!study.status.locked}">
     <div class="homebox_bullets"><a href="CreateSubStudy"><fmt:message key="create_new_site" bundle="${resworkflow}"/></a></div>
    </c:if>
    --%>
-<p></p>
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showSiteRow.jsp" /></c:import>
 <br><br>
 <jsp:include page="../include/footer.jsp"/>

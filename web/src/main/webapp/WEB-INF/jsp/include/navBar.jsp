@@ -1,5 +1,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri = "http://java.sun.com/jsp/jstl/functions" prefix = "fn" %>
 <%@ page import="org.akaza.openclinica.i18n.util.ResourceBundleProvider" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
@@ -7,12 +8,20 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
 <script language="JavaScript">
-        /*function reportBug() {
-            var bugtrack = "https://www.openclinica.com/OpenClinica/bug.php?version=<fmt:message key="version_number" bundle="${resword}"/>&user=";
-            var user= "<c:out value="${userBean.name}"/>";
-            bugtrack = bugtrack + user+ "&url=" + window.location.href;
-            openDocWindow(bugtrack);
-        }*/
+
+        // Walkme snippet
+        (function() {
+            var walkme = document.createElement('script');
+            walkme.type = 'text/javascript';
+            walkme.async = true;
+            walkme.src = '<c:out value="${sessionScope.walkmeURL}" />';
+            var s = document.getElementsByTagName('script')[0];
+            s.parentNode.insertBefore(walkme, s);
+            window._walkmeConfig = {
+                smartLoad: true
+            };
+        })();
+
         function confirmCancel(pageName){
             var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
             if(confirm1){
@@ -74,11 +83,11 @@
      <div class="oc_nav">
         <div class="nav-top-bar">
         <!-- Logo -->
-    
+
             <div class="logo">
                 <c:set var="isLogo"/>
                 <c:set var="isHref"/>
-                
+
                 <c:if test="${param.isSpringController}">
                     <c:set var="isHref" value="../MainMenu" />
                     <c:set var="isLogo" value="../images/logo-color-on-dark.svg" />
@@ -91,7 +100,7 @@
 
                 <a href="${isHref}"><img src="${isLogo}" alt="OpenClinica Logo" /></a>
             </div>
-            
+
             <div id="StudyInfo">
                 <c:choose>
                     <c:when test='${study.parentStudyId > 0}'>
@@ -104,20 +113,20 @@
                         <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
                     </c:otherwise>
                 </c:choose>
-                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
+                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;<span class="stat-tag status-${fn:toLowerCase(study.envType)}"></span>&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy">Change</a>
-                
+
             </div>
 
             <div id="UserInfo">
                 <div id="userDropdown">
                     <ul>
-                        <li><a href="${urlPrefix}UpdateProfile"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)<span class="icon icon-caret-down white"></span></a></a>
+                        <li><a href="#"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)<span class="icon icon-caret-down white"></span></a></a>
                         <!-- First Tier Drop Down -->
                         <ul class="dropdown_BG">
                             <li><a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a></li>
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a></li>
-                            <li> <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
+                            <li> <a href="${urlPrefix}pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
                         </ul>
                         </li>
                     </ul>
@@ -136,9 +145,9 @@
                             <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tr>
                                     <td>
-                                      <form METHOD="GET" action="ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == 'Study Subject ID') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
+                                      <form METHOD="GET" action="ListStudySubjects" onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
                                                                     <!--<a href="javascript:reportBug()">Report Issue</a>|-->
-                                            <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = 'Enter Study Subject ID'" onfocus="if (this.value == 'Study Subject ID') this.value = ''" value="Study Subject ID" class="navSearch"/>
+                                            <input type="text" name="findSubjects_f_studySubject.label" onblur="if (this.value == '') this.value = '<fmt:message key="study_subject_ID" bundle="${resword}"/>'" onfocus="if (this.value == '<fmt:message key="study_subject_ID" bundle="${resword}"/>') this.value = ''" value='<fmt:message key="study_subject_ID" bundle="${resword}"/>' class="navSearch"/>
                                             <input type="hidden" name="navBar" value="yes"/>
                                             <input type="submit" value="View &#8594;"  class="navSearchButton"/>
                                         </form>
@@ -292,14 +301,14 @@
         <br clear="all">
         <div class="taskGroup"><fmt:message key="nav_monitor_and_manage_data" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_source_data_verification" bundle="${resword}"/></a></div>
             <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
+            <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a>
+            </div>
             <c:choose>
                 <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
                 </c:when>
                 <c:otherwise>
-                    <div class="taskLink"><a href="${urlPrefix}ViewRuleAssignment?read=true"><fmt:message key="nav_rules" bundle="${resword}"/></a></div><div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-
+                    <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div><div class="taskLink"></div>
                 </c:otherwise>
             </c:choose>
         </div>
@@ -309,69 +318,19 @@
             </c:when>
             <c:otherwise>
                 <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="AuditUserActivity?restore=true"><fmt:message key="user_audit_log" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div><div class="taskLink"><br/></div>
             </c:otherwise>
         </c:choose>
         </div>
         <br clear="all">
         <div class="taskGroup"><fmt:message key="nav_extract_data" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
             <div class="taskLink"><a href="${urlPrefix}CreateDataset"><fmt:message key="nav_create_dataset" bundle="${resword}"/></a></div>
         </div>
         <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewAllJobs"><fmt:message key="nav_jobs" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        <div class="taskGroup"><fmt:message key="nav_study_setup" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes"><fmt:message key="nav_view_study" bundle="${resword}"/></a></div>
-            <c:choose>
-                <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-                </c:when>
-                <c:otherwise>
-                    <div class="taskLink"><a href="${urlPrefix}pages/studymodule"><fmt:message key="nav_build_study" bundle="${resword}"/></a></div>
-                    <!-- <div class="taskLink"><a href="${urlPrefix}ListEventDefinition?read=true"><fmt:message key="nav_event_definitions" bundle="${resword}"/></a></div>  -->
-                </c:otherwise>
-            </c:choose>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListStudyUser"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
-            <%--
-            <c:choose>
-                <c:when test="${study.parentStudyId > 0 && (userRole.coordinator || userRole.director) }">
-                </c:when>
-                <c:otherwise>
-                    <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
-                </c:otherwise>
-            </c:choose>
-             --%>
+            <div class="taskLink"><a href="${urlPrefix}ViewDatasets"><fmt:message key="nav_view_datasets" bundle="${resword}"/></a></div>
         </div>
         <br clear="all">
         </c:if>
-        <c:if test="${userBean.sysAdmin || userBean.techAdmin}">
-        <div class="taskGroup"><fmt:message key="nav_administration" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListStudy"><fmt:message key="nav_studies" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ListUserAccounts"><fmt:message key="nav_users" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}ListCRF?module=admin"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-            <div class="taskLink"><a href="${urlPrefix}ListSubject"><fmt:message key="nav_subjects" bundle="${resword}"/></a></div>
-        </div>
-        <br clear="all">
-        </c:if>
-        <div class="taskGroup"><fmt:message key="nav_other" bundle="${resword}"/></div>
-        <div class="taskLeftColumn">
-            <div class="taskLink"><a href="${urlPrefix}UpdateProfile"><fmt:message key="nav_update_profile" bundle="${resword}"/></a></div>
-        </div>
-        <div class="taskRightColumn">
-            <div class="taskLink"><a href="${urlPrefix}j_spring_security_logout"><fmt:message key="nav_log_out" bundle="${resword}"/></a></div>
-
-        </div>
-
-        <br clear="all">
-        <div></div>
     </div>
 </div>

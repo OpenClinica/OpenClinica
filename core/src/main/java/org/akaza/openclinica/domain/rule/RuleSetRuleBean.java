@@ -7,39 +7,21 @@
  */
 package org.akaza.openclinica.domain.rule;
 
+import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
+import org.hibernate.annotations.Cache;
+import org.hibernate.annotations.*;
+import org.hibernate.annotations.Parameter;
+
+import javax.persistence.CascadeType;
+import javax.persistence.Entity;
+import javax.persistence.*;
+import javax.persistence.Table;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
-
-import javax.persistence.CascadeType;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.Table;
-import javax.persistence.Transient;
-
-import org.akaza.openclinica.domain.AbstractAuditableMutableDomainObject;
-import org.akaza.openclinica.domain.rule.action.DiscrepancyNoteActionBean;
-import org.akaza.openclinica.domain.rule.action.EmailActionBean;
-import org.akaza.openclinica.domain.rule.action.EventActionBean;
-import org.akaza.openclinica.domain.rule.action.HideActionBean;
-import org.akaza.openclinica.domain.rule.action.InsertActionBean;
-import org.akaza.openclinica.domain.rule.action.NotificationActionBean;
-import org.akaza.openclinica.domain.rule.action.RandomizeActionBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
-import org.akaza.openclinica.domain.rule.action.RuleActionRunBean.Phase;
-import org.akaza.openclinica.domain.rule.action.ShowActionBean;
-import org.apache.commons.collections.FactoryUtils;
-import org.apache.commons.collections.list.LazyList;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
-import org.hibernate.annotations.Fetch;
-import org.hibernate.annotations.FetchMode;
-import org.hibernate.annotations.GenericGenerator;
-import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "rule_set_rule")
@@ -50,23 +32,9 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject implem
     RuleSetBean ruleSetBean;
     RuleBean ruleBean;
     List<RuleActionBean> actions;
-    private List<DiscrepancyNoteActionBean> lazyDiscrepancyNoteActions = LazyList.decorate(new ArrayList<DiscrepancyNoteActionBean>(),
-            FactoryUtils.instantiateFactory(DiscrepancyNoteActionBean.class));
-    private List<EmailActionBean> lazyEmailActions = LazyList
-            .decorate(new ArrayList<EmailActionBean>(), FactoryUtils.instantiateFactory(EmailActionBean.class));
-    private List<ShowActionBean> lazyShowActions = LazyList.decorate(new ArrayList<ShowActionBean>(), FactoryUtils.instantiateFactory(ShowActionBean.class));
-    private List<HideActionBean> lazyHideActions = LazyList.decorate(new ArrayList<HideActionBean>(), FactoryUtils.instantiateFactory(HideActionBean.class));
-    private List<InsertActionBean> lazyInsertActions = LazyList.decorate(new ArrayList<InsertActionBean>(),
-            FactoryUtils.instantiateFactory(InsertActionBean.class));
-    private List<RandomizeActionBean> lazyRandomizeActions = LazyList.decorate(new ArrayList<RandomizeActionBean>(),
-            FactoryUtils.instantiateFactory(RandomizeActionBean.class));
 
-    private List<EventActionBean> lazyEventActions =  LazyList.decorate(new ArrayList<EventActionBean>(),
-            FactoryUtils.instantiateFactory(EventActionBean.class));
-    private List<NotificationActionBean> lazyNotificationActions = LazyList
-            .decorate(new ArrayList<NotificationActionBean>(), FactoryUtils.instantiateFactory(NotificationActionBean.class));
 
-    
+
     // Transient
     String oid;
     RuleSetRuleBeanImportStatus ruleSetRuleBeanImportStatus;
@@ -75,17 +43,6 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject implem
         EXACT_DOUBLE, TO_BE_REMOVED, LINE
     }
 
-    @Transient
-    public void formToModel() {
-        actions = new ArrayList<RuleActionBean>();
-        actions.addAll(lazyDiscrepancyNoteActions);
-        actions.addAll(lazyEmailActions);
-        actions.addAll(lazyNotificationActions);
-        actions.addAll(lazyShowActions);
-        actions.addAll(lazyHideActions);
-        actions.addAll(lazyEventActions);
-        actions.addAll(lazyRandomizeActions);
-    }
 
     @Transient
     public HashMap<String, ArrayList<RuleActionBean>> getAllActionsWithEvaluatesToAsKey() {
@@ -235,68 +192,6 @@ public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject implem
 
     public void setRuleSetRuleBeanImportStatus(RuleSetRuleBeanImportStatus ruleSetRuleBeanImportStatus) {
         this.ruleSetRuleBeanImportStatus = ruleSetRuleBeanImportStatus;
-    }
-
-    @Transient
-    public List<DiscrepancyNoteActionBean> getLazyDiscrepancyNoteActions() {
-        return lazyDiscrepancyNoteActions;
-    }
-
-    public void setLazyDiscrepancyNoteActions(List<DiscrepancyNoteActionBean> lazyDiscrepancyNoteActions) {
-        this.lazyDiscrepancyNoteActions = lazyDiscrepancyNoteActions;
-    }
-
-    @Transient
-    public List<EmailActionBean> getLazyEmailActions() {
-        return lazyEmailActions;
-    }
-
-    public void setLazyEmailActions(List<EmailActionBean> lazyEmailActions) {
-        this.lazyEmailActions = lazyEmailActions;
-    }
-    @Transient
-    public List<NotificationActionBean> getLazyNotificationActions() {
-        return lazyNotificationActions;
-    }
-
-    public void setLazyNotificationActions(List<NotificationActionBean> lazyNotificationActions) {
-        this.lazyNotificationActions = lazyNotificationActions;
-    }
-
-    @Transient
-    public List<ShowActionBean> getLazyShowActions() {
-        return lazyShowActions;
-    }
-
-    public void setLazyShowActions(List<ShowActionBean> lazyShowActions) {
-        this.lazyShowActions = lazyShowActions;
-    }
-
-    @Transient
-    public List<HideActionBean> getLazyHideActions() {
-        return lazyHideActions;
-    }
-
-    public void setLazyHideActions(List<HideActionBean> lazyHideActions) {
-        this.lazyHideActions = lazyHideActions;
-    }
-
-    @Transient
-    public List<InsertActionBean> getLazyInsertActions() {
-        return lazyInsertActions;
-    }
-
-    public void setLazyInsertActions(List<InsertActionBean> lazyInsertActions) {
-        this.lazyInsertActions = lazyInsertActions;
-    }
-
-    @Transient
-    public List<RandomizeActionBean> getLazyRandomizeActions() {
-        return lazyRandomizeActions;
-    }
-
-    public void setLazyRandomizeActions(List<RandomizeActionBean> lazyRandomizeActions) {
-        this.lazyRandomizeActions = lazyRandomizeActions;
     }
 
 

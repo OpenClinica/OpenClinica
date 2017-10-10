@@ -53,6 +53,7 @@ import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -104,7 +105,6 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private static final String INPUT_NOTE_ID = "noteId";
     private static final String CAN_ADMIN_EDIT = "canAdminEdit";
     private static final String EVENT_CRF_ID = "ecId";
-    private static final String STUDY_SUB_ID = "studySubjectId";
     public static final String ORIGINATING_PAGE = "originatingPage";
     public static final String STUDYSUBJECTID = "studySubjectId";
 
@@ -125,7 +125,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         if ("subject".equalsIgnoreCase(entityType)) {
             if (ub.isSysAdmin() || ub.isTechAdmin()) {
-                return Page.UPDATE_SUBJECT_SERVLET;
+                return Page.UPDATE_STUDY_SUBJECT_SERVLET;
             } else {
                 return Page.VIEW_STUDY_SUBJECT_SERVLET;
             }
@@ -253,6 +253,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setItemRepeatGroupName(igBean.getLayoutGroupPath());
             subjectContext.setStudyEventId(String.valueOf(seb.getId()));
             String contextHash = cache.putSubjectContext(subjectContext);
+            StudyBean parentStudyBean = getParentStudy(currentStudy.getOid(), ds);
+            context.setAttribute("SS_OID", ssb.getOid());
 
             if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
                 // This section is for version migration ,where item does not exist in the current formLayout
@@ -267,8 +269,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 if (!itemExistInFormLayout)
                     formLayout = (FormLayoutBean) fldao.findByPK(vms.get(0).getFormLayout().getFormLayoutId());
                 // Get Original formLayout file from data directory
+
                 String xformOutput = "";
-                String directoryPath = Utils.getCrfMediaFilePath(crf.getOid(), formLayout.getOid());
+                String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(parentStudyBean.getOid(), crf.getOid(), formLayout.getOid());
                 File dir = new File(directoryPath);
                 File[] directoryListing = dir.listFiles();
                 if (directoryListing != null) {
@@ -284,6 +287,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 Body body = html.getBody();
                 Head head = html.getHead();
                 Model model = head.getModel();
+
                 List<Bind> binds = model.getBind();
                 List<Instance> instances = model.getInstance();
                 binds = getBindElements(binds, item);
@@ -319,7 +323,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 uControls.add(itemUserControl);
                 uControls.add(itemCommentUserControl);
 
-                String xform = xformParser.marshall(buildSingleItemForm(item, uControls, binds, itext, instances, seb, ssb, sed));
+                String xform = xformParser.marshall(buildSingleItemForm(item, uControls, binds, itext, instances, seb, ssb, sed, head.getTitle()));
                 xform = xform.substring(0, xform.indexOf("<meta>")) + "<group_layout>" + "<" + item.getName() + "/><" + item.getName() + COMMENT + " "
                         + FS_QUERY_ATTRIBUTE + "=\"" + item.getName() + "\"/>" + "</group_layout>" + xform.substring(xform.indexOf("<meta>"));
 
@@ -333,7 +337,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (ecb.getId() > 0) {
                 formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role, EDIT_MODE);
             } else {
-                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE);
+                String hash = formLayout.getXform();
+                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash);
             }
             int hashIndex = formUrl.lastIndexOf("#");
             String part1 = formUrl;
@@ -345,7 +350,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
             request.setAttribute(EnketoFormServlet.FORM_URL1, part1);
             request.setAttribute(EnketoFormServlet.FORM_URL2, part2);
             request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module);
-            request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
+            if (!flavor.equals(SINGLE_ITEM_FLAVOR)) {
+                request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
+            } else {
+                request.setAttribute(STUDYSUBJECTID, "");
+            }
         }
         return true;
     }
@@ -442,7 +451,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 p.setFileName(p.getFileName() + "?fromViewNotes=1");
             }
             String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(discrepancyNoteBean, ResolutionStatus.CLOSED, true);
-            setPopUpURL(createNoteURL);
+            setPopUpURL("");
         }
 
         if (!goNext) {
@@ -591,7 +600,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     }
 
     private Html buildSingleItemForm(ItemBean item, List<UserControl> userControls, List<Bind> binds, Itext itext, List<Instance> instances, StudyEventBean seb,
-            StudySubjectBean ssb, StudyEventDefinitionBean sed) {
+            StudySubjectBean ssb, StudyEventDefinitionBean sed, String title) {
 
         Html html = new Html();
         Head head = new Head();
@@ -604,7 +613,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         group.setRef("/form/group_layout");
         Label metaLabel = new Label();
         metaLabel.setLabel(resword.getString("subject_id") + ": " + ssb.getLabel() + "\n" + resword.getString("event_name") + ": " + sed.getName() + "\n"
-                + resword.getString("event_date") + ": " + formatDate(seb.getDateStarted()) + "\n\n ");
+                + resword.getString("event_date") + ": " + formatDate(seb.getDateStarted()) + "\n" + resword.getString("form_title") + ": " + title + "\n\n ");
         group.setLabel(metaLabel);
         group.setUsercontrol(userControls);
         List<Group> groups = new ArrayList<>();
@@ -808,4 +817,14 @@ public class ResolveDiscrepancyServlet extends SecureController {
         return sdf.format(date);
     }
 
+    private StudyBean getParentStudy(String studyOid, DataSource ds) {
+        StudyDAO sdao = new StudyDAO(ds);
+        StudyBean study = (StudyBean) sdao.findByOid(studyOid);
+        if (study.getParentStudyId() == 0) {
+            return study;
+        } else {
+            StudyBean parentStudy = (StudyBean) sdao.findByPK(study.getParentStudyId());
+            return parentStudy;
+        }
+    }
 }

@@ -21,11 +21,21 @@ public class Role extends Term {
     public static final Role RESEARCHASSISTANT = new Role(5, "ra", "Data_Entry_Person", null);
     public static final Role MONITOR = new Role(6, "monitor", "Monitor", null);
     public static final Role RESEARCHASSISTANT2 = new Role(7, "ra2", "site_Data_Entry_Person2", null);
-   
-    
+
+
+    public static final Role STUDY_COORDINATOR = new Role(2, "coordinator", "Study_Coordinator", null);
+    public static final Role STUDY_STUDYDIRECTOR = new Role(3, "director", "Study_Director", null);
+    public static final Role STUDY_INVESTIGATOR = new Role(4, "Investigator", "Investigator", null);
+    public static final Role STUDY_RESEARCHASSISTANT = new Role(5, "ra", "Data_Entry_Person", null);
+    public static final Role STUDY_MONITOR = new Role(6, "monitor", "Monitor", null);
+    public static final Role STUDY_RESEARCHASSISTANT2 = new Role(7, "ra2", "site_Data_Entry_Person2", null);
+
     private static final Role[] members = { ADMIN, COORDINATOR, STUDYDIRECTOR, INVESTIGATOR, MONITOR, RESEARCHASSISTANT,RESEARCHASSISTANT2};
-    public static final List list = Arrays.asList(members);
-    
+    private static final List list = Arrays.asList(members);
+
+    private static final Role[] studyMembers = { STUDY_COORDINATOR, STUDY_STUDYDIRECTOR, STUDY_INVESTIGATOR, STUDY_MONITOR, STUDY_RESEARCHASSISTANT, STUDY_RESEARCHASSISTANT2};
+    private static final List studyList = Arrays.asList(studyMembers);
+
     public static final Map studyRoleMap = new LinkedHashMap();
     static {
         studyRoleMap.put(2, "Study_Coordinator");
@@ -33,7 +43,7 @@ public class Role extends Term {
         studyRoleMap.put(4, "Investigator");
         studyRoleMap.put(5, "Data_Entry_Person");
         studyRoleMap.put(6, "Monitor");
-           }
+    }
 
     public static final Map siteRoleMap = new LinkedHashMap();
     static {
@@ -44,6 +54,16 @@ public class Role extends Term {
         siteRoleMap.put(6, "site_monitor");
         siteRoleMap.put(7, "site_Data_Entry_Person2");
     }
+
+    public static final Map sbsSiteRoleMap = new LinkedHashMap();
+    static {
+        sbsSiteRoleMap.put("Data Manager", "coordinator");
+        sbsSiteRoleMap.put("Investigator", "Data Specialist");
+        sbsSiteRoleMap.put("Clinical Research Coordinator", "ra");
+        sbsSiteRoleMap.put("Monitor", "monitor");
+    }
+
+
 
     private List privileges;
 
@@ -73,8 +93,31 @@ public class Role extends Term {
         return INVALID;
     }
 
+    public static Role getByDesc(String desc) {
+        for (int i = 0; i < list.size(); i++) {
+            Role temp = (Role) list.get(i);
+            if (temp.getDescription().equals(desc) || temp.description.equals(desc)) {
+                return temp;
+            }
+        }
+        return INVALID;
+    }
+
+    public static Role getByRoleDesc(String desc) {
+        for (int i = 0; i < studyList.size(); i++) {
+            Role temp = (Role) studyList.get(i);
+            if (temp.getDescription().equals(desc) || temp.description.equals(desc)) {
+                return temp;
+            }
+        }
+        return INVALID;
+    }
     public static ArrayList toArrayList() {
         return new ArrayList(list);
+    }
+
+    public static ArrayList toStudyArrayList() {
+        return new ArrayList(studyList);
     }
 
     public boolean hasPrivilege(Privilege p) {

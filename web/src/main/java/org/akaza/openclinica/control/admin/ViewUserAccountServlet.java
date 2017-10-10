@@ -46,6 +46,7 @@ public class ViewUserAccountServlet extends SecureController {
 
     @Override
     protected void processRequest() throws Exception {
+        request.setAttribute("requestSchema", "public");
         FormProcessor fp = new FormProcessor(request);
         int userId = fp.getInt(ARG_USER_ID, true);
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());

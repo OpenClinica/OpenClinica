@@ -40,6 +40,7 @@ public class HelperObject {
     FormLayoutDao formLayoutDao;
     SessionFactory sessionFactory;
     Session session;
+    String schema;
 
     public HelperObject() {
         // TODO Auto-generated constructor stub
@@ -197,4 +198,11 @@ public class HelperObject {
         this.formLayoutDao = formLayoutDao;
     }
 
+    public String getSchema() {
+        return schema;
+    }
+
+    public void setSchema(String schema) {
+        this.schema = schema;
+    }
 }

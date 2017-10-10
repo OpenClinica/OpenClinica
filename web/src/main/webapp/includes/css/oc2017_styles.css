@@ -1,6 +1,5 @@
 /* Load web fonts */
 @import url("https://fonts.googleapis.com/css?family=Didact+Gothic|Open+Sans+Condensed:300,700|Open+Sans:400,400i,600,700,700i");
-@import url("fonts/icomoon.woff");
 html {
   box-sizing: border-box; }
 
@@ -68,7 +67,7 @@ h1 {
   color: #ED7800;
   font-family: 'Didact Gothic', Helvetica, Arial, sans-serif;
   font-size: 1.5em;
-  margin: 0 .25em; }
+  margin: 0; }
   h1 span.icon-question-circle {
     font-size: .75em; }
 
@@ -85,7 +84,7 @@ a:link {
   color: #3a6087; }
 
 a:visited {
-  color: #93397f; }
+  color: #3a6087; }
 
 a:hover {
   color: #090f14; }
@@ -207,7 +206,7 @@ a:hover {
   padding: .5em 1em 1em 1em;
   width: 100%;
   max-width: calc(100vw - 180px);
-  overflow-x: scroll; }
+}
   .aka_revised_content form > div, .content form > div {
     min-width: 60% !important; }
 

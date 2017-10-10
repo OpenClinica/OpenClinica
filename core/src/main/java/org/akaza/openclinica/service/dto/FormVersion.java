@@ -5,6 +5,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 
+import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
+
 import com.fasterxml.jackson.annotation.JsonAnyGetter;
 import com.fasterxml.jackson.annotation.JsonAnySetter;
 import com.fasterxml.jackson.annotation.JsonIgnore;
@@ -19,7 +21,7 @@ public class FormVersion {
     @JsonProperty("description")
     private String description;
     @JsonProperty("id")
-    private Integer id;
+    private Long id;
     @JsonProperty("name")
     private String name;
     @JsonProperty("ocoid")
@@ -28,6 +30,8 @@ public class FormVersion {
     private String previewURL;
     @JsonProperty("fileLinks")
     private List<String> fileLinks;
+    @JsonProperty("publishedEnvType")
+    private StudyEnvEnum publishedEnvType;
 
     @JsonIgnore
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
@@ -78,7 +82,7 @@ public class FormVersion {
      *         The id
      */
     @JsonProperty("id")
-    public Integer getId() {
+    public Long getId() {
         return id;
     }
 
@@ -88,7 +92,7 @@ public class FormVersion {
      *            The id
      */
     @JsonProperty("id")
-    public void setId(Integer id) {
+    public void setId(Long id) {
         this.id = id;
     }
 
@@ -170,6 +174,14 @@ public class FormVersion {
     @JsonAnySetter
     public void setFileLinks(List<String> fileLinks) {
         this.fileLinks = fileLinks;
+    }
+
+    public StudyEnvEnum getPublishedEnvType() {
+        return publishedEnvType;
+    }
+
+    public void setPublishedEnvType(StudyEnvEnum publishedEnvType) {
+        this.publishedEnvType = publishedEnvType;
     }
 
 }

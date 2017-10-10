@@ -17,27 +17,46 @@ import java.util.Set;
 import java.util.regex.Pattern;
 
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
+import org.quartz.Scheduler;
+import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.context.ResourceLoaderAware;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
 import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
+import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 
 public class CoreResources implements ResourceLoaderAware {
 
     private ResourceLoader resourceLoader;
     public static String PROPERTIES_DIR;
     private static String DB_NAME;
+    public static ThreadLocal<String> tenantSchema = new ThreadLocal<>();
     private static Properties DATAINFO;
     private static Properties EXTRACTINFO;
 
@@ -162,7 +181,7 @@ public class CoreResources implements ResourceLoaderAware {
             DATAINFO = dataInfo;
             dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
             // instance
-
+            tenantSchema.set(DATAINFO.getProperty("schema"));
             EXTRACTINFO = extractInfo;
 
             DB_NAME = dbName;
@@ -190,6 +209,15 @@ public class CoreResources implements ResourceLoaderAware {
             // TODO Auto-generated catch block
             e.printStackTrace();
         }
+    }
+
+    public static void setRootUserAccountBean(HttpServletRequest request, DataSource dataSource) {
+        UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+        UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserName("root");
+        if (ub.getId() != 0) {
+            request.getSession().setAttribute("userBean", ub);
+        }
+
     }
 
     /**
@@ -303,7 +331,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         if (DATAINFO.getProperty("org.quartz.jobStore.misfireThreshold") == null)
             DATAINFO.setProperty("org.quartz.jobStore.misfireThreshold", "60000");
-        DATAINFO.setProperty("org.quartz.jobStore.class", "org.quartz.impl.jdbcjobstore.JobStoreTX");
+        DATAINFO.setProperty("org.quartz.jobStore.class", "org.akaza.openclinica.dao.core.MultiSchemaJobStoreTx");//"org.quartz.impl.jdbcjobstore.JobStoreTX");
 
         if (database.equalsIgnoreCase("oracle")) {
             DATAINFO.setProperty("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.oracle.OracleDelegate");
@@ -371,6 +399,16 @@ public class CoreResources implements ResourceLoaderAware {
             supportURL = "https://www.openclinica.com/support";
         DATAINFO.setProperty("supportURL", supportURL);
 
+        String walkmeURL = DATAINFO.getProperty("walkme.url");
+        if (walkmeURL == null || walkmeURL.isEmpty())
+            walkmeURL = "https://ineedawalkme.url";
+        DATAINFO.setProperty("walkmeURL", walkmeURL);
+
+        String piwikURL = DATAINFO.getProperty("piwik.url");
+        if (piwikURL == null || piwikURL.isEmpty())
+            piwikURL = "https://ineedapiwik.url";
+        DATAINFO.setProperty("piwikURL", piwikURL);
+
         DATAINFO.setProperty("show_unique_id", "1");
 
         DATAINFO.setProperty("auth_mode", "password");
@@ -433,7 +471,13 @@ public class CoreResources implements ResourceLoaderAware {
 
     public static void setSchema(Connection conn) throws SQLException {
         Statement statement = conn.createStatement();
-        String schema = DATAINFO.getProperty("schema");
+        String schema = null;
+
+        schema = handleMultiSchemaConnection(conn, schema);
+
+        logger.debug("Using schema in CoreResources:schema:" + schema);
+        if (conn.getSchema().equalsIgnoreCase(schema))
+            return;
         try {
             statement.execute("set search_path to '" + schema + "'");
         } finally {
@@ -441,40 +485,117 @@ public class CoreResources implements ResourceLoaderAware {
         }
     }
 
-    private void setDatabaseProperties(String database) {
-        String herokuUrl= System.getenv("DATABASE_URL");
-        if (herokuUrl!=null){
-            String namepass[] = herokuUrl.split(":");
-
-            String user = namepass[1].substring(2);
-            String pass = namepass[2].substring(0, namepass[2].indexOf("@"));
-            String dbhst = namepass[2].substring(namepass[2].indexOf("@")+1);
-            String db = namepass[3].substring(5);
-            String dbpt = namepass[3].substring(0,4);
-
-            DATAINFO.setProperty("dbUser", user);
-            DATAINFO.setProperty("dbPass", pass);
-            DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
-            DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
-
-            DATAINFO.setProperty("dbHost", dbhst);
-            DATAINFO.setProperty("db", db);
-            DATAINFO.setProperty("dbPort", dbpt);
-
-        }else{
-            DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
-            DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
+    public static String getRequestSchema() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            if (request.getAttribute("requestSchema") != null) {
+                return (String) request.getAttribute("requestSchema");
+            }
         }
+        return null;
+    }
 
+    public static String getRequestSchema(HttpServletRequest request) {
+        return (String) request.getAttribute("requestSchema");
+    }
+    public static boolean setRequestSchema(String schema) {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            request.setAttribute("requestSchema", schema);
+            return true;
+        }
+        return false;
+    }
 
+    public static void setRequestSchema(HttpServletRequest request, String schema) {
+            request.setAttribute("requestSchema", schema);
+    }
 
-        String schema =(DATAINFO.getProperty("schema").trim().equals("") ? "public"  : DATAINFO.getProperty("schema").trim());
+    public static HttpServletRequest getRequest() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            return request;
+        }
+        return null;
+    }
+
+    public static Boolean isPublicStudySameAsTenantStudy (StudyBean tenantStudy, int publicStudyID, DataSource ds) {
+        StudyBean publicStudy = getPublicStudy(tenantStudy.getOid(), ds);
+        return publicStudy.getId() == publicStudyID;
+    }
+
+    public static StudyBean getPublicStudy (String ocId, DataSource ds) {
+        StudyDAO studyDAO = new StudyDAO(ds);
+        HttpServletRequest request = getRequest();
+        if (request == null)
+            return null;
+        String schema = (String) request.getAttribute("requestSchema");
+        request.setAttribute("requestSchema", "public");
+        StudyBean study = studyDAO.findByOid(ocId);
+        request.setAttribute("requestSchema", schema);
+        return study;
+    }
+
+    public static void setRequestSchemaByStudy(String ocId, DataSource ds){
+        StudyBean studyBean = getPublicStudy(ocId,ds);
+        setRequestSchema(studyBean.getSchemaName());
+    }
+
+    private static String handleMultiSchemaConnection(Connection conn, String schema) throws SQLException {
+        if (tenantSchema.get() == null)
+            tenantSchema.set(conn.getSchema());
+
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            HttpSession session = requestAttributes.getRequest().getSession();
+            if (request.getAttribute("changeStudySchema") != null) {
+                schema = (String) request.getAttribute("changeStudySchema");
+                logger.debug("request.getAttribute(\"changeStudySchema\"):" + schema);
+                if (session != null) {
+                    session.setAttribute(CURRENT_TENANT_ID, schema);
+                }
+            } else if (request.getAttribute("requestSchema") != null) {
+                schema = (String) request.getAttribute("requestSchema");
+                logger.debug("request.getAttribute(\"requestSchema\"):" + schema);
+            } else if (session != null) {
+                    schema = (String) session.getAttribute(CURRENT_TENANT_ID);
+                    logger.debug("Session schema:" + schema);
+            } else {
+                    schema = (String) request.getAttribute(CURRENT_TENANT_ID);
+                    logger.debug("Request schema:" + schema);
+            }
+            if (StringUtils.isNotEmpty(schema))
+                tenantSchema.set(schema);
+        }
+        if (StringUtils.isEmpty(schema)) {
+            if (tenantSchema.get() != null) {
+                schema = tenantSchema.get();
+            } else
+                schema = DATAINFO.getProperty("schema");
+        }
+        logger.debug("Current thread schema:" + tenantSchema.get());
+        logger.debug("Current schema for JDBC connections:" + schema);
+        return schema;
+    }
+
+    private void setDatabaseProperties(String database) {
+
+        DATAINFO.setProperty("username", DATAINFO.getProperty("dbUser"));
+        DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
+        DATAINFO.setProperty("archiveUsername", DATAINFO.getProperty("archiveDbUser"));
+        DATAINFO.setProperty("archivePassword", DATAINFO.getProperty("archiveDbPass"));
 
         String url = null, driver = null, hibernateDialect = null;
+        String archiveUrl = null;
         if (database.equalsIgnoreCase("postgres")) {
             url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db") ;
             driver = "org.postgresql.Driver";
-            hibernateDialect = "org.hibernate.dialect.PostgreSQLDialect";
+            hibernateDialect = "org.hibernate.dialect.PostgreSQL94Dialect";
+            archiveUrl = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("archiveDbHost") + ":" + DATAINFO.getProperty("archiveDbPort") + "/" + DATAINFO.getProperty("archiveDb") ;
         } else if (database.equalsIgnoreCase("oracle")) {
             url = "jdbc:oracle:thin:" + "@" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + ":" + DATAINFO.getProperty("db");
             driver = "oracle.jdbc.driver.OracleDriver";
@@ -483,7 +604,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         DATAINFO.setProperty("dataBase", database);
         DATAINFO.setProperty("url", url);
-        DATAINFO.setProperty("schema", schema);
+        DATAINFO.setProperty("archiveUrl", archiveUrl);
         DATAINFO.setProperty("hibernate.dialect", hibernateDialect);
         DATAINFO.setProperty("driver", driver);
 
@@ -596,7 +717,7 @@ public class CoreResources implements ResourceLoaderAware {
         }
 
         /*
-         * 
+         *
          * for (Resource r: resources) { File f = new File(dest, r.getFilename()); if(!f.exists()){ out = new
          * FileOutputStream(f); IOUtils.copy(r.getInputStream(), out); out.close(); } }
          */

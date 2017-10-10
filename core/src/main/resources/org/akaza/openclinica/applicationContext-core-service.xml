@@ -137,6 +137,7 @@
     </bean>
 
     <bean id="odmImportServiceImpl" class="org.akaza.openclinica.service.OdmImportServiceImpl" autowire="byName">
+        <constructor-arg ref="dataSource"/>
         <property name="studyEventDefDao" ref="studyEventDefDaoDomain"/>
         <property name="userAccountDao" ref="userDaoDomain"/>
         <property name="studyUserRoleDao" ref="studyUserRoleDao"/>        
@@ -147,6 +148,7 @@
         <property name="studyDao" ref="studyDaoDomain"/>
         <property name="studyParameterValueDao" ref="studyParameterValueDao"/>
         <property name="xformParser" ref="xformParser"/>
+        <property name="coreResources" ref="coreResources"/>
     </bean>
     <bean id = "enketoCredentials" class="org.akaza.openclinica.service.crfdata.xform.EnketoCredentials">
         <property name="studyDao" ref="studyDaoDomain"/>

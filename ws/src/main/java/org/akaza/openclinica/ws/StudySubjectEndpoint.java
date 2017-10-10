@@ -294,7 +294,7 @@ public class StudySubjectEndpoint {
             throw new OpenClinicaSystemException("studySubjectEndpoint.provide_valid_study_site", "Provide a valid study/site.");
         }
         if (studyIdentifier != null && siteIdentifier == null) {
-            StudyBean study = getStudyDao().findByUniqueIdentifier(studyIdentifier);
+            StudyBean study = getStudyDao().findByOid(studyIdentifier);
             if (study == null) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_identifier", "The study identifier you provided is not valid.");
             }
@@ -306,8 +306,8 @@ public class StudySubjectEndpoint {
             return study;
         }
         if (studyIdentifier != null && siteIdentifier != null) {
-            StudyBean study = getStudyDao().findByUniqueIdentifier(studyIdentifier);
-            StudyBean site = getStudyDao().findByUniqueIdentifier(siteIdentifier);
+            StudyBean study = getStudyDao().findByOid(studyIdentifier);
+            StudyBean site = getStudyDao().findByOid(siteIdentifier);
             if (study == null || site == null || site.getParentStudyId() != study.getId()) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_site_identifier",
                         "The study/site identifier you provided is not valid.");
@@ -428,7 +428,7 @@ public class StudySubjectEndpoint {
         // TODO: Implement this
         StudySubjectDAO ssdao = new StudySubjectDAO(dataSource);
         StudyDAO studyDao = new StudyDAO(dataSource);
-        StudyBean studyBean = studyDao.findByUniqueIdentifier(subjectTransferBean.getStudy().getIdentifier());
+        StudyBean studyBean = studyDao.findByOid(subjectTransferBean.getStudy().getOid());
         StudySubjectBean ssbean = ssdao.findByLabelAndStudy(subjectTransferBean.getStudySubjectId(), studyBean);
         return ssbean.getId() > 0 ? true : false;
     }

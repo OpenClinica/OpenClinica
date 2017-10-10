@@ -123,16 +123,9 @@
                                             name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
                                 </td>
                                 <td>
-  <a href="javascript:processPrintCRFRequest('rest/metadata/html/print/*/*/<c:out value="${version.oid}"/>')"
-                                       onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><span
-                                            name="bt_Print1" class="icon icon-print" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>
-
-                                </td>
-                                <td>
                                     <a href="ViewCRFVersion?id=<c:out value="${version.id}"/>"><span
-                                            name="bt_Metadata" class="icon icon-icon-doubleDataEntry orange" border="0" alt="Metadata" title="Metadata" align="left" hspace="6"></a>
-
+                                            name="bt_Metadata" class="icon icon-icon-doubleDataEntry orange" border="0" alt="Metadata" title="Metadata" align="left" hspace="6">
+                                    </a>
                                 </td>
                             </tr>
                         </table>
@@ -155,7 +148,7 @@
                     <td class="table_header_row"><fmt:message key="item_oid" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="data_type" bundle="${resword}"/></td>
-                    <td class="table_header_row"><fmt:message key="versions" bundle="${resword}"/></td>
+                    <%--<td class="table_header_row"><fmt:message key="versions" bundle="${resword}"/></td>--%>
                     <td class="table_header_row"><fmt:message key="integrity_check" bundle="${resword}"/></td>
                 </tr>
                  <c:forEach var ="item" items="${items}">
@@ -165,7 +158,7 @@
                     <td class="table_cell"><c:out value="${item.itemOID}"/></td>
                     <td class="table_cell"><c:out value="${item.itemDescription}"/></td>
                     <td class="table_cell"><c:out value="${item.itemDataType}"/></td>
-                    <td class="table_cell"><c:out value="${item.versions}"/></td>
+                    <%--<td class="table_cell"><c:out value="${item.versions}"/></td>--%>
                     <td class="table_cell">
                      <c:choose>
      <c:when test="${empty item.arrErrorMesages}"><span class="aka_green_highlight"><b><fmt:message key="ok" bundle="${respage}"/></b></span>       

@@ -20,6 +20,7 @@ import javax.persistence.TemporalType;
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.service.dto.Form;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
@@ -38,7 +39,7 @@ public class EventDefinitionCrf extends DataMapDomainObject {
     private int eventDefinitionCrfId;
     private UserAccount userAccount;
     private StudyEventDefinition studyEventDefinition;
-    private CrfVersion crfVersion;
+    private FormLayout formLayout;
     private Study study;
     private Integer statusId;
     private CrfBean crf;
@@ -68,14 +69,14 @@ public class EventDefinitionCrf extends DataMapDomainObject {
         this.eventDefinitionCrfId = eventDefinitionCrfId;
     }
 
-    public EventDefinitionCrf(int eventDefinitionCrfId, UserAccount userAccount, StudyEventDefinition studyEventDefinition, CrfVersion crfVersion, Study study,
+    public EventDefinitionCrf(int eventDefinitionCrfId, UserAccount userAccount, StudyEventDefinition studyEventDefinition, FormLayout formLayout, Study study,
             Integer statusId, CrfBean crf, Boolean requiredCrf, Boolean doubleEntry, Boolean requireAllTextFilled, Boolean decisionConditions,
             String nullValues, Date dateCreated, Date dateUpdated, Integer updateId, Integer ordinal, Boolean electronicSignature, Boolean hideCrf,
             Boolean participantForm, Integer sourceDataVerificationCode, String selectedVersionIds, Integer parentId, Set datasetCrfVersionMaps) {
         this.eventDefinitionCrfId = eventDefinitionCrfId;
         this.userAccount = userAccount;
         this.studyEventDefinition = studyEventDefinition;
-        this.crfVersion = crfVersion;
+        this.formLayout = formLayout;
         this.study = study;
         this.statusId = statusId;
         this.crf = crf;
@@ -130,12 +131,12 @@ public class EventDefinitionCrf extends DataMapDomainObject {
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "default_version_id")
-    public CrfVersion getCrfVersion() {
-        return this.crfVersion;
+    public FormLayout getFormLayout() {
+        return this.formLayout;
     }
 
-    public void setCrfVersion(CrfVersion crfVersion) {
-        this.crfVersion = crfVersion;
+    public void setFormLayout(FormLayout formLayout) {
+        this.formLayout = formLayout;
     }
 
     @ManyToOne(fetch = FetchType.LAZY)

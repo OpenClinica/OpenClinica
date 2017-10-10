@@ -87,7 +87,7 @@
 <h1 ><span class="title_manage"><fmt:message key="edit_dataset" bundle="${resword}"/> - <fmt:message key="specify_dataset_properties" bundle="${resword}"/>
 : <c:out value="${newDataset.name}"/></span></h1><br/>
 </c:when>
-<c:otherwise><h1 style="margin: 0em"><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="specify_dataset_properties" bundle="${resword}"/></span></h1><br/>
+<c:otherwise><h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="specify_dataset_properties" bundle="${resword}"/></span></h1><br/>
 </c:otherwise>
 </c:choose>
 
@@ -309,7 +309,7 @@
 
 		<input type="hidden" name="dsStatus" value="1"/>
 
-			<input type="submit" name="remove" value=" <fmt:message key="continue" bundle="${resword}"/>" class="button_xlong"/>
+			<input type="submit" name="remove" value=" <fmt:message key="confirm_and_save" bundle="${resword}"/>" class="button_xlong"/>
             <input type="button" onclick="confirmCancel('ViewDatasets');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
 
         </td>

@@ -67,11 +67,24 @@
          </sql>
 	</query>
 	<query>
+		<name>findByPublicOid</name>
+		<sql>SELECT s.* FROM public.study s
+			WHERE s.OC_OID = ?
+		</sql>
+	</query>
+	<query>
         <name>findByUniqueIdentifier</name>
         <sql>SELECT s.* FROM study s
            WHERE s.unique_identifier = ?
          </sql>
     </query>
+	<query>
+		<name>findByStudyEnvUuid</name>
+		<sql>SELECT s.* FROM study s
+			WHERE s.study_env_uuid = ?
+			or s.study_env_site_uuid = ?
+		</sql>
+	</query>
     <query>
         <name>findSiteByUniqueIdentifier</name>
         <sql>select site.* from study site, study study where
@@ -94,7 +107,7 @@
 	</query>
 	<query>
 		<name>findNextKey</name>
-		<sql>select nextval('study_study_id_seq') as key</sql>
+		<sql>select nextval('public.study_study_id_seq') as key</sql>
 	</query>
 	<query>
 		<name>createStepOne</name>
@@ -104,9 +117,9 @@
 		DATE_PLANNED_END, FACILITY_NAME, FACILITY_CITY, FACILITY_STATE,
 		FACILITY_ZIP, FACILITY_COUNTRY, FACILITY_RECRUITMENT_STATUS,
 		FACILITY_CONTACT_NAME, FACILITY_CONTACT_DEGREE, FACILITY_CONTACT_PHONE,
-		FACILITY_CONTACT_EMAIL, STATUS_ID, DATE_CREATED, OWNER_ID, OC_OID)
+		FACILITY_CONTACT_EMAIL, STATUS_ID, DATE_CREATED, OWNER_ID, OC_OID, ENV_TYPE)
 		VALUES (?,
-		?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</sql>
+		?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)</sql>
 	</query>
 	<query>
 	   <name>createStepTwo</name>
@@ -115,7 +128,8 @@
 		PROTOCOL_DATE_VERIFICATION=?, PHASE=?, EXPECTED_TOTAL_ENROLLMENT=?,
 		SPONSOR=?, COLLABORATORS=?, MEDLINE_IDENTIFIER=?, results_reference=?,
 		URL=?,URL_DESCRIPTION=?, CONDITIONS=?, KEYWORDS=?, ELIGIBILITY=?,
-		GENDER=?, AGE_MAX=?, AGE_MIN=?, HEALTHY_VOLUNTEER_ACCEPTED=?
+		GENDER=?, AGE_MAX=?, AGE_MIN=?, HEALTHY_VOLUNTEER_ACCEPTED=?,
+        SCHEMA_NAME=?, STUDY_ENV_UUID=?, STUDY_ENV_SITE_UUID=?, PUBLISHED=?
 		WHERE STUDY_ID=?
       </sql>
 	</query>

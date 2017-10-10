@@ -1,19 +1,20 @@
 <?xml version="1.0" encoding="UTF-8"?>
 
-<beans xmlns="http://www.springframework.org/schema/beans"
-        xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-        xmlns:tx="http://www.springframework.org/schema/tx"
-	    xsi:schemaLocation="http://www.springframework.org/schema/beans
+<beans xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+       xmlns:tx="http://www.springframework.org/schema/tx"
+       xmlns="http://www.springframework.org/schema/beans"
+       xsi:schemaLocation="http://www.springframework.org/schema/beans
                             http://www.springframework.org/schema/beans/spring-beans-4.3.xsd
                             http://www.springframework.org/schema/tx
                             http://www.springframework.org/schema/tx/spring-tx-4.3.xsd"
-                            >
+>
 
 
 
-    <!-- A Hibernate SessionFactory for mapping Domain Objects from object to relation tables -->
-    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean">
-        <property name="dataSource" ref="dataSource"/>
+
+    <bean id="sessionFactory" class="org.springframework.orm.hibernate5.LocalSessionFactoryBean" primary="true">
+        <qualifier value="oc"/>
+        <property name="dataSource" ref="dataSource" />
         <property name="mappingLocations">
             <list>
                 <value>classpath:org/akaza/openclinica/typedefs.hbm.xml</value>
@@ -51,18 +52,18 @@
                 <value>org.akaza.openclinica.domain.crfdata.SCDItemMetadataBean</value>
                 <value>org.akaza.openclinica.domain.usageStats.LogUsageStatsBean</value>
                 <value>org.akaza.openclinica.domain.OpenClinicaVersionBean</value>
- 
+
                 <!-- The following beans are coded for data maping, currently they are partially working, to resume the work uncomment it -->
-                <value>org.akaza.openclinica.domain.datamap.Study</value> 
+                <value>org.akaza.openclinica.domain.datamap.Study</value>
                 <value>org.akaza.openclinica.domain.user.UserAccount</value>
                 <value>org.akaza.openclinica.domain.user.UserType</value>
-                <value>org.akaza.openclinica.domain.datamap.CrfBean              </value>  
-                <value>org.akaza.openclinica.domain.datamap.CompletionStatus</value>  
-                <value>org.akaza.openclinica.domain.datamap.CrfVersion</value>  
-                <value>org.akaza.openclinica.domain.datamap.FormLayout</value>  
-                <value>org.akaza.openclinica.domain.datamap.FormLayoutMedia</value>  
-                <value>org.akaza.openclinica.domain.datamap.DiscrepancyNote      </value>  
-                <value>org.akaza.openclinica.domain.datamap.DiscrepancyNoteType  </value>  
+                <value>org.akaza.openclinica.domain.datamap.CrfBean              </value>
+                <value>org.akaza.openclinica.domain.datamap.CompletionStatus</value>
+                <value>org.akaza.openclinica.domain.datamap.CrfVersion</value>
+                <value>org.akaza.openclinica.domain.datamap.FormLayout</value>
+                <value>org.akaza.openclinica.domain.datamap.FormLayoutMedia</value>
+                <value>org.akaza.openclinica.domain.datamap.DiscrepancyNote      </value>
+                <value>org.akaza.openclinica.domain.datamap.DiscrepancyNoteType  </value>
                 <value>org.akaza.openclinica.domain.datamap.DnEventCrfMap   </value>
                 <value>org.akaza.openclinica.domain.datamap.DnEventCrfMapId </value>
                 <value>org.akaza.openclinica.domain.datamap.DnItemDataMap</value>
@@ -73,47 +74,47 @@
                 <value>org.akaza.openclinica.domain.datamap.DnStudyEventMapId    </value>
                 <value>org.akaza.openclinica.domain.datamap.VersioningMap    </value>
                 <value>org.akaza.openclinica.domain.datamap.VersioningMapId    </value>
-                <value>org.akaza.openclinica.domain.datamap.EventCrf             </value>  
-                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrf   </value>  
-                <value>org.akaza.openclinica.domain.datamap.Item                 </value>  
-                <value>org.akaza.openclinica.domain.datamap.ItemData             </value>  
- 
-                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrfItemTag </value>  
-                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag</value>  
+                <value>org.akaza.openclinica.domain.datamap.EventCrf             </value>
+                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrf   </value>
+                <value>org.akaza.openclinica.domain.datamap.Item                 </value>
+                <value>org.akaza.openclinica.domain.datamap.ItemData             </value>
 
-                <value>org.akaza.openclinica.domain.datamap.ItemDataFlag </value>  
-                <value>org.akaza.openclinica.domain.datamap.EventCrfFlag   </value>  
-                <value>org.akaza.openclinica.domain.datamap.ItemDataFlagWorkflow </value>  
-                <value>org.akaza.openclinica.domain.datamap.EventCrfFlagWorkflow   </value>  
+                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrfItemTag </value>
+                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag</value>
 
-                <value>org.akaza.openclinica.domain.datamap.IdtView   </value>  
-                <value>org.akaza.openclinica.domain.datamap.Tag   </value>  
+                <value>org.akaza.openclinica.domain.datamap.ItemDataFlag </value>
+                <value>org.akaza.openclinica.domain.datamap.EventCrfFlag   </value>
+                <value>org.akaza.openclinica.domain.datamap.ItemDataFlagWorkflow </value>
+                <value>org.akaza.openclinica.domain.datamap.EventCrfFlagWorkflow   </value>
 
-                <value>org.akaza.openclinica.domain.datamap.ItemDataType         </value>  
-                <value>org.akaza.openclinica.domain.datamap.ItemFormMetadata      </value>  
-                <value>org.akaza.openclinica.domain.datamap.ItemGroup             </value>  
-                <value>org.akaza.openclinica.domain.datamap.ItemGroupMetadata     </value>  
-                <value>org.akaza.openclinica.domain.datamap.ItemReferenceType     </value>  
-                <value>org.akaza.openclinica.domain.datamap.ResolutionStatus      </value>  
-                <value>org.akaza.openclinica.domain.datamap.ResponseSet           </value>  
-                <value>org.akaza.openclinica.domain.datamap.ResponseType          </value>  
-                <value>org.akaza.openclinica.domain.datamap.Section               </value>  
-                <value>org.akaza.openclinica.domain.datamap.StudyEvent            </value>  
-                <value>org.akaza.openclinica.domain.datamap.StudyEventDefinition</value>  
-                <value>org.akaza.openclinica.domain.datamap.StudySubject</value>  
-                <value>org.akaza.openclinica.domain.datamap.Subject</value>  
-        
-                <!-- the following were not tested, to be remain commented as of now -->         
+                <value>org.akaza.openclinica.domain.datamap.IdtView   </value>
+                <value>org.akaza.openclinica.domain.datamap.Tag   </value>
+
+                <value>org.akaza.openclinica.domain.datamap.ItemDataType         </value>
+                <value>org.akaza.openclinica.domain.datamap.ItemFormMetadata      </value>
+                <value>org.akaza.openclinica.domain.datamap.ItemGroup             </value>
+                <value>org.akaza.openclinica.domain.datamap.ItemGroupMetadata     </value>
+                <value>org.akaza.openclinica.domain.datamap.ItemReferenceType     </value>
+                <value>org.akaza.openclinica.domain.datamap.ResolutionStatus      </value>
+                <value>org.akaza.openclinica.domain.datamap.ResponseSet           </value>
+                <value>org.akaza.openclinica.domain.datamap.ResponseType          </value>
+                <value>org.akaza.openclinica.domain.datamap.Section               </value>
+                <value>org.akaza.openclinica.domain.datamap.StudyEvent            </value>
+                <value>org.akaza.openclinica.domain.datamap.StudyEventDefinition</value>
+                <value>org.akaza.openclinica.domain.datamap.StudySubject</value>
+                <value>org.akaza.openclinica.domain.datamap.Subject</value>
+
+                <!-- the following were not tested, to be remain commented as of now -->
                 <!--         <value>org.akaza.openclinica.domain.datamap.AuditEvent    </value>       -->
-                <value>org.akaza.openclinica.domain.datamap.AuditLogEvent     </value>   
-                <value>org.akaza.openclinica.domain.datamap.AuditLogEventType    </value>  
+                <value>org.akaza.openclinica.domain.datamap.AuditLogEvent     </value>
+                <value>org.akaza.openclinica.domain.datamap.AuditLogEventType    </value>
                 <!-- to be remain commented for now -->
-                <value>org.akaza.openclinica.domain.datamap.GroupClassTypes      </value>  
+                <value>org.akaza.openclinica.domain.datamap.GroupClassTypes      </value>
                 <!-- <value>org.akaza.openclinica.domain.datamap.MeasurementUnit       </value>   -->
                 <!-- <value>org.akaza.openclinica.domain.datamap.NullValueType         </value>   -->
                 <!-- <value>org.akaza.openclinica.domain.datamap.OpenclinicaVersion    </value>   -->
-                <value>org.akaza.openclinica.domain.datamap.StudyGroup</value>  
-                <value>org.akaza.openclinica.domain.datamap.StudyGroupClass</value>  
+                <value>org.akaza.openclinica.domain.datamap.StudyGroup</value>
+                <value>org.akaza.openclinica.domain.datamap.StudyGroupClass</value>
                 <!-- <value>org.akaza.openclinica.domain.datamap.StudyModuleStatus</value>   -->
                 <value>org.akaza.openclinica.domain.datamap.StudyParameter</value>
                 <value>org.akaza.openclinica.domain.datamap.StudyParameterValue</value>
@@ -123,10 +124,11 @@
                 <value>org.akaza.openclinica.domain.datamap.StudyUserRoleId</value>
                 <value>org.akaza.openclinica.domain.datamap.SubjectGroupMap</value>
 
-       
-                
+
+
             </list>
         </property>
+
         <property name="hibernateProperties">
             <props>
                 <prop key="hibernate.show_sql">false</prop>
@@ -137,9 +139,13 @@
                 <prop key="hibernate.cache.use_query_cache">true</prop>
                 <prop key="hibernate.cache.use_second_level_cache">true</prop>
                 <prop key="hibernate.cache.provider_configuration_file_resource_path">/ehcache.xml</prop>
-                <prop key="hibernate.default_schema">s[schema]</prop>
-                <!-- Uncommenting the following line allows better logging of Hibernate errors for debugging purposes. Must be commented out for production use. -->
-                <!-- prop key="hibernate.jdbc.batch_size">0</prop -->
+                <prop key="hibernate.multiTenancy">SCHEMA</prop>
+                <prop key="hibernate.connection.password">s[password]</prop>
+                <prop key="hibernate.connection.url">s[url]</prop>
+                <prop key="hibernate.connection.username">s[username]</prop>
+                <prop key="hibernate.connection.driver_class">org.postgresql.Driver</prop>
+                <prop key ="hibernate.multi_tenant_connection_provider">org.akaza.openclinica.dao.hibernate.multitenant.DataSourceBasedMultiTenantConnectionProviderImpl</prop>
+                <prop key="hibernate.tenant_identifier_resolver">org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl</prop>
             </props>
         </property>
         <!-- convet aaBb to aa_bb -->
@@ -150,107 +156,114 @@
         <property name="implicitNamingStrategy">
             <bean class="org.hibernate.boot.model.naming.ImplicitNamingStrategyLegacyHbmImpl" />
         </property>
+        <property name="multiTenantConnectionProvider" ref="simpleTenantConnectionProvider"/>
+        <property name="currentTenantIdentifierResolver" ref="currentTenantIdentifierResolverImpl"/>
+    </bean>
+    <!-- A transaction manager for working with Hibernate SessionFactories -->
+    <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager" primary="true">
+        <property name="sessionFactory" ref="sessionFactory"/>
+        <qualifier value="default"/>
+    </bean>
+
+    <bean id="sharedTransactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
+        <property name="transactionManager" ref="transactionManager"/>
+    </bean>
+
+
+    <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
+        <property name="sessionFactory" ref="sessionFactory"/>
+    </bean>
+
+    <!-- Instructs the container to look for beans with @Transactional and decorate them -->
+    <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
+
+    <bean id="currentTenantIdentifierResolverImpl"
+          class="org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl"/>
+
+    <bean id="simpleTenantConnectionProvider" class="org.akaza.openclinica.dao.hibernate.multitenant.DataSourceBasedMultiTenantConnectionProviderImpl"/>
+    <bean id="abstractDomainDao" class="org.akaza.openclinica.dao.hibernate.AbstractDomainDao" abstract="true"/>
+
+    <bean id="ruleActionRunLogDao" class="org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="dynamicsItemFormMetadataDao" class="org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="dynamicsItemGroupMetadataDao" class="org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="ruleSetDao" class="org.akaza.openclinica.dao.hibernate.RuleSetDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="ruleSetAuditDao" class="org.akaza.openclinica.dao.hibernate.RuleSetAuditDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="ruleDao" class="org.akaza.openclinica.dao.hibernate.RuleDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="ruleActionPropertyDao" class="org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="ruleSetRuleDao" class="org.akaza.openclinica.dao.hibernate.RuleSetRuleDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="ruleSetRuleAuditDao" class="org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao" parent="abstractDomainDao" autowire="byName" />
+
+    <bean id="authoritiesDao" class="org.akaza.openclinica.dao.hibernate.AuthoritiesDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="studyModuleStatusDao" class="org.akaza.openclinica.dao.hibernate.StudyModuleStatusDao" parent="abstractDomainDao" autowire="byName"/>
+
+    <bean id="auditUserLoginDao" class="org.akaza.openclinica.dao.hibernate.AuditUserLoginDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="databaseChangeLogDao" class="org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao" autowire="byName" />
+    <bean id="configurationDao" class="org.akaza.openclinica.dao.hibernate.ConfigurationDao" parent="abstractDomainDao" autowire="byName" />
+
+    <bean id="measurementUnitDao" class="org.akaza.openclinica.dao.hibernate.MeasurementUnitDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="scdItemMetadataDao" class="org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao" parent="abstractDomainDao" autowire="byName" />
+
+    <bean id="usageStatsServiceDAO" class="org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO" parent="abstractDomainDao" autowire="byName" />
+    <bean id="openClinicaVersionDAO" class="org.akaza.openclinica.dao.hibernate.OpenClinicaVersionDAO" parent="abstractDomainDao" autowire="byName" />
+    <bean id="crfVersionDao" class="org.akaza.openclinica.dao.hibernate.CrfVersionDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="formLayoutDao" class="org.akaza.openclinica.dao.hibernate.FormLayoutDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="eventCrfDao" class="org.akaza.openclinica.dao.hibernate.EventCrfDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="eventDefinitionCrfDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="formLayoutMediaDao" class="org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="crfDao" class="org.akaza.openclinica.dao.hibernate.CrfDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="sectionDao" class="org.akaza.openclinica.dao.hibernate.SectionDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="itemGroupDao" class="org.akaza.openclinica.dao.hibernate.ItemGroupDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="itemDao" class="org.akaza.openclinica.dao.hibernate.ItemDao" parent="abstractDomainDao" autowire="byName" />
+
+
+    <bean id="eventDefinitionCrfItemTagDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfItemTagDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="eventDefinitionCrfTagDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao" parent="abstractDomainDao" autowire="byName" />
+
+    <bean id="eventCrfFlagDao" class="org.akaza.openclinica.dao.hibernate.EventCrfFlagDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="itemDataFlagDao" class="org.akaza.openclinica.dao.hibernate.ItemDataFlagDao" parent="abstractDomainDao" autowire="byName" />
+
+    <bean id="eventCrfFlagWorkflowDao" class="org.akaza.openclinica.dao.hibernate.EventCrfFlagWorkflowDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="itemDataFlagWorkflowDao" class="org.akaza.openclinica.dao.hibernate.ItemDataFlagWorkflowDao" parent="abstractDomainDao" autowire="byName" />
+
+    <bean id="idtViewDao" class="org.akaza.openclinica.dao.hibernate.IdtViewDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="tagDao" class="org.akaza.openclinica.dao.hibernate.TagDao" parent="abstractDomainDao" autowire="byName" />
+
+
+    <bean id="itemDataDao" class="org.akaza.openclinica.dao.hibernate.ItemDataDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="itemReferenceTypeDao" class="org.akaza.openclinica.dao.hibernate.ItemReferenceTypeDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="itemDataTypeDao" class="org.akaza.openclinica.dao.hibernate.ItemDataTypeDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="responseSetDao" class="org.akaza.openclinica.dao.hibernate.ResponseSetDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="responseTypeDao" class="org.akaza.openclinica.dao.hibernate.ResponseTypeDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="itemFormMetadataDao" class="org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="versioningMapDao" class="org.akaza.openclinica.dao.hibernate.VersioningMapDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="itemGroupMetadataDao" class="org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="studyParameterValueDao" class="org.akaza.openclinica.dao.hibernate.StudyParameterValueDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="studyParameterDao" class="org.akaza.openclinica.dao.hibernate.StudyParameterDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="dnItemDataMapDao" class="org.akaza.openclinica.dao.hibernate.DnItemDataMapDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="completionStatusDao" class="org.akaza.openclinica.dao.hibernate.CompletionStatusDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="discrepancyNoteDao" class="org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="discrepancyNoteTypeDao" class="org.akaza.openclinica.dao.hibernate.DiscrepancyNoteTypeDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="resolutionStatusDao" class="org.akaza.openclinica.dao.hibernate.ResolutionStatusDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="studyUserRoleDao" class="org.akaza.openclinica.dao.hibernate.StudyUserRoleDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="subjectDao" class="org.akaza.openclinica.dao.hibernate.SubjectDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="SchemaServiceDao" class="org.akaza.openclinica.dao.hibernate.SchemaServiceDao" autowire="byName" />
+
+    <bean id="viewNotesDao" class="org.akaza.openclinica.dao.managestudy.ViewNotesDaoImpl">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="queryStore" ref="queryStore"/>
+    </bean>
+
+    <bean id="studyDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyDao" parent="abstractDomainDao" autowire="byName">
 
     </bean>
 
-  <!-- A transaction manager for working with Hibernate SessionFactories -->
-  <bean id="transactionManager" class="org.springframework.orm.hibernate5.HibernateTransactionManager">
-    <property name="sessionFactory" ref="sessionFactory"/>
-  </bean>
-  
-  <bean id="sharedTransactionTemplate" class="org.springframework.transaction.support.TransactionTemplate">
-    <property name="transactionManager" ref="transactionManager"/>
-  </bean>
-  
-
-  <bean id="hibernateTemplate" class="org.springframework.orm.hibernate5.HibernateTemplate">
-    <property name="sessionFactory" ref="sessionFactory"/>
-  </bean>
-
-  <!-- Instructs the container to look for beans with @Transactional and decorate them -->
-  <tx:annotation-driven transaction-manager="transactionManager" proxy-target-class="true"/>
-
-  <bean id="abstractDomainDao" class="org.akaza.openclinica.dao.hibernate.AbstractDomainDao" abstract="true"/>
-
-  <bean id="ruleActionRunLogDao" class="org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="dynamicsItemFormMetadataDao" class="org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="dynamicsItemGroupMetadataDao" class="org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="ruleSetDao" class="org.akaza.openclinica.dao.hibernate.RuleSetDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="ruleSetAuditDao" class="org.akaza.openclinica.dao.hibernate.RuleSetAuditDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="ruleDao" class="org.akaza.openclinica.dao.hibernate.RuleDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="ruleActionPropertyDao" class="org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="ruleSetRuleDao" class="org.akaza.openclinica.dao.hibernate.RuleSetRuleDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="ruleSetRuleAuditDao" class="org.akaza.openclinica.dao.hibernate.RuleSetRuleAuditDao" parent="abstractDomainDao" autowire="byName" />
-
-  <bean id="authoritiesDao" class="org.akaza.openclinica.dao.hibernate.AuthoritiesDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="studyModuleStatusDao" class="org.akaza.openclinica.dao.hibernate.StudyModuleStatusDao" parent="abstractDomainDao" autowire="byName"/>
-
-  <bean id="auditUserLoginDao" class="org.akaza.openclinica.dao.hibernate.AuditUserLoginDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="databaseChangeLogDao" class="org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao" autowire="byName" />
-  <bean id="configurationDao" class="org.akaza.openclinica.dao.hibernate.ConfigurationDao" parent="abstractDomainDao" autowire="byName" />
-
-  <bean id="measurementUnitDao" class="org.akaza.openclinica.dao.hibernate.MeasurementUnitDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="scdItemMetadataDao" class="org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao" parent="abstractDomainDao" autowire="byName" />
-  
-  <bean id="usageStatsServiceDAO" class="org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO" parent="abstractDomainDao" autowire="byName" />
-  <bean id="openClinicaVersionDAO" class="org.akaza.openclinica.dao.hibernate.OpenClinicaVersionDAO" parent="abstractDomainDao" autowire="byName" />
-  <bean id="crfVersionDao" class="org.akaza.openclinica.dao.hibernate.CrfVersionDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="formLayoutDao" class="org.akaza.openclinica.dao.hibernate.FormLayoutDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="eventCrfDao" class="org.akaza.openclinica.dao.hibernate.EventCrfDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="eventDefinitionCrfDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="formLayoutMediaDao" class="org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="crfDao" class="org.akaza.openclinica.dao.hibernate.CrfDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="sectionDao" class="org.akaza.openclinica.dao.hibernate.SectionDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="itemGroupDao" class="org.akaza.openclinica.dao.hibernate.ItemGroupDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="itemDao" class="org.akaza.openclinica.dao.hibernate.ItemDao" parent="abstractDomainDao" autowire="byName" />
-
-
-  <bean id="eventDefinitionCrfItemTagDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfItemTagDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="eventDefinitionCrfTagDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao" parent="abstractDomainDao" autowire="byName" />
- 
-  <bean id="eventCrfFlagDao" class="org.akaza.openclinica.dao.hibernate.EventCrfFlagDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="itemDataFlagDao" class="org.akaza.openclinica.dao.hibernate.ItemDataFlagDao" parent="abstractDomainDao" autowire="byName" />
- 
-  <bean id="eventCrfFlagWorkflowDao" class="org.akaza.openclinica.dao.hibernate.EventCrfFlagWorkflowDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="itemDataFlagWorkflowDao" class="org.akaza.openclinica.dao.hibernate.ItemDataFlagWorkflowDao" parent="abstractDomainDao" autowire="byName" />
-
-  <bean id="idtViewDao" class="org.akaza.openclinica.dao.hibernate.IdtViewDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="tagDao" class="org.akaza.openclinica.dao.hibernate.TagDao" parent="abstractDomainDao" autowire="byName" />
-
-
-  <bean id="itemDataDao" class="org.akaza.openclinica.dao.hibernate.ItemDataDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="itemReferenceTypeDao" class="org.akaza.openclinica.dao.hibernate.ItemReferenceTypeDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="itemDataTypeDao" class="org.akaza.openclinica.dao.hibernate.ItemDataTypeDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="responseSetDao" class="org.akaza.openclinica.dao.hibernate.ResponseSetDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="responseTypeDao" class="org.akaza.openclinica.dao.hibernate.ResponseTypeDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="itemFormMetadataDao" class="org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="versioningMapDao" class="org.akaza.openclinica.dao.hibernate.VersioningMapDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="itemGroupMetadataDao" class="org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="studyParameterValueDao" class="org.akaza.openclinica.dao.hibernate.StudyParameterValueDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="dnItemDataMapDao" class="org.akaza.openclinica.dao.hibernate.DnItemDataMapDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="completionStatusDao" class="org.akaza.openclinica.dao.hibernate.CompletionStatusDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="discrepancyNoteDao" class="org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="discrepancyNoteTypeDao" class="org.akaza.openclinica.dao.hibernate.DiscrepancyNoteTypeDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="resolutionStatusDao" class="org.akaza.openclinica.dao.hibernate.ResolutionStatusDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="studyUserRoleDao" class="org.akaza.openclinica.dao.hibernate.StudyUserRoleDao" parent="abstractDomainDao" autowire="byName" />
-  <bean id="subjectDao" class="org.akaza.openclinica.dao.hibernate.SubjectDao" parent="abstractDomainDao" autowire="byName" />
-  
-  <bean id="viewNotesDao" class="org.akaza.openclinica.dao.managestudy.ViewNotesDaoImpl">
-    <property name="dataSource" ref="dataSource"/>
-    <property name="queryStore" ref="queryStore"/>
-  </bean>
-  
-  <bean id="studyDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyDao" parent="abstractDomainDao" autowire="byName">
-  
-  </bean>
-    
-  <bean id="studySubjectDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudySubjectDao" parent="abstractDomainDao" autowire="byName">
-  </bean>
-   <bean id="studyEventDefDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao" parent="abstractDomainDao" autowire="byName">
-  </bean>
-   <bean id="auditLogEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.AuditLogEventDao" parent="abstractDomainDao" autowire="byName">
-  </bean>
-  <bean id="userDaoDomain" class="org.akaza.openclinica.dao.hibernate.UserAccountDao" parent="abstractDomainDao" autowire="byName"/>
-  <bean id="userTypeDao" class="org.akaza.openclinica.dao.hibernate.UserTypeDao" parent="abstractDomainDao" autowire="byName"/>
-  <bean id="studyEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDao" parent="abstractDomainDao" autowire="byName"></bean> 
+    <bean id="studySubjectDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudySubjectDao" parent="abstractDomainDao" autowire="byName">
+    </bean>
+    <bean id="studyEventDefDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao" parent="abstractDomainDao" autowire="byName">
+    </bean>
+    <bean id="auditLogEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.AuditLogEventDao" parent="abstractDomainDao" autowire="byName">
+    </bean>
+    <bean id="userDaoDomain" class="org.akaza.openclinica.dao.hibernate.UserAccountDao" parent="abstractDomainDao" autowire="byName"/>
+    <bean id="userTypeDao" class="org.akaza.openclinica.dao.hibernate.UserTypeDao" parent="abstractDomainDao" autowire="byName"/>
+    <bean id="studyEventDaoDomain" class="org.akaza.openclinica.dao.hibernate.StudyEventDao" parent="abstractDomainDao" autowire="byName"></bean>
 </beans>

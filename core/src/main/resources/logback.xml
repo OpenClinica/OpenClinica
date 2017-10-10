@@ -20,6 +20,8 @@
 	</appender>
 	<logger name="org.hibernate.SQL" level="${hibernateSQLLogLevel}" />
 	<logger name="org.hibernate.type" level="${hibernateTypeLogLevel}" />
+	<logger name="org.springframework.security" level="ERROR" />
+	<logger name="liquibase" level="ERROR" />
 	<root level="${logLevel}">
 		<appender-ref ref="FILE" />
 		<appender-ref ref="STDOUT" />

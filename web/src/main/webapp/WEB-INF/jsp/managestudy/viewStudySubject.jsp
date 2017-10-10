@@ -41,7 +41,7 @@
             }
         });
     }
-    
+
     function checkCRFLockedInitial(ecId, formName){
         if(ecId==0) {formName.submit(); return;}
         jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
@@ -108,16 +108,11 @@
       }
 </script>
 
-<table border="0" cellpadding="0" cellspacing="0" width="100%">
-    <tr><td>
-        <h1 style="margin: 0em">
-            <div class="title_manage">
-                <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/>
-           </div>
-        </h1><br/>
-        </td>
-    </tr>
-</table>
+<h1>
+    <span class="title manage">
+        <fmt:message key="view_subject" bundle="${restext}"/> <c:out value="${studySub.label}"/>
+    </span>
+</h1>
 
 <%-- <p>
     <a href="#events"><fmt:message key="events" bundle="${resword}"/></a> &nbsp; &nbsp; &nbsp;

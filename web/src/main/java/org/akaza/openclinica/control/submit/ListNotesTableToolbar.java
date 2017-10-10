@@ -3,7 +3,6 @@ package org.akaza.openclinica.control.submit;
 import static java.util.Arrays.sort;
 
 import java.util.Comparator;
-import java.util.Map;
 import java.util.ResourceBundle;
 
 import org.akaza.openclinica.control.DefaultToolbar;
@@ -129,14 +128,15 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         }
 
         /**
-         * @return Dynamically generate the indexes of studyGroupClasses. It
-         *         starts from 4 because there are 4 columns before study group
-         *         columns that will require to be hidden.
-         * @see ListStudySubjectTableFactory#configureColumns(org.jmesa.facade.TableFacade,
+         * @return These indexes represent the 0-based column indexes on the Notes page.
+         *         Columns in this list are hidden by default and can be revealed by clicking 
+         *         a link in the table..
+         *         
+         * @see ListNotesTableFactory#configureColumns(org.jmesa.facade.TableFacade,
          *      java.util.Locale)
          */
         String getIndexes() {
-            String result = "4, 5, 9, 11, 14, 16, 17, 19";
+            String result = "1, 4, 8, 10, 12, 16";
             return result;
         }
 

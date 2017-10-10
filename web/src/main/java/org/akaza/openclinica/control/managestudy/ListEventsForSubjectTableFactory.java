@@ -105,12 +105,12 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     public ListEventsForSubjectTableFactory(boolean showMoreLink) {
         imageIconPaths.put(1, "icon icon-clock2");
-        imageIconPaths.put(2, "icon icon-doc");
+        imageIconPaths.put(2, "icon icon-clock");
         imageIconPaths.put(3, "icon icon-pencil-squared orange");
         imageIconPaths.put(4, "icon icon-checkbox-checked green");
         imageIconPaths.put(5, "icon icon-stop-circle red");
         imageIconPaths.put(6, "icon icon-redo");
-        imageIconPaths.put(7, "icon icon-icon-locked");
+        imageIconPaths.put(7, "icon icon-lock");
         imageIconPaths.put(8, "icon icon-icon-sign");
 
         crfColumnImageIconPaths.put(0, "icon icon-file-excel red");
@@ -120,7 +120,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         crfColumnImageIconPaths.put(4, "icon icon-icon-doubleDataEntry orange");
         crfColumnImageIconPaths.put(5, "icon icon-checkbox-checked green");
         crfColumnImageIconPaths.put(6, "icon icon-checkbox-checked green");
-        crfColumnImageIconPaths.put(7, "icon icon-icon-locked");
+        crfColumnImageIconPaths.put(7, "icon icon-lock");
         this.showMoreLink = showMoreLink;
     }
 
@@ -839,8 +839,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     private String reAssignStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" href=\"ReassignStudySubject?id="+studySubject.getId());
-        builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Reassign\" alt=\"Reassign\" class=\"icon icon-icon-reassign\" name=\"bt_Reassign1\"/></a>");
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-reassign3');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-icon-reassign3');\" href=\"ReassignStudySubject?id="+studySubject.getId());
+        builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Reassign\" alt=\"Reassign\" class=\"icon icon-icon-reassign3\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
     }

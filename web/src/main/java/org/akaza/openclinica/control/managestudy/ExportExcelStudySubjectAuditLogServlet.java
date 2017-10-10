@@ -452,7 +452,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                         }
                         row++;
 
-                        excelRow = new String[] { auditBean.getCrfName(), auditBean.getCrfVersionName(), dateFormat(auditBean.getDateInterviewed()),
+                        excelRow = new String[] { auditBean.getCrfName(), auditBean.getFormLayoutName(), dateFormat(auditBean.getDateInterviewed()),
                                 auditBean.getInterviewerName(), auditBean.getUserName() };
                         for (int i = 0; i < excelRow.length; i++) {
                             label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
@@ -572,7 +572,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
             workbook.write();
             workbook.close();
             session.setAttribute("subject", null);
-            session.setAttribute("study", null);
             session.setAttribute("studySub", null);
             session.setAttribute("studyEventAudits", null);
             session.setAttribute("studySubjectAudits", null);

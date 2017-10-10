@@ -37,7 +37,7 @@
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
-<h1 style="margin: 0em;"><span class="title_manage"><fmt:message key="view_scheduled_inport_jobs" bundle="${resword}"/></span></h1>
+<h1><span class="title_manage"><fmt:message key="view_scheduled_inport_jobs" bundle="${resword}"/></span></h1>
 
 <%-- <div class="homebox_bullets"><a href="CreateJobExport">Create a new Export Data Job</a></div> --%>
 <div class="homebox_bullets"><a style="text-decoration: none" href="CreateJobImport"><fmt:message key="create_a_new_import_data_job" bundle="${resword}"/></a></div>
