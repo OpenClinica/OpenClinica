@@ -188,7 +188,7 @@
 
 				<c:when test="${dedc.status.name=='locked'}">
 					<td class="table_cell" bgcolor="#F5F5F5" align="center" width="20">
-						<span class="icon icon-icon-locked" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
+						<span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
 					</td>
 				</c:when>
 
@@ -295,7 +295,7 @@
 		    <span class="icon icon-pencil" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>">
 		 </c:when>
 		 <c:when test="${dec.stage.locked || dec.eventCRF.status.locked || dec.locked}">
-		   <span class="icon icon-icon-locked" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
+		   <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>">
 		 </c:when>
 		 <c:otherwise>
 		    <span class="icon icon-file-excel red" alt="<fmt:message key="invalid" bundle="${resword}"/>" title="<fmt:message key="invalid" bundle="${resword}"/>">
