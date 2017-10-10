@@ -184,17 +184,16 @@
                     <td valign="top">
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
+                                <td>
+                                    <input onfocus="this.select()" type="text" name="enrollmentDate" size="16" value="<c:out value="${enrollmentDate}" />" class="formfieldM form-control" id="enrollmentDateField" />
+                                </td>
                                 <td valign="top" class="icon-container">
                                     <a href="#">
                                          <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
                                             <script type="text/javascript">
                                             Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger", customPX: 300, customPY: 10 });
                                             </script>
-                                        </a>
-                                            
-                                </td>
-                                <td class="icon-input-container">
-                                    <input onfocus="this.select()" type="text" name="enrollmentDate" size="16" value="<c:out value="${enrollmentDate}" />" class="formfieldM form-control" id="enrollmentDateField" />
+                                        </a>    
                                 </td>
                             </tr>
                             <tr>
@@ -360,15 +359,15 @@
                     <td valign="top">
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
+                                <td>
+                                    <input type="text" name="startDate" size="15" value="<c:out value="${startDate}" />" class="formfieldM form-control" id="enrollmentDateField2" />
+                                </td>
                                 <td valign="top" class="icon-container">
                                      <a href="#">
                                          <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2"/></a>
                                          <script type="text/javascript">
                                          Calendar.setup({inputField  : "enrollmentDateField2", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger2" ,customPX: 300, customPY: 10 });
                                          </script>
-                                </td>
-                                <td class="icon-input-container">
-                                    <input type="text" name="startDate" size="15" value="<c:out value="${startDate}" />" class="formfieldM form-control" id="enrollmentDateField2" />
                                 </td>
                             </tr>
                             <tr>
