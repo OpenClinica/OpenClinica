@@ -122,7 +122,7 @@ public class PFormCache {
         contextMap.put("studyEventID", studyEventID);
 
         contextMap.put("studyOid", studyOid);
-        String hashString = studySubjectOID + "." + studyEventDefinitionID + "." + studyEventOrdinal + "." + formLayoutOID;
+        String hashString = userAccountID + "." + studySubjectOID + "." + studyEventDefinitionID + "." + studyEventOrdinal + "." + formLayoutOID;
         ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
         String hashOutput = encoder.encodePassword(hashString, null);
         subjectContextCache.remove(hashOutput);
