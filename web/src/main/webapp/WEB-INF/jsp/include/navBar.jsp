@@ -7,6 +7,9 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+
 <script language="JavaScript">
 
         // Walkme snippet
@@ -164,7 +167,7 @@
                                             <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a></li>
                                             <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                             <c:if test="${study.status.available}">
-                                                <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
+                                                <li><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
                                             </c:if>
                                             <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></li>
                                         </c:if>
@@ -172,7 +175,7 @@
                                             <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a></li>
                                             <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                             <c:if test="${study.status.available}">
-                                                <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
+                                                <li><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
                                             </c:if>
                                             <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></li>
                                         </c:if>
@@ -203,8 +206,6 @@
         </tr>
     </table>
     <!-- NAVIGATION DROP-DOWN -->
-
-
 
 <div id="nav_hide" style="position: absolute; left: 0px; top: 0px; visibility: hidden; z-index: 2; width: 100%; height: 400px;">
 
@@ -243,7 +244,7 @@
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
             <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
         </div>
@@ -261,7 +262,7 @@
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
             <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
         </div>
@@ -287,7 +288,7 @@
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
             <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
         </div>
@@ -333,4 +334,33 @@
         <br clear="all">
         </c:if>
     </div>
+</div>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        jQuery('#navAddSubject').click(function () {
+            jQuery.blockUI({message: jQuery('#navAddSubjectForm'), css: {left: "300px", top: "10px"}});
+        });
+
+        jQuery('#cancel').click(function () {
+            jQuery.unblockUI();
+            return false;
+        });
+    });
+</script>
+
+<div id="navAddSubjectForm" style="display: none">
+    <c:catch var="addSubjectMonitorContainer">
+        <c:import url="submit/addNewSubjectExpressNew.jsp"/>
+    </c:catch>
+    <c:if test="${!empty addSubjectMonitorContainer}">
+        <c:catch var="addSubjectMonitorContainer2">
+            <c:import url="../submit/addNewSubjectExpressNew.jsp"/>
+        </c:catch>
+        <c:if test="${!empty addSubjectMonitorContainer2}">
+            <c:catch var="addSubjectMonitorContainer3">
+                <c:import url="submit/addNewSubjectExpressNew.jsp"/>
+            </c:catch>
+        </c:if>
+    </c:if>
 </div>

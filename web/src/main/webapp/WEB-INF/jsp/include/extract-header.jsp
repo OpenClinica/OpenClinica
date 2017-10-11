@@ -31,6 +31,14 @@
 <script language="JavaScript" src="includes/Tabs.js"></script>
 <script language="JavaScript" src="includes/CalendarPopup.js"></script>
 
+<!-- Added for the new Calender -->
+<link rel="stylesheet" type="text/css" media="all" href="includes/new_cal/skins/aqua/theme.css" title="Aqua" />
+<script type="text/javascript" src="includes/new_cal/calendar.js"></script>
+<script type="text/javascript" src="includes/new_cal/lang/calendar-en.js"></script>
+<script type="text/javascript" src="includes/new_cal/lang/<fmt:message key="jscalendar_language_file" bundle="${resformat}"/>"></script>
+<script type="text/javascript" src="includes/new_cal/calendar-setup.js"></script>
+<!-- End -->
+
 </head>
 
 <body class="main_BG" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0"

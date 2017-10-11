@@ -427,7 +427,7 @@
         <td><div class="lines"></div></td>
     </tr>
     <tr>
-        <td colspan="2">
+        <td colspan="2" style="text-align: center;">
             <input type="submit" name="addSubject" value="Add"/>
             &nbsp;
             <input type="button" id="cancel" name="cancel" value="Cancel"/>
