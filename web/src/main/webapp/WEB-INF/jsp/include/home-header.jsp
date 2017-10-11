@@ -61,11 +61,69 @@
         function sizeFix(){var obol=$('ol');obol.style.height=pageHeight()+'px';obol.style.width=pageWidth()+'px';}
         function kp(e){ky=e?e.which:event.keyCode;if(ky==88||ky==120)hm();return false}
         function inf(h){tag=document.getElementsByTagName('select');for(i=tag.length-1;i>=0;i--)tag[i].style.visibility=h;tag=document.getElementsByTagName('iframe');for(i=tag.length-1;i>=0;i--)tag[i].style.visibility=h;tag=document.getElementsByTagName('object');for(i=tag.length-1;i>=0;i--)tag[i].style.visibility=h;}
-        function sm(obl, wd, ht){var h='hidden';var b='block';var p='px';var obol=$('ol'); var obbxd = $('mbd');obbxd.innerHTML = $(obl).innerHTML;obol.style.height=pageHeight()+p;obol.style.width=pageWidth()+p;obol.style.top=posTop()+p;obol.style.left=posLeft()+p;obol.style.display=b;var tp=posTop()+((pageHeight()-ht)/2)-12;var lt=posLeft()+((pageWidth()-wd)/2)-12;var obbx=$('mbox');obbx.style.top=(tp<0?0:tp)+p;obbx.style.left=(lt<0?0:lt)+p;obbx.style.width=wd+p;obbx.style.height=ht+p;inf(h);obbx.style.display=b;return false;}
-        function hm(){var v='visible';var n='none';$('ol').style.display=n;$('mbox').style.display=n;inf(v);document.onkeypress=''}
 
-        function initmb(){var ab='absolute';var n='none';var obody=document.getElementsByTagName('body')[0];var frag=document.createDocumentFragment();var obol=document.createElement('div');obol.setAttribute('id','ol');obol.style.display=n;obol.style.position=ab;obol.style.top=0;obol.style.left=0;obol.style.zIndex=998;obol.style.width='100%';frag.appendChild(obol);var obbx=document.createElement('div');obbx.setAttribute('id','mbox');obbx.style.display=n;obbx.style.position=ab;obbx.style.zIndex=999;var obl=document.createElement('span');obbx.appendChild(obl);var obbxd=document.createElement('div');obbxd.setAttribute('id','mbd');obl.appendChild(obbxd);frag.insertBefore(obbx,obol.nextSibling);obody.insertBefore(frag,obody.firstChild);
-            window.onscroll = scrollFix; window.onresize = sizeFix;
+        // Initialize markup
+        function initmb() {
+          var ab = 'absolute';
+          var n = 'none';
+          var obody = document.getElementsByTagName('body')[0];
+          var frag = document.createDocumentFragment();
+          var obol = document.createElement('div');
+          obol.setAttribute('id', 'ol');
+          obol.style.display = n;
+          obol.style.position = ab;
+          obol.style.top = 0;
+          obol.style.left = 0;
+          obol.style.zIndex = 998;
+          obol.style.width = '100%';
+          frag.appendChild(obol);
+          var obbx = document.createElement('div');
+          obbx.setAttribute('id', 'mbox');
+          obbx.style.display = n;
+          obbx.style.position = ab;
+          obbx.style.zIndex = 999;
+          var obl = document.createElement('span');
+          obbx.appendChild(obl);
+          var obbxd = document.createElement('div');
+          obbxd.setAttribute('id', 'mbd');
+          obl.appendChild(obbxd);
+          frag.insertBefore(obbx, obol.nextSibling);
+          obody.insertBefore(frag, obody.firstChild);
+        }
+
+        // Show markup
+        function sm(obl, wd, ht) {
+          var h = 'hidden';
+          var b = 'block';
+          var p = 'px';
+          var obol = document.getElementById('ol');
+          var obbxd = document.getElementById('mbd');
+          obbxd.innerHTML = document.getElementById(obl).innerHTML;
+          obol.style.height = pageHeight() + p;
+          obol.style.width = pageWidth() + p;
+          obol.style.top = posTop() + p;
+          obol.style.left = posLeft() + p;
+          obol.style.display = b;
+          var tp = posTop() + ((pageHeight() - ht) / 2) - 12;
+          var lt = posLeft() + ((pageWidth() - wd) / 2) - 12;
+          var obbx = document.getElementById('mbox');
+          obbx.style.top = (tp < 0 ? 0 : tp) + p;
+          obbx.style.left = (lt < 0 ? 0 : lt) + p;
+          obbx.style.width = wd + p;
+          obbx.style.height = ht + p;
+          inf(h);
+          obbx.style.display = b;
+          return false;
+        }
+
+        // Close markup
+        function hm() {
+          var v = 'visible';
+          var n = 'none';
+          document.getElementById('ol').style.display = n;
+          document.getElementById('mbox').style.display = n;
+          inf(v);
+          document.onkeypress = ''
         }
     </script>
 
