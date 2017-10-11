@@ -57,10 +57,3 @@
 <div class="icons_image"><img src="images/icon_Signed.gif" class="icon_space"
                                alt="<fmt:message key="sign" bundle='${reswords}'/>" align="bottom"> <fmt:message key="sign" bundle="${reswords}"/></div>
   </c:if>
-
-
-         <div class="sidebar_tab_content">
-
-             <a href="#" onClick="openDefWindow('help/allicons.html'); return false;"><fmt:message key="view_all_icons" bundle="${reswords}"/></a>
-
-         </div>
