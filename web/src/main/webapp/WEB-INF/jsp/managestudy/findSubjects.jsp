@@ -37,7 +37,7 @@
             jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
         });
 
-        jQuery('#cancel').click(function() {
+        jQuery('input#cancel').click(function() {
             jQuery.unblockUI();
             return false;
         });
