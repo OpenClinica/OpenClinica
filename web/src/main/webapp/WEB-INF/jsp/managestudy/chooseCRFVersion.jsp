@@ -14,9 +14,9 @@
 
 <link rel="SHORTCUT ICON" href="../../images/favicon.ico" type="image/x-icon" />
 
-<jsp:include page="../include/managestudy_top_pages_new.jsp"/>
-	
-	
+<jsp:include page="../include/managestudy_top_pages_new.jsp">
+	<jsp:param name="isSpringControllerCCV" value="true" />
+</jsp:include>
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
