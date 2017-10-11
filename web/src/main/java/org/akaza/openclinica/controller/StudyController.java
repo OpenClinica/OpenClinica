@@ -276,6 +276,7 @@ public class StudyController {
         String collectBirthDate = (String) map.get("collectDateOfBirth");
         Boolean collectSex = (Boolean) map.get("collectSex");
         String collectPersonId = (String) map.get("collectPersonId");
+        Boolean showSecondaryId = (Boolean) map.get("showSecondaryId");
         if (collectBirthDate == null) {
             ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
             errorObjects.add(errorObject);
@@ -295,6 +296,11 @@ public class StudyController {
             collectPersonId = collectPersonId.trim();
         }
         spc.setSubjectPersonIdRequired(collectPersonId);
+        if (showSecondaryId == null) {
+            ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "ShowSecondaryId");
+            errorObjects.add(errorObject);
+        }
+        spc.setSecondaryLabelViewable(Boolean.toString(showSecondaryId));
         return spc;
     }
 
@@ -679,6 +685,9 @@ public class StudyController {
                 case "personIdShownOnCRF":
                     spv.setValue(studyParameterConfig.getPersonIdShownOnCRF());
                     break;
+                case "secondaryLabelViewable":
+                    spv.setValue(studyParameterConfig.getSecondaryLabelViewable());
+                    break;
 
             }
         }
@@ -806,6 +815,15 @@ public class StudyController {
         personIdShownOnCRFValue.setStudyParameter(personIdShownOnCRF);
         personIdShownOnCRFValue.setValue(studyParameterConfig.getPersonIdShownOnCRF());
         studyParameterValues.add(personIdShownOnCRFValue);
+
+        StudyParameterValue secondaryLabelViewableValue = new StudyParameterValue();
+        secondaryLabelViewableValue.setStudy(schemaStudy);
+        StudyParameter secondaryLabelViewable = studyParameterDao.findByHandle("secondaryLabelViewable");
+        secondaryLabelViewableValue.setStudyParameter(secondaryLabelViewable);
+        secondaryLabelViewableValue.setValue(studyParameterConfig.getSecondaryLabelViewable());
+        studyParameterValues.add(secondaryLabelViewableValue);
+
+
         studyDao.saveOrUpdate(schemaStudy);
         if (StringUtils.isNotEmpty(schema))
             CoreResources.setRequestSchema(request, schema);
