@@ -293,7 +293,7 @@
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
             <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="JavaScript:;" id="addSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
         </div>
