@@ -80,15 +80,6 @@
   <jsp:include page="../include/showPopUp.jsp"/>
 >
 
-<body class="main_BG" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0"
-    <c:if test="${(!study.status.locked || !study.status.frozen || !study.status.available)}">
-        <c:if test="${userBean.numVisitsToMainMenu<=1 || studyJustChanged=='yes'}">
-            onload="initmb();sm('box', 730,100);"
-         </c:if>
-      </c:if>
-    <jsp:include page="../include/showPopUp.jsp"/>
->
-
 <table border="0" cellpadding="0" cellspacing="0" width="100%" height="100%" class="background">
     <tr>
         <td valign="top">
