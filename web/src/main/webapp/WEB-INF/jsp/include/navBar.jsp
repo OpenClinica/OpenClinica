@@ -77,6 +77,7 @@
 <!--  If Controller Spring based append ../ to urls -->
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}" />
+<c:set var="requestFromSpringController" value="${param.isSpringControllerCCV}" />
 <c:if test="${requestFromSpringController == 'true' }">
       <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
 </c:if>
@@ -94,6 +95,11 @@
                 <c:if test="${param.isSpringController}">
                     <c:set var="isHref" value="../MainMenu" />
                     <c:set var="isLogo" value="../images/logo-color-on-dark.svg" />
+                </c:if>
+
+                <c:if test="${param.isSpringControllerCCV}">
+                    <c:set var="isHref" value="../../MainMenu" />
+                    <c:set var="isLogo" value="../../images/logo-color-on-dark.svg" />
                 </c:if>
 
                 <c:if test="${!param.isSpringController}">
