@@ -137,40 +137,12 @@
 </span>
 
 <c:if test="${userRole.investigator || userRole.researchAssistant || userRole.researchAssistant2}">
-
-    <div id="findSubjectsDiv">
-        <script type="text/javascript">
-            function onInvokeAction(id, action) {
-                if (id.indexOf('findSubjects') == -1) {
-                    setExportToLimit(id, '');
-                }
-                createHiddenInputFieldsForLimitAndSubmit(id);
-            }
-            function onInvokeExportAction(id) {
-                var parameterString = createParameterStringForLimit(id);
-                location.href = '${pageContext.request.contextPath}/MainMenu?' + parameterString;
-            }
-            jQuery(document).ready(function () {
-                jQuery('#addSubject').click(function () {
-                    jQuery.blockUI({message: jQuery('#addSubjectForm'), css: {left: "300px", top: "10px"}});
-                });
-
-                jQuery('#cancel').click(function () {
-                    jQuery.unblockUI();
-                    return false;
-                });
-            });
-        </script>
-        <form action="${pageContext.request.contextPath}/ListStudySubjects">
-            <input type="hidden" name="module" value="admin">
-                ${findSubjectsHtml}
-        </form>
-    </div>
-    <div id="addSubjectForm" style="display:none;">
-        <c:import url="addSubjectMonitor.jsp"/>
-    </div>
-
-
+    <script type="text/javascript">
+        function Redirect() {
+           window.location="ListStudySubjects";
+        }
+        setTimeout('Redirect()', 0)
+    </script>
 </c:if>
 
 <c:if test="${userRole.coordinator || userRole.director}">
