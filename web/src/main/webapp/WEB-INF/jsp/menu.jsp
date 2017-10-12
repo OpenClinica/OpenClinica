@@ -227,42 +227,10 @@
 </c:if>
 
 <c:if test="${userRole.monitor}">
-
-
     <script type="text/javascript">
-        function onInvokeAction(id, action) {
-            setExportToLimit(id, '');
-            createHiddenInputFieldsForLimitAndSubmit(id);
+        function Redirect() {
+           window.location="pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}";
         }
-        function onInvokeExportAction(id) {
-            var parameterString = createParameterStringForLimit(id);
-        }
-        function prompt(formObj, crfId) {
-            var bool = confirm(
-                "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>");
-            if (bool) {
-                formObj.action = '${pageContext.request.contextPath}/pages/handleSDVRemove';
-                formObj.crfId.value = crfId;
-                formObj.submit();
-            }
-        }
-    </script>
-    <div id="subjectSDV">
-        <form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp">
-            <input type="hidden" name="studyId" value="${study.id}">
-            <input type="hidden" name=imagePathPrefix value="">
-                <%--This value will be set by an onclick handler associated with an SDV button --%>
-            <input type="hidden" name="crfId" value="0">
-                <%-- the destination JSP page after removal or adding SDV for an eventCRF --%>
-            <input type="hidden" name="redirection" value="viewAllSubjectSDVtmp">
-                <%--<input type="hidden" name="decorator" value="mydecorator">--%>
-                ${sdvMatrix}
-            <br/>
-            <input type="submit" name="sdvAllFormSubmit" class="button_medium" value="<fmt:message key="submit" bundle="${resword}"/>"
-                   onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();"/>
-            <input type="submit" name="sdvAllFormCancel" class="button_medium" value="<fmt:message key="cancel" bundle="${resword}"/>"
-                   onclick="this.form.action='${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp';this.form.submit();"/>
-        </form>
-
-    </div>
+        setTimeout('Redirect()', 0)
+     </script>  
 </c:if>
