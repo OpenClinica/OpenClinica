@@ -77,8 +77,8 @@
 <!--  If Controller Spring based append ../ to urls -->
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}" />
-<c:set var="requestFromSpringController" value="${param.isSpringControllerCCV}" />
-<c:if test="${requestFromSpringController == 'true' }">
+<c:set var="requestFromSpringControllerCCV" value="${param.isSpringControllerCCV}" />
+<c:if test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
       <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
 </c:if>
 
