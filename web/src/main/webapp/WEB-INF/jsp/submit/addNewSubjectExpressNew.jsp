@@ -113,26 +113,6 @@
                     </td>
                 </tr>
                 
-                <c:if test="${study.studyParameterConfig.secondaryLabelViewable =='true'}">
-                <tr valign="top">
-                    <td class="formlabel" align="left">
-                        <span class="addNewStudyLayout"><fmt:message key="secondary_ID" bundle="${resword}"/></span>
-                    </td>
-                    <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
-                            <tr>        
-                                <td valign="top"><div class="formfieldXL_BG">
-                                    <input onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" width="30" class="formfieldXL form-control">
-                                </div></td>
-                            </tr>
-                            <tr>        
-                                <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>        
-                            </tr>       
-                        </table>        
-                    </td>       
-                </tr>
-                </c:if>
-
                 <c:choose>
                 <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
                 <tr valign="top">
@@ -176,6 +156,26 @@
                   <input type="hidden" name="uniqueIdentifier" value="<c:out value="${uniqueIdentifier}"/>">
                 </c:otherwise>
                 </c:choose>
+
+                <c:if test="${study.studyParameterConfig.secondaryLabelViewable =='true'}">
+                <tr valign="top">
+                    <td class="formlabel" align="left">
+                        <span class="addNewStudyLayout"><fmt:message key="secondary_ID" bundle="${resword}"/></span>
+                    </td>
+                    <td valign="top">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
+                            <tr>        
+                                <td valign="top"><div class="formfieldXL_BG">
+                                    <input onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" width="30" class="formfieldXL form-control">
+                                </div></td>
+                            </tr>
+                            <tr>        
+                                <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>        
+                            </tr>       
+                        </table>        
+                    </td>       
+                </tr>
+                </c:if>
 
                 <tr valign="top" >
                     <td class="formlabel" align="left">
