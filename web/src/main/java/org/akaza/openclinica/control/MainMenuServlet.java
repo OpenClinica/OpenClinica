@@ -162,11 +162,6 @@ public class MainMenuServlet extends SecureController {
         UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
         processSpecificStudyEnvUuid(request, ub1);
         
-//        if (!currentRole.isActive()) {
-//            forwardPage(Page.CHANGE_STUDY_SERVLET, false);
-//            return;
-//        }
-        
         String externalReturnUrl = processExternalReturnUrl(request);
         ub1.setLastVisitDate(new Date(System.currentTimeMillis()));
         // have to actually set the above to a timestamp? tbh
