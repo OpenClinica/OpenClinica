@@ -119,12 +119,21 @@ public class MainMenuServlet extends SecureController {
 
         if (roleInParent.getStudyId() != parentStudyId) {
             logger.error("You have no roles for this study.");
-            throw new Exception("You have no roles for this study.");
+            //throw new Exception("You have no roles for this study.");
+            currentStudy = new StudyBean();
+            currentPublicStudy = new StudyBean();
+            currentRole = new StudyUserRoleBean();
+            
+            session.setAttribute("publicStudy", currentPublicStudy);
+            session.setAttribute("study", currentStudy);
+            session.setAttribute("userRole", currentRole);
+        } else {
+            currentRole = roleInParent;
+            session.setAttribute("userRole", roleInParent);
+            if (ub.getActiveStudyId() == parentStudyId)
+                return;
+            ub.setActiveStudyId(parentStudyId);
         }
-        session.setAttribute("userRole", roleInParent);
-        if (ub.getActiveStudyId() == parentStudyId)
-            return;
-        ub.setActiveStudyId(parentStudyId);
     }
 
 
@@ -152,6 +161,7 @@ public class MainMenuServlet extends SecureController {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
         processSpecificStudyEnvUuid(request, ub1);
+        
         String externalReturnUrl = processExternalReturnUrl(request);
         ub1.setLastVisitDate(new Date(System.currentTimeMillis()));
         // have to actually set the above to a timestamp? tbh
@@ -159,6 +169,11 @@ public class MainMenuServlet extends SecureController {
         ub1.setUpdater(ub1);
         udao.update(ub1);
 
+        if (!currentRole.isActive()) {
+            forwardPage(Page.CHANGE_STUDY_SERVLET, false);
+            return;
+        }
+        
         // Use study Id in JSPs
         if (currentStudy != null) {
             request.setAttribute("studyId", currentStudy.getId());
