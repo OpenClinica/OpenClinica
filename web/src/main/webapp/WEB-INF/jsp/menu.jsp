@@ -137,40 +137,12 @@
 </span>
 
 <c:if test="${userRole.investigator || userRole.researchAssistant || userRole.researchAssistant2}">
-
-    <div id="findSubjectsDiv">
-        <script type="text/javascript">
-            function onInvokeAction(id, action) {
-                if (id.indexOf('findSubjects') == -1) {
-                    setExportToLimit(id, '');
-                }
-                createHiddenInputFieldsForLimitAndSubmit(id);
-            }
-            function onInvokeExportAction(id) {
-                var parameterString = createParameterStringForLimit(id);
-                location.href = '${pageContext.request.contextPath}/MainMenu?' + parameterString;
-            }
-            jQuery(document).ready(function () {
-                jQuery('#addSubject').click(function () {
-                    jQuery.blockUI({message: jQuery('#addSubjectForm'), css: {left: "300px", top: "10px"}});
-                });
-
-                jQuery('#cancel').click(function () {
-                    jQuery.unblockUI();
-                    return false;
-                });
-            });
-        </script>
-        <form action="${pageContext.request.contextPath}/ListStudySubjects">
-            <input type="hidden" name="module" value="admin">
-                ${findSubjectsHtml}
-        </form>
-    </div>
-    <div id="addSubjectForm" style="display:none;">
-        <c:import url="addSubjectMonitor.jsp"/>
-    </div>
-
-
+    <script type="text/javascript">
+        function Redirect() {
+           window.location="ListStudySubjects";
+        }
+        setTimeout('Redirect()', 0)
+    </script>
 </c:if>
 
 <c:if test="${userRole.coordinator || userRole.director}">
@@ -227,42 +199,10 @@
 </c:if>
 
 <c:if test="${userRole.monitor}">
-
-
     <script type="text/javascript">
-        function onInvokeAction(id, action) {
-            setExportToLimit(id, '');
-            createHiddenInputFieldsForLimitAndSubmit(id);
+        function Redirect() {
+           window.location="pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}";
         }
-        function onInvokeExportAction(id) {
-            var parameterString = createParameterStringForLimit(id);
-        }
-        function prompt(formObj, crfId) {
-            var bool = confirm(
-                "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>");
-            if (bool) {
-                formObj.action = '${pageContext.request.contextPath}/pages/handleSDVRemove';
-                formObj.crfId.value = crfId;
-                formObj.submit();
-            }
-        }
-    </script>
-    <div id="subjectSDV">
-        <form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp">
-            <input type="hidden" name="studyId" value="${study.id}">
-            <input type="hidden" name=imagePathPrefix value="">
-                <%--This value will be set by an onclick handler associated with an SDV button --%>
-            <input type="hidden" name="crfId" value="0">
-                <%-- the destination JSP page after removal or adding SDV for an eventCRF --%>
-            <input type="hidden" name="redirection" value="viewAllSubjectSDVtmp">
-                <%--<input type="hidden" name="decorator" value="mydecorator">--%>
-                ${sdvMatrix}
-            <br/>
-            <input type="submit" name="sdvAllFormSubmit" class="button_medium" value="<fmt:message key="submit" bundle="${resword}"/>"
-                   onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();"/>
-            <input type="submit" name="sdvAllFormCancel" class="button_medium" value="<fmt:message key="cancel" bundle="${resword}"/>"
-                   onclick="this.form.action='${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp';this.form.submit();"/>
-        </form>
-
-    </div>
+        setTimeout('Redirect()', 0)
+     </script>  
 </c:if>

@@ -256,6 +256,9 @@
                     <td valign="top">
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
+                                <td>
+                                    <input onfocus="this.select()" type="text" name="dob" size="16" value="<c:out value="${dob}" />" class="formfieldM form-control" id="dobField" />
+                                </td>
                                 <td valign="top" class="icon-container">
                                     <a href="#">
                                         <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
@@ -263,9 +266,6 @@
                                         Calendar.setup({inputField  : "dobField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger", customPX: 300, customPY: 10 });
                                         </script>
                                     </a>    
-                                </td>
-                                <td class="icon-input-container">
-                                    <input onfocus="this.select()" type="text" name="dob" size="16" value="<c:out value="${dob}" />" class="formfieldM form-control" id="dobField" />
                                 </td>
                             </tr>
                             <tr>
