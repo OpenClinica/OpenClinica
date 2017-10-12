@@ -75,7 +75,11 @@
         </property>
     </bean>
 
+    <!-- This tag registers the DefaultAnnotationHandlerMapping and AnnotationMethodHandlerAdapter
+         beans that are required for Spring MVC to dispatch requests to @Controllers.
+         KK - commented this out and manually created the beans to configure converters.
     <mvc:annotation-driven />
+    -->
 
 	<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
 

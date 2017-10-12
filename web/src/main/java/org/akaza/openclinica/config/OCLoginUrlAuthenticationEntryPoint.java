@@ -10,9 +10,12 @@ import org.springframework.security.web.RedirectStrategy;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 
 import javax.servlet.ServletException;
+import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Enumeration;
 
 /**
@@ -31,6 +34,24 @@ public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEn
             returnTo = request.getRequestURI();
             SessionUtils.set(request, Auth0Controller.RETURN_TO, returnTo);
         }
+        Enumeration<String> parameterNames = request.getParameterNames();
+        String queryStr = "";
+        while (parameterNames.hasMoreElements()) {
+            String element = parameterNames.nextElement();
+            if (StringUtils.isEmpty(queryStr))
+                queryStr += "?" + element + "=" + request.getParameter(element);
+            else
+                queryStr += "&" + element + "=" + request.getParameter(element);
+        }
+        Cookie cookie = null;
+        try {
+            cookie = new Cookie("queryStr", URLEncoder.encode(request.getRequestURL() + queryStr, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        cookie.setPath("/");
+        response.addCookie(cookie);
+
         return this.getLoginFormUrl();
     }
 }

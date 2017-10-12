@@ -55,7 +55,6 @@ public class Auth0Controller {
         AuthorizeUrl authUrl = controller
                 .buildAuthorizeUrl(request, redirectUri)
                 .withAudience(userInfoAudience);
-
         String returnTo = (String)SessionUtils.get(request, RETURN_TO);
         if (returnTo == null) {
             returnTo = request.getRequestURI();

@@ -7,14 +7,6 @@
  */
 package org.akaza.openclinica.control;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.Cookie;
-import javax.servlet.http.HttpServletRequest;
-
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -28,14 +20,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -50,6 +35,16 @@ import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.servlet.ServletContext;
+import javax.servlet.http.Cookie;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import java.io.UnsupportedEncodingException;
+import java.net.URLDecoder;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.Locale;
 
 /**
  * The main controller servlet for all the work behind study sites for
@@ -82,11 +77,32 @@ public class MainMenuServlet extends SecureController {
         // ResourceBundle.getBundle("org.akaza.openclinica.i18n.page_messages",locale);
     }
 
+    public String getQueryStrCookie(HttpServletRequest request, HttpServletResponse response) {
+        String queryStr = "";
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equalsIgnoreCase("queryStr")) {
+                try {
+                    queryStr = URLDecoder.decode(cookie.getValue(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    logger.error("Error decoding redirect URL from queryStr cookie:" + e.getMessage());
+                }
+                cookie.setValue(null);
+                cookie.setMaxAge(0);
+                cookie.setPath("/");
+                if (response != null)
+                    response.addCookie(cookie);
+                break;
+            }
+        }
+        return queryStr;
+    }
 
     public void processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) throws Exception {
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
-        if (StringUtils.isEmpty(studyEnvUuid))
+        if (StringUtils.isEmpty(studyEnvUuid)) {
             return;
+        }
         ServletContext context = getServletContext();
         WebApplicationContext ctx =
                 WebApplicationContextUtils
@@ -129,6 +145,11 @@ public class MainMenuServlet extends SecureController {
     }
 
     @Override public void processRequest() throws Exception {
+        String queryStrCookie = getQueryStrCookie(request, response);
+        if (StringUtils.isNotEmpty(queryStrCookie)) {
+            response.sendRedirect(queryStrCookie);
+            return;
+        }
         FormProcessor fp = new FormProcessor(request);
         ub.incNumVisitsToMainMenu();
         session.setAttribute(USER_BEAN_NAME, ub);

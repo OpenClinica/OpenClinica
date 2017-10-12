@@ -50,15 +50,20 @@ public class CallbackServiceImpl implements CallbackService {
         Map<String, Object> userContextMap = userContext.contextClaim.asMap();
         request.getSession().setAttribute("userContextMap", userContextMap);
         String userUuid = (String) userContextMap.get("userUuid");
-        getUserDetails(request, userContextMap, user);
+        getUserDetails(request, user);
         logger.info("Callback for user:" + userUuid);
         if (StringUtils.isEmpty(userUuid))
             return null;
         UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid(userUuid);
-        if (StringUtils.isNotEmpty(ub.getName())) {
-            ub.setUserUuid(userUuid);
-            userAccountDAO.update(ub);
-            updateStudyUsername(ub, user);
+        if (StringUtils.isEmpty(ub.getName())) {
+            if (user != null && StringUtils.isNotEmpty(user.getNickname())) {
+                ub = (UserAccountBean) userAccountDAO.findByUserName(user.getNickname());
+                if ((ub != null)
+                        && (ub.getId() != 0)) {
+                    ub.setUserUuid(userUuid);
+                    userAccountDAO.update(ub);
+                }
+            }
         }
         if (ub.getId() == 0) {
             ub = createUserAccount(request, user, userContextMap);
@@ -67,7 +72,7 @@ public class CallbackServiceImpl implements CallbackService {
         return new UserAccountHelper(ub, isUserUpdated);
     }
 
-    public void getUserDetails(HttpServletRequest request, Map<String, Object> userContextMap, Auth0User user) {
+    public void getUserDetails(HttpServletRequest request, Auth0User user) {
         ResponseEntity<OCUserDTO> userDetails = studyBuildService.getUserDetails(request);
         OCUserDTO userDTO = userDetails.getBody();
         user.setEmail(userDTO.getEmail());
@@ -79,15 +84,6 @@ public class CallbackServiceImpl implements CallbackService {
         return (UserAccountBean) userAccountDAO.findByUserName(ub.getName());
     }
 
-    @Modifying
-    private void updateStudyUsername(UserAccountBean ub, Auth0User user) {
-        Query query=studyUserRoleDao.getCurrentSession().createQuery("update StudyUserRole set id.userName=:userName where id.userName=:prevUser");
-        logger.info("update StudyUserRole set id.userName=" + user.getNickname() + " where id.userName=" + user.getUserId());
-        query.setParameter("userName", user.getNickname());
-        query.setParameter("prevUser", user.getUserId());
-        int modifications=query.executeUpdate();
-        logger.info(modifications + " studyUserRole rows have been updated from user:" + ub.getName() + " to user:" + user.getNickname());
-    }
 
     public UserContext getUserContextMap(Auth0User user)  throws Exception {
         UserContext userContext = user.getUserContext();
@@ -112,8 +108,7 @@ public class CallbackServiceImpl implements CallbackService {
 
         map.put("role_name", "Data Manager");
         map.put("user_uuid", (String) userContextMap.get("userUuid"));
-        UserContext userContext = user.getUserContext();
-        String userType = userContext.getUserType();
+        String userType = (String) userContextMap.get("userType");
         String convertedUserType = null;
         switch (userType) {
         case "Business Admin":

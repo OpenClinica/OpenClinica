@@ -22,7 +22,8 @@ public class LogoutServiceImpl implements LogoutService {
             if (cookie.getName().equalsIgnoreCase("returnTo")) {
                 returnTo = cookie.getValue();
                 cookie.setValue(null);
-                cookie.setMaxAge(0);
+                cookie.setMaxAge(30);
+                cookie.setPath("/");
                 response.addCookie(cookie);
                 break;
             }

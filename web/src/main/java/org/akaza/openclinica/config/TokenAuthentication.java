@@ -48,7 +48,7 @@ public class TokenAuthentication extends AbstractAuthenticationToken {
 
     @Override
     public void setAuthenticated(boolean authenticated) {
-        setAuthenticated(true);
+        super.setAuthenticated(authenticated);
         invalidated = !authenticated;
     }
 

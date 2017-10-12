@@ -455,6 +455,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 ub = (UserAccountBean) uDAO.findByUserName(ub.getName());
                 session.setAttribute(USER_BEAN_NAME, ub);
                 if (ub.getId() > 0 && ub.getActiveStudyId() > 0) {
+                    CoreResources.setRequestSchema(request, "public");
                     StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
                     currentPublicStudy = (StudyBean) sdao.findByPK(ub.getActiveStudyId());
 

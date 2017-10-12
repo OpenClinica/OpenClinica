@@ -7,8 +7,37 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 
 <script language="JavaScript">
+    $(window).on('mouseover', (function () {
+        window.onbeforeunload = null;
+    }));
+    $(window).on('mouseout', (function () {
+        window.onbeforeunload = ConfirmLeave;
+    }));
+    function ConfirmLeave() {
+
+        jQuery.get('${urlPrefix}pages/invalidateSession', function (data) {
+        });
+        return null;
+    }
+    var prevKey = "";
+    $(document).keydown(function (e) {
+        if (e.key == "F5") {
+            window.onbeforeunload = ConfirmLeave;
+        }
+        else if (e.key.toUpperCase() == "W" && prevKey == "CONTROL") {
+            window.onbeforeunload = ConfirmLeave;
+        }
+        else if (e.key.toUpperCase() == "R" && prevKey == "CONTROL") {
+            window.onbeforeunload = ConfirmLeave;
+        }
+        else if (e.key.toUpperCase() == "F4" && (prevKey == "ALT" || prevKey == "CONTROL")) {
+            window.onbeforeunload = ConfirmLeave;
+        }
+        prevKey = e.key.toUpperCase();
+    });
 
         // Walkme snippet
         (function() {
@@ -66,8 +95,11 @@
             }
         }
         function createReturnToCookie (returnTo) {
+            // Do not create a cookie for a redirect from Auth0
+            if (returnTo.indexOf("/logoutSuccess") >= 0)
+                return;
             var date = new Date();
-            date.setTime(date.getTime()+(30*1000));
+            date.setTime(date.getTime()+(60*1000));
             var expires = "; expires="+date.toGMTString();
             document.cookie = "returnTo=" + encodeURIComponent(returnTo) + expires + "; path=/";
         }

@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.MainMenuServlet;
 import org.akaza.openclinica.controller.helper.OCUserDTO;
 import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
@@ -133,9 +134,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         boolean studyEnvUuidProcessed =false;
         HttpSession session = request.getSession();
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
-        if (StringUtils.isEmpty(studyEnvUuid))
-            return studyEnvUuidProcessed;
-
+        if (StringUtils.isEmpty(studyEnvUuid)) {
+           return studyEnvUuidProcessed;
+        }
         updateStudyUserRoles(request, ub, userActiveStudyId);
 
         StudyDAO studyDAO = new StudyDAO(dataSource);
@@ -183,7 +184,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
         if(studyEnvUuidProcessed)
             return true;
-
+        CoreResources.setRequestSchema(request, "public");
         studyUserRoleUpdated = updateStudyUserRoles(request, ub, userActiveStudyId);
         if (ub.getActiveStudy() == null) {
             logger.error("There are no studies or this user has no studies avaiable");

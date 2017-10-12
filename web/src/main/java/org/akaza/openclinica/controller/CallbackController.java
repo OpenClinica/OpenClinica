@@ -1,6 +1,7 @@
 package org.akaza.openclinica.controller;
 
 import com.auth0.IdentityVerificationException;
+import com.auth0.InvalidRequestException;
 import com.auth0.SessionUtils;
 import com.auth0.Tokens;
 import com.auth0.jwt.JWT;
@@ -9,8 +10,11 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.config.TokenAuthentication;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.Auth0User;
 import org.akaza.openclinica.service.CallbackService;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.MediaType;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -33,6 +37,7 @@ public class CallbackController {
     private Auth0Controller controller;
     @Autowired
     CallbackService callbackService;
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     private final String redirectOnFail;
     private final String redirectOnSuccess;
@@ -44,16 +49,16 @@ public class CallbackController {
     }
 
     @RequestMapping(value = "/callback", method = RequestMethod.GET)
-    protected void getCallback(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+    protected void getCallback(final HttpServletRequest req, final HttpServletResponse res) throws Exception {
         handle(req, res);
     }
 
     @RequestMapping(value = "/callback", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
-    protected void postCallback(final HttpServletRequest req, final HttpServletResponse res) throws ServletException, IOException {
+    protected void postCallback(final HttpServletRequest req, final HttpServletResponse res) throws Exception {
         handle(req, res);
     }
 
-    private void handle(HttpServletRequest req, HttpServletResponse res) throws IOException {
+    private void handle(HttpServletRequest req, HttpServletResponse res) throws Exception {
         try {
             String error = req.getParameter("error");
             if (error != null && error.equals("login_required")) {
@@ -64,13 +69,15 @@ public class CallbackController {
 
                 TokenAuthentication tokenAuth = new TokenAuthentication(decodedJWT);
                 SecurityContextHolder.getContext().setAuthentication(tokenAuth);
+                CoreResources.setRequestSchema(req, "public");
                 req.getSession().setAttribute("accessToken", tokens.getAccessToken());
                 Auth0User user = new Auth0User(decodedJWT);
                 UserAccountHelper userAccountHelper = null;
                 try {
                     userAccountHelper = callbackService.isCallbackSuccessful(req, user);
                 } catch (Exception e) {
-                    e.printStackTrace();
+                    logger.error(e.getMessage());
+                    throw e;
                 }
                 UserAccountBean ub = userAccountHelper.getUb();
                 if (ub != null) {
@@ -85,6 +92,10 @@ public class CallbackController {
                 if (returnTo == null) returnTo = this.redirectOnSuccess;
                 res.sendRedirect(returnTo);
             }
+        } catch (InvalidRequestException e) {
+            e.printStackTrace();
+            SecurityContextHolder.clearContext();
+            res.sendRedirect(redirectOnFail);
         } catch (IdentityVerificationException e) {
             e.printStackTrace();
             SecurityContextHolder.clearContext();

@@ -1,10 +1,21 @@
 package org.akaza.openclinica.controller;
 
+import com.auth0.SessionUtils;
+import com.auth0.client.auth.AuthAPI;
+import com.auth0.exception.Auth0Exception;
+import com.auth0.json.auth.TokenHolder;
+import com.auth0.net.AuthRequest;
+import org.akaza.openclinica.config.AppConfig;
+import org.akaza.openclinica.config.TokenAuthentication;
 import org.akaza.openclinica.service.LogoutService;
+import org.akaza.openclinica.view.Page;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -30,7 +41,7 @@ public class LogoutController {
     @Autowired
     private Auth0Controller controller;
     @Autowired LogoutService logoutService;
-
+    @Autowired AppConfig config;
     @RequestMapping(value="/logout", method = RequestMethod.GET)
     protected String home(final Map<String, Object> model, final HttpServletRequest req) {
         HttpSession session = req.getSession();
@@ -49,7 +60,7 @@ public class LogoutController {
     }
 
     @RequestMapping(value="/logoutSuccess", method = RequestMethod.GET)
-    protected RedirectView logout(RedirectAttributes redirectAttributes, final HttpServletRequest request, HttpServletResponse response) {
+    protected String logout(final HttpServletRequest request, HttpServletResponse response) {
         String returnToCookie = null;
         try {
             returnToCookie = URLDecoder.decode(logoutService.getReturnToCookie(request, response), "UTF-8");
@@ -58,19 +69,16 @@ public class LogoutController {
         }
         int index = request.getRequestURL().indexOf(request.getContextPath());
         String returnURL = request.getRequestURL().substring(0, index);
-        return new RedirectView (returnURL + returnToCookie);
+        if (StringUtils.isEmpty(returnToCookie))
+            returnToCookie = request.getContextPath() + Page.MENU_SERVLET.getFileName();
+        return "redirect:" + returnURL + returnToCookie;
     }
 
     @RequestMapping(value="/invalidateSession", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
-    protected void invalidateSession(final Map<String, Object> model, final HttpServletRequest req) {
-        HttpSession session = req.getSession();
-        logger.info("Logout page");
-        session.removeAttribute("userBean");
-        session.removeAttribute("study");
-        session.removeAttribute("userRole");
-        session.removeAttribute("passwordExpired");
-        SecurityContextHolder.clearContext();
-        session.invalidate();
+    protected void invalidateAccessToken(final Map<String, Object> model, final HttpServletRequest req) {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        if (auth != null)
+            auth.setAuthenticated(false);
     }
 }
