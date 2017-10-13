@@ -87,10 +87,14 @@
         ${findSubjectsHtml}
     </form>
 </div>
-<div id="addSubjectForm" style="display:none;">
-      <c:import url="../submit/addNewSubjectExpressNew.jsp">
-      </c:import>
-</div>
+
+<c:if test="${userRole.coordinator}">
+    <div id="addSubjectForm" style="display:none;">
+          <c:import url="../submit/addNewSubjectExpressNew.jsp">
+          </c:import>
+    </div>
+</c:if>
+
 
 <br>
 <jsp:include page="../include/footer.jsp"/>

@@ -1,5 +1,7 @@
 package org.akaza.openclinica.dao.core;
 
+import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
+
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.FileInputStream;
@@ -16,27 +18,24 @@ import java.util.Properties;
 import java.util.Set;
 import java.util.regex.Pattern;
 
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.PdfProcessingFunction;
 import org.akaza.openclinica.bean.service.SasProcessingFunction;
 import org.akaza.openclinica.bean.service.SqlProcessingFunction;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
-import org.quartz.Scheduler;
-import org.quartz.SchedulerException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
 import org.springframework.context.ResourceLoaderAware;
-import org.springframework.context.annotation.Lazy;
 import org.springframework.core.io.DefaultResourceLoader;
 import org.springframework.core.io.Resource;
 import org.springframework.core.io.ResourceLoader;
@@ -44,12 +43,6 @@ import org.springframework.core.io.support.PathMatchingResourcePatternResolver;
 import org.springframework.core.io.support.ResourcePatternResolver;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
-import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdentifierResolverImpl.CURRENT_TENANT_ID;
 
 public class CoreResources implements ResourceLoaderAware {
 
@@ -158,25 +151,26 @@ public class CoreResources implements ResourceLoaderAware {
             // setPROPERTIES_DIR(resourceLoader);
             // @pgawade 18-April-2011 Fix for issue 8394
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
-/*          getPropertiesSource();
-
-            String filePath = "$catalina.home/$WEBAPP.lower.config";
-
-            filePath = replaceWebapp(filePath);
-            filePath = replaceCatHome(filePath);
-
-            String dataInfoPropFileName = filePath + "/datainfo.properties";
-            String extractPropFileName = filePath + "/extract.properties";
-
-            Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp, dataInfoPropFileName);
-            Properties OC_dataExtractProperties = getPropValues(extractProp, extractPropFileName);
-
-            if (OC_dataDataInfoProperties != null)
-                dataInfo = OC_dataDataInfoProperties;
-            if (OC_dataExtractProperties != null)
-                extractInfo = OC_dataExtractProperties;
-
-*/            String dbName = dataInfo.getProperty("dbType");
+            /*
+             * getPropertiesSource();
+             * 
+             * String filePath = "$catalina.home/$WEBAPP.lower.config";
+             * 
+             * filePath = replaceWebapp(filePath);
+             * filePath = replaceCatHome(filePath);
+             * 
+             * String dataInfoPropFileName = filePath + "/datainfo.properties";
+             * String extractPropFileName = filePath + "/extract.properties";
+             * 
+             * Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp, dataInfoPropFileName);
+             * Properties OC_dataExtractProperties = getPropValues(extractProp, extractPropFileName);
+             * 
+             * if (OC_dataDataInfoProperties != null)
+             * dataInfo = OC_dataDataInfoProperties;
+             * if (OC_dataExtractProperties != null)
+             * extractInfo = OC_dataExtractProperties;
+             * 
+             */ String dbName = dataInfo.getProperty("dbType");
 
             DATAINFO = dataInfo;
             dataInfo = setDataInfoProperties();// weird, but there are references to dataInfo...MainMenuServlet for
@@ -195,7 +189,7 @@ public class CoreResources implements ResourceLoaderAware {
                 extractProperties = findExtractProperties();
                 // JN: this is in for junits to run without extract props
                 copyImportRulesFiles();
-                //         copyConfig();
+                // copyConfig();
             }
 
             // tbh, following line to be removed
@@ -309,7 +303,7 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     private Properties setDataInfoProperties() {
-        //        getPropertiesSource();
+        // getPropertiesSource();
 
         String filePath = DATAINFO.getProperty("filePath");
         if (filePath == null || filePath.isEmpty())
@@ -324,14 +318,13 @@ public class CoreResources implements ResourceLoaderAware {
 
         DATAINFO.setProperty("changeLogFile", "src/main/resources/migration/master.xml");
 
-
         // sysURL.base
         String sysURLBase = DATAINFO.getProperty("sysURL").replace("MainMenu", "");
         DATAINFO.setProperty("sysURL.base", sysURLBase);
 
         if (DATAINFO.getProperty("org.quartz.jobStore.misfireThreshold") == null)
             DATAINFO.setProperty("org.quartz.jobStore.misfireThreshold", "60000");
-        DATAINFO.setProperty("org.quartz.jobStore.class", "org.akaza.openclinica.dao.core.MultiSchemaJobStoreTx");//"org.quartz.impl.jdbcjobstore.JobStoreTX");
+        DATAINFO.setProperty("org.quartz.jobStore.class", "org.akaza.openclinica.dao.core.MultiSchemaJobStoreTx");// "org.quartz.impl.jdbcjobstore.JobStoreTX");
 
         if (database.equalsIgnoreCase("oracle")) {
             DATAINFO.setProperty("org.quartz.jobStore.driverDelegateClass", "org.quartz.impl.jdbcjobstore.oracle.OracleDelegate");
@@ -444,7 +437,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     }
 
-    public static String getStudyManager(){
+    public static String getStudyManager() {
         return DATAINFO.getProperty("smURL");
     }
 
@@ -499,6 +492,7 @@ public class CoreResources implements ResourceLoaderAware {
     public static String getRequestSchema(HttpServletRequest request) {
         return (String) request.getAttribute("requestSchema");
     }
+
     public static boolean setRequestSchema(String schema) {
         ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null && requestAttributes.getRequest() != null) {
@@ -510,7 +504,7 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     public static void setRequestSchema(HttpServletRequest request, String schema) {
-            request.setAttribute("requestSchema", schema);
+        request.setAttribute("requestSchema", schema);
     }
 
     public static HttpServletRequest getRequest() {
@@ -522,12 +516,12 @@ public class CoreResources implements ResourceLoaderAware {
         return null;
     }
 
-    public static Boolean isPublicStudySameAsTenantStudy (StudyBean tenantStudy, int publicStudyID, DataSource ds) {
+    public static Boolean isPublicStudySameAsTenantStudy(StudyBean tenantStudy, int publicStudyID, DataSource ds) {
         StudyBean publicStudy = getPublicStudy(tenantStudy.getOid(), ds);
         return publicStudy.getId() == publicStudyID;
     }
 
-    public static StudyBean getPublicStudy (String ocId, DataSource ds) {
+    public static StudyBean getPublicStudy(String ocId, DataSource ds) {
         StudyDAO studyDAO = new StudyDAO(ds);
         HttpServletRequest request = getRequest();
         if (request == null)
@@ -539,9 +533,10 @@ public class CoreResources implements ResourceLoaderAware {
         return study;
     }
 
-    public static void setRequestSchemaByStudy(String ocId, DataSource ds){
-        StudyBean studyBean = getPublicStudy(ocId,ds);
-        setRequestSchema(studyBean.getSchemaName());
+    public static void setRequestSchemaByStudy(String ocId, DataSource ds) {
+        StudyBean studyBean = getPublicStudy(ocId, ds);
+        if (studyBean != null)
+            setRequestSchema(studyBean.getSchemaName());
     }
 
     private static String handleMultiSchemaConnection(Connection conn, String schema) throws SQLException {
@@ -562,11 +557,11 @@ public class CoreResources implements ResourceLoaderAware {
                 schema = (String) request.getAttribute("requestSchema");
                 logger.debug("request.getAttribute(\"requestSchema\"):" + schema);
             } else if (session != null) {
-                    schema = (String) session.getAttribute(CURRENT_TENANT_ID);
-                    logger.debug("Session schema:" + schema);
+                schema = (String) session.getAttribute(CURRENT_TENANT_ID);
+                logger.debug("Session schema:" + schema);
             } else {
-                    schema = (String) request.getAttribute(CURRENT_TENANT_ID);
-                    logger.debug("Request schema:" + schema);
+                schema = (String) request.getAttribute(CURRENT_TENANT_ID);
+                logger.debug("Request schema:" + schema);
             }
             if (StringUtils.isNotEmpty(schema))
                 tenantSchema.set(schema);
@@ -592,10 +587,11 @@ public class CoreResources implements ResourceLoaderAware {
         String url = null, driver = null, hibernateDialect = null;
         String archiveUrl = null;
         if (database.equalsIgnoreCase("postgres")) {
-            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db") ;
+            url = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + "/" + DATAINFO.getProperty("db");
             driver = "org.postgresql.Driver";
             hibernateDialect = "org.hibernate.dialect.PostgreSQL94Dialect";
-            archiveUrl = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("archiveDbHost") + ":" + DATAINFO.getProperty("archiveDbPort") + "/" + DATAINFO.getProperty("archiveDb") ;
+            archiveUrl = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("archiveDbHost") + ":" + DATAINFO.getProperty("archiveDbPort") + "/"
+                    + DATAINFO.getProperty("archiveDb");
         } else if (database.equalsIgnoreCase("oracle")) {
             url = "jdbc:oracle:thin:" + "@" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + ":" + DATAINFO.getProperty("db");
             driver = "oracle.jdbc.driver.OracleDriver";
@@ -725,7 +721,7 @@ public class CoreResources implements ResourceLoaderAware {
 
     /**
      * @deprecated. ByteArrayInputStream keeps the whole file in memory needlessly. Use Commons IO's
-     *              {@link IOUtils#copy(java.io.InputStream, java.io.OutputStream)} instead.
+     * {@link IOUtils#copy(java.io.InputStream, java.io.OutputStream)} instead.
      */
     @Deprecated
     private void copyFiles(ByteArrayInputStream fis, File dest) {
@@ -739,8 +735,8 @@ public class CoreResources implements ResourceLoaderAware {
                 fos.write(buffer, 0, bytesRead);
             }
         } catch (IOException ioe) {// error while copying files
-            OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "."
-                    + dest.getAbsolutePath() + ".");
+            OpenClinicaSystemException oe = new OpenClinicaSystemException(
+                    "Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "." + dest.getAbsolutePath() + ".");
             oe.initCause(ioe);
             oe.setStackTrace(ioe.getStackTrace());
             throw oe;
@@ -749,8 +745,8 @@ public class CoreResources implements ResourceLoaderAware {
                 try {
                     fis.close();
                 } catch (IOException ioe) {
-                    OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "."
-                            + dest.getAbsolutePath() + ".");
+                    OpenClinicaSystemException oe = new OpenClinicaSystemException(
+                            "Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "." + dest.getAbsolutePath() + ".");
                     oe.initCause(ioe);
                     oe.setStackTrace(ioe.getStackTrace());
                     logger.debug(ioe.getMessage());
@@ -762,8 +758,8 @@ public class CoreResources implements ResourceLoaderAware {
                 try {
                     fos.close();
                 } catch (IOException ioe) {
-                    OpenClinicaSystemException oe = new OpenClinicaSystemException("Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "."
-                            + dest.getAbsolutePath() + ".");
+                    OpenClinicaSystemException oe = new OpenClinicaSystemException(
+                            "Unable to copy file: " + fis + "to" + dest.getAbsolutePath() + "." + dest.getAbsolutePath() + ".");
                     oe.initCause(ioe);
                     oe.setStackTrace(ioe.getStackTrace());
                     logger.debug(ioe.getMessage());
@@ -937,11 +933,12 @@ public class CoreResources implements ResourceLoaderAware {
     private int getMaxExtractCounterValue() {
         Set<String> properties = EXTRACTINFO.stringPropertyNames();
         int numExtractTypes = 0;
-        for (String property:properties) {
+        for (String property : properties) {
             if (property.split(Pattern.quote(".")).length == 3 && property.startsWith("extract.") && property.endsWith(".file")) {
                 try {
                     int value = Integer.parseInt(property.split(Pattern.quote("."))[1]);
-                    if (value > numExtractTypes) numExtractTypes = value;
+                    if (value > numExtractTypes)
+                        numExtractTypes = value;
                 } catch (Exception e) {
                     // Wasn't a number. Do nothing.
                 }

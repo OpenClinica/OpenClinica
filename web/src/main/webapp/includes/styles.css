@@ -206,9 +206,9 @@ a:hover {
 .status-tag {
   border-radius: .15em;
   padding: .15em .25em; }
-  .status-tag .status-test {
+  .status-tag.status-test {
     background-color: #ED7800; }
-  .status-tag .status-prod {
+  .status-tag.status-prod {
     background-color: #06C279; }
 
 .logo {
