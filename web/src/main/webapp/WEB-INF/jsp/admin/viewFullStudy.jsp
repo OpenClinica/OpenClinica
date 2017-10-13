@@ -101,7 +101,7 @@
   <c:out value="${studyToView.principalInvestigator}"/>
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="brief_summary" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.summary}"/>&nbsp;
+  <c:out value="${studyToView.description}"/>&nbsp;
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="owner" bundle="${resword}"/>:</td><td class="table_cell">
