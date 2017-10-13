@@ -336,10 +336,6 @@ public class ChangeStudyServlet extends SecureController {
         if (currentRole.isMonitor()) {
             setupSubjectSDVTable();
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
-            if (currentStudy.getStatus().isPending()) {
-                response.sendRedirect(request.getContextPath() + Page.MANAGE_STUDY_MODULE.getFileName());
-                return;
-            }
             setupStudySiteStatisticsTable();
             setupSubjectEventStatusStatisticsTable();
             setupStudySubjectStatusStatisticsTable();
