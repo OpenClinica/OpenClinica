@@ -19,7 +19,6 @@ public class ParticipantFormServlet extends SecureController {
     public static final String QUERY_FLAVOR = "-query";
     public static final String DASH = "-";
 
-
     @Override
     protected void processRequest() throws Exception {
         String crf_oid = request.getParameter(CRF_ID);
@@ -31,6 +30,7 @@ public class ParticipantFormServlet extends SecureController {
         // Build Enketo URL for CRF version.
         EnketoCredentials credentials = getCredentials();
         EnketoAPI enketo = new EnketoAPI(credentials);
+        context.setAttribute("SS_OID", "");
         formURL = enketo.getFormPreviewURL(crf_oid + DASH + formLayout.getXform() + QUERY_FLAVOR);
         if (!formURL.equals("")) {
             response.sendRedirect(formURL);

@@ -128,7 +128,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(4, "icon icon-checkbox-checked green");
         imageIconPaths.put(5, "icon icon-stop-circle red");
         imageIconPaths.put(6, "icon icon-redo");
-        imageIconPaths.put(7, "icon icon-icon-locked");
+        imageIconPaths.put(7, "icon icon-lock");
         imageIconPaths.put(8, "icon icon-icon-sign");
     }
 
@@ -768,11 +768,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
                     }
 
-                    if (getCurrentRole().getRole() == Role.INVESTIGATOR && getStudyBean().getStatus() == Status.AVAILABLE
-                            && studySubjectBean.getStatus() != Status.DELETED && isSignable) {
-                        url.append(signStudySubjectLinkBuilder(studySubjectBean));
-                    }
-
                     try {
                         if (getStudyBean().getStatus() == Status.AVAILABLE
                                 && (getCurrentRole().getRole() == Role.RESEARCHASSISTANT || getCurrentRole().getRole() == Role.RESEARCHASSISTANT2)
@@ -976,7 +971,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // <td>...</td>
         eventDiv.td(0).id("Scroll_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L_dis").width("20")
                 .close();
-        eventDiv.img().src("images/arrow_status_back_dis.gif").border("0").close();
+        eventDiv.append("<span class=\"icon icon-caret-left gray\"/>");
         eventDiv.tdEnd();
         // <td>...</td>
         eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L").width("20")
@@ -989,7 +984,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.divEnd();
         // <div>...</div>
         eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back_dis").close();
-        eventDiv.img().src("images/arrow_status_back_dis.gif").border("0").close();
+        eventDiv.append("<span class=\"icon icon-caret-left gray\"/>");
         eventDiv.divEnd();
         eventDiv.tdEnd();
 
@@ -1006,7 +1001,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             // <tr><td>...</td></tr>
             eventDiv.tr(0).valign("top").close();
             eventDiv.td(0).styleClass(tableHeaderRowStyleClass).colspan("2").close();
-            eventDiv.bold().append(occurrence_x_of).append("#" + (i + 1) + " of " + studyEventsSize).br();
+            eventDiv.bold().append(occurrence_x_of).append(" " + (i + 1) + " of " + studyEventsSize).br();
             eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
             eventDiv.append(status + ": " + studyEventBean.getSubjectEventStatus().getName());
             eventDiv.boldEnd().tdEnd().trEnd(0);
@@ -1024,7 +1019,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // <td>...</td>
         eventDiv.td(0).id("Scroll_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R_dis").width("20")
                 .close();
-        eventDiv.img().src("images/arrow_status_next_dis.gif").border("0").close();
+        eventDiv.append("<span class=\"icon icon-caret-right gray\"/>");
         eventDiv.tdEnd();
         // <td>...</td>
         eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R").width("20")
@@ -1037,7 +1032,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.divEnd();
         // <div>...</div>
         eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next_dis").style("display: none;").close();
-        eventDiv.img().src("images/arrow_status_next_dis.gif").border("0").close();
+        eventDiv.append("<span class=\"icon icon-caret-right gray\"/>");
         eventDiv.divEnd();
         eventDiv.tdEnd().trEnd(0);
 
@@ -1162,7 +1157,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
             eventDiv.tr(0).valign("top").close();
             eventDiv.td(0).styleClass(tableHeaderRowStyleClass).colspan("2").close();
-            eventDiv.bold().append(occurrence_x_of).append("#1 of 1").br();
+            eventDiv.bold().append(occurrence_x_of).append("1 of 1").br();
             if (studyEvents.size() > 0) {
                 eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
                 eventDiv.append(status + " : " + studyEvents.get(0).getSubjectEventStatus().getName());
@@ -1294,7 +1289,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         builder.close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>");
         builder.nbsp().nbsp().a().href(href1);
-        builder.close().append(view).aEnd();
+        builder.close().append("View").aEnd();
 
     }
 

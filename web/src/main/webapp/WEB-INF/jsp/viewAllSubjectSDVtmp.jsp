@@ -6,11 +6,8 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
-<link rel="stylesheet" href="../includes/css/icomoon-style.css">
-
 
 <jsp:include page="include/managestudy_top_pages.jsp"/>
-
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="include/sideAlert.jsp"/>

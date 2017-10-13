@@ -537,7 +537,7 @@ public class StudyInfoPanel implements Serializable {
         } else if (stage.isAdmin_Editing()) {
             answer = "<span class='icon icon-pencil' alt='Administrative Editing'>";
         } else if (stage.isLocked()) {
-            answer = "<span class='icon icon-icon-locked' alt='Locked'>";
+            answer = "<span class='icon icon-lock' alt='Locked'>";
         } else {
             answer = "<span class='icon icon-file-excel red' alt='Invalid'>";
         }

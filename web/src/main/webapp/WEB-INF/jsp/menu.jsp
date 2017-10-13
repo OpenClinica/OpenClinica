@@ -50,14 +50,21 @@
 
 <!-- then instructions-->
 <div id="box" class="dialog">
-<span id="mbm">
-    <br>
-     <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
-   </span><br>
+    <span id="mbm">
+        <br>
+        <c:if test="${(!study.status.pending)}">
+            <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
+        </c:if>
+        
+        <c:if test="${(study.status.pending)}">
+            <fmt:message key="study_design_note" bundle="${restext}"/>
+        </c:if>   
+    </span><br>
     <div style="text-align:center; width:100%;">
         <button onclick="hm('box');">OK</button>
     </div>
 </div>
+
 <tr id="sidebar_Instructions_open" style="display: all">
     <td class="sidebar_tab">
 
@@ -126,44 +133,16 @@
 </c:if>
 <span class="table_title_Admin" style="line-height:15px;">
 <a style="text-decoration: none;" href="ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value='${userBean.name}' />"><p style="padding-left:10px;"><fmt:message key="notes_assigned_to_me" bundle="${restext}"/>
-				<span name="flag_start" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"> 0</p></a><br /><br />
+                <span name="flag_start" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"> 0</p></a><br /><br />
 </span>
 
 <c:if test="${userRole.investigator || userRole.researchAssistant || userRole.researchAssistant2}">
-
-    <div id="findSubjectsDiv">
-        <script type="text/javascript">
-            function onInvokeAction(id, action) {
-                if (id.indexOf('findSubjects') == -1) {
-                    setExportToLimit(id, '');
-                }
-                createHiddenInputFieldsForLimitAndSubmit(id);
-            }
-            function onInvokeExportAction(id) {
-                var parameterString = createParameterStringForLimit(id);
-                location.href = '${pageContext.request.contextPath}/MainMenu?' + parameterString;
-            }
-            jQuery(document).ready(function () {
-                jQuery('#addSubject').click(function () {
-                    jQuery.blockUI({message: jQuery('#addSubjectForm'), css: {left: "300px", top: "10px"}});
-                });
-
-                jQuery('#cancel').click(function () {
-                    jQuery.unblockUI();
-                    return false;
-                });
-            });
-        </script>
-        <form action="${pageContext.request.contextPath}/ListStudySubjects">
-            <input type="hidden" name="module" value="admin">
-                ${findSubjectsHtml}
-        </form>
-    </div>
-    <div id="addSubjectForm" style="display:none;">
-        <c:import url="addSubjectMonitor.jsp"/>
-    </div>
-
-
+    <script type="text/javascript">
+        function Redirect() {
+           window.location="ListStudySubjects";
+        }
+        setTimeout('Redirect()', 0)
+    </script>
 </c:if>
 
 <c:if test="${userRole.coordinator || userRole.director}">
@@ -220,92 +199,10 @@
 </c:if>
 
 <c:if test="${userRole.monitor}">
-
-
     <script type="text/javascript">
-        function onInvokeAction(id, action) {
-            setExportToLimit(id, '');
-            createHiddenInputFieldsForLimitAndSubmit(id);
+        function Redirect() {
+           window.location="pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}";
         }
-        function onInvokeExportAction(id) {
-            var parameterString = createParameterStringForLimit(id);
-        }
-        function prompt(formObj, crfId) {
-            var bool = confirm(
-                "<fmt:message key="uncheck_sdv" bundle="${resmessages}"/>");
-            if (bool) {
-                formObj.action = '${pageContext.request.contextPath}/pages/handleSDVRemove';
-                formObj.crfId.value = crfId;
-                formObj.submit();
-            }
-        }
-    </script>
-
-    <div id="searchFilterSDV">
-        <table border="0" cellpadding="0" cellspacing="0">
-            <tr>
-                <td valign="bottom" id="Tab1'">
-                    <div id="Tab1NotSelected">
-                        <div class="tab_BG">
-                            <div class="tab_L">
-                                <div class="tab_R">
-                                    <a class="tabtext" title="<fmt:message key="view_by_event_CRF" bundle="${resword}"/>"
-                                       href='pages/viewAllSubjectSDVtmp?studyId=${studyId}' onclick="javascript:HighlightTab(1);"><fmt:message
-                                            key="view_by_event_CRF" bundle="${resword}"/></a></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="Tab1Selected" style="display:none">
-                        <div class="tab_BG_h">
-                            <div class="tab_L_h">
-                                <div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_event_CRF" bundle="${resword}"/></span></div>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-
-                <td valign="bottom" id="Tab2'">
-                    <div id="Tab2Selected">
-                        <div class="tab_BG">
-                            <div class="tab_L">
-                                <div class="tab_R">
-                                    <a class="tabtext" title="<fmt:message key="view_by_studysubjectID" bundle="${resword}"/>"
-                                       href='pages/viewSubjectAggregate?studyId=${studyId}' onclick="javascript:HighlightTab(2);"><fmt:message
-                                            key="view_by_studysubjectID" bundle="${resword}"/></a></div>
-                            </div>
-                        </div>
-                    </div>
-                    <div id="Tab2NotSelected" style="display:none">
-                        <div class="tab_BG_h">
-                            <div class="tab_L_h">
-                                <div class="tab_R_h"><span class="tabtext"><fmt:message key="view_by_studysubjectID" bundle="${resword}"/></span></div>
-                            </div>
-                        </div>
-                    </div>
-                </td>
-
-            </tr>
-        </table>
-        <script language="JavaScript">
-            HighlightTab(1);
-        </script>
-    </div>
-    <div id="subjectSDV">
-        <form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp">
-            <input type="hidden" name="studyId" value="${study.id}">
-            <input type="hidden" name=imagePathPrefix value="">
-                <%--This value will be set by an onclick handler associated with an SDV button --%>
-            <input type="hidden" name="crfId" value="0">
-                <%-- the destination JSP page after removal or adding SDV for an eventCRF --%>
-            <input type="hidden" name="redirection" value="viewAllSubjectSDVtmp">
-                <%--<input type="hidden" name="decorator" value="mydecorator">--%>
-                ${sdvMatrix}
-            <br/>
-            <input type="submit" name="sdvAllFormSubmit" class="button_medium" value="<fmt:message key="submit" bundle="${resword}"/>"
-                   onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/handleSDVPost';this.form.submit();"/>
-            <input type="submit" name="sdvAllFormCancel" class="button_medium" value="<fmt:message key="cancel" bundle="${resword}"/>"
-                   onclick="this.form.action='${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp';this.form.submit();"/>
-        </form>
-
-    </div>
+        setTimeout('Redirect()', 0)
+     </script>  
 </c:if>

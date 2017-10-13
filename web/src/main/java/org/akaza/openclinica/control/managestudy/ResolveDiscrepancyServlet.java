@@ -254,6 +254,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setStudyEventId(String.valueOf(seb.getId()));
             String contextHash = cache.putSubjectContext(subjectContext);
             StudyBean parentStudyBean = getParentStudy(currentStudy.getOid(), ds);
+            context.setAttribute("SS_OID", ssb.getOid());
 
             if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
                 // This section is for version migration ,where item does not exist in the current formLayout

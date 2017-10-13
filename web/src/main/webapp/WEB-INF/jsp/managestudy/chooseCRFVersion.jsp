@@ -12,10 +12,11 @@
 
 <link rel="stylesheet" href="../../includes/style_shaded_table.css" type="text/css">
 
+<link rel="SHORTCUT ICON" href="../../images/favicon.ico" type="image/x-icon" />
 
-<jsp:include page="../include/managestudy_top_pages_new.jsp"/>
-	
-	
+<jsp:include page="../include/managestudy_top_pages_new.jsp">
+	<jsp:param name="isSpringControllerCCV" value="true" />
+</jsp:include>
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -144,7 +145,6 @@ $.noConflict();
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="default_version" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="action" bundle="${resword}"/></td>
 </tr>
-
 <!-- versions data -->
 
 <c:forEach var="version" items="${crfBean.versions}">

@@ -17,6 +17,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.util.Enumeration;
+import java.util.regex.Pattern;
 
 /**
  * Created by yogi on 7/20/17.
@@ -36,6 +37,9 @@ public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEn
         }
         Enumeration<String> parameterNames = request.getParameterNames();
         String queryStr = "";
+        if (isUrlSuitableToCreateCookie(request) == false)
+            return this.getLoginFormUrl();
+
         while (parameterNames.hasMoreElements()) {
             String element = parameterNames.nextElement();
             if (StringUtils.isEmpty(queryStr))
@@ -50,8 +54,15 @@ public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEn
             e.printStackTrace();
         }
         cookie.setPath("/");
+        cookie.setMaxAge(60);
         response.addCookie(cookie);
 
         return this.getLoginFormUrl();
+    }
+
+    protected boolean isUrlSuitableToCreateCookie(HttpServletRequest request) {
+        if (Pattern.matches(".*(css|jpg|png|gif|js|htm|html)$", request.getRequestURL()))
+            return false;
+        return true;
     }
 }

@@ -9,36 +9,11 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
+
 <script language="JavaScript">
-    $(window).on('mouseover', (function () {
-        window.onbeforeunload = null;
-    }));
-    $(window).on('mouseout', (function () {
-        window.onbeforeunload = ConfirmLeave;
-    }));
-    function ConfirmLeave() {
-
-        jQuery.get('${urlPrefix}pages/invalidateSession', function (data) {
-        });
-        return null;
-    }
-    var prevKey = "";
-    $(document).keydown(function (e) {
-        if (e.key == "F5") {
-            window.onbeforeunload = ConfirmLeave;
-        }
-        else if (e.key.toUpperCase() == "W" && prevKey == "CONTROL") {
-            window.onbeforeunload = ConfirmLeave;
-        }
-        else if (e.key.toUpperCase() == "R" && prevKey == "CONTROL") {
-            window.onbeforeunload = ConfirmLeave;
-        }
-        else if (e.key.toUpperCase() == "F4" && (prevKey == "ALT" || prevKey == "CONTROL")) {
-            window.onbeforeunload = ConfirmLeave;
-        }
-        prevKey = e.key.toUpperCase();
-    });
-
         // Walkme snippet
         (function() {
             var walkme = document.createElement('script');
@@ -113,7 +88,8 @@
 <!--  If Controller Spring based append ../ to urls -->
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}" />
-<c:if test="${requestFromSpringController == 'true' }">
+<c:set var="requestFromSpringControllerCCV" value="${param.isSpringControllerCCV}" />
+<c:if test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
       <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
 </c:if>
 
@@ -130,6 +106,11 @@
                 <c:if test="${param.isSpringController}">
                     <c:set var="isHref" value="../MainMenu" />
                     <c:set var="isLogo" value="../images/logo-color-on-dark.svg" />
+                </c:if>
+
+                <c:if test="${param.isSpringControllerCCV}">
+                    <c:set var="isHref" value="../../MainMenu" />
+                    <c:set var="isLogo" value="../../images/logo-color-on-dark.svg" />
                 </c:if>
 
                 <c:if test="${!param.isSpringController}">
@@ -152,7 +133,7 @@
                         <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
                     </c:otherwise>
                 </c:choose>
-                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;<span class="stat-tag status-${fn:toLowerCase(study.envType)}"></span>&nbsp;&nbsp;|&nbsp;&nbsp;
+                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;<span class="status-tag status-${fn:toLowerCase(study.envType)}">${study.envType}</span>&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy">Change</a>
 
             </div>
@@ -212,7 +193,7 @@
                                             <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a></li>
                                             <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                             <c:if test="${study.status.available}">
-                                                <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
+                                                <li><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
                                             </c:if>
                                             <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></li>
                                         </c:if>
@@ -220,7 +201,7 @@
                                             <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home" bundle="${resword}"/></a></li>
                                             <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                             <c:if test="${study.status.available}">
-                                                <li><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
+                                                <li><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></li>
                                             </c:if>
                                             <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></li>
                                         </c:if>
@@ -251,8 +232,6 @@
         </tr>
     </table>
     <!-- NAVIGATION DROP-DOWN -->
-
-
 
 <div id="nav_hide" style="position: absolute; left: 0px; top: 0px; visibility: hidden; z-index: 2; width: 100%; height: 400px;">
 
@@ -291,7 +270,7 @@
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
             <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
         </div>
@@ -309,7 +288,7 @@
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
             <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
         </div>
@@ -335,7 +314,7 @@
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
             <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="${urlPrefix}AddNewSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
         </div>
@@ -381,4 +360,33 @@
         <br clear="all">
         </c:if>
     </div>
+</div>
+
+<script type="text/javascript">
+    jQuery(document).ready(function () {
+        jQuery('#navAddSubject').click(function () {
+            jQuery.blockUI({message: jQuery('#navAddSubjectForm'), css: {left: "300px", top: "10px"}});
+        });
+
+        jQuery('#cancel').click(function () {
+            jQuery.unblockUI();
+            return false;
+        });
+    });
+</script>
+
+<div id="navAddSubjectForm" style="display: none">
+    <c:catch var="addSubjectMonitorContainer">
+        <c:import url="submit/addNewSubjectExpressNew.jsp"/>
+    </c:catch>
+    <c:if test="${!empty addSubjectMonitorContainer}">
+        <c:catch var="addSubjectMonitorContainer2">
+            <c:import url="../submit/addNewSubjectExpressNew.jsp"/>
+        </c:catch>
+        <c:if test="${!empty addSubjectMonitorContainer2}">
+            <c:catch var="addSubjectMonitorContainer3">
+                <c:import url="submit/addNewSubjectExpressNew.jsp"/>
+            </c:catch>
+        </c:if>
+    </c:if>
 </div>

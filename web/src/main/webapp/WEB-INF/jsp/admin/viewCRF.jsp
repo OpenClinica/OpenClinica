@@ -148,7 +148,7 @@
                     <td class="table_header_row"><fmt:message key="item_oid" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="data_type" bundle="${resword}"/></td>
-                    <td class="table_header_row"><fmt:message key="versions" bundle="${resword}"/></td>
+                    <%--<td class="table_header_row"><fmt:message key="versions" bundle="${resword}"/></td>--%>
                     <td class="table_header_row"><fmt:message key="integrity_check" bundle="${resword}"/></td>
                 </tr>
                  <c:forEach var ="item" items="${items}">
@@ -158,7 +158,7 @@
                     <td class="table_cell"><c:out value="${item.itemOID}"/></td>
                     <td class="table_cell"><c:out value="${item.itemDescription}"/></td>
                     <td class="table_cell"><c:out value="${item.itemDataType}"/></td>
-                    <td class="table_cell"><c:out value="${item.versions}"/></td>
+                    <%--<td class="table_cell"><c:out value="${item.versions}"/></td>--%>
                     <td class="table_cell">
                      <c:choose>
      <c:when test="${empty item.arrErrorMesages}"><span class="aka_green_highlight"><b><fmt:message key="ok" bundle="${respage}"/></b></span>       

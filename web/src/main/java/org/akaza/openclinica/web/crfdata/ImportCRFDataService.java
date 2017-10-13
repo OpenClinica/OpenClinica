@@ -672,6 +672,7 @@ public class ImportCRFDataService {
                 if (!"".equals(displayItemBean.getData().getValue())) {
                     String dateValue = displayItemBean.getData().getValue();
                     SimpleDateFormat sdf_sqldate = new SimpleDateFormat("yyyy-MM-dd");
+                    sdf_sqldate.setLenient(false);
                     try {
                         Date originalDate = sdf_sqldate.parse(dateValue);
                         String replacementValue = new SimpleDateFormat("MM/dd/yyyy").format(originalDate);
@@ -1115,7 +1116,7 @@ public class ImportCRFDataService {
         CRFBean crfBean = crfDAO.findByOid(formOid);
         if (crfBean != null) {
             FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByFullName(formDataBean.getFormLayoutName(), crfBean.getName());
-            if (formLayoutBean != null) {
+            if (formLayoutBean != null && formLayoutBean.getId() != 0) {
                 formLayoutBeans.add(formLayoutBean);
             }
         }

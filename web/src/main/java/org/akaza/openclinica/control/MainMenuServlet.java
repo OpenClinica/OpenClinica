@@ -136,12 +136,21 @@ public class MainMenuServlet extends SecureController {
 
         if (roleInParent.getStudyId() != parentStudyId) {
             logger.error("You have no roles for this study.");
-            throw new Exception("You have no roles for this study.");
+            //throw new Exception("You have no roles for this study.");
+            currentStudy = new StudyBean();
+            currentPublicStudy = new StudyBean();
+            currentRole = new StudyUserRoleBean();
+
+            session.setAttribute("publicStudy", currentPublicStudy);
+            session.setAttribute("study", currentStudy);
+            session.setAttribute("userRole", currentRole);
+        } else {
+            currentRole = roleInParent;
+            session.setAttribute("userRole", roleInParent);
+            if (ub.getActiveStudyId() == parentStudyId)
+                return;
+            ub.setActiveStudyId(parentStudyId);
         }
-        session.setAttribute("userRole", roleInParent);
-        if (ub.getActiveStudyId() == parentStudyId)
-            return;
-        ub.setActiveStudyId(parentStudyId);
     }
 
     @Override public void processRequest() throws Exception {
@@ -173,6 +182,11 @@ public class MainMenuServlet extends SecureController {
         ub1.setOwner(ub1);
         ub1.setUpdater(ub1);
         udao.update(ub1);
+
+        if (!currentRole.isActive()) {
+            forwardPage(Page.CHANGE_STUDY_SERVLET, false);
+            return;
+        }
 
         // Use study Id in JSPs
         if (currentStudy != null) {

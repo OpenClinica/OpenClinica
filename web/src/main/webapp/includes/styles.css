@@ -63,10 +63,13 @@ body {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   margin: 0;
   overflow-x: hidden;
-  width: 100% !important; }
+  width: 100% !important;
+  overflow: auto; 
+  }
   body > table {
     margin: 0 auto;
-    min-width: 1024px; }
+    min-width: 1024px; 
+  }
 
 p, ul, ol, td, th {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif; }

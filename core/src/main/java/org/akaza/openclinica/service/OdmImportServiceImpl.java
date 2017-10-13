@@ -200,23 +200,22 @@ public class OdmImportServiceImpl implements OdmImportService {
                             jsonEventDefCrfList.add(eventDefinitionCrf);
                         }
 
-                        List<EventDefinitionCrf> ocEventDefCrfList = getEventDefinitionCrfDao()
-                                .findAvailableByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(), study.getStudyId());
-                        for (EventDefinitionCrf ocEventDefCrf : ocEventDefCrfList) {
-                            if (!jsonEventDefCrfList.contains(ocEventDefCrf)) {
-                                // Remove CRF From Event Definition
-                                ocEventDefCrf.setStatusId(Status.DELETED.getCode());
-                                ocEventDefCrf.setUpdateId(userAccount.getUserId());
-                                ocEventDefCrf.setDateUpdated(new Date());
-                                getEventDefinitionCrfDao().saveOrUpdate(ocEventDefCrf);
-                                eventService.removeCrfFromEventDefinition(ocEventDefCrf.getEventDefinitionCrfId(),
-                                        studyEventDefinition.getStudyEventDefinitionId(), userAccount.getUserId(), study.getStudyId());
-                            }
+                    }
+                    List<EventDefinitionCrf> ocEventDefCrfList = getEventDefinitionCrfDao()
+                            .findAvailableByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(), study.getStudyId());
+                    for (EventDefinitionCrf ocEventDefCrf : ocEventDefCrfList) {
+                        if (!jsonEventDefCrfList.contains(ocEventDefCrf)) {
+                            // Remove CRF From Event Definition
+                            ocEventDefCrf.setStatusId(Status.DELETED.getCode());
+                            ocEventDefCrf.setUpdateId(userAccount.getUserId());
+                            ocEventDefCrf.setDateUpdated(new Date());
+                            getEventDefinitionCrfDao().saveOrUpdate(ocEventDefCrf);
+                            eventService.removeCrfFromEventDefinition(ocEventDefCrf.getEventDefinitionCrfId(), studyEventDefinition.getStudyEventDefinitionId(),
+                                    userAccount.getUserId(), study.getStudyId());
                         }
                     }
                 }
             }
-
         }
         if (errors.hasErrors()) {
             List<ErrorObj> errList = getErrorList(errors.getAllErrors());

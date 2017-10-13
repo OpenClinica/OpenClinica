@@ -113,26 +113,6 @@
                     </td>
                 </tr>
                 
-                <c:if test="${study.studyParameterConfig.secondaryLabelViewable =='true'}">
-                <tr valign="top">
-                    <td class="formlabel" align="left">
-                        <span class="addNewStudyLayout"><fmt:message key="secondary_ID" bundle="${resword}"/></span>
-                    </td>
-                    <td valign="top">
-                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
-                            <tr>        
-                                <td valign="top"><div class="formfieldXL_BG">
-                                    <input onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" width="30" class="formfieldXL form-control">
-                                </div></td>
-                            </tr>
-                            <tr>        
-                                <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>        
-                            </tr>       
-                        </table>        
-                    </td>       
-                </tr>
-                </c:if>
-
                 <c:choose>
                 <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
                 <tr valign="top">
@@ -177,6 +157,26 @@
                 </c:otherwise>
                 </c:choose>
 
+                <c:if test="${study.studyParameterConfig.secondaryLabelViewable =='true'}">
+                <tr valign="top">
+                    <td class="formlabel" align="left">
+                        <span class="addNewStudyLayout"><fmt:message key="secondary_ID" bundle="${resword}"/></span>
+                    </td>
+                    <td valign="top">
+                        <table border="0" cellpadding="0" cellspacing="0" class="full-width">
+                            <tr>        
+                                <td valign="top"><div class="formfieldXL_BG">
+                                    <input onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" width="30" class="formfieldXL form-control">
+                                </div></td>
+                            </tr>
+                            <tr>        
+                                <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>        
+                            </tr>       
+                        </table>        
+                    </td>       
+                </tr>
+                </c:if>
+
                 <tr valign="top" >
                     <td class="formlabel" align="left">
                         <span class="addNewStudyLayout"><fmt:message key="enrollment_date" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
@@ -184,17 +184,16 @@
                     <td valign="top">
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
+                                <td>
+                                    <input onfocus="this.select()" type="text" name="enrollmentDate" size="16" value="<c:out value="${enrollmentDate}" />" class="formfieldM form-control" id="enrollmentDateField" />
+                                </td>
                                 <td valign="top" class="icon-container">
                                     <a href="#">
                                          <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger" />
                                             <script type="text/javascript">
                                             Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger", customPX: 300, customPY: 10 });
                                             </script>
-                                        </a>
-                                            
-                                </td>
-                                <td class="icon-input-container">
-                                    <input onfocus="this.select()" type="text" name="enrollmentDate" size="16" value="<c:out value="${enrollmentDate}" />" class="formfieldM form-control" id="enrollmentDateField" />
+                                        </a>    
                                 </td>
                             </tr>
                             <tr>
@@ -257,6 +256,9 @@
                     <td valign="top">
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
+                                <td>
+                                    <input onfocus="this.select()" type="text" name="dob" size="16" value="<c:out value="${dob}" />" class="formfieldM form-control" id="dobField" />
+                                </td>
                                 <td valign="top" class="icon-container">
                                     <a href="#">
                                         <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger" />
@@ -264,9 +266,6 @@
                                         Calendar.setup({inputField  : "dobField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger", customPX: 300, customPY: 10 });
                                         </script>
                                     </a>    
-                                </td>
-                                <td class="icon-input-container">
-                                    <input onfocus="this.select()" type="text" name="dob" size="16" value="<c:out value="${dob}" />" class="formfieldM form-control" id="dobField" />
                                 </td>
                             </tr>
                             <tr>
@@ -360,15 +359,15 @@
                     <td valign="top">
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
+                                <td>
+                                    <input type="text" name="startDate" size="15" value="<c:out value="${startDate}" />" class="formfieldM form-control" id="enrollmentDateField2" />
+                                </td>
                                 <td valign="top" class="icon-container">
                                      <a href="#">
                                          <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2"/></a>
                                          <script type="text/javascript">
                                          Calendar.setup({inputField  : "enrollmentDateField2", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger2" ,customPX: 300, customPY: 10 });
                                          </script>
-                                </td>
-                                <td class="icon-input-container">
-                                    <input type="text" name="startDate" size="15" value="<c:out value="${startDate}" />" class="formfieldM form-control" id="enrollmentDateField2" />
                                 </td>
                             </tr>
                             <tr>
@@ -428,7 +427,7 @@
         <td><div class="lines"></div></td>
     </tr>
     <tr>
-        <td colspan="2">
+        <td colspan="2" style="text-align: center;">
             <input type="submit" name="addSubject" value="Add"/>
             &nbsp;
             <input type="button" id="cancel" name="cancel" value="Cancel"/>

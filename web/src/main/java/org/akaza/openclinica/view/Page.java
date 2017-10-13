@@ -79,7 +79,8 @@ public enum Page {
     /**
      * Page for changing study
      */
-   CHANGE_STUDY ("/WEB-INF/jsp/login/changeStudy.jsp", "Change Study"),
+    CHANGE_STUDY ("/WEB-INF/jsp/login/changeStudy.jsp", "Change Study"),
+    CHANGE_STUDY_SERVLET ("/ChangeStudy", "Change Study Servlet"),
 
     REQUEST_ACCOUNT("/WEB-INF/jsp/login/requestAccount.jsp", "Request account form"),
 

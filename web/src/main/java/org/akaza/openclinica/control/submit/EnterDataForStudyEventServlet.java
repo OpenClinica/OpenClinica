@@ -149,26 +149,7 @@ public class EnterDataForStudyEventServlet extends SecureController {
         DiscrepancyNoteDAO discrepancyNoteDAO = new DiscrepancyNoteDAO(sm.getDataSource());
         ArrayList<DiscrepancyNoteBean> allNotesforSubjectAndEvent = new ArrayList<DiscrepancyNoteBean>();
 
-        /*
-         * allNotesforSubjectAndEvent =
-         * discrepancyNoteDAO.findAllStudyEventByStudyAndId(currentStudy,
-         * studySubjectBean.getId());
-         */
-
-        // These methods return only parent disc notes
-        if (subjectStudyIsCurrentStudy && isParentStudy) {
-            allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudyAndId(currentStudy, studySubjectBean.getId());
-        } else { // findAllStudyEventByStudiesAndSubjectId
-            if (!isParentStudy) {
-                StudyBean stParent = (StudyBean) studydao.findByPK(study.getParentStudyId());
-                allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(stParent, study, studySubjectBean.getId());
-            } else {
-
-                allNotesforSubjectAndEvent = discrepancyNoteDAO.findAllStudyEventByStudiesAndSubjectId(currentStudy, study, studySubjectBean.getId());
-
-            }
-
-        }
+        allNotesforSubjectAndEvent = discrepancyNoteDAO.findExistingNoteForStudyEvent(seb);
 
         if (!allNotesforSubjectAndEvent.isEmpty()) {
             setRequestAttributesForNotes(allNotesforSubjectAndEvent);
