@@ -721,13 +721,13 @@ Calendar.cellClick = function(el, ev) {
  *  an element, be it BODY, then it creates a non-popup calendar (still
  *  hidden).  Some properties need to be set before calling this function.
  */
-Calendar.prototype.create = function (_par) {
+Calendar.prototype.create = function (_par, _idKey) {
 	var parent = null;
 	if (! _par) {
 		// default parent is the document body, in which case we create
 		// a popup calendar.
-        if(document.getElementById("dvForCalander")){
-            parent = document.getElementById("dvForCalander");
+        if(document.getElementById("dvForCalander_" + _idKey)){
+            parent = document.getElementById("dvForCalander_" + _idKey);
         } else {
             parent = document.getElementsByTagName("body")[0];
         }
