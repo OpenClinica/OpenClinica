@@ -54,15 +54,19 @@ public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEn
             e.printStackTrace();
         }
         cookie.setPath("/");
-        cookie.setMaxAge(60);
+        cookie.setMaxAge(120);
         response.addCookie(cookie);
 
         return this.getLoginFormUrl();
     }
 
     protected boolean isUrlSuitableToCreateCookie(HttpServletRequest request) {
-        if (Pattern.matches(".*(css|jpg|png|gif|js|htm|html)$", request.getRequestURL()))
+        StringBuffer url = request.getRequestURL();
+        if (Pattern.matches(".*(css|jpg|png|gif|js|htm|html)$", url))
             return false;
+        if (url.indexOf("pages/invalidateSession") > 0)
+            return false;
+
         return true;
     }
 }
