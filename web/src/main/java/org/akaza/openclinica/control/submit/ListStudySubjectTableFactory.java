@@ -1157,7 +1157,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
             eventDiv.tr(0).valign("top").close();
             eventDiv.td(0).styleClass(tableHeaderRowStyleClass).colspan("2").close();
-            eventDiv.bold().append(occurrence_x_of).append("1 of 1").br();
+            eventDiv.bold().append(occurrence_x_of).append(" 1 of 1").br();
             if (studyEvents.size() > 0) {
                 eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
                 eventDiv.append(status + " : " + studyEvents.get(0).getSubjectEventStatus().getName());
@@ -1287,7 +1287,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String href1 = "EnterDataForStudyEvent?eventId=" + studyEventId;
         builder.a().href(href1);
         builder.close();
-        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>");
+        builder.a().href(href1).append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>").aEnd();
         builder.nbsp().nbsp().a().href(href1);
         builder.close().append("View").aEnd();
 

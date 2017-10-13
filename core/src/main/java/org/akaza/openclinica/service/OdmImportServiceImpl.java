@@ -382,6 +382,8 @@ public class OdmImportServiceImpl implements OdmImportService {
         if (study == null) {
             errors.rejectValue("name", "environment_error", "Environment is not available - FAILED");
             logger.info("Study with this oid: " + studyOid + " doesn't exist. Please fix !!! ");
+            List<ErrorObj> errList = getErrorList(errors.getAllErrors());
+            throw new CustomRuntimeException("There are errors with publishing", errList);
         }
         return study;
     }
