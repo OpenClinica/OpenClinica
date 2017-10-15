@@ -864,3 +864,20 @@ div#subjectSDV table#sdv {
   border-bottom-left-radius: 0;
   margin-left: -2px;
 }
+
+body.extra-width {
+  overflow-x: auto;
+  width: 120% !important; 
+}
+
+.extra-width #subnav_Tasks {
+  right: -20% !important;  
+}
+
+body.extra-width-ie {
+  overflow-x: auto;
+}
+
+.extra-width-ie #subnav_Tasks {
+  right: -37% !important;  
+}
