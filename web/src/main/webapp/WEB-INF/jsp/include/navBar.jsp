@@ -154,7 +154,9 @@
                         <li><a href="#"><b><c:out value="${userBean.name}" /></b> (<c:out value="${userRole.role.description}" />)<span class="icon icon-caret-down white"></span></a></a>
                         <!-- First Tier Drop Down -->
                         <ul class="dropdown_BG">
-                            <li><a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a></li>
+                            <c:if test="${userBean.sysAdmin || userBean.techAdmin || userRole.coordinator}">
+                                <li><a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a></li>
+                            </c:if>
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a></li>
                             <li> <a onClick="javascript:createReturnToCookie('<%=currentURL%>');" href="${urlPrefix}pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></li>
                         </ul>
