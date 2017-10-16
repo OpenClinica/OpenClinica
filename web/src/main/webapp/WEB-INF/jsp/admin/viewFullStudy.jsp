@@ -75,7 +75,7 @@
 
 <a style="text-decoration:none" href="javascript:openDocWindow('DownloadStudyMetadata?studyId=<c:out value="${studyToView.id}"/>');"><fmt:message key="download_study_meta" bundle="${restext}"/></a>.
 <fmt:message key="get_subject_oid_from_matrix_show_more" bundle="${restext}"/>
-<a style="text-decoration:none" href="ListStudySubjects">Subject Matrix</a>.
+<a style="text-decoration:none" href="ListStudySubjects"><fmt:message key="subject_matrix" bundle="${restext}"/></a>.
 
 <br><br>
 <a href="javascript:leftnavExpand('overview');" style="text-decoration:none;">
@@ -101,7 +101,7 @@
   <c:out value="${studyToView.principalInvestigator}"/>
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="brief_summary" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.description}"/>&nbsp;
+  <c:out value="${studyToView.name}"/>&nbsp;
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="owner" bundle="${resword}"/>:</td><td class="table_cell">
