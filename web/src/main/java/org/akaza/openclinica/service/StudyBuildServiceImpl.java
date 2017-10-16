@@ -184,7 +184,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
         if(studyEnvUuidProcessed)
             return true;
-        CoreResources.setRequestSchema(request, "public");
         studyUserRoleUpdated = updateStudyUserRoles(request, ub, userActiveStudyId);
         if (ub.getActiveStudy() == null) {
             logger.error("There are no studies or this user has no studies avaiable");
