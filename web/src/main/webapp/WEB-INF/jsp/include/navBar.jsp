@@ -273,7 +273,7 @@
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
             <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
         </div>
@@ -291,7 +291,7 @@
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
             <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
         </div>
@@ -317,7 +317,7 @@
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
             <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="javascript:;" id="navAddSubject"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
             </c:if>
             <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
         </div>
@@ -368,6 +368,16 @@
 <script type="text/javascript">
     jQuery(document).ready(function () {
         jQuery('#navAddSubject').click(function () {
+            jQuery.blockUI({message: jQuery('#navAddSubjectForm'), css: {left: "300px", top: "10px"}});
+        });
+
+        jQuery('#cancel').click(function () {
+            jQuery.unblockUI();
+            return false;
+        });
+    });
+    jQuery(document).ready(function () {
+        jQuery('#navAddSubjectSD').click(function () {
             jQuery.blockUI({message: jQuery('#navAddSubjectForm'), css: {left: "300px", top: "10px"}});
         });
 

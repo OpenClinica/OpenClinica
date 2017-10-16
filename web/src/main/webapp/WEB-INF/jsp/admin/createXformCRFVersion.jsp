@@ -27,7 +27,7 @@
 
         <a href="javascript:leftnavExpand('sidebar_Instructions_open');
         leftnavExpand('sidebar_Instructions_closed');">
-            <span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+            <span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
 
         <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -54,7 +54,7 @@
 
         <a href="javascript:leftnavExpand('sidebar_Instructions_open');
         leftnavExpand('sidebar_Instructions_closed');">
-            <span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+            <span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
 
         <fmt:message key="instructions" bundle="${resword}"/>
 

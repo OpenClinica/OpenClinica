@@ -96,6 +96,15 @@ function hideCols(tableId,columnNumArray,showTable){
         }
     }
 
+    //spesial case for queries/listNotes
+    if (tableId === "listNotes") {
+        if (showTable) {
+            jQuery('body').addClass(BrowserDetect.browser==='Explorer' ? 'extra-width-ie' : 'extra-width');
+        } else {
+            jQuery('body').removeClass(BrowserDetect.browser==='Explorer' ? 'extra-width-ie' : 'extra-width');
+        }
+    }
+
 }
 
 function toggleName(str){

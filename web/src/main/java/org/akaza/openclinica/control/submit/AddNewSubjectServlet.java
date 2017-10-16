@@ -450,10 +450,10 @@ public class AddNewSubjectServlet extends SecureController {
                 if (!existingSubShown) {
                     Object isSubjectOverlay = fp.getRequest().getParameter("subjectOverlay");
                     if (isSubjectOverlay != null){
-                        int eventId = fp.getInt("studyEventDefinition");
-                        if (eventId < 1) {
-                             Validator.addError(errors, STUDY_EVENT_DEFINITION, resexception.getString("input_not_acceptable_option"));
-                        }
+                        // int eventId = fp.getInt("studyEventDefinition");
+                        // if (eventId < 1) {
+                        //      Validator.addError(errors, STUDY_EVENT_DEFINITION, resexception.getString("input_not_acceptable_option"));
+                        // }
                         String location = fp.getString(LOCATION);
                         if (location == null && location.length() == 0) {
                             Validator.addError(errors, LOCATION, resexception.getString("field_not_blank"));
