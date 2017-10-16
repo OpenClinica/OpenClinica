@@ -54,7 +54,7 @@ public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEn
             e.printStackTrace();
         }
         cookie.setPath("/");
-        cookie.setMaxAge(120);
+        cookie.setMaxAge(3600);
         response.addCookie(cookie);
 
         return this.getLoginFormUrl();

@@ -71,7 +71,8 @@
         }
         function createReturnToCookie (returnTo) {
             // Do not create a cookie for a redirect from Auth0
-            if (returnTo.indexOf("/logoutSuccess") >= 0)
+            if ((returnTo.indexOf("/logoutSuccess") >= 0) ||
+                (returnTo.indexOf("/login") >= 0))
                 return;
             var date = new Date();
             date.setTime(date.getTime()+(60*1000));

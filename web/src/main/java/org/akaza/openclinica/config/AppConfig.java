@@ -85,6 +85,7 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
                 .antMatchers("/partner/home").permitAll()
                 .antMatchers(securedRoute).hasAnyAuthority("ROLE_USER")
                 .antMatchers(securedRoute).authenticated();
+        http.authorizeRequests().antMatchers("/includes/**").permitAll().anyRequest().permitAll();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER);
         http.csrf().disable();
     }
