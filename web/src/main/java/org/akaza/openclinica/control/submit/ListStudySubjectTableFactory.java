@@ -1003,7 +1003,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             eventDiv.td(0).styleClass(tableHeaderRowStyleClass).colspan("2").close();
             eventDiv.bold().append(occurrence_x_of).append(" " + (i + 1) + " of " + studyEventsSize).br();
             eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
-            eventDiv.append(status + ": " + studyEventBean.getSubjectEventStatus().getName());
+            eventDiv.append(studyEventBean.getSubjectEventStatus().getName());
             eventDiv.boldEnd().tdEnd().trEnd(0);
             // <tr><td><table>...</table></td></tr>
             eventDiv.tr(0).id("Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_" + (i + 1)).style("display: none").close();
@@ -1143,7 +1143,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
         if (!sed.isRepeating()) {
-            eventDiv.br().bold().append(resword.getString("status")).append(": ").append(eventStatus.getName()).br();
+            eventDiv.br().bold().append(eventStatus.getName()).br();
             eventDiv.tdEnd();
             eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
             linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
@@ -1160,9 +1160,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             eventDiv.bold().append(occurrence_x_of).append(" 1 of 1").br();
             if (studyEvents.size() > 0) {
                 eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
-                eventDiv.append(status + " : " + studyEvents.get(0).getSubjectEventStatus().getName());
+                eventDiv.append(studyEvents.get(0).getSubjectEventStatus().getName());
             } else {
-                eventDiv.append(status + " : " + SubjectEventStatus.NOT_SCHEDULED.getName());
+                eventDiv.append(SubjectEventStatus.NOT_SCHEDULED.getName());
             }
             eventDiv.boldEnd().tdEnd().trEnd(0);
             if (eventStatus != SubjectEventStatus.NOT_SCHEDULED && eventSysStatus != Status.DELETED && eventSysStatus != Status.AUTO_DELETED) {

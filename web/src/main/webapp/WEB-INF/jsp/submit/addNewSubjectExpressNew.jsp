@@ -331,7 +331,7 @@
             </c:if>
 
                 <tr valign="top">
-                    <td class="formlabel" align="left"><span class="addNewStudyLayout"><fmt:message key="SED_2" bundle="${resword}"/></span>&nbsp;<small class="required">*</small></td>
+                    <td class="formlabel" align="left"><span class="addNewStudyLayout"><fmt:message key="SED_2" bundle="${resword}"/></span></td>
                     <td valign="top">
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr><td>

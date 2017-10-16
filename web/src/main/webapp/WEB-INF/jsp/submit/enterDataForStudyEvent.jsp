@@ -339,7 +339,7 @@
     <c:when test="${studyEvent.subjectEventStatus.name=='locked'}">
         <%--<c:when test="${dedc.status.name=='locked'}">--%>
         <td class="table_cell" bgcolor="#F5F5F5" align="center">
-            <span class="icon icon-icon-locked" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"></span>
+            <span class="icon icon-lock" alt="<fmt:message key="locked" bundle="${resword}"/>" title="<fmt:message key="locked" bundle="${resword}"/>"></span>
         </td>
     </c:when>
 

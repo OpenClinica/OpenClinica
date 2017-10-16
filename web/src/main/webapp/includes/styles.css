@@ -615,6 +615,9 @@ form[action="UpdateSubStudy"] .textbox_center td.table_cell, form[action="Update
 .jmesa table:not(#studyAuditLogs) .odd > td, .jmesa table:not(#studyAuditLogs) .even > td, .jmesa table:not(#studyAuditLogs) .highlight > td {
   vertical-align: top; }
 
+.jmesa table#findSubjects .odd > td, .jmesa table#findSubjects .even > td, .jmesa table#findSubjects .highlight > td, .jmesa table#findSubjects td table td {
+  vertical-align: middle; }
+
 .jmesa table:not(#studyAuditLogs) .odd td, .jmesa table:not(#studyAuditLogs) .even td, .jmesa table:not(#studyAuditLogs) .highlight td {
   border: none;
   font-family: 'Open Sans', arial, helvetica, sans-serif;
@@ -860,4 +863,21 @@ div#subjectSDV table#sdv {
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   margin-left: -2px;
+}
+
+body.extra-width {
+  overflow-x: auto;
+  width: 120% !important; 
+}
+
+.extra-width #subnav_Tasks {
+  right: -20% !important;  
+}
+
+body.extra-width-ie {
+  overflow-x: auto;
+}
+
+.extra-width-ie #subnav_Tasks {
+  right: -37% !important;  
 }
