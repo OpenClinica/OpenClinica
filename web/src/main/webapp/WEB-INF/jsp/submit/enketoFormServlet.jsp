@@ -16,7 +16,6 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
-    <jsp:include page="../auth0/ssoLogout.jsp"/>
     <script type="text/javascript" language="javascript">
     $(document).ready(function(){
     	var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
@@ -37,6 +36,11 @@
         }
     </script>
 </head>
+<c:set var="urlPrefix" value=""/>
+<c:set var="requestFromSpringController" value="${param.isSpringController}" />
+<c:if test="${requestFromSpringController == 'true' }">
+    <c:set var="urlPrefix" value="../"/>
+</c:if>
 <body style="width:1024px;" class="main_BG">
 <iframe id="enketo" style="position:fixed;z-index:1011;top:0;left:0;width:100vw;height:100vh;"/>
 </body>

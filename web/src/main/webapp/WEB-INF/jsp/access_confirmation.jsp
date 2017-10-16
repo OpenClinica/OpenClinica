@@ -23,16 +23,7 @@
   <!--<h1>OpenClinica</h1>-->
 
   <div id="content">
-
-    <!-- 
-    <c:if test="${!empty sessionScope.SPRING_SECURITY_LAST_EXCEPTION}">
-      <div class="error">
-        <h2>Woops!</h2>
-
-        <p>Access could not be granted. (<%= ((AuthenticationException) session.getAttribute(AbstractAuthenticationProcessingFilter.SPRING_SECURITY_LAST_EXCEPTION_KEY)).getMessage() %>)</p>
-      </div>
-    </c:if>
-     -->
+      
     <c:remove scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"/>
 
     <authz:authorize ifAllGranted="ROLE_USER">

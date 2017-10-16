@@ -1,6 +1,7 @@
 package org.akaza.openclinica.config;
 
 import com.auth0.AuthenticationController;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.autoconfigure.condition.ConditionalOnProperty;
 import org.springframework.boot.autoconfigure.security.SecurityProperties;
@@ -10,6 +11,7 @@ import org.springframework.context.annotation.PropertySource;
 import org.springframework.context.annotation.PropertySources;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
@@ -50,13 +52,13 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
     @Value(value = "${auth0.securedRoute}")
     private String securedRoute;
 
-
     @Bean
     public AuthenticationController authenticationController() throws UnsupportedEncodingException {
         return AuthenticationController.newBuilder(domain, clientId, clientSecret)
                 .withResponseType("code")
                 .build();
     }
+
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {

@@ -19,13 +19,12 @@ import java.net.URLEncoder;
 public class Auth0Controller {
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final AuthenticationController controller;
+    @Autowired private AuthenticationController controller;
     private final String userInfoAudience;
     public static final String RETURN_TO = "auth0_return_to";
     private String domain;
 
     @Autowired public Auth0Controller(AppConfig config) {
-        controller = AuthenticationController.newBuilder(config.getDomain(), config.getClientId(), config.getClientSecret()).build();
         domain = config.getDomain();
         userInfoAudience = String.format("https://%s/userinfo", domain);
     }

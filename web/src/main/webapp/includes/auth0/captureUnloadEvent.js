@@ -9,8 +9,10 @@ $(window).on('mouseout', (function () {
 }));
 function ConfirmLeave() {
 
-    jQuery.get('${urlPrefix}pages/invalidateSession', function (data) {
+
+    jQuery.get('pages/invalidateSession', function (data) {
     });
+
     return null;
 }
 var prevKey = "";

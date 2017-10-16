@@ -70,7 +70,7 @@
     </c:if>
 </c:forEach>
 
-<link type="text/css" rel="stylesheet" href="<c:url value="/style.css"/>"/>
+<link type="text/css" rel="stylesheet" href="<c:url value="../../includes/styles.css"/>"/>
 
 <form name="subjectForm" action="AddNewSubject" method="post">
 <input type="hidden" name="subjectOverlay" value="true">
