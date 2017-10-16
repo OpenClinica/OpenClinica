@@ -88,7 +88,7 @@
     </form>
 </div>
 
-<c:if test="${userRole.coordinator}">
+<c:if test="${userRole.monitor || userRole.coordinator || userRole.director || userRole.investigator || userRole.researchAssistant || userRole.researchAssistant2}">
     <div id="addSubjectForm" style="display:none;">
           <c:import url="../submit/addNewSubjectExpressNew.jsp">
           </c:import>
