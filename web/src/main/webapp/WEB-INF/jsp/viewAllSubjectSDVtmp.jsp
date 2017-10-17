@@ -54,16 +54,18 @@
         var parameterString = createParameterStringForLimit(id);
         //location.href = '${pageContext.request.contextPath}/ViewCRF?module=manage&crfId=' + '${crf.id}&' + parameterString;
     }
-
-$(window).on('load', function () {
-	  <c:if test="${(study.status.locked || study.status.frozen || study.status.pending)}">
-	    <c:if test="${userBean.numVisitsToMainMenu<=1 || studyJustChanged=='yes'}">
-	      initmb();
-	      sm('box', 730,100);
-	    </c:if>
-	  </c:if>
-	});
 </script>
+
+<c:if test="${(study.status.locked || study.status.frozen || study.status.pending)}">
+    <c:if test="${userBean.numVisitsToMainMenu<=1 || studyJustChanged=='yes'}">
+        <script type="text/javascript">
+            $(window).on('load', function () {
+                initmb();
+                sm('box', 730,100);
+            });
+        </script>
+    </c:if>
+</c:if>
 
 
 </div>

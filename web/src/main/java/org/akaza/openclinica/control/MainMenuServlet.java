@@ -228,9 +228,11 @@ public class MainMenuServlet extends SecureController {
         setPresetValues(fp.getPresetValues());
 
         if (currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentRole.isResearchAssistant2()) {
+            ub.decNumVisitsToMainMenu();
             forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
         }
         if (currentRole.isMonitor()) {
+            ub.decNumVisitsToMainMenu();
             response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId());
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();
