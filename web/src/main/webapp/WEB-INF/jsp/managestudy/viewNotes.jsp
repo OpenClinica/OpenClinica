@@ -35,6 +35,10 @@
     function openPopup() {
         openDocWindow(window.location.href +'&print=yes')
     }
+    jQuery('body').addClass('query-page');
+    jQuery(window).resize(function() {
+      recalculateDropDownPos();
+    });
 </script>
 
 

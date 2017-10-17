@@ -62,7 +62,6 @@ body {
   font-size: 100%;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   margin: 0;
-  overflow-x: hidden;
   width: 100% !important;
   overflow: auto; 
   }
@@ -341,7 +340,7 @@ a:hover {
   line-height: 1.5;
   right: 0 !important;
   top: inherit !important;
-  left: inherit !important; }
+  /*left: inherit !important;*/ }
 
 /*End of Dropdown Styling*/
 /* Misc*/
@@ -865,19 +864,6 @@ div#subjectSDV table#sdv {
   margin-left: -2px;
 }
 
-body.extra-width {
-  overflow-x: auto;
-  width: 120% !important; 
-}
-
-.extra-width #subnav_Tasks {
-  right: -20% !important;  
-}
-
-body.extra-width-ie {
-  overflow-x: auto;
-}
-
-.extra-width-ie #subnav_Tasks {
-  right: -37% !important;  
+body.query-page .aka_revised_content{
+  max-width: 100%;
 }
