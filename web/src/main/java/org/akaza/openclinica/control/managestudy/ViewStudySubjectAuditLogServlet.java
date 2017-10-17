@@ -195,7 +195,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                     // Link CRF and CRF Versions
                     EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(j);
                     eventCRF.setFormLayout((FormLayoutBean) fldao.findByPK(eventCRF.getFormLayoutId()));
-                    eventCRF.setCrf(cdao.findByVersionId(eventCRF.getCRFVersionId()));
+                    eventCRF.setCrf(cdao.findByLayoutId(eventCRF.getFormLayoutId()));
                     // Get the event crf audits
                     eventCRFAudits.addAll(adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId()));
                     logger.info("eventCRFAudits size [" + eventCRFAudits.size() + "] eventCRF id [" + eventCRF.getId() + "]");
