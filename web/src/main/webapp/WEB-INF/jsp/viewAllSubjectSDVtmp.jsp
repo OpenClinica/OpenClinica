@@ -54,7 +54,36 @@
         var parameterString = createParameterStringForLimit(id);
         //location.href = '${pageContext.request.contextPath}/ViewCRF?module=manage&crfId=' + '${crf.id}&' + parameterString;
     }
-</script></div>
+
+$(window).on('load', function () {
+	  <c:if test="${(study.status.locked || study.status.frozen || study.status.pending)}">
+	    <c:if test="${userBean.numVisitsToMainMenu<=1 || studyJustChanged=='yes'}">
+	      initmb();
+	      sm('box', 730,100);
+	    </c:if>
+	  </c:if>
+	});
+</script>
+
+
+</div>
+
+<div id="box" class="dialog">
+    <span id="mbm">
+        <br>
+        <c:if test="${(!study.status.pending)}">
+            <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
+        </c:if>
+        
+        <c:if test="${(study.status.pending)}">
+            <fmt:message key="study_design_note" bundle="${restext}"/>
+        </c:if>   
+    </span><br>
+    <div style="text-align:center; width:100%;">
+        <button onclick="hm('box');">OK</button>
+    </div>
+</div>
+
 
 <h1><span class="title_manage">
 <fmt:message key="sdv_sdv_for" bundle="${resword}"/> <c:out value="${study.name}"/>
