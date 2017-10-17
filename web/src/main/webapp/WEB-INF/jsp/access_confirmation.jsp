@@ -23,7 +23,7 @@
   <!--<h1>OpenClinica</h1>-->
 
   <div id="content">
-      
+
     <c:remove scope="session" var="SPRING_SECURITY_LAST_EXCEPTION"/>
 
     <authz:authorize ifAllGranted="ROLE_USER">

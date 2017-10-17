@@ -15,6 +15,7 @@
     <link rel="stylesheet" href="includes/styles.css" type="text/css"/>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
+    <script>var myContextPath = "${pageContext.request.contextPath}"</script>
     <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
     <script type="text/javascript" language="javascript">
     $(document).ready(function(){

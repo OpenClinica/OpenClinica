@@ -10,7 +10,7 @@ $(window).on('mouseout', (function () {
 function ConfirmLeave() {
 
 
-    jQuery.get('pages/invalidateSession', function (data) {
+    jQuery.get(myContextPath + '/pages/invalidateSession', function (data) {
     });
 
     return null;

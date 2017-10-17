@@ -11,6 +11,7 @@
 
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+<script>var myContextPath = "${pageContext.request.contextPath}"</script>
 <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
 
 <script language="JavaScript">
