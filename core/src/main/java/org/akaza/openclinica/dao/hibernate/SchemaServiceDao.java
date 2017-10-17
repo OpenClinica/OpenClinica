@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
 import org.hibernate.internal.SessionImpl;
@@ -34,7 +35,8 @@ public class SchemaServiceDao {
     }
 
     public void createStudySchema(String schemaName) throws Exception {
-        Query schemaQuery = getCurrentSession().createNativeQuery("CREATE SCHEMA " + schemaName + " AUTHORIZATION clinica");
+        String dbUser = CoreResources.getField("dbUser");
+        Query schemaQuery = getCurrentSession().createNativeQuery("CREATE SCHEMA " + schemaName + " AUTHORIZATION  " + dbUser);
         schemaQuery.executeUpdate();
     }
     public void setConnectionSchemaName(String schemaName) throws Exception {
