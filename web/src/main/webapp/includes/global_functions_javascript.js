@@ -98,13 +98,18 @@ function hideCols(tableId,columnNumArray,showTable){
 
     //spesial case for queries/listNotes
     if (tableId === "listNotes") {
-        if (showTable) {
-            jQuery('body').addClass(BrowserDetect.browser==='Explorer' ? 'extra-width-ie' : 'extra-width');
-        } else {
-            jQuery('body').removeClass(BrowserDetect.browser==='Explorer' ? 'extra-width-ie' : 'extra-width');
-        }
+        recalculateDropDownPos();
     }
 
+}
+
+function recalculateDropDownPos() {
+    var table = jQuery('.aka_revised_content'),
+    dropdown = document.getElementById('subnav_Tasks'),
+    basePx = parseFloat(jQuery('#subnav_Tasks').css('font-size')),
+    widthInPx = basePx * 36,
+    tableWidth = table.width();
+    dropdown.style.left = 180 + 16 + tableWidth - widthInPx + 'px';
 }
 
 function toggleName(str){
@@ -1696,23 +1701,24 @@ function refreshSource(isRefresh, pattern) {
 function findPos(navElement)
 {
 	var subnavElement='sub'+navElement;
-	var parentobj = document.getElementById(navElement);
-	var obj = document.getElementById(subnavElement);
-	var posX = parentobj.offsetLeft;var posY = parentobj.offsetTop;
-	var offsetx = -14;
-	var offsety = (parentobj.offsetHeight);
-	while(parentobj.offsetParent)
-	{
-		posX=posX+parentobj.offsetParent.offsetLeft;
-		posY=posY+parentobj.offsetParent.offsetTop;
-		if(parentobj==document.getElementsByTagName('body')[0]){break}
-		else
-		{
-			parentobj=parentobj.offsetParent;
-		}
-	}
-	obj.style.top  = (posY + offsety) + 'px';
-	obj.style.left = (posX + offsetx) + 'px';
+    // // overrided by css
+	// var parentobj = document.getElementById(navElement);
+	// var obj = document.getElementById(subnavElement);
+	// var posX = parentobj.offsetLeft;var posY = parentobj.offsetTop;
+	// var offsetx = -14;
+	// var offsety = (parentobj.offsetHeight);
+	// while(parentobj.offsetParent)
+	// {
+	// 	posX=posX+parentobj.offsetParent.offsetLeft;
+	// 	posY=posY+parentobj.offsetParent.offsetTop;
+	// 	if(parentobj==document.getElementsByTagName('body')[0]){break}
+	// 	else
+	// 	{
+	// 		parentobj=parentobj.offsetParent;
+	// 	}
+	// }
+	// obj.style.top  = (posY + offsety) + 'px';
+	// obj.style.left = (posX + offsetx) + 'px';
 	displayObject( subnavElement, true );
 }
 
