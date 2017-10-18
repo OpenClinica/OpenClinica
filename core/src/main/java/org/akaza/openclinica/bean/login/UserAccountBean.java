@@ -514,6 +514,10 @@ public class UserAccountBean extends AuditableEntityBean {
         numVisitsToMainMenu++;
     }
 
+    public void decNumVisitsToMainMenu() {
+        numVisitsToMainMenu--;
+    }
+
     /**
      * @return Returns the notes.
      */

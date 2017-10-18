@@ -2,6 +2,22 @@ package org.akaza.openclinica.controller;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.Enumeration;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -30,22 +46,6 @@ import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.ServletRequestDataBinder;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestParam;
-
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.Enumeration;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
 
 
 /**
@@ -159,7 +159,14 @@ public class SDVController {
             }
             return null;
         }
-    ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
+        
+        UserAccountBean userBean = (UserAccountBean)request.getSession().getAttribute("userBean");
+        StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
+        if (currentRole.isMonitor()) {
+            userBean.incNumVisitsToMainMenu();
+        }
+
+        ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
         // Reseting the side info panel set by SecureControler Mantis Issue: 8680.
         // Todo need something to reset panel from all the Spring Controllers
         StudyInfoPanel panel = new StudyInfoPanel();
@@ -183,6 +190,8 @@ public class SDVController {
         } else {
             showMoreLink = true;
         }
+        
+        if (request.getParameter("studyJustChanged") != null) request.setAttribute("studyJustChanged", request.getParameter("studyJustChanged"));
         request.setAttribute("showMoreLink", showMoreLink+"");
         session.setAttribute("sdv_showMoreLink", showMoreLink+"");
         request.setAttribute("studyId", studyId);

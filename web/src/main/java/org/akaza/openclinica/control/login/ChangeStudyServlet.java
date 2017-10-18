@@ -331,10 +331,10 @@ public class ChangeStudyServlet extends SecureController {
         request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
 
         if (currentRole.isInvestigator() || currentRole.isResearchAssistant()|| currentRole.isResearchAssistant2()) {
-            setupListStudySubjectTable();
+            forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
         }
         if (currentRole.isMonitor()) {
-            setupSubjectSDVTable();
+            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId() + "&studyJustChanged=yes");
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();
             setupSubjectEventStatusStatisticsTable();

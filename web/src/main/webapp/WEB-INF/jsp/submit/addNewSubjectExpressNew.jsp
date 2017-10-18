@@ -158,7 +158,6 @@
                 </c:otherwise>
                 </c:choose>
 
-                <c:if test="${study.studyParameterConfig.secondaryLabelViewable =='true'}">
                 <tr valign="top">
                     <td class="formlabel" align="left">
                         <span class="addNewStudyLayout"><fmt:message key="secondary_ID" bundle="${resword}"/></span>
@@ -176,7 +175,6 @@
                         </table>        
                     </td>       
                 </tr>
-                </c:if>
 
                 <tr valign="top" >
                     <td class="formlabel" align="left">
