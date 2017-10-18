@@ -136,15 +136,6 @@
                 <span name="flag_start" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>"> 0</p></a><br /><br />
 </span>
 
-<c:if test="${userRole.investigator || userRole.researchAssistant || userRole.researchAssistant2}">
-    <script type="text/javascript">
-        function Redirect() {
-           window.location="ListStudySubjects";
-        }
-        setTimeout('Redirect()', 0)
-    </script>
-</c:if>
-
 <c:if test="${userRole.coordinator || userRole.director}">
 
 
@@ -196,13 +187,4 @@
         </tr>
     </table>
 
-</c:if>
-
-<c:if test="${userRole.monitor}">
-    <script type="text/javascript">
-        function Redirect() {
-           window.location="pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}";
-        }
-        setTimeout('Redirect()', 0)
-     </script>  
 </c:if>

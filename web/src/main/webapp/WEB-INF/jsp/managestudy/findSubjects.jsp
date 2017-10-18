@@ -42,7 +42,18 @@
             return false;
         });
     });
-</script>
+    </script>
+
+<c:if test="${(study.status.locked || study.status.frozen || study.status.pending)}">
+    <c:if test="${userBean.numVisitsToMainMenu<=1 || studyJustChanged=='yes'}">
+        <script type="text/javascript">
+            $(window).on('load', function () {
+                initmb();
+                sm('box', 730,100);
+            });
+        </script>
+    </c:if>
+</c:if>
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -80,6 +91,22 @@
     </span>
 </h1>
 <br/>
+
+<div id="box" class="dialog">
+    <span id="mbm">
+        <br>
+        <c:if test="${(!study.status.pending)}">
+            <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
+        </c:if>
+        
+        <c:if test="${(study.status.pending)}">
+            <fmt:message key="study_design_note" bundle="${restext}"/>
+        </c:if>   
+    </span><br>
+    <div style="text-align:center; width:100%;">
+        <button onclick="hm('box');">OK</button>
+    </div>
+</div>
 
 <div id="findSubjectsDiv">
     <form  action="${pageContext.request.contextPath}/ListStudySubjects">
