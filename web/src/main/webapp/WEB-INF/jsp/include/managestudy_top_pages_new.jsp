@@ -23,7 +23,7 @@
 
 <head>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
 <title><fmt:message key="openclinica" bundle="${resword}"/></title> 
 <link rel="SHORTCUT ICON" href="images/favicon.ico" type="image/x-icon" />
