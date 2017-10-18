@@ -21,7 +21,7 @@
 
 <head>
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
-  <meta http-equiv="X-UA-Compatible" content="IE=8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=edge" />
 
 <title><fmt:message key="openclinica" bundle="${resword}"/></title> 
 <link rel="SHORTCUT ICON" href="images/favicon.ico" type="image/x-icon" />

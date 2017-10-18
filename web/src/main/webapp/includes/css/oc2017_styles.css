@@ -161,7 +161,8 @@ a:hover {
   width: 150px; }
   .logo img {
     max-width: 150px;
-    margin: .25em 0; }
+    margin: .25em 0; 
+    max-height: 23px }
 
 .logo-2 {
   display: inline-block;
