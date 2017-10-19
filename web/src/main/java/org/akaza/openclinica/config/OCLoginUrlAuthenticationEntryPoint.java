@@ -64,7 +64,7 @@ public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEn
         StringBuffer url = request.getRequestURL();
         if (Pattern.matches(".*(css|jpg|png|gif|js|htm|html)$", url))
             return false;
-        if (url.indexOf("pages/invalidateSession") > 0)
+        if (url.indexOf("pages/invalidateAuth0Token") > 0)
             return false;
 
         return true;

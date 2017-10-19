@@ -73,7 +73,7 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
                         "/pages/callback",
                         "/pages/login",
                         "/pages/logout",
-                        "/pages/invalidateSession",
+                        "/pages/invalidateAuth0Token",
                         "/pages/auth/api/**",
                         "/pages/studyversion/**",
                         "/rest2/openrosa/**",

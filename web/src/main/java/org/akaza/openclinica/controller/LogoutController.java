@@ -74,7 +74,7 @@ public class LogoutController {
         return "redirect:" + returnURL + returnToCookie;
     }
 
-    @RequestMapping(value="/invalidateSession", method = RequestMethod.GET)
+    @RequestMapping(value="/invalidateAuth0Token", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
     protected void invalidateAccessToken(final Map<String, Object> model, final HttpServletRequest req) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();

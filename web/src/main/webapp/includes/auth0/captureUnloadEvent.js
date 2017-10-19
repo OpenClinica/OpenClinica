@@ -10,8 +10,10 @@ $(window).on('mouseout', (function () {
 function ConfirmLeave() {
 
 
-    jQuery.get(myContextPath + '/pages/invalidateSession', function (data) {
-    });
+    jQuery.get(myContextPath + '/pages/invalidateAuth0Token')
+        .error(function(jqXHR, textStatus, errorThrown) {
+            "Error calling :" + myContextPath + '/pages/invalidateAuth0Token' + " " + textStatus + " " + errorThrown
+        });
 
     return null;
 }
