@@ -183,10 +183,6 @@
                 </table>
                 </div></div></div></div></div></div></div></div></div></div>
 
-
-<br/>
-<span class="title_Manage" style="font-weight: bold;"><fmt:message key="studies_using_crf" bundle="${resword}"/></span>
-
 <div id="studiesDiv">
     <form  action="${pageContext.request.contextPath}/ViewCRF">
         <input type="hidden" name="module" value="admin">
