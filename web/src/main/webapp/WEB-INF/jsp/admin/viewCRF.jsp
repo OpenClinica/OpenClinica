@@ -79,9 +79,6 @@
                 <tr valign="top"><td class="table_header_column_top"><fmt:message key="name" bundle="${resword}"/>:</td><td class="table_cell">
                     <c:out value="${crf.name}"/>
                 </td></tr>
-                <tr valign="top"><td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td><td class="table_cell">
-                    <c:out value="${crf.description}"/>
-                </td></tr>
                 <tr valign="top"><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_cell">
                     <c:out value="${crf.oid}"/>
                 </td></tr>
