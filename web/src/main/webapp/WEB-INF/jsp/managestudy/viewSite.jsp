@@ -346,8 +346,6 @@
  <tr valign="top">
     <td width="90px" class="table_header_row"><fmt:message key="name" bundle="${resword}"/></td>
     <td valign="top" class="table_header_row"><fmt:message key="required" bundle="${resword}"/></td>
-    <td valign="top" class="table_header_row"><fmt:message key="double_data_entry" bundle="${resword}"/></td>
-    <td valign="top" class="table_header_row"><fmt:message key="password_required" bundle="${resword}"/></td>
     <!-- <td valign="top" class="table_header_row"><fmt:message key="enforce_decision_conditions" bundle="${restext}"/></td>-->
     <td valign="top" class="table_header_row"><fmt:message key="default_version" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="hidden_crf" bundle="${resword}"/></td>
@@ -359,8 +357,6 @@
      <td valign="top" class="table_header_row"><fmt:message key="offline" bundle="${resword}"/></td>
     </c:when>
     </c:choose>
-     
-     <td valign="top" class="table_header_row"><fmt:message key="null_values" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="selected_verions" bundle="${resword}"/></td>
      <td valign="top" class="table_header_row"><fmt:message key="sdv_option" bundle="${resword}"/></td>
     <td valign="top" class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
@@ -403,22 +399,6 @@
      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
     </c:choose>
    </td>
-
-    <td class="table_cell">
-     <c:choose>
-      <c:when test="${crf.doubleEntry == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
-      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
-     </c:choose>
-    </td>
-
-    <td class="table_cell">
-     <c:choose>
-      <c:when test="${crf.electronicSignature == true}"> <fmt:message key="yes" bundle="${resword}"/> </c:when>
-      <c:otherwise> <fmt:message key="no" bundle="${resword}"/> </c:otherwise>
-     </c:choose>
-    </td>
-
-  
 
    <td class="table_cell">
     <c:out value="${crf.defaultVersionName}"/>
@@ -465,10 +445,7 @@
     
    </c:when>  
  </c:choose>
-   
-   <td class="table_cell">
-    <c:out value="${crf.nullValues}"/> &nbsp;
-  </td>
+
   <td class="table_cell"><c:out value="${selectedVersionNames}"/></td>
   <td class="table_cell"><fmt:message key="${crf.sourceDataVerification.description}" bundle="${resterm}"/></td>
    <td class="table_cell"><c:out value="${crf.status.name}"/></td>
