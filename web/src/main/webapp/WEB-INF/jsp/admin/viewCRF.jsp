@@ -98,7 +98,6 @@
                     <td class="table_header_row_left"><fmt:message key="version_name" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="oid" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
-                    <td class="table_header_row"><fmt:message key="revision_notes" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="action" bundle="${resword}"/></td>
                 </tr>
                 <c:forEach var ="version" items="${crf.versions}">
@@ -106,7 +105,6 @@
                     <td class="table_cell_left"><c:out value="${version.name}"/></td>
                     <td class="table_cell"><c:out value="${version.oid}"/></td>
                     <td class="table_cell"><c:out value="${version.status.name}"/></td>
-                    <td class="table_cell"><c:out value="${version.revisionNotes}"/></td>
                     <td class="table_cell">
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
