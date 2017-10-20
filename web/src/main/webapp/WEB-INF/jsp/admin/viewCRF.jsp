@@ -141,7 +141,6 @@
                 <tr valign="top">
                     <td class="table_header_row_left"><fmt:message key="name" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="item_oid" bundle="${resword}"/></td>
-                    <td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="data_type" bundle="${resword}"/></td>
                     <%--<td class="table_header_row"><fmt:message key="versions" bundle="${resword}"/></td>--%>
                     <td class="table_header_row"><fmt:message key="integrity_check" bundle="${resword}"/></td>
@@ -151,7 +150,6 @@
                     <td class="table_cell_left">
                      <c:if test="${item.id > 0}"><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"></c:if><c:out value="${item.itemName}"/> <c:if test="${item.id > 0}"></a></c:if></td>
                     <td class="table_cell"><c:out value="${item.itemOID}"/></td>
-                    <td class="table_cell"><c:out value="${item.itemDescription}"/></td>
                     <td class="table_cell"><c:out value="${item.itemDataType}"/></td>
                     <%--<td class="table_cell"><c:out value="${item.versions}"/></td>--%>
                     <td class="table_cell">
