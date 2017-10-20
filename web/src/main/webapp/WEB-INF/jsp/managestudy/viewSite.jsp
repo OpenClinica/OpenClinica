@@ -313,9 +313,6 @@
     <tr valign="top"><td class="table_header_column"><fmt:message key="oid" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${definition.oid}"/>
    </td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${definition.description}"/>&nbsp;
-  </td></tr>
 
  <tr valign="top"><td class="table_header_column"><fmt:message key="repeating" bundle="${resword}"/>:</td><td class="table_cell">
   <c:choose>
@@ -328,9 +325,6 @@
     <c:out value="${definition.type}"/>
    </td></tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="category" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${definition.category}"/>&nbsp;
-  </td></tr>
   </table>
   </div>
 </div></div></div></div></div></div></div></div>
