@@ -105,11 +105,10 @@ public class OdmImportServiceImpl implements OdmImportService {
     public void importOdm(ODM odm, String boardId) {
         Study study = importOdmToOC(odm, boardId);
         Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
-        updatePublicStudypublishedFlag(publicStudy);
+        updatePublicStudyPublishedFlag(publicStudy);
     }
 
-    @Transactional
-    private Study importOdmToOC(ODM odm, String boardId) {
+    @Transactional Study importOdmToOC(ODM odm, String boardId) {
         DataBinder dataBinder = new DataBinder(new Study());
         Errors errors = dataBinder.getBindingResult();
         printOdm(odm);
@@ -224,21 +223,12 @@ public class OdmImportServiceImpl implements OdmImportService {
         return study;
     }
 
-    private void updatePublicStudypublishedFlag(Study publicStudy) {
+    private void updatePublicStudyPublishedFlag(Study publicStudy) {
         publicStudy.setPublished(true);
         studyDao.updatePublicStudy(publicStudy);
         for (Study publicStudySite : publicStudy.getStudies()) {
             publicStudySite.setPublished(true);
             studyDao.updatePublicStudy(publicStudySite);
-        }
-    }
-
-    private void updateStudypublishedFlag(Study study) {
-        study.setPublished(true);
-        studyDao.saveOrUpdate(study);
-        for (Study publicStudySite : study.getStudies()) {
-            publicStudySite.setPublished(true);
-            studyDao.saveOrUpdate(publicStudySite);
         }
     }
 
