@@ -54,6 +54,7 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.StudyParameter;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.LiquibaseOnDemandService;
@@ -213,10 +214,17 @@ public class StudyController {
             return new ResponseEntity(studyDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
         }
         if (ub != null){
+            CoreResources.setRequestSchema(request, "public");
+            // update the user roles since they may have changed
+            studyBuildService.updateStudyUserRoles(request, studyBuildService.getUserAccountObject(ub), ub.getActiveStudyId());
+            // get the new bean
+            UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+            ub = (UserAccountBean) userAccountDAO.findByUserUuid(ub.getUserUuid());
             if (!isDataManagerOrStudyDirector(ub,currentPublicStudy)){
                 return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
             }
         }
+        CoreResources.setRequestSchema(request, tenantSchema);
         // Get Status object from requestDTO
         Status status = getStatus((String) requestDTO.get("status"));
         // Validate status field
