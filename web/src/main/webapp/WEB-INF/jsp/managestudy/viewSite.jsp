@@ -43,27 +43,27 @@
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
-		<td class="sidebar_tab">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_collapse.gif" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+    <b><fmt:message key="instructions" bundle="${resword}"/></b>
 
-		<div class="sidebar_tab_content">
+    <div class="sidebar_tab_content">
 
-		</div>
+    </div>
 
-		</td>
+    </td>
 
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: all">
-		<td class="sidebar_tab">
+  </tr>
+  <tr id="sidebar_Instructions_closed" style="display: all">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><img src="images/sidebar_expand.gif" border="0" align="right" hspace="10"></a>
 
-		<b><fmt:message key="instructions" bundle="${resword}"/></b>
+    <b><fmt:message key="instructions" bundle="${resword}"/></b>
 
-		</td>
+    </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
@@ -110,10 +110,10 @@
     <img id="excl_siteProperties" src="images/bt_Collapse.gif" border="0"> <fmt:message key="view_site_properties" bundle="${resword}"/> </a></div>
 <c:choose>
 <c:when test="${idToSort>0}">
-	<div id="siteProperties" style="display: none">
+  <div id="siteProperties" style="display: none">
 </c:when>
 <c:otherwise>
-	<div id="siteProperties" style="display: all">
+  <div id="siteProperties" style="display: all">
 </c:otherwise>
 </c:choose>
 
@@ -134,20 +134,12 @@
   <c:out value="${siteToView.identifier}"/>
   </td></tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="secondary_IDs" bundle="${resword}"/>:</td><td class="table_cell">
-   <c:out value="${siteToView.secondaryIdentifier}"/>
-   </td></tr>
-
-    <tr valign="top"><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_cell">
+  <tr valign="top"><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_cell">
    <c:out value="${siteToView.oid}"/>
    </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="principal_investigator" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${siteToView.principalInvestigator}"/>
-  </td></tr>
-
-  <tr valign="top"><td class="table_header_column"><fmt:message key="brief_summary" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${siteToView.summary}"/>
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="protocol_verification" bundle="${resword}"/>:</td><td class="table_cell">
@@ -158,15 +150,8 @@
   <fmt:formatDate value="${siteToView.datePlannedStart}" pattern="${dteFormat}"/>&nbsp;
   </td></tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="estimated_completion_date" bundle="${resword}"/>:</td><td class="table_cell">
-  <fmt:formatDate value="${siteToView.datePlannedEnd}" pattern="${dteFormat}"/>&nbsp;
-  </td></tr>
-
   <tr valign="top"><td class="table_header_column"><fmt:message key="expected_total_enrollment" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${siteToView.expectedTotalEnrollment}"/>&nbsp;
-  </td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="facility_name" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${siteToView.facilityName}"/>&nbsp;
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="facility_city" bundle="${resword}"/>:</td><td class="table_cell">
@@ -215,72 +200,72 @@
   <c:forEach var="config" items="${siteToView.studyParameters}">
    <c:choose>
   
-	<c:when test="${config.parameter.handle=='interviewerNameRequired'}">
-		   <tr valign="top"><td class="table_header_column"><fmt:message key="when_entering_data" bundle="${resword}"/></td><td class="table_cell">
-		   
-		   <c:choose>
-		   <c:when test="${   config.value.value == 'yes' }">
-		   <fmt:message key="yes" bundle="${resword}"/>
+  <c:when test="${config.parameter.handle=='interviewerNameRequired'}">
+       <tr valign="top"><td class="table_header_column"><fmt:message key="when_entering_data" bundle="${resword}"/></td><td class="table_cell">
+       
+       <c:choose>
+       <c:when test="${   config.value.value == 'yes' }">
+       <fmt:message key="yes" bundle="${resword}"/>
 
-		   </c:when>
-		   <c:when test="${config.value.value == 'no' }">
-		  			<fmt:message key="no" bundle="${resword}"/>
-		  </c:when>
-		   <c:otherwise>
-		   <fmt:message key="not_used" bundle="${resword}"/>
-		     </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-	</c:when>
-	<c:when test="${config.parameter.handle=='interviewerNameDefault'}">
-		  <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/></td><td class="table_cell">
-		   <c:choose>
-		   <c:when test="${config.value.value== 'blank'}">
-		    <fmt:message key="blank" bundle="${resword}"/>
+       </c:when>
+       <c:when test="${config.value.value == 'no' }">
+            <fmt:message key="no" bundle="${resword}"/>
+      </c:when>
+       <c:otherwise>
+       <fmt:message key="not_used" bundle="${resword}"/>
+         </c:otherwise>
+      </c:choose>
+      </td>
+      </tr>
+  </c:when>
+  <c:when test="${config.parameter.handle=='interviewerNameDefault'}">
+      <tr valign="top"><td class="table_header_column"><fmt:message key="interviewer_name_default_as_blank" bundle="${resword}"/></td><td class="table_cell">
+       <c:choose>
+       <c:when test="${config.value.value== 'blank'}">
+        <fmt:message key="blank" bundle="${resword}"/>
 
-		   </c:when>
-		   <c:otherwise>
-		   <fmt:message key="pre_populated_from_study_event" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-	</c:when>
-	<c:when test="${config.parameter.handle=='interviewDateRequired'}">
-		  <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_required" bundle="${resword}"/></td><td class="table_cell">
-		  
-		  <c:choose>
-		   <c:when test="${  config.value.value == 'yes'}">
-		   <fmt:message key="yes" bundle="${resword}"/>
+       </c:when>
+       <c:otherwise>
+       <fmt:message key="pre_populated_from_study_event" bundle="${resword}"/>
+       </c:otherwise>
+      </c:choose>
+      </td>
+      </tr>
+  </c:when>
+  <c:when test="${config.parameter.handle=='interviewDateRequired'}">
+      <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_required" bundle="${resword}"/></td><td class="table_cell">
+      
+      <c:choose>
+       <c:when test="${  config.value.value == 'yes'}">
+       <fmt:message key="yes" bundle="${resword}"/>
 
-		   </c:when>
-		  <c:when test="${config.value.value == 'no'  }">
-		  			<fmt:message key="no" bundle="${resword}"/>
-		  </c:when>
-		   <c:otherwise>
-		   <fmt:message key="not_used" bundle="${resword}"/>
-		     </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
+       </c:when>
+      <c:when test="${config.value.value == 'no'  }">
+            <fmt:message key="no" bundle="${resword}"/>
+      </c:when>
+       <c:otherwise>
+       <fmt:message key="not_used" bundle="${resword}"/>
+         </c:otherwise>
+      </c:choose>
+      </td>
+      </tr>
     </c:when>
-	<c:when test="${config.parameter.handle=='interviewDateDefault'}">
-		  <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_default_as_blank" bundle="${resword}"/></td><td class="table_cell">
-		   <c:choose>
-		   <c:when test="${config.value.value== 'blank'}">
-		   <fmt:message key="blank" bundle="${resword}"/>
+  <c:when test="${config.parameter.handle=='interviewDateDefault'}">
+      <tr valign="top"><td class="table_header_column"><fmt:message key="interview_date_default_as_blank" bundle="${resword}"/></td><td class="table_cell">
+       <c:choose>
+       <c:when test="${config.value.value== 'blank'}">
+       <fmt:message key="blank" bundle="${resword}"/>
 
-		   </c:when>
-		   <c:otherwise>
+       </c:when>
+       <c:otherwise>
 
-		   <fmt:message key="pre_populated_from_study_event" bundle="${resword}"/>
-		   </c:otherwise>
-		  </c:choose>
-		  </td>
-		  </tr>
-	 </c:when>
-	</c:choose>
+       <fmt:message key="pre_populated_from_study_event" bundle="${resword}"/>
+       </c:otherwise>
+      </c:choose>
+      </td>
+      </tr>
+   </c:when>
+  </c:choose>
 
   </c:forEach>
 
@@ -293,7 +278,7 @@
 </div>
 <br>
 
-	<div class="table_title_Manage" style="width:300px;float:left"><fmt:message key="view_site_event_definitions" bundle="${resword}"/></div>
+  <div class="table_title_Manage" style="width:300px;float:left"><fmt:message key="view_site_event_definitions" bundle="${resword}"/></div>
 <div style="float:left;width:8%">
 <!--
    <a href="javascript:openDocWindow('PrintAllSiteEventCRF?siteId=<c:out value="${siteToView.id}"/>')"
@@ -306,16 +291,16 @@
 <c:set var="defCount" value="0"/>
 <c:forEach var="definition" items="${definitions}">
 <c:set var="defCount" value="${defCount+1}"/>
-	&nbsp&nbsp&nbsp&nbsp<b><a href="javascript:leftnavExpand('sed<c:out value="${defCount}"/>');">
+  &nbsp&nbsp&nbsp&nbsp<b><a href="javascript:leftnavExpand('sed<c:out value="${defCount}"/>');">
         <img id="excl_sed<c:out value="${defCount}"/>" src="images/bt_Expand.gif" border="0"> <c:out value="${definition.name}"/></b></a>
-		<c:choose>
-		<c:when test="${idToSort>0 && idToSort == definition.id}">
-			<div id="sed<c:out value="${defCount}"/>" style="display: all">
-		</c:when>
-		<c:otherwise>
-			<div id="sed<c:out value="${defCount}"/>" style="display: none">
-		</c:otherwise>
-		</c:choose>
+    <c:choose>
+    <c:when test="${idToSort>0 && idToSort == definition.id}">
+      <div id="sed<c:out value="${defCount}"/>" style="display: all">
+    </c:when>
+    <c:otherwise>
+      <div id="sed<c:out value="${defCount}"/>" style="display: none">
+    </c:otherwise>
+    </c:choose>
 
 <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -406,16 +391,16 @@
 
     <c:choose>
     <c:when test="${fn:length(crf.selectedVersionIds)>0}">
-		<c:set var="selectedVersionNames" value="${crf.selectedVersionNames}"/>
+    <c:set var="selectedVersionNames" value="${crf.selectedVersionNames}"/>
     </c:when>
     <c:otherwise>
-		<c:set var="selectedVersionNames" value=""/>
-		<c:forEach var="v" items="${crf.versions}">
-			<c:set var="selectedVersionNames" value="${selectedVersionNames}${v.name},"/>
-		</c:forEach>
-		<c:set var="selectedVersionNames" value="${fn:substring(selectedVersionNames,0,fn:length(selectedVersionNames)-1)}"/>
-	</c:otherwise>
-	</c:choose>
+    <c:set var="selectedVersionNames" value=""/>
+    <c:forEach var="v" items="${crf.versions}">
+      <c:set var="selectedVersionNames" value="${selectedVersionNames}${v.name},"/>
+    </c:forEach>
+    <c:set var="selectedVersionNames" value="${fn:substring(selectedVersionNames,0,fn:length(selectedVersionNames)-1)}"/>
+  </c:otherwise>
+  </c:choose>
 
 
     <td class="table_cell">
@@ -495,7 +480,7 @@
    <td class="table_cell"><c:out value="${crf.status.name}"/></td>
    <td class="table_cell">
      <table border="0" cellpadding="0" cellspacing="0">
-	  <tr>
+    <tr>
         <td>
                    <a href="ViewCRF?crfId=<c:out value="${crf.crfId}"/>"
                  onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
@@ -503,9 +488,9 @@
                 name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 
         </td>
-		
-	  </tr>
-	 </table>
+    
+    </tr>
+   </table>
    </td>
    </tr>
    <c:set var="prevCrf" value="${crf}"/>
