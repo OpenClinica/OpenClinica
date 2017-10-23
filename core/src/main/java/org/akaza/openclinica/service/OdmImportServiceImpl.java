@@ -1,14 +1,20 @@
 package org.akaza.openclinica.service;
 
+import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.HashSet;
 import java.util.List;
+import java.util.Set;
 
 import javax.sql.DataSource;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
 
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
@@ -20,6 +26,7 @@ import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
@@ -27,20 +34,17 @@ import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-import org.akaza.openclinica.domain.datamap.StudyParameterValue;
-import org.akaza.openclinica.domain.datamap.StudyUserRole;
-import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParser;
+import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
+import org.akaza.openclinica.service.dto.Bucket;
 import org.akaza.openclinica.service.dto.Form;
-import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.cdisc.ns.odm.v130.EventType;
 import org.cdisc.ns.odm.v130.ODM;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormDef;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormRef;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionGlobalVariables;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionMetaDataVersion;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudy;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudyEventDef;
@@ -53,13 +57,13 @@ import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutR
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.StringUtils;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
 import org.springframework.web.client.RestTemplate;
 
 public class OdmImportServiceImpl implements OdmImportService {
-    public final String FM_BASEURL = "http://fm.openclinica.info:8080/api/protocol/";
-    // public final String FM_BASEURL = "http://oc.local:8090/api/protocol/";
 
     private UserAccountDao userAccountDao;
     private StudyUserRoleDao studyUserRoleDao;
@@ -72,47 +76,50 @@ public class OdmImportServiceImpl implements OdmImportService {
     private StudyDao studyDao;
     private EventDefinitionCrfTagDao eventDefinitionCrfTagDao;
     private StudyParameterValueDao studyParameterValueDao;
-
+    private DataSource dataSource;
     private XformParser xformParser;
-
     private XformMetaDataService xformService;
+    private CoreResources coreResources;
+    private EventService eventService;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public OdmImportServiceImpl(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    private void printOdm(ODM odm) {
+        JAXBContext jaxbContext = null;
+        try {
+            jaxbContext = JAXBContext.newInstance(ODM.class);
+            Marshaller jaxbMarshaller = jaxbContext.createMarshaller();
+            // output pretty printed
+            jaxbMarshaller.setProperty(Marshaller.JAXB_FORMATTED_OUTPUT, true);
+
+            jaxbMarshaller.marshal(odm, System.out);
+        } catch (JAXBException e) {
+            e.printStackTrace();
+        }
+    }
+
+    public void importOdm(ODM odm, String boardId) {
+        Study study = importOdmToOC(odm, boardId);
+        Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
+        updatePublicStudypublishedFlag(publicStudy);
     }
 
     @Transactional
-    public void importOdmToOC(ODM odm) {
+    private Study importOdmToOC(ODM odm, String boardId) {
+        DataBinder dataBinder = new DataBinder(new Study());
+        Errors errors = dataBinder.getBindingResult();
+        printOdm(odm);
+        CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(), dataSource);
 
         UserAccount userAccount = getCurrentUser();
         // TODO add validation to all entities
         ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
-        Study study = saveOrUpdateStudy(odm, userAccount, odmStudy);
-
-        ParticipantPortalRegistrar portal = new ParticipantPortalRegistrar();
-        portal.registerStudy(study.getOc_oid(), study.getOc_oid(), study.getName());
-
-        StudyParameterValue spv = getStudyParameterValueDao().findByStudyIdParameter(study.getStudyId(), "participantPortal");
-        // Update OC Study configuration
-        if (spv == null) {
-            spv = new StudyParameterValue();
-            spv.setStudy(study);
-        }
-        spv.setValue("enabled");
-        spv = getStudyParameterValueDao().saveOrUpdate(spv);
-
-        StudyUserRole studyUserRole = null;
-        StudyUserRoleId studyUserRoleId = null;
-
-        Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(study);
-
-        ArrayList<StudyUserRole> surRoles = getStudyUserRoleDao().findAllUserRolesByUserAccount(userAccount, study.getStudyId(), study.getStudyId());
-        if (surRoles.size() == 0) {
-            studyUserRoleId = new StudyUserRoleId();
-            studyUserRole = new StudyUserRole();
-            studyUserRole = getStudyUserRoleDao().saveOrUpdate(populateUserRole(study, userAccount, studyUserRole, studyUserRoleId));
-        }
+        Study study = retrieveStudy(odm, userAccount, odmStudy, errors);
+        Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(boardId, errors);
 
         StudyEventDefinition studyEventDefinition = null;
         List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions = odmStudy.getMetaDataVersion();
@@ -121,7 +128,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         CrfBean crf = null;
         FormLayout formLayout = null;
 
-        saveOrUpdateCrf(userAccount, study, odmMetadataVersions, fmCrfs);
+        saveOrUpdateCrf(userAccount, study, odmMetadataVersions, fmCrfs, errors);
 
         List<ODMcomplexTypeDefinitionStudyEventRef> odmStudyEventRefs = odmMetadataVersions.get(0).getProtocol().getStudyEventRef();
         for (ODMcomplexTypeDefinitionStudyEventRef odmStudyEventRef : odmStudyEventRefs) {
@@ -135,62 +142,104 @@ public class OdmImportServiceImpl implements OdmImportService {
                     EventDefinitionCrf eventDefinitionCrf = null;
                     for (ODMcomplexTypeDefinitionFormRef odmFormRef : odmStudyEventDef.getFormRef()) {
                         crf = getCrfDao().findByOcOID(odmFormRef.getFormOID());
-
-                        eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-                                studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(), study.getStudyId());
-
-                        String defaultVersionName = null;
-                        OCodmComplexTypeDefinitionConfigurationParameters conf = odmFormRef.getConfigurationParameters();
-                        List<OCodmComplexTypeDefinitionFormLayoutRef> formLayoutRefs = odmFormRef.getFormLayoutRef();
-                        if (formLayoutRefs.size() == 1 && formLayoutRefs.get(0).getIsDefaultVersion() == null) {
-                            defaultVersionName = formLayoutRefs.get(0).getOID();
-                        } else {
-                            for (OCodmComplexTypeDefinitionFormLayoutRef formLayoutRef : formLayoutRefs) {
-                                if (formLayoutRef.getIsDefaultVersion().equalsIgnoreCase("Yes")) {
-                                    defaultVersionName = formLayoutRef.getOID();
+                        if (crf != null) {
+                            eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+                                    studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(), study.getStudyId());
+                            // Restore CRF From Event Definition
+                            if (eventDefinitionCrf != null && !eventDefinitionCrf.getStatusId().equals(Status.AVAILABLE.getCode())) {
+                                eventDefinitionCrf.setStatusId(Status.AVAILABLE.getCode());
+                                eventService.restoreCrfFromEventDefinition(eventDefinitionCrf.getEventDefinitionCrfId(),
+                                        studyEventDefinition.getStudyEventDefinitionId(), userAccount.getUserId());
+                            }
+                            String defaultVersionName = null;
+                            OCodmComplexTypeDefinitionConfigurationParameters conf = odmFormRef.getConfigurationParameters();
+                            List<OCodmComplexTypeDefinitionFormLayoutRef> formLayoutRefs = odmFormRef.getFormLayoutRef();
+                            if (formLayoutRefs.size() == 1 && formLayoutRefs.get(0).getIsDefaultVersion() == null) {
+                                defaultVersionName = formLayoutRefs.get(0).getOID();
+                            } else {
+                                for (OCodmComplexTypeDefinitionFormLayoutRef formLayoutRef : formLayoutRefs) {
+                                    if (formLayoutRef.getIsDefaultVersion().equalsIgnoreCase("Yes")) {
+                                        defaultVersionName = formLayoutRef.getOID();
+                                    }
                                 }
                             }
+                            if (defaultVersionName == null) {
+                                String formName = "";
+                                for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
+                                    if (odmFormDef.getOID().equals(odmFormRef.getFormOID())) {
+                                        formName = odmFormDef.getName();
+                                    }
+                                }
+                                errors.rejectValue("name", "missing_default_version_error", "No default version has been selected for Form \"" + formName
+                                        + "\" in Event \"" + odmStudyEventDef.getName() + "\" - FAILED");
+                                logger.info("No default version has been selected for Form <" + formName + "> in Event <" + odmStudyEventDef.getName()
+                                        + "> - FAILED");
+                                defaultVersionName = formLayoutRefs.get(0).getOID();
+                            }
+                            formLayout = getFormLayoutDao().findByNameCrfId(defaultVersionName, crf.getCrfId());
+                            EventDefinitionCrfDTO edcObj = new EventDefinitionCrfDTO();
+                            edcObj.setUserAccount(userAccount);
+                            edcObj.setConf(conf);
+                            edcObj.setCrf(crf);
+                            edcObj.setEventDefinitionCrf(eventDefinitionCrf);
+                            edcObj.setOdmFormRef(odmFormRef);
+                            edcObj.setStudy(study);
+                            edcObj.setFormLayout(formLayout);
+                            edcObj.setStudyEventDefinition(studyEventDefinition);
+                            edcObj.setOrdinal(odmFormRef.getOrderNumber().intValue());
+
+                            EDCTagDTO populateEDCTagParameter = new EDCTagDTO();
+                            populateEDCTagParameter.setConf(conf);
+
+                            populateEDCTagParameter.setConf(conf);
+                            populateEDCTagParameter.setEventDefinitionCrf(eventDefinitionCrf);
+                            populateEDCTagParameter.setUserAccount(userAccount);
+
+                            eventDefinitionCrf = saveOrUpdateEventDefnCrf(new EventDefinitionCrfDTO(edcObj));
+                            saveOrUpdateEDCTag(new EDCTagDTO(populateEDCTagParameter), studyEventDefinition, crf);
+                            jsonEventDefCrfList.add(eventDefinitionCrf);
                         }
-                        if (defaultVersionName == null) {
-                            defaultVersionName = formLayoutRefs.get(0).getOID();
-                        }
-                        formLayout = getFormLayoutDao().findByNameCrfId(defaultVersionName, crf.getCrfId());
-                        EventDefinitionCrfDTO edcObj = new EventDefinitionCrfDTO();
-                        edcObj.setUserAccount(userAccount);
-                        edcObj.setConf(conf);
-                        edcObj.setCrf(crf);
-                        edcObj.setEventDefinitionCrf(eventDefinitionCrf);
-                        edcObj.setOdmFormRef(odmFormRef);
-                        edcObj.setStudy(study);
-                        edcObj.setFormLayout(formLayout);
-                        edcObj.setStudyEventDefinition(studyEventDefinition);
 
-                        EDCTagDTO populateEDCTagParameter = new EDCTagDTO();
-                        populateEDCTagParameter.setConf(conf);
-
-                        populateEDCTagParameter.setConf(conf);
-                        populateEDCTagParameter.setEventDefinitionCrf(eventDefinitionCrf);
-                        populateEDCTagParameter.setUserAccount(userAccount);
-
-                        eventDefinitionCrf = saveOrUpdateEventDefnCrf(new EventDefinitionCrfDTO(edcObj));
-                        saveOrUpdateEDCTag(new EDCTagDTO(populateEDCTagParameter), studyEventDefinition, crf);
-                        jsonEventDefCrfList.add(eventDefinitionCrf);
                     }
-
                     List<EventDefinitionCrf> ocEventDefCrfList = getEventDefinitionCrfDao()
                             .findAvailableByStudyEventDefStudy(studyEventDefinition.getStudyEventDefinitionId(), study.getStudyId());
                     for (EventDefinitionCrf ocEventDefCrf : ocEventDefCrfList) {
                         if (!jsonEventDefCrfList.contains(ocEventDefCrf)) {
+                            // Remove CRF From Event Definition
                             ocEventDefCrf.setStatusId(Status.DELETED.getCode());
+                            ocEventDefCrf.setUpdateId(userAccount.getUserId());
+                            ocEventDefCrf.setDateUpdated(new Date());
                             getEventDefinitionCrfDao().saveOrUpdate(ocEventDefCrf);
+                            eventService.removeCrfFromEventDefinition(ocEventDefCrf.getEventDefinitionCrfId(), studyEventDefinition.getStudyEventDefinitionId(),
+                                    userAccount.getUserId(), study.getStudyId());
                         }
                     }
-
                 }
             }
-
         }
+        if (errors.hasErrors()) {
+            List<ErrorObj> errList = getErrorList(errors.getAllErrors());
+            throw new CustomRuntimeException("There are errors with publishing", errList);
+        }
+        return study;
+    }
 
+    private void updatePublicStudypublishedFlag(Study publicStudy) {
+        publicStudy.setPublished(true);
+        studyDao.updatePublicStudy(publicStudy);
+        for (Study publicStudySite : publicStudy.getStudies()) {
+            publicStudySite.setPublished(true);
+            studyDao.updatePublicStudy(publicStudySite);
+        }
+    }
+
+    private void updateStudypublishedFlag(Study study) {
+        study.setPublished(true);
+        studyDao.saveOrUpdate(study);
+        for (Study publicStudySite : study.getStudies()) {
+            publicStudySite.setPublished(true);
+            studyDao.saveOrUpdate(publicStudySite);
+        }
     }
 
     private void saveOrUpdateEDCTag(EDCTagDTO edcTagObj, StudyEventDefinition studyEventDefinition, CrfBean crf) {
@@ -215,6 +264,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         if (eventDefinitionCrf == null) {
             eventDefinitionCrf = new EventDefinitionCrf();
             edcObj.setEventDefinitionCrf(eventDefinitionCrf);
+            edcObj.getEventDefinitionCrf().setStatusId(org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
             eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(populateEventDefinitionCrf(new EventDefinitionCrfDTO(edcObj)));
         } else {
             eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(updateEventDefinitionCrf(new EventDefinitionCrfDTO(edcObj)));
@@ -222,33 +272,71 @@ public class OdmImportServiceImpl implements OdmImportService {
         return eventDefinitionCrf;
     }
 
-    private void saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Form[] fmCrfs) {
+    private void saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Form[] fmCrfs,
+            Errors errors) {
+        Set<Long> publishedVersions = new HashSet<>();
         for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
             String crfOid = odmFormDef.getOID();
             List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs = odmFormDef.getFormLayoutDef();
+            if (formLayoutDefs.size() == 0) {
+                errors.rejectValue("name", "form_upload_error", "No Excel definition has been uploaded for Form \"" + odmFormDef.getName() + "\" - FAILED");
+                logger.info("No Excel definition has been uploaded for Form <" + odmFormDef.getName() + "> - FAILED");
+            }
+
             // String crfDescription = odmFormDef.getFormDetails().getDescription();
             String crfName = odmFormDef.getName();
-            saveOrUpdateCrfAndFormLayouts(crfOid, formLayoutDefs, fmCrfs, userAccount, study, crfName);
+
+            CrfBean crfBean = getCrfDao().findByOcOID(crfOid);
+            if (crfBean != null) {
+                List<String> jsonLayoutOids = new ArrayList<>();
+                for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : formLayoutDefs) {
+                    jsonLayoutOids.add(formLayoutDef.getOID());
+                }
+                List<FormLayout> formLayouts = getFormLayoutDao().findAllByCrfId(crfBean.getCrfId());
+                for (FormLayout formLayout : formLayouts) {
+                    if (!jsonLayoutOids.contains(formLayout.getName()) && !formLayout.getStatus().equals(Status.LOCKED)) {
+                        formLayout.setStatus(Status.LOCKED);
+                        formLayout.setUserAccount(userAccount);
+                        formLayout.setDateCreated(new Date());
+                        getFormLayoutDao().saveOrUpdate(formLayout);
+                    }
+                }
+            }
+            saveOrUpdateCrfAndFormLayouts(crfOid, formLayoutDefs, fmCrfs, userAccount, study, crfName, publishedVersions, errors);
+        }
+        if (publishedVersions.size() != 0) {
+            String fmUrl = getCoreResources().getField("formManager").trim() + "/api/xlsForm/setPublishedEnvironment";
+            RestTemplate restTemplate = new RestTemplate();
+            PublishingDTO dto = new PublishingDTO();
+            dto.setPublishedEnvType(study.getEnvType());
+            dto.setVersionIds(publishedVersions);
+
+            try {
+                restTemplate.postForObject(fmUrl, dto, PublishingDTO.class);
+            } catch (Exception e) {
+                logger.info(e.getMessage());
+                errors.rejectValue("name", "fm_app_error", "Form Manager not responding");
+            }
         }
 
     }
 
     private void saveOrUpdateCrfAndFormLayouts(String crfOid, List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs, Form[] fmCrfs,
-            UserAccount userAccount, Study study, String crfName) {
+            UserAccount userAccount, Study study, String crfName, Set<Long> publishedVersions, Errors errors) {
 
-        DataBinder dataBinder = new DataBinder(new FormLayout());
-        Errors errors = dataBinder.getBindingResult();
         StudyBean currentStudy = new StudyBean();
         currentStudy.setId(study.getStudyId());
+        currentStudy.setEnvType(study.getEnvType());
+        currentStudy.setOid(study.getOc_oid());
 
         UserAccountBean ub = new UserAccountBean();
         ub.setId(userAccount.getUserId());
         ub.setActiveStudyId(currentStudy.getId());
-
         for (Form crf : fmCrfs) {
             if (crf.getOcoid().equals(crfOid)) {
+                crf.setName(crfName);
                 ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, currentStudy, ub, true, null);
-                xformService.executeIndividualCrf(eicObj);
+                xformService.executeIndividualCrf(eicObj, publishedVersions);
             }
         }
 
@@ -265,8 +353,13 @@ public class OdmImportServiceImpl implements OdmImportService {
             if (studyEventDefinition == null || studyEventDefinition.getStudyEventDefinitionId() == 0) {
                 studyEventDefinition = new StudyEventDefinition();
                 studyEventDefinition.setOc_oid(odmStudyEventDef.getOID());
+                studyEventDefinition.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
                 studyEventDefinition = getStudyEventDefDao().saveOrUpdate(populateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study));
             } else {
+                if (!studyEventDefinition.getStatus().equals(Status.AVAILABLE)) {
+                    // restore study event defn
+                    eventService.restoreStudyEventDefn(studyEventDefinition.getStudyEventDefinitionId(), userAccount.getUserId());
+                }
                 studyEventDefinition = getStudyEventDefDao().saveOrUpdate(updateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study));
             }
             jsonEventList.add(studyEventDefinition);
@@ -274,56 +367,25 @@ public class OdmImportServiceImpl implements OdmImportService {
         List<StudyEventDefinition> ocEventList = getStudyEventDefDao().findAll(); // findAllNonRemovedEvents
         for (StudyEventDefinition ocEvent : ocEventList) {
             if (!jsonEventList.contains(ocEvent)) {
-                ocEvent.setStatus(Status.DELETED);
-                getStudyEventDefDao().saveOrUpdate(ocEvent);
+                // remove study event defn
+                eventService.removeStudyEventDefn(ocEvent.getStudyEventDefinitionId(), userAccount.getUserId());
             }
         }
 
         return odmStudyEventDefs;
     }
 
-    private Study saveOrUpdateStudy(ODM odm, UserAccount userAccount, ODMcomplexTypeDefinitionStudy odmStudy) {
-        ODMcomplexTypeDefinitionGlobalVariables odmGlobalVariables = odmStudy.getGlobalVariables();
+    private Study retrieveStudy(ODM odm, UserAccount userAccount, ODMcomplexTypeDefinitionStudy odmStudy, Errors errors) {
         String studyOid = odm.getStudy().get(0).getOID();
         Study study = getStudyDao().findByOcOID(studyOid);
 
-        if (study == null || study.getStudyId() == 0) {
-            study = new Study();
-            study.setOc_oid(studyOid);
-            study = getStudyDao().saveOrUpdate(populateStudy(odmGlobalVariables, userAccount, study));
-        } else {
-            study = getStudyDao().saveOrUpdate(updateStudy(odmGlobalVariables, userAccount, study));
+        if (study == null) {
+            errors.rejectValue("name", "environment_error", "Environment is not available - FAILED");
+            logger.info("Study with this oid: " + studyOid + " doesn't exist. Please fix !!! ");
+            List<ErrorObj> errList = getErrorList(errors.getAllErrors());
+            throw new CustomRuntimeException("There are errors with publishing", errList);
         }
         return study;
-    }
-
-    private Study populateStudy(ODMcomplexTypeDefinitionGlobalVariables odmGlobalVariables, UserAccount userAccount, Study study) {
-        study.setUniqueIdentifier(odmGlobalVariables.getProtocolName().getValue());
-        study.setName(odmGlobalVariables.getStudyName().getValue());
-        // study.setSummary(odmGlobalVariables.getStudyDescription().getValue());
-        study.setSummary("This is the summary");
-        study.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-        study.setUserAccount(userAccount);
-        study.setDateCreated(new Date());
-        return study;
-    }
-
-    private Study updateStudy(ODMcomplexTypeDefinitionGlobalVariables odmGlobalVariables, UserAccount userAccount, Study study) {
-        study = populateStudy(odmGlobalVariables, userAccount, study);
-        study.setUpdateId(userAccount.getUserId());
-        study.setDateUpdated(new Date());
-        return study;
-    }
-
-    private StudyUserRole populateUserRole(Study study, UserAccount userAccount, StudyUserRole sur, StudyUserRoleId surId) {
-        surId.setUserName(userAccount.getUserName());
-        surId.setRoleName(Role.STUDYDIRECTOR.getName());
-        surId.setStudyId(study.getStudyId());
-        surId.setStatusId(1);
-        surId.setOwnerId(userAccount.getUserId());
-        surId.setDateCreated(new Date());
-        sur.setId(surId);
-        return sur;
     }
 
     private StudyEventDefinition populateEvent(ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef, UserAccount userAccount,
@@ -338,7 +400,6 @@ public class OdmImportServiceImpl implements OdmImportService {
         studyEventDefinition.setType(EventType.SCHEDULED.value().toLowerCase());
         studyEventDefinition.setStudy(study);
         studyEventDefinition.setUserAccount(userAccount);
-        studyEventDefinition.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
         if (odmStudyEventDef.getStudyEventDefElementExtension().size() != 0) {
             OCodmComplexTypeDefinitionEventDefinitionDetails eventDetails = odmStudyEventDef.getStudyEventDefElementExtension().get(0);
             if (eventDetails != null && eventDetails.getCategory() != null) {
@@ -369,9 +430,11 @@ public class OdmImportServiceImpl implements OdmImportService {
         edcObj.getEventDefinitionCrf().setStudy(edcObj.getStudy());
         edcObj.getEventDefinitionCrf().setStudyEventDefinition(edcObj.getStudyEventDefinition());
         edcObj.getEventDefinitionCrf().setCrf(edcObj.getCrf());
-        edcObj.getEventDefinitionCrf().setStatusId(org.akaza.openclinica.domain.Status.AVAILABLE.getCode());
         edcObj.getEventDefinitionCrf().setUserAccount(edcObj.getUserAccount());
-        edcObj.getEventDefinitionCrf().setCrfVersion(edcObj.getCrfVersion());
+        edcObj.getEventDefinitionCrf().setFormLayout(edcObj.getFormLayout());
+        edcObj.getEventDefinitionCrf().setDoubleEntry(false);
+        edcObj.getEventDefinitionCrf().setElectronicSignature(false);
+        edcObj.getEventDefinitionCrf().setOrdinal(edcObj.getOrdinal());
         setConfigurationProperties(edcObj.getConf(), edcObj.getEventDefinitionCrf());
         if (edcObj.getOdmFormRef().getMandatory().equals(YesOrNo.YES)) {
             edcObj.getEventDefinitionCrf().setRequiredCrf(true);
@@ -405,6 +468,12 @@ public class OdmImportServiceImpl implements OdmImportService {
             eventDefinitionCrf.setHideCrf(true);
         } else {
             eventDefinitionCrf.setHideCrf(false);
+        }
+        String sdvDescription = conf.getSourceDataVerificationCode();
+        if (!StringUtils.isEmpty(sdvDescription) && SourceDataVerification.getByDescription(sdvDescription) != null) {
+            eventDefinitionCrf.setSourceDataVerificationCode(SourceDataVerification.getByDescription(conf.getSourceDataVerificationCode()).getCode());
+        } else {
+            eventDefinitionCrf.setSourceDataVerificationCode(SourceDataVerification.PARTIALREQUIRED.getCode());
         }
         eventDefinitionCrf.setSubmissionUrl(conf.getSubmissionUrl());
 
@@ -528,19 +597,51 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.formLayoutDao = formLayoutDao;
     }
 
-    public Form[] getAllCrfsByProtIdFromFormManager(Study study) {
-        // String protocolId = study.getUniqueIdentifier();
-        String protocolId = study.getOc_oid();
-
-        String url = FM_BASEURL + protocolId + "/forms";
-        RestTemplate restTemplate = new RestTemplate();
-        Form[] crfs = null;
-        try {
-            crfs = (Form[]) restTemplate.getForObject(url, Form[].class);
-        } catch (Exception e) {
-            logger.info(e.getMessage());
-        }
-        return crfs;
+    public CoreResources getCoreResources() {
+        return coreResources;
     }
 
+    public void setCoreResources(CoreResources coreResources) {
+        this.coreResources = coreResources;
+    }
+
+    public Form[] getAllCrfsByProtIdFromFormManager(String boardId, Errors errors) {
+
+        String formServiceBaseURL = getCoreResources().getField("formManager").trim() + "/api/buckets?boardUuid={0}";
+
+        String url = MessageFormat.format(formServiceBaseURL, boardId);
+        Bucket[] buckets = null;
+        RestTemplate restTemplate = new RestTemplate();
+        ArrayList<Form> forms = null;
+
+        try {
+            buckets = (Bucket[]) restTemplate.getForObject(url, Bucket[].class);
+        } catch (Exception e) {
+            logger.info(e.getMessage());
+            errors.rejectValue("name", "fm_app_error", "Form Manager not responding");
+
+        }
+
+        if (buckets != null && buckets.length == 1) {
+            forms = buckets[0].getForms();
+        } else {
+            errors.rejectValue("name", "fm_app_error", "No forms found for this board");
+
+        }
+
+        return forms.toArray(new Form[forms.size()]);
+    }
+
+    public void setEventService(EventService eventService) {
+        this.eventService = eventService;
+    }
+
+    private List<ErrorObj> getErrorList(List<ObjectError> objErrors) {
+        List<ErrorObj> err = new ArrayList<>();
+        for (ObjectError er : objErrors) {
+            ErrorObj obj = new ErrorObj(er.getCode(), er.getDefaultMessage());
+            err.add(obj);
+        }
+        return err;
+    }
 }

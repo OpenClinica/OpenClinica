@@ -7,7 +7,7 @@
 	</query>
 	<query>
 		<name>getCurrentPK</name>
-		<sql> select currval('rule_expression_rule_expression_id_seq') as key</sql>
+		<sql> select currval('rule_expression_id_seq') as key</sql>
 	</query>
 	<query>
 		<name>delete</name>

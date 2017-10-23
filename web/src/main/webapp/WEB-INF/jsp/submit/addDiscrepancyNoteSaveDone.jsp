@@ -33,7 +33,7 @@
 </head>
 <body class="popup_BG" style="margin: 25px;" onload="javascript:refreshSource('true','/ViewNotes?');javascript:window.setTimeout('window.close()',3000);">
 <div style="float: left;"><h1 class="table_title_Submit"><fmt:message key="add_discrepancy_note" bundle="${resword}"/></h1></div>
-<div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
+<div style="float: right;margin-right: 50px;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="close_window" bundle="${resword}"/></a></p></div>
 <br clear="all">
 <p class="alert" style="font-size: 14px; margin: 120px 50px;" >    
 <c:forEach var="message" items="${pageMessages}">

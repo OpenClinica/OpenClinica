@@ -7,7 +7,7 @@
 	</query>
 	<query>
         <name>findCurrentPKValue</name>
-        <sql> select currval('rule_set_audit_rule_set_audit_id_seq') as key</sql>
+        <sql> select currval('rule_set_audit_id_seq') as key</sql>
     </query>
 	<query>
 		<name>findAllByRuleSet</name>

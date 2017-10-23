@@ -6,11 +6,8 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
-<link rel="stylesheet" href="../includes/css/icomoon-style.css">
-
 
 <jsp:include page="include/managestudy_top_pages.jsp"/>
-
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="include/sideAlert.jsp"/>
@@ -57,7 +54,38 @@
         var parameterString = createParameterStringForLimit(id);
         //location.href = '${pageContext.request.contextPath}/ViewCRF?module=manage&crfId=' + '${crf.id}&' + parameterString;
     }
-</script></div>
+</script>
+
+<c:if test="${(study.status.locked || study.status.frozen || study.status.pending)}">
+    <c:if test="${userBean.numVisitsToMainMenu<=1 || studyJustChanged=='yes'}">
+        <script type="text/javascript">
+            $(window).on('load', function () {
+                initmb();
+                sm('box', 730,100);
+            });
+        </script>
+    </c:if>
+</c:if>
+
+
+</div>
+
+<div id="box" class="dialog">
+    <span id="mbm">
+        <br>
+        <c:if test="${(!study.status.pending)}">
+            <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
+        </c:if>
+        
+        <c:if test="${(study.status.pending)}">
+            <fmt:message key="study_design_note" bundle="${restext}"/>
+        </c:if>   
+    </span><br>
+    <div style="text-align:center; width:100%;">
+        <button onclick="hm('box');">OK</button>
+    </div>
+</div>
+
 
 <h1><span class="title_manage">
 <fmt:message key="sdv_sdv_for" bundle="${resword}"/> <c:out value="${study.name}"/>

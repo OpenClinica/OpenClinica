@@ -110,7 +110,7 @@ public class StudyConfigService {
                 } else if (handle.equalsIgnoreCase("discrepancyManagement")) {
                     spc.setDiscrepancyManagement(spv.getValue());
                 } else if (handle.equalsIgnoreCase("subjectPersonIdRequired")) {
-                    spc.setSubjectPersonIdRequired(spv.getValue());
+                    spc.setSubjectPersonIdRequired(spv.getValue().toLowerCase());
                     // logger.info("subjectPersonIdRequired" +
                     // spc.getSubjectPersonIdRequired());
                 } else if (handle.equalsIgnoreCase("interviewerNameRequired")) {

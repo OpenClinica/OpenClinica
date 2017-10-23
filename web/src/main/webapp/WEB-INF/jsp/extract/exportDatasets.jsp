@@ -22,7 +22,7 @@
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
 		<td class="sidebar_tab">
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
 		<fmt:message key="instructions" bundle="${resword}"/>
 		<div class="sidebar_tab_content">
 		</div>
@@ -31,7 +31,7 @@
 	</tr>
 	<tr id="sidebar_Instructions_closed" style="display: all">
 		<td class="sidebar_tab">
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
 		<fmt:message key="instructions" bundle="${resword}"/>
 		</td>
   </tr>
@@ -60,13 +60,12 @@
 </table>
 </div>
 
-<P><b><fmt:message key="note" bundle="${resword}"/>: </b><fmt:message key="export_dataset_download2" bundle="${restext}"/>
-
 </div></div></div></div></div></div></div></div>
 </div>
 
 <input type="hidden" name="datasetId" value="<c:out value="${dataset.id}"/>"/>
 <table border="0" cellpadding="5" width="625">
+<tr valign="top" width="100%"><p>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;<b><fmt:message key="note" bundle="${resword}"/>: </b><fmt:message key="export_dataset_download2" bundle="${restext}"/></p></tr>
 <tr valign="top" width="100%">
     <td class="text" >
 	<ul><%-- <li><a href="ExportDataset?action=html&datasetId=<c:out value="${dataset.id}"/>"><fmt:message key="view_as_HTML" bundle="${resword}"/></a></li> --%>
@@ -99,7 +98,7 @@
 </tr>
 </table>
 
-<P><b><fmt:message key="archive_of_exported_dataset_files" bundle="${resword}"/>:</b></P>
+<p><b><fmt:message key="archive_of_exported_dataset_files" bundle="${resword}"/>:</b></p>
 
 <c:import url="../include/showTable.jsp">
 <c:param name="rowURL" value="showArchivedDatasetFileRow.jsp" />

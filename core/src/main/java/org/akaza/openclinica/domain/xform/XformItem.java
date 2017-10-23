@@ -10,6 +10,7 @@ public class XformItem {
     String itemResponseType = null;
     String itemDataType = null;
     String readonly = null;
+    String relevant = null;
     boolean calculate = false;
     int itemOrderInForm;
     boolean required = false;
@@ -146,6 +147,14 @@ public class XformItem {
 
     public void setVersions(List<String> versions) {
         this.versions = versions;
+    }
+
+    public String getRelevant() {
+        return relevant;
+    }
+
+    public void setRelevant(String relevant) {
+        this.relevant = relevant;
     }
 
 }

@@ -298,10 +298,7 @@
 <!--
    <a href="javascript:openDocWindow('PrintAllSiteEventCRF?siteId=<c:out value="${siteToView.id}"/>')"
  -->
-  <a href="javascript:processPrintCRFRequest('rest/metadata/html/print/<c:out value="${siteToView.oid}"/>/*/*')"
-   onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
-   onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
-   name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" title="<fmt:message key="print_all_available_crf" bundle="${resword}"/>" align="left" hspace="6"></a>
+
    </div>
    <div style="clear:both"></div>
 

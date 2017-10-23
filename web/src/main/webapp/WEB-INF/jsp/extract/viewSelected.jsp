@@ -43,7 +43,7 @@ function notSelectAll() {
 <tr id="sidebar_Instructions_open" style="display: none">
     <td class="sidebar_tab">
 
-    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
 
     <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -57,7 +57,7 @@ function notSelectAll() {
   <tr id="sidebar_Instructions_closed" style="display: all">
     <td class="sidebar_tab">
 
-    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
 
     <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -79,10 +79,6 @@ function notSelectAll() {
 </c:otherwise>
 </c:choose>
 
-<P><jsp:include page="../showInfo.jsp"/></P>
-
-<P><jsp:include page="../include/alertbox.jsp"/></P>
-
 <c:if test="${newDataset.id<=0}">
 <p><fmt:message key="can_view_items_selected_inclusion" bundle="${restext}"/><fmt:message key="select_all_items_inclusion_clicking" bundle="${restext}"/></p>
 <form action="EditSelected" method="post" name="cl">
@@ -97,7 +93,7 @@ function notSelectAll() {
 <input type="hidden" name="action" value="beginsubmit"/>
 <input type="hidden" name="crfId" value="-1">
 <input type="hidden" name="defId" value="<c:out value="${definition.id}"/>">
-<P><B><fmt:message key="show_items_this_dataset" bundle="${restext}"/></b></p>
+<p><b><fmt:message key="show_items_this_dataset" bundle="${restext}"/></b></p>
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
    <td><input type="submit" name="save" value="<fmt:message key="save_and_add_more_items" bundle="${resword}"/>" class="button_xlong"/></td>
@@ -119,8 +115,5 @@ function notSelectAll() {
 </form>
 </c:if>
 <br><br><br>
-<jsp:include page="createDatasetBoxes.jsp" flush="true">
-<jsp:param name="selectStudyEvents" value="1"/>
-</jsp:include>
 
 <jsp:include page="../include/footer.jsp"/>

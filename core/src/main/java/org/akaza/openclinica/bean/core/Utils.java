@@ -234,6 +234,14 @@ public class Utils {
         return attachedFilePath;
     }
 
+    public static String getFilePath() {
+        return CoreResources.getField("filePath");
+    }
+
+    public static String getCrfMediaPath(String studyOid, String crfOid, String formLayoutOid) {
+        return "crf" + File.separator + studyOid + File.separator + crfOid + File.separator + formLayoutOid + File.separator;
+    }
+
     public static String getCrfMediaFilePath(String crfOid, String formLayoutOid) {
         String attachedFilePath = CoreResources.getField("attached_file_location");
         String filePath = crfOid + File.separator + formLayoutOid + File.separator;

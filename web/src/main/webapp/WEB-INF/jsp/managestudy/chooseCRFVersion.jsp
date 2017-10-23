@@ -12,17 +12,18 @@
 
 <link rel="stylesheet" href="../../includes/style_shaded_table.css" type="text/css">
 
+<link rel="SHORTCUT ICON" href="../../images/favicon.ico" type="image/x-icon" />
 
-<jsp:include page="../include/managestudy_top_pages_new.jsp"/>
-	
-	
+<jsp:include page="../include/managestudy_top_pages_new.jsp">
+	<jsp:param name="isSpringControllerCCV" value="true" />
+</jsp:include>
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
 <tr id="sidebar_Instructions_open" style="display: all">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
 
 		<fmt:message key="instructions" bundle="${resword}"/>
 
@@ -36,7 +37,7 @@
 	<tr id="sidebar_Instructions_closed" style="display: none">
 		<td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
 
 		<fmt:message key="instructions" bundle="${resword}"/>
 
@@ -144,7 +145,6 @@ $.noConflict();
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="default_version" bundle="${resword}"/></td>
 <td class="table_header_row" style="color: #789EC5;"><fmt:message key="action" bundle="${resword}"/></td>
 </tr>
-
 <!-- versions data -->
 
 <c:forEach var="version" items="${crfBean.versions}">
@@ -157,10 +157,8 @@ $.noConflict();
 <!-- <td  class="table_cell"  > <c:out value="${version.status.name}" />&nbsp;</td>-->
 <td  class="table_cell"  style="text-align:center;" ><c:if test="${version.id == formLayoutId}">X</c:if>&nbsp;</td>
 <td  class="table_cell"  >
-<a onmouseup="javascript:setImage('bt_View1','../../images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','../../images/bt_View_d.gif');" 
-href="#" onclick="window.openNewWindow('../../ViewSectionDataEntry?module=admin&crfId=<c:out value="${crfBean.id}"/>&formLayoutId=<c:out value="${version.id}"/>&tabId=1&crfListPage=yes','','','')">
-<span hspace="6" border="0" align="left" title="View" alt="View" class="icon icon-search" name="bt_View1">
-</a>
+<a href="../../ParticipantFormServlet?crfOID=<c:out value="${version.oid}"/>" target="_blank"><span
+ name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
 <a onmouseup="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" onmousedown="javascript:setImage('bt_Metadata','../../images/bt_Metadata.gif');" 
 href="#" onclick="window.openNewWindow('../../ViewCRFVersion?id=<c:out value="${version.id}"/>','','','')">
 <span border="0" align="left" title="Metadata" alt="Metadata" class="icon icon-icon-dataEntryCompleted orange" name="bt_Metadata">

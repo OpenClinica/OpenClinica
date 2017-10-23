@@ -103,16 +103,16 @@ public class PFormCache {
 
     public String putSubjectContext(PFormCacheSubjectContextEntry entry) {
         return putSubjectContext(entry.getStudySubjectOid(), entry.getStudyEventDefinitionId(), entry.getOrdinal(), entry.getFormLayoutOid(),
-                entry.getUserAccountId(), entry.getStudyEventId());
+                entry.getUserAccountId(), entry.getStudyEventId(),entry.getStudyOid());
     }
 
     public String putSubjectContext(String studySubjectOID, String studyEventDefinitionID, String studyEventOrdinal, String formLayoutOID,
-            String studyEventID) {
-        return putSubjectContext(studySubjectOID, studyEventDefinitionID, studyEventOrdinal, formLayoutOID, null, studyEventID);
+            String studyEventID, String studyOid) {
+        return putSubjectContext(studySubjectOID, studyEventDefinitionID, studyEventOrdinal, formLayoutOID, null, studyEventID, studyOid);
     }
 
     public String putSubjectContext(String studySubjectOID, String studyEventDefinitionID, String studyEventOrdinal, String formLayoutOID, String userAccountID,
-            String studyEventID) {
+            String studyEventID,String studyOid) {
         HashMap<String, String> contextMap = new HashMap<String, String>();
         contextMap.put("studySubjectOID", studySubjectOID);
         contextMap.put("studyEventDefinitionID", studyEventDefinitionID);
@@ -121,7 +121,8 @@ public class PFormCache {
         contextMap.put("userAccountID", userAccountID);
         contextMap.put("studyEventID", studyEventID);
 
-        String hashString = studySubjectOID + "." + studyEventDefinitionID + "." + studyEventOrdinal + "." + formLayoutOID;
+        contextMap.put("studyOid", studyOid);
+        String hashString = userAccountID + "." + studySubjectOID + "." + studyEventDefinitionID + "." + studyEventOrdinal + "." + formLayoutOID;
         ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
         String hashOutput = encoder.encodePassword(hashString, null);
         subjectContextCache.remove(hashOutput);

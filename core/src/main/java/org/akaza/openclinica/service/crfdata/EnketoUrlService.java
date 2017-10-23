@@ -3,8 +3,6 @@ package org.akaza.openclinica.service.crfdata;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.MalformedURLException;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -23,11 +21,12 @@ import org.akaza.openclinica.core.form.xform.QueryBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
+import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
-import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
@@ -45,6 +44,7 @@ import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.ItemData;
@@ -57,14 +57,13 @@ import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.akaza.openclinica.service.crfdata.xform.EditUrlObject;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLResponse;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
-import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.apache.commons.dbcp.BasicDataSource;
-import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.joda.time.DateTime;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -95,6 +94,7 @@ public class EnketoUrlService {
     public static final String COMMENT = "comment";
     public static final String AUDIT = "audit";
     public static final String ITEMDATA = "item_data";
+    public static final String DASH = "-";
 
     @Autowired
     @Qualifier("dataSource")
@@ -102,6 +102,9 @@ public class EnketoUrlService {
 
     @Autowired
     ServletContext context;
+
+    @Autowired
+    private CrfVersionDao crfVersionDao;
 
     @Autowired
     private FormLayoutDao formLayoutDao;
@@ -117,9 +120,6 @@ public class EnketoUrlService {
 
     @Autowired
     private EventCrfDao eventCrfDao;
-
-    @Autowired
-    private ItemDao itemDao;
 
     @Autowired
     private CrfDao crfDao;
@@ -157,6 +157,9 @@ public class EnketoUrlService {
     @Autowired
     private FormLayoutMediaDao formLayoutMediaDao;
 
+    @Autowired
+    private EventDefinitionCrfDao eventDefinitionCrfDao;
+
     public static final String FORM_CONTEXT = "ecid";
     ParticipantPortalRegistrar participantPortalRegistrar;
 
@@ -165,7 +168,7 @@ public class EnketoUrlService {
     StudyDAO sdao;
 
     public String getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String flavor, Role role,
-            String mode) throws Exception {
+            String mode, String hash) throws Exception {
         // Call Enketo api to get edit url
         Study parentStudy = enketoCredentials.getParentStudy(studyOid);
         studyOid = parentStudy.getOc_oid();
@@ -174,7 +177,8 @@ public class EnketoUrlService {
         if (subjectContext.getStudyEventId() != null) {
             studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
         }
-        return enketo.getFormURL(subjectContext.getFormLayoutOid() + flavor, studyOid, role, parentStudy, studyEvent, mode) + "?ecid=" + subjectContextKey;
+        return enketo.getFormURL(subjectContext.getFormLayoutOid() + DASH + hash + flavor, studyOid, role, parentStudy, studyEvent, mode) + "?ecid="
+                + subjectContextKey;
 
     }
 
@@ -196,9 +200,9 @@ public class EnketoUrlService {
             goTo = "//" + subjectContext.getItemName();
 
         // Lookup relevant data
+
         eventDef = studyEventDefinitionDao.findByStudyEventDefinitionId(Integer.valueOf(subjectContext.getStudyEventDefinitionId()));
         StudyEvent studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
-        eventDef = studyEvent.getStudyEventDefinition();
         subject = studyEvent.getStudySubject();
 
         if (formLayout == null) {
@@ -216,6 +220,7 @@ public class EnketoUrlService {
         // Load populated instance
         String populatedInstance = "";
         String crfFlavor = "";
+        String crfOid = "";
         if (flavor.equals(QUERY_FLAVOR)) {
             populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, flavor);
             crfFlavor = flavor;
@@ -224,17 +229,23 @@ public class EnketoUrlService {
             crfFlavor = flavor + "[" + idb.getId() + "]";
             markComplete = false;
         }
+        crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
 
         // Call Enketo api to get edit url
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
 
         // Build redirect url
-        String redirectUrl = getRedirectUrl(subject.getOcOid(), studyOid);
+        String redirectUrl = CoreResources.getField("sysURL");
+
+        EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(eventDef.getStudyEventDefinitionId(),
+                formLayout.getCrf().getCrfId(), eventDef.getStudy().getStudyId());
 
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
-        EnketoURLResponse eur = enketo.getEditURL(formLayout, crfFlavor, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid, mediaList,
-                goTo, flavor, role, study, studyEvent, mode);
+        EditUrlObject editUrlObject = new EditUrlObject(formLayout, crfOid, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
+                mediaList, goTo, flavor, role, study, studyEvent, mode, edc, eventCrf);
+
+        EnketoURLResponse eur = enketo.registerAndGetEditURL(editUrlObject);
 
         if (eur.getEdit_url() != null) {
             editURL = eur.getEdit_url();
@@ -259,31 +270,6 @@ public class EnketoUrlService {
 
         return editURL;
 
-    }
-
-    private String getRedirectUrl(String studySubjectOid, String studyOid) {
-        String portalURL = CoreResources.getField("portalURL");
-        String url = "";
-        if (portalURL != null && !portalURL.equals("")) {
-            ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-            Authorization pManageAuthorization = registrar.getAuthorization(studyOid);
-            try {
-                URL pManageUrl = new URL(portalURL);
-
-                if (pManageAuthorization != null && pManageAuthorization.getStudy() != null && pManageAuthorization.getStudy().getHost() != null
-                        && !pManageAuthorization.getStudy().getHost().equals("")) {
-                    url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
-                            + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-                }
-            } catch (MalformedURLException e) {
-                logger.error("Error building redirect URL: " + e.getMessage());
-                logger.error(ExceptionUtils.getStackTrace(e));
-                return "";
-            }
-        }
-        if (!url.equals(""))
-            url = url + "/#/event/" + studySubjectOid + "/dashboard";
-        return url;
     }
 
     public QueriesBean buildQueryElement(ItemData itemdata) {
@@ -389,7 +375,12 @@ public class EnketoUrlService {
                             ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), i + 1);
                             String itemValue = getItemValue(itemData, crfVersion);
                             hashMap.put(igm.getItem().getName(), itemData != null ? itemValue : "");
-                            if (flavor.equals(QUERY_FLAVOR)) {
+
+                            ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(igm.getItem().getItemId(),
+                                    crfVersion.getCrfVersionId());
+                            Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
+
+                            if (flavor.equals(QUERY_FLAVOR) && responseTypeId != 8) {
                                 if (itemData != null) {
                                     ObjectMapper mapper = new ObjectMapper();
                                     QueriesBean queriesBean = buildQueryElement(itemData);
@@ -414,7 +405,10 @@ public class EnketoUrlService {
                     ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(igm.getItem().getItemId(), eventCrf.getEventCrfId(), 1);
                     String itemValue = getItemValue(itemData, crfVersion);
                     data.put(igm.getItem().getName(), itemData != null ? itemValue : "");
-                    if (flavor.equals(QUERY_FLAVOR)) {
+                    ItemFormMetadata itemFormMetadata = itemFormMetadataDao.findByItemCrfVersion(igm.getItem().getItemId(), crfVersion.getCrfVersionId());
+                    Integer responseTypeId = itemFormMetadata.getResponseSet().getResponseType().getResponseTypeId();
+
+                    if (flavor.equals(QUERY_FLAVOR) && responseTypeId != 8) {
                         if (itemData != null) {
                             ObjectMapper mapper = new ObjectMapper();
                             QueriesBean queriesBean = buildQueryElement(itemData);
@@ -428,7 +422,7 @@ public class EnketoUrlService {
         }
         String templateStr = null;
         CrfBean crfBean = crfDao.findById(formLayout.getCrf().getCrfId());
-        String directoryPath = Utils.getCrfMediaFilePath(crfBean.getOcOid(), formLayout.getOcOid());
+        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOid, crfBean.getOcOid(), formLayout.getOcOid());
         File dir = new File(directoryPath);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {

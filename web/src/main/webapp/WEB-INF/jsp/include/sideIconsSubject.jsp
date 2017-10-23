@@ -80,7 +80,7 @@ View
                     <td><fmt:message key="restore" bundle="${reswords}"/></td>
                 </tr>
                 <tr>
-                    <td>&nbsp;<span class="icon icon-icon-reassign2"></span></td>
+                    <td>&nbsp;<span class="icon icon-icon-reassign3"></span></td>
                     <td><fmt:message key="reassign" bundle="${reswords}"/></td>
                 </tr>
                 <tr>
@@ -89,12 +89,6 @@ View
                 </tr>
             </c:if>
         </table>
-
-        <div class="sidebar_tab_content">
-
-            <u><a href="#" onClick="openDefWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/overview-openclinica/home-page#content-title-3610'); return false;"><fmt:message key="view_all_icons" bundle="${reswords}"/></a></u>
-
-        </div>
 
     </td>
 </tr>

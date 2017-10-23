@@ -42,6 +42,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -639,9 +640,12 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         request.setAttribute(DIS_NOTES, noteTree);
 
         // copied from CreatediscrepancyNoteServlet generateUserAccounts
+        String currentSchema = CoreResources.getRequestSchema(request);
+        CoreResources.setRequestSchema(request, "public");
+
         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         StudyBean subjectStudy = studyDAO.findByStudySubjectId(subjectId);
-        int studyId = currentStudy.getId();
+        int studyId = ub.getActiveStudyId();
         ArrayList<UserAccountBean> userAccounts = new ArrayList();
         if (currentStudy.getParentStudyId() > 0) {
             userAccounts = udao.findAllUsersByStudyOrSite(studyId, currentStudy.getParentStudyId(), subjectId);
@@ -650,6 +654,9 @@ public class ViewDiscrepancyNoteServlet extends SecureController {
         } else {
             userAccounts = udao.findAllUsersByStudyOrSite(studyId, 0, subjectId);
         }
+        CoreResources.setRequestSchema(request,currentSchema);
+        
+        
         request.setAttribute(USER_ACCOUNTS, userAccounts);
         request.setAttribute(VIEW_DN_LINK, this.getPageServletFileName());
 

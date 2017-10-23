@@ -21,7 +21,7 @@
 
 		<jsp:include page="include/userbox-inactive.jsp"/>
 		<table border="0" cellpadding=0" cellspacing="0">
-			<tr><td class="sidebar" valign="top"><br><b><a href="j_spring_security_logout"><fmt:message key="logout" bundle="${restext}"/></a></b></br></td>
+			<tr><td class="sidebar" valign="top"><br><b><a href="${pageContext.request.contextPath}/pages/logout"><fmt:message key="logout" bundle="${restext}"/></a></b></br></td>
 				<td class="content" valign="top">
 	</c:otherwise>
 </c:choose>
@@ -29,7 +29,7 @@
 <h1><span class="title_manage"><fmt:message key="an_error_has_ocurred" bundle="${resword}"/></span></h1>
 
 <font class="bodytext">
-<c:set var="referer" value="MainMenu"/>
+<c:set var="referer" value="${pageContext.request.contextPath}/MainMenu"/>
 <c:forEach var="refererValue" items="${pageContext.request.headerNames}">
 	<c:if test="${refererValue eq 'referer'}">
 		<!-- found it! -->
@@ -51,6 +51,6 @@
 		<jsp:include page="include/footer.jsp"/>
 	</c:when>
 	<c:otherwise>
-		<jsp:include page="login-include/login-footer.jsp"/>
+		<jsp:include page="login-include/error-login-footer.jsp"/>
 	</c:otherwise>
 </c:choose>

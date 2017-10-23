@@ -6,6 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 
 <jsp:useBean id="id" scope="request" class="java.lang.String"/>
@@ -75,7 +76,7 @@
 <!-- End Alert Box -->
 
 <div style="float: left;"><h1 class="title_manage"><c:out value="${entityName}"/>: <fmt:message key="view_discrepancy_notes" bundle="${resword}"/></h1></div>
-<div style="float: right;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="exit_window" bundle="${resword}"/></a></p></div>
+<div style="float: right;margin-right: 50px;"><p><a href="#" onclick="javascript:window.close();"><fmt:message key="exit_window" bundle="${resword}"/></a></p></div>
 <br clear="all">
 
 
@@ -189,7 +190,7 @@
 <c:set var="count" value="${1}"/>
 <!-- Thread Heading -->
 <c:forEach var="note" items="${discrepancyNotes}">
-<table border="0" cellpadding="0" cellspacing="0">
+<table border="0" cellpadding="0" cellspacing="0" align="left">
     <tbody>
         <tr>
             <td>
@@ -265,33 +266,7 @@
 
                             </c:forEach>
                             <c:set var="showDNBox" value="n"/>
-                            <c:if test="${!study.status.locked}">
-                                <tr>
-                                <td class="table_cell_left" colspan="4" align="right">
-                                    <c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4 && whichResStatus == '22')}">
-                                        <c:set var="sindex" value="0"/>
-                                        <c:forEach var="status" items="${resolutionStatuses}">
-                                            <c:choose>
-                                            <c:when test="${status.id == 2}">
-                                                <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
-                                            </c:when>
-                                            <c:when test="${status.id == 4}">
-                                                <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="close_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>');"/>
-                                            </c:when>
-                                            </c:choose>
-                                            <c:set var="sindex" value="${sindex+1}"/>
-                                        </c:forEach>
-                                        <br>
-                                        <c:set var="showDNBox" value="y"/>
-                                    </c:if>
-                                </td>
-                                </tr>
-                                <tr>
-                                    <td class="table_cell_left" id="msg${note.value.id}">
-                                    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${note.value.id}"/></jsp:include>  
-                                    </td>
-                                </tr>
-                            </c:if>
+                           
                         </table>
                     </div>
                 </div></div></div></div></div></div></div></div>
@@ -299,6 +274,35 @@
             </td>
         </tr>
              
+        <table border="0" style="padding-left: 330px;" align="left">
+            <c:if test="${!study.status.locked}">
+                <tr>
+                <td class="table_cell_left" colspan="4" align="left">
+                    <c:if test="${(note.value.id>0 && note.value.resStatus.id != 5) && !(note.value.resStatus.id == 4 && whichResStatus == '22')}">
+                        <c:set var="sindex" value="0"/>
+                        <c:forEach var="status" items="${resolutionStatuses}">
+                            <c:choose>
+                            <c:when test="${status.id == 2}">
+                                <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="updaate_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>','<fmt:message key="update_this_Discrepancy_Note" bundle="${restext}"/>');/*scrollToElement('<c:out value="submitBtn${note.value.id}"/>');*/"/>
+                            </c:when>
+                            <c:when test="${status.id == 4}">
+                                <input class="button_medium" type="button" id="resStatus${status.id}${note.value.id}" value="<fmt:message key="close_note" bundle="${resterm}"/>" onclick="javascript:boxShowWithDefault('<c:out value="${note.value.id}"/>','<c:out value="${sindex}"/>','<c:out value="${status.id}"/>','<c:out value="${status.name}"/>','<fmt:message key="close_this_Discrepancy_Note" bundle="${restext}"/>');"/>
+                            </c:when>
+                            </c:choose>
+                            <c:set var="sindex" value="${sindex+1}"/>
+                        </c:forEach>
+                        <br>
+                        <c:set var="showDNBox" value="y"/>
+                    </c:if>
+                </td>
+                </tr>
+                <tr>
+                    <td class="table_cell_left" id="msg${note.value.id}">
+                    <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="newChildAdded${note.value.id}"/></jsp:include>  
+                    </td>
+                </tr>
+            </c:if>
+        </table>
         
         <c:if test="${showDNBox eq 'y'}">
             <c:import url="./discrepancyNote.jsp">
@@ -316,30 +320,6 @@
 </table>
 <c:set var="count" value="${count+1}"/>
 </c:forEach>
-
-<c:if test="${!study.status.locked}">
-    <div style="clear:both;"></div>
-    <c:choose>
-    <c:when test="${boxToShow==0}">
-        <p id="p">
-            <a href="javascript:showOnly('box<c:out value='${0}'/>New');javascript:removeText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');" id="a0"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a>
-        </p>
-    </c:when>
-    <c:otherwise>
-        <p id="p">
-            <a href="javascript:showOnly('box<c:out value='${0}'/>New');javascript:removeText('a0','<b><fmt:message key="begin_new_thread" bundle="${resword}"/></b>');" id="a0"><b><fmt:message key="begin_new_thread" bundle="${resword}"/></b></a>
-        </p>
-    </c:otherwise>
-    </c:choose>
-    <c:import url="./discrepancyNote.jsp">
-        <c:param name="parentId" value="0"/>
-        <c:param name="entityId" value="${id}"/>                
-        <c:param name="entityType" value="${name}"/>                
-        <c:param name="field" value="${field}"/>                
-        <c:param name="column" value="${column}"/>
-        <c:param name="boxId" value="box${0}New"/>
-    </c:import>
-</c:if>  
 
 <div style="clear:both;"></div>
 <div id="audit">

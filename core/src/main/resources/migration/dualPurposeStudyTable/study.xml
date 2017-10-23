@@ -1,0 +1,78 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="yogi (generated)" id="1497972092906-91">
+        <createTable tableName="study">
+            <column name="study_id" type="INT">
+                <constraints nullable="false" primaryKey="true"/>
+            </column>
+            <column name="parent_study_id" type="INT"/>
+            <column name="unique_identifier" type="VARCHAR(30)"/>
+            <column name="secondary_identifier" type="VARCHAR(255)"/>
+            <column name="name" type="VARCHAR(255)"/>
+            <column name="summary" type="VARCHAR(255)"/>
+            <column name="date_planned_start" type="date"/>
+            <column name="date_planned_end" type="date"/>
+            <column name="date_created" type="date"/>
+            <column name="date_updated" type="date"/>
+            <column name="owner_id" type="INT"/>
+            <column name="update_id" type="INT"/>
+            <column name="type_id" type="INT"/>
+            <column name="status_id" type="INT"/>
+            <column name="principal_investigator" type="VARCHAR(255)"/>
+            <column name="facility_name" type="VARCHAR(255)"/>
+            <column name="facility_city" type="VARCHAR(255)"/>
+            <column name="facility_state" type="VARCHAR(20)"/>
+            <column name="facility_zip" type="VARCHAR(64)"/>
+            <column name="facility_country" type="VARCHAR(64)"/>
+            <column name="facility_recruitment_status" type="VARCHAR(60)"/>
+            <column name="facility_contact_name" type="VARCHAR(255)"/>
+            <column name="facility_contact_degree" type="VARCHAR(255)"/>
+            <column name="facility_contact_phone" type="VARCHAR(255)"/>
+            <column name="facility_contact_email" type="VARCHAR(255)"/>
+            <column name="protocol_type" type="VARCHAR(30)"/>
+            <column name="protocol_description" type="VARCHAR(1000)"/>
+            <column name="protocol_date_verification" type="date"/>
+            <column name="phase" type="VARCHAR(30)"/>
+            <column name="expected_total_enrollment" type="INT"/>
+            <column name="sponsor" type="VARCHAR(255)"/>
+            <column name="collaborators" type="VARCHAR(1000)"/>
+            <column name="medline_identifier" type="VARCHAR(255)"/>
+            <column name="url" type="VARCHAR(255)"/>
+            <column name="url_description" type="VARCHAR(255)"/>
+            <column name="conditions" type="VARCHAR(500)"/>
+            <column name="keywords" type="VARCHAR(255)"/>
+            <column name="eligibility" type="VARCHAR(500)"/>
+            <column name="gender" type="VARCHAR(30)"/>
+            <column name="age_max" type="VARCHAR(3)"/>
+            <column name="age_min" type="VARCHAR(3)"/>
+            <column name="healthy_volunteer_accepted" type="BOOLEAN"/>
+            <column name="purpose" type="VARCHAR(64)"/>
+            <column name="allocation" type="VARCHAR(64)"/>
+            <column name="masking" type="VARCHAR(30)"/>
+            <column name="control" type="VARCHAR(30)"/>
+            <column name="assignment" type="VARCHAR(30)"/>
+            <column name="endpoint" type="VARCHAR(64)"/>
+            <column name="interventions" type="VARCHAR(1000)"/>
+            <column name="duration" type="VARCHAR(30)"/>
+            <column name="selection" type="VARCHAR(30)"/>
+            <column name="timing" type="VARCHAR(30)"/>
+            <column name="official_title" type="VARCHAR(255)"/>
+            <column name="results_reference" type="BOOLEAN"/>
+            <column name="oc_oid" type="VARCHAR(40)">
+                <constraints nullable="false"/>
+            </column>
+            <column defaultValueNumeric="1" name="old_status_id" type="INT"/>
+            <column name="study_env_uuid" type="VARCHAR(64)"/>
+            <column name="study_env_site_uuid" type="VARCHAR(64)"/>
+            <column name="env_type" type="VARCHAR(32)"/>
+            <column name="schema_name" type="VARCHAR(64)"/>
+        </createTable>
+        <createIndex indexName="index_study_env_site_uuid" tableName="study" unique="true">
+            <column name="study_env_site_uuid"/>
+        </createIndex>
+    </changeSet>
+</databaseChangeLog>

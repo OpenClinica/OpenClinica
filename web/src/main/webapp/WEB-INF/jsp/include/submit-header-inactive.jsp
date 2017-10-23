@@ -16,7 +16,8 @@
 
 <head>
 
-<title><fmt:message key="openclinica" bundle="${resword}"/></title>
+<title><fmt:message key="openclinica" bundle="${resword}"/></title> 
+<link rel="SHORTCUT ICON" href="images/favicon.ico" type="image/x-icon" />
 
   <link rel="stylesheet" href="includes/styles.css" type="text/css">
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>

@@ -24,8 +24,8 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
@@ -38,8 +38,8 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -110,7 +110,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         StudyDAO studydao = new StudyDAO(sm.getDataSource());
         CRFDAO cdao = new CRFDAO(sm.getDataSource());
-        CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+        FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
         StudySubjectBean studySubject = null;
         SubjectBean subject = null;
         ArrayList events = null;
@@ -200,8 +200,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                 for (int j = 0; j < eventCRFs.size(); j++) {
                     // Link CRF and CRF Versions
                     EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(j);
-                    eventCRF.setCrfVersion((CRFVersionBean) cvdao.findByPK(eventCRF.getCRFVersionId()));
-                    eventCRF.setCrf(cdao.findByVersionId(eventCRF.getCRFVersionId()));
+                    eventCRF.setFormLayout((FormLayoutBean) fldao.findByPK(eventCRF.getFormLayoutId()));
+                    eventCRF.setCrf(cdao.findByLayoutId(eventCRF.getFormLayoutId()));
                     // Get the event crf audits
                     eventCRFAudits.addAll(adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId()));
                     logger.info("eventCRFAudits size [" + eventCRFAudits.size() + "] eventCRF id [" + eventCRF.getId() + "]");
@@ -452,7 +452,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                         }
                         row++;
 
-                        excelRow = new String[] { auditBean.getCrfName(), auditBean.getCrfVersionName(), dateFormat(auditBean.getDateInterviewed()),
+                        excelRow = new String[] { auditBean.getCrfName(), auditBean.getFormLayoutName(), dateFormat(auditBean.getDateInterviewed()),
                                 auditBean.getInterviewerName(), auditBean.getUserName() };
                         for (int i = 0; i < excelRow.length; i++) {
                             label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
@@ -572,7 +572,6 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
             workbook.write();
             workbook.close();
             session.setAttribute("subject", null);
-            session.setAttribute("study", null);
             session.setAttribute("studySub", null);
             session.setAttribute("studyEventAudits", null);
             session.setAttribute("studySubjectAudits", null);

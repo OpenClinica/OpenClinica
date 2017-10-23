@@ -13,7 +13,7 @@
 <tr id="sidebar_Instructions_open" style="display: none">
     <td class="sidebar_tab">
 
-    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
 
     <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -27,7 +27,7 @@
   <tr id="sidebar_Instructions_closed" style="display: all">
     <td class="sidebar_tab">
 
-    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
 
     <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -40,14 +40,6 @@
 <jsp:useBean scope="request" id="eventlist" class="java.util.HashMap"/>
 
 <h1><span class="title_manage"><fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="select_CRF_attributes" bundle="${resword}"/></span></h1>
-
-<P><jsp:include page="../showInfo.jsp"/></P>
-
-<jsp:include page="createDatasetBoxes.jsp" flush="true">
-<jsp:param name="selectStudyEvents" value="1"/>
-</jsp:include>
-
-<P><jsp:include page="../showMessage.jsp"/></P>
 
 <fmt:message key="instructions_extract_select_CRF_and_group" bundle="${resword}"/>
 

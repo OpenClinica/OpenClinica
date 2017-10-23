@@ -1,17 +1,15 @@
 package org.akaza.openclinica.service.extract;
 
+import java.math.BigInteger;
+
 import org.akaza.openclinica.bean.extract.ExtractPropertyBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.quartz.Scheduler;
 import org.quartz.SchedulerException;
 import org.quartz.SimpleTrigger;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.SimpleTriggerFactoryBean;
-import org.springframework.web.context.ContextLoader;
-import org.springframework.web.context.WebApplicationContext;
-
-import java.math.BigInteger;
 
 public class XsltTriggerService {
 
@@ -29,6 +27,7 @@ public class XsltTriggerService {
     public static final String EXTRACT_PROPERTY = "extractProperty";
     public static final String LOCALE = "locale";
     public static final String STUDY_ID = "studyId";
+    public static final String TENANT_SCHEMA = "tenantSchema";
     public static final String ZIPPED="zipped";
     public static final String DELETE_OLD="deleteOld";
     public static final String SUCCESS_MESSAGE="SUCCESS_MESSAGE";
@@ -50,7 +49,8 @@ public class XsltTriggerService {
 
 
     public SimpleTrigger generateXsltTrigger(Scheduler scheduler, String xslFile, String xmlFile, String endFilePath,
-            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt, String xsltPath, String triggerGroupName) {
+            String endFile, int datasetId, ExtractPropertyBean epBean, UserAccountBean userAccountBean, String locale,int cnt, String xsltPath, String triggerGroupName,
+            StudyBean currentPublicStudy,StudyBean currentStudy) {
         //Date startDateTime = new Date(System.currentTimeMillis());
         String jobName =  datasetId+ "_"+epBean.getExportFileName()[0];
         if(triggerGroupName!=null)
@@ -64,7 +64,7 @@ public class XsltTriggerService {
             e.printStackTrace();
         }
         SimpleTriggerFactoryBean triggerFactoryBean = context.getBean(
-                SimpleTriggerFactoryBean.class, xslFile, xmlFile, endFilePath, endFile, datasetId, epBean, userAccountBean, locale, cnt, xsltPath);
+                SimpleTriggerFactoryBean.class, xslFile, xmlFile, endFilePath, endFile, datasetId, epBean, userAccountBean, locale, cnt, xsltPath, currentPublicStudy, currentStudy);
         SimpleTrigger trigger = triggerFactoryBean.getObject();
 
         return trigger;
@@ -88,6 +88,26 @@ public class XsltTriggerService {
             // day?
         }
         return interval.longValue();
+    }
+
+    public static int getIntervalTimeInSeconds(String period) {
+        Integer interval = new Integer("0");
+        if ("monthly".equalsIgnoreCase(period)) {
+            interval = new Integer("2419200"); // how many
+            // milliseconds in
+            // a month? should
+            // be 24192000000
+        } else if ("weekly".equalsIgnoreCase(period)) {
+            interval = new Integer("604800"); // how many
+            // milliseconds in
+            // a week? should
+            // be 6048000000
+        } else { // daily
+            interval = new Integer("86400");// how many
+            // milliseconds in a
+            // day?
+        }
+        return interval.intValue();
     }
 
     public String getTriggerGroupNameForExportJobs()

@@ -162,8 +162,6 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 <tr>
  <td class="table_header_column_top"><fmt:message key="CRF_version" bundle="${resword}"/></td>
- <td class="table_header_column_top"><fmt:message key="interviewer_name" bundle="${resword}"/></td>
- <td class="table_header_column_top"><fmt:message key="interview_date" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="CRF_status" bundle="${resword}"/></td>
  </tr>
  <tr>
@@ -176,26 +174,6 @@
      </c:otherwise>
     </c:choose>    
    </td>   
-   <td class="table_cell">
-   <c:choose>
-     <c:when test="${newDataset.showCRFinterviewerName}">
-       <input type="checkbox" checked name="interviewer" value="yes" disabled="disabled">  
-     </c:when>
-     <c:otherwise>
-       <input type="checkbox" name="interviewer" value="yes" disabled="disabled">
-     </c:otherwise>
-    </c:choose>
-   </td>  
-   <td class="table_cell"> 
-     <c:choose>
-     <c:when test="${newDataset.showCRFinterviewerDate}">
-       <input type="checkbox" checked name="interviewer_date" value="yes" disabled="disabled">  
-     </c:when>
-     <c:otherwise>
-       <input type="checkbox" name="interviewer_date" value="yes" disabled="disabled">
-     </c:otherwise>
-    </c:choose>   
-   </td>
  <td class="table_cell">
  <c:choose>
      <c:when test="${newDataset.showCRFstatus}">
@@ -230,20 +208,20 @@
 
    <c:forEach var="sgclass" items="${allSelectedGroups}">
    <tr>
-	<c:choose>
-   		<c:when test="${sgclass.selected}">
- 			<td class="table_cell"><input type=checkbox checked name="groupSelected<c:out value="${sgclass.id}"/>" value="yes" disabled="disabled">
-	 	</c:when>
- 		<c:otherwise>
- 	 		<td class="table_cell"><input type=checkbox name="groupSelected<c:out value="${sgclass.id}"/>" value="yes" disabled="disabled">
-	 	</c:otherwise>
- 	</c:choose>
-		<td class="table_cell"><c:out value="${sgclass.name}"/></td>
-		<td class="table_cell"><c:out value="${sgclass.groupClassTypeName}"/></td>
-		<td class="table_cell"><c:out value="${sgclass.status.name}"/></td>
-		<td class="table_cell"><c:out value="${sgclass.subjectAssignment}"/></td>
-	</tr>
-	</c:forEach>
+  <c:choose>
+      <c:when test="${sgclass.selected}">
+      <td class="table_cell"><input type=checkbox checked name="groupSelected<c:out value="${sgclass.id}"/>" value="yes" disabled="disabled">
+    </c:when>
+    <c:otherwise>
+      <td class="table_cell"><input type=checkbox name="groupSelected<c:out value="${sgclass.id}"/>" value="yes" disabled="disabled">
+    </c:otherwise>
+  </c:choose>
+    <td class="table_cell"><c:out value="${sgclass.name}"/></td>
+    <td class="table_cell"><c:out value="${sgclass.groupClassTypeName}"/></td>
+    <td class="table_cell"><c:out value="${sgclass.status.name}"/></td>
+    <td class="table_cell"><c:out value="${sgclass.subjectAssignment}"/></td>
+  </tr>
+  </c:forEach>
 
 </table>
 
@@ -269,7 +247,7 @@
     <td class="table_header_column_top"><fmt:message key="response_label" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="PHI" bundle="${resword}"/></td>  
     
-  </tr>	
+  </tr> 
 <c:set var="count" value="0"/>
 <c:forEach var='item' items='${allSelectedItems}'>  
   <tr>

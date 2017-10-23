@@ -11,6 +11,10 @@
     </parent>
     <dependencies>
         <dependency>
+            <groupId>com.auth0</groupId>
+            <artifactId>auth0-spring-security-mvc</artifactId>
+        </dependency>
+        <dependency>
             <groupId>${project.groupId}</groupId>
             <artifactId>OpenClinica-core</artifactId>
         </dependency>
@@ -22,7 +26,11 @@
             <groupId>net.sf.saxon</groupId>
             <artifactId>saxon-dom</artifactId>
         </dependency>
-
+        <!-- https://mvnrepository.com/artifact/com.fasterxml.jackson.datatype/jackson-datatype-jsr310 -->
+        <dependency>
+            <groupId>com.fasterxml.jackson.datatype</groupId>
+            <artifactId>jackson-datatype-jsr310</artifactId>
+        </dependency>
         <dependency>
             <groupId>rome</groupId>
             <artifactId>rome-fetcher</artifactId>
@@ -70,6 +78,13 @@
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-web</artifactId>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.springframework.security/spring-security-jwt -->
+        <dependency>
+            <groupId>org.springframework.security</groupId>
+            <artifactId>spring-security-jwt</artifactId>
+            <version>1.0.7.RELEASE</version>
+        </dependency>
+
 
         <dependency>
             <groupId>net.sourceforge.pjl-comp-filter</groupId>
@@ -96,6 +111,10 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-config</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-orm</artifactId>
         </dependency>
         <dependency>
             <groupId>cglib</groupId>
@@ -138,9 +157,10 @@
             <artifactId>oro</artifactId>
             <scope>compile</scope>
         </dependency>
+        <!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
         <dependency>
-            <groupId>commons-collections</groupId>
-            <artifactId>commons-collections</artifactId>
+            <groupId>org.apache.commons</groupId>
+            <artifactId>commons-collections4</artifactId>
             <scope>compile</scope>
         </dependency>
         <dependency>
@@ -342,25 +362,6 @@
             <groupId>org.hibernate</groupId>
             <artifactId>hibernate-ehcache</artifactId>
         </dependency>
-
-        <dependency>
-            <groupId>org.liquibase</groupId>
-            <artifactId>liquibase-plugin</artifactId>
-            <exclusions>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-plugin-api</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-project</artifactId>
-                </exclusion>
-                <exclusion>
-                    <groupId>org.apache.maven</groupId>
-                    <artifactId>maven-project</artifactId>
-                </exclusion>
-            </exclusions>
-        </dependency>
         <dependency>
             <groupId>org.dbunit</groupId>
             <artifactId>dbunit</artifactId>
@@ -369,6 +370,10 @@
         <dependency>
             <groupId>org.springframework</groupId>
             <artifactId>spring-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>org.springframework.ws</groupId>
+            <artifactId>spring-ws-core</artifactId>
         </dependency>
         <dependency>
             <groupId>org.springframework.session</groupId>
@@ -384,47 +389,16 @@
             <version>4.5.2</version>
         </dependency>
         <dependency>
-            <groupId>com.stormpath.sdk</groupId>
-            <artifactId>stormpath-sdk-api</artifactId>
-            <version>${stormpath.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.stormpath.spring.security</groupId>
-            <artifactId>stormpath-spring-security-core</artifactId>
-            <version>0.3.0</version>
-        </dependency>
-        <dependency>
-            <groupId>com.stormpath.sdk</groupId>
-            <artifactId>stormpath-sdk-httpclient</artifactId>
-            <version>${stormpath.version}</version>
-        </dependency>
-        <dependency>
-            <groupId>com.stormpath.spring</groupId>
-            <artifactId>stormpath-default-spring-boot-starter</artifactId>
-            <version>${stormpath.version}</version>
-        </dependency>
-        <dependency>
             <groupId>org.akaza.openclinica.odm</groupId>
             <artifactId>openclinica-odm</artifactId>
         </dependency>
         <dependency>
             <groupId>javax.servlet.jsp</groupId>
             <artifactId>jsp-api</artifactId>
-            <version>2.1</version>
         </dependency>
         <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
-            <version>2.1</version>
-        </dependency>
-        <dependency>
-            <groupId>javax.servlet.jsp</groupId>
-            <artifactId>jsp-api</artifactId>
+            <groupId>org.springframework</groupId>
+            <artifactId>spring-test</artifactId>
         </dependency>
     </dependencies>
 
@@ -498,7 +472,6 @@
 
     <properties>
         <assembly.name>OpenClinica</assembly.name>
-        <stormpath.version>1.0.4</stormpath.version>
     </properties>
 
 </project>

@@ -1,0 +1,20 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+    <changeSet author="yogi" id="2017-03-31-7969-1">
+        <sql splitStatements="false">
+            CREATE EXTENSION postgres_fdw;
+        </sql>
+        <sql splitStatements="false">
+            CREATE SERVER ${mappingServer}
+            FOREIGN DATA WRAPPER postgres_fdw
+            OPTIONS (host '${dbHost}', dbname '${db}');
+        </sql>
+        <sql splitStatements="false">
+            CREATE USER MAPPING FOR CURRENT_USER SERVER ${mappingServer}
+            OPTIONS (user '${dbUser}', password '${dbPass}');
+        </sql>
+    </changeSet>
+</databaseChangeLog>

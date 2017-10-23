@@ -123,12 +123,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     public ListStudySubjectTableFactory(boolean showMoreLink) {
         this.showMoreLink = showMoreLink;
         imageIconPaths.put(1, "icon icon-clock2");
-        imageIconPaths.put(2, "icon icon-doc");
+        imageIconPaths.put(2, "icon icon-clock");
         imageIconPaths.put(3, "icon icon-pencil-squared orange");
         imageIconPaths.put(4, "icon icon-checkbox-checked green");
         imageIconPaths.put(5, "icon icon-stop-circle red");
         imageIconPaths.put(6, "icon icon-redo");
-        imageIconPaths.put(7, "icon icon-icon-locked");
+        imageIconPaths.put(7, "icon icon-lock");
         imageIconPaths.put(8, "icon icon-icon-sign");
     }
 
@@ -768,11 +768,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
                     }
 
-                    if (getCurrentRole().getRole() == Role.INVESTIGATOR && getStudyBean().getStatus() == Status.AVAILABLE
-                            && studySubjectBean.getStatus() != Status.DELETED && isSignable) {
-                        url.append(signStudySubjectLinkBuilder(studySubjectBean));
-                    }
-
                     try {
                         if (getStudyBean().getStatus() == Status.AVAILABLE
                                 && (getCurrentRole().getRole() == Role.RESEARCHASSISTANT || getCurrentRole().getRole() == Role.RESEARCHASSISTANT2)
@@ -870,8 +865,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private String reAssignStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder actionLink = new HtmlBuilder();
-        actionLink.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"ReassignStudySubject?id="+studySubject.getId());
-        actionLink.append("\"><span hspace=\"2\" border=\"0\" title=\"Reassign\" alt=\"View\" class=\"icon icon-icon-reassign\" name=\"bt_Reassign1\"/></a>");
+        actionLink.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-reassign3');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"ReassignStudySubject?id="+studySubject.getId());
+        actionLink.append("\"><span hspace=\"2\" border=\"0\" title=\"Reassign\" alt=\"View\" class=\"icon icon-icon-reassign3\" name=\"bt_Reassign1\"/></a>");
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -879,8 +874,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private String restoreStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"javascript:openDocWindow(RestoreStudySubject?action=confirm&id="+studySubject.getId()+"&subjectId" + studySubject.getSubjectId()+"&studyId"+studySubject.getStudyId());
-        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"RestoreStudySubject?action=confirm&id=" + studySubject.getId() + "&subjectId=" + studySubject.getSubjectId() + "&studyId="
+                        + studySubject.getStudyId());
+        builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
 
@@ -975,7 +971,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // <td>...</td>
         eventDiv.td(0).id("Scroll_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L_dis").width("20")
                 .close();
-        eventDiv.img().src("images/arrow_status_back_dis.gif").border("0").close();
+        eventDiv.append("<span class=\"icon icon-caret-left gray\"/>");
         eventDiv.tdEnd();
         // <td>...</td>
         eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L").width("20")
@@ -988,7 +984,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.divEnd();
         // <div>...</div>
         eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back_dis").close();
-        eventDiv.img().src("images/arrow_status_back_dis.gif").border("0").close();
+        eventDiv.append("<span class=\"icon icon-caret-left gray\"/>");
         eventDiv.divEnd();
         eventDiv.tdEnd();
 
@@ -1005,9 +1001,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             // <tr><td>...</td></tr>
             eventDiv.tr(0).valign("top").close();
             eventDiv.td(0).styleClass(tableHeaderRowStyleClass).colspan("2").close();
-            eventDiv.bold().append(occurrence_x_of).append("#" + (i + 1) + " of " + studyEventsSize).br();
+            eventDiv.bold().append(occurrence_x_of).append(" " + (i + 1) + " of " + studyEventsSize).br();
             eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
-            eventDiv.append(status + ": " + studyEventBean.getSubjectEventStatus().getName());
+            eventDiv.append(studyEventBean.getSubjectEventStatus().getName());
             eventDiv.boldEnd().tdEnd().trEnd(0);
             // <tr><td><table>...</table></td></tr>
             eventDiv.tr(0).id("Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_" + (i + 1)).style("display: none").close();
@@ -1023,7 +1019,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // <td>...</td>
         eventDiv.td(0).id("Scroll_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R_dis").width("20")
                 .close();
-        eventDiv.img().src("images/arrow_status_next_dis.gif").border("0").close();
+        eventDiv.append("<span class=\"icon icon-caret-right gray\"/>");
         eventDiv.tdEnd();
         // <td>...</td>
         eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R").width("20")
@@ -1036,7 +1032,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         eventDiv.divEnd();
         // <div>...</div>
         eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next_dis").style("display: none;").close();
-        eventDiv.img().src("images/arrow_status_next_dis.gif").border("0").close();
+        eventDiv.append("<span class=\"icon icon-caret-right gray\"/>");
         eventDiv.divEnd();
         eventDiv.tdEnd().trEnd(0);
 
@@ -1143,11 +1139,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String studySubjectLabel = studySubject.getLabel();
 
         eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).close();
-        eventDiv.append(subjectText).append(" : ").append(studySubjectLabel).br();
-        eventDiv.append(eventText).append(" : ").append(sed.getName()).br();
+        eventDiv.append(subjectText).append(": ").append(studySubjectLabel).br();
+        eventDiv.append(eventText).append(": ").append(sed.getName()).br();
 
         if (!sed.isRepeating()) {
-            eventDiv.br().bold().append(resword.getString("status")).append(" : ").append(eventStatus.getName()).br();
+            eventDiv.br().bold().append(eventStatus.getName()).br();
             eventDiv.tdEnd();
             eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").close();
             linkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
@@ -1161,12 +1157,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
             eventDiv.tr(0).valign("top").close();
             eventDiv.td(0).styleClass(tableHeaderRowStyleClass).colspan("2").close();
-            eventDiv.bold().append(occurrence_x_of).append("#1 of 1").br();
+            eventDiv.bold().append(occurrence_x_of).append(" 1 of 1").br();
             if (studyEvents.size() > 0) {
                 eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
-                eventDiv.append(status + " : " + studyEvents.get(0).getSubjectEventStatus().getName());
+                eventDiv.append(studyEvents.get(0).getSubjectEventStatus().getName());
             } else {
-                eventDiv.append(status + " : " + SubjectEventStatus.NOT_SCHEDULED.getName());
+                eventDiv.append(SubjectEventStatus.NOT_SCHEDULED.getName());
             }
             eventDiv.boldEnd().tdEnd().trEnd(0);
             if (eventStatus != SubjectEventStatus.NOT_SCHEDULED && eventSysStatus != Status.DELETED && eventSysStatus != Status.AUTO_DELETED) {
@@ -1291,9 +1287,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String href1 = "EnterDataForStudyEvent?eventId=" + studyEventId;
         builder.a().href(href1);
         builder.close();
-        builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>");
+        builder.a().href(href1).append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>").aEnd();
         builder.nbsp().nbsp().a().href(href1);
-        builder.close().append(view).aEnd();
+        builder.close().append("View").aEnd();
 
     }
 

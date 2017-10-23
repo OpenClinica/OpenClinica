@@ -2,10 +2,13 @@ package org.akaza.openclinica.dao.hibernate;
 
 import java.io.Serializable;
 import java.util.ArrayList;
+import java.util.Collection;
+import java.util.List;
 
 import org.akaza.openclinica.domain.CompositeIdDomainObject;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
+import org.hibernate.query.Query;
 import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -51,8 +54,17 @@ public abstract class CompositeIdAbstractDomainDao<T extends CompositeIdDomainOb
     org.hibernate.Query q = getCurrentSession().createQuery(query);
     q.setParameter(0, id);
     return (T) q.uniqueResult();
-    } 
-    
+    }
+
+    @Transactional
+    public Collection<T> findAllByColumnName(Object id,String key) {
+        String query = "from " + getDomainClassName() + " do where do."+key +"= ?";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter(0, id);
+        return (Collection<T>) q.list();
+    }
+
+
     public Long count() {
         return (Long) getCurrentSession().createQuery("select count(*) from " + domainClass().getName()).uniqueResult();
     }

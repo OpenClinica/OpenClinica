@@ -1,0 +1,29 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="jkeremian" id="2017-06-19-OC-8195-01"
+		dbms="postgresql" runOnChange="true">
+		<comment>Dropping Views before updating crf_version fields into form_layout</comment>
+		<sql>
+			DROP VIEW IF EXISTS view_site_hidden_event_definition_crf;
+			DROP
+			VIEW IF
+			EXISTS view_study_hidden_event_definition_crf;
+			DROP VIEW IF
+			EXISTS view_discrepancy_note;
+			DROP VIEW IF EXISTS
+			view_dn_item_data;
+			DROP VIEW IF EXISTS view_dn_event_crf;
+			DROP VIEW
+			view_item_data_toolkit_filtered;
+			DROP VIEW
+			view_item_data_toolkit;
+		</sql>
+		<rollback>
+			<sql></sql>
+		</rollback>
+	</changeSet>
+
+</databaseChangeLog>

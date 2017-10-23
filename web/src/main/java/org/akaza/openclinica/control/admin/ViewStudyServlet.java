@@ -58,16 +58,17 @@ public class ViewStudyServlet extends SecureController {
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
         int studyId = fp.getInt("id");
+        StudyBean study = (StudyBean) sdao.findByPK(studyId);
+
         if (studyId == 0) {
             addPageMessage(respage.getString("please_choose_a_study_to_view"));
             forwardPage(Page.STUDY_LIST_SERVLET);
         } else {
             if (currentStudy.getId() != studyId && currentStudy.getParentStudyId() != studyId) {
-                checkRoleByUserAndStudy(ub, studyId, 0);
+                checkRoleByUserAndStudy(ub, study, sdao);
             }
 
             String viewFullRecords = fp.getString("viewFull");
-            StudyBean study = (StudyBean) sdao.findByPK(studyId);
 
 
             StudyConfigService scs = new StudyConfigService(sm.getDataSource());
@@ -84,19 +85,13 @@ public class ViewStudyServlet extends SecureController {
 
             if (seRandomizationDTO!=null && seRandomizationDTO.getStatus().equalsIgnoreCase("ACTIVE") && randomizationStatusInOC.equalsIgnoreCase("enabled")){
                 study.getStudyParameterConfig().setRandomization("enabled");
-            }else{
+            } else {
                 study.getStudyParameterConfig().setRandomization("disabled");
-             };
-
+            };
 
              ParticipantPortalRegistrar  participantPortalRegistrar = new ParticipantPortalRegistrar();
              String pStatus = participantPortalRegistrar.getCachedRegistrationStatus(study.getOid(), session);
-             if (participantPortalRegistrar!=null && pStatus.equalsIgnoreCase("ACTIVE") && participantStatusInOC.equalsIgnoreCase("enabled")){
-                 study.getStudyParameterConfig().setParticipantPortal("enabled");
-             }else{
-                 study.getStudyParameterConfig().setParticipantPortal("disabled");
-              };
-
+             study.getStudyParameterConfig().setParticipantPortal("enabled");
 
             request.setAttribute("studyToView", study);
             if ("yes".equalsIgnoreCase(viewFullRecords)) {
@@ -107,11 +102,16 @@ public class ViewStudyServlet extends SecureController {
                 ArrayList subjects = new ArrayList();
                 if (this.currentStudy.getParentStudyId() > 0 && this.currentRole.getRole().getId() > 3) {
                     sites.add(this.currentStudy);
-                    userRoles = udao.findAllUsersByStudy(currentStudy.getId());
+                    request.setAttribute("requestSchema", "public");
+                    userRoles = udao.findAllUsersByStudy(currentPublicStudy.getId());
+                    request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                     subjects = ssdao.findAllByStudy(currentStudy);
                 } else {
                     sites = (ArrayList) sdao.findAllByParent(studyId);
-                    userRoles = udao.findAllUsersByStudy(studyId);
+                    StudyBean publicStudy = sdao.getPublicStudy(study.getOid());
+                    request.setAttribute("requestSchema", "public");
+                    userRoles = udao.findAllUsersByStudy(publicStudy.getId());
+                    request.setAttribute("requestSchema", publicStudy.getSchemaName());
                     subjects = ssdao.findAllByStudy(study);
                 }
 

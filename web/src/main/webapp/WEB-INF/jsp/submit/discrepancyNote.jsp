@@ -27,7 +27,10 @@ function showOnly(strLeftNavRowElementName){
     }
 }
 
-function boxShowWithDefault(id, index, defaultId, defaultValue){
+function boxShowWithDefault(id, index, defaultId, defaultValue, instructions){
+    var msgDiv = document.getElementById('instructionsbox'+id);
+    msgDiv.innerHTML = instructions;
+
 	showOnly("box"+id);
 	var objSelect = MM_findObj("resStatusId"+id);
 	if(objSelect != null) {
@@ -190,7 +193,7 @@ function setYPos(id) {
 	<div class="textbox_center">
 	<table border="0" width="580">
 		<c:if test="${parentId>0}">
-			<div style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
+			<div id="instructions${boxId}" style="float:left"><fmt:message key="respond_this_Discrepancy_Note" bundle="${restext}"/></div>
 		</c:if>
 		<div style="float:right">
 			<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/monitor-and-manage-data/notes-and-discrepancies')"><i class="fa fa-question"></i></a>
@@ -358,8 +361,8 @@ function setYPos(id) {
 			<span id="user2${parentId}" style="display:block">
 		</c:otherwise>
 		</c:choose>
-			<div class="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>:</div>
-			<div class="dnBoxCol2"><input name="sendEmail${parentId}" value="1" type="checkbox"/></div>
+			<div class="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>: <input name="sendEmail${parentId}" value="1" type="checkbox"/></div>
+			<br/>
 		</span>
 		
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>

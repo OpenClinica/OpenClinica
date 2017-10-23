@@ -1,5 +1,7 @@
 package org.akaza.openclinica.bean.login;
 
+import org.akaza.openclinica.bean.core.Status;
+
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
@@ -7,21 +9,35 @@ import java.util.HashMap;
 public class SiteDTO {
 	private String uniqueSiteProtocolID;
 	private String briefTitle;
+	private String briefDescription;
 	private String principalInvestigator;
-	private String expectedTotalEnrollment;
-	private String startDate;
-	private String protocolDateVerification;
-	private String secondaryProId;
+
+	private Integer expectedTotalEnrollment;
     private String siteOid;
     private ArrayList<ErrorObject> errors;
     private String message;
-    private ArrayList<UserRole> assignUserRoles;
-
+    private Status status;
+    private FacilityInfo facilityInfo;
 
 	public SiteDTO() {
 		super();
 	}
 
+	public Status getStatus() {
+		return status;
+	}
+
+	public void setStatus(Status status) {
+		this.status = status;
+	}
+
+	public String getBriefDescription() {
+		return briefDescription;
+	}
+
+	public void setBriefDescription(String briefDescription) {
+		this.briefDescription = briefDescription;
+	}
 
 	public String getUniqueSiteProtocolID() {
 		return uniqueSiteProtocolID;
@@ -31,8 +47,15 @@ public class SiteDTO {
 		this.uniqueSiteProtocolID = uniqueSiteProtocolID;
 	}
 
+    public FacilityInfo getFacilityInfo() {
+        return facilityInfo;
+    }
 
-	public String getBriefTitle() {
+    public void setFacilityInfo(FacilityInfo facilityInfo) {
+        this.facilityInfo = facilityInfo;
+    }
+
+    public String getBriefTitle() {
 		return briefTitle;
 	}
 
@@ -51,42 +74,13 @@ public class SiteDTO {
 	}
 
 
-	public String getExpectedTotalEnrollment() {
+	public Integer getExpectedTotalEnrollment() {
 		return expectedTotalEnrollment;
 	}
 
 
-	public void setExpectedTotalEnrollment(String expectedTotalEnrollment) {
+	public void setExpectedTotalEnrollment(Integer expectedTotalEnrollment) {
 		this.expectedTotalEnrollment = expectedTotalEnrollment;
-	}
-
-
-	public String getStartDate() {
-		return startDate;
-	}
-
-
-	public void setStartDate(String startDate) {
-		this.startDate = startDate;
-	}
-
-
-	public String getProtocolDateVerification() {
-		return protocolDateVerification;
-	}
-
-
-	public void setProtocolDateVerification(String protocolDateVerification) {
-		this.protocolDateVerification = protocolDateVerification;
-	}
-
-
-	public String getSecondaryProId() {
-		return secondaryProId;
-	}
-
-	public void setSecondaryProId(String secondaryProId) {
-		this.secondaryProId = secondaryProId;
 	}
 
 
@@ -119,14 +113,5 @@ public class SiteDTO {
 		this.message = message;
 	}
 
-
-	public ArrayList<UserRole> getAssignUserRoles() {
-		return assignUserRoles;
-	}
-
-
-	public void setAssignUserRoles(ArrayList<UserRole> assignUserRoles) {
-		this.assignUserRoles = assignUserRoles;
-	}
 
 }

@@ -55,14 +55,15 @@ public class FullReportBean extends OdmXmlReportBean {
         // 3) the information about reference data
         // addNodeReferenceData();
         // 4) the information about clinical Data
-        Iterator<OdmClinicalDataBean> itc = this.clinicalDataMap.values().iterator();
-        while (itc.hasNext()) {
-            OdmClinicalDataBean c = itc.next();
-            if (c.getExportSubjectData().size() > 0) {
-                addNodeClinicalData(c);
+        if (this.clinicalDataMap != null) {
+            Iterator<OdmClinicalDataBean> itc = this.clinicalDataMap.values().iterator();
+            while (itc.hasNext()) {
+                OdmClinicalDataBean c = itc.next();
+                if (c.getExportSubjectData().size() > 0) {
+                    addNodeClinicalData(c);
+                }
             }
         }
-
         this.addRootEndLine();
     }
 

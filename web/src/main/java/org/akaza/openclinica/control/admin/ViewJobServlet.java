@@ -1,7 +1,11 @@
 package org.akaza.openclinica.control.admin;
 
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.HashMap;
+import java.util.Set;
+
 import org.akaza.openclinica.bean.admin.TriggerBean;
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -9,23 +13,17 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.TriggerRow;
 import org.akaza.openclinica.web.job.ExampleSpringJob;
-import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.JobDataMap;
 import org.quartz.Trigger;
 import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.quartz.impl.matchers.GroupMatcher;
-import org.springframework.scheduling.quartz.SchedulerFactoryBean;
-
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.HashMap;
-import java.util.Set;
 
 /**
  * 
@@ -35,27 +33,17 @@ public class ViewJobServlet extends SecureController {
 
    
     private static String SCHEDULER = "schedulerFactoryBean";
-    private static String EXPORT_TRIGGER = "exportTrigger";
-
-    private SchedulerFactoryBean schedulerFactoryBean;
     private StdScheduler scheduler;
 
     @Override
     protected void mayProceed() throws InsufficientPermissionException {
-        // TODO copied from CreateJobExport - DRY? tbh
         if (ub.isSysAdmin() || ub.isTechAdmin()) {
             return;
         }
-//        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {// ?
-//            // ?
-//            return;
-//        }
-
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
         throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_allowed_access_extract_data_servlet"), "1");// TODO
         // above copied from create dataset servlet, needs to be changed to
         // allow only admin-level users
-
     }
 
     private StdScheduler getScheduler() {
@@ -73,19 +61,13 @@ public class ViewJobServlet extends SecureController {
         // First we must get a reference to a scheduler
         scheduler = getScheduler();
         XsltTriggerService xsltTriggerSrvc = new XsltTriggerService();
-        // Scheduler sched = sfb.getScheduler();
 
-        Set<TriggerKey> triggerKeys = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltTriggerSrvc.getTriggerGroupNameForExportJobs()));
-        String[] triggerNames = triggerKeys.stream().toArray(String[]::new);
-
-  //      String[]    triggerNames          =           scheduler.getJobNames(XsltTriggerService.TRIGGER_GROUP_NAME);
-        // logger.info("trigger list: "+triggerNames.length);
-        // logger.info("trigger names: "+triggerNames.toString());
-
+        Set<TriggerKey> triggerKeySet = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltTriggerSrvc.getTriggerGroupNameForExportJobs()));
+        TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
 
         ArrayList triggerBeans = new ArrayList();
-        for (String triggerName : triggerNames) {
-            Trigger trigger = scheduler.getTrigger(TriggerKey.triggerKey(triggerName, xsltTriggerSrvc.getTriggerGroupNameForExportJobs()));
+        for (TriggerKey triggerKey : triggerKeys) {
+            Trigger trigger = scheduler.getTrigger(triggerKey);
             try {
                 logger.debug("prev fire time " + trigger.getPreviousFireTime().toString());
                 logger.debug("next fire time " + trigger.getNextFireTime().toString());
@@ -93,9 +75,6 @@ public class ViewJobServlet extends SecureController {
             } catch (NullPointerException npe) {
                 // could be nulls in the dates, etc
             }
-
-            // logger.info(trigger.getDescription());
-            // logger.info("");//getJobDataMap()
             TriggerBean triggerBean = new TriggerBean();
             triggerBean.setFullName(trigger.getKey().getName());
             triggerBean.setPreviousDate(trigger.getPreviousFireTime());
@@ -117,10 +96,9 @@ public class ViewJobServlet extends SecureController {
                 triggerBean.setDatasetName(dataset.getName());
                 StudyBean study = (StudyBean) studyDao.findByPK(dataset.getStudyId());
                 triggerBean.setStudyName(study.getName());
-                // triggerBean.setStudyName(dataMap.getString(ExampleSpringJob.STUDY_NAME));
             }
             logger.debug("Trigger Priority: " + trigger.getKey().getName() + " " + trigger.getPriority());
-            if (scheduler.getTriggerState(TriggerKey.triggerKey(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME)) == Trigger.TriggerState.PAUSED) {
+            if (scheduler.getTriggerState(triggerKey) == Trigger.TriggerState.PAUSED) {
                 triggerBean.setActive(false);
                 logger.debug("setting active to false for trigger: " + trigger.getKey().getName());
             } else {
@@ -141,13 +119,11 @@ public class ViewJobServlet extends SecureController {
         table.hideColumnLink(3);
         table.hideColumnLink(7);
         table.setQuery("ViewJob", new HashMap());
-        // table.addLink("", "CreateUserAccount");
         table.setSortingColumnInd(0);
         table.setRows(allRows);
         table.computeDisplay();
 
         request.setAttribute("table", table);
-        // throw new NullPointerException("faking an error here");
         forwardPage(Page.VIEW_JOB);
 
     }

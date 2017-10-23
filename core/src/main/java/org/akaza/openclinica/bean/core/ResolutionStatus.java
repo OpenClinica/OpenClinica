@@ -33,7 +33,7 @@ public class ResolutionStatus extends Term {
 
     public static final ResolutionStatus OPEN = new ResolutionStatus(1, "New", null, "fa fa-bubble-red");
 
-    public static final ResolutionStatus UPDATED = new ResolutionStatus(2, "Updated", null, "fa fa-bubble-yellow");
+    public static final ResolutionStatus UPDATED = new ResolutionStatus(2, "Updated", null, "fa fa-bubble-orange");
 
     public static final ResolutionStatus RESOLVED = new ResolutionStatus(3, "Resolution_Proposed", null, "");
 

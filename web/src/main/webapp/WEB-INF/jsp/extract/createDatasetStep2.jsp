@@ -41,7 +41,7 @@ function notSelectAll() {
 <tr id="sidebar_Instructions_open" style="display: none">
     <td class="sidebar_tab">
 
-    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
 
     <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -55,7 +55,7 @@ function notSelectAll() {
   <tr id="sidebar_Instructions_closed" style="display: all">
     <td class="sidebar_tab">
 
-    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
 
     <fmt:message key="instructions" bundle="${resword}"/>
 
@@ -87,12 +87,10 @@ function notSelectAll() {
 </h1>
 </c:when>
 <c:otherwise>
-<h1 style="margin: 0em">
- <span class="title_manage">
-   <fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="filter_by_date" bundle="${resword}"/>
-   <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')">
-   <span class="" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
- </span>
+<h1>
+  <span class="title_manage">
+     <fmt:message key="create_dataset" bundle="${resword}"/>
+  </span>
 </h1>
 </c:otherwise>
 </c:choose>
@@ -105,6 +103,7 @@ function notSelectAll() {
 
 
 <p><fmt:message key="Select_a_CRF_to_choose_individual" bundle="${resword}"/> </p>
+
 <table border="0" cellpadding="0" cellspacing="0">
   <tr>
     <td><img src="images/arrow_left.gif" alt="<fmt:message key="select_CRF_on_the_left" bundle="${restext}"/>" title="<fmt:message key="select_CRF_on_the_left" bundle="${restext}"/>"></td>

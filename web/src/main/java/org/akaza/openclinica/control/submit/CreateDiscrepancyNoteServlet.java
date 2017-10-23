@@ -19,7 +19,6 @@ import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -43,6 +42,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -737,8 +737,15 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         }
 
                     }
-                    note = (DiscrepancyNoteBean) dndao.create(note);
+                    String entityName ="";
+                    if (!StringUtils.isBlank(note.getEntityType()) && !"itemData".equalsIgnoreCase(note.getEntityType())
+                            && !StringUtils.isBlank((String)request.getAttribute("entityName"))) {
+                            entityName = (String)request.getAttribute("entityName");
+                    } else {
+                        entityName=note.getEntityName();
+                    }
 
+                    note = (DiscrepancyNoteBean) dndao.create(note);
                     dndao.createMapping(note);
 
                     request.setAttribute(DIS_NOTE, note);
@@ -834,7 +841,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                         message.append(respage.getString("email_footer"));
 
                         String emailBodyString = message.toString();
-                        sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),study.getName(), note.getEntityName()), emailBodyString, true, null,
+                        sendEmail(alertEmail.trim(), EmailEngine.getAdminEmail(), MessageFormat.format(respage.getString("mailDNSubject"),study.getName(), entityName), emailBodyString, true, null,
                                 null, true);
 
                     } else {
@@ -940,6 +947,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
     }
 
     private ArrayList generateUserAccounts(int studyId, int subjectId) {
+        String currentSchema = CoreResources.getRequestSchema(request);
+        CoreResources.setRequestSchema(request, "public");
+
         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         StudyBean subjectStudy = studyDAO.findByStudySubjectId(subjectId);
@@ -952,6 +962,9 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
         } else {
             userAccounts = userAccountDAO.findAllUsersByStudyOrSite(studyId, 0, subjectId);
         }
+        CoreResources.setRequestSchema(request,currentSchema);
+
+        
         return userAccounts;
     }
 

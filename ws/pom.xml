@@ -153,9 +153,10 @@
 			<artifactId>oro</artifactId>
 			<scope>compile</scope>
 		</dependency>
+		<!-- https://mvnrepository.com/artifact/org.apache.commons/commons-collections4 -->
 		<dependency>
-			<groupId>commons-collections</groupId>
-			<artifactId>commons-collections</artifactId>
+			<groupId>org.apache.commons</groupId>
+			<artifactId>commons-collections4</artifactId>
 			<scope>compile</scope>
 		</dependency>
 		<dependency>
@@ -246,6 +247,10 @@
             <groupId>oracle.ojdbc14</groupId>
             <artifactId>ojdbc14</artifactId>
         </dependency>
+		<dependency>
+			<groupId>com.auth0</groupId>
+			<artifactId>auth0</artifactId>
+		</dependency>
 	</dependencies>
     <build>
         <plugins>

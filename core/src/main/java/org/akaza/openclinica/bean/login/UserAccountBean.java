@@ -50,6 +50,15 @@ public class UserAccountBean extends AuditableEntityBean {
     private String time_zone;
     private boolean enableApiKey;
     private String apiKey;
+    private String userUuid;
+
+    public String getUserUuid() {
+        return userUuid;
+    }
+
+    public void setUserUuid(String userUuid) {
+        this.userUuid = userUuid;
+    }
 
     /**
      * Counts the number of times the user visited Main Menu servlet.
@@ -503,6 +512,10 @@ public class UserAccountBean extends AuditableEntityBean {
 
     public void incNumVisitsToMainMenu() {
         numVisitsToMainMenu++;
+    }
+
+    public void decNumVisitsToMainMenu() {
+        numVisitsToMainMenu--;
     }
 
     /**

@@ -49,7 +49,6 @@
 <h1><span class="title_manage">
 <fmt:message key="reassign_study_subject" bundle="${resworkflow}"/> 
 </span></h1>
-<p><fmt:message key="you_choose_to_reassign_the_following_subject2" bundle="${restext}"/></p>
 <form action="ReassignStudySubject" method="post">
 <input type="hidden" name="action" value="confirm">
 <input type="hidden" name="id" value="<c:out value="${studySub.id}"/>">

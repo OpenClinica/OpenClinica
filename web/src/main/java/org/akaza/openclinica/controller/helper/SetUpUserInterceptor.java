@@ -2,10 +2,12 @@ package org.akaza.openclinica.controller.helper;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Component;
 import org.springframework.web.servlet.handler.HandlerInterceptorAdapter;
 
 import java.util.Locale;
@@ -67,7 +69,8 @@ public class SetUpUserInterceptor extends HandlerInterceptorAdapter {
 
         SetUpStudyRole setupStudy = new SetUpStudyRole(dataSource);
         setupStudy.setUp(currentSession, userBean);
-
+        Study study = (Study) currentSession.getAttribute("publicStudy");
+        httpServletRequest.setAttribute("requestSchema", study.getSchemaName());
         return true;
     }
 

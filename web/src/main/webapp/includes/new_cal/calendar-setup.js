@@ -190,7 +190,7 @@ Calendar.setup = function (params) {
 		cal.getDateText = params.dateText;
 		cal.setDateFormat(dateFmt);
 		if (mustCreate)
-			cal.create();
+			cal.create(null, params.randomize);
 		cal.refresh();
 		if (!params.position){
             if(params.customPX && params.customPY){

@@ -50,7 +50,7 @@ public class EditDatasetServlet extends SecureController {
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         StudyBean study = (StudyBean)sdao.findByPK(dataset.getStudyId());
         // Checking if user has permission to access the current study/site
-        checkRoleByUserAndStudy(ub, study.getParentStudyId(), study.getId());
+        checkRoleByUserAndStudy(ub, study, sdao);
 
         // Checking the dataset belongs to current study or a site of current study
         if (study.getId() != currentStudy.getId() && study.getParentStudyId() != currentStudy.getId()) {

@@ -8,6 +8,10 @@ public class ListNotesFilter implements CriteriaCommand {
 
     List<Filter> filters = new ArrayList<Filter>();
     HashMap<String, String> columnMapping = new HashMap<String, String>();
+    
+    public static final String filterDnTypeQueryAndFailedValidationCheck = "31";
+    public static final String filterResStatusNewAndUpdated = "21";
+    public static final String filterResStatusClosedAndClosedModified = "64";
 
     public ListNotesFilter() {
         columnMapping.put("studySubject.label", "ss.label");
@@ -63,7 +67,7 @@ public class ListNotesFilter implements CriteriaCommand {
                     criteria = criteria + " days " + value.toString();
                 }
             } else if ("discrepancyNoteBean.disType".equalsIgnoreCase(property)) {
-                if("31".equals(value.toString())) {
+                if(filterDnTypeQueryAndFailedValidationCheck.equals(value.toString())) {
                     criteria = criteria + " and ";
                     criteria = criteria + " (dn.discrepancy_note_type_id = 1 or dn.discrepancy_note_type_id = 3)";
                 } else {
@@ -71,10 +75,13 @@ public class ListNotesFilter implements CriteriaCommand {
                     criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
                 }
             } else if ("discrepancyNoteBean.resolutionStatus".equalsIgnoreCase(property)) {
-                if("21".equals(value.toString())) {
+                if (filterResStatusNewAndUpdated.equals(value.toString())) {
                     criteria = criteria + " and ";
                     criteria = criteria + " (dn.resolution_status_id = 1 or dn.resolution_status_id = 2)";
-                } else {
+                } else if (filterResStatusClosedAndClosedModified.equals(value.toString())) {
+                    criteria = criteria + " and ";
+                    criteria = criteria + " (dn.resolution_status_id = 4 or dn.resolution_status_id = 6)";
+                }  else {
                     criteria = criteria + " and ";
                     criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
                 }

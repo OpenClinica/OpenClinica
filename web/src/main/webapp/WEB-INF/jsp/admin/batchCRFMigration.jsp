@@ -22,7 +22,7 @@
 <tr id="sidebar_Instructions_open" style="display: none">
 	<td class="sidebar_tab"><a
 		href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right"
-			hspace="10"></a> <b><fmt:message key="instructions"
+			hspace="10"></span></a> <b><fmt:message key="instructions"
 				bundle="${restext}" /></b>
 
 		<div class="sidebar_tab_content"></div></td>
@@ -30,7 +30,7 @@
 </tr>
 <tr id="sidebar_Instructions_closed" style="display: all">
 	<td class="sidebar_tab"><a
-		href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></a>
+		href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
 		<b><fmt:message key="instructions" bundle="${resword}" /></b>
 		<div class="sidebar_tab_content">
 			<fmt:message key="choose_crf_migration_batch_instruction_key"

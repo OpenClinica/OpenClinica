@@ -41,6 +41,7 @@ public class ListUserAccountsServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
+        request.setAttribute("requestSchema", "public");
 
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         EntityBeanTable table = fp.getEntityBeanTable();

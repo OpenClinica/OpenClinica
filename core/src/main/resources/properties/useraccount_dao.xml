@@ -18,8 +18,8 @@
 			email, active_study, institutional_affiliation,
 			status_id, owner_id, date_created,
 			passwd_challenge_question, passwd_challenge_answer,
-			phone, user_type_id,run_webservices,access_code,enable_api_key, api_key)
-			values (?,?,?,?,?,?,?,?,?,?,now(),?,?,?,?,?,?,?,?)</sql>
+			phone, user_type_id,run_webservices,access_code,enable_api_key, api_key, user_uuid)
+			values (?,?,?,?,?,?,?,?,?,?,now(),?,?,?,?,?,?,?,?,?)</sql>
 	</query>
 	<query>
 		<name>insertStudyUserRole</name>
@@ -39,7 +39,7 @@
 			status_id=?, update_id=?, date_updated=now(), date_lastvisit=?,
 			passwd_timestamp=?, passwd_challenge_question=?,
 			passwd_challenge_answer=?, phone=?, user_type_id=?, account_non_locked=?,lock_counter=?,run_webservices=?,access_code=?,
-			time_zone=? ,enable_api_key=? , api_key=? where user_id=?</sql>
+			time_zone=? ,enable_api_key=? , api_key=?, user_uuid=? where user_id=?</sql>
 	</query>
 	<query>
 		<name>createRole</name>
@@ -83,12 +83,20 @@
 		<sql>select * from user_account where user_name=?</sql>
 	</query>
 	<query>
+		<name>findByEmail</name>
+		<sql>select * from user_account where email=?</sql>
+	</query>
+	<query>
 		<name>findByAccessCode</name>
 		<sql>select * from user_account where access_code=?</sql>
 	</query>
 	<query>
 		<name>findByApiKey</name>
 		<sql>select * from user_account where api_key=?</sql>
+	</query>
+	<query>
+		<name>findByUserUuid</name>
+		<sql>select * from user_account where user_uuid=?</sql>
 	</query>
 	<query>
 		<name>findAllParticipantsByStudyOid</name>
@@ -148,7 +156,7 @@
 	</query>
 	<query>
 	 <name>findStudyByUser</name>
-	 <sql>select sur.role_name, sur.study_id ,s.name 
+	 <sql>select sur.role_name, sur.study_id ,s.name, s.env_type
 	      from study_user_role sur, study s
           where sur.study_id = s.study_id and sur.status_id = 1 
           and sur.role_name != 'admin' and sur.user_name=?

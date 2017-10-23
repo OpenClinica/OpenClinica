@@ -15,34 +15,6 @@ public class RuleSetRuleDaoTest extends HibernateOcDbTestCase {
     private static RuleSetRuleDao ruleSetRuleDao;
     private static RuleDao ruleDao;
     private static RuleSetDao ruleSetDao;
-    /*static
-    {
-        
-        loadProperties();
-        dbName = properties.getProperty("dbName");
-        dbUrl = properties.getProperty("url");
-        dbUserName = properties.getProperty("username");
-        dbPassword = properties.getProperty("password");
-        dbDriverClassName = properties.getProperty("driver");
-        locale = properties.getProperty("locale");
-        initializeLocale();
-        initializeQueriesInXml();
-       
-     
-        
-        context =
-            new ClassPathXmlApplicationContext(
-                    new String[] { "classpath*:applicationContext-core-s*.xml", "classpath*:org/akaza/openclinica/applicationContext-core-db.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-core-email.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-core-hibernate.xml",
-                                           "classpath*:org/akaza/openclinica/applicationContext-core-service.xml",
-                       " classpath*:org/akaza/openclinica/applicationContext-core-timer.xml",
-                        "classpath*:org/akaza/openclinica/applicationContext-security.xml" });
-      transactionManager = (PlatformTransactionManager) context.getBean("transactionManager");
-      transactionManager.getTransaction(new DefaultTransactionDefinition());
-        
-
-    }*/
     @Override
     public void setUp() throws Exception{
         super.setUp();

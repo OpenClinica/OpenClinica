@@ -37,12 +37,23 @@
             jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
         });
 
-        jQuery('#cancel').click(function() {
+        jQuery('input#cancel').click(function() {
             jQuery.unblockUI();
             return false;
         });
     });
-</script>
+    </script>
+
+<c:if test="${(study.status.locked || study.status.frozen || study.status.pending)}">
+    <c:if test="${userBean.numVisitsToMainMenu<=1 || studyJustChanged=='yes'}">
+        <script type="text/javascript">
+            $(window).on('load', function () {
+                initmb();
+                sm('box', 730,100);
+            });
+        </script>
+    </c:if>
+</c:if>
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -74,11 +85,28 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 
-<h1><span class="title_manage">
-<fmt:message key="view_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
-<a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/submit-data-module-overview/subject-matrix')">
-     <span class="" ></span></a>
-</span></h1><br/>
+<h1>   
+    <span class="title_manage">
+        <fmt:message key="view_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
+    </span>
+</h1>
+<br/>
+
+<div id="box" class="dialog">
+    <span id="mbm">
+        <br>
+        <c:if test="${(!study.status.pending)}">
+            <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
+        </c:if>
+        
+        <c:if test="${(study.status.pending)}">
+            <fmt:message key="study_design_note" bundle="${restext}"/>
+        </c:if>   
+    </span><br>
+    <div style="text-align:center; width:100%;">
+        <button onclick="hm('box');">OK</button>
+    </div>
+</div>
 
 <div id="findSubjectsDiv">
     <form  action="${pageContext.request.contextPath}/ListStudySubjects">
@@ -86,10 +114,14 @@
         ${findSubjectsHtml}
     </form>
 </div>
-<div id="addSubjectForm" style="display:none;">
-      <c:import url="../submit/addNewSubjectExpressNew.jsp">
-      </c:import>
-</div>
+
+<c:if test="${userRole.monitor || userRole.coordinator || userRole.director || userRole.investigator || userRole.researchAssistant || userRole.researchAssistant2}">
+    <div id="addSubjectForm" style="display:none;">
+          <c:import url="../submit/addNewSubjectExpressNew.jsp">
+          </c:import>
+    </div>
+</c:if>
+
 
 <br>
 <jsp:include page="../include/footer.jsp"/>

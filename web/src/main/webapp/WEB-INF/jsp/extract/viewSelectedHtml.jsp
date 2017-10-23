@@ -12,10 +12,10 @@
 <style type="text/css">
 
 .popup_BG { background-image: url(images/main_BG.gif);
-	background-repeat: repeat-x;
-	background-position: top;
-	background-color: #FFFFFF;
-	}
+  background-repeat: repeat-x;
+  background-position: top;
+  background-color: #FFFFFF;
+  }
 
 
 </style>
@@ -29,7 +29,7 @@
 <h1><span class="title_manage">
 <c:choose>
 <c:when test="${newDataset.id<=0}">
-<fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="view_selected_items" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/create-dataset')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
+<fmt:message key="create_dataset" bundle="${resword}"/>: <fmt:message key="view_selected_items" bundle="${resword}"/>
 </c:when>
 <c:otherwise>
 <fmt:message key="edit_dataset" bundle="${resword}"/>: <fmt:message key="view_selected_items" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/openclinica-user-guide/edit-dataset')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a>
@@ -188,33 +188,11 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 <tr>
  <td class="table_header_column_top"><fmt:message key="CRF_version" bundle="${resword}"/></td>
- <td class="table_header_column_top"><fmt:message key="interviewer_name" bundle="${resword}"/></td>
- <td class="table_header_column_top"><fmt:message key="interview_date" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="CRF_status" bundle="${resword}"/></td>
  </tr>
  <tr>
  <td class="table_cell"><c:choose>
      <c:when test="${newDataset.showCRFversion}">
-       <fmt:message key="yes" bundle="${resword}"/>
-     </c:when>
-     <c:otherwise>
-       <fmt:message key="no" bundle="${resword}"/>
-     </c:otherwise>
-    </c:choose>
-   </td>
-   <td class="table_cell">
-   <c:choose>
-     <c:when test="${newDataset.showCRFinterviewerName}">
-       <fmt:message key="yes" bundle="${resword}"/>
-     </c:when>
-     <c:otherwise>
-       <fmt:message key="no" bundle="${resword}"/>
-     </c:otherwise>
-    </c:choose>
-   </td>
-   <td class="table_cell">
-     <c:choose>
-     <c:when test="${newDataset.showCRFinterviewerDate}">
        <fmt:message key="yes" bundle="${resword}"/>
      </c:when>
      <c:otherwise>
@@ -256,13 +234,13 @@
    <c:forEach var="sgclass" items="${allSelectedGroups}">
    <tr>
    <c:if test="${sgclass.selected}">
-		<td class="table_cell"><c:out value="${sgclass.name}"/></td>
-		<td class="table_cell"><c:out value="${sgclass.groupClassTypeName}"/></td>
-		<td class="table_cell"><c:out value="${sgclass.status.name}"/></td>
-		<td class="table_cell"><c:out value="${sgclass.subjectAssignment}"/></td>
+    <td class="table_cell"><c:out value="${sgclass.name}"/></td>
+    <td class="table_cell"><c:out value="${sgclass.groupClassTypeName}"/></td>
+    <td class="table_cell"><c:out value="${sgclass.status.name}"/></td>
+    <td class="table_cell"><c:out value="${sgclass.subjectAssignment}"/></td>
    </c:if>
-	</tr>
-	</c:forEach>
+  </tr>
+  </c:forEach>
 
 </table>
 

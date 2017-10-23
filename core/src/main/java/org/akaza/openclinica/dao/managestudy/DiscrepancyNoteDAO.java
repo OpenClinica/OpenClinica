@@ -1682,6 +1682,27 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return this.executeFindAllQuery("findByStudyEvent", variables);
     }
 
+    public ArrayList findExistingNoteForStudyEvent(StudyEventBean studyEvent) {
+        this.setTypesExpected();
+        this.setTypeExpected(12, TypeNames.STRING);// column_name
+        this.setTypeExpected(13, TypeNames.INT);// study_event_id
+
+        ArrayList alist = new ArrayList();
+        HashMap variables = new HashMap();
+        variables.put(Integer.valueOf(1), Integer.valueOf(studyEvent.getId()));
+        alist = this.select(digester.getQuery("findExistingNotesForStudyEvent"), variables);
+        ArrayList<DiscrepancyNoteBean> al = new ArrayList<DiscrepancyNoteBean>();
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            HashMap hm = (HashMap) it.next();
+            DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
+            eb.setColumn((String) hm.get("column_name"));
+            eb.setEntityId(((Integer) hm.get("study_event_id")).intValue());
+            al.add(eb);
+        }
+        return al;
+    }
+
     public ArrayList findAllByStudyEventWithConstraints(StudyEventBean studyEvent, StringBuffer constraints) {
         this.setTypesExpected();
         ArrayList answer = new ArrayList();

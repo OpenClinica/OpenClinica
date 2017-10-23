@@ -13,6 +13,9 @@ select, input, textarea {
 textarea {
   width: 100%; }
 
+table, td {
+  font-size: 100%; }
+
 input[type="text"], input[type="password"] {
   background-color: white;
   display: inline-block;
@@ -23,19 +26,21 @@ input[type="text"], input[type="password"] {
   input[type="text"].navSearch, input[type="password"].navSearch {
     width: 13em; }
 
-input[type="submit"]:not(.navSearchButton), input[type="button"]:not(.navSearchButton) {
-  background: #618ebb;
-  background: linear-gradient(to bottom, #618ebb 0%, #3e6891 100%);
-  box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
-  color: white;
-  font-size: 1em;
-  border-radius: .25em;
-  border: 0;
-  padding: .4em .9em;
-  margin: 0 .25em; }
-  input[type="submit"]:not(.navSearchButton):hover, input[type="button"]:not(.navSearchButton):hover {
-    background: #3e6891;
-    background: linear-gradient(to top, #618ebb 0%, #3e6891 100%); }
+input[type="submit"], input[type="button"] {
+  -webkit-appearance: none; }
+  input[type="submit"]:not(.navSearchButton), input[type="button"]:not(.navSearchButton) {
+    background: #618ebb;
+    background: linear-gradient(to bottom, #618ebb 0%, #3e6891 100%);
+    box-shadow: 1px 1px 3px rgba(0, 0, 0, 0.3);
+    color: white;
+    font-size: 1em;
+    border-radius: .25em;
+    border: 0;
+    padding: .4em .9em;
+    margin: 0 .25em; }
+    input[type="submit"]:not(.navSearchButton):hover, input[type="button"]:not(.navSearchButton):hover {
+      background: #3e6891;
+      background: linear-gradient(to top, #618ebb 0%, #3e6891 100%); }
 
 .navSearchButton {
   background: #3e6891;
@@ -57,11 +62,13 @@ body {
   font-size: 100%;
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   margin: 0;
-  overflow-x: hidden;
-  width: 100% !important; }
+  width: 100% !important;
+  overflow: auto; 
+  }
   body > table {
     margin: 0 auto;
-    min-width: 1024px; }
+    min-width: 1024px; 
+  }
 
 p, ul, ol, td, th {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif; }
@@ -70,7 +77,7 @@ h1 {
   color: #ED7800;
   font-family: 'Didact Gothic', Helvetica, Arial, sans-serif;
   font-size: 1.5em;
-  margin: 0 .25em; }
+  margin: 0; }
 
 li:not(div#bt_Home) {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
@@ -81,7 +88,51 @@ td {
   font-size: inherit;
   line-height: inherit; }
 
+a{
+  text-decoration: none;
+}
+
+#ol{
+    background-image: url(overlay.png);
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="overlay.png", sizingMethod="scale");
+}
+#box {
+    display:none
+}
+
+#ol{
+    background-image: url(overlay.png);
+    filter:progid:DXImageTransform.Microsoft.AlphaImageLoader(src="overlay.png", sizingMethod="scale");
+}
+
+#mbox{
+    background-color:#eeeeee;
+    padding:15px;
+    border:2px outset #666;
+}
+
+#mbm{
+    font-family: Tahoma, Arial, Helvetica, Sans-Serif;
+    font-size: 11px;
+    font-style: normal;
+    font-weight: bold;
+    float:right;
+    padding-bottom:5px;
+}
+
+.statusSide{
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;
+}
+
+.eventSide{
+  color:#494D4B !important;
+  font-family: 'Open Sans', Helvetica, Arial, sans-serif;"
+}
+
 a:link {
+  color: #3a6087; }
+
+a:visited {
   color: #3a6087; }
 
 a:hover {
@@ -151,6 +202,14 @@ a:hover {
     font-size: 1.25rem; }
 
 /* navigation */
+.status-tag {
+  border-radius: .15em;
+  padding: .15em .25em; }
+  .status-tag.status-test {
+    background-color: #ED7800; }
+  .status-tag.status-prod {
+    background-color: #06C279; }
+
 .logo {
   display: inline-block;
   float: left;
@@ -207,7 +266,7 @@ a:hover {
   padding: .5em 1em 1em 1em;
   width: 100%;
   max-width: calc(100vw - 180px);
-  }
+}
   .aka_revised_content form > div, .content form > div {
     min-width: 60% !important; }
 
@@ -281,10 +340,15 @@ a:hover {
   line-height: 1.5;
   right: 0 !important;
   top: inherit !important;
-  left: inherit !important; }
+  /*left: inherit !important;*/ }
 
 /*End of Dropdown Styling*/
 /* Misc*/
+.blockUI.blockMsg.blockPage {
+  width: auto !important;
+  padding: 1em !important;
+}
+
 form[action="CreateNewStudyEvent"] > div {
   width: 850px; }
 
@@ -301,7 +365,8 @@ form[name="subjectForm"] a, form[action="UpdateStudySubject"] a {
 form[name="subjectForm"] .formlabel, form[name="subjectForm"] input[type="text"], form[name="subjectForm"] select, form[action="UpdateStudySubject"] .formlabel, form[action="UpdateStudySubject"] input[type="text"], form[action="UpdateStudySubject"] select {
   display: block;
   margin-bottom: 1em;
-  margin-right: 1em; }
+  margin-right: 1em;
+  padding-left: 10px; }
 
 #findSubjects tr td div {
   width: auto !important; }
@@ -356,20 +421,24 @@ td.table_actions > table {
     border-bottom: 1px solid #ccc;
     padding: .15em; }
 
-.shaded_table {
-  border: 1px solid #ccc;
+table.shaded_table {
+  border: 0;
   margin: 1em 0; }
-  .shaded_table tr:first-child td {
-    border-top: 0; }
-  .shaded_table td {
+  table.shaded_table table {
+    border: 1px solid #ccc; }
+  table.shaded_table td {
     padding: .25em;
     border-top: 1px solid #ccc;
     border-left: 1px solid #ccc;
     border-right: 0;
     border-bottom: 0; }
-    .shaded_table td:first-child {
-      border-left: 0;
+    table.shaded_table td:first-child {
+      border-left: 0; }
+    table.shaded_table td.table_header_row {
+      background-color: #f1f1f1;
       border-top: 0; }
+  table.shaded_table > tbody > tr > td {
+    border: 0; }
 
 .tablebox_center {
   font-size: .85rem;
@@ -380,8 +449,7 @@ td.table_actions > table {
     border-bottom: 1px solid #ccc; }
   .tablebox_center td {
     padding: .25em;
-    vertical-align: top;
-    width: auto; }
+    vertical-align: top; }
     .tablebox_center td.table_divider {
       border-bottom: 1px solid #ccc; }
     .tablebox_center td.table_cell_top {
@@ -405,6 +473,13 @@ td.table_actions > table {
         border-right: 1px solid #ccc; }
     .tablebox_center td.table_cell_left {
       border-left: 1px solid #ccc; }
+
+form[action="UpdateSubStudy"] .textbox_center tr[bgcolor="#F5F5F5"] {
+  background-color: #fff !important; }
+
+form[action="UpdateSubStudy"] .textbox_center td.table_cell, form[action="UpdateSubStudy"] .textbox_center td.table_cell_left, form[action="UpdateSubStudy"] .textbox_center td.table_header_column, form[action="UpdateSubStudy"] .textbox_center td.table_header_column_top {
+  border-bottom: 0px !important; }
+
 
 .textbox_center {
   background-color: #f1f1f1;
@@ -537,30 +612,35 @@ td.table_actions > table {
   background-color: #f2e7b8; }
 
 .jmesa table:not(#studyAuditLogs) .odd > td, .jmesa table:not(#studyAuditLogs) .even > td, .jmesa table:not(#studyAuditLogs) .highlight > td {
-  padding: .25em .75em;
   vertical-align: top; }
+
+.jmesa table#findSubjects .odd > td, .jmesa table#findSubjects .even > td, .jmesa table#findSubjects .highlight > td, .jmesa table#findSubjects td table td {
+  vertical-align: middle; }
 
 .jmesa table:not(#studyAuditLogs) .odd td, .jmesa table:not(#studyAuditLogs) .even td, .jmesa table:not(#studyAuditLogs) .highlight td {
   border: none;
   font-family: 'Open Sans', arial, helvetica, sans-serif;
   font-weight: 400;
-  hyphens: auto;
+  hyphens: none;
   line-height: 1.5em;
-  min-width: 2em; }
+  min-width: 2em;
+  height: 2.25em;
+  padding: .25em .75em; }
 
 .jmesa table:not(#studyAuditLogs) .odd a, .jmesa table:not(#studyAuditLogs) .even a, .jmesa table:not(#studyAuditLogs) .highlight a {
   text-decoration: none; }
 
 .jmesa table#studyAuditLogs tbody.tbody tr.odd td, .jmesa table#studyAuditLogs tbody.tbody tr.even td, .jmesa table#studyAuditLogs tbody.tbody tr.highlight td {
-  border-top: 1px solid #ccc;
-  border-left: 1px solid #ccc;
+  border-top: 0px solid #ccc;
+  border-left: 0px solid #ccc;
   border-right: 0;
-  border-bottom: 0; }
+  border-bottom: 0;
+  padding: .25em; }
   .jmesa table#studyAuditLogs tbody.tbody tr.odd td:last-child, .jmesa table#studyAuditLogs tbody.tbody tr.even td:last-child, .jmesa table#studyAuditLogs tbody.tbody tr.highlight td:last-child {
-    border-right: 1px solid #ccc; }
+    border-right: 0px solid #ccc; }
 
 .jmesa table#studyAuditLogs tbody.tbody tr.odd:last-child td, .jmesa table#studyAuditLogs tbody.tbody tr.even:last-child td, .jmesa table#studyAuditLogs tbody.tbody tr.highlight:last-child td {
-  border-bottom: 1px solid #ccc; }
+  border-bottom: 0px solid #ccc; }
 
 .ViewSubjectsPopup {
   box-shadow: 0px 5px 20px rgba(0, 0, 0, 0.5);
@@ -585,39 +665,33 @@ div#subjectEvents {
     padding: 0;
     margin: 0;
     list-style: none;
-    position: relative; }
-
-#userDropdown ul li {
-  display: inline-block;
-  list-style-image: none; }
-
-#userDropdown a {
-  display: block;
-  padding: 0 10px;
-  color: white;
-  line-height: 30px;
-  text-decoration: none; }
-
-#userDropdown a:hover {
-  background-color: #618ebb;
-  color: white; }
-
-/* Hide Dropdowns by Default */
-#userDropdown ul ul {
-  background-color: #00344c;
-  display: none;
-  position: absolute; }
-
-/* Display Dropdowns on Hover */
-#userDropdown ul li:hover > ul {
-  display: inherit; }
-
-/* Fisrt Tier Dropdown */
-#userDropdown ul ul li {
-  width: 170px;
-  float: none;
-  display: list-item;
-  position: relative; }
+    position: relative;
+    /* Hide Dropdowns by Default */ }
+    #userDropdown ul li {
+      display: inline-block;
+      list-style-image: none;
+      /* Display Dropdowns on Hover */ }
+      #userDropdown ul li:hover > ul, #userDropdown ul li:focus > ul {
+        display: inherit; }
+    #userDropdown ul ul {
+      background-color: #00344c;
+      display: none;
+      position: absolute;
+      /* Fisrt Tier Dropdown */ }
+      #userDropdown ul ul li {
+        width: 170px;
+        float: none;
+        display: list-item;
+        position: relative; }
+  #userDropdown a {
+    display: block;
+    padding: 0 10px;
+    color: white;
+    line-height: 30px;
+    text-decoration: none; }
+    #userDropdown a:hover, #userDropdown a:focus {
+      background-color: #618ebb;
+      color: white; }
 
 .vline, .vline_B {
   background-image: url(../images/leftbar_vline.gif);
@@ -655,3 +729,141 @@ table[width="160"] tr:nth-last-child(-n+2) td.sidebar_tab {
 
 .tablee_tools:first-child {
   text-align: right; }
+
+form[action="ExportExcelStudySubjectAuditLog"] ~ table {
+  border: 0 !important; }
+  form[action="ExportExcelStudySubjectAuditLog"] ~ table tr:last-child td {
+    border-bottom: 1px solid #ccc; }
+  form[action="ExportExcelStudySubjectAuditLog"] ~ table td {
+    border-left: 1px solid #ccc;
+    border-top: 1px solid #ccc;
+    border-right: 0;
+    border-bottom: 0;
+    padding: .25em; }
+    form[action="ExportExcelStudySubjectAuditLog"] ~ table td:last-child {
+      border-right: 1px solid #ccc; }
+    form[action="ExportExcelStudySubjectAuditLog"] ~ table td table {
+      border: 0 !important; }
+  form[action="ExportExcelStudySubjectAuditLog"] ~ table table {
+    width: 100%; }
+    form[action="ExportExcelStudySubjectAuditLog"] ~ table table table {
+      width: 100%; }
+
+div#subjectSDV img[alt="Separator"] {
+  margin: 0 .75em; }
+
+div#subjectSDV table#sdv {
+  width: 90%; }
+  div#subjectSDV table#sdv thead tr.toolbar td {
+    padding: .5em 0; }
+
+.addNewStudyLayout{
+  font-style: normal;
+  font-variant-ligatures: normal;
+  font-variant-caps: normal;
+  font-variant-numeric: normal;
+  font-weight: normal;
+  font-stretch: normal;
+  font-size: 14px;
+  line-height: 18px;
+  font-family: "Open Sans", "Helvetica Neue", Arial, Helvetica, "Yu Gothic", Meiryo, sans-serif;
+}
+
+.addNewSubjectTitle{
+  font-style: normal;
+  font-variant-ligatures: normal;
+  font-variant-caps: normal;
+  font-variant-numeric: normal;
+  font-weight: normal;
+  font-stretch: normal;
+  font-size: 18px;
+  line-height: 18px;
+  font-family: "Open Sans", "Helvetica Neue", Arial, Helvetica, "Yu Gothic", Meiryo, sans-serif;
+}
+
+.required{
+  color: #d9534f!important;
+}
+
+.input-group {
+    position: relative;
+    display: flex;
+    width: 100%;
+}
+
+.input-group-addon {
+    padding: .5rem .75rem;
+    margin-bottom: 0;
+    font-size: 1rem;
+    font-weight: 400;
+    line-height: 1.25;
+    color: #464a4c;
+    text-align: center;
+    background-color: #eceeef;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: .25rem;
+}
+
+.form-control {
+    display: block;
+    width: 95%;
+    padding: .5rem .75rem;
+    font-size: 1rem;
+    line-height: 1.25;
+    color: #464a4c;
+    background-color: #fff;
+    background-image: none;
+    background-clip: padding-box;
+    border: 1px solid rgba(0,0,0,.15);
+    border-radius: .25rem;
+    transition: border-color .15s ease-in-out,box-shadow .15s ease-in-out;
+}
+
+.selectS select{
+  font-size: 14px;
+  line-height: 18px;
+  font-family: "Open Sans", "Helvetica Neue", Arial, Helvetica, "Yu Gothic", Meiryo, sans-serif;
+  width:100px;
+  border: 1px solid rgba(0,0,0,.15);
+  border-radius: .25rem;
+  width: 80px;
+}
+
+.lines {
+    display: flex;
+    align-items: center;
+    justify-content: flex-end;
+    padding-top: 15px;
+    border-top: 1px solid #eceeef;
+}
+
+.alert.small {
+  line-height: 3px;
+  margin-bottom: 10px;
+  font-size: small;
+  text-align: left;
+}
+
+.full-width {
+  width: 100%;
+}
+
+.full-width tr {
+  text-align: left;
+}
+
+.full-width td.icon-container {
+  width: 32px;
+}
+
+.full-width td.icon-input-container input {
+  height: 32px;
+  border-left: none;
+  border-top-left-radius: 0;
+  border-bottom-left-radius: 0;
+  margin-left: -2px;
+}
+
+body.query-page .aka_revised_content{
+  max-width: 100%;
+}

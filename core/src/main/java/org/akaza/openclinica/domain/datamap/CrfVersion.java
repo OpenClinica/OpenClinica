@@ -56,7 +56,6 @@ public class CrfVersion extends DataMapDomainObject {
     private List<VersioningMap> versioningMaps;
     private List<EventCrf> eventCrfs;
     private List<Section> sections;
-    private List<EventDefinitionCrf> eventDefinitionCrfs;
     private Set decisionConditions = new HashSet(0);
     private Set<ItemGroupMetadata> itemGroupMetadatas;
     private List<FileItem> fileItems;
@@ -72,7 +71,7 @@ public class CrfVersion extends DataMapDomainObject {
 
     public CrfVersion(int crfVersionId, UserAccount userAccount, Status status, CrfBean crf, String name, String description, String revisionNotes,
             Date dateCreated, Date dateUpdated, Integer updateId, String ocOid, String xform, String xformName, Set filterCrfVersionMaps,
-            List<VersioningMap> versioningMaps, List<EventCrf> eventCrfs, List<Section> sections, List<EventDefinitionCrf> eventDefinitionCrfs,
+            List<VersioningMap> versioningMaps, List<EventCrf> eventCrfs, List<Section> sections,
             Set decisionConditions, Set<ItemGroupMetadata> itemGroupMetadatas) {
         this.crfVersionId = crfVersionId;
         this.userAccount = userAccount;
@@ -91,7 +90,6 @@ public class CrfVersion extends DataMapDomainObject {
         this.versioningMaps = versioningMaps;
         this.eventCrfs = eventCrfs;
         this.sections = sections;
-        this.eventDefinitionCrfs = eventDefinitionCrfs;
         this.decisionConditions = decisionConditions;
         this.itemGroupMetadatas = itemGroupMetadatas;
     }
@@ -226,7 +224,7 @@ public class CrfVersion extends DataMapDomainObject {
     /*
      * @OneToMany(fetch = FetchType.LAZY, mappedBy = "crfVersion") public Set getFilterCrfVersionMaps() { return
      * this.filterCrfVersionMaps; }
-     * 
+     *
      * public void setFilterCrfVersionMaps(Set filterCrfVersionMaps) { this.filterCrfVersionMaps = filterCrfVersionMaps;
      * }
      */
@@ -258,19 +256,13 @@ public class CrfVersion extends DataMapDomainObject {
         this.sections = sections;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "crfVersion")
-    public List<EventDefinitionCrf> getEventDefinitionCrfs() {
-        return this.eventDefinitionCrfs;
-    }
 
-    public void setEventDefinitionCrfs(List<EventDefinitionCrf> eventDefinitionCrfs) {
-        this.eventDefinitionCrfs = eventDefinitionCrfs;
-    }
+
 
     /*
      * @OneToMany(fetch = FetchType.LAZY, mappedBy = "crfVersion") public Set getDecisionConditions() { return
      * this.decisionConditions; }
-     * 
+     *
      * public void setDecisionConditions(Set decisionConditions) { this.decisionConditions = decisionConditions; }
      */
     @OneToMany(fetch = FetchType.LAZY, mappedBy = "crfVersion")
