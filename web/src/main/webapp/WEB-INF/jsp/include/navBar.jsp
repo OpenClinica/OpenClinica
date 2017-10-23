@@ -295,10 +295,16 @@
         <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
         <div class="taskLeftColumn">
             <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
-            <c:if test="${study.status.available}">
-                <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
-            </c:if>
-            <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
+            <c:choose>
+                <c:when test="${study.status.available}">
+                    <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
+                </c:when>
+                <c:otherwise>
+                    <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
+                    <div class="taskLink">&nbsp;</div>
+                </c:otherwise>
+            </c:choose>
         </div>
         <div class="taskRightColumn">
             <c:if test="${!study.status.frozen && !study.status.locked}">
