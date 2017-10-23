@@ -385,6 +385,8 @@ public class ImportSpringJob extends QuartzJobBean {
             }
             // next: check, then import
             List<String> errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getId());
+            errors = getImportCRFDataService(dataSource).eventCRFStatusesValid(odmContainer, ub, errors);
+
             // this needs to be replaced with the study name from the job, since
             // the user could be in any study ...
             if (errors != null) {
@@ -431,8 +433,7 @@ public class ImportSpringJob extends QuartzJobBean {
             ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
             // validation errors, the same as in the ImportCRFDataServlet. DRY?
             List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, ub);
-            ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
-            Boolean eventCRFStatusesValid = getImportCRFDataService(dataSource).eventCRFStatusesValid(odmContainer, ub);
+            List<EventCRFBean> permittedEventCRFs = new ArrayList<EventCRFBean>();
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
@@ -458,7 +459,8 @@ public class ImportSpringJob extends QuartzJobBean {
                     if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
                             || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
                             || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
-                        permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
+
+                        permittedEventCRFs.add(eventCRFBean);
                     } else {
                         // break out here with an exception
 
@@ -478,7 +480,7 @@ public class ImportSpringJob extends QuartzJobBean {
                     }
                 }
 
-                if (eventCRFBeans.size() >= permittedEventCRFIds.size()) {
+                if (eventCRFBeans.size() >= permittedEventCRFs.size()) {
                     msg.append(respage.getString("passed_event_crf_status_check") + "<br/>");
                     auditMsg.append(respage.getString("passed_event_crf_status_check") + "<br/>");
                 } else {
@@ -496,7 +498,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 try {
                     List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
                     tempDisplayItemBeanWrappers = getImportCRFDataService(dataSource).lookupValidationErrors(request, odmContainer, ub, totalValidationErrors,
-                            hardValidationErrors, permittedEventCRFIds);
+                            hardValidationErrors, permittedEventCRFs);
                     logger.debug("size of total validation errors: " + totalValidationErrors.size());
                     displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
                 } catch (NullPointerException npe1) {
@@ -516,12 +518,6 @@ public class ImportSpringJob extends QuartzJobBean {
                     out.write(oce1.getOpenClinicaMessage() + "<br/>");
 
                 }
-            } else if (!eventCRFStatusesValid) {
-                fail = true;
-                msg.append(respage.getString("the_event_crf_not_correct_status"));
-                out.write(respage.getString("the_event_crf_not_correct_status"));
-                out.close();
-                continue;
             } else {
                 // fail = true;
                 // break here with an exception
@@ -719,8 +715,8 @@ public class ImportSpringJob extends QuartzJobBean {
                 // auditMsg.append(finalLine);
                 auditMsg.append(this.runRules(studyBean, ub, containers, ruleSetService, ExecutionMode.SAVE));
             }
-        }// end for loop
-         // is the writer still not closed? try to close it
+        } // end for loop
+          // is the writer still not closed? try to close it
 
         ArrayList<String> retList = new ArrayList<String>();
         retList.add(msg.toString());
