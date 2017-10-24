@@ -81,6 +81,8 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemaStudy.setDatePlannedEnd(studyInfoObject.getStudy().getDatePlannedEnd());
             schemaStudy.setExpectedTotalEnrollment((studyInfoObject.getStudy().getExpectedTotalEnrollment()));
             schemaStudy.setProtocolType(studyInfoObject.getStudy().getProtocolType());
+            schemaStudy.setProtocolDescription(studyInfoObject.getStudy().getProtocolDescription());
+            schemaStudy.setPhase(studyInfoObject.getStudy().getPhase());
 
             schemaServiceDao.setConnectionSchemaName(studyInfoObject.getSchema());
             studyDao.getCurrentSession().clear();

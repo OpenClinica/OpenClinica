@@ -101,7 +101,7 @@
   <c:out value="${studyToView.principalInvestigator}"/>
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="brief_summary" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.name}"/>&nbsp;
+  <c:out value="${studyToView.protocolDescription}"/>&nbsp;
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><fmt:message key="owner" bundle="${resword}"/>:</td><td class="table_cell">
@@ -141,7 +141,7 @@
   </td></tr>
 
   <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#BriefSummary'); return false;"><fmt:message key="brief_summary" bundle="${resword}"/></a>:</td><td class="table_cell">
-  <c:out value="${studyToView.summary}"/>
+  <c:out value="${studyToView.protocolDescription}"/>
   </td></tr>
   </table>
 </div>
@@ -161,7 +161,7 @@
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
  <tr valign="top"><td class="table_header_column"><fmt:message key="study_phase" bundle="${resword}"/>:</td><td class="table_cell">
-  <c:out value="${studyToView.phase}"/>
+  <fmt:message key="${studyToView.phase}" bundle="${resword}"/>
   </td></tr>
 
  <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#StudyType" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#StudyType'); return false;"><fmt:message key="protocol_type" bundle="${resword}"/></a>:</td><td class="table_cell">

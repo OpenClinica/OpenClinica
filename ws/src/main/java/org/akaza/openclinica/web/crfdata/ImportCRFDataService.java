@@ -556,7 +556,7 @@ public class ImportCRFDataService {
                         // the
                         displayItemBeanWrapper = new DisplayItemBeanWrapper(displayItemBeans, true, overwrite, validationErrors, studyEventId, crfVersionId,
                                 studyEventDataBean.getStudyEventOID(), studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(),
-                                crfVersion.getName(), studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey());
+                                crfVersion.getName(), studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey(),eventCRFBean);
 
                         // JN: Commenting out the following code, since we shouldn't re-initialize at this point, as
                         // validationErrors would get overwritten and the

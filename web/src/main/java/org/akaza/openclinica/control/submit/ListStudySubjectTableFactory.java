@@ -733,7 +733,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             StringBuilder url = new StringBuilder();
             url.append(eventDivBuilder(subject, rowcount, studyEvents, studyEventDefinition, studySubjectBean));
             url.append("<span class='" + imageIconPaths.get(subjectEventStatus.getId()) + "' style='padding-top: 2px; padding-bottom: 3px;'>");
-            url.append("</a></td><td align='left' width='10px'><span style='color: #668cff; padding-bottom: 145px; font-size: 13px;'>"+getCount()+" </span></td></tr></table>");
+            url.append("<span style='color: #668cff; padding-bottom: 145px; font-size: 13px;'>"+getCount()+"</span></a></td></tr></table>");
 
             return url.toString();
         }

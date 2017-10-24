@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.InputStreamReader;
+import java.text.MessageFormat;
+import java.util.ArrayList;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -32,15 +41,6 @@ import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
-
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.InputStreamReader;
-import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
 
 /**
  * Create a new CRF verison by uploading excel file. Makes use of several other classes to validate and provide accurate
@@ -242,23 +242,15 @@ public class ImportCRFDataServlet extends SecureController {
             // 3.f. are those items in that item group?
 
             List<String> errors = getImportCRFDataService().validateStudyMetadata(odmContainer, ub.getActiveStudyId());
-            if (errors != null) {
-                // add to session
-                // forward to another page
-                logger.info(errors.toString());
-                for (String error : errors) {
-                    addPageMessage(error);
-                }
-                if (errors.size() > 0) {
-                    // fail = true;
-                    forwardPage(Page.IMPORT_CRF_DATA);
-                } else {
-                    addPageMessage(respage.getString("passed_study_check"));
-                    addPageMessage(respage.getString("passed_oid_metadata_check"));
-                }
-
+            errorCheck(errors);
+            if (errors.size() == 0) {
+                errors = getImportCRFDataService().eventCRFStatusesValid(odmContainer, ub, errors);
+                errorCheck(errors);
             }
-            logger.debug("passed error check");
+            if (errors.size() != 0) {
+                logger.debug("failed error check");
+                return;
+            }
             // TODO ADD many validation steps before we get to the
             // session-setting below
             // 4. is the event in the correct status to accept data import?
@@ -267,7 +259,6 @@ public class ImportCRFDataServlet extends SecureController {
             // (and the event should be independent, ie not affected by other
             // events)
 
-            Boolean eventCRFStatusesValid = getImportCRFDataService().eventCRFStatusesValid(odmContainer, ub);
             ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, sm.getDataSource());
             // The eventCRFBeans list omits EventCRFs that don't match UpsertOn rules. If EventCRF did not exist and
             // doesn't match upsert, it won't be created.
@@ -287,7 +278,7 @@ public class ImportCRFDataServlet extends SecureController {
                 fail = true;
                 addPageMessage(respage.getString("no_event_status_matching"));
             } else {
-                ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
+                List<EventCRFBean> permittedEventCRFs = new ArrayList<EventCRFBean>();
                 logger.info("found a list of eventCRFBeans: " + eventCRFBeans.toString());
 
                 // List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
@@ -306,7 +297,8 @@ public class ImportCRFDataServlet extends SecureController {
                                 + eventCRFStatus.getName());
                         if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
                                 || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-                                || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                                || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
+                                || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
                             // actually want the negative
                             // was status == available and the stage questions, but
                             // when you are at 'data entry complete' your status is
@@ -317,7 +309,7 @@ public class ImportCRFDataServlet extends SecureController {
                             // need to create a list and inform that one is blocked
                             // and the rest are not...
                             //
-                            permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
+                            permittedEventCRFs.add(eventCRFBean);
                         } else {
                             // fail = true;
                             // addPageMessage(respage.getString(
@@ -328,7 +320,7 @@ public class ImportCRFDataServlet extends SecureController {
 
                     // so that we don't repeat this following message
                     // did we exclude all the event CRFs? if not, pass, else fail
-                    if (eventCRFBeans.size() >= permittedEventCRFIds.size()) {
+                    if (eventCRFBeans.size() >= permittedEventCRFs.size()) {
                         addPageMessage(respage.getString("passed_event_crf_status_check"));
                     } else {
                         fail = true;
@@ -358,8 +350,9 @@ public class ImportCRFDataServlet extends SecureController {
 
                     try {
                         List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
+
                         tempDisplayItemBeanWrappers = getImportCRFDataService().lookupValidationErrors(request, odmContainer, ub, totalValidationErrors,
-                                hardValidationErrors, permittedEventCRFIds);
+                                hardValidationErrors, permittedEventCRFs);
                         logger.debug("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
                         logger.debug("size of total validation errors: " + totalValidationErrors.size());
                         displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
@@ -375,9 +368,6 @@ public class ImportCRFDataServlet extends SecureController {
                         logger.debug("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
                         addPageMessage(oce1.getOpenClinicaMessage());
                     }
-                } else if (!eventCRFStatusesValid) {
-                    fail = true;
-                    addPageMessage(respage.getString("the_event_crf_not_correct_status"));
                 } else {
                     fail = true;
                     addPageMessage(respage.getString("no_event_crfs_matching_the_xml_metadata"));
@@ -415,6 +405,7 @@ public class ImportCRFDataServlet extends SecureController {
             }
             // }
         }
+
     }
 
     /*
@@ -465,6 +456,26 @@ public class ImportCRFDataServlet extends SecureController {
         } else {
             return "";
         }
+    }
+
+    public void errorCheck(List<String> errors) {
+        if (errors != null) {
+            // add to session
+            // forward to another page
+            logger.info(errors.toString());
+            for (String error : errors) {
+                addPageMessage(error);
+            }
+            if (errors.size() > 0) {
+                // fail = true;
+                forwardPage(Page.IMPORT_CRF_DATA);
+            } else {
+                addPageMessage(respage.getString("passed_study_check"));
+                addPageMessage(respage.getString("passed_oid_metadata_check"));
+            }
+
+        }
+
     }
 
 }

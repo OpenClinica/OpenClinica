@@ -76,7 +76,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class ViewStudySubjectServlet extends SecureController {
     // The study subject has an existing discrepancy note related to their
-    // unique identifier; this
+    // person id; this
     // value will be saved as a request attribute
     public final static String HAS_UNIQUE_ID_NOTE = "hasUniqueIDNote";
     // The study subject has an existing discrepancy note related to their date

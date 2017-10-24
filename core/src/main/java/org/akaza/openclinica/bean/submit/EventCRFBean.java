@@ -549,4 +549,32 @@ public class EventCRFBean extends AuditableEntityBean {
         this.formLayout = formLayout;
     }
 
+    @Override
+    public int hashCode() {
+        final int prime = 31;
+        int result = super.hashCode();
+        result = prime * result + formLayoutId;
+        result = prime * result + studyEventId;
+        result = prime * result + studySubjectId;
+        return result;
+    }
+
+    @Override
+    public boolean equals(Object obj) {
+        if (this == obj)
+            return true;
+        if (!super.equals(obj))
+            return false;
+        if (getClass() != obj.getClass())
+            return false;
+        EventCRFBean other = (EventCRFBean) obj;
+        if (formLayoutId != other.formLayoutId)
+            return false;
+        if (studyEventId != other.studyEventId)
+            return false;
+        if (studySubjectId != other.studySubjectId)
+            return false;
+        return true;
+    }
+
 }
