@@ -207,13 +207,64 @@ function setYPos(id) {
 			</c:choose>
 		</div>
 		<div style="clear:both;"></div> 
-		<div class="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:<span class="alert">*</span></div>
-		<div class="dnBoxCol2">
-			<div class="formtextareaXL4_BG">
-		  		<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
-			</div>
-			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes${parentId}"/></jsp:include>
-		</div>
+		<table border="0">
+			<tr>
+				<td>
+					<div class="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:<span class="	alert">*</span></div>
+				</td>
+				<td>
+					<div class="dnBoxCol2">
+						<div class="formtextareaXL4_BG">
+			  			<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
+						</div><br/>
+						<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes${parentId}"/></jsp:include>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="dnBoxCol1"><fmt:message key="assign_to_user" bundle="${resword}"/>:</div>
+				</td>
+				<td>
+					<div class="dnBoxCol2" class="formfieldL_BG">
+						<div class="formfieldL_BG">
+						<c:choose>
+						<c:when test='${discrepancyNote.assignedUserId != ""}'>
+							<c:set var="userAccountId1" value="${discrepancyNote.assignedUserId}"/>
+						</c:when>
+						<c:otherwise>
+							<c:set var="userAccountId1" value="0"/>
+						</c:otherwise>
+						</c:choose>
+						<select name="userAccountId${parentId}" id="userAccountId${parentId}" class="formfieldL" >
+							<option value="0">
+					  		<c:forEach var="user" items="${userAccounts}">
+					   		<c:choose>
+					     	<c:when test="${userAccountId1 == user.userAccountId}">
+					       		<option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.lastName}"/>, <c:out value="${user.firstName}"/> (<c:out value="${user.userName}"/>)
+					     	</c:when>
+					     	<c:otherwise>
+					       		<option value="<c:out value="${user.userAccountId}"/>"><c:out value="${user.lastName}"/>, <c:out value="${user.firstName}"/> (<c:out value="${user.userName}"/>)
+					     	</c:otherwise>
+					   		</c:choose>
+					 		</c:forEach>
+						</select>
+						</div>
+			  			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userAccountId${parentId}"/></jsp:include>
+					</div>
+				</td>
+			</tr>
+			<tr>
+				<td>
+					<div class="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>: 
+				</td>
+				<td>
+					<input name="sendEmail${parentId}" value="1" type="checkbox"/></div>
+				</td>
+			</tr>
+		</table>
+		
+		
 		
 		<c:choose>
 		<c:when test="${parentId > 0}">
@@ -324,33 +375,7 @@ function setYPos(id) {
 			<span id="user1${parentId}" style="display:block">
       	</c:otherwise>
 		</c:choose>
-			<div class="dnBoxCol1"><fmt:message key="assign_to_user" bundle="${resword}"/>:</div>
-			<div class="dnBoxCol2" class="formfieldL_BG">
-				<div class="formfieldL_BG">
-					<c:choose>
-					<c:when test='${discrepancyNote.assignedUserId != ""}'>
-						<c:set var="userAccountId1" value="${discrepancyNote.assignedUserId}"/>
-					</c:when>
-					<c:otherwise>
-						<c:set var="userAccountId1" value="0"/>
-					</c:otherwise>
-					</c:choose>
-					<select name="userAccountId${parentId}" id="userAccountId${parentId}" class="formfieldL" >
-						<option value="0">
-				  		<c:forEach var="user" items="${userAccounts}">
-				   		<c:choose>
-				     	<c:when test="${userAccountId1 == user.userAccountId}">
-				       		<option value="<c:out value="${user.userAccountId}"/>" selected><c:out value="${user.lastName}"/>, <c:out value="${user.firstName}"/> (<c:out value="${user.userName}"/>)
-				     	</c:when>
-				     	<c:otherwise>
-				       		<option value="<c:out value="${user.userAccountId}"/>"><c:out value="${user.lastName}"/>, <c:out value="${user.firstName}"/> (<c:out value="${user.userName}"/>)
-				     	</c:otherwise>
-				   		</c:choose>
-				 		</c:forEach>
-					</select>
-				</div>
-		  		<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="userAccountId${parentId}"/></jsp:include>
-			</div>
+			
 		</span>
 		
 		<c:choose>
@@ -361,8 +386,6 @@ function setYPos(id) {
 			<span id="user2${parentId}" style="display:block">
 		</c:otherwise>
 		</c:choose>
-			<div class="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>: <input name="sendEmail${parentId}" value="1" type="checkbox"/></div>
-			<br/>
 		</span>
 		
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
