@@ -10,12 +10,7 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
-<script>
-    var myContextPath = "${pageContext.request.contextPath}";
-    var sessionTimeout = "<%= session.getMaxInactiveInterval() %>";
-</script>
-<script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
+<jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <%
     String currentURL = null;
     if (request.getAttribute("javax.servlet.forward.request_uri") != null) {
@@ -25,9 +20,18 @@
         currentURL += "?" + request.getQueryString();
     }
 %>
+<script>
+    var myContextPath = "${pageContext.request.contextPath}";
+    var sessionTimeout = "<%= session.getMaxInactiveInterval() %>";
+    var userName = "<%= userBean.getName() %>";
+    var currentURL = "<%= currentURL %>"
+</script>
+<script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
+
 <script language="JavaScript">
 
-    var isTimedOut = isSessionTimedOut();
+    var isTimedOut = isSessionTimedOut(encodeURIComponent(currentURL));
     if (isTimedOut) {
         window.location.replace (myContextPath + '/pages/logout');
     }
@@ -102,7 +106,7 @@
         var date = new Date();
         date.setTime(date.getTime() + (60 * 1000));
         var expires = "; expires=" + date.toGMTString();
-        document.cookie = "returnTo=" + encodeURIComponent(returnTo) + expires + "; path=/";
+        document.cookie = "returnTo-" + userName + "=" + encodeURIComponent(returnTo) + expires + "; path=/";
     }
 </script>
 
