@@ -224,7 +224,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("entityName", discrepancyNoteBean.getEntityName());
             h.put("entityValue", discrepancyNoteBean.getEntityValue());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
-            h.put("discrepancyNoteBean.description", discrepancyNoteBean.getDescription());
             h.put("discrepancyNoteBean.detailedNotes", discrepancyNoteBean.getDetailedNotes());
             h.put("numberOfNotes", discrepancyNoteBean.getNumChildren());
             h.put("discrepancyNoteBean.user", discrepancyNoteBean.getAssignedUser());
