@@ -54,6 +54,7 @@ public class ViewNotesFilterCriteria {
         FILTER_BY_TABLE_COLUMN.put("entityValue", "value");
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.entityType", "entity_type");
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.description", "description");
+        FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.detailedNotes", "detailed_notes");
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.user", "user");
     }
 
