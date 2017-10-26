@@ -160,9 +160,13 @@
 
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
- <tr valign="top"><td class="table_header_column"><fmt:message key="study_phase" bundle="${resword}"/>:</td><td class="table_cell">
-  <fmt:message key="${studyToView.phase}" bundle="${resword}"/>
-  </td></tr>
+  <tr valign="top">
+    <td class="table_header_column"><fmt:message key="study_phase" bundle="${resword}"/>:</td><td class="table_cell">
+      <c:if test="${studyToView.protocolType =='Interventional'}">
+        <fmt:message key="${studyToView.phase}" bundle="${resword}"/>
+      </c:if>
+    </td>
+  </tr>
 
  <tr valign="top"><td class="table_header_column"><a href="http://prsinfo.clinicaltrials.gov/definitions.html#StudyType" target="def_win" onClick="openDefWindow('http://prsinfo.clinicaltrials.gov/definitions.html#StudyType'); return false;"><fmt:message key="protocol_type" bundle="${resword}"/></a>:</td><td class="table_cell">
  <c:out value="${studyToView.protocolType}"/>
