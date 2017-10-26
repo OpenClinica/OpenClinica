@@ -10,19 +10,29 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=8"/>
-    <title><fmt:message key="openclinica" bundle="${resword}"/></title> 
+    <title><fmt:message key="openclinica" bundle="${resword}"/></title>
     <link rel="SHORTCUT ICON" href="images/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="includes/styles.css" type="text/css"/>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
-    <script>var myContextPath = "${pageContext.request.contextPath}"</script>
+    <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
+    <script>
+        var myContextPath = "${pageContext.request.contextPath}";
+        var sessionTimeout = "<%= session.getMaxInactiveInterval() %>";
+    </script>
+    <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
     <script type="text/javascript" language="javascript">
-    $(document).ready(function(){
-    	var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
-    	iframe = document.getElementById("enketo");
-        iframe.setAttribute('src', fullEnketoURL);
-    });
+        var isTimedOut = isSessionTimedOut();
+        if (isTimedOut) {
+            window.location.replace (myContextPath + '/pages/logout');
+        }
+
+        $(document).ready(function(){
+            var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
+            iframe = document.getElementById("enketo");
+            iframe.setAttribute('src', fullEnketoURL);
+        });
 
         window.addEventListener("message", receiveMessage, false);
         function receiveMessage(event) {
