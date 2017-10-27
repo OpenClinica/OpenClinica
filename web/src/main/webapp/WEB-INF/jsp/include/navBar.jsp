@@ -371,6 +371,18 @@
             return false;
         });
     });
+
+    //close dropdown when click outside
+    clickOutside = document.getElementById("subnav_Tasks");
+    clickOutside.addEventListener("click",     function(action){action.stopPropagation()},true);
+    addEventListener("click", function() {clickOutside.style.display="none"},false);
+    
+    //close dropdown using esc
+    $(document).keyup(function(e) {
+        if (e.keyCode == 27) { // escape key maps to keycode `27`
+            clickOutside.style.display="none";
+        }
+    });
 </script>
 
 <div id="navAddSubjectForm" style="display: none">

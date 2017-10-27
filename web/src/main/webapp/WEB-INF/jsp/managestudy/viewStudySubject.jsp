@@ -76,7 +76,7 @@
 
 <h1>   
     <span class="title_manage">
-        <fmt:message key="view_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
+        <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/>
     </span>
 </h1>
 <br/>
