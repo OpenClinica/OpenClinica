@@ -43,7 +43,15 @@ public class UserPermissionInterceptor implements EndpointInterceptor {
         if (requestAttributes != null && requestAttributes.getRequest() != null) {
             HttpServletRequest request = requestAttributes.getRequest();
             if (request != null) {
-                request.setAttribute("requestSchema", getSchemaFromStudyOid((String)request.getAttribute("studyOid")));
+                String schema = getSchemaFromStudyOid((String)request.getAttribute("studyOid"));
+                if (schema == null) {
+                    SoapBody response = ((SoapMessage) messageContext.getResponse()).getSoapBody();
+                    response.addClientOrSenderFault("No study found with this studyOid:." + (String)request.getAttribute("studyOid"),
+                            Locale.ENGLISH);
+                    return false;
+                } else {
+                    request.setAttribute("requestSchema", schema);
+                }
             }
         }
 
@@ -63,6 +71,8 @@ public class UserPermissionInterceptor implements EndpointInterceptor {
     private String getSchemaFromStudyOid(String studyOid) {
         StudyDAO studyDAO = new StudyDAO(dataSource);
         StudyBean studyBean = studyDAO.findByOid(studyOid);
+        if (studyBean == null)
+            return null;
         return studyBean.getSchemaName();
     }
     public boolean handleResponse(MessageContext messageContext, Object endpoint) throws Exception {
