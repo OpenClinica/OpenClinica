@@ -371,22 +371,16 @@
             return false;
         });
     });
-    
-    dropdown = document.getElementById("subnav_Tasks");
 
+    //close dropdown when click outside
+    clickOutside = document.getElementById("subnav_Tasks");
+    clickOutside.addEventListener("click",     function(action){action.stopPropagation()},true);
+    addEventListener("click", function() {clickOutside.style.display="none"},false);
+    
     //close dropdown using esc
     $(document).keyup(function(e) {
         if (e.keyCode == 27) { // escape key maps to keycode `27`
-            dropdown.style.display="none";
-        }
-    });
-
-    //we have it open on mouse-over OR click when it is closed
-    addEventListener("click", function() {
-        if (dropdown.style.display === 'none') {
-            dropdown.style.display = 'block';
-        } else {
-            dropdown.style.display = 'none';
+            clickOutside.style.display="none";
         }
     });
 </script>
