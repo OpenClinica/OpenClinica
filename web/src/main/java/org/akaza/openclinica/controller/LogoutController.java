@@ -1,19 +1,12 @@
 package org.akaza.openclinica.controller;
 
-import com.auth0.SessionUtils;
-import com.auth0.client.auth.AuthAPI;
-import com.auth0.exception.Auth0Exception;
-import com.auth0.json.auth.TokenHolder;
-import com.auth0.net.AuthRequest;
 import org.akaza.openclinica.config.AppConfig;
-import org.akaza.openclinica.config.TokenAuthentication;
 import org.akaza.openclinica.service.LogoutService;
 import org.akaza.openclinica.view.Page;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.repository.query.Param;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -21,8 +14,6 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
-import org.springframework.web.servlet.mvc.support.RedirectAttributes;
-import org.springframework.web.servlet.view.RedirectView;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -34,7 +25,7 @@ import java.util.Map;
 /**
  * Created by krikorkrumlian on 3/30/17.
  */
-@Controller
+@Controller(value = "logoutController")
 public class LogoutController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
@@ -52,7 +43,6 @@ public class LogoutController {
         session.removeAttribute("passwordExpired");
         SecurityContextHolder.clearContext();
         session.invalidate();
-
         String urlPrefix = req.getRequestURL().substring(0, req.getRequestURL().lastIndexOf("/"));
         int index = urlPrefix.indexOf(req.getContextPath());
         String returnURL = urlPrefix.substring(0, index).concat(req.getContextPath()).concat("/pages/logoutSuccess");
@@ -76,7 +66,7 @@ public class LogoutController {
 
     @RequestMapping(value="/invalidateAuth0Token", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
-    protected void invalidateAccessToken(final Map<String, Object> model, final HttpServletRequest req) {
+    public void invalidateAccessToken(final HttpServletRequest req) {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null)
             auth.setAuthenticated(false);

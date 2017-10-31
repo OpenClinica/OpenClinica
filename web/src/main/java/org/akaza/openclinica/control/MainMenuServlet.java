@@ -98,6 +98,30 @@ public class MainMenuServlet extends SecureController {
         return queryStr;
     }
 
+    public String getTimeoutReturnToCookie(HttpServletRequest request, HttpServletResponse response) {
+        String queryStr = "";
+        if (ub == null || StringUtils.isEmpty(ub.getName()))
+            return queryStr;
+
+        Cookie[] cookies = request.getCookies();
+        for (Cookie cookie : cookies) {
+            if (cookie.getName().equalsIgnoreCase("bridgeTimeoutReturn-" + ub.getName())) {
+                try {
+                    queryStr = URLDecoder.decode(cookie.getValue(), "UTF-8");
+                } catch (UnsupportedEncodingException e) {
+                    logger.error("Error decoding redirect URL from queryStr cookie:" + e.getMessage());
+                }
+                cookie.setValue(null);
+                cookie.setMaxAge(0);
+                cookie.setPath("/");
+                if (response != null)
+                    response.addCookie(cookie);
+                break;
+            }
+        }
+        return queryStr;
+    }
+
     public void processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) throws Exception {
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
         if (StringUtils.isEmpty(studyEnvUuid)) {
@@ -159,6 +183,12 @@ public class MainMenuServlet extends SecureController {
             response.sendRedirect(queryStrCookie);
             return;
         }
+        queryStrCookie = getTimeoutReturnToCookie(request, response);
+        if (StringUtils.isNotEmpty(queryStrCookie)) {
+            response.sendRedirect(queryStrCookie);
+            return;
+        }
+
         FormProcessor fp = new FormProcessor(request);
         ub.incNumVisitsToMainMenu();
         session.setAttribute(USER_BEAN_NAME, ub);

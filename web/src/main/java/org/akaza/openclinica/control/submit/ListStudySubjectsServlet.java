@@ -105,9 +105,7 @@ public class ListStudySubjectsServlet extends SecureController {
             setPresetValues(fp.getPresetValues());
         }
 
-        if (currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentRole.isResearchAssistant2()) {
-            ub.incNumVisitsToMainMenu();
-        }
+        ub.incNumVisitsToMainMenu();
 
         request.setAttribute("closeInfoShowIcons", true);
         if (fp.getString("navBar").equals("yes") && fp.getString("findSubjects_f_studySubject.label").trim().length() > 0) {

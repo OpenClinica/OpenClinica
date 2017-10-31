@@ -744,7 +744,8 @@ public class Study   extends DataMapDomainObject {
 		this.studyEventDefinitions = studyEventDefinitions;
 	}
 
-	@OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
+	// FetchType.LAZY doesn't seem to retrieve studies
+	@OneToMany(fetch = FetchType.EAGER, mappedBy = "study")
 	public List<Study> getStudies() {
 		return this.studies;
 	}

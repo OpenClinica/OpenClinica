@@ -1,16 +1,12 @@
 package org.akaza.openclinica.ws;
 
-import com.auth0.Auth0;
-import com.auth0.authentication.AuthenticationAPIClient;
-import com.auth0.authentication.result.Credentials;
+import com.auth0.client.auth.AuthAPI;
+import com.auth0.json.auth.TokenHolder;
+import com.auth0.net.AuthRequest;
 import com.sun.xml.wss.impl.callback.PasswordValidationCallback;
-import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.domain.user.AuthoritiesBean;
-import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
@@ -121,19 +117,13 @@ public class SpringPlainTextPasswordValidationCallbackHandler extends AbstractCa
                 WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
                 dataSource = (DataSource) context.getBean("dataSource");
                 Properties auth0Properties = (Properties) context.getBean("auth0Properties");
-
-                Auth0 auth = new Auth0(auth0Properties.getProperty("auth0.clientId"), auth0Properties.getProperty("auth0.domain"));
-                AuthenticationAPIClient client = auth.newAuthenticationAPIClient();
-                logger.info("Creating client login in SpringSecurityPlainTextPasswordValidator: user: " +
-                        plainTextRequest.getUsername() + ": password: " + plainTextRequest.getPassword()
-                        + ": connection: " + auth0Properties.getProperty("auth0.connection"));
-                Credentials credentials = client.login(plainTextRequest.getUsername(), plainTextRequest.getPassword())
-                        .setConnection(auth0Properties.getProperty("auth0.connection")).execute();
-                logger.info("client credentials in SpringSecurityPlainTextPasswordValidator:" + credentials);
-                logger.info("client access token in SpringSecurityPlainTextPasswordValidator:" + credentials.getAccessToken());
-                logger.info("user username/password in SpringSecurityPlainTextPasswordValidator:" + plainTextRequest.getUsername() + ":" + plainTextRequest.getPassword());
-                if (StringUtils.isNotEmpty(credentials.getAccessToken())) {
-                    findOrCreateUser(plainTextRequest, credentials);
+                AuthAPI authAPI = new AuthAPI(auth0Properties.getProperty("auth0.domain"), auth0Properties.getProperty("auth0.clientId"),
+                        auth0Properties.getProperty("auth0.clientSecret"));
+                AuthRequest authRequest = authAPI.login(plainTextRequest.getUsername(), plainTextRequest.getPassword(),
+                        auth0Properties.getProperty("auth0.connection"));
+                TokenHolder tokenHolder = authRequest.execute();
+                if (StringUtils.isNotEmpty(tokenHolder.getAccessToken())) {
+                    findOrCreateUser(plainTextRequest, tokenHolder);
                     Authentication authentication = new UsernamePasswordAuthenticationToken(plainTextRequest.getUsername(), null,
                             AuthorityUtils.createAuthorityList("ROLE_USER"));
                     SecurityContextHolder.getContext().setAuthentication(authentication);
@@ -152,8 +142,8 @@ public class SpringPlainTextPasswordValidationCallbackHandler extends AbstractCa
     }
 
     private UserAccountBean findOrCreateUser(PasswordValidationCallback.PlainTextPasswordRequest plainTextRequest,
-            Credentials credentials) throws Exception{
-        Map<String, Object> map = decode(credentials.getIdToken());
+            TokenHolder tokenHolder) throws Exception{
+        Map<String, Object> map = decode(tokenHolder.getIdToken());
         UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
 
         UserAccountBean ub = (UserAccountBean) userAccountDAO.findByApiKey(plainTextRequest.getUsername());
