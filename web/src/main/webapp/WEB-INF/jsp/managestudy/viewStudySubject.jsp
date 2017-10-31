@@ -216,7 +216,7 @@
 
                                         </c:if>
                                         </td>
-                                        <td class="table_cell"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/></td>
+                                        <td class="table_cell"><c:out value="${subject.dateOfBirth}" /></td>
 
                                 </c:when>
                                 <c:when test="${subjectStudy.studyParameterConfig.collectDob == '3'}">
@@ -344,8 +344,9 @@
                                     </c:choose>
                                 </c:if>
                             </td>
-                            <td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}"/>&nbsp;
-                             </td>
+                            <td class="table_cell">
+                                <c:out value="${studySub.enrollmentDate}"/>
+                            </td>
                         </tr>
                         <tr>
                             <td class="table_divider" colspan="4">&nbsp;</td>
