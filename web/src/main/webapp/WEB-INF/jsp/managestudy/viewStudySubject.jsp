@@ -107,7 +107,7 @@
 </c:choose>
 
 <a href="javascript:leftnavExpand('studySubjectRecord');" style="text-decoration: none">
-    <img id="excl_studySubjectRecord" src="images/bt_Expand.gif" border="0"> <fmt:message key="study_subject_record" bundle="${resword}"/></a></div>
+    <img id="excl_studySubjectRecord" src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/></a></div>
 <div id="studySubjectRecord" style="display: none">
 
 <table border="0" cellpadding="0" cellspacing="0">
@@ -216,7 +216,7 @@
 
                                         </c:if>
                                         </td>
-                                        <td class="table_cell"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/></td>
+                                        <td class="table_cell"><c:out value="${subject.dateOfBirth}" /></td>
 
                                 </c:when>
                                 <c:when test="${subjectStudy.studyParameterConfig.collectDob == '3'}">
@@ -344,8 +344,9 @@
                                     </c:choose>
                                 </c:if>
                             </td>
-                            <td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}"/>&nbsp;
-                             </td>
+                            <td class="table_cell">
+                                <c:out value="${studySub.enrollmentDate}"/>
+                            </td>
                         </tr>
                         <tr>
                             <td class="table_divider" colspan="4">&nbsp;</td>
@@ -410,7 +411,7 @@
     </c:otherwise>
 </c:choose>
 <a name="events"><a href="javascript:leftnavExpand('subjectEvents');" style="text-decoration: none">
-    <img id="excl_subjectEvents" src="images/bt_Collapse.gif" border="0"> <fmt:message key="events" bundle="${resword}"/></a></a></div>
+    <img id="excl_subjectEvents" src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="events" bundle="${resword}"/></a></a></div>
 <div id="subjectEvents">
     <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showStudyEventRow.jsp" /></c:import>
 
@@ -552,7 +553,7 @@
 
     </c:otherwise>
     </c:choose>    <a name="global"><a style="text-decoration: none" href="javascript:leftnavExpand('globalRecord');">
-        <img id="excl_globalRecord" src="images/bt_Expand.gif" border="0"> <fmt:message key="global_subject_record" bundle="${resword}"/></a></a></div>
+        <img id="excl_globalRecord" src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="global_subject_record" bundle="${resword}"/></a></a></div>
 
 <div id="globalRecord" style="display:none">
 <div style="width: 350px">

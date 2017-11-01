@@ -193,8 +193,8 @@
                                             <li><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message key="nav_sdv" bundle="${resword}"/></a></li>
                                             <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></li>
                                         </c:if>
-                                        <li id="nav_Tasks" style="position: relative; z-index: 3;">
-                                            <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link"><fmt:message key="nav_tasks" bundle="${resword}"/>
+                                        <li class="nav_TaskB" id="nav_Tasks" style="position: relative; z-index: 1;">
+                                            <a href="#" onmouseover="setNav('nav_Tasks');" id="nav_Tasks_link" onclick="showDropdown()"><fmt:message key="nav_tasks" bundle="${resword}"/>
                                                <span class="icon icon-caret-down white"></span></a>
                                         </li>
                                         </ul>
@@ -371,18 +371,36 @@
             return false;
         });
     });
-
-    //close dropdown when click outside
-    clickOutside = document.getElementById("subnav_Tasks");
-    clickOutside.addEventListener("click",     function(action){action.stopPropagation()},true);
-    addEventListener("click", function() {clickOutside.style.display="none"},false);
     
+    dropdown = document.getElementById("subnav_Tasks");
+
     //close dropdown using esc
     $(document).keyup(function(e) {
         if (e.keyCode == 27) { // escape key maps to keycode `27`
-            clickOutside.style.display="none";
+            dropdown.style.display="none";
         }
     });
+
+    //we have it open on mouse-over OR click when it is closed
+    $(document).ready(function(){
+        // Show hide popover
+        $(".nav_TaskB").click(function(){
+            $(this).find(".dropdown").slideToggle("fast");
+        });
+    });
+    $(document).on("click", function(event){
+        var $trigger = $(".nav_TaskB");
+        if($trigger !== event.target && !$trigger.has(event.target).length){
+            $(".dropdown").slideUp("fast");
+        }
+    });
+    function showDropdown() {
+        if (dropdown.style.display === 'none') {
+            dropdown.style.display = 'block';
+        } else {
+            droopdown.style.display = 'none';
+        }
+    }  
 </script>
 
 <div id="navAddSubjectForm" style="display: none">
