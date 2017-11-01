@@ -136,7 +136,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
          *      java.util.Locale)
          */
         String getIndexes() {
-            String result = "1, 4, 8, 10, 12, 16";
+            String result = "3, 4, 8, 10, 13, 15";
             return result;
         }
 
@@ -222,7 +222,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            html.a().href("#");
+            html.a().href("javascript:void(0)");
             html.onclick("javascript:openPopup()");
             html.quote();
             html.append(getAction());

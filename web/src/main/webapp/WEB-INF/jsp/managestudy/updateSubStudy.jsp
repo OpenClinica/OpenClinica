@@ -217,7 +217,7 @@ function updateThis(multiSelEle, count) {
 	        </c:choose>
 		    </td>
 
-		    <td class="table_cell" colspan="6" style="display: none;"><fmt:message key="sdv_option" bundle="${resword}"/>:
+		    <td class="table_cell" colspan="6" ><fmt:message key="sdv_option" bundle="${resword}"/>:
 		    <select name="sdvOption<c:out value="${num}"/>">
 	            <c:set var="index" value="1"/>
 	            <c:forEach var="sdv" items="${sdvOptions}">

@@ -733,7 +733,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             StringBuilder url = new StringBuilder();
             url.append(eventDivBuilder(subject, rowcount, studyEvents, studyEventDefinition, studySubjectBean));
             url.append("<span class='" + imageIconPaths.get(subjectEventStatus.getId()) + "' style='padding-top: 2px; padding-bottom: 3px;'>");
-            url.append("</a></td><td align='left' width='10px'><span style='color: #668cff; padding-bottom: 145px; font-size: 13px;'>"+getCount()+" </span></td></tr></table>");
+            url.append("<span style='color: #668cff; padding-bottom: 145px; font-size: 13px;'>"+getCount()+"</span></a></td></tr></table>");
 
             return url.toString();
         }
@@ -766,6 +766,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                             && getCurrentRole().getRole() != Role.RESEARCHASSISTANT2 && getCurrentRole().getRole() != Role.INVESTIGATOR
                             && studySubjectBean.getStatus() == Status.AVAILABLE) {
                         url.append(reAssignStudySubjectLinkBuilder(studySubjectBean));
+                    }
+
+                    if (getCurrentRole().getRole() == Role.INVESTIGATOR && getStudyBean().getStatus() == Status.AVAILABLE && studySubjectBean.getStatus() != Status.DELETED && isSignable) {
+                        url.append(signStudySubjectLinkBuilder(studySubjectBean));
                     }
 
                     try {
@@ -856,7 +860,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private String signStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-sign');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-icon-sign');\" href=\"signStudySubject?id="+studySubject.getId());
+        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-sign');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-icon-sign');\" href=\"SignStudySubject?id="+studySubject.getId());
         builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Sign\" alt=\"Sign\" class=\"icon icon-icon-sign\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();

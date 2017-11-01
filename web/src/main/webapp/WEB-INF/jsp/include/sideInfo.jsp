@@ -15,13 +15,12 @@
 <c:choose>
  <c:when test="${userBean != null && userBean.id>0}">
  <%-- BWP 3098 >> switch displays for Info box--%>
-    <tr id="sidebar_Info_open"<c:if test="${closeInfoShowIcons}">style="display: none"</c:if>>
+    <tr id="sidebar_Info_open"<c:if test="${!closeInfoShowIcons}">style="display: none"</c:if>>
 		<td class="sidebar_tab">
 
 		<a href="javascript:leftnavExpand('sidebar_Info_open'); leftnavExpand('sidebar_Info_closed');">
-
                <span class="icon icon-caret-down gray"></span>
-</a>
+		</a>
 
 		<fmt:message key="info" bundle="${restext}"/>
 
@@ -76,7 +75,7 @@
 		</td>
 	</tr>
     <%-- BWP 3098 >> switch displays for Info box--%>
-    <tr id="sidebar_Info_closed"<c:if test="${! closeInfoShowIcons}">style="display: none"</c:if>>
+    <tr id="sidebar_Info_closed"<c:if test="${closeInfoShowIcons}">style="display: none"</c:if>>
 		<td class="sidebar_tab">
 
 		<a href="javascript:leftnavExpand('sidebar_Info_open'); leftnavExpand('sidebar_Info_closed');"><span class="icon icon-caret-right gray"></span></a>

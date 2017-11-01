@@ -38,6 +38,7 @@ public class EnketoAPI {
     public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     public static final String VIEW_MODE = "view";
     public static final String EDIT_MODE = "edit";
+    public static final String PREVIEW_MODE = "preview";
 
     /*
      * SURVEY : Initial Data Entry
@@ -116,7 +117,10 @@ public class EnketoAPI {
             // https://jira.openclinica.com/browse/OC-8279 Study Director edits XForms.
         } else if (mode.equals(EDIT_MODE) && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
             eURL = new URL(enketoURL + SURVEY_WRITABLE_DN_CLOSE_BUTTON);
+        } else if (mode.equals(PREVIEW_MODE)) {
+            eURL = new URL(enketoURL + SURVEY_PREVIEW_MODE);
         }
+
         String myUrl = null;
         EnketoURLResponse response = registerAndGetURL(eURL, crfOID);
         if (response != null) {
@@ -124,6 +128,8 @@ public class EnketoAPI {
                 myUrl = response.getSingle_fieldsubmission_iframe_url();
             } else if (response.getView_iframe_url() != null) {
                 myUrl = response.getView_iframe_url();
+            } else if (response.getPreview_url() != null) {
+                myUrl = response.getPreview_url();
             }
 
             if (enketoURL.toLowerCase().startsWith("https") && !myUrl.toLowerCase().startsWith("https")) {
