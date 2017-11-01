@@ -61,9 +61,15 @@
         </c:if>   
     </span><br>
     <div style="text-align:center; width:100%;">
-        <button onclick="hm('box');">OK</button>
+        <button id="btn" onclick="hm('box');">OK</button>
     </div>
 </div>
+
+<script type="text/javascript">
+    window.onload = function() {
+        document.getElementById("btn").focus();
+    };
+</script>
 
 <tr id="sidebar_Instructions_open" style="display: all">
     <td class="sidebar_tab">
