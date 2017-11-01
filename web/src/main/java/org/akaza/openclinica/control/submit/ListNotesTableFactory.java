@@ -107,9 +107,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
         tableFacade.setColumnProperties("studySubject.label",
-                "discrepancyNoteBean.createdDate",
                 "discrepancyNoteBean.resolutionStatus",
                 "siteId",
+                "discrepancyNoteBean.createdDate",
                 "discrepancyNoteBean.updatedDate",
                 "age",
                 "days",
@@ -117,12 +117,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 "eventStartDate",
                 "crfName",
                 "crfStatus",
-                "discrepancyNoteBean.detailedNotes",
-                "numberOfNotes",
-                "discrepancyNoteBean.user",
                 "entityName",
                 "entityValue",
                 "discrepancyNoteBean.entityType",
+                "discrepancyNoteBean.detailedNotes",
+                "numberOfNotes",
+                "discrepancyNoteBean.user",
                 "actions");
 
         Row row = tableFacade.getTable().getRow();
