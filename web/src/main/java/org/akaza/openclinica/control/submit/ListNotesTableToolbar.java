@@ -222,7 +222,7 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            html.a().href("#");
+            html.a().href("javascript:void(0)");
             html.onclick("javascript:openPopup()");
             html.quote();
             html.append(getAction());
