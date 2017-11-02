@@ -42,6 +42,7 @@ import java.security.cert.CertificateFactory;
 import java.util.Locale;
 import java.util.Map;
 import java.util.Properties;
+import java.util.ResourceBundle;
 
 /**
  * Callback handler that validates a user against Auth0. Logic based
@@ -114,13 +115,12 @@ public class SpringPlainTextPasswordValidationCallbackHandler extends AbstractCa
             try {
                 Locale locale = new Locale("en_US");
                 ResourceBundleProvider.updateLocale(locale);
-                WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
-                dataSource = (DataSource) context.getBean("dataSource");
-                Properties auth0Properties = (Properties) context.getBean("auth0Properties");
-                AuthAPI authAPI = new AuthAPI(auth0Properties.getProperty("auth0.domain"), auth0Properties.getProperty("auth0.clientId"),
-                        auth0Properties.getProperty("auth0.clientSecret"));
+                ResourceBundle rb = ResourceBundle.getBundle("auth0");
+                AuthAPI authAPI = new AuthAPI(rb.getString("auth0.domain"), rb.getString("auth0.clientId"),
+                        rb.getString("auth0.clientSecret"));
+                authAPI.setLoggingEnabled(true);
                 AuthRequest authRequest = authAPI.login(plainTextRequest.getUsername(), plainTextRequest.getPassword(),
-                        auth0Properties.getProperty("auth0.connection"));
+                        rb.getString("auth0.connection"));
                 TokenHolder tokenHolder = authRequest.execute();
                 if (StringUtils.isNotEmpty(tokenHolder.getAccessToken())) {
                     findOrCreateUser(plainTextRequest, tokenHolder);
@@ -143,9 +143,10 @@ public class SpringPlainTextPasswordValidationCallbackHandler extends AbstractCa
 
     private UserAccountBean findOrCreateUser(PasswordValidationCallback.PlainTextPasswordRequest plainTextRequest,
             TokenHolder tokenHolder) throws Exception{
+        WebApplicationContext context = ContextLoader.getCurrentWebApplicationContext();
+        dataSource = (DataSource) context.getBean("dataSource");
         Map<String, Object> map = decode(tokenHolder.getIdToken());
         UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-
         UserAccountBean ub = (UserAccountBean) userAccountDAO.findByApiKey(plainTextRequest.getUsername());
         if (StringUtils.isEmpty(ub.getName())) {
             ub = (UserAccountBean) userAccountDAO.findByUserName(plainTextRequest.getUsername());
