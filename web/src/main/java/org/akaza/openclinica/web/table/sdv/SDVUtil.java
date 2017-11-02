@@ -592,7 +592,7 @@ public class SDVUtil {
           "org.akaza.openclinica.i18n.words",LocaleResolver.getLocale(request));
 
         String[] allTitles = {"Study Subject Id","Person Id","Secondary Id" ,"Event Name",
-          "Event Date","Enrollment Date","Subject Status","CRF Name / Version","CRF Status",
+          "Event Date","Enrollment Date","Subject Status","CRF Name / Version","View CRF",
           "Last Updated Date",
           "Last Updated By","SDV Status / Actions"};
 
@@ -678,7 +678,7 @@ public class SDVUtil {
 
         String[] allTitles =
         { resword.getString("SDV_status"), resword.getString("study_subject_ID"), resword.getString("site_id"), resword.getString("person_ID"), resword.getString("secondary_ID"), resword.getString("event_name"), resword.getString("event_date"), resword.getString("enrollment_date"), resword.getString("subject_status"),
-            resword.getString("CRF_name")+" / "+resword.getString("version"), resword.getString("SDV_requirement"), resword.getString("CRF_status"), resword.getString("last_updated_date"), resword.getString("last_updated_by"), resword.getString("study_event_status"), resword.getString("actions")};
+    		resword.getString("CRF_name")+" / "+resword.getString("version"), resword.getString("SDV_requirement"), resword.getString("view_CRF"), resword.getString("last_updated_date"), resword.getString("last_updated_by"), resword.getString("study_event_status"), resword.getString("actions")};
 
         setTitles(allTitles, table);
 
@@ -752,7 +752,7 @@ public class SDVUtil {
 
         String[] allTitles =
         {  resword.getString("study_subject_ID"), resword.getString("site_id"), resword.getString("person_ID"), resword.getString("secondary_ID"), resword.getString("event_name"), resword.getString("event_date"), resword.getString("enrollment_date"), resword.getString("subject_status"),
-            resword.getString("CRF_name")+" / "+resword.getString("version"), resword.getString("SDV_requirement"), resword.getString("CRF_status"), resword.getString("last_updated_date"), resword.getString("last_updated_by"), resword.getString("study_event_status"), resword.getString("SDV_status")+" / "+resword.getString("actions")};
+    		resword.getString("CRF_name")+" / "+resword.getString("version"), resword.getString("SDV_requirement"), resword.getString("view_CRF"), resword.getString("last_updated_date"), resword.getString("last_updated_by"), resword.getString("study_event_status"), resword.getString("SDV_status")+" / "+resword.getString("actions")};
 
         setTitles(allTitles, table);
 
@@ -1434,7 +1434,7 @@ public class SDVUtil {
         public SDVView(Locale locale, HttpServletRequest request) {
             resword = ResourceBundleProvider.getWordsBundle(locale);
             if(request.getRequestURI().contains("MainMenu"))
-                showTitle = true;
+            	showTitle = true;
         }
 
         public Object render() {
@@ -1481,17 +1481,17 @@ public class SDVUtil {
         }
         private String customHeader()
         {
-            if(showTitle)
-            {
-            HtmlBuilder html = new HtmlBuilder();
+        	if(showTitle)
+        	{
+        	HtmlBuilder html = new HtmlBuilder();
 
-             html.tr(0).styleClass("header").width("100%").close();
-            html.td(0).colspan("100%").style("border-bottom: 1px solid white;background-color:white;color:black;font-size:12px;").align("left").close().append(resword.getString("source_data_verification")).tdEnd().trEnd(0);
+        	 html.tr(0).styleClass("header").width("100%").close();
+	        html.td(0).colspan("100%").style("border-bottom: 1px solid white;background-color:white;color:black;font-size:12px;").align("left").close().append(resword.getString("source_data_verification")).tdEnd().trEnd(0);
 
 
-            return html.toString();
-            }
-            else return "";
+	        return html.toString();
+        	}
+        	else return "";
         }
     }
 
