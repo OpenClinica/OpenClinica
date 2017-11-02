@@ -82,10 +82,15 @@
         </c:if>   
     </span><br>
     <div style="text-align:center; width:100%;">
-        <button onclick="hm('box');">OK</button>
+        <button id="btn" onclick="hm('box');">OK</button>
     </div>
 </div>
 
+<script type="text/javascript">
+    window.onload = function() {
+        document.getElementById("btn").focus();
+    };
+</script>
 
 <h1><span class="title_manage">
 <fmt:message key="sdv_sdv_for" bundle="${resword}"/> <c:out value="${study.name}"/>

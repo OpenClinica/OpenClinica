@@ -611,6 +611,7 @@ public class StudyController {
         study.setDatePlannedEnd(parameters.endDate);
         study.setExpectedTotalEnrollment(parameters.expectedTotalEnrollment);
         study.setProtocolType(parameters.studyType.toLowerCase());
+        study.setProtocolDescription(parameters.description);
         if(study.getStatus() != null){
             study.setOldStatusId(study.getStatus().getCode());
         }

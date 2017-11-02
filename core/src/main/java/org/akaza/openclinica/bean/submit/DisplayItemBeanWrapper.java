@@ -1,6 +1,5 @@
 package org.akaza.openclinica.bean.submit;
 
-
 import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
@@ -29,12 +28,14 @@ public class DisplayItemBeanWrapper {
     String crfVersionName;
     String studySubjectOid;
     String studyEventRepeatKey;
+    EventCRFBean eventCrfBean;
 
     // need to add here
     // study_subject_id, date_of_event, name_of_event, crf_name and version
 
-    public DisplayItemBeanWrapper(List<DisplayItemBean> displayItemBeans, boolean isSavable, boolean isOverwrite, HashMap validationErrors,
-            String studyEventId, String crfVersionId, String studyEventName, String studySubjectName, Date dateOfEvent, String crfName, String crfVersionName, String studySubjectOid, String studyEventRepeatKey) {
+    public DisplayItemBeanWrapper(List<DisplayItemBean> displayItemBeans, boolean isSavable, boolean isOverwrite, HashMap validationErrors, String studyEventId,
+            String crfVersionId, String studyEventName, String studySubjectName, Date dateOfEvent, String crfName, String crfVersionName,
+            String studySubjectOid, String studyEventRepeatKey, EventCRFBean eventCrfBean) {
         this.isSavable = isSavable;
         this.isOverwrite = isOverwrite;
         this.displayItemBeans = displayItemBeans;
@@ -48,7 +49,7 @@ public class DisplayItemBeanWrapper {
         this.crfVersionName = crfVersionName;
         this.studySubjectOid = studySubjectOid;
         this.studyEventRepeatKey = studyEventRepeatKey;
-
+        this.eventCrfBean = eventCrfBean;
     }
 
     public HashMap getValidationErrors() {
@@ -72,14 +73,14 @@ public class DisplayItemBeanWrapper {
     }
 
     public String getStudySubjectOid() {
-		return studySubjectOid;
-	}
+        return studySubjectOid;
+    }
 
-	public void setStudySubjectOid(String studySubjectOid) {
-		this.studySubjectOid = studySubjectOid;
-	}
+    public void setStudySubjectOid(String studySubjectOid) {
+        this.studySubjectOid = studySubjectOid;
+    }
 
-	public String getCrfVersionId() {
+    public String getCrfVersionId() {
         return crfVersionId;
     }
 
@@ -151,12 +152,20 @@ public class DisplayItemBeanWrapper {
         this.isOverwrite = isOverwrite;
     }
 
-	public String getStudyEventRepeatKey() {
-		return studyEventRepeatKey;
-	}
+    public String getStudyEventRepeatKey() {
+        return studyEventRepeatKey;
+    }
 
-	public void setStudyEventRepeatKey(String studyEventRepeatKey) {
-		this.studyEventRepeatKey = studyEventRepeatKey;
-	}
+    public void setStudyEventRepeatKey(String studyEventRepeatKey) {
+        this.studyEventRepeatKey = studyEventRepeatKey;
+    }
+
+    public EventCRFBean getEventCrfBean() {
+        return eventCrfBean;
+    }
+
+    public void setEventCrfBean(EventCRFBean eventCrfBean) {
+        this.eventCrfBean = eventCrfBean;
+    }
 
 }

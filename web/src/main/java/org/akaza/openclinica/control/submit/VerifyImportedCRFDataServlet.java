@@ -17,11 +17,8 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -167,8 +164,10 @@ public class VerifyImportedCRFDataServlet extends SecureController {
 
             for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
                 boolean resetSDV = false;
-                int eventCrfBeanId = -1;
-                EventCRFBean eventCrfBean = new EventCRFBean();
+                EventCRFBean eventCrfBean = wrapper.getEventCrfBean();
+                if (eventCrfBean.getId() == 0) {
+                    eventCrfDao.create(eventCrfBean);
+                }
 
                 // TODO : tom , the wrapper object has all the necessary data -
                 // as you see we check the
@@ -191,8 +190,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                     // System.out.println("wrapper problems found : " +
                     // wrapper.getValidationErrors().toString());
                     for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
-                        eventCrfBeanId = displayItemBean.getData().getEventCRFId();
-                        eventCrfBean = (EventCRFBean) eventCrfDao.findByPK(eventCrfBeanId);
+                        displayItemBean.getData().setEventCRFId(eventCrfBean.getId());
+
                         logger.info("found value here: " + displayItemBean.getData().getValue());
                         logger.info("found status here: " + eventCrfBean.getStatus().getName());
                         // System.out.println("found event crf bean name here: "
@@ -204,8 +203,8 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         // we get around this by checking the bean first, to
                         // make sure it's not null
                         ItemDataBean itemDataBean = new ItemDataBean();
-                        itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(), displayItemBean
-                                .getData().getOrdinal());
+                        itemDataBean = itemDataDao.findByItemIdAndEventCRFIdAndOrdinal(displayItemBean.getItem().getId(), eventCrfBean.getId(),
+                                displayItemBean.getData().getOrdinal());
                         if (wrapper.isOverwrite() && itemDataBean.getStatus() != null) {
                             // ItemDataBean itemDataBean = new ItemDataBean();
                             // itemDataBean =
