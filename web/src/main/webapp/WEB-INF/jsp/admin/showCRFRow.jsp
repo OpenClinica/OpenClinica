@@ -95,7 +95,7 @@
       <table border="0" cellpadding="0" cellspacing="0">
         <tr>
           <td>
-            <a href="EnketoFormServlet?formLayoutId=<c:out value="${version.id}"/>&studyEventId=<c:out value="0"/>&eventCrfId=<c:out value="0"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"><span
+            <a href="EnketoFormServlet?formLayoutId=<c:out value="${version.id}"/>&studyEventId=<c:out value="0"/>&eventCrfId=<c:out value="0"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=preview" target="_blank"><span
               name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
           </td>
           <c:if test="${version.status.available && userBean.sysAdmin && module=='admin'}">

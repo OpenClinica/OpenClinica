@@ -54,6 +54,7 @@ public class ViewNotesFilterCriteria {
         FILTER_BY_TABLE_COLUMN.put("entityValue", "value");
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.entityType", "entity_type");
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.description", "description");
+        FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.detailedNotes", "detailed_notes");
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.user", "user");
     }
 
@@ -82,6 +83,9 @@ public class ViewNotesFilterCriteria {
                 value = discrepancyNoteTypeDecoder.get(value);
             } else if (filterName.equals("resolution_status_id")) {
                 value = resolutionTypeDecoder.get(value);
+            } else if (filterName.equals("entity_name")) {
+                // translate value need to replace space with _
+                value = value.replace(" ", "_");
             }
 
             criteria.getFilters().put(filterName, processValue(filterName, value, df));
@@ -107,6 +111,9 @@ public class ViewNotesFilterCriteria {
                     value = discrepancyNoteTypeDecoder.get(value);
                 } else if (filterName.equals("resolution_status_id")) {
                     value = resolutionTypeDecoder.get(value);
+                } else if (filterName.equals("entity_name")) {
+                    // translate value need to replace space with _
+                    value = value.replace(" ", "_");
                 }
                 criteria.getFilters().put(filterName, processValue(filterName, value, df));
             }

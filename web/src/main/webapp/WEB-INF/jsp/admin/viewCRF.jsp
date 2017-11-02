@@ -79,9 +79,6 @@
                 <tr valign="top"><td class="table_header_column_top"><fmt:message key="name" bundle="${resword}"/>:</td><td class="table_cell">
                     <c:out value="${crf.name}"/>
                 </td></tr>
-                <tr valign="top"><td class="table_header_column"><fmt:message key="description" bundle="${resword}"/>:</td><td class="table_cell">
-                    <c:out value="${crf.description}"/>
-                </td></tr>
                 <tr valign="top"><td class="table_header_column"><fmt:message key="OID" bundle="${resword}"/>:</td><td class="table_cell">
                     <c:out value="${crf.oid}"/>
                 </td></tr>
@@ -100,26 +97,20 @@
                 <tr valign="top">
                     <td class="table_header_row_left"><fmt:message key="version_name" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="oid" bundle="${resword}"/></td>
-                    <td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
-                    <td class="table_header_row"><fmt:message key="revision_notes" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="action" bundle="${resword}"/></td>
                 </tr>
                 <c:forEach var ="version" items="${crf.versions}">
                 <tr valign="top">
                     <td class="table_cell_left"><c:out value="${version.name}"/></td>
                     <td class="table_cell"><c:out value="${version.oid}"/></td>
-                    <td class="table_cell"><c:out value="${version.description}"/></td>
                     <td class="table_cell"><c:out value="${version.status.name}"/></td>
-                    <td class="table_cell"><c:out value="${version.revisionNotes}"/></td>
                     <td class="table_cell">
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr>
                                 <td>
                                    
-                                    <a href="EnketoFormServlet?formLayoutId=<c:out value="${version.id}"/>&studyEventId=<c:out value="0"/>&eventCrfId=<c:out value="0"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"       
-                                       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                                       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
+                                    <a href="EnketoFormServlet?formLayoutId=<c:out value="${version.id}"/>&studyEventId=<c:out value="0"/>&eventCrfId=<c:out value="0"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=preview" target="_blank"><span
                                             name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
                                 </td>
                                 <td>
@@ -146,7 +137,6 @@
                 <tr valign="top">
                     <td class="table_header_row_left"><fmt:message key="name" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="item_oid" bundle="${resword}"/></td>
-                    <td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>
                     <td class="table_header_row"><fmt:message key="data_type" bundle="${resword}"/></td>
                     <%--<td class="table_header_row"><fmt:message key="versions" bundle="${resword}"/></td>--%>
                     <td class="table_header_row"><fmt:message key="integrity_check" bundle="${resword}"/></td>
@@ -156,7 +146,6 @@
                     <td class="table_cell_left">
                      <c:if test="${item.id > 0}"><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"></c:if><c:out value="${item.itemName}"/> <c:if test="${item.id > 0}"></a></c:if></td>
                     <td class="table_cell"><c:out value="${item.itemOID}"/></td>
-                    <td class="table_cell"><c:out value="${item.itemDescription}"/></td>
                     <td class="table_cell"><c:out value="${item.itemDataType}"/></td>
                     <%--<td class="table_cell"><c:out value="${item.versions}"/></td>--%>
                     <td class="table_cell">

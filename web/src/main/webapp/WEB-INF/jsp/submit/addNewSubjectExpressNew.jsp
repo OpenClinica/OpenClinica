@@ -61,7 +61,7 @@
     <c:if test='${presetValue.key == "group"}'>
         <c:set var="groupId" value="${presetValue.value}" />
     </c:if>
-    
+
     <c:if test='${presetValue.key == "studyEventDefinition"}'>
         <c:set var="studyEventDefinition" value="${presetValue.value}" />
     </c:if>
@@ -69,8 +69,6 @@
         <c:set var="location" value="${presetValue.value}" />
     </c:if>
 </c:forEach>
-
-<link type="text/css" rel="stylesheet" href="<c:url value="../../includes/styles.css"/>"/>
 
 <form name="subjectForm" action="AddNewSubject" method="post">
 <input type="hidden" name="subjectOverlay" value="true">
@@ -109,11 +107,11 @@
                             <tr>
                                 <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include></td>
                             </tr>
-                            
+
                         </table>
                     </td>
                 </tr>
-                
+
                 <c:choose>
                 <c:when test="${study.studyParameterConfig.subjectPersonIdRequired =='required'}">
                 <tr valign="top">
@@ -164,16 +162,16 @@
                     </td>
                     <td valign="top">
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
-                            <tr>        
+                            <tr>
                                 <td valign="top"><div class="formfieldXL_BG">
                                     <input onfocus="this.select()" type="text" name="secondaryLabel" value="<c:out value="${secondaryLabel}"/>" width="30" class="formfieldXL form-control">
                                 </div></td>
                             </tr>
-                            <tr>        
-                                <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>        
-                            </tr>       
-                        </table>        
-                    </td>       
+                            <tr>
+                                <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>
+                            </tr>
+                        </table>
+                    </td>
                 </tr>
 
                 <tr valign="top" >
@@ -192,7 +190,7 @@
                                             <script type="text/javascript">
                                             Calendar.setup({inputField  : "enrollmentDateField_${rand}", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger_${rand}", customPX: 300, customPY: 10, randomize: "${rand}" });
                                             </script>
-                                        </a>    
+                                        </a>
                                 </td>
                             </tr>
                             <tr>
@@ -264,7 +262,7 @@
                                         <script type="text/javascript">
                                         Calendar.setup({inputField  : "dobField_${rand}", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger_${rand}", customPX: 300, customPY: 10, randomize: "${rand}" });
                                         </script>
-                                    </a>    
+                                    </a>
                                 </td>
                             </tr>
                             <tr>
@@ -375,7 +373,7 @@
                         </table>
                     </td>
                 </tr>
-                
+
                 <c:choose>
                 <c:when test="${study.studyParameterConfig.eventLocationRequired == 'required'}">
                 <tr valign="top">
@@ -417,7 +415,7 @@
                     <input type="hidden" name="location" value=""/>
                 </c:otherwise>
                 </c:choose>
-                
+
             </table>
             </div>
         </td>
