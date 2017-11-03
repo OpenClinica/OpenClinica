@@ -7,8 +7,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.util.*;
-
 import com.auth0.client.auth.AuthAPI;
 import com.auth0.exception.Auth0Exception;
 import com.auth0.json.auth.TokenHolder;
@@ -18,20 +16,9 @@ import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
@@ -42,30 +29,26 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.rule.RuleSetDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
+import org.akaza.openclinica.service.Auth0UserService;
+import org.akaza.openclinica.service.Auth0UserServiceImpl;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.springframework.web.context.ContextLoader;
 import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
-import javax.sql.DataSource;
+import java.util.*;
 
 /**
  * @author jxu
@@ -97,7 +80,7 @@ public class UpdateStudyEventServlet extends SecureController {
     public final static String START_DATE_NOTE = "startDateNote";
     public final static String HAS_END_DATE_NOTE = "hasEndDateNote";
     public final static String END_DATE_NOTE = "endDateNote";
-
+    private WebApplicationContext ctx = null;
     @Override
     public void mayProceed() throws InsufficientPermissionException {
 
@@ -112,6 +95,8 @@ public class UpdateStudyEventServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
+        ctx = WebApplicationContextUtils.getWebApplicationContext(context);
+
         FormDiscrepancyNotes discNotes = null;
         FormProcessor fp = new FormProcessor(request);
         int studyEventId = fp.getInt(EVENT_ID, true);
@@ -506,7 +491,9 @@ public class UpdateStudyEventServlet extends SecureController {
             // org.akaza.openclinica.core.SecurityManager.getInstance().encrytPassword(password);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             StudyEventBean seb = (StudyEventBean) session.getAttribute("eventSigned");
-            if (authenticateAuth0User(username, password) && ub.getName().equals(username)) {
+            Auth0UserService auth0UserService = ctx.getBean("auth0UserService", Auth0UserServiceImpl.class);
+            boolean isAuthenticated = auth0UserService.authenticateAuth0User(username, password);
+            if (isAuthenticated && ub.getName().equals(username)) {
                 seb.setUpdater(ub);
                 seb.setUpdatedDate(new Date());
                 sedao.update(seb);
@@ -659,42 +646,6 @@ public class UpdateStudyEventServlet extends SecureController {
 
     }
 
-    private boolean authenticateAuth0User(String username, String password) {
-        boolean authenticated = false;
-        HttpResponse<String> response = null;
-        try {
-            String SBSUrl = CoreResources.getField("SBSUrl");
-            int index = SBSUrl.indexOf("//");
-            String protocol = SBSUrl.substring(0, index) + "//";
-            String subDomain = SBSUrl.substring(SBSUrl.indexOf("//")  + 2,  SBSUrl.indexOf("."));
-            String SBSDomainURl = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + "/customer-service/api/allowed-connections?subdomain=" + subDomain;
-            response = Unirest.get(SBSDomainURl)
-                    .header("content-type", "application/json")
-                    .asString();
-        } catch (UnirestException e) {
-            e.printStackTrace();
-        }
-
-        if (response == null || response.getBody() == null)
-            return authenticated;
-        String connection = (String) new JsonNode(response.getBody()).getArray().get(0);
-        ResourceBundle rb = ResourceBundle.getBundle("auth0");
-
-        AuthAPI authAPI = new AuthAPI(rb.getString("auth0.domain"), rb.getString("auth0.clientId"),
-                rb.getString("auth0.clientSecret"));
-        authAPI.setLoggingEnabled(true);
-        AuthRequest authRequest = authAPI.login(username, password, connection);
-        if (authRequest == null)
-            return authenticated;
-
-        try {
-            TokenHolder tokenHolder = authRequest.execute();
-        } catch (Auth0Exception e) {
-            logger.error("Error authenticating auth0 user:" + e.getMessage());
-            return authenticated;
-        }
-        return true;
-    }
 
     private void updateClosedQueriesForUpdatedStudySubjectFields(StudyEventBean updatedStudyEvent) {
         StudyEventDAO seDAO = new StudyEventDAO(sm.getDataSource());
