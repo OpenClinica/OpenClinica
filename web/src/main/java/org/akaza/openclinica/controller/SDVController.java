@@ -149,7 +149,7 @@ public class SDVController {
     }
 
     @RequestMapping("/viewAllSubjectSDVtmp")
-    public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId, HttpServletResponse response) {
+    public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId, @RequestParam(value = "sdv_restore", required = false) String restore, HttpServletResponse response) {
 
         if(!mayProceed(request)){
             try{
@@ -195,7 +195,7 @@ public class SDVController {
         request.setAttribute("showMoreLink", showMoreLink+"");
         session.setAttribute("sdv_showMoreLink", showMoreLink+"");
         request.setAttribute("studyId", studyId);
-        String restore = (String)request.getAttribute("sdv_restore");
+        //String restore = (String)request.getAttribute("sdv_restore");
         restore = restore != null && restore.length()>0 ? restore : "false";
         request.setAttribute("sdv_restore", restore);
         //request.setAttribute("imagePathPrefix","../");
