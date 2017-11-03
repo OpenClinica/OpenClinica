@@ -79,33 +79,33 @@ public class SDVUtil {
     private final static String VIEW_ICON_FORSUBJECT_PREFIX =
         "<a onmouseup=\"javascript:setImage('bt_View1','images/bt_View.gif');\" onmousedown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\" href=\"ViewStudySubject?id=";
     private final static String VIEW_ICON_FORSUBJECT_SUFFIX =
-        "\"><img hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" src=\"../images/bt_View.gif\" name=\"bt_View1\"/></a>";
-    private final static String ICON_FORCRFSTATUS_PREFIX = "<img hspace='2' border='0'  title='Event CRF Status' alt='Event CRF Status' src='../images/icon_";
+        "\"><span hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" class=\"icon icon-serach\" name=\"bt_View1\"/></a>";
+    private final static String ICON_FORCRFSTATUS_PREFIX = "<span hspace='2' border='0'  title='Event CRF Status' alt='Event CRF Status' class='icon icon-search'>";
 
     private final static String ICON_FORCRFSTATUS_SUFFIX = ".gif'/>";
     public final static String CHECKBOX_NAME = "sdvCheck_";
-    public final static String VIEW_ICON_HTML = "<img src=\"../images/bt_View.gif\" border=\"0\" />";
+    public final static String VIEW_ICON_HTML = "<span class=\"icon icon-search\" border=\"0>";
     private ResourceBundle resformat;
     private String pathPrefix;
 
     String getIconForSdvStatusPrefix() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
-        return "<img hspace='2' border='0'  title='SDV Complete' alt='SDV Complete' src='" + prefix + "images/icon_";
+        return "<span hspace='2' border='0'  title='SDV Complete' alt='SDV Complete' class='icon icon-ok'>";
     }
 
     String getIconForCrfStatusPrefix() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
-        return "<img hspace='2' border='0'  title='Event CRF Status' alt='Event CRF Status' src='" + prefix + "images/icon_";
+        return "<span hspace='2' border='0'  title='Event CRF Status' alt='Event CRF Status' class='icon icon-ok'>";
     }
 
     String getIconForSubjectSufix() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
-        return "\"><img hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" src=\"" + prefix + "images/bt_View.gif\" name=\"bt_View1\"/></a>";
+        return "\"><span hspace=\"6\" border=\"0\" align=\"left\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_View1\"/></a>";
     }
 
     String getIconForViewHtml() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
-        return "<img src=\"" + prefix + "images/bt_View.gif\" border=\"0\" />";
+        return "<span src=\"icon icon-search\" border=\"0\" />";
     }
 
     public final static Map<Integer, String> SUBJECT_EVENT_STATUS_ICONS = new HashMap<Integer, String>();
@@ -121,14 +121,14 @@ public class SDVUtil {
         SUBJECT_EVENT_STATUS_ICONS.put(7, "Locked");
         SUBJECT_EVENT_STATUS_ICONS.put(8, "Signed");
 
-        CRF_STATUS_ICONS.put(0, "Invalid");
-        CRF_STATUS_ICONS.put(1, "NotStarted");
-        CRF_STATUS_ICONS.put(2, "InitialDE");
-        CRF_STATUS_ICONS.put(3, "InitialDEComplete");
-        CRF_STATUS_ICONS.put(4, "DDE");
-        CRF_STATUS_ICONS.put(5, "DEcomplete");
-        CRF_STATUS_ICONS.put(6, "InitialDE");
-        CRF_STATUS_ICONS.put(7, "Locked");
+        CRF_STATUS_ICONS.put(0, "icon icon-file-excel red");
+        CRF_STATUS_ICONS.put(1, "icon icon-doc");
+        CRF_STATUS_ICONS.put(2, "icon icon-pencil-squared orange");
+        CRF_STATUS_ICONS.put(3, "icon icon-icon-dataEntryCompleted orange");
+        CRF_STATUS_ICONS.put(4, "icon icon-icon-doubleDataEntry orange");
+        CRF_STATUS_ICONS.put(5, "icon icon-search");
+        CRF_STATUS_ICONS.put(6, "icon icon-pencil-squared orange");
+        CRF_STATUS_ICONS.put(7, "icon icon-lock");
     }
 
     private DataSource dataSource;
@@ -925,7 +925,7 @@ public class SDVUtil {
                 sdvStatus.append("<center><a href='javascript:void(0)' onclick='prompt(document.sdvForm,");
                 sdvStatus.append(crfBean.getId());
                 sdvStatus.append(")'>");
-                sdvStatus.append(getIconForSdvStatusPrefix()).append("DoubleCheck").append(ICON_FORCRFSTATUS_SUFFIX).append("</a></center>");
+                sdvStatus.append(getIconForSdvStatusPrefix()).append("</a></center>");
             } else {
                 sdvStatus.append("<center><input style='margin-right: 5px' type='checkbox' ").append("class='sdvCheck'").append(" name='")
                         .append(CHECKBOX_NAME).append(crfBean.getId()).append("' /></center>");
@@ -1008,20 +1008,12 @@ public class SDVUtil {
         builderHref.append("ViewSectionDataEntry?eventDefinitionCRFId=").append(eventDefinitionCRFId);
         builderHref.append("&crfVersionId=").append(crfVersionId).append("&tabId=1&studySubjectId=").append(studySubjectId).append("'\">");
 
-        StringBuilder builder = new StringBuilder(html.toString()).append(getIconForCrfStatusPrefix());
+        StringBuilder builder = new StringBuilder(html.toString());
 
         String imgName = "";
         StringBuilder input = new StringBuilder("<input type=\"hidden\" statusId=\"");
         input.append(statusId).append("\" />");
-
-        if (statusId > 0 && statusId < 8) {
-
-            builder.append(CRF_STATUS_ICONS.get(statusId));
-        } else {
-            builder.append(CRF_STATUS_ICONS.get(0));
-
-        }
-        builder.append(ICON_FORCRFSTATUS_SUFFIX);
+        builder.append("<center><span title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0'></center>");
         //"<input type=\"hidden\" statusId=\"1\" />"
         builder.append("</a>");
         builder.append(" ");
@@ -1479,10 +1471,10 @@ public class SDVUtil {
             HtmlBuilder html = new HtmlBuilder();
             html.tr(1).styleClass("logic").close().td(1).colspan("100%").style("font-size: 12px;").close();
             html.append("<b>" + resword.getString("table_sdv_select") + "</b>&#160;&#160;");
-            html.append("<a name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,true)'>" + resword.getString("table_sdv_all"));
-            html.append(",</a>");
+            html.append("<a style='text-decoration:none;' name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,true)'>" + resword.getString("table_sdv_all"));
+            html.append("</a>");
             html.append("&#160;&#160;&#160;");
-            html.append("<a name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,false)'>" + resword.getString("table_sdv_none"));
+            html.append("<a style='text-decoration:none;' name='checkSDVAll' href='javascript:selectAllChecks(document.sdvForm,false)'>" + resword.getString("table_sdv_none"));
             html.append("</a>");
             html.tdEnd().trEnd(1);
             return html.toString();
