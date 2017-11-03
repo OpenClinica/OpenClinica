@@ -31,9 +31,9 @@
   <table border="0" cellpadding="0" cellspacing="0"> 		
 	<tr valign="top">						
 	<td class="table_header_row_left"><fmt:message key="study_subject_ID" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="type" bundle="${resword}"/></td>
+	<td class="table_header_row"><fmt:message key="site_id" bundle="${resword}"/></td>
+    <td class="table_header_row"><fmt:message key="note_type" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="resolution_status" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="site_id" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="date_updated" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="days_open" bundle="${resword}"/></td>
@@ -42,8 +42,7 @@
 	<td class="table_header_row"><fmt:message key="CRF" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="CRF_status" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="entity_name" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="entity_value" bundle="${resword}"/></td>		
-	<td class="table_header_row"><fmt:message key="description" bundle="${resword}"/></td>	
+	<td class="table_header_row"><fmt:message key="entity_value" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="detailed_notes" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="n_of_notes" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="assigned_user" bundle="${resword}"/></td>
@@ -51,9 +50,9 @@
    <c:forEach var="note" items="${allNotes}">
   <tr valign="top">
     <td class="table_cell_left"><c:out value="${note.studySub.label}" /></td>
+    <td class="table_cell"><c:out value="${note.siteId}" /></td>
     <td class="table_cell"><c:out value="${note.disType.name}" /></td>
     <td class="table_cell"><c:out value="${note.resStatus.name}" /></td>
-    <td class="table_cell"><c:out value="${note.siteId}" /></td>
     <td class="table_cell"><fmt:formatDate value="${note.createdDate}" pattern="${dteFormat}"/></td>
     <td class="table_cell"><fmt:formatDate value="${note.updatedDate}" pattern="${dteFormat}"/></td>
     <td class="table_cell"><c:out value="${note.age}" /></td>
@@ -74,11 +73,10 @@
 	    <c:out value="${note.entityName}"/>&nbsp;	 
 	</td>
 	<td class="table_cell"><c:out value="${note.entityValue}" />&nbsp;</td>
-    <td class="table_cell"><c:out value="${note.description}" /></td>
     <td class="table_cell" width="400">		
 	 <c:out value="${note.detailedNotes}" />&nbsp; 
 	</td>
-	<td class="table_cell" align="right"><c:out value="${note.numChildren+1}" /></td>
+	<td class="table_cell" align="right"><c:out value="${note.numChildren}" /></td>
 	<td class="table_cell"><c:out value="${note.assignedUser.name}" /></td>	
 	
  </tr>
