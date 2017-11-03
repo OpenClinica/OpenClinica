@@ -13,6 +13,7 @@ import java.util.Map;
 import javax.servlet.ServletContext;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.core.form.xform.LogBean;
@@ -94,6 +95,8 @@ public class EnketoUrlService {
     public static final String COMMENT = "comment";
     public static final String AUDIT = "audit";
     public static final String ITEMDATA = "item_data";
+    public static final String STUDYEVENT = "study_event";
+
     public static final String DASH = "-";
 
     @Autowired
@@ -438,12 +441,32 @@ public class EnketoUrlService {
         }
 
         data.put("instanceID", "uuid:1234");
+
         Template template = new Template("template name", new StringReader(templateStr), new Configuration());
 
         StringWriter wtr = new StringWriter();
         template.process(data, wtr);
 
         String instance = wtr.toString();
+        StudyEvent studyEvent = studyEventDao.findByStudyEventId(eventCrf.getStudyEvent().getStudyEventId());
+        if (studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.SIGNED.getId())) {
+            AuditLogEvent auditLogEvent = new AuditLogEvent();
+            auditLogEvent.setAuditTable(STUDYEVENT);
+            auditLogEvent.setEntityId(studyEvent.getStudyEventId());
+            auditLogEvent.setEntityName("Status");
+
+            List<AuditLogEvent> ales = auditLogEventDao.findByParam(auditLogEvent);
+            for (AuditLogEvent audit : ales) {
+                if (audit.getAuditLogEventType().getAuditLogEventTypeId() == 31
+                        && audit.getNewValue().equals(String.valueOf(SubjectEventStatus.SIGNED.getId()))) {
+                    String signature = audit.getDetails();
+
+                    instance = instance.substring(0, instance.indexOf("</meta>")) + "<oc:signature>" + signature + "</oc:signature>"
+                            + instance.substring(instance.indexOf("</meta>"));
+                    break;
+                }
+            }
+        }
         System.out.println(instance);
         return instance;
     }
