@@ -441,7 +441,6 @@ public class EnketoUrlService {
         }
 
         data.put("instanceID", "uuid:1234");
-        data.put("instanceID_comment", "uuid:1234_comment");
 
         Template template = new Template("template name", new StringReader(templateStr), new Configuration());
 
