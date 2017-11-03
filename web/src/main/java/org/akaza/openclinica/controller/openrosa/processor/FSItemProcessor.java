@@ -13,6 +13,7 @@ import java.util.Set;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
@@ -25,6 +26,7 @@ import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventCrf;
@@ -35,6 +37,7 @@ import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -59,6 +62,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private ItemDataDao itemDataDao;
     @Autowired
     private EventCrfDao eventCrfDao;
+    @Autowired
+    private StudyEventDao studyEventDao;
     @Autowired
     private ItemDao itemDao;
     @Autowired
@@ -177,6 +182,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setInstanceId(container.getInstanceId());
                     existingItemData = itemDataDao.saveOrUpdate(existingItemData);
+                    updateEventSubjectStatusIfSigned(container);
                     resetSdvStatus(container);
 
                     // Close discrepancy notes
@@ -185,6 +191,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     ItemData newItemData = createItemData(ig.getItem(), "", itemOrdinal, container);
                     newItemData.setDeleted(true);
                     newItemData = itemDataDao.saveOrUpdate(newItemData);
+                    updateEventSubjectStatusIfSigned(container);
                 }
             }
             return;
@@ -241,6 +248,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 if (existingItemData == null) {
                     newItemData.setStatus(Status.UNAVAILABLE);
                     itemDataDao.saveOrUpdate(newItemData);
+                    updateEventSubjectStatusIfSigned(container);
                     resetSdvStatus(container);
 
                 } else if (existingItemData.getValue().equals(newItemData.getValue())) {
@@ -252,6 +260,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                     existingItemData.setUpdateId(container.getUser().getUserId());
                     existingItemData.setDateUpdated(new Date());
                     itemDataDao.saveOrUpdate(existingItemData);
+                    updateEventSubjectStatusIfSigned(container);
                     resetSdvStatus(container);
                 }
             } else {
@@ -275,6 +284,16 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
         eventCrf.setSdvStatus(false);
         eventCrf.setSdvUpdateId(container.getUser().getUserId());
         eventCrfDao.saveOrUpdate(eventCrf);
+    }
+
+    private void updateEventSubjectStatusIfSigned(SubmissionContainer container) {
+        StudyEvent studyEvent = container.getEventCrf().getStudyEvent();
+        if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SIGNED.getId()) {
+            studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getId());
+            studyEvent.setUpdateId(container.getUser().getUserId());
+            studyEvent.setDateUpdated(new Date());
+            studyEventDao.saveOrUpdate(studyEvent);
+        }
     }
 
 }
