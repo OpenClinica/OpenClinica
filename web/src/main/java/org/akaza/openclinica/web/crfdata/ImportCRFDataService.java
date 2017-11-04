@@ -963,6 +963,8 @@ public class ImportCRFDataService {
                                 // Event in the Study.");
                                 logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
                             }
+                            if (studyEventDataBean.getStudyEventRepeatKey() == null)
+                                studyEventDataBean.setStudyEventRepeatKey("1");
                             StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
                                     studyEventDefintionBean.getId(), Integer.valueOf(studyEventDataBean.getStudyEventRepeatKey()));
                             if (studyEvent == null || studyEvent.getId() == 0) {
