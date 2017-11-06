@@ -32,26 +32,25 @@
 	<tr valign="top">						
 	<td class="table_header_row_left"><fmt:message key="study_subject_ID" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="site_id" bundle="${resword}"/></td>
-    <td class="table_header_row"><fmt:message key="note_type" bundle="${resword}"/></td>
     <td class="table_header_row"><fmt:message key="resolution_status" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="date_created" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="date_updated" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="days_open" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="days_since_updated" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="event" bundle="${resword}"/></td>
+	<td class="table_header_row"><fmt:message key="event_name" bundle="${resword}"/></td>
+	<td class="table_header_row"><fmt:message key="event_date" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="CRF" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="CRF_status" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="entity_name" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="entity_value" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="detailed_notes" bundle="${resword}"/></td>
-	<td class="table_header_row"><fmt:message key="n_of_notes" bundle="${resword}"/></td>
+	<td class="table_header_row"><fmt:message key="of_notes" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="assigned_user" bundle="${resword}"/></td>
   </tr>
    <c:forEach var="note" items="${allNotes}">
   <tr valign="top">
     <td class="table_cell_left"><c:out value="${note.studySub.label}" /></td>
     <td class="table_cell"><c:out value="${note.siteId}" /></td>
-    <td class="table_cell"><c:out value="${note.disType.name}" /></td>
     <td class="table_cell"><c:out value="${note.resStatus.name}" /></td>
     <td class="table_cell"><fmt:formatDate value="${note.createdDate}" pattern="${dteFormat}"/></td>
     <td class="table_cell"><fmt:formatDate value="${note.updatedDate}" pattern="${dteFormat}"/></td>
@@ -67,6 +66,7 @@
         </c:choose>
     </td>
     <td class="table_cell"><c:out value="${note.eventName}" />&nbsp;</td>
+    <td class="table_cell"><c:out value="${note.eventStart}" />&nbsp;</td>
     <td class="table_cell"><c:out value="${note.crfName}" />&nbsp;</td>
     <td class="table_cell"><c:out value="${note.crfStatus}" />&nbsp;</td>
     <td class="table_cell">
