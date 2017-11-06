@@ -19,6 +19,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.core.form.xform.LogBean;
 import org.akaza.openclinica.core.form.xform.QueriesBean;
 import org.akaza.openclinica.core.form.xform.QueryBean;
+import org.akaza.openclinica.core.form.xform.QueryType;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
@@ -92,7 +93,8 @@ public class EnketoUrlService {
     public static final String QUERY_FLAVOR = "-query";
     public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     public static final String NO_FLAVOR = "";
-    public static final String COMMENT = "comment";
+    public static final String QUERY = "comment";
+    public static final String REASON = "reason";
     public static final String AUDIT = "audit";
     public static final String ITEMDATA = "item_data";
     public static final String STUDYEVENT = "study_event";
@@ -288,12 +290,18 @@ public class EnketoUrlService {
             query.setId(String.valueOf(i));
             query.setAssigned_to(dn.getUserAccountByOwnerId().getUserName());
             query.setComment(escapedValue(dn.getDetailedNotes()));
-            query.setStatus(dn.getResolutionStatus().getName().toLowerCase());
+            if (dn.getResolutionStatus().getResolutionStatusId() != 5) {
+                query.setStatus(dn.getResolutionStatus().getName().toLowerCase());
+            }
             DateTime dateTime = new DateTime(dn.getDateCreated());
             query.setDate_time(convertDateFormat(dateTime));
             query.setNotify(false);
             query.setUser(dn.getUserAccountByOwnerId().getUserName());
-            query.setType(COMMENT);
+            if (dn.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() == QueryType.QUERY.getValue()) {
+                query.setType(QUERY);
+            } else if (dn.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() == QueryType.REASON.getValue()) {
+                query.setType(REASON);
+            }
             queryBeans.add(query);
         }
 

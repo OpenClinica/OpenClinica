@@ -20,6 +20,7 @@ import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBea
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.xform.QueriesBean;
 import org.akaza.openclinica.core.form.xform.QueryBean;
+import org.akaza.openclinica.core.form.xform.QueryType;
 import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
 import org.akaza.openclinica.dao.hibernate.DnItemDataMapDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
@@ -149,7 +150,11 @@ public class QueryServiceImpl implements QueryService {
         dn.setDescription("description");
 
         dn.setDetailedNotes(queryBean.getComment());
-        dn.setDiscrepancyNoteType(new DiscrepancyNoteType(3));
+        if (queryBean.getType().equals(QueryType.QUERY.getName()))
+            dn.setDiscrepancyNoteType(new DiscrepancyNoteType(3));
+        else if (queryBean.getType().equals(QueryType.REASON.getName()))
+            dn.setDiscrepancyNoteType(new DiscrepancyNoteType(4));
+
         String user = queryBean.getUser();
         if (user == null) {
             dn.setUserAccountByOwnerId(helperBean.getContainer().getUser());
@@ -179,6 +184,8 @@ public class QueryServiceImpl implements QueryService {
     }
 
     private void handleEmailNotification(QueryServiceHelperBean helperBean, QueryBean queryBean) throws Exception {
+        if (queryBean.getNotify() == null)
+            return;
         if (queryBean.getNotify() != true) {
             return;
         }
@@ -277,12 +284,13 @@ public class QueryServiceImpl implements QueryService {
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("disc_note_info"));
         message.append(respage.getString("email_body_separator"));
-        message.append(MessageFormat.format(respage.getString("mailDNParameters1"), helperBean.getDn().getDetailedNotes(), helperBean.getUserAccount().getUserName()));
+        message.append(
+                MessageFormat.format(respage.getString("mailDNParameters1"), helperBean.getDn().getDetailedNotes(), helperBean.getUserAccount().getUserName()));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("entity_information"));
         message.append(respage.getString("email_body_separator"));
-        message.append(
-                MessageFormat.format(respage.getString("mailDNParameters2"), helperBean.getDn().getStudy().getName(), helperBean.getContainer().getSubject().getLabel()));
+        message.append(MessageFormat.format(respage.getString("mailDNParameters2"), helperBean.getDn().getStudy().getName(),
+                helperBean.getContainer().getSubject().getLabel()));
 
         if (!("studySub".equalsIgnoreCase(helperBean.getDn().getEntityType()) || "subject".equalsIgnoreCase(helperBean.getDn().getEntityType()))) {
             message.append(MessageFormat.format(respage.getString("mailDNParameters3"),
@@ -356,7 +364,9 @@ public class QueryServiceImpl implements QueryService {
     }
 
     private void setResolutionStatus(QueryBean queryBean, DiscrepancyNote dn) {
-        if (queryBean.getStatus().equals("new")) {
+        if (queryBean.getStatus() == null) {
+            dn.setResolutionStatus(resolutionStatusDao.findById(5));
+        } else if (queryBean.getStatus().equals("new")) {
             dn.setResolutionStatus(resolutionStatusDao.findById(1));
         } else if (queryBean.getStatus().equals("updated")) {
             dn.setResolutionStatus(resolutionStatusDao.findById(2));
@@ -364,6 +374,7 @@ public class QueryServiceImpl implements QueryService {
             dn.setResolutionStatus(resolutionStatusDao.findById(4));
         } else if (queryBean.getStatus().equals("closed-modified")) {
             dn.setResolutionStatus(resolutionStatusDao.findById(6));
+        } else {
         }
     }
 }
