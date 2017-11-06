@@ -42,6 +42,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import org.akaza.openclinica.domain.datamap.AuditLogEventType;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
@@ -462,17 +463,15 @@ public class EnketoUrlService {
             auditLogEvent.setAuditTable(STUDYEVENT);
             auditLogEvent.setEntityId(studyEvent.getStudyEventId());
             auditLogEvent.setEntityName("Status");
+            auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
+            auditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
 
             List<AuditLogEvent> ales = auditLogEventDao.findByParam(auditLogEvent);
             for (AuditLogEvent audit : ales) {
-                if (audit.getAuditLogEventType().getAuditLogEventTypeId() == 31
-                        && audit.getNewValue().equals(String.valueOf(SubjectEventStatus.SIGNED.getId()))) {
-                    String signature = audit.getDetails();
-
-                    instance = instance.substring(0, instance.indexOf("</meta>")) + "<oc:signature>" + signature + "</oc:signature>"
-                            + instance.substring(instance.indexOf("</meta>"));
-                    break;
-                }
+                String signature = audit.getDetails();
+                instance = instance.substring(0, instance.indexOf("</meta>")) + "<oc:signature>" + signature + "</oc:signature>"
+                        + instance.substring(instance.indexOf("</meta>"));
+                break;
             }
         }
         System.out.println(instance);
