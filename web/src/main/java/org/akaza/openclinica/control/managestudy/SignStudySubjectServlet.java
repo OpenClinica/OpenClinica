@@ -69,7 +69,6 @@ public class SignStudySubjectServlet extends SecureController {
     public void mayProceed() throws InsufficientPermissionException {
 
         checkStudyLocked(Page.LIST_STUDY_SUBJECTS, respage.getString("current_study_locked"));
-        mayAccess();
 
         if (ub.isSysAdmin()) {
             return;
