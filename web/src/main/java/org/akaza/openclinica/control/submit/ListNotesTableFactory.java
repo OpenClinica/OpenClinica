@@ -108,7 +108,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         tableFacade.setColumnProperties("studySubject.label",
                 "siteId",
-                "discrepancyNoteBean.disType",
                 "discrepancyNoteBean.resolutionStatus",
                 "discrepancyNoteBean.createdDate",
                 "discrepancyNoteBean.updatedDate",
@@ -129,7 +128,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
         configureColumn(row.getColumn("siteId"), resword.getString("site_id"), null, null, true, false);
-        configureColumn(row.getColumn("discrepancyNoteBean.disType"), resword.getString("note_type"), null, null, true, true);
         configureColumn(row.getColumn("discrepancyNoteBean.createdDate"), resword.getString("date_created"), new DateCellEditor(getDateFormat()), null, true,
                 true);
         configureColumn(row.getColumn("discrepancyNoteBean.updatedDate"), resword.getString("date_updated"), new DateCellEditor(getDateFormat()), null, true,
@@ -231,7 +229,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             h.put("age", discrepancyNoteBean.getAge());
             h.put("days", discrepancyNoteBean.getDays());
             h.put("siteId", discrepancyNoteBean.getSiteId());
-            h.put("discrepancyNoteBean.disType", discrepancyNoteBean.getDisType().getName());
             h.put("discrepancyNoteBean", discrepancyNoteBean);
             h.put("discrepancyNoteBean.createdDate", discrepancyNoteBean.getCreatedDate());
             h.put("discrepancyNoteBean.updatedDate", discrepancyNoteBean.getUpdatedDate());
