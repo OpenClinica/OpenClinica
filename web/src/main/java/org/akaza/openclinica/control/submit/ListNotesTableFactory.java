@@ -185,6 +185,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         int parentStudyId = 0;
 
         Limit limit = tableFacade.getLimit();
+        // Show only QUERY note type
+        limit.getFilterSet().addFilter(new Filter("discrepancyNoteBean.discrepancyNoteTypeId","Query"));
+
         if (!limit.isComplete()) {
             parentStudyId = currentStudy.getId();
 
