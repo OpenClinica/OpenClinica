@@ -366,7 +366,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             ResolutionStatus status = (ResolutionStatus) ((HashMap<Object, Object>) item).get("discrepancyNoteBean.resolutionStatus");
 
             if (status != null) {
-                value = "<span class=\"" + status.getIconFilePath() + "\" border=\"0\" align=\"left\"> &nbsp;&nbsp;" + status.getName();
+                value = "<span class=\"" + status.getIconFilePath() + "\" border=\"0\" align=\"left\"> <text>" + status.getName() + "</text>";
             }
             return value;
         }
