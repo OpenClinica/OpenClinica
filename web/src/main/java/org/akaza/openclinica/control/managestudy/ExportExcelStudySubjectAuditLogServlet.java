@@ -367,7 +367,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                 row++;
 
                 // Audit Events for Study Event
-                excelRow = new String[] { "audit_event", "date_time_of_server", "user", "value_type", "old", "new" };
+                excelRow = new String[] { "audit_event", "date_time_of_server", "user", "value_type", "old", "new", "details" };
                 for (int i = 0; i < excelRow.length; i++) {
                     label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
                     excelSheet.addCell(label);
@@ -426,7 +426,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                             newValue = studyEvent.getNewValue();
 
                         excelRow = new String[] { studyEvent.getAuditEventTypeName(), dateTimeFormat(studyEvent.getAuditDate()), studyEvent.getUserName(),
-                                studyEvent.getEntityName() + "(" + studyEvent.getOrdinal() + ")", oldValue, newValue };
+                                studyEvent.getEntityName() + "(" + studyEvent.getOrdinal() + ")", oldValue, newValue, studyEvent.getDetails() };
                         for (int i = 0; i < excelRow.length; i++) {
                             label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
                             excelSheet.addCell(label);

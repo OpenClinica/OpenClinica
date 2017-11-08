@@ -23,7 +23,6 @@ import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
@@ -736,6 +735,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
             AuditLogBean auditBean = new AuditLogBean();
             auditBean.setOid("AL_" + auditLogEvent.getAuditId());
             auditBean.setDatetimeStamp(auditLogEvent.getAuditDate());
+            auditBean.setDetails(auditLogEvent.getDetails());
             if (auditLogEvent.getEntityName() != null && auditLogEvent.getEntityName().equals(STATUS)) {
                 /*
                  * if(auditLogEvent.getAuditTable().equals(EVENT_CRF)){
@@ -823,8 +823,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
             isActiveRoleAtSite = false;
         }
 
-        ArrayList<StudyUserRole> surlist = getStudyUserRoleDao().findAllUserRolesByUserAccountStudySites(userAccount,
-                publicStudy.getStudyId(), parentStudyId);
+        ArrayList<StudyUserRole> surlist = getStudyUserRoleDao().findAllUserRolesByUserAccountStudySites(userAccount, publicStudy.getStudyId(), parentStudyId);
         if (surlist == null || surlist.size() == 0) {
             // Does not have permission to view study or site info / return null
             return null;

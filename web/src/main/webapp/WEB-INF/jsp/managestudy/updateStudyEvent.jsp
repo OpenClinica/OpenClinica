@@ -9,6 +9,8 @@
 <jsp:useBean scope="request" id="studyEvent" class="org.akaza.openclinica.bean.managestudy.StudyEventBean" />
 <jsp:useBean scope="request" id="studySubject" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean" />
 
+<link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
+
 <c:choose>
  <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
    <c:import url="../include/admin-header.jsp"/>

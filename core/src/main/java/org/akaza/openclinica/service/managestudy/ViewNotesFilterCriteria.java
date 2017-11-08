@@ -56,6 +56,7 @@ public class ViewNotesFilterCriteria {
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.description", "description");
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.detailedNotes", "detailed_notes");
         FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.user", "user");
+        FILTER_BY_TABLE_COLUMN.put("discrepancyNoteBean.discrepancyNoteTypeId", "discrepancy_note_type_id");
     }
 
     private final Map<String, Object> filters = new HashMap<String, Object>();

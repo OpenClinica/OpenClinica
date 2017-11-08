@@ -18,6 +18,7 @@ import org.akaza.openclinica.controller.openrosa.QueryService;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer;
 import org.akaza.openclinica.controller.openrosa.SubmissionContainer.FieldRequestTypeEnum;
 import org.akaza.openclinica.controller.openrosa.SubmissionProcessorChain.ProcessorEnum;
+import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
@@ -28,6 +29,8 @@ import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.domain.Status;
+import org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import org.akaza.openclinica.domain.datamap.AuditLogEventType;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.FormLayout;
@@ -78,8 +81,11 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private XformParserHelper xformParserHelper;
     @Autowired
     FormLayoutMediaDao formLayoutMediaDao;
+    @Autowired
+    AuditLogEventDao auditLogEventDao;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    public static final String STUDYEVENT = "study_event";
 
     public ProcessorEnum process(SubmissionContainer container) throws Exception {
 
@@ -289,7 +295,20 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private void updateEventSubjectStatusIfSigned(SubmissionContainer container) {
         StudyEvent studyEvent = container.getEventCrf().getStudyEvent();
         if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SIGNED.getId()) {
-            studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getId());
+            String oldStatusId = "3";
+            AuditLogEvent auditLogEvent = new AuditLogEvent();
+            auditLogEvent.setAuditTable(STUDYEVENT);
+            auditLogEvent.setEntityId(studyEvent.getStudyEventId());
+            auditLogEvent.setEntityName("Status");
+            auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
+            auditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
+
+            List<AuditLogEvent> ales = auditLogEventDao.findByParam(auditLogEvent);
+            for (AuditLogEvent audit : ales) {
+                oldStatusId = audit.getOldValue();
+                break;
+            }
+            studyEvent.setSubjectEventStatusId(Integer.valueOf(oldStatusId));
             studyEvent.setUpdateId(container.getUser().getUserId());
             studyEvent.setDateUpdated(new Date());
             studyEventDao.saveOrUpdate(studyEvent);
