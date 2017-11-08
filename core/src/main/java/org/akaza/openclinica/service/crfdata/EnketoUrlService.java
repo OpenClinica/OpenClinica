@@ -315,7 +315,7 @@ public class EnketoUrlService {
             LogBean logBean = new LogBean();
             String oldValue = audit.getOldValue() != null ? audit.getOldValue() : "";
             String newValue = audit.getNewValue() != null ? audit.getNewValue() : "";
-            logBean.setMessage("Value Changed from \"" + escapedValue(oldValue) + "\" to \"" + escapedValue(newValue) + "\"");
+            logBean.setMessage("Value changed from \"" + escapedValue(oldValue) + "\" to \"" + escapedValue(newValue) + "\"");
             DateTime dateTime = new DateTime(audit.getAuditDate());
             logBean.setDate_time(convertDateFormat(dateTime));
             UserAccount uAccount = userAccountDao.findById(audit.getUserAccount().getUserId());
