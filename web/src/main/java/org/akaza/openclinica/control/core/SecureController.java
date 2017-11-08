@@ -660,6 +660,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         case "ListStudy":
         case "AuditUserActivity":
         case "EditStudyUserRole":
+        case "SignStudySubject":
             return "public";
         default:
             return currentPublicStudy.getSchemaName();
@@ -855,13 +856,16 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         StudyDAO sdao = new StudyDAO(ds);
         ArrayList<StudyBean> studies = (ArrayList<StudyBean>) sdao.findAllByUserNotRemoved(userName);
         for (int i = 0; i < studies.size(); ++i) {
-            if (adao.findByPKAndStudy(entityId, studies.get(i)).getId() > 0) {
+            StudyBean publicStudy = studies.get(i);
+            CoreResources.setRequestSchema(request, publicStudy.getSchemaName());
+            StudyBean study = sdao.findByOid(publicStudy.getOid());
+            if (adao.findByPKAndStudy(entityId, study).getId() > 0) {
                 return true;
             }
             // Here follow the current logic - study subjects at sites level are
             // visible to parent studies.
-            if (studies.get(i).getParentStudyId() <= 0) {
-                ArrayList<StudyBean> sites = (ArrayList<StudyBean>) sdao.findAllByParent(studies.get(i).getId());
+            if (study.getParentStudyId() <= 0) {
+                ArrayList<StudyBean> sites = (ArrayList<StudyBean>) sdao.findAllByParent(study.getId());
                 if (sites.size() > 0) {
                     for (int j = 0; j < sites.size(); ++j) {
                         if (adao.findByPKAndStudy(entityId, sites.get(j)).getId() > 0) {

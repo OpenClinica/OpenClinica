@@ -7,16 +7,15 @@
  */
 package org.akaza.openclinica.bean.login;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 /**
  * @author thickerson
@@ -30,6 +29,8 @@ public class UserAccountBean extends AuditableEntityBean {
     /**
      * LDAP/Active Directory users are identified by having this password stored in the database
      */
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
     public static final String LDAP_PASSWORD = "*";
 
     private String passwd;
@@ -102,7 +103,7 @@ public class UserAccountBean extends AuditableEntityBean {
 
     // key is Integer whose intValue is a studyId, value is StudyUserRoleBean
     // for that study
-    private final HashMap rolesByStudy = new HashMap();
+    private final HashMap <Integer, Integer> rolesByStudy = new HashMap();
 
     private String notes; // not in the DB, only for showing some notes for
 
