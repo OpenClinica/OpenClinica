@@ -204,6 +204,7 @@
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="value_type" bundle="${resword}"/></b></td>
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="old" bundle="${resword}"/></b></td>
                     <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="new" bundle="${resword}"/></b></td>
+                    <td class="table_header_column_top" style="color: #789EC5"><b><fmt:message key="details" bundle="${resword}"/></b></td>
                 </tr>
 
                 <c:forEach var="studyEventAudit" items="${studyEventAudits}">
@@ -271,6 +272,8 @@
                                     </c:otherwise>
                                 </c:choose>
                                 &nbsp;</td>
+                             <td class="table_header_column"><c:out value="${studyEventAudit.details}"/>&nbsp;</td>
+                                
                         </tr>
                     </c:if>
                 </c:forEach>
