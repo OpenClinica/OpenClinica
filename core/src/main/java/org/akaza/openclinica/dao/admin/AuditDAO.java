@@ -95,6 +95,7 @@ public class AuditDAO extends EntityDAO {
         this.setTypeExpected(20, TypeNames.DATE); // interviewed_date
         this.setTypeExpected(21, TypeNames.STRING); // interviewer
         this.setTypeExpected(22, TypeNames.INT); // ordinal from audit_log_event table
+        this.setTypeExpected(23, TypeNames.STRING); // details
     }
 
     /**
@@ -124,6 +125,7 @@ public class AuditDAO extends EntityDAO {
         eb.setAuditEventTypeId(((Integer) hm.get("audit_log_event_type_id")).intValue());
         eb.setUserName((String) hm.get("user_name"));
         eb.setAuditEventTypeName((String) hm.get("name"));
+        eb.setDetails((String) hm.get("details"));
 
         return eb;
     }
@@ -336,6 +338,7 @@ public class AuditDAO extends EntityDAO {
      */
     public Collection findStudyEventAuditEvents(int studyEventId) {
         this.setTypesExpected();
+        this.setTypeExpected(14, TypeNames.STRING); // DETAILS
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studyEventId));

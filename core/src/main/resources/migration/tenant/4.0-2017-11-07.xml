@@ -1,0 +1,14 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+	<changeSet author="jkeremian" id="2017-11-07-2">
+		<comment>Updating audit_log_event table details column size into 4000 character</comment>
+		    <modifyDataType 
+            columnName="details"
+            newDataType="varchar(4000)"
+            tableName="audit_log_event"/>
+	</changeSet>
+
+</databaseChangeLog>
