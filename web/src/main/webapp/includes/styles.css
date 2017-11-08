@@ -867,3 +867,7 @@ div#subjectSDV table#sdv {
 body.query-page .aka_revised_content{
   max-width: 100%;
 }
+
+form#searchByStudySubjectId {
+  margin-bottom: 0;
+}
