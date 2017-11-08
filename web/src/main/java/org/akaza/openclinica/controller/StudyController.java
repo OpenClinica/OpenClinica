@@ -195,9 +195,11 @@ public class StudyController {
         ResourceBundleProvider.updateLocale(locale);
 
         UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
-        if (ub == null)
-            return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
 
+        if (ub == null) {
+            logger.error("No userBean found in the session.");
+            return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
+        }
         // Get public study
         StudyDAO studyDAO = new StudyDAO(dataSource);
         StudyBean currentPublicStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
@@ -221,6 +223,7 @@ public class StudyController {
             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
             ub = (UserAccountBean) userAccountDAO.findByUserUuid(ub.getUserUuid());
             if (!isDataManagerOrStudyDirector(ub,currentPublicStudy)){
+                logger.error("User does not have a proper role to do this operation");
                 return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
             }
         }

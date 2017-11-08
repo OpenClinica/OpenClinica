@@ -46,6 +46,16 @@ public class Auth0Controller {
         return this.buildAuthorizeUrl(request, redirectUri, sso);
     }
 
+    public String buildAuthorizeSignatureUrl(HttpServletRequest request, boolean sso) {
+        int port = request.getServerPort();
+        String portStr ="";
+        if (port != 80 && port != 443) {
+            portStr = ":" + port;
+        }
+        String redirectUri = request.getScheme() + "://" + request.getServerName() + portStr + request.getContextPath() + "/pages/signatureCallback";
+        return this.buildAuthorizeUrl(request, redirectUri, sso);
+    }
+
     public String setReturnTo(HttpServletRequest request) {
         return (String)SessionUtils.get(request, RETURN_TO);
     }

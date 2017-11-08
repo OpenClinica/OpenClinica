@@ -229,11 +229,16 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
         for (StudySubjectBean studySubjectBean : items) {
+            StudyBean study = (StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId());
+
+            if (study.getStatus() != Status.AVAILABLE)
+                continue;
+
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
             theItem.put("studySubject", studySubjectBean);
             theItem.put("studySubject.label", studySubjectBean.getLabel());
             theItem.put("studySubject.status", studySubjectBean.getStatus());
-            theItem.put("enrolledAt", ((StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId())).getIdentifier());
+            theItem.put("enrolledAt", study.getIdentifier());
             theItem.put("studySubject.oid", studySubjectBean.getOid());
             theItem.put("studySubject.secondaryLabel", studySubjectBean.getSecondaryLabel());
 

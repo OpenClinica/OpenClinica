@@ -102,6 +102,10 @@ public class ImportCRFDataService {
             upsert = new UpsertOnBean();
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
         StudyBean studyBean = studyDAO.findByOid(studyOID);
+        if (studyBean.getStatus() != Status.AVAILABLE) {
+            logger.error("Study status is :" + studyBean.getStatus() + ", so dataImport is not allowed.");
+            return eventCRFBeans;
+        }
         ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
         for (SubjectDataBean subjectDataBean : subjectDataBeans) {
             ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();

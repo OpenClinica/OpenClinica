@@ -51,17 +51,23 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.service.Auth0UserService;
+import org.akaza.openclinica.service.Auth0UserServiceImpl;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Created by IntelliJ IDEA. User: bads Date: Jun 10, 2008 Time: 5:28:46 PM To
  * change this template use File | Settings | File Templates.
  */
 public class SignStudySubjectServlet extends SecureController {
+    private WebApplicationContext ctx = null;
+
     /**
      * Checks whether the user has the right permission to proceed function
      */
@@ -74,8 +80,7 @@ public class SignStudySubjectServlet extends SecureController {
             return;
         }
 
-        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
-            || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+        if (currentRole.getRole().equals(Role.INVESTIGATOR)) {
             return;
         }
 
@@ -192,6 +197,7 @@ public class SignStudySubjectServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
+        ctx = WebApplicationContextUtils.getWebApplicationContext(context);
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
@@ -219,12 +225,13 @@ public class SignStudySubjectServlet extends SecureController {
         if (action.equalsIgnoreCase("confirm")) {
             String username = request.getParameter("j_user");
             String password = request.getParameter("j_pass");
-            SecurityManager securityManager = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager"));
             // String encodedUserPass =
             // org.akaza.openclinica.core.SecurityManager
             // .getInstance().encrytPassword(password);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
-            if (securityManager.verifyPassword(password, getUserDetails()) && ub.getName().equals(username)) {
+            Auth0UserService auth0UserService = ctx.getBean("auth0UserService", Auth0UserServiceImpl.class);
+            boolean isAuthenticated = auth0UserService.authenticateAuth0User(username, password);
+            if (isAuthenticated && ub.getName().equals(username)) {
                 if (signSubjectEvents(studySub, sm.getDataSource(), ub)) {
                     // Making the StudySubject signed as all the events have
                     // become signed.
