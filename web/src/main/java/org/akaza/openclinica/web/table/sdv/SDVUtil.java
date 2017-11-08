@@ -997,10 +997,10 @@ public class SDVUtil {
     private String getCRFStatusIconPath(int statusId, HttpServletRequest request, int studySubjectId, int eventDefinitionCRFId, int crfVersionId) {
 
         HtmlBuilder html = new HtmlBuilder();
-        html.a().onclick(
-                "openDocWindow('" + request.getContextPath() + "/ViewSectionDataEntry?eventDefinitionCRFId=&ecId=" + eventDefinitionCRFId
-                    + "&tabId=1&studySubjectId=" + studySubjectId + "');");
-        html.href("#").close();
+//        html.a().onclick(
+//                "openDocWindow('" + request.getContextPath() + "/ViewSectionDataEntry?eventDefinitionCRFId=&ecId=" + eventDefinitionCRFId
+//                    + "&tabId=1&studySubjectId=" + studySubjectId + "');");
+//        html.href('#').close();
 
         StringBuilder builderHref = new StringBuilder("<a href='javascript:void(0)' onclick=\"");
         //ViewSectionDataEntry?eventDefinitionCRFId=127&crfVersionId=682&tabId=1&studySubjectId=203
@@ -1013,7 +1013,8 @@ public class SDVUtil {
         String imgName = "";
         StringBuilder input = new StringBuilder("<input type=\"hidden\" statusId=\"");
         input.append(statusId).append("\" />");
-        builder.append("<center><span title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0'></center>");
+        builder.append("<center><a title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0' href='" + request.getContextPath() + "/ViewSectionDataEntry?eventDefinitionCRFId=&ecId=" + eventDefinitionCRFId
+                + "&tabId=1&studySubjectId=" + studySubjectId + "&exitTo=pages/viewAllSubjectSDVtmp?sdv_restore=true' ></a></center>");
         //"<input type=\"hidden\" statusId=\"1\" />"
         builder.append("</a>");
         builder.append(" ");
