@@ -272,7 +272,12 @@ public class ViewStudySubjectServlet extends SecureController {
              */
             // YW 11-26-2007 <<
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-            study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
+            if (isParentStudy) {
+                study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
+            } else {
+                study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(study.getParentStudyId(), "collectDob").getValue());
+            }
+
             // YW >>
             request.setAttribute("subjectStudy", study);
 
