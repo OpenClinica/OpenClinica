@@ -894,7 +894,7 @@
             pk,
             now(),
             ''event_crf'',
-            OLD.update_id,
+            NEW.update_id,
             OLD.event_crf_id,
             ''CRF version'',
             ''33'',
