@@ -871,3 +871,9 @@ body.query-page .aka_revised_content{
 form#searchByStudySubjectId {
   margin-bottom: 0;
 }
+
+.connect-widget {
+  padding: 10px;
+  background: #f1f1f1;
+  border-radius: 5px;
+}
