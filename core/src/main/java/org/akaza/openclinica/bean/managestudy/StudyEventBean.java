@@ -7,15 +7,15 @@
  */
 package org.akaza.openclinica.bean.managestudy;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.patterns.ocobserver.Listener;
 import org.akaza.openclinica.patterns.ocobserver.Observer;
-
-import java.util.ArrayList;
-import java.util.Date;
 
 /**
  * @author jxu
@@ -41,8 +41,7 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
     private Date dateEnded;
 
     // not in database
-    private StudyEventDefinitionBean studyEventDefinition =
-      new StudyEventDefinitionBean();
+    private StudyEventDefinitionBean studyEventDefinition = new StudyEventDefinitionBean();
 
     private ArrayList eventCRFs = new ArrayList();// not in DB
 
@@ -65,18 +64,18 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
     // YW 08-17-2007
     private boolean startTimeFlag = false;
     private boolean endTimeFlag = false;
+    private String attestation = "";
 
-    //BWP: for display discrepancy notes in a matrix-type study/event grid; 5/2/2008
-      private ArrayList<DiscrepancyNoteBean>  discBeanList = new ArrayList<DiscrepancyNoteBean>();
+    // BWP: for display discrepancy notes in a matrix-type study/event grid; 5/2/2008
+    private ArrayList<DiscrepancyNoteBean> discBeanList = new ArrayList<DiscrepancyNoteBean>();
 
-      public ArrayList<DiscrepancyNoteBean> getDiscBeanList() {
-          return discBeanList;
-      }
+    public ArrayList<DiscrepancyNoteBean> getDiscBeanList() {
+        return discBeanList;
+    }
 
-      public void setDiscBeanList(ArrayList<DiscrepancyNoteBean> discBeanList) {
-          this.discBeanList = discBeanList;
-      }
-    
+    public void setDiscBeanList(ArrayList<DiscrepancyNoteBean> discBeanList) {
+        this.discBeanList = discBeanList;
+    }
 
     /**
      * @return startTimeFlag
@@ -346,10 +345,11 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
         this.scheduledDatePast = scheduledDatePast;
     }
 
-    public boolean isEditable(){
+    public boolean isEditable() {
         return editable;
     }
-    public void setEditable(boolean editable){
+
+    public void setEditable(boolean editable) {
         this.editable = editable;
     }
 
@@ -361,15 +361,24 @@ public class StudyEventBean extends AuditableEntityBean implements Listener {
         this.studySubject = studySubject;
     }
 
-	@Override
-	public void setObserver(Observer o) {
-		// TODO Auto-generated method stub
-		
-	}
+    @Override
+    public void setObserver(Observer o) {
+        // TODO Auto-generated method stub
 
-	@Override
-	public Observer getObserver() {
-		// TODO Auto-generated method stub
-		return null;
-	}
+    }
+
+    @Override
+    public Observer getObserver() {
+        // TODO Auto-generated method stub
+        return null;
+    }
+
+    public String getAttestation() {
+        return attestation;
+    }
+
+    public void setAttestation(String attestation) {
+        this.attestation = attestation;
+    }
+
 }

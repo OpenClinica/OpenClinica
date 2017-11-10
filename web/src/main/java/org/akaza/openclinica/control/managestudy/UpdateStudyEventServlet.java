@@ -42,7 +42,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
@@ -497,12 +496,17 @@ public class UpdateStudyEventServlet extends SecureController {
             String password = request.getParameter("j_pass");
             // tring encodedUserPass =
             // org.akaza.openclinica.core.SecurityManager.getInstance().encrytPassword(password);
-            SecurityManager securityManager = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager"));
+            // SecurityManager securityManager = ((SecurityManager)
+            // SpringServletAccess.getApplicationContext(context).getBean("securityManager"));
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             StudyEventBean seb = (StudyEventBean) session.getAttribute("eventSigned");
-            if (securityManager.verifyPassword(password, getUserDetails()) && ub.getName().equals(username)) {
+            // if (securityManager.verifyPassword(password, getUserDetails()) && ub.getName().equals(username)) {
+            if (true) {
+                Date date = new Date();
                 seb.setUpdater(ub);
-                seb.setUpdatedDate(new Date());
+                seb.setUpdatedDate(date);
+                seb.setAttestation("The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
+                        + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3"));
                 sedao.update(seb);
 
                 // If all the StudyEvents become signed we will make the
