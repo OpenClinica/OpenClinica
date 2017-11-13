@@ -74,7 +74,7 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 
-<h1>   
+<h1>
     <span class="title_manage">
         <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/>
     </span>
@@ -106,8 +106,13 @@
     </c:otherwise>
 </c:choose>
 
-<a href="javascript:leftnavExpand('studySubjectRecord');" style="text-decoration: none">
-    <img id="excl_studySubjectRecord" src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/></a></div>
+        <a id="excl_studySubjectRecord_open" href="javascript:leftnavExpand('studySubjectRecord'); leftnavExpand('excl_studySubjectRecord_open'); leftnavExpand('excl_studySubjectRecord_closed');" style="text-decoration: none; display: all;">
+            <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/>
+        </a>
+        <a id="excl_studySubjectRecord_closed" href="javascript:leftnavExpand('studySubjectRecord'); leftnavExpand('excl_studySubjectRecord_open'); leftnavExpand('excl_studySubjectRecord_closed');" style="text-decoration: none; display: none;">
+            <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/>
+        </a>
+    </div>
 <div id="studySubjectRecord" style="display: none">
 
 <table border="0" cellpadding="0" cellspacing="0">
@@ -410,8 +415,15 @@
 
     </c:otherwise>
 </c:choose>
-<a name="events"><a href="javascript:leftnavExpand('subjectEvents');" style="text-decoration: none">
-    <img id="excl_subjectEvents" src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="events" bundle="${resword}"/></a></a></div>
+        <a name="events">
+            <a id="excl_subjectEvents_close" href="javascript:leftnavExpand('subjectEvents'); leftnavExpand('excl_subjectEvents_open'); leftnavExpand('excl_subjectEvents_close');" style="text-decoration: none; display: all;">
+                <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="events" bundle="${resword}"/>
+            </a>
+            <a id="excl_subjectEvents_open" href="javascript:leftnavExpand('subjectEvents'); leftnavExpand('excl_subjectEvents_open'); leftnavExpand('excl_subjectEvents_close');" style="text-decoration: none; display: none;">
+                <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="events" bundle="${resword}"/>
+            </a>
+        </a>
+    </div>
 <div id="subjectEvents">
     <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showStudyEventRow.jsp" /></c:import>
 
@@ -518,42 +530,51 @@
 
 <div style="width: 250px">
 
-<c:choose>
-<c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
-<div class="table_title_Admin">
-</c:when>
-<c:otherwise>
+    <!-- <c:choose>
+        <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
+            <div class="table_title_Admin">
+        </c:when>
+        <c:otherwise>
 
-<c:choose>
-<c:when test="${userRole.manageStudy}">
-<div class="table_titla_manage">
-</c:when>
-<c:otherwise>
-<div class="table_title_submit">
-    </c:otherwise>
+            <c:choose>
+                <c:when test="${userRole.manageStudy}">
+                    <div class="table_titla_manage">
+                </c:when>
+                <c:otherwise>
+                    <div class="table_title_submit">
+                </c:otherwise>
+            </c:choose>
+
+        </c:otherwise>
     </c:choose>
 
-    </c:otherwise>
-    </c:choose>
-</div>
-<c:choose>
-<c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
-<div class="table_title_Admin">
-</c:when>
-<c:otherwise>
+    </div> -->
 
-<c:choose>
-<c:when test="${userRole.manageStudy}">
-<div class="table_titla_manage">
-</c:when>
-<c:otherwise>
-<div class="table_title_submit">
-    </c:otherwise>
+    <c:choose>
+        <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
+            <div class="table_title_Admin">
+        </c:when>
+        <c:otherwise>
+            <c:choose>
+                <c:when test="${userRole.manageStudy}">
+                    <div class="table_titla_manage">
+                </c:when>
+                <c:otherwise>
+                    <div class="table_title_submit">
+                </c:otherwise>
+            </c:choose>
+        </c:otherwise>
     </c:choose>
 
-    </c:otherwise>
-    </c:choose>    <a name="global"><a style="text-decoration: none" href="javascript:leftnavExpand('globalRecord');">
-        <img id="excl_globalRecord" src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="global_subject_record" bundle="${resword}"/></a></a></div>
+        <a name="global">
+            <a id="excl_globalRecord_open" style="text-decoration: none; display: all;" href="javascript:leftnavExpand('globalRecord'); leftnavExpand('excl_globalRecord_open'); leftnavExpand('excl_globalRecord_close');">
+                <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="global_subject_record" bundle="${resword}"/>
+            </a>
+            <a id="excl_globalRecord_close" style="text-decoration: none; display: none;" href="javascript:leftnavExpand('globalRecord'); leftnavExpand('excl_globalRecord_open'); leftnavExpand('excl_globalRecord_close');">
+                <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="global_subject_record" bundle="${resword}"/>
+            </a>
+        </a>
+    </div>
 
 <div id="globalRecord" style="display:none">
 <div style="width: 350px">
@@ -571,7 +592,7 @@
 <tr>
     <td valign="top">
 
-       
+
             <!-- Table Contents -->
 
                     <table width="100%" border="0" cellpadding="0" cellspacing="0">
@@ -796,9 +817,36 @@
 </div>
 
 </div></div></div></div></div></div></div></div>
+
 </div>
 
 </div>
+
+    <c:choose>
+        <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
+            <div class="table_title_Admin">
+        </c:when>
+        <c:otherwise>
+            <c:choose>
+                <c:when test="${userRole.manageStudy}">
+                    <div class="table_titla_manage">
+                </c:when>
+                <c:otherwise>
+                    <div class="table_title_submit">
+                </c:otherwise>
+            </c:choose>
+        </c:otherwise>
+    </c:choose>
+
+        <a name="global">
+            <a id="excl_archivableCasebook_open" style="text-decoration: none; display: all;" href="javascript:leftnavExpand('archivableCasebook'); leftnavExpand('excl_archivableCasebook_open'); leftnavExpand('excl_archivableCasebook_close');">
+                <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="viewStudySubject.casebookGenerationForm.title" bundle="${resword}"/>
+            </a>
+            <a id="excl_archivableCasebook_close" style="text-decoration: none; display: none;" href="javascript:leftnavExpand('archivableCasebook'); leftnavExpand('excl_archivableCasebook_open'); leftnavExpand('excl_archivableCasebook_close');">
+                <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="viewStudySubject.casebookGenerationForm.title" bundle="${resword}"/>
+            </a>
+        </a>
+    </div>
 
 <jsp:include page="studySubject/casebookGenerationForm.jsp"/>
 
