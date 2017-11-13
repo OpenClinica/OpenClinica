@@ -888,7 +888,7 @@ public class SDVUtil {
 
                 }
 
-                tempSDVBean.setCrfStatus(getCRFStatusIconPath(status, request, studySubjectBean.getId(), crfBean.getId(), crfBean.getCRFVersionId()));
+                tempSDVBean.setCrfStatus(getCRFStatusIconPath(status, request, studySubjectBean.getId(), crfBean.getId(), crfBean.getCRFVersionId(), eventDefinitionCRFBean.getDefaultVersionId(), crfBean.getStudyEventId(), studyBean.getId()));
             }
 
             tempSDVBean.setStudyEventStatus(studyEventBean.getStatus().getName());
@@ -994,7 +994,7 @@ public class SDVUtil {
         return allRows;
     }
 
-    private String getCRFStatusIconPath(int statusId, HttpServletRequest request, int studySubjectId, int eventDefinitionCRFId, int crfVersionId) {
+    private String getCRFStatusIconPath(int statusId, HttpServletRequest request, int studySubjectId, int eventDefinitionCRFId, int crfVersionId, int formLayoutId, int studyEventId, int studyId) {
 
         HtmlBuilder html = new HtmlBuilder();
 //        html.a().onclick(
@@ -1013,8 +1013,9 @@ public class SDVUtil {
         String imgName = "";
         StringBuilder input = new StringBuilder("<input type=\"hidden\" statusId=\"");
         input.append(statusId).append("\" />");
-        builder.append("<center><a title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0' href='" + request.getContextPath() + "/ViewSectionDataEntry?eventDefinitionCRFId=&ecId=" + eventDefinitionCRFId
-                + "&tabId=1&studySubjectId=" + studySubjectId + "&exitTo=pages/viewAllSubjectSDVtmp?sdv_restore=true' ></a></center>");
+        String href = request.getContextPath() +  "/EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId=" + eventDefinitionCRFId + "&originatingPage=pages/viewAllSubjectSDVtmp?sdv_restore=true%26studyId="
+               + studyId + "&mode=view";
+        builder.append("<center><a title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0' href='" + href + "' ></a></center>");
         //"<input type=\"hidden\" statusId=\"1\" />"
         builder.append("</a>");
         builder.append(" ");
