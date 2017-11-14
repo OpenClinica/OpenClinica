@@ -63,8 +63,8 @@
             INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
             VALUES (pk, ''22'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
             ELSIF(NEW.subject_event_status_id = ''8'') THEN
-            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
-            VALUES (pk, ''31'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value,details)
+            VALUES (pk, ''31'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id,NEW.attestation);
             END IF;
             END IF;
             IF(OLD.status_id <![CDATA[<>]]> NEW.status_id) THEN
@@ -283,8 +283,8 @@
             INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
             VALUES (pk, ''22'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
             ELSIF(NEW.subject_event_status_id = ''8'') THEN
-            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value)
-            VALUES (pk, ''31'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id);
+            INSERT INTO audit_log_event(audit_id, audit_log_event_type_id, audit_date, user_id, audit_table, entity_id, entity_name, old_value, new_value,details)
+            VALUES (pk, ''31'', now(), NEW.update_id, ''study_event'', NEW.study_event_id, ''Status'', OLD.subject_event_status_id, NEW.subject_event_status_id,NEW.attestation);
             END IF;
             END IF;
             IF(OLD.status_id <![CDATA[<>]]> NEW.status_id) THEN

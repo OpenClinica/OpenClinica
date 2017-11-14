@@ -256,30 +256,31 @@ public class OpenRosaSubmissionController {
         List<EventDefinitionCrf> eventDefinitionCrfs = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(sed.getStudyEventDefinitionId(),
                 study.getStudyId());
 
-        int count = 0;
-        for (EventCrf evCrf : eventCrfs) {
-            if (evCrf.getStatusId() == org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()
-                    || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.DELETED.getCode()
-                    || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.AUTO_DELETED.getCode()) {
-                for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
-                    if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
-                        count++;
-                        break;
+        if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.SIGNED.getCode()) {
+            int count = 0;
+            for (EventCrf evCrf : eventCrfs) {
+                if (evCrf.getStatusId() == org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode()
+                        || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.DELETED.getCode()
+                        || evCrf.getStatusId() == org.akaza.openclinica.domain.Status.AUTO_DELETED.getCode()) {
+                    for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
+                        if (eventDefinitionCrf.getCrf().getCrfId() == evCrf.getFormLayout().getCrf().getCrfId()) {
+                            count++;
+                            break;
+                        }
                     }
                 }
             }
-        }
 
-        if (count == eventDefinitionCrfs.size()) {
-            studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
-            studyEvent.setUserAccount(userAccount);
-            studyEventDao.saveOrUpdate(studyEvent);
-        } else if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()) {
-            studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
-            studyEvent.setUserAccount(userAccount);
-            studyEventDao.saveOrUpdate(studyEvent);
+            if (count == eventDefinitionCrfs.size()) {
+                studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
+                studyEvent.setUserAccount(userAccount);
+                studyEventDao.saveOrUpdate(studyEvent);
+            } else if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()) {
+                studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                studyEvent.setUserAccount(userAccount);
+                studyEventDao.saveOrUpdate(studyEvent);
+            }
         }
-
         String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
         return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
     }
