@@ -440,7 +440,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                 // Event CRFs Audit Events
                 for (int j = 0; j < allEventCRFs.size(); j++) {
                     AuditBean auditBean = (AuditBean) allEventCRFs.get(j);
-
+                    EventCRFBean eventCrf = (EventCRFBean) ecdao.findByPK(auditBean.getEventCRFId());
+                    FormLayoutBean formLayout = (FormLayoutBean) fldao.findByPK(eventCrf.getFormLayoutId());
                     if (auditBean.getStudyEventId() == event.getId()) {
 
                         // Audit Events for Study Event
@@ -452,8 +453,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                         }
                         row++;
 
-                        excelRow = new String[] { auditBean.getCrfName(), auditBean.getFormLayoutName(), dateFormat(auditBean.getDateInterviewed()),
-                                auditBean.getInterviewerName(), auditBean.getUserName() };
+                        excelRow = new String[] { auditBean.getCrfName(), formLayout.getName(), dateFormat(eventCrf.getDateInterviewed()),
+                                eventCrf.getInterviewerName(), eventCrf.getOwner().getName() };
                         for (int i = 0; i < excelRow.length; i++) {
                             label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
                             excelSheet.addCell(label);

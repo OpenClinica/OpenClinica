@@ -122,7 +122,7 @@
         <sql>
             UPDATE study_event SET STUDY_EVENT_DEFINITION_ID=?,STUDY_SUBJECT_ID=?,LOCATION=?,
             SAMPLE_ORDINAL=?, DATE_START=?,DATE_END=?,STATUS_ID=?,DATE_UPDATED=now(),
-            UPDATE_ID=? , subject_event_status_id=?, start_time_flag=?, end_time_flag=? WHERE STUDY_EVENT_ID=?
+            UPDATE_ID=? , subject_event_status_id=?, start_time_flag=?, end_time_flag=?, attestation=? WHERE STUDY_EVENT_ID=?
         </sql>
     </query>
     <query>

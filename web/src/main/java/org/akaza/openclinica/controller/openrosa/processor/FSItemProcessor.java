@@ -28,6 +28,7 @@ import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
 import org.akaza.openclinica.domain.datamap.AuditLogEventType;
@@ -41,6 +42,7 @@ import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -68,6 +70,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     @Autowired
     private StudyEventDao studyEventDao;
     @Autowired
+    private StudySubjectDao studySubjectDao;
+    @Autowired
     private ItemDao itemDao;
     @Autowired
     private ItemFormMetadataDao itemFormMetadataDao;
@@ -86,6 +90,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String STUDYEVENT = "study_event";
+    public static final String STUDYSUBJECT = "study_subject";
 
     public ProcessorEnum process(SubmissionContainer container) throws Exception {
 
@@ -295,23 +300,44 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     private void updateEventSubjectStatusIfSigned(SubmissionContainer container) {
         StudyEvent studyEvent = container.getEventCrf().getStudyEvent();
         if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SIGNED.getId()) {
-            String oldStatusId = "3";
-            AuditLogEvent auditLogEvent = new AuditLogEvent();
-            auditLogEvent.setAuditTable(STUDYEVENT);
-            auditLogEvent.setEntityId(studyEvent.getStudyEventId());
-            auditLogEvent.setEntityName("Status");
-            auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
-            auditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
+            String eventOldStatusId = "3";
+            AuditLogEvent eventAuditLogEvent = new AuditLogEvent();
+            eventAuditLogEvent.setAuditTable(STUDYEVENT);
+            eventAuditLogEvent.setEntityId(studyEvent.getStudyEventId());
+            eventAuditLogEvent.setEntityName("Status");
+            eventAuditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
+            eventAuditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
 
-            List<AuditLogEvent> ales = auditLogEventDao.findByParam(auditLogEvent);
-            for (AuditLogEvent audit : ales) {
-                oldStatusId = audit.getOldValue();
+            List<AuditLogEvent> eventAles = auditLogEventDao.findByParam(eventAuditLogEvent);
+            for (AuditLogEvent audit : eventAles) {
+                eventOldStatusId = audit.getOldValue();
                 break;
             }
-            studyEvent.setSubjectEventStatusId(Integer.valueOf(oldStatusId));
+            studyEvent.setSubjectEventStatusId(Integer.valueOf(eventOldStatusId));
             studyEvent.setUpdateId(container.getUser().getUserId());
             studyEvent.setDateUpdated(new Date());
             studyEventDao.saveOrUpdate(studyEvent);
+            StudySubject studySubject = container.getSubject();
+
+            if (studySubject.getStatus() == Status.SIGNED) {
+                String subjectOldStatusId = "1";
+                AuditLogEvent subjectAuditLogEvent = new AuditLogEvent();
+                subjectAuditLogEvent.setAuditTable(STUDYSUBJECT);
+                subjectAuditLogEvent.setEntityId(studySubject.getStudySubjectId());
+                subjectAuditLogEvent.setEntityName("Status");
+                subjectAuditLogEvent.setAuditLogEventType(new AuditLogEventType(3));
+                subjectAuditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
+
+                List<AuditLogEvent> subjectAles = auditLogEventDao.findByParam(subjectAuditLogEvent);
+                for (AuditLogEvent audit : subjectAles) {
+                    subjectOldStatusId = audit.getOldValue();
+                    break;
+                }
+                studySubject.setStatus(Status.getByCode(Integer.valueOf(subjectOldStatusId)));
+                studySubject.setUpdateId(container.getUser().getUserId());
+                studySubject.setDateUpdated(new Date());
+                studySubjectDao.saveOrUpdate(studySubject);
+            }
         }
     }
 
