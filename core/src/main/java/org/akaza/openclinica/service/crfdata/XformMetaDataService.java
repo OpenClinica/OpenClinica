@@ -427,7 +427,7 @@ public class XformMetaDataService {
         HttpHeaders headers = new HttpHeaders();
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
         HttpEntity<String> entity = new HttpEntity<String>(headers);
-        ResponseEntity<byte[]> response = restTemplate.exchange(fileLink, HttpMethod.GET, entity, byte[].class, "1");
+        ResponseEntity<byte[]> response = restTemplate.exchange(replaceUrlWithServiceGatewayURL(fileLink), HttpMethod.GET, entity, byte[].class, "1");
         FileItem fileItem = null;
         if (response.getStatusCode() == HttpStatus.OK) {
             String fileName = "";
@@ -472,7 +472,7 @@ public class XformMetaDataService {
                         fileLinks = version.getFileLinks();
                         for (String fileLink : fileLinks) {
                             if (fileLink.endsWith(VERSION)) {
-                                vForm = rest.getForObject(fileLink, String.class);
+                                vForm = rest.getForObject(replaceUrlWithServiceGatewayURL(fileLink), String.class);
                                 break;
                             }
                         }
@@ -559,7 +559,7 @@ public class XformMetaDataService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
-        ResponseEntity<byte[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, byte[].class, "1");
+        ResponseEntity<byte[]> response = restTemplate.exchange(replaceUrlWithServiceGatewayURL(uri), HttpMethod.GET, entity, byte[].class, "1");
 
         File file = new File(dir + File.separator + fileName);
         if (response.getStatusCode().equals(HttpStatus.OK)) {
@@ -652,5 +652,11 @@ public class XformMetaDataService {
                 }
             }
         }
+    }
+
+    private String replaceUrlWithServiceGatewayURL(String url){
+        return CoreResources.getSBSFieldFormservice() + url.split("api")[1];
+
+
     }
 }

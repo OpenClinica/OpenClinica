@@ -147,23 +147,23 @@ public class CoreResources implements ResourceLoaderAware {
             webapp = getWebAppName(resourceLoader.getResource("/").getURI().getPath());
             /*
              * getPropertiesSource();
-             * 
+             *
              * String filePath = "$catalina.home/$WEBAPP.lower.config";
-             * 
+             *
              * filePath = replaceWebapp(filePath);
              * filePath = replaceCatHome(filePath);
-             * 
+             *
              * String dataInfoPropFileName = filePath + "/datainfo.properties";
              * String extractPropFileName = filePath + "/extract.properties";
-             * 
+             *
              * Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp, dataInfoPropFileName);
              * Properties OC_dataExtractProperties = getPropValues(extractProp, extractPropFileName);
-             * 
+             *
              * if (OC_dataDataInfoProperties != null)
              * dataInfo = OC_dataDataInfoProperties;
              * if (OC_dataExtractProperties != null)
              * extractInfo = OC_dataExtractProperties;
-             * 
+             *
              */ String dbName = dataInfo.getProperty("dbType");
 
             DATAINFO = dataInfo;
@@ -1054,6 +1054,11 @@ public class CoreResources implements ResourceLoaderAware {
             value = value.trim();
         }
         return value == null ? "" : value;
+    }
+
+    public static String getSBSFieldFormservice(){
+        String value = getField("SBSUrl");
+        return value.replaceFirst("user-service(.)*","form-service/api");
     }
 
     // TODO internationalize

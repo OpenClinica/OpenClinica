@@ -11,6 +11,8 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
+import javax.servlet.http.HttpServletRequest;
+
 @Controller
 @RequestMapping(value = "/studyversion")
 public class OdmImportController {
@@ -19,10 +21,11 @@ public class OdmImportController {
     OdmImportServiceImpl odmImportServiceImpl;
 
     @RequestMapping(value = "/boardId/{boardId}", method = RequestMethod.POST)
-    public ResponseEntity<Object> importOdmToOC(@RequestBody org.cdisc.ns.odm.v130.ODM odm, @PathVariable("boardId") String boardId) throws Exception {
+    public ResponseEntity<Object> importOdmToOC(@RequestBody org.cdisc.ns.odm.v130.ODM odm, @PathVariable("boardId") String boardId,
+                                                HttpServletRequest request) throws Exception {
 
         try {
-            odmImportServiceImpl.importOdm(odm, boardId);
+            odmImportServiceImpl.importOdm(odm, boardId,request);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (CustomRuntimeException e) {
             return new ResponseEntity<>(e.getErrList(), HttpStatus.BAD_REQUEST);

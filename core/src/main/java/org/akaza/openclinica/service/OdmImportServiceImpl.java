@@ -1,17 +1,15 @@
 package org.akaza.openclinica.service;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -56,7 +54,12 @@ import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutD
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.*;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.util.StringUtils;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
@@ -102,13 +105,14 @@ public class OdmImportServiceImpl implements OdmImportService {
         }
     }
 
-    public void importOdm(ODM odm, String boardId) {
-        Study study = importOdmToOC(odm, boardId);
+    public void importOdm(ODM odm, String boardId, HttpServletRequest request) {
+        Study study = importOdmToOC(odm, boardId, request);
         Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
         updatePublicStudyPublishedFlag(publicStudy);
     }
 
-    @Transactional Study importOdmToOC(ODM odm, String boardId) {
+    @Transactional
+    private Study importOdmToOC(ODM odm, String boardId, HttpServletRequest request) {
         DataBinder dataBinder = new DataBinder(new Study());
         Errors errors = dataBinder.getBindingResult();
         printOdm(odm);
@@ -118,7 +122,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         // TODO add validation to all entities
         ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
         Study study = retrieveStudy(odm, userAccount, odmStudy, errors);
-        Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(boardId, errors);
+        Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(boardId, errors, request);
 
         StudyEventDefinition studyEventDefinition = null;
         List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions = odmStudy.getMetaDataVersion();
@@ -127,7 +131,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         CrfBean crf = null;
         FormLayout formLayout = null;
 
-        saveOrUpdateCrf(userAccount, study, odmMetadataVersions, fmCrfs, errors);
+        saveOrUpdateCrf(userAccount, study, odmMetadataVersions, fmCrfs, errors, request);
 
         List<ODMcomplexTypeDefinitionStudyEventRef> odmStudyEventRefs = odmMetadataVersions.get(0).getProtocol().getStudyEventRef();
         for (ODMcomplexTypeDefinitionStudyEventRef odmStudyEventRef : odmStudyEventRefs) {
@@ -263,7 +267,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     private void saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Form[] fmCrfs,
-            Errors errors) {
+            Errors errors, HttpServletRequest request) {
         Set<Long> publishedVersions = new HashSet<>();
         for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
             String crfOid = odmFormDef.getOID();
@@ -295,14 +299,15 @@ public class OdmImportServiceImpl implements OdmImportService {
             saveOrUpdateCrfAndFormLayouts(crfOid, formLayoutDefs, fmCrfs, userAccount, study, crfName, publishedVersions, errors);
         }
         if (publishedVersions.size() != 0) {
-            String fmUrl = getCoreResources().getField("formManager").trim() + "/api/xlsForm/setPublishedEnvironment";
-            RestTemplate restTemplate = new RestTemplate();
+            //String fmUrl = getCoreResources().getField("formManager").trim() + "/api/xlsForm/setPublishedEnvironment";
+            //RestTemplate restTemplate = new RestTemplate();
             PublishingDTO dto = new PublishingDTO();
             dto.setPublishedEnvType(study.getEnvType());
             dto.setVersionIds(publishedVersions);
 
             try {
-                restTemplate.postForObject(fmUrl, dto, PublishingDTO.class);
+                setPublishEnvironment(request,dto);
+                //restTemplate.postForObject(fmUrl, dto, PublishingDTO.class);
             } catch (Exception e) {
                 logger.info(e.getMessage());
                 errors.rejectValue("name", "fm_app_error", "Form Manager not responding");
@@ -595,17 +600,13 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.coreResources = coreResources;
     }
 
-    public Form[] getAllCrfsByProtIdFromFormManager(String boardId, Errors errors) {
+    public Form[] getAllCrfsByProtIdFromFormManager(String boardId, Errors errors, HttpServletRequest request) {
 
-        String formServiceBaseURL = getCoreResources().getField("formManager").trim() + "/api/buckets?boardUuid={0}";
-
-        String url = MessageFormat.format(formServiceBaseURL, boardId);
         Bucket[] buckets = null;
-        RestTemplate restTemplate = new RestTemplate();
         ArrayList<Form> forms = null;
 
         try {
-            buckets = (Bucket[]) restTemplate.getForObject(url, Bucket[].class);
+            buckets = getBucket(request,boardId);
         } catch (Exception e) {
             logger.info(e.getMessage());
             errors.rejectValue("name", "fm_app_error", "Form Manager not responding");
@@ -633,5 +634,46 @@ public class OdmImportServiceImpl implements OdmImportService {
             err.add(obj);
         }
         return err;
+    }
+
+
+    private void setPublishEnvironment(HttpServletRequest request, PublishingDTO publishingDTO){
+
+        RestTemplate restTemplate = new RestTemplate();
+        MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
+        ObjectMapper objectMapper = new ObjectMapper();
+        String accessToken = (String) request.getSession().getAttribute("accessToken");
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity<PublishingDTO> entity = new HttpEntity<>(publishingDTO, headers);
+
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        jsonConverter.setObjectMapper(objectMapper);
+        converters.add(jsonConverter);
+        restTemplate.setMessageConverters(converters);
+        restTemplate.postForObject(CoreResources.getSBSFieldFormservice() + "/xlsForm/setPublishedEnvironment", entity, PublishingDTO.class);
+    }
+
+    private Bucket[] getBucket(HttpServletRequest request, String boardId){
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        ObjectMapper objectMapper = new ObjectMapper();
+        String accessToken = (String) request.getSession().getAttribute("accessToken");
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        jsonConverter.setObjectMapper(objectMapper);
+        converters.add(jsonConverter);
+        restTemplate.setMessageConverters(converters);
+        String formServiceBaseURL = CoreResources.getSBSFieldFormservice().trim() + "/api/buckets?boardUuid={0}";
+        String url = MessageFormat.format(formServiceBaseURL, boardId);
+
+        ResponseEntity<Bucket[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Bucket[].class);
+        return response.getBody();
     }
 }
