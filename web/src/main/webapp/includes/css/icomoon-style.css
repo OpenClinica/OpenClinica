@@ -118,7 +118,7 @@
   content: "\e90e";
 }
 .icon-caret-right:before {
-  content: "\e90f";
+  content: "\e90e";
 }
 .icon-caret-left:before {
   content: "\e910";
@@ -127,7 +127,7 @@
   content: "\e911";
 }
 .icon-caret-down:before {
-  content: "\e912";
+  content: "\e911";
 }
 .icon-question-circle:before {
   content: "\e913";
