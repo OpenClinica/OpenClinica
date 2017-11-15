@@ -5,10 +5,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <%
@@ -119,12 +115,21 @@
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}"/>
 <c:set var="requestFromSpringControllerCCV" value="${param.isSpringControllerCCV}"/>
-<c:if test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
-    <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
-</c:if>
+<c:choose>
+    <c:when test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
+        <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
+        <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
+        <link rel="stylesheet" href="../includes/css/icomoon-style.css">
+    </c:when>
+    <c:otherwise>
+        <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+        <link rel="stylesheet" href="includes/css/icomoon-style.css">
+    </c:otherwise>
+</c:choose>
 
 <!-- Main Navigation -->
-<link rel="stylesheet" href="includes/css/icomoon-style.css">
 <div class="oc_nav">
     <div class="nav-top-bar">
         <!-- Logo -->

@@ -494,6 +494,7 @@ public class UpdateStudyEventServlet extends SecureController {
             Auth0UserService auth0UserService = ctx.getBean("auth0UserService", Auth0UserServiceImpl.class);
             boolean isAuthenticated = auth0UserService.authenticateAuth0User(username, password);
             if (isAuthenticated && ub.getName().equals(username)) {
+                Date date = new Date();
                 seb.setUpdater(ub);
                 seb.setUpdatedDate(date);
                 seb.setAttestation("The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
