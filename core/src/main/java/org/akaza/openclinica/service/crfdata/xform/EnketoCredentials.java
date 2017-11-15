@@ -71,6 +71,17 @@ public class EnketoCredentials implements Serializable {
         }
     }
 
+    public static Study getSiteStudy(String studyOid) {
+        Study study = studyDao.findByOcOID(studyOid);
+        if (study.getStudy() == null) {
+            logger.debug("The Study Oid: " + studyOid + " is a Study level Oid");
+            return study;
+        } else {
+            logger.debug("The Study Oid: " + studyOid + " is a Site level Oid");
+            return null;
+        }
+    }
+
     public static StudyDao getStudyDao() {
         return studyDao;
     }

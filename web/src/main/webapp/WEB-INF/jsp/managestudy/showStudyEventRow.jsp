@@ -219,8 +219,10 @@
 				 </c:when>
 
 				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">
-				 <td>
+					 <B>Comes here 1*******************************</B>
+					 <td>
                 <c:if test="${study.status.available && !currRow.bean.studyEvent.status.deleted && !userRole.monitor}">
+					<B>Comes here 2*******************************</B>
                     <c:choose>
                     <c:when test="${dedc.eventCRF.status.id != 0}">
                     <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
@@ -321,40 +323,39 @@
 		 <table border="0" cellpadding="0" cellspacing="0">
 	     <tr valign="top">
 	     <td>
-			<c:if test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available && !currRow.bean.studyEvent.status.deleted && !userRole.monitor}">
-			    <c:if test="${dec.continueInitialDataEntryPermitted}">
-		           <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
-				    onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-				    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                       <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6">
-				    </a>
-    		    </c:if>
-	    		<c:if test="${dec.startDoubleDataEntryPermitted}">
-    				<a href="#"
-	    			onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-		    		onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', 'DoubleDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}');">
-                        <spam name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" title="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" align="left" hspace="6"></a>
-    			</c:if>
-	    		<c:if test="${dec.continueDoubleDataEntryPermitted}">
-		            <a href="#"
-				    onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-				    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
-                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', 'DoubleDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}');">
-				    <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></a>
-    			</c:if>
-    			<c:if test="${(dec.performAdministrativeEditingPermitted) &&(study.status.available)}">
-        		   
-		           <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
-				    onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-				    onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-				    <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6">
-				    </a>
-                </c:if>
+			<c:if test="${!dec.eventCRF.status.deleted && !dec.eventCRF.status.locked && study.status.available
+				&& !currRow.bean.studyEvent.status.deleted && !userRole.monitor && subjectStudy.status.available}">
+				<c:if test="${dec.continueInitialDataEntryPermitted}">
+				   <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
+					onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
+					onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
+					   <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6">
+					</a>
+				</c:if>
+				<c:if test="${dec.startDoubleDataEntryPermitted}">
+					<a href="#"
+					onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
+					onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
+					onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', 'DoubleDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}');">
+						<spam name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" title="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" align="left" hspace="6"></a>
+				</c:if>
+				<c:if test="${dec.continueDoubleDataEntryPermitted}">
+					<a href="#"
+					onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
+					onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');"
+					onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', 'DoubleDataEntry?eventCRFId=<c:out value="${dec.eventCRF.id}"/>&exitTo=ViewStudySubject?id=${studySub.id}');">
+					<span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></a>
+				</c:if>
+				<c:if test="${(dec.performAdministrativeEditingPermitted) &&(study.status.available) && (studySubject.status.available)}">
+
+				   <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
+					onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
+					onMouseUp="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
+					<span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6">
+					</a>
+				</c:if>
 			<%-- locked status here --%>
-    			<c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}">
-	    			
-		    	</c:if>
+				<c:if test="${dec.locked || dec.eventCRF.status.locked || dec.stage.locked || currRow.bean.studyEvent.subjectEventStatus.locked}"></c:if>
     		</c:if>
 		</td>
 	     <td>
@@ -367,7 +368,7 @@
 		 </td>
 		<c:choose>
 		<c:when test="${!dec.eventCRF.status.deleted}">
-		 <c:if test="${userRole.manageStudy && study.status.available}">
+			<c:if test="${userRole.manageStudy && study.status.available && studySubject.status.available}">
 		  <td><a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
 			onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
 			onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
@@ -376,7 +377,7 @@
 		 </c:if>
 		</c:when>
 		<c:otherwise>
-		 <c:if test="${(userRole.manageStudy && currRow.bean.studyEvent.status.name!='auto-removed' && dec.eventCRF.status.name != 'auto-removed') && (study.status.available)}">
+			<c:if test="${(userRole.manageStudy && currRow.bean.studyEvent.status.name!='auto-removed' && dec.eventCRF.status.name != 'auto-removed') && (study.status.available) && (studySubject.status.available)}">
 		  <td><a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
 			onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
 			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><span
@@ -385,7 +386,7 @@
 		 </c:if>
 		</c:otherwise>
 		</c:choose>
-		<c:if test="${(userBean.sysAdmin) && (study.status.available) && (dec.eventCRF.status.name != 'completed')}">
+		<c:if test="${(userBean.sysAdmin) && (study.status.available) && (dec.eventCRF.status.name != 'completed') && (studySubject.status.available)}">
 		<td>
 		 <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
 			onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
@@ -396,7 +397,7 @@
 		 
 		   
 		    <c:if test="${ (userRole.director || userRole.coordinator) &&
- (study.status.available )
+ (study.status.available ) && (studySubject.status.available)
  && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped)
  
  }">

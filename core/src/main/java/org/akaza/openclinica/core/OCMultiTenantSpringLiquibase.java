@@ -14,7 +14,7 @@ import java.util.List;
 /**
  * Created by yogi on 2/17/17.
  */
-public class OCMultiTenantSpringLiquibase extends MultiTenantSpringLiquibase {
+public class OCMultiTenantSpringLiquibase extends CustomMultiTenantSpringLiquibase {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @Autowired

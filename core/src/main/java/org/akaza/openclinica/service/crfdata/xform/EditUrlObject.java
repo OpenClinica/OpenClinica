@@ -23,13 +23,14 @@ public class EditUrlObject {
     String flavor;
     Role role;
     Study parentStudy;
+    Study site;
     StudyEvent studyEvent;
     String mode;
     EventDefinitionCrf edc;
     EventCrf eventCrf;
 
     public EditUrlObject(FormLayout formLayout, String crfOid, String instance, String ecid, String redirect, boolean markComplete, String studyOid,
-            List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, StudyEvent studyEvent, String mode,
+            List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, Study site, StudyEvent studyEvent, String mode,
             EventDefinitionCrf edc, EventCrf eventCrf) {
         super();
         this.formLayout = formLayout;
@@ -48,6 +49,7 @@ public class EditUrlObject {
         this.mode = mode;
         this.edc = edc;
         this.eventCrf = eventCrf;
+        this.site = site;
     }
 
 }
