@@ -858,6 +858,7 @@ public class OpenRosaServices {
 
     private String getUserXml(ServletContext context, String studyOID) throws Exception {
         String studySubjectOid = (String) context.getAttribute("SS_OID");
+        String userId = (String) context.getAttribute("USER_ID");
 
         DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
         DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
@@ -874,6 +875,7 @@ public class OpenRosaServices {
             StudyBean publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
             StudyBean parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
             CoreResources.setRequestSchema("public");
+            UserAccount currentUser = userAccountDao.findByUserId(Integer.valueOf(userId));
             users = userAccountDao.findNonRootNonParticipateUsersByStudyId(publicStudy.getId(), parentPublicStudy.getId());
             CoreResources.setRequestSchema(publicStudy.getSchemaName());
             for (UserAccount userAccount : users) {
@@ -887,6 +889,9 @@ public class OpenRosaServices {
                 item.appendChild(userName);
                 item.appendChild(firstName);
                 item.appendChild(lastName);
+                if (userAccount.getUserName().equals(currentUser.getUserName())) {
+                    item.setAttribute("current", "true");
+                }
                 root.appendChild(item);
             }
         }

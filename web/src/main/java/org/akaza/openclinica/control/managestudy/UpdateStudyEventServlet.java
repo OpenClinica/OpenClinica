@@ -495,7 +495,9 @@ public class UpdateStudyEventServlet extends SecureController {
             boolean isAuthenticated = auth0UserService.authenticateAuth0User(username, password);
             if (isAuthenticated && ub.getName().equals(username)) {
                 seb.setUpdater(ub);
-                seb.setUpdatedDate(new Date());
+                seb.setUpdatedDate(date);
+                seb.setAttestation("The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
+                        + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3"));
                 sedao.update(seb);
 
                 // If all the StudyEvents become signed we will make the

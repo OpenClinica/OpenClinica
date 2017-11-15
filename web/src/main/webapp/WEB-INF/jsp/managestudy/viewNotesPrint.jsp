@@ -43,6 +43,7 @@
 	<td class="table_header_row"><fmt:message key="CRF_status" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="entity_name" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="entity_value" bundle="${resword}"/></td>
+	<td class="table_header_row"><fmt:message key="entity_type" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="detailed_notes" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="of_notes" bundle="${resword}"/></td>
 	<td class="table_header_row"><fmt:message key="assigned_user" bundle="${resword}"/></td>
@@ -73,6 +74,7 @@
 	    <c:out value="${note.entityName}"/>&nbsp;	 
 	</td>
 	<td class="table_cell"><c:out value="${note.entityValue}" />&nbsp;</td>
+	<td class="table_cell"><c:out value="${note.entityType}" />&nbsp;</td>
     <td class="table_cell" width="400">		
 	 <c:out value="${note.detailedNotes}" />&nbsp; 
 	</td>

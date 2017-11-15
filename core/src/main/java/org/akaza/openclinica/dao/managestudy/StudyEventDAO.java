@@ -47,12 +47,11 @@ import org.akaza.openclinica.service.rule.StudyEventBeanListener;
  *
  */
 public class StudyEventDAO extends AuditableEntityDAO implements Listener {
-    
-	
-	private Observer observer;
-	// private DAODigester digester;
 
-	    private void setQueryNames() {
+    private Observer observer;
+    // private DAODigester digester;
+
+    private void setQueryNames() {
         findByPKAndStudyName = "findByPKAndStudy";
         getCurrentPKName = "getCurrentPrimaryKey";
     }
@@ -108,7 +107,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         this.setTypeExpected(14, TypeNames.BOOL); // start_time_flag
         this.setTypeExpected(15, TypeNames.BOOL); // end_time_flag
         // YW >>
-
+        this.setTypeExpected(16, TypeNames.STRING); // attestation
     }
 
     public void setTypesExpected(boolean withSubject) {
@@ -183,6 +182,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         // YW 08-17-2007
         eb.setStartTimeFlag((Boolean) hm.get("start_time_flag"));
         eb.setEndTimeFlag((Boolean) hm.get("end_time_flag"));
+        eb.setAttestation((String) hm.get("attestation"));
 
         return eb;
     }
@@ -214,6 +214,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         if (withSubject) {
             eb.setStudySubjectLabel((String) hm.get("label"));
         }
+        eb.setAttestation((String) hm.get("attestation"));
 
         return eb;
     }
@@ -458,6 +459,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
 
         return eb;
     }
+
     public EntityBean findByPKCached(int ID) {
         StudyEventBean eb = new StudyEventBean();
         this.setTypesExpected();
@@ -480,8 +482,9 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
      * Creates a new studysubject
      */
     public EntityBean create(EntityBean eb) {
-        return create(eb,false);
+        return create(eb, false);
     }
+
     /**
      * Creates a new studysubject
      */
@@ -525,10 +528,10 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         if (isQuerySuccessful()) {
             sb.setId(getLatestPK());
         }
-        
-        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true,true);
+
+        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true, true);
         changeDetails.setRunningInTransaction(isTransaction);
-        StudyEventBeanContainer container = new StudyEventBeanContainer(sb,changeDetails);
+        StudyEventBeanContainer container = new StudyEventBeanContainer(sb, changeDetails);
         notifyObservers(container);
         return sb;
     }
@@ -537,25 +540,25 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
      * Updates a Study event
      */
     public EntityBean update(EntityBean eb) {
-        return update(eb,false);
+        return update(eb, false);
     }
-    
+
     /**
      * Updates a Study event
      */
     public EntityBean update(EntityBean eb, boolean isTransaction) {
-    	 Connection con = null;
-    	 return update( eb, con, isTransaction);
+        Connection con = null;
+        return update(eb, con, isTransaction);
     }
-    
+
     public EntityBean update(EntityBean eb, Connection con) {
-        return update(eb,con,false);
+        return update(eb, con, false);
     }
-    /* this function allows to run transactional updates for an action*/
-    
+    /* this function allows to run transactional updates for an action */
+
     public EntityBean update(EntityBean eb, Connection con, boolean isTransaction) {
         StudyEventBean sb = (StudyEventBean) eb;
-        StudyEventBean oldStudyEventBean = (StudyEventBean)findByPK(sb.getId());
+        StudyEventBean oldStudyEventBean = (StudyEventBean) findByPK(sb.getId());
         HashMap nullVars = new HashMap();
         HashMap variables = new HashMap();
         // UPDATE study_event SET
@@ -580,7 +583,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         }
         variables.put(Integer.valueOf(7), Integer.valueOf(sb.getStatus().getId()));
         // changing date_updated from java.util.Date() into postgres now() statement
-       // variables.put(Integer.valueOf(8), new java.util.Date());// DATE_Updated
+        // variables.put(Integer.valueOf(8), new java.util.Date());// DATE_Updated
         variables.put(Integer.valueOf(8), Integer.valueOf(sb.getUpdater().getId()));
         variables.put(Integer.valueOf(9), Integer.valueOf(sb.getSubjectEventStatus().getId()));
         variables.put(Integer.valueOf(10), sb.getStartTimeFlag()); // YW
@@ -589,28 +592,29 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         variables.put(Integer.valueOf(11), sb.getEndTimeFlag()); // YW
         // 08-17-2007,
         // end_time_flag
-        variables.put(Integer.valueOf(12), Integer.valueOf(sb.getId()));
+        variables.put(Integer.valueOf(12), sb.getAttestation()); // YW
+        variables.put(Integer.valueOf(13), Integer.valueOf(sb.getId()));
 
         String sql = digester.getQuery("update");
-        if ( con == null){
-        	this.execute(sql, variables, nullVars);
-        }else{
-        	this.execute(sql, variables, nullVars, con);
+        if (con == null) {
+            this.execute(sql, variables, nullVars);
+        } else {
+            this.execute(sql, variables, nullVars, con);
         }
-        
+
         if (isQuerySuccessful()) {
             sb.setActive(true);
         }
 
         StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
         if (oldStudyEventBean.getDateStarted().compareTo(sb.getDateStarted()) != 0)
-        	changeDetails.setStartDateChanged(true);
-        if (oldStudyEventBean.getSubjectEventStatus().getId() != sb.getSubjectEventStatus().getId()) 
-        	changeDetails.setStatusChanged(true);
+            changeDetails.setStartDateChanged(true);
+        if (oldStudyEventBean.getSubjectEventStatus().getId() != sb.getSubjectEventStatus().getId())
+            changeDetails.setStatusChanged(true);
         changeDetails.setRunningInTransaction(isTransaction);
-        StudyEventBeanContainer container = new StudyEventBeanContainer(sb,changeDetails);
-       notifyObservers(container);
-        
+        StudyEventBeanContainer container = new StudyEventBeanContainer(sb, changeDetails);
+        notifyObservers(container);
+
         return sb;
     }
 
@@ -878,7 +882,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
                 returnMe.put(event, crfs);// maybe combine the two crf +
                 // version?
             }
-        }// end of cycling through answers
+        } // end of cycling through answers
 
         return returnMe;
     }
@@ -905,7 +909,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
             crf.setName((String) answers.get("crf_name") + " " + (String) answers.get("ver_name"));
             crf.setId(((Integer) answers.get("crf_version_id")).intValue());
             returnMe.put(event, crf);// maybe combine the two crf + version?
-        }// end of cycling through answers
+        } // end of cycling through answers
 
         return returnMe;
     }
@@ -1003,13 +1007,13 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
                         if (cvbCheck.getId() == cvb.getId()) {
                             versionFound = true;
                         }
-                    }// end of iteration through versions
+                    } // end of iteration through versions
                     if (!versionFound) {
                         oldList.add(cvb);
                         crfs.put(cbean, oldList);
-                    }// end of adding new version to old crf
-                }// end of check to see if current crf is in list
-            }// end of iterating
+                    } // end of adding new version to old crf
+                } // end of check to see if current crf is in list
+            } // end of iterating
             if (!found) {
                 // add new crf here with version
                 // CRFVersionBean cvb = (CRFVersionBean)cvdao.findByPK(
@@ -1018,7 +1022,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
                 newList.add(cvb);
                 crfs.put(cbean, newList);
             }
-        }// end of cycling through answers
+        } // end of cycling through answers
 
         return crfs;
     }
@@ -1134,8 +1138,8 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         this.setTypeExpected(3, TypeNames.INT);
         this.setTypeExpected(3, TypeNames.INT);
 
-        ArrayList rows =
-            select("SELECT study_event_id, study_event_definition_id, study_subject_id, sample_ordinal FROM study_event ORDER BY study_subject_id ASC, study_event_definition_id ASC, sample_ordinal ASC");
+        ArrayList rows = select(
+                "SELECT study_event_id, study_event_definition_id, study_subject_id, sample_ordinal FROM study_event ORDER BY study_subject_id ASC, study_event_definition_id ASC, sample_ordinal ASC");
 
         for (int i = 0; i < rows.size(); i++) {
             HashMap row = (HashMap) rows.get(i);
@@ -1199,21 +1203,21 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
             return 0;
         }
     }
-    
+
     public HashMap getStudySubjectCRFData(StudyBean sb, int studySubjectId, int eventDefId, String crfVersionOID, int eventOrdinal) {
         HashMap studySubjectCRFDataDetails = new HashMap();
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
         this.setTypeExpected(2, TypeNames.INT);
         this.setTypeExpected(2, TypeNames.INT);
-       
+
         HashMap variables = new HashMap();
         variables.put(1, Integer.valueOf(sb.getId()));
         variables.put(2, Integer.valueOf(eventOrdinal));
         variables.put(3, crfVersionOID);
         variables.put(4, Integer.valueOf(studySubjectId));
         variables.put(5, Integer.valueOf(eventDefId));
-        
+
         ArrayList alist = this.select(digester.getQuery("getStudySubjectCRFDataDetails"), variables);
         // TODO make sure this other statement for eliciting crfs works, tbh
         // switched from getEventAndCRFVersionInformation
@@ -1234,24 +1238,24 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
             returnMe.put("event_definition_crf_id", answers.get("event_definition_crf_id"));
             returnMe.put("study_event_id", answers.get("study_event_id"));
 
-        }// end of cycling through answers
+        } // end of cycling through answers
 
         return returnMe;
     }
 
-    private void notifyObservers(StudyEventBeanContainer sbc){
-    if(getObserver()!=null)
-    	getObserver().update(sbc);
+    private void notifyObservers(StudyEventBeanContainer sbc) {
+        if (getObserver() != null)
+            getObserver().update(sbc);
     }
-    
-    @Override
-	public Observer getObserver() {
-		return new StudyEventBeanListener(this);
-	}
 
-	@Override
+    @Override
+    public Observer getObserver() {
+        return new StudyEventBeanListener(this);
+    }
+
+    @Override
     public void setObserver(Observer observer) {
-		this.observer = observer;
-	}
+        this.observer = observer;
+    }
 
 }

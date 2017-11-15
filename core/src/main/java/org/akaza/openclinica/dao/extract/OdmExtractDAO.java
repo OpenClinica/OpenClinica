@@ -466,6 +466,8 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // new_value
         ++i;
+        this.setTypeExpected(i, TypeNames.STRING); // details
+        ++i;
         this.setTypeExpected(i, TypeNames.INT); // audit_log_event_type_id
     }
 
@@ -2563,6 +2565,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String auditReason = (String) row.get("reason_for_change");
             String oldValue = (String) row.get("old_value");
             String newValue = (String) row.get("new_value");
+            String details = (String) row.get("details");
             Integer typeId = (Integer) row.get("audit_log_event_type_id");
 
             if (evnOidPoses.containsKey(studySubjectLabel + sedOid)) {
@@ -2575,6 +2578,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setDatetimeStamp(auditDate);
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
+                auditLog.setDetails(details);
                 if (typeId == 17 || typeId == 18 || typeId == 19 || typeId == 20 || typeId == 21 || typeId == 22 || typeId == 23 || typeId == 31) {
                     if ("0".equals(newValue)) {
                         auditLog.setOldValue(SubjectEventStatus.INVALID.getName());
@@ -3623,7 +3627,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getOCEventDataAuditsSql(String studySubjectOids) {
         return "select ss.oc_oid as study_subject_oid, sed.oc_oid as definition_oid, ale.audit_id,"
-                + " alet.name, ale.user_id, ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value," + " ale.audit_log_event_type_id"
+                + " alet.name, ale.user_id, ale.audit_date, ale.reason_for_change, ale.old_value, ale.new_value, ale.details," + " ale.audit_log_event_type_id"
                 + " from audit_log_event ale, study_subject ss, study_event se, study_event_definition sed, audit_log_event_type alet"
                 + " where audit_table = 'study_event' and ss.oc_oid in (" + studySubjectOids + ") and ss.study_subject_id = se.study_subject_id"
                 + " and ale.entity_id = se.study_event_id" + " and se.study_event_definition_id = sed.study_event_definition_id"

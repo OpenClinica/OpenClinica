@@ -468,7 +468,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         if (!StringUtils.isEmpty(sdvDescription) && SourceDataVerification.getByDescription(sdvDescription) != null) {
             eventDefinitionCrf.setSourceDataVerificationCode(SourceDataVerification.getByDescription(conf.getSourceDataVerificationCode()).getCode());
         } else {
-            eventDefinitionCrf.setSourceDataVerificationCode(SourceDataVerification.PARTIALREQUIRED.getCode());
+            eventDefinitionCrf.setSourceDataVerificationCode(SourceDataVerification.NOTAPPLICABLE.getCode());
         }
         eventDefinitionCrf.setSubmissionUrl(conf.getSubmissionUrl());
 
