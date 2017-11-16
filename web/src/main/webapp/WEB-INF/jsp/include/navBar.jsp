@@ -128,8 +128,8 @@
                         <b><a href="${urlPrefix}ViewStudy?id=${study.id}&viewFull=yes" title="<c:out value='${study.name}'/>" alt="<c:out value='${study.name}'/>"><c:out value="${study.abbreviatedName}" /></a></b>
                     </c:otherwise>
                 </c:choose>
-                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;|&nbsp;&nbsp;
-                <a href="${urlPrefix}ChangeStudy">Change</a>
+                (<c:out value="${study.abbreviatedIdentifier}" />)&nbsp;&nbsp;<c:if test="${study.envType == 'TEST'}"><span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/></span></c:if>&nbsp;&nbsp;|&nbsp;&nbsp;
+                <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>
 
             </div>
 
