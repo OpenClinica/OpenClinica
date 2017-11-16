@@ -118,12 +118,6 @@ public class CustomMultiTenantSpringLiquibase implements InitializingBean, Resou
 
             this.log.info("Initializing Liquibase for schema " + schema);
             CustomSpringLiquibase liquibase = this.getSpringLiquibase(this.dataSource);
-            try {
-                Connection c = dataSource.getConnection();
-                c.setSchema(schema);
-            } catch (SQLException e) {
-                e.printStackTrace();
-            }
             liquibase.setDefaultSchema(schema);
             liquibase.afterPropertiesSet();
             this.log.info("Liquibase ran for schema " + schema);

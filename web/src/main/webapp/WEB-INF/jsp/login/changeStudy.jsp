@@ -80,7 +80,9 @@
                  <tr>
                    <td class="table_cell">&nbsp;&nbsp;<img src="images/bullet.gif">
                    <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>
-                       <c:out value="${studyRole.studyName}"/> (<c:out value="${studyRole.envType}"/>)
+                       <c:out value="${studyRole.studyName}"/> 
+                       <c:if test="${studyRole.envType == 'TEST'}">(<c:out value="Test"/>)</c:if>
+                       <c:if test="${studyRole.envType == 'PROD'}">(<c:out value="Production"/>)</c:if>
                        <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
                        (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>) </td>
                  </tr>
@@ -91,7 +93,9 @@
                  <tr>
                  <td class="table_cell">
                      <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>">
-                     <b><c:out value="${studyRole.studyName}"/> (<c:out value="${studyRole.envType}"/>) (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
+                     <b><c:out value="${studyRole.studyName}"/> 
+                     <c:if test="${studyRole.envType == 'TEST'}">(<c:out value="Test"/>)</c:if>
+                     <c:if test="${studyRole.envType == 'PROD'}">(<c:out value="Production"/>)</c:if> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">
@@ -111,7 +115,8 @@
                       <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>
                       <c:out value="${studyRole.studyName}"/>
                       <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
-                      (<c:out value="${studyRole.envType}"/>)
+                      <c:if test="${studyRole.envType == 'TEST'}">(<c:out value="Test"/>)</c:if>
+                      <c:if test="${studyRole.envType == 'PROD'}">(<c:out value="Production"/>)</c:if>
                       (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</td>
                  </tr>
                </c:if>
@@ -121,7 +126,9 @@
                  <tr>
                   <td class="table_cell">
                       <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>">
-                      <b><c:out value="${studyRole.studyName}"/> (<c:out value="${studyRole.envType}"/>) (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
+                      <b><c:out value="${studyRole.studyName}"/> 
+                      <c:if test="${studyRole.envType == 'TEST'}">(<c:out value="Test"/>)</c:if>
+                      <c:if test="${studyRole.envType == 'PROD'}">(<c:out value="Production"/>)</c:if> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">
