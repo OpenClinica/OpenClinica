@@ -261,6 +261,7 @@ public class EnketoAPI {
         String ecid = editUrlObject.ecid;
         String crfOid = editUrlObject.crfOid;
         Study parentStudy = editUrlObject.parentStudy;
+        Study site = editUrlObject.site;
         StudyEvent studyEvent = editUrlObject.studyEvent;
         boolean markComplete = editUrlObject.markComplete;
         EventDefinitionCrf edc = editUrlObject.edc;
@@ -288,7 +289,9 @@ public class EnketoAPI {
             URL eURL = null;
             // https://jira.openclinica.com/browse/OC-8270 Open Form when event is locked
             // https://jira.openclinica.com/browse/OC-8269 Open Form when study is locked
-            if (parentStudy.getStatus().equals(Status.LOCKED) || studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId())
+
+            if (((parentStudy.getStatus().equals(Status.LOCKED)) || (site != null && site.getStatus().equals(Status.LOCKED)))
+                    || studyEvent.getSubjectEventStatusId().equals(SubjectEventStatus.LOCKED.getId())
                     || studyEvent.getStatusId().equals(Status.DELETED.getCode()) || studyEvent.getStatusId().equals(Status.AUTO_DELETED.getCode())
                     || edc.getStatusId().equals(Status.DELETED.getCode()) || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())
                     || eventCrf.getStatusId().equals(Status.DELETED.getCode()) || eventCrf.getStatusId().equals(Status.AUTO_DELETED.getCode())) {
@@ -318,25 +321,33 @@ public class EnketoAPI {
                 // https://jira.openclinica.com/browse/OC-8266 Data Entry Person edits XForms.
                 // https://jira.openclinica.com/browse/OC-7572 Investigator edits XForms.
                 // https://jira.openclinica.com/browse/OC-7571 CRC edits XForms.
-            } else if (flavor.equals(QUERY_FLAVOR) && !parentStudy.getStatus().equals(Status.FROZEN) && mode.equals(EDIT_MODE)
+            } else if (flavor.equals(QUERY_FLAVOR) &&
+                    ((!parentStudy.getStatus().equals(Status.FROZEN) || (site != null && !site.getStatus().equals(Status.FROZEN))))
+                    && mode.equals(EDIT_MODE)
                     && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
                 eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN);
 
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
                 // https://jira.openclinica.com/browse/OC-8279 Study Director edits XForms.
                 // https://jira.openclinica.com/browse/OC-8278 Data Manager edits XForms.
-            } else if (flavor.equals(QUERY_FLAVOR) && !parentStudy.getStatus().equals(Status.FROZEN) && mode.equals(EDIT_MODE)
+            } else if (flavor.equals(QUERY_FLAVOR) &&
+                    ((!parentStudy.getStatus().equals(Status.FROZEN)) || (site != null && !site.getStatus().equals(Status.FROZEN)))
+                    && mode.equals(EDIT_MODE)
                     && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
                 eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN_CLOSE_BUTTON);
 
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
-            } else if (flavor.equals(QUERY_FLAVOR) && parentStudy.getStatus().equals(Status.FROZEN) && mode.equals(EDIT_MODE)
+            } else if (flavor.equals(QUERY_FLAVOR) &&
+                    ((parentStudy.getStatus().equals(Status.FROZEN)) || (site != null && site.getStatus().equals(Status.FROZEN)))
+                    && mode.equals(EDIT_MODE)
                     && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
                 eURL = new URL(enketoURL + INSTANCE_READONLY_DN);
                 markComplete = false;
 
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
-            } else if (flavor.equals(QUERY_FLAVOR) && parentStudy.getStatus().equals(Status.FROZEN) && mode.equals(EDIT_MODE)
+            } else if (flavor.equals(QUERY_FLAVOR) &&
+                    ((parentStudy.getStatus().equals(Status.FROZEN)) || (site != null && site.getStatus().equals(Status.FROZEN)))
+                    && mode.equals(EDIT_MODE)
                     && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
                 eURL = new URL(enketoURL + INSTANCE_READONLY_DN_CLOSE_BUTTON);
                 markComplete = false;

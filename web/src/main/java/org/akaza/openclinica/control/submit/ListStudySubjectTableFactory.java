@@ -231,9 +231,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         for (StudySubjectBean studySubjectBean : items) {
             StudyBean study = (StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId());
 
-            if (study.getStatus() != Status.AVAILABLE)
-                continue;
-
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
             theItem.put("studySubject", studySubjectBean);
             theItem.put("studySubject.label", studySubjectBean.getLabel());
