@@ -5,10 +5,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-
-<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <%
@@ -36,6 +32,20 @@
         window.location.replace (myContextPath + '/pages/logout');
     }
 
+    //Piwik
+    var _paq = _paq || [];
+    /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
+    _paq.push(["setDocumentTitle", document.domain + "/" + document.title]);
+    _paq.push(['trackPageView']);
+    _paq.push(['enableLinkTracking']);
+    (function() {
+    var u='<c:out value="${sessionScope.piwikURL}" />';
+    _paq.push(['setTrackerUrl', u+'piwik.php']);
+    _paq.push(['setSiteId', '1']);
+    var d=document, g=d.createElement('script'), s=d.getElementsByTagName('script')[0];
+    g.type='text/javascript'; g.async=true; g.defer=true; g.src=u+'piwik.js'; s.parentNode.insertBefore(g,s);
+    })();
+
 
     // Walkme snippet
     (function () {
@@ -48,7 +58,7 @@
         window._walkmeConfig = {
             smartLoad: true
         };
-    });
+    })();
 
     function confirmCancel(pageName) {
         var confirm1 = confirm('<fmt:message key="sure_to_cancel" bundle="${resword}"/>');
@@ -119,12 +129,21 @@
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}"/>
 <c:set var="requestFromSpringControllerCCV" value="${param.isSpringControllerCCV}"/>
-<c:if test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
-    <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
-</c:if>
+<c:choose>
+    <c:when test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
+        <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
+        <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
+        <link rel="stylesheet" href="../includes/css/icomoon-style.css">
+    </c:when>
+    <c:otherwise>
+        <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+        <link rel="stylesheet" href="includes/css/icomoon-style.css">
+    </c:otherwise>
+</c:choose>
 
 <!-- Main Navigation -->
-<link rel="stylesheet" href="includes/css/icomoon-style.css">
 <div class="oc_nav">
     <div class="nav-top-bar">
         <!-- Logo -->

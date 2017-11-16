@@ -346,6 +346,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             String o = audit.getOldValue();
             String n = audit.getNewValue();
             String vt = audit.getValueType();
+            String details = (audit.getDetails() != null) ? audit.getDetails() : "";
 
             Boolean p = i.length() > 0 || u.length() > 0 || d != null || t.length() > 0 || r.length() > 0 || o.length() > 0 || n.length() > 0 ? true : false;
             if (p) {
@@ -384,6 +385,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (vt.length() > 0) {
                     xml.append(nls);
                     xml.append(currentIndent + "                      ValueType=\"" + StringEscapeUtils.escapeXml(vt) + "\"");
+                }
+                if (details.length() > 0) {
+                    xml.append(nls);
+                    xml.append(currentIndent + "                      Details=\"" + StringEscapeUtils.escapeXml(details) + "\"");
                 }
                 xml.append("/>");
                 xml.append(nls);

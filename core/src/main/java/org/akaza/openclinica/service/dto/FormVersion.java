@@ -14,7 +14,7 @@ import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
 @JsonIgnoreProperties
-public class FormVersion {
+public class FormVersion extends AbstractAuditingEntity {
 
     @JsonProperty("artifactURL")
     private String artifactURL;
@@ -37,7 +37,7 @@ public class FormVersion {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
+     *
      * @return
      *         The artifactURL
      */
@@ -47,7 +47,7 @@ public class FormVersion {
     }
 
     /**
-     * 
+     *
      * @param artifactURL
      *            The artifactURL
      */
@@ -57,7 +57,7 @@ public class FormVersion {
     }
 
     /**
-     * 
+     *
      * @return
      *         The description
      */
@@ -67,7 +67,7 @@ public class FormVersion {
     }
 
     /**
-     * 
+     *
      * @param description
      *            The description
      */
@@ -77,7 +77,7 @@ public class FormVersion {
     }
 
     /**
-     * 
+     *
      * @return
      *         The id
      */
@@ -87,7 +87,7 @@ public class FormVersion {
     }
 
     /**
-     * 
+     *
      * @param id
      *            The id
      */
@@ -97,7 +97,7 @@ public class FormVersion {
     }
 
     /**
-     * 
+     *
      * @return
      *         The name
      */
@@ -107,7 +107,7 @@ public class FormVersion {
     }
 
     /**
-     * 
+     *
      * @param name
      *            The name
      */
@@ -117,7 +117,7 @@ public class FormVersion {
     }
 
     /**
-     * 
+     *
      * @return
      *         The ocoid
      */
@@ -127,7 +127,7 @@ public class FormVersion {
     }
 
     /**
-     * 
+     *
      * @param ocoid
      *            The ocoid
      */
@@ -137,7 +137,7 @@ public class FormVersion {
     }
 
     /**
-     * 
+     *
      * @return
      *         The previewURL
      */
@@ -147,7 +147,7 @@ public class FormVersion {
     }
 
     /**
-     * 
+     *
      * @param previewURL
      *            The previewURL
      */

@@ -66,6 +66,8 @@ public class EnketoFormServlet extends SecureController {
         } else {
             context.setAttribute("SS_OID", "");
         }
+        String userId = String.valueOf(ub.getId());
+        context.setAttribute("USER_ID", userId);
         subjectContext.setFormLayoutOid(formLayout.getOcOid());
         subjectContext.setUserAccountId(String.valueOf(ub.getId()));
         subjectContext.setStudyOid((currentStudy.getOid()));

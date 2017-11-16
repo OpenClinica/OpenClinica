@@ -36,6 +36,7 @@ public class AuditBean extends EntityBean {
     private Date dateInterviewed;
     private String interviewerName;
     private int itemDataRepeatKey;
+    private String details;
 
     public int getItemDataRepeatKey() {
         return itemDataRepeatKey;
@@ -242,6 +243,14 @@ public class AuditBean extends EntityBean {
 
     public void setFormLayoutName(String formLayoutName) {
         this.formLayoutName = formLayoutName;
+    }
+
+    public String getDetails() {
+        return details;
+    }
+
+    public void setDetails(String details) {
+        this.details = details;
     }
 
 }

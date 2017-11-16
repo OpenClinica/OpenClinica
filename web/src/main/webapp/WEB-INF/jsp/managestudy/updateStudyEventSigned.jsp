@@ -96,7 +96,7 @@
 
 <p><fmt:message key="sure_to_sign_subject" bundle="${resword}"/></p>
 
-<p><fmt:message key="sure_to_sign_subject1" bundle="${resword}"/></p>
+<p><fmt:message key="sure_to_sign_subject3" bundle="${resword}"/></p>
 
 <b><fmt:message key="user_full_name" bundle="${resword}"/>: <c:out value="${userBean.firstName}"/>&nbsp;<c:out value="${userBean.lastName}"/>
 <br/>
