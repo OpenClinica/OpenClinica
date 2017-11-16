@@ -12,8 +12,8 @@ import com.fasterxml.jackson.annotation.JsonIgnore;
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import com.fasterxml.jackson.annotation.JsonProperty;
 
-@JsonIgnoreProperties
-public class Form {
+@JsonIgnoreProperties(ignoreUnknown = true)
+public class Form extends AbstractAuditingEntity {
 
     @JsonProperty("description")
     private String description;
@@ -31,7 +31,7 @@ public class Form {
     private Map<String, Object> additionalProperties = new HashMap<String, Object>();
 
     /**
-     * 
+     *
      * @return
      *         The description
      */
@@ -41,7 +41,7 @@ public class Form {
     }
 
     /**
-     * 
+     *
      * @param description
      *            The description
      */
@@ -51,7 +51,7 @@ public class Form {
     }
 
     /**
-     * 
+     *
      * @return
      *         The id
      */
@@ -61,7 +61,7 @@ public class Form {
     }
 
     /**
-     * 
+     *
      * @param id
      *            The id
      */
@@ -71,7 +71,7 @@ public class Form {
     }
 
     /**
-     * 
+     *
      * @return
      *         The name
      */
@@ -81,7 +81,7 @@ public class Form {
     }
 
     /**
-     * 
+     *
      * @param name
      *            The name
      */
@@ -91,7 +91,7 @@ public class Form {
     }
 
     /**
-     * 
+     *
      * @return
      *         The ocoid
      */
@@ -101,7 +101,7 @@ public class Form {
     }
 
     /**
-     * 
+     *
      * @param ocoid
      *            The ocoid
      */
@@ -111,7 +111,7 @@ public class Form {
     }
 
     /**
-     * 
+     *
      * @return
      *         The protocolId
      */
@@ -121,7 +121,7 @@ public class Form {
     }
 
     /**
-     * 
+     *
      * @param protocolId
      *            The protocolId
      */
@@ -131,7 +131,7 @@ public class Form {
     }
 
     /**
-     * 
+     *
      * @return
      *         The versions
      */
@@ -141,7 +141,7 @@ public class Form {
     }
 
     /**
-     * 
+     *
      * @param versions
      *            The versions
      */

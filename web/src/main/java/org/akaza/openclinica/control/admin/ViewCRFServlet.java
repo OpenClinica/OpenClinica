@@ -82,12 +82,6 @@ public class ViewCRFServlet extends SecureController {
         panel.setExtractData(false);
         panel.setCreateDataset(false);
 
-        setToPanel(resword.getString("create_CRF"), respage.getString("br_create_new_CRF_entering"));
-        setToPanel(resword.getString("create_CRF_version"), respage.getString("br_create_new_CRF_uploading"));
-        setToPanel(resword.getString("revise_CRF_version"), respage.getString("br_if_you_owner_CRF_version"));
-        setToPanel(resword.getString("CRF_spreadsheet_template"), respage.getString("br_download_blank_CRF_spreadsheet_from"));
-        setToPanel(resword.getString("example_CRF_br_spreadsheets"), respage.getString("br_download_example_CRF_instructions_from"));
-
         FormProcessor fp = new FormProcessor(request);
 
         // checks which module the requests are from, manage or admin

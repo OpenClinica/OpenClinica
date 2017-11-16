@@ -14,7 +14,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import javax.servlet.http.HttpServletRequest;
 
 @Controller
-@RequestMapping(value = "/studyversion")
+@RequestMapping(value = "/auth/api/v1/studyversion")
 public class OdmImportController {
 
     @Autowired

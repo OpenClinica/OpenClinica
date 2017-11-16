@@ -42,6 +42,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
+import org.akaza.openclinica.domain.datamap.AuditLogEventType;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
@@ -315,7 +316,7 @@ public class EnketoUrlService {
             LogBean logBean = new LogBean();
             String oldValue = audit.getOldValue() != null ? audit.getOldValue() : "";
             String newValue = audit.getNewValue() != null ? audit.getNewValue() : "";
-            logBean.setMessage("Value Changed from \"" + escapedValue(oldValue) + "\" to \"" + escapedValue(newValue) + "\"");
+            logBean.setMessage("Value changed from \"" + escapedValue(oldValue) + "\" to \"" + escapedValue(newValue) + "\"");
             DateTime dateTime = new DateTime(audit.getAuditDate());
             logBean.setDate_time(convertDateFormat(dateTime));
             UserAccount uAccount = userAccountDao.findById(audit.getUserAccount().getUserId());
@@ -463,17 +464,15 @@ public class EnketoUrlService {
             auditLogEvent.setAuditTable(STUDYEVENT);
             auditLogEvent.setEntityId(studyEvent.getStudyEventId());
             auditLogEvent.setEntityName("Status");
+            auditLogEvent.setAuditLogEventType(new AuditLogEventType(31));
+            auditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
 
             List<AuditLogEvent> ales = auditLogEventDao.findByParam(auditLogEvent);
             for (AuditLogEvent audit : ales) {
-                if (audit.getAuditLogEventType().getAuditLogEventTypeId() == 31
-                        && audit.getNewValue().equals(String.valueOf(SubjectEventStatus.SIGNED.getId()))) {
-                    String signature = audit.getDetails();
-
-                    instance = instance.substring(0, instance.indexOf("</meta>")) + "<oc:signature>" + signature + "</oc:signature>"
-                            + instance.substring(instance.indexOf("</meta>"));
-                    break;
-                }
+                String signature = audit.getDetails();
+                instance = instance.substring(0, instance.indexOf("</meta>")) + "<oc:signature>" + signature + "</oc:signature>"
+                        + instance.substring(instance.indexOf("</meta>"));
+                break;
             }
         }
         System.out.println(instance);

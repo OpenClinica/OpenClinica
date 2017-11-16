@@ -584,7 +584,7 @@ form[action="UpdateSubStudy"] .textbox_center td.table_cell, form[action="Update
 .jmesa .fa, .jmesa .icon {
   font-size: .9em; }
 
-.jmesa td {
+.jmesa td, .jmesa td text {
   font-size: .85rem; }
 
 .jmesa .table {
@@ -617,7 +617,7 @@ form[action="UpdateSubStudy"] .textbox_center td.table_cell, form[action="Update
 .jmesa table#findSubjects .odd > td, .jmesa table#findSubjects .even > td, .jmesa table#findSubjects .highlight > td, .jmesa table#findSubjects td table td {
   vertical-align: middle; }
 
-.jmesa table:not(#studyAuditLogs) .odd td, .jmesa table:not(#studyAuditLogs) .even td, .jmesa table:not(#studyAuditLogs) .highlight td {
+.jmesa table:not(#studyAuditLogs) .odd td, .jmesa table:not(#studyAuditLogs) .even td, .jmesa table:not(#studyAuditLogs) .highlight td, .jmesa table#listNotes td text {
   border: none;
   font-family: 'Open Sans', arial, helvetica, sans-serif;
   font-weight: 400;
@@ -866,4 +866,14 @@ div#subjectSDV table#sdv {
 
 body.query-page .aka_revised_content{
   max-width: 100%;
+}
+
+form#searchByStudySubjectId {
+  margin-bottom: 0;
+}
+
+.connect-widget {
+  padding: 10px;
+  background: #f1f1f1;
+  border-radius: 5px;
 }

@@ -1,6 +1,5 @@
 package org.akaza.openclinica.core;
 
-import liquibase.integration.spring.MultiTenantSpringLiquibase;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.apache.commons.lang.StringUtils;
@@ -17,8 +16,7 @@ import java.util.List;
 public class OCMultiTenantSpringLiquibase extends CustomMultiTenantSpringLiquibase {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
-    @Autowired
-    StudyDao studyDao;
+    @Autowired StudyDao studyDao;
     @Override
     public void afterPropertiesSet() throws Exception {
         List<String> schemas = new ArrayList<>();

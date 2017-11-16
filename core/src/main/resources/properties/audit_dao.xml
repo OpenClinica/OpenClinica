@@ -48,7 +48,7 @@
 		<sql>
 			SELECT  ale.audit_id, ale.audit_date, ale.audit_table, ale.user_id, ale.entity_id,
         	ale.entity_name, ale.reason_for_change, ale.audit_log_event_type_id, ale.old_value,
-        	ale.new_value, ale.event_crf_id, ua.user_name, alet.name
+        	ale.new_value, ale.event_crf_id, ua.user_name, alet.name, ale.details
 			FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
      		JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
 			WHERE ale.audit_log_event_type_id IN (17,18,19,20,21,22,23,24,25,26,31,35) AND ale.entity_id=? order by ale.audit_date desc;

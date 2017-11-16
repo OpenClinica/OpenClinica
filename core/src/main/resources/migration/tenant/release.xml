@@ -7,4 +7,6 @@
        <include file="migration/tenant/4.0-2017-06-19-OC-8195.xml"/>
        <include file="migration/tenant/4.0-2017-06-20-OC-8195.xml"/>
        <include file="migration/tenant/4.0-2017-09-28-1.xml"/>
+       <include file="migration/tenant/4.0-2017-11-07.xml"/>
+       <include file="migration/tenant/4.0-2017-11-08-OC-8483.xml"/>     
 </databaseChangeLog>
