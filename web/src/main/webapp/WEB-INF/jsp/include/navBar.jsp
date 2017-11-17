@@ -150,6 +150,9 @@
                     <c:if test="${study.status.frozen}">
                         <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="frozen" bundle="${resword}"/></span>
                     </c:if>
+                    <c:if test="${study.status.available}">
+                        <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/></span>
+                    </c:if>
                 </c:if>&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>
 
