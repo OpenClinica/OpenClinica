@@ -141,7 +141,15 @@
                     </c:if>
                 </c:if>
                 <c:if test="${study.envType == 'TEST'}">
-                    <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/></span>
+                    <c:if test="${study.status.pending}">
+                        <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="design" bundle="${resword}"/></span>
+                    </c:if>
+                    <c:if test="${study.status.locked}">
+                        <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="locked" bundle="${resword}"/></span>
+                    </c:if>
+                    <c:if test="${study.status.frozen}">
+                        <span class="status-tag status-${fn:toLowerCase(study.envType)}"><fmt:message key="test_environment" bundle="${resword}"/> | <fmt:message key="frozen" bundle="${resword}"/></span>
+                    </c:if>
                 </c:if>&nbsp;&nbsp;|&nbsp;&nbsp;
                 <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>
 
