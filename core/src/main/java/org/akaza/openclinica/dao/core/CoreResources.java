@@ -199,13 +199,15 @@ public class CoreResources implements ResourceLoaderAware {
         }
     }
 
-    public static void setRootUserAccountBean(HttpServletRequest request, DataSource dataSource) {
+    public static UserAccountBean setRootUserAccountBean(HttpServletRequest request, DataSource dataSource) {
         UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
         UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserName("root");
+        ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getName());
+        ub.setRoles(userRoleBeans);
         if (ub.getId() != 0) {
             request.getSession().setAttribute("userBean", ub);
         }
-
+        return ub;
     }
 
     /**

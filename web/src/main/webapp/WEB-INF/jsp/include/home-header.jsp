@@ -57,11 +57,6 @@
 </head>
 
 <body class="main_BG" topmargin="0" leftmargin="0" marginwidth="0" marginheight="0"
-<c:if test="${(study.status.locked || study.status.frozen || study.status.pending)}">
-<c:if test="${userBean.numVisitsToMainMenu<=1 || studyJustChanged=='yes'}">
-      onload="initmb();sm('box', 730,100);"
-</c:if>
-</c:if>
 <jsp:include page="../include/showPopUp.jsp"/>
 >
 

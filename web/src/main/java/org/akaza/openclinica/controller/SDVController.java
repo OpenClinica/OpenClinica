@@ -162,9 +162,6 @@ public class SDVController {
         
         UserAccountBean userBean = (UserAccountBean)request.getSession().getAttribute("userBean");
         StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
-        if (currentRole.isMonitor()) {
-            userBean.incNumVisitsToMainMenu();
-        }
 
         ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
         // Reseting the side info panel set by SecureControler Mantis Issue: 8680.
