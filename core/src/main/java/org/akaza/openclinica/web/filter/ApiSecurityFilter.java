@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.user.CreateUserCoreService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.LoggerFactory;
@@ -52,6 +53,8 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
 
     @Autowired
     private DataSource dataSource;
+
+    @Autowired CreateUserCoreService userService;
 
     private static final String PUBLIC_KEY_LOCATION = "oc4.cer";
     private static final String X509_CERTFICATE = "X509";
@@ -114,16 +117,16 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                                 SecurityContextHolder.getContext().setAuthentication(authentication);
                                 request.getSession().setAttribute("userBean",ub);
                             } else {
-                                ub = CoreResources.setRootUserAccountBean(request, dataSource);
-                                if (StringUtils.isEmpty(ub.getUserUuid())) {
-                                    // is the userUuid from the context map of the root user?
-                                    ResponseEntity<OCUserDTO> userResponse = getUserDetails(request);
-                                    if (userResponse != null) {
-                                        OCUserDTO userDTO = userResponse.getBody();
-                                        if (StringUtils.equalsIgnoreCase(userDTO.getUsername(), "root")) {
-                                            ub.setUserUuid(userDTO.getUuid());
-                                            userAccountDAO.update(ub);
-                                        }
+                                OCUserDTO userDTO = getUserDetails(request);
+                                if (userDTO.getUsername().equalsIgnoreCase("root")) {
+                                    CoreResources.setRootUserAccountBean(request, dataSource);
+                                } else {
+                                    try {
+                                        HashMap<String, String> userAccount = createUserAccount(request, userDTO);
+                                        UserAccountBean user = userService.createUser(request, userAccount);
+                                        request.getSession().setAttribute("userBean",user);
+                                    } catch (Exception e) {
+                                        logger.error("Failed user creation:" + e.getMessage());
                                     }
                                 }
                             }
@@ -179,7 +182,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
         }
     }
 
-    public ResponseEntity getUserDetails (HttpServletRequest request) {
+    public OCUserDTO getUserDetails (HttpServletRequest request) {
         Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
         if (userContextMap == null)
             return null;
@@ -200,7 +203,31 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
         ResponseEntity<OCUserDTO> response = restTemplate.exchange(uri, HttpMethod.GET, entity, OCUserDTO.class);
-        return response;
+        if (response == null)
+            return null;
+        return response.getBody();
+    }
+    private HashMap<String, String>  createUserAccount(HttpServletRequest request, OCUserDTO user) throws Exception {
+        HashMap<String, String> map = new HashMap<>();
+        map.put("username", user.getUsername());
+        if (StringUtils.isNotEmpty(user.getFirstName()))
+            map.put("fName", user.getFirstName());
+        else
+            map.put("fName", "first");
+        if (StringUtils.isNotEmpty(user.getLastName()))
+            map.put("lName", user.getLastName());
+        else
+            map.put("lName", "last");
+
+        map.put("role_name", "Data Manager");
+        map.put("user_uuid", user.getUuid());
+        org.akaza.openclinica.service.UserType userType = user.getUserType();
+
+        map.put("user_type", userType.getName());
+        map.put("authorize_soap", "true");
+        map.put("email", user.getEmail());
+        map.put("institution", "OC");
+        return map;
     }
 
 }

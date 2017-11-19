@@ -1325,7 +1325,7 @@ public class StudyController {
 */
     @RequestMapping(value = "/{studyEnvUuid}/sites", method = RequestMethod.POST)
     public ResponseEntity<Object> createNewSites(HttpServletRequest request,
-                                                 @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
+            @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
         logger.debug("Creating site(s) for study:" + studyEnvUuid);
         StudyBean siteBean = null;
         ResponseEntity<Object> response = null;
@@ -1811,6 +1811,8 @@ public class StudyController {
 
     public UserAccountBean getSiteOwnerAccount(HttpServletRequest request, StudyBean study) {
         UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
+        studyBuildService.updateStudyUserRoles(request, studyBuildService.getUserAccountObject(ownerUserAccount)
+                , ownerUserAccount.getActiveStudyId());
         StudyUserRoleBean currentRole = createUserRole(ownerUserAccount, study);
 
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
