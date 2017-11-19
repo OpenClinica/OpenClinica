@@ -110,6 +110,7 @@
           <c:choose>
             <c:when test="${studyRole.parentStudyId > 0}">
                <c:if test="${!studyRole.invalid}">
+                <c:if test="${study.status.available || study.status.locked || study.status.frozen}">
                  <tr>
                   <td class="table_cell">&nbsp;&nbsp;<img src="images/bullet.gif">
                       <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>
@@ -119,6 +120,7 @@
                       <c:if test="${studyRole.envType == 'PROD'}">(<c:out value="Production"/>)</c:if>
                       (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</td>
                  </tr>
+                </c:if>
                </c:if>
             </c:when>
             <c:otherwise>
