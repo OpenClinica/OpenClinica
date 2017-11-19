@@ -7,6 +7,16 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
+import java.sql.Types;
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Iterator;
+import java.util.Locale;
+
+import javax.sql.DataSource;
+
 /**
  * <P>
  * StudyDAO.java, the data access object that users will access the database for
@@ -21,14 +31,15 @@ import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyType;
-import org.akaza.openclinica.dao.core.*;
+import org.akaza.openclinica.dao.core.AuditableEntityDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.core.DAODigester;
+import org.akaza.openclinica.dao.core.SQLFactory;
+import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.apache.commons.lang.StringUtils;
 
-import javax.sql.DataSource;
-import java.sql.Types;
-import java.util.*;
-public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEntityDAO {
+public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEntityDAO {
     // private DataSource ds;
     // private DAODigester digester;
     public StudyDAO(DataSource ds) {
@@ -117,6 +128,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         this.setTypeExpected(59, TypeNames.STRING);// env type
         this.setTypeExpected(60, TypeNames.STRING);// study env uuid
         this.setTypeExpected(61, TypeNames.BOOL);// published
+        this.setTypeExpected(62, TypeNames.INT);// file path
     }
 
     /**
@@ -482,7 +494,8 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         }
         variables.put(new Integer(22), sb.getStudyEnvSiteUuid());
         variables.put(new Integer(23), sb.isPublished());
-        variables.put(new Integer(24), new Integer(sb.getId()));
+        variables.put(new Integer(24), sb.getFilePath());
+        variables.put(new Integer(25), new Integer(sb.getId()));
         this.execute(digester.getQuery("createStepTwo"), variables, nullVars);
         return sb;
     }
@@ -576,7 +589,7 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         eb.setHealthyVolunteerAccepted(((Boolean) hm.get("healthy_volunteer_accepted")).booleanValue());
         eb.setResultsReference(((Boolean) hm.get("results_reference")).booleanValue());
         // eb.setUsingDOB(((Boolean)hm.get("collect_dob")).booleanValue());
-        //eb.setDiscrepancyManagement(((Boolean)hm.get("discrepancy_management")
+        // eb.setDiscrepancyManagement(((Boolean)hm.get("discrepancy_management")
         // ).booleanValue());
         // next set all the ints/dates
 
@@ -619,8 +632,9 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         if (StringUtils.isNotEmpty(envTypeStr))
             eb.setEnvType(StudyEnvEnum.valueOf(envTypeStr.toUpperCase()));
         eb.setStudyEnvSiteUuid((String) hm.get("study_env_site_uuid"));
-        eb.setStudyEnvUuid((String)hm.get("study_env_uuid"));
+        eb.setStudyEnvUuid((String) hm.get("study_env_uuid"));
         eb.setPublished(((Boolean) hm.get("published")).booleanValue());
+        eb.setFilePath((Integer) hm.get("file_path"));
         return eb;
     }
 
@@ -953,8 +967,6 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         variables.put(new Integer(1), sb.getStatus().getId());
         variables.put(new Integer(2), sb.getOldStatus().getId());
         variables.put(new Integer(3), sb.getId());
-
-
         this.execute(digester.getQuery("updateStudyStatus"), variables, nullVars);
         return sb;
     }
@@ -998,7 +1010,8 @@ public class StudyDAO <K extends String,V extends ArrayList> extends AuditableEn
         return al;
 
     }
-    public StudyBean getPublicStudy (String ocId) {
+
+    public StudyBean getPublicStudy(String ocId) {
         StudyBean study = findByPublicOid(ocId);
         return study;
     }

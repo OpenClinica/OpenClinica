@@ -272,7 +272,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 // Get Original formLayout file from data directory
 
                 String xformOutput = "";
-                String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(parentStudyBean.getOid(), crf.getOid(), formLayout.getOid());
+                String directoryPath = Utils.getFilePath()
+                        + Utils.getCrfMediaPath(parentStudyBean.getOid(), parentStudyBean.getFilePath(), crf.getOid(), formLayout.getOid());
                 File dir = new File(directoryPath);
                 File[] directoryListing = dir.listFiles();
                 if (directoryListing != null) {
