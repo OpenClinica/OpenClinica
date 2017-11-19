@@ -40,7 +40,7 @@ import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.dto.SiteStatusDTO;
 import org.akaza.openclinica.controller.dto.StudyEnvStatusDTO;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
-import org.akaza.openclinica.controller.helper.OCUserDTO;
+import org.akaza.openclinica.service.OCUserDTO;
 import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -54,7 +54,6 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.StudyParameter;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
-import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.LiquibaseOnDemandService;
@@ -1326,7 +1325,7 @@ public class StudyController {
 */
     @RequestMapping(value = "/{studyEnvUuid}/sites", method = RequestMethod.POST)
     public ResponseEntity<Object> createNewSites(HttpServletRequest request,
-                                                 @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
+            @RequestBody HashMap<String, Object> map, @PathVariable("studyEnvUuid") String studyEnvUuid) throws Exception {
         logger.debug("Creating site(s) for study:" + studyEnvUuid);
         StudyBean siteBean = null;
         ResponseEntity<Object> response = null;
@@ -1761,6 +1760,12 @@ public class StudyController {
 
     public Boolean isDataManagerOrStudyDirector(UserAccountBean userAccount, StudyBean currentStudy){
 
+        logger.error("All Roles:" + userAccount.getRoles().toString());
+        logger.error("Current study Id:" + currentStudy.getId());
+        for (StudyUserRoleBean userRoleBean : userAccount.getRoles()) {
+            logger.error("***************inside StudyController study: " + userRoleBean.getStudyId() + " role: " + userRoleBean.getRoleName());
+        }
+
         long result = userAccount.getRoles()
                 .stream()
                 .filter(role -> currentStudy.getId() == (role.getStudyId())
@@ -1768,6 +1773,7 @@ public class StudyController {
                                 || role.getRole().equals(Role.COORDINATOR)))
                 .count();
 
+        logger.error("Status returned from role check:" + (result > 0));
         return result > 0;
     }
 
@@ -1805,6 +1811,8 @@ public class StudyController {
 
     public UserAccountBean getSiteOwnerAccount(HttpServletRequest request, StudyBean study) {
         UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
+        studyBuildService.updateStudyUserRoles(request, studyBuildService.getUserAccountObject(ownerUserAccount)
+                , ownerUserAccount.getActiveStudyId());
         StudyUserRoleBean currentRole = createUserRole(ownerUserAccount, study);
 
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {

@@ -190,7 +190,6 @@ public class MainMenuServlet extends SecureController {
         }
 
         FormProcessor fp = new FormProcessor(request);
-        ub.incNumVisitsToMainMenu();
         session.setAttribute(USER_BEAN_NAME, ub);
         request.setAttribute("iconInfoShown", true);
         request.setAttribute("closeInfoShowIcons", false);
@@ -233,21 +232,6 @@ public class MainMenuServlet extends SecureController {
             return;
         }
 
-        if (ub.getNumVisitsToMainMenu() <= 1) {
-            if (ub.getLastVisitDate() != null) {
-                addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("last_logged") + " "
-                        + local_df.format(ub.getLastVisitDate()) + ". ");
-            } else {
-                addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". ");
-            }
-
-            if (currentStudy.getStatus().isLocked()) {
-                addPageMessage(respage.getString("current_study_locked"));
-            } else if (currentStudy.getStatus().isFrozen()) {
-                addPageMessage(respage.getString("current_study_frozen"));
-            }
-        }
-
         ////Integer assignedDiscrepancies = getDiscrepancyNoteDAO().countAllItemDataByStudyAndUser(currentStudy, ub);
         //Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id ="
         //  + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
@@ -272,11 +256,9 @@ public class MainMenuServlet extends SecureController {
         setPresetValues(fp.getPresetValues());
 
         if (currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentRole.isResearchAssistant2()) {
-            ub.decNumVisitsToMainMenu();
             forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
         }
         if (currentRole.isMonitor()) {
-            ub.decNumVisitsToMainMenu();
             response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId());
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();

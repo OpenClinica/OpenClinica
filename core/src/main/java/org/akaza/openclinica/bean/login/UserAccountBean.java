@@ -61,10 +61,6 @@ public class UserAccountBean extends AuditableEntityBean {
         this.userUuid = userUuid;
     }
 
-    /**
-     * Counts the number of times the user visited Main Menu servlet.
-     */
-    private int numVisitsToMainMenu;
 
     private int activeStudyId;
     // private Study activeStudy;
@@ -127,7 +123,6 @@ public class UserAccountBean extends AuditableEntityBean {
 
         userTypes = new ArrayList();
         status = Status.AVAILABLE;
-        numVisitsToMainMenu = 0;
         notes = "";
         enabled = true;
         accountNonLocked = true;
@@ -494,29 +489,6 @@ public class UserAccountBean extends AuditableEntityBean {
             return false;
         }
         return id == ub.getId();
-    }
-
-    /**
-     * @return Returns the numVisitsToMainMenu.
-     */
-    public int getNumVisitsToMainMenu() {
-        return numVisitsToMainMenu;
-    }
-
-    /**
-     * @param numVisitsToMainMenu
-     *            The numVisitsToMainMenu to set.
-     */
-    public void setNumVisitsToMainMenu(int numVisitsToMainMenu) {
-        this.numVisitsToMainMenu = numVisitsToMainMenu;
-    }
-
-    public void incNumVisitsToMainMenu() {
-        numVisitsToMainMenu++;
-    }
-
-    public void decNumVisitsToMainMenu() {
-        numVisitsToMainMenu--;
     }
 
     /**

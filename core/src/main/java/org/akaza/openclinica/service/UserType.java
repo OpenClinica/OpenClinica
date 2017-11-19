@@ -1,4 +1,4 @@
-package org.akaza.openclinica.controller.helper;
+package org.akaza.openclinica.service;
 
 /**
  * The UserType enumeration.

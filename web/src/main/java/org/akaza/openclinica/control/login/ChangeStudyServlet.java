@@ -316,7 +316,6 @@ public class ChangeStudyServlet extends SecureController {
             session.removeAttribute("studyWithRole");
             addPageMessage(restext.getString("current_study_changed_succesfully"));
         }
-        ub.incNumVisitsToMainMenu();
         // YW 2-18-2008, if study has been really changed <<
         if (StringUtils.equals(prevStudyEnvUuid, studyEnvUuid) != true)  {
             session.removeAttribute("eventsForCreateDataset");

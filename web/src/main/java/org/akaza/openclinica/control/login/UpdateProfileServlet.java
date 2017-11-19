@@ -74,7 +74,6 @@ public class UpdateProfileServlet extends SecureController {
                 submitProfile(udao);
 
                 addPageMessage(respage.getString("profile_updated_succesfully"));
-                ub.incNumVisitsToMainMenu();
                 forwardPage(Page.MENU_SERVLET);
             }
         }

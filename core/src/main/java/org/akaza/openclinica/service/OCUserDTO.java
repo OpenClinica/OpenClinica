@@ -1,4 +1,4 @@
-package org.akaza.openclinica.controller.helper;
+package org.akaza.openclinica.service;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;

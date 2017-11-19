@@ -6,8 +6,6 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.control.MainMenuServlet;
-import org.akaza.openclinica.controller.helper.OCUserDTO;
 import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -206,6 +204,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     public boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId) {
         boolean studyUserRoleUpdated = false;
         ResponseEntity<StudyEnvironmentRoleDTO[]> userRoles = getUserRoles(request);
+
         if (userRoles == null)
             return studyUserRoleUpdated;
         Collection<StudyUserRole> existingStudyUserRoles = studyUserRoleDao.findAllUserRolesByUserAccount(ub);
@@ -302,6 +301,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
         ResponseEntity<StudyEnvironmentRoleDTO[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, StudyEnvironmentRoleDTO[].class);
+        logger.error("Response: getUserRoles:" + response);
+        if (logger.isErrorEnabled()) {
+            for (StudyEnvironmentRoleDTO userRole: response.getBody()) {
+                logger.error("UserRole in updateStudyUserRoles: role: " + userRole.getRoleName() + " uuid:" + userRole.getUuid() );
+            }
+        }
         return response;
     }
 
