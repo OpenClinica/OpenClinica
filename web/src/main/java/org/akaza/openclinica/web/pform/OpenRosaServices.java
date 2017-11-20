@@ -73,6 +73,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
@@ -289,6 +290,7 @@ public class OpenRosaServices {
 
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
         CrfBean crf = crfDao.findById(formLayout.getCrf().getCrfId());
+        Study study = studyDao.findByOcOID(studyOID);
 
         String xformOutput = "";
         String attribute = "";
@@ -296,7 +298,7 @@ public class OpenRosaServices {
             attribute = uniqueId.substring(uniqueId.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
-            String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, crf.getOcOid(), formLayout.getOcOid());
+            String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, study.getFilePath(), crf.getOcOid(), formLayout.getOcOid());
             File dir = new File(directoryPath);
             File[] directoryListing = dir.listFiles();
             if (directoryListing != null) {
@@ -458,7 +460,7 @@ public class OpenRosaServices {
         String flavor = getQuerySet(uniqueId);
         String formLayoutOid = getFormLayoutOid(uniqueId);
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
-
+        Study study = studyDao.findByOcOID(studyOID);
         CrfBean crf = formLayout.getCrf();
 
         String xformOutput = "";
@@ -466,7 +468,7 @@ public class OpenRosaServices {
             String attribute = uniqueId.substring(uniqueId.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
-            String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, crf.getOcOid(), formLayout.getOcOid());
+            String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, study.getFilePath(), crf.getOcOid(), formLayout.getOcOid());
             File dir = new File(directoryPath);
             File[] directoryListing = dir.listFiles();
             if (directoryListing != null) {

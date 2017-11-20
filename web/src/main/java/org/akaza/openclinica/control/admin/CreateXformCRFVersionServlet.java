@@ -1,10 +1,8 @@
 package org.akaza.openclinica.control.admin;
 
 import java.util.ArrayList;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Locale;
-import java.util.Set;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
@@ -16,7 +14,6 @@ import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
-import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import org.akaza.openclinica.service.crfdata.FormArtifactTransferObj;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.dto.FormVersion;
@@ -77,9 +74,7 @@ public class CreateXformCRFVersionServlet extends SecureController {
                 formLayoutDef.setURL(version.getArtifactURL());
                 formLayoutDefs.add(formLayoutDef);
             }
-            ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(transferObj.getForm(), formLayoutDefs, errors, currentStudy, ub, false, null);
-            Set<Long> publishedVersions = new HashSet<>();
-            xformService.executeIndividualCrf(eicObj, publishedVersions);
+            xformService.executeIndividualCrf(null, null);
         }
         if (errors.hasErrors()) {
             request.setAttribute("errorList", errors.getAllErrors());

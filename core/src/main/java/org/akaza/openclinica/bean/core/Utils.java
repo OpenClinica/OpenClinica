@@ -238,8 +238,12 @@ public class Utils {
         return CoreResources.getField("filePath");
     }
 
-    public static String getCrfMediaPath(String studyOid, String crfOid, String formLayoutOid) {
-        return "crf" + File.separator + studyOid + File.separator + crfOid + File.separator + formLayoutOid + File.separator;
+    public static String getCrfMediaPath(String studyOid, int filePath, String crfOid, String formLayoutOid) {
+        return "crf" + File.separator + studyOid + "-" + filePath + File.separator + crfOid + File.separator + formLayoutOid + File.separator;
+    }
+
+    public static String getStudyPath(String studyOid, int filePath) {
+        return "crf" + File.separator + studyOid + "-" + filePath + File.separator;
     }
 
     public static String getCrfMediaFilePath(String crfOid, String formLayoutOid) {
