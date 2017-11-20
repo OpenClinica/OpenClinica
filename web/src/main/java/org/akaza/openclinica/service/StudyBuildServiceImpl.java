@@ -301,10 +301,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
         ResponseEntity<StudyEnvironmentRoleDTO[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, StudyEnvironmentRoleDTO[].class);
-        logger.error("Response: getUserRoles:" + response);
-        if (logger.isErrorEnabled()) {
+        logger.debug("Response: getUserRoles:" + response);
+        if (logger.isDebugEnabled()) {
             for (StudyEnvironmentRoleDTO userRole: response.getBody()) {
-                logger.error("UserRole in updateStudyUserRoles: role: " + userRole.getRoleName() + " uuid:" + userRole.getUuid() );
+                logger.debug("UserRole in updateStudyUserRoles: role: " + userRole.getRoleName() + " uuid:" + userRole.getUuid() );
             }
         }
         return response;

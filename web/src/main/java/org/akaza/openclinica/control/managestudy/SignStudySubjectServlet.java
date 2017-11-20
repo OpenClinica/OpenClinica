@@ -38,6 +38,7 @@ import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -212,6 +213,7 @@ public class SignStudySubjectServlet extends SecureController {
             forwardPage(Page.LIST_STUDY_SUBJECTS);
             return;
         }
+        CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
         StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
 
         if (!permitSign(studySub, sm.getDataSource())) {
