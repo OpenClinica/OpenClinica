@@ -110,7 +110,11 @@ public class QueryServiceImpl implements QueryService {
             }
             Collections.reverse(idList);
             queryBean = qBeans.get(0);
-            parentDN = findQueryParent(helperBean);
+            int noteTypeId = 3;
+            if (queryBean.getType().equals(QueryType.REASON.getName())) {
+                noteTypeId = 4;
+            }
+            parentDN = findQueryParent(helperBean, noteTypeId);
 
             if (parentDN == null) {
                 parentDN = createQuery(helperBean, queryBean);
@@ -147,7 +151,6 @@ public class QueryServiceImpl implements QueryService {
         DiscrepancyNote dn = new DiscrepancyNote();
         dn.setStudy(helperBean.getContainer().getStudy());
         dn.setEntityType("itemData");
-        dn.setDescription("description");
 
         dn.setDetailedNotes(queryBean.getComment());
         if (queryBean.getType().equals(QueryType.QUERY.getName()))
@@ -229,8 +232,8 @@ public class QueryServiceImpl implements QueryService {
         return itemData;
     }
 
-    private DiscrepancyNote findQueryParent(QueryServiceHelperBean helperBean) {
-        DiscrepancyNote parentDiscrepancyNote = discrepancyNoteDao.findParentQueryByItemData(helperBean.getItemData().getItemDataId());
+    private DiscrepancyNote findQueryParent(QueryServiceHelperBean helperBean, int noteTypeId) {
+        DiscrepancyNote parentDiscrepancyNote = discrepancyNoteDao.findParentQueryByItemData(helperBean.getItemData().getItemDataId(), noteTypeId);
         return parentDiscrepancyNote;
     }
 
