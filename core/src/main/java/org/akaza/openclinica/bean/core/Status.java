@@ -91,7 +91,7 @@ public class Status extends Term implements Comparable {
     public static Status getByName(String name) {
         for (int i = 0; i < list.size(); i++) {
             Status temp = (Status) list.get(i);
-            if (temp.getName().equals(name)) {
+            if (temp.getName().equalsIgnoreCase(name)) {
                 return temp;
             }
         }
