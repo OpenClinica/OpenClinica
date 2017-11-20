@@ -1,13 +1,7 @@
 package org.akaza.openclinica.service;
 
 import java.text.MessageFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -129,7 +123,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     @Transactional
-    private Study importOdmToOC(ODM odm, String boardId, HttpServletRequest request) {
+    private Map<String, Object> importOdmToOC(ODM odm, String boardId, HttpServletRequest request) {
         DataBinder dataBinder = new DataBinder(new Study());
         Errors errors = dataBinder.getBindingResult();
         printOdm(odm);
@@ -149,7 +143,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         CrfBean crf = null;
         FormLayout formLayout = null;
 
-        saveOrUpdateCrf(userAccount, study, odmMetadataVersions, fmCrfs, errors, request);
+        Set<Long> publishedVersions = saveOrUpdateCrf(userAccount, study, odmMetadataVersions, fmCrfs, errors, request);
 
         List<ODMcomplexTypeDefinitionStudyEventRef> odmStudyEventRefs = odmMetadataVersions.get(0).getProtocol().getStudyEventRef();
         for (ODMcomplexTypeDefinitionStudyEventRef odmStudyEventRef : odmStudyEventRefs) {
@@ -251,7 +245,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         return map;
     }
 
-    private void updatePublicStudyPublishedFlag(Study publicStudy) {
+    public void updatePublicStudypublishedFlag(Study publicStudy) {
         publicStudy.setPublished(true);
         studyDao.updatePublicStudy(publicStudy);
         for (Study publicStudySite : publicStudy.getStudies()) {
@@ -637,18 +631,12 @@ public class OdmImportServiceImpl implements OdmImportService {
         return err;
     }
 
-    public void setPublishedVersionsInFM(Map<String, Object> map) {
+    public void setPublishedVersionsInFM(Map<String, Object> map, HttpServletRequest request) {
         Study study = (Study) map.get("study");
         PublishingDTO dto = (PublishingDTO) map.get("publishingDTO");
         if (dto.getVersionIds().size() != 0) {
-            String fmUrl = getCoreResources().getField("formManager").trim() + "/api/xlsForm/setPublishedEnvironment";
-            RestTemplate restTemplate = new RestTemplate();
             dto.setPublishedEnvType(study.getEnvType());
-            try {
-                restTemplate.postForObject(fmUrl, dto, PublishingDTO.class);
-            } catch (Exception e) {
-                logger.info(e.getMessage());
-            }
+            setPublishEnvironment(request,dto);
         }
     }
 
