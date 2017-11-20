@@ -1960,7 +1960,6 @@ public class StudyController {
         Status statusObj = null;
 
         if (myStatus != null) {
-            myStatus = myStatus.equals("DESIGN") ? "PENDING" : myStatus;
             statusObj = Status.getByName(myStatus.toLowerCase());
         }
         return statusObj;

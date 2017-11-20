@@ -86,19 +86,26 @@ public class CreateUserCoreServiceImpl implements CreateUserCoreService {
         }
 
         // User Types
-        found = false;
         UserType uType = null;
         ArrayList<UserType> types = UserType.toArrayList();
         types.remove(UserType.INVALID);
-        for (UserType type : types) {
-            if (userType.equalsIgnoreCase(type.getName())) {
-                uType = UserType.get(type.getId());
-                found = true;
-                break;
-            }
+        switch (userType) {
+        case "Business Admin":
+            uType = UserType.SYSADMIN;
+            break;
+        case "Tech Admin":
+            uType = UserType.TECHADMIN;
+            break;
+        case "User":
+            uType = UserType.USER;
+            break;
+        default:
+            uType = UserType.INVALID;
+            break;
         }
 
-        if (!found) {
+
+        if (uType == UserType.INVALID) {
             logger.error("The Type is not a Valid User Type");
             return uBean;
         }
