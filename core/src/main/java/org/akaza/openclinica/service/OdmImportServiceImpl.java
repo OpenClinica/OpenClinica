@@ -1,7 +1,13 @@
 package org.akaza.openclinica.service;
 
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -109,10 +115,17 @@ public class OdmImportServiceImpl implements OdmImportService {
         }
     }
 
-    public void importOdm(ODM odm, String boardId, HttpServletRequest request) {
-        Study study = importOdmToOC(odm, boardId, request);
-        Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
-        updatePublicStudyPublishedFlag(publicStudy);
+    @Transactional
+    public Map<String, Object> importOdm(ODM odm, String boardId, HttpServletRequest request) {
+        Map<String, Object> map = importOdmToOC(odm, boardId, request);
+        Study study = (Study) map.get("study");
+        study.setPublished(true);
+        study = getStudyDao().saveOrUpdate(study);
+        for (Study site : study.getStudies()) {
+            site.setPublished(true);
+            studyDao.saveOrUpdate(site);
+        }
+        return map;
     }
 
     @Transactional
@@ -126,6 +139,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         // TODO add validation to all entities
         ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
         Study study = retrieveStudy(odm, userAccount, odmStudy, errors);
+        study.setFilePath(study.getFilePath() + 1);
         Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(boardId, errors, request);
 
         StudyEventDefinition studyEventDefinition = null;
@@ -228,7 +242,13 @@ public class OdmImportServiceImpl implements OdmImportService {
             List<ErrorObj> errList = getErrorList(errors.getAllErrors());
             throw new CustomRuntimeException("There are errors with publishing", errList);
         }
-        return study;
+        Map<String, Object> map = new HashMap<>();
+        map.put("study", study);
+        PublishingDTO publishingDTO = new PublishingDTO();
+        publishingDTO.setVersionIds(publishedVersions);
+        map.put("publishingDTO", publishingDTO);
+
+        return map;
     }
 
     private void updatePublicStudyPublishedFlag(Study publicStudy) {
@@ -270,8 +290,8 @@ public class OdmImportServiceImpl implements OdmImportService {
         return eventDefinitionCrf;
     }
 
-    private void saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Form[] fmCrfs,
-            Errors errors, HttpServletRequest request) {
+    private Set<Long> saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Form[] fmCrfs,
+                                      Errors errors, HttpServletRequest request) {
         Set<Long> publishedVersions = new HashSet<>();
         for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
             String crfOid = odmFormDef.getOID();
@@ -280,7 +300,6 @@ public class OdmImportServiceImpl implements OdmImportService {
                 errors.rejectValue("name", "form_upload_error", "No Excel definition has been uploaded for Form \"" + odmFormDef.getName() + "\" - FAILED");
                 logger.info("No Excel definition has been uploaded for Form <" + odmFormDef.getName() + "> - FAILED");
             }
-
             // String crfDescription = odmFormDef.getFormDetails().getDescription();
             String crfName = odmFormDef.getName();
 
@@ -300,45 +319,23 @@ public class OdmImportServiceImpl implements OdmImportService {
                     }
                 }
             }
-            saveOrUpdateCrfAndFormLayouts(crfOid, formLayoutDefs, fmCrfs, userAccount, study, crfName, publishedVersions, errors);
-        }
-        if (publishedVersions.size() != 0) {
-            //String fmUrl = getCoreResources().getField("formManager").trim() + "/api/xlsForm/setPublishedEnvironment";
-            //RestTemplate restTemplate = new RestTemplate();
-            PublishingDTO dto = new PublishingDTO();
-            dto.setPublishedEnvType(study.getEnvType());
-            dto.setVersionIds(publishedVersions);
-
-            try {
-                setPublishEnvironment(request,dto);
-                //restTemplate.postForObject(fmUrl, dto, PublishingDTO.class);
-            } catch (Exception e) {
-                logger.info(e.getMessage());
-                errors.rejectValue("name", "fm_app_error", "Form Manager not responding");
-            }
+            publishedVersions = saveOrUpdateCrfAndFormLayouts(crfOid, formLayoutDefs, fmCrfs, userAccount, study, crfName, publishedVersions, errors);
         }
 
+        return publishedVersions;
     }
 
-    private void saveOrUpdateCrfAndFormLayouts(String crfOid, List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs, Form[] fmCrfs,
+    private Set<Long> saveOrUpdateCrfAndFormLayouts(String crfOid, List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs, Form[] fmCrfs,
             UserAccount userAccount, Study study, String crfName, Set<Long> publishedVersions, Errors errors) {
-
-        StudyBean currentStudy = new StudyBean();
-        currentStudy.setId(study.getStudyId());
-        currentStudy.setEnvType(study.getEnvType());
-        currentStudy.setOid(study.getOc_oid());
-
-        UserAccountBean ub = new UserAccountBean();
-        ub.setId(userAccount.getUserId());
-        ub.setActiveStudyId(currentStudy.getId());
         for (Form crf : fmCrfs) {
             if (crf.getOcoid().equals(crfOid)) {
                 crf.setName(crfName);
-                ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, currentStudy, ub, true, null);
-                xformService.executeIndividualCrf(eicObj, publishedVersions);
+                ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, study, userAccount, true, null);
+                publishedVersions = xformService.executeIndividualCrf(eicObj, publishedVersions);
+                break;
             }
         }
-
+        return publishedVersions;
     }
 
     private List<ODMcomplexTypeDefinitionStudyEventDef> saveOrUpdateEvent(UserAccount userAccount, Study study,
@@ -639,6 +636,22 @@ public class OdmImportServiceImpl implements OdmImportService {
         }
         return err;
     }
+
+    public void setPublishedVersionsInFM(Map<String, Object> map) {
+        Study study = (Study) map.get("study");
+        PublishingDTO dto = (PublishingDTO) map.get("publishingDTO");
+        if (dto.getVersionIds().size() != 0) {
+            String fmUrl = getCoreResources().getField("formManager").trim() + "/api/xlsForm/setPublishedEnvironment";
+            RestTemplate restTemplate = new RestTemplate();
+            dto.setPublishedEnvType(study.getEnvType());
+            try {
+                restTemplate.postForObject(fmUrl, dto, PublishingDTO.class);
+            } catch (Exception e) {
+                logger.info(e.getMessage());
+            }
+        }
+    }
+
 
 
     private void setPublishEnvironment(HttpServletRequest request, PublishingDTO publishingDTO){
