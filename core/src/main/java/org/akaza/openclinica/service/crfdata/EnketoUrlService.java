@@ -193,6 +193,7 @@ public class EnketoUrlService {
         Study study = enketoCredentials.getParentStudy(studyOid);
         Study site = enketoCredentials.getSiteStudy(studyOid);
         studyOid = study.getOc_oid();
+        int filePath = study.getFilePath();
 
         String editURL = null;
         StudyEventDefinition eventDef = null;
@@ -229,7 +230,7 @@ public class EnketoUrlService {
         String crfFlavor = "";
         String crfOid = "";
         if (flavor.equals(QUERY_FLAVOR)) {
-            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, flavor);
+            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor);
             crfFlavor = flavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
@@ -342,7 +343,8 @@ public class EnketoUrlService {
         return dt;
     }
 
-    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, String flavor) throws Exception {
+    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor)
+            throws Exception {
 
         Map<String, Object> data = new HashMap<String, Object>();
 
@@ -435,7 +437,7 @@ public class EnketoUrlService {
         }
         String templateStr = null;
         CrfBean crfBean = crfDao.findById(formLayout.getCrf().getCrfId());
-        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOid, crfBean.getOcOid(), formLayout.getOcOid());
+        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOid, filePath, crfBean.getOcOid(), formLayout.getOcOid());
         File dir = new File(directoryPath);
         File[] directoryListing = dir.listFiles();
         if (directoryListing != null) {

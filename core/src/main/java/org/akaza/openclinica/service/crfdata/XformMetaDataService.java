@@ -12,8 +12,6 @@ import java.util.List;
 import java.util.Set;
 
 import org.akaza.openclinica.bean.core.Utils;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
@@ -43,6 +41,7 @@ import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.datamap.ResponseSet;
 import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.domain.datamap.Section;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.domain.datamap.VersioningMapId;
@@ -56,6 +55,7 @@ import org.akaza.openclinica.service.dto.FormVersion;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutDef;
@@ -164,7 +164,7 @@ public class XformMetaDataService {
 
         crfBean = (CrfBean) crfDao.findByOcOID(cmdObject.crf.getOcoid());
         if (crfBean != null) {
-            crfBean.setUpdateId(cmdObject.ub.getId());
+            crfBean.setUpdateId(cmdObject.ub.getUserId());
             crfBean.setName(cmdObject.crf.getName());
             crfBean.setDateUpdated(new Date());
             crfBean = crfDao.saveOrUpdate(crfBean);
@@ -175,7 +175,7 @@ public class XformMetaDataService {
                 formLayout = populateFormLayout(formLayout, crfBean, cmdObject);
                 formLayout = formLayoutDao.saveOrUpdate(formLayout);
             } else if (!formLayout.getStatus().equals(Status.AVAILABLE)) {
-                UserAccount userAccount = userDao.findById(cmdObject.ub.getId());
+                UserAccount userAccount = userDao.findById(cmdObject.ub.getUserId());
                 formLayout.setStatus(Status.AVAILABLE);
                 formLayout.setUserAccount(userAccount);
                 formLayout.setDateCreated(new Date());
@@ -214,7 +214,7 @@ public class XformMetaDataService {
         return formLayout;
     }
 
-    private void createGroups(XformContainer container, CrfBean crf, CrfVersion crfVersion, FormLayout formLayout, Section section, UserAccountBean ub,
+    private void createGroups(XformContainer container, CrfBean crf, CrfVersion crfVersion, FormLayout formLayout, Section section, UserAccount ub,
             Errors errors) throws Exception {
         Integer itemOrdinal = 1;
         ArrayList<String> usedGroupOids = new ArrayList<String>();
@@ -232,7 +232,7 @@ public class XformMetaDataService {
                 itemGroup.setLayoutGroupPath(xformGroup.getGroupPath());
                 itemGroup.setCrf(crf);
                 itemGroup.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-                itemGroup.setUserAccount(userDao.findById(ub.getId()));
+                itemGroup.setUserAccount(userDao.findById(ub.getUserId()));
                 itemGroup.setOcOid(xformGroup.getGroupOid());
                 usedGroupOids.add(itemGroup.getOcOid());
                 itemGroup = itemGroupDao.saveOrUpdate(itemGroup);
@@ -346,7 +346,7 @@ public class XformMetaDataService {
         return itemFormMetadata;
     }
 
-    private Item createItem(XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccountBean ub, ArrayList<String> usedItemOids, Errors errors)
+    private Item createItem(XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccount ub, ArrayList<String> usedItemOids, Errors errors)
             throws Exception {
         ItemDataType newDataType = getItemDataType(xformItem);
 
@@ -363,7 +363,7 @@ public class XformMetaDataService {
             item.setItemDataType(newDataType);
             item.setItemReferenceType(itemRefTypeDao.findByItemReferenceTypeId(1));
             item.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-            item.setUserAccount(userDao.findById(ub.getId()));
+            item.setUserAccount(userDao.findById(ub.getUserId()));
             item.setOcOid(xformItem.getItemOid());
             usedItemOids.add(item.getOcOid());
             item = itemDao.saveOrUpdate(item);
@@ -459,7 +459,7 @@ public class XformMetaDataService {
         return fileItem;
     }
 
-    public ExecuteIndividualCrfObject executeIndividualCrf(ExecuteIndividualCrfObject eicObject, Set<Long> publishedVersions) {
+    public Set<Long> executeIndividualCrf(ExecuteIndividualCrfObject eicObject, Set<Long> publishedVersions) {
         for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : eicObject.formLayoutDefs) {
 
             List<String> fileLinks = null;
@@ -500,8 +500,7 @@ public class XformMetaDataService {
                         // Save meta-data in database
                         saveFormMetadata(eicObject, version, eicObject.container, formLayoutDef, fileLinks);
                         StudyEnvEnum existingEnv = version.getPublishedEnvType();
-                        StudyEnvEnum publishingEnv = eicObject.currentStudy.getEnvType();
-
+                        StudyEnvEnum publishingEnv = eicObject.study.getEnvType();
                         if ((publishingEnv.equals(StudyEnvEnum.TEST) && existingEnv.equals(StudyEnvEnum.NOT_PUBLISHED))
                                 || (publishingEnv.equals(StudyEnvEnum.PROD) && !existingEnv.equals(StudyEnvEnum.PROD))) {
                             publishedVersions.add(version.getId());
@@ -511,7 +510,7 @@ public class XformMetaDataService {
                 }
             }
         }
-        return eicObject;
+        return publishedVersions;
     }
 
     public void saveFormMetadata(ExecuteIndividualCrfObject eicObj, FormVersion version, XformContainer container,
@@ -520,9 +519,9 @@ public class XformMetaDataService {
         try {
             try {
                 FormLayout formLayout = createCRFMetaData(
-                        new CrfMetaDataObject(eicObj.form, version, container, eicObj.getCurrentStudy(), eicObj.ub, eicObj.errors, formLayoutDef.getURL()));
-                saveFormArtifactsInOCDataDirectory(fileLinks, eicObj.getCurrentStudy(), eicObj.form.getOcoid(), version.getOcoid(), formLayout);
-                saveMediaFiles(fileLinks, eicObj.getCurrentStudy(), eicObj.form.getOcoid(), formLayout);
+                        new CrfMetaDataObject(eicObj.form, version, container, eicObj.getStudy(), eicObj.ub, eicObj.errors, formLayoutDef.getURL()));
+                saveFormArtifactsInOCDataDirectory(fileLinks, eicObj.getStudy(), eicObj.form.getOcoid(), version.getOcoid(), formLayout);
+                saveMediaFiles(fileLinks, eicObj.getStudy(), eicObj.form.getOcoid(), formLayout);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
                 e.printStackTrace();
@@ -533,10 +532,14 @@ public class XformMetaDataService {
         }
     }
 
-    public void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, StudyBean study, String crfOid, String formLayoutOid, FormLayout formLayout)
+    public void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, Study study, String crfOid, String formLayoutOid, FormLayout formLayout)
             throws IOException {
         // Create the directory structure for saving the media
-        String dir = Utils.getFilePath() + Utils.getCrfMediaPath(study.getOid(), crfOid, formLayoutOid);
+        String studyPath = Utils.getFilePath() + Utils.getStudyPath(study.getOc_oid(), study.getFilePath());
+        if (new File(studyPath).exists()) {
+            FileUtils.deleteDirectory(new File(studyPath));
+        }
+        String dir = Utils.getFilePath() + Utils.getCrfMediaPath(study.getOc_oid(), study.getFilePath(), crfOid, formLayoutOid);
         if (!new File(dir).exists()) {
             new File(dir).mkdirs();
             logger.debug("Made the directory " + dir);
@@ -581,7 +584,7 @@ public class XformMetaDataService {
         formLayout.setName(cmdObject.version.getName());
         formLayout.setDescription(cmdObject.version.getDescription());
         formLayout.setCrf(crfBean);
-        formLayout.setUserAccount(userDao.findById(cmdObject.ub.getId()));
+        formLayout.setUserAccount(userDao.findById(cmdObject.ub.getUserId()));
         formLayout.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
         formLayout.setRevisionNotes(cmdObject.version.getDescription());
         formLayout.setOcOid(cmdObject.version.getOcoid());
@@ -595,11 +598,11 @@ public class XformMetaDataService {
     private CrfBean populateCrf(CrfBean crfBean, CrfMetaDataObject cmdObject) {
         crfBean.setName(cmdObject.crf.getName());
         crfBean.setDescription(cmdObject.crf.getDescription());
-        crfBean.setUserAccount(userDao.findById(cmdObject.ub.getId()));
+        crfBean.setUserAccount(userDao.findById(cmdObject.ub.getUserId()));
         crfBean.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
-        crfBean.setStudy(studyDao.findById(cmdObject.currentStudy.getId()));
+        crfBean.setStudy(studyDao.findById(cmdObject.study.getStudyId()));
         crfBean.setOcOid(cmdObject.crf.getOcoid());
-        crfBean.setUpdateId(cmdObject.ub.getId());
+        crfBean.setUpdateId(cmdObject.ub.getUserId());
         crfBean.setDateUpdated(new Date());
         return crfBean;
     }
@@ -608,7 +611,7 @@ public class XformMetaDataService {
         crfVersion.setName(cmdObject.version.getName());
         crfVersion.setDescription(cmdObject.version.getDescription());
         crfVersion.setCrf(crfBean);
-        crfVersion.setUserAccount(userDao.findById(cmdObject.ub.getId()));
+        crfVersion.setUserAccount(userDao.findById(cmdObject.ub.getUserId()));
         crfVersion.setStatus(org.akaza.openclinica.domain.Status.AVAILABLE);
         crfVersion.setRevisionNotes(cmdObject.version.getDescription());
         crfVersion.setOcOid(crfVersionDao.getValidOid(new CrfVersion(), crfBean.getOcOid(), crfVersion.getName()));
@@ -623,14 +626,14 @@ public class XformMetaDataService {
         section.setSubtitle("");
         section.setPageNumberLabel("");
         section.setOrdinal(1);
-        section.setUserAccount(userDao.findById(cmdObject.ub.getId())); // not null
+        section.setUserAccount(userDao.findById(cmdObject.ub.getUserId())); // not null
         section.setBorders(0);
         return section;
     }
 
-    private void saveMediaFiles(List<String> fileLinks, StudyBean study, String crfOid, FormLayout formLayout) throws IOException {
+    private void saveMediaFiles(List<String> fileLinks, Study study, String crfOid, FormLayout formLayout) throws IOException {
         // Create the directory structure for saving the media
-        String dir = Utils.getCrfMediaPath(study.getOid(), crfOid, formLayout.getOcOid());
+        String dir = Utils.getCrfMediaPath(study.getOc_oid(), study.getFilePath(), crfOid, formLayout.getOcOid());
         for (String fileLink : fileLinks) {
             String fileName = "";
             int startIndex = fileLink.lastIndexOf('/');
