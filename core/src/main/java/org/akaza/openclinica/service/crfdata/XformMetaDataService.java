@@ -536,9 +536,11 @@ public class XformMetaDataService {
             throws IOException {
         // Create the directory structure for saving the media
         String studyPath = Utils.getFilePath() + Utils.getStudyPath(study.getOc_oid(), study.getFilePath());
+        /*
         if (new File(studyPath).exists()) {
             FileUtils.deleteDirectory(new File(studyPath));
         }
+        */
         String dir = Utils.getFilePath() + Utils.getCrfMediaPath(study.getOc_oid(), study.getFilePath(), crfOid, formLayoutOid);
         if (!new File(dir).exists()) {
             new File(dir).mkdirs();
@@ -562,7 +564,7 @@ public class XformMetaDataService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
-        ResponseEntity<byte[]> response = restTemplate.exchange(replaceUrlWithServiceGatewayURL(uri), HttpMethod.GET, entity, byte[].class, "1");
+         ResponseEntity<byte[]> response = restTemplate.exchange(replaceUrlWithServiceGatewayURL(uri), HttpMethod.GET, entity, byte[].class, "1");
 
         File file = new File(dir + File.separator + fileName);
         if (response.getStatusCode().equals(HttpStatus.OK)) {
@@ -658,7 +660,8 @@ public class XformMetaDataService {
     }
 
     private String replaceUrlWithServiceGatewayURL(String url){
-        return CoreResources.getSBSFieldFormservice() + url.split("api")[1];
+        String updatedURL = CoreResources.getSBSFieldFormservice() + url.split("api")[1];
+        return updatedURL;
 
 
     }
