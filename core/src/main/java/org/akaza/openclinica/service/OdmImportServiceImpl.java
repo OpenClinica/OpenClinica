@@ -38,6 +38,7 @@ import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParser;
@@ -159,7 +160,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 
         StudyEventDefinition studyEventDefinition = null;
         List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions = odmStudy.getMetaDataVersion();
-        List<ODMcomplexTypeDefinitionStudyEventDef> odmStudyEventDefs = saveOrUpdateEvent(userAccount, study, odmMetadataVersions);
+        List<ODMcomplexTypeDefinitionStudyEventDef> odmStudyEventDefs = saveOrUpdateEvent(userAccount, study, odmMetadataVersions, errors);
 
         CrfBean crf = null;
         FormLayout formLayout = null;
@@ -354,7 +355,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     private List<ODMcomplexTypeDefinitionStudyEventDef> saveOrUpdateEvent(UserAccount userAccount, Study study,
-            List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions) {
+            List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Errors errors) {
         StudyEventDefinition studyEventDefinition;
         List<ODMcomplexTypeDefinitionStudyEventDef> odmStudyEventDefs = odmMetadataVersions.get(0).getStudyEventDef();
         List<StudyEventDefinition> jsonEventList = new ArrayList<>();
@@ -371,7 +372,7 @@ public class OdmImportServiceImpl implements OdmImportService {
                     // restore study event defn
                     eventService.restoreStudyEventDefn(studyEventDefinition.getStudyEventDefinitionId(), userAccount.getUserId());
                 }
-                studyEventDefinition = getStudyEventDefDao().saveOrUpdate(updateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study));
+                studyEventDefinition = getStudyEventDefDao().saveOrUpdate(updateEventDef(odmStudyEventDef, userAccount, studyEventDefinition, study, errors));
             }
             jsonEventList.add(studyEventDefinition);
         }
@@ -424,8 +425,15 @@ public class OdmImportServiceImpl implements OdmImportService {
         return studyEventDefinition;
     }
 
-    private StudyEventDefinition updateEvent(ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef, UserAccount userAccount,
-            StudyEventDefinition studyEventDefinition, Study study) {
+    private StudyEventDefinition updateEventDef(ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef, UserAccount userAccount,
+            StudyEventDefinition studyEventDefinition, Study study, Errors errors) {
+        if (study.getEnvType().equals(StudyEnvEnum.PROD) && odmStudyEventDef.getRepeating().value().equalsIgnoreCase("No")
+                && studyEventDefinition.getRepeating()) {
+            errors.rejectValue("name", "event_error", " Cannot change Event \"" + studyEventDefinition.getName()
+                    + "\" to non-repeating since it was previously published to Production as repeating - FAILED");
+            logger.info(studyEventDefinition.getName() + " cannot change to non-repeating; event has been published to Production - FAILED");
+
+        }
         studyEventDefinition = populateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study);
         studyEventDefinition.setUpdateId(userAccount.getUserId());
         studyEventDefinition.setDateUpdated(new Date());
