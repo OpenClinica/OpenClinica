@@ -1,10 +1,10 @@
 @font-face {
   font-family: 'icomoon';
-  src:  url('../fonts/icomoon.eot?8lfuvy');
-  src:  url('../fonts/icomoon.eot?8lfuvy#iefix') format('embedded-opentype'),
-    url('../fonts/icomoon.ttf?8lfuvy') format('truetype'),
-    url('../fonts/icomoon.woff?8lfuvy') format('woff'),
-    url('../fonts/icomoon.svg?8lfuvy#icomoon') format('svg');
+  src:  url('../fonts/icomoon.eot?37gwv7');
+  src:  url('../fonts/icomoon.eot?37gwv7#iefix') format('embedded-opentype'),
+    url('../fonts/icomoon.ttf?37gwv7') format('truetype'),
+    url('../fonts/icomoon.woff?37gwv7') format('woff'),
+    url('../fonts/icomoon.svg?37gwv7#icomoon') format('svg');
   font-weight: normal;
   font-style: normal;
 }
@@ -24,174 +24,168 @@
   -moz-osx-font-smoothing: grayscale;
 }
 
-.icon-icon-SDV-doubleCheck:before {
-  content: "\e918";
-}
-.icon-icon-reassign3:before {
-  content: "\e916";
-}
-.icon-icon-sdv-text:before {
-  content: "\e900";
-}
-.icon-doc:before {
-  content: "\e800";
-}
-.icon-ok:before {
-  content: "\e801";
-}
-.icon-lock:before {
-  content: "\e802";
-}
-.icon-lock-open:before {
-  content: "\e803";
-}
-.icon-search:before {
-  content: "\e804";
-}
-.icon-pencil:before {
-  content: "\e805";
-}
-.icon-user:before {
-  content: "\e806";
-}
-.icon-cancel:before {
-  content: "\e807";
-}
-.icon-ccw:before {
-  content: "\e808";
-}
-.icon-calendar:before {
-  content: "\e809";
-}
-.icon-plus:before {
-  content: "\e80a";
-}
-.icon-flag:before {
-  content: "\e80b";
-}
-.icon-download:before {
-  content: "\e80c";
-}
-.icon-upload:before {
-  content: "\e80d";
-}
-.icon-print:before {
-  content: "\e80e";
-}
-.icon-icon-sign:before {
+.icon-doc-text-solid:before {
   content: "\e901";
 }
-.icon-icon-stop:before {
-  content: "\e903";
+.icon-doc:before {
+  content: "\e80f";
 }
-.icon-icon-removeRole2:before {
-  content: "\e904";
+.icon-ok:before {
+  content: "\e810";
 }
-.icon-icon-locked:before {
-  content: "\e905";
+.icon-lock:before {
+  content: "\e811";
 }
-.icon-icon-reassign:before {
-  content: "\e906";
+.icon-lock-open:before {
+  content: "\e812";
 }
-.icon-icon-dataEntryCompleted:before {
-  content: "\e907";
+.icon-search:before {
+  content: "\e813";
 }
-.icon-icon-newVersion:before {
-  content: "\e908";
+.icon-pencil:before {
+  content: "\e814";
 }
-.icon-icon-sign2:before {
-  content: "\e909";
+.icon-user:before {
+  content: "\e815";
 }
-.icon-icon-removeRole:before {
-  content: "\e90a";
+.icon-cancel:before {
+  content: "\e816";
 }
-.icon-icon-reassign2:before {
-  content: "\e90b";
+.icon-ccw:before {
+  content: "\e817";
 }
-.icon-icon-unArchive:before {
-  content: "\e90c";
+.icon-calendar:before {
+  content: "\e818";
 }
-.icon-icon-unsavedData:before {
-  content: "\e90d";
+.icon-plus:before {
+  content: "\e819";
 }
-.icon-icon-doubleDataEntry:before {
-  content: "\e90e";
+.icon-flag:before {
+  content: "\e81a";
 }
-.icon-caret-right:before {
-  content: "\e90e";
+.icon-download:before {
+  content: "\e81b";
 }
-.icon-caret-left:before {
-  content: "\e910";
+.icon-upload:before {
+  content: "\e81c";
 }
-.icon-caret-up:before {
-  content: "\e911";
+.icon-print:before {
+  content: "\e81d";
 }
-.icon-caret-down:before {
-  content: "\e911";
+.icon-icon-sdv-text:before {
+  content: "\e919";
 }
-.icon-question-circle:before {
-  content: "\e913";
-}
-.icon-question:before {
-  content: "\e914";
-}
-.icon-archive:before {
-  content: "\e915";
-}
-.icon-redo:before {
-  content: "\e966";
-}
-.icon-redo2:before {
-  content: "\e968";
-}
-.icon-first:before {
-  content: "\ea21";
-}
-.icon-last:before {
-  content: "\ea22";
-}
-.icon-previous2:before {
-  content: "\ea23";
-}
-.icon-next2:before {
-  content: "\ea24";
-}
-.icon-checkbox-checked:before {
-  content: "\ea52";
-}
-.icon-doc-text:before {
-  content: "\f0f6";
-}
-.icon-flag-empty:before {
-  content: "\f11d";
-}
-.icon-pencil-squared:before {
-  content: "\f14b";
-}
-.icon-file-excel:before {
-  content: "\f1c3";
-}
-.icon-trash:before {
-  content: "\f1f8";
-}
-.icon-stop-circle:before {
-  content: "\f28d";
-}
-.icon-minus-square-o:before {
-  content: "\e917";
+.icon-icon-sign:before {
+  content: "\e91a";
 }
 .icon-plus-square-o:before {
-  content: "\e902";
+  content: "\e91b";
+}
+.icon-icon-stop:before {
+  content: "\e91c";
+}
+.icon-icon-removeRole:before {
+  content: "\e91d";
+}
+.icon-icon-locked:before {
+  content: "\e91e";
+}
+.icon-icon-dataEntryCompleted:before {
+  content: "\e920";
+}
+.icon-icon-newVersion:before {
+  content: "\e921";
+}
+.icon-icon-unArchive:before {
+  content: "\e925";
+}
+.icon-icon-unsavedData:before {
+  content: "\e926";
+}
+.icon-icon-doubleDataEntry:before {
+  content: "\e927";
+}
+.icon-caret-right:before {
+  content: "\e928";
+}
+.icon-caret-left:before {
+  content: "\e929";
+}
+.icon-caret-up:before {
+  content: "\e92a";
+}
+.icon-caret-down:before {
+  content: "\e92b";
+}
+.icon-question-circle:before {
+  content: "\e92c";
+}
+.icon-question:before {
+  content: "\e92d";
+}
+.icon-archive:before {
+  content: "\e92e";
+}
+.icon-icon-reassign3:before {
+  content: "\e92f";
+}
+.icon-minus-square-o:before {
+  content: "\e930";
+}
+.icon-icon-SDV-doubleCheck:before {
+  content: "\e931";
+}
+.icon-doc-text-half:before {
+  content: "\e932";
 }
 .icon-clock:before {
-  content: "\e94e";
+  content: "\e950";
 }
 .icon-clock2:before {
-  content: "\e94f";
+  content: "\e951";
 }
-.icon-bubble:before {
-  content: "\e96b";
+.icon-redo:before {
+  content: "\e967";
 }
-.icon-bubble2:before {
-  content: "\e96e";
+.icon-redo2:before {
+  content: "\e969";
+}
+.icon-bubble-closed:before {
+  content: "\e96c";
+}
+.icon-bubble-open:before {
+  content: "\e96f";
+}
+.icon-first:before {
+  content: "\ea25";
+}
+.icon-last:before {
+  content: "\ea26";
+}
+.icon-previous2:before {
+  content: "\ea27";
+}
+.icon-next2:before {
+  content: "\ea28";
+}
+.icon-checkbox-checked:before {
+  content: "\ea53";
+}
+.icon-doc-text:before {
+  content: "\f0f7";
+}
+.icon-flag-empty:before {
+  content: "\f11e";
+}
+.icon-pencil-squared:before {
+  content: "\f14c";
+}
+.icon-file-excel:before {
+  content: "\f1c4";
+}
+.icon-trash:before {
+  content: "\f1f9";
+}
+.icon-stop-circle:before {
+  content: "\f28e";
 }
