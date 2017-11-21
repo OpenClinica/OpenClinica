@@ -55,7 +55,6 @@ import org.akaza.openclinica.service.dto.FormVersion;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItem;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutDef;
@@ -535,10 +534,7 @@ public class XformMetaDataService {
     public void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, Study study, String crfOid, String formLayoutOid, FormLayout formLayout)
             throws IOException {
         // Create the directory structure for saving the media
-        String studyPath = Utils.getFilePath() + Utils.getStudyPath(study.getOc_oid(), study.getFilePath());
-        if (new File(studyPath).exists()) {
-            FileUtils.deleteDirectory(new File(studyPath));
-        }
+
         String dir = Utils.getFilePath() + Utils.getCrfMediaPath(study.getOc_oid(), study.getFilePath(), crfOid, formLayoutOid);
         if (!new File(dir).exists()) {
             new File(dir).mkdirs();
@@ -657,9 +653,8 @@ public class XformMetaDataService {
         }
     }
 
-    private String replaceUrlWithServiceGatewayURL(String url){
+    private String replaceUrlWithServiceGatewayURL(String url) {
         return CoreResources.getSBSFieldFormservice() + url.split("api")[1];
-
 
     }
 }
