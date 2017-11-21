@@ -107,23 +107,7 @@ public class CallbackServiceImpl implements CallbackService {
         map.put("role_name", "Data Manager");
         map.put("user_uuid", (String) userContextMap.get("userUuid"));
         String userType = (String) userContextMap.get("userType");
-        String convertedUserType = null;
-        switch (userType) {
-        case "Business Admin":
-            convertedUserType = UserType.SYSADMIN.getName();
-            break;
-        case "Tech Admin":
-            convertedUserType = UserType.TECHADMIN.getName();
-            break;
-        case "User":
-            convertedUserType = UserType.USER.getName();
-            break;
-        default:
-            String error = "Invalid userType:" + userType;
-            logger.error(error);
-            throw new Exception(error);
-        }
-        map.put("user_type", convertedUserType);
+        map.put("user_type", userType);
         map.put("authorize_soap", "true");
         map.put("email", user.getEmail());
         map.put("institution", "OC");
