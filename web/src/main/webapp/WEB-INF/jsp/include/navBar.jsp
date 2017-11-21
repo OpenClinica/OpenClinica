@@ -357,7 +357,7 @@
 </table>
 <!-- NAVIGATION DROP-DOWN -->
 
-<div id="nav_hide" style="position: absolute; left: 0px; top: 0px; visibility: hidden; z-index: 2; width: 100%; height: 400px;">
+<div id="nav_hide" style="position: absolute; left: 0px; top: 0px; visibility: hidden; z-index: -1; width: 100%; height: 400px;">
 
     <a href="#" onmouseover="hideSubnavs();"><img src="images/spacer.gif" alt="" width="1000" height="400" border="0"/></a>
 </div>
@@ -518,6 +518,36 @@
             return false;
         });
     });
+    
+    dropdown = document.getElementById("subnav_Tasks");
+
+    //close dropdown using esc
+    $(document).keyup(function(e) {
+        if (e.keyCode == 27) { // escape key maps to keycode `27`
+            dropdown.style.display="none";
+        }
+    });
+
+    //we have it open on mouse-over OR click when it is closed
+    $(document).ready(function(){
+        // Show hide popover
+        $(".nav_TaskB").click(function(){
+            $(this).find(".dropdown").slideToggle("fast");
+        });
+    });
+    $(document).on("click", function(event){
+        var $trigger = $(".nav_TaskB");
+        if($trigger !== event.target && !$trigger.has(event.target).length){
+            $(".dropdown").slideUp("fast");
+        }
+    });
+    function showDropdown() {
+        if (dropdown.style.display === 'none') {
+            dropdown.style.display = 'block';
+        } else {
+            droopdown.style.display = 'none';
+        }
+    }  
 </script>
 
 <div id="navAddSubjectForm" style="display: none">
