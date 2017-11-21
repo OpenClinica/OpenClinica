@@ -9,6 +9,7 @@ import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormRef;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionConfigurationParameters;
+import org.springframework.validation.Errors;
 
 public class EventDefinitionCrfDTO {
     private EventDefinitionCrf eventDefinitionCrf;
@@ -21,7 +22,7 @@ public class EventDefinitionCrfDTO {
     private StudyEventDefinition studyEventDefinition;
     private ODMcomplexTypeDefinitionFormRef odmFormRef;
     private Integer ordinal;
-
+    private Errors errors;
 
     public EventDefinitionCrfDTO(EventDefinitionCrfDTO edcObj) {
         this.eventDefinitionCrf = edcObj.eventDefinitionCrf;
@@ -33,6 +34,7 @@ public class EventDefinitionCrfDTO {
         this.studyEventDefinition = edcObj.studyEventDefinition;
         this.odmFormRef = edcObj.odmFormRef;
         this.formLayout = edcObj.formLayout;
+        this.errors = edcObj.errors;
     }
 
     public EventDefinitionCrfDTO() {

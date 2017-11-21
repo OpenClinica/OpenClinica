@@ -1,7 +1,16 @@
 package org.akaza.openclinica.service;
 
+import java.io.File;
+import java.io.IOException;
 import java.text.MessageFormat;
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Map;
+import java.util.Set;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -9,9 +18,7 @@ import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
@@ -31,6 +38,7 @@ import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParser;
@@ -39,6 +47,7 @@ import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.dto.Bucket;
 import org.akaza.openclinica.service.dto.Form;
+import org.apache.commons.io.FileUtils;
 import org.cdisc.ns.odm.v130.EventType;
 import org.cdisc.ns.odm.v130.ODM;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormDef;
@@ -56,9 +65,9 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.http.HttpMethod;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.transaction.annotation.Transactional;
@@ -69,6 +78,8 @@ import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.client.RestTemplate;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
 
 public class OdmImportServiceImpl implements OdmImportService {
 
@@ -134,11 +145,22 @@ public class OdmImportServiceImpl implements OdmImportService {
         ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
         Study study = retrieveStudy(odm, userAccount, odmStudy, errors);
         study.setFilePath(study.getFilePath() + 1);
+
+        String studyPath = Utils.getFilePath() + Utils.getStudyPath(study.getOc_oid(), study.getFilePath());
+        if (new File(studyPath).exists()) {
+            try {
+                FileUtils.deleteDirectory(new File(studyPath));
+            } catch (IOException e) {
+                // TODO Auto-generated catch block
+                e.printStackTrace();
+            }
+        }
+
         Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(boardId, errors, request);
 
         StudyEventDefinition studyEventDefinition = null;
         List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions = odmStudy.getMetaDataVersion();
-        List<ODMcomplexTypeDefinitionStudyEventDef> odmStudyEventDefs = saveOrUpdateEvent(userAccount, study, odmMetadataVersions);
+        List<ODMcomplexTypeDefinitionStudyEventDef> odmStudyEventDefs = saveOrUpdateEvent(userAccount, study, odmMetadataVersions, errors);
 
         CrfBean crf = null;
         FormLayout formLayout = null;
@@ -285,7 +307,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     private Set<Long> saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Form[] fmCrfs,
-                                      Errors errors, HttpServletRequest request) {
+            Errors errors, HttpServletRequest request) {
         Set<Long> publishedVersions = new HashSet<>();
         for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
             String crfOid = odmFormDef.getOID();
@@ -333,7 +355,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     private List<ODMcomplexTypeDefinitionStudyEventDef> saveOrUpdateEvent(UserAccount userAccount, Study study,
-            List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions) {
+            List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Errors errors) {
         StudyEventDefinition studyEventDefinition;
         List<ODMcomplexTypeDefinitionStudyEventDef> odmStudyEventDefs = odmMetadataVersions.get(0).getStudyEventDef();
         List<StudyEventDefinition> jsonEventList = new ArrayList<>();
@@ -350,7 +372,7 @@ public class OdmImportServiceImpl implements OdmImportService {
                     // restore study event defn
                     eventService.restoreStudyEventDefn(studyEventDefinition.getStudyEventDefinitionId(), userAccount.getUserId());
                 }
-                studyEventDefinition = getStudyEventDefDao().saveOrUpdate(updateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study));
+                studyEventDefinition = getStudyEventDefDao().saveOrUpdate(updateEventDef(odmStudyEventDef, userAccount, studyEventDefinition, study, errors));
             }
             jsonEventList.add(studyEventDefinition);
         }
@@ -403,8 +425,15 @@ public class OdmImportServiceImpl implements OdmImportService {
         return studyEventDefinition;
     }
 
-    private StudyEventDefinition updateEvent(ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef, UserAccount userAccount,
-            StudyEventDefinition studyEventDefinition, Study study) {
+    private StudyEventDefinition updateEventDef(ODMcomplexTypeDefinitionStudyEventDef odmStudyEventDef, UserAccount userAccount,
+            StudyEventDefinition studyEventDefinition, Study study, Errors errors) {
+        if (study.getEnvType().equals(StudyEnvEnum.PROD) && odmStudyEventDef.getRepeating().value().equalsIgnoreCase("No")
+                && studyEventDefinition.getRepeating()) {
+            errors.rejectValue("name", "event_error", " Cannot change Event \"" + studyEventDefinition.getName()
+                    + "\" to non-repeating since it was previously published to Production as repeating - FAILED");
+            logger.info(studyEventDefinition.getName() + " cannot change to non-repeating; event has been published to Production - FAILED");
+
+        }
         studyEventDefinition = populateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study);
         studyEventDefinition.setUpdateId(userAccount.getUserId());
         studyEventDefinition.setDateUpdated(new Date());
@@ -601,7 +630,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         ArrayList<Form> forms = null;
 
         try {
-            buckets = getBucket(request,boardId);
+            buckets = getBucket(request, boardId);
         } catch (Exception e) {
             logger.info(e.getMessage());
             errors.rejectValue("name", "fm_app_error", "Form Manager not responding");
@@ -636,13 +665,11 @@ public class OdmImportServiceImpl implements OdmImportService {
         PublishingDTO dto = (PublishingDTO) map.get("publishingDTO");
         if (dto.getVersionIds().size() != 0) {
             dto.setPublishedEnvType(study.getEnvType());
-            setPublishEnvironment(request,dto);
+            setPublishEnvironment(request, dto);
         }
     }
 
-
-
-    private void setPublishEnvironment(HttpServletRequest request, PublishingDTO publishingDTO){
+    private void setPublishEnvironment(HttpServletRequest request, PublishingDTO publishingDTO) {
 
         RestTemplate restTemplate = new RestTemplate();
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
@@ -660,7 +687,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         restTemplate.postForObject(CoreResources.getSBSFieldFormservice() + "/xlsForm/setPublishedEnvironment", entity, PublishingDTO.class);
     }
 
-    private Bucket[] getBucket(HttpServletRequest request, String boardId){
+    private Bucket[] getBucket(HttpServletRequest request, String boardId) {
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
