@@ -246,11 +246,13 @@ public class OpenRosaSubmissionController {
             createItemData(items.get(0), "", eventCrf, userAccount);
         }
 
-        eventCrf.setStatusId(org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode());
-        eventCrf.setUserAccount(userAccount);
-        eventCrf.setUpdateId(userAccount.getUserId());
-        eventCrf.setDateUpdated(new Date());
-        eventCrfDao.saveOrUpdate(eventCrf);
+        if (!eventCrf.getStatusId().equals(org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode())) {
+            eventCrf.setStatusId(org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode());
+            eventCrf.setUserAccount(userAccount);
+            eventCrf.setUpdateId(userAccount.getUserId());
+            eventCrf.setDateUpdated(new Date());
+            eventCrfDao.saveOrUpdate(eventCrf);
+        }
 
         List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
         List<EventDefinitionCrf> eventDefinitionCrfs = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(sed.getStudyEventDefinitionId(),
