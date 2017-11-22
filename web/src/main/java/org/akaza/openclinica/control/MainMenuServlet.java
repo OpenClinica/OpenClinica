@@ -221,7 +221,7 @@ public class MainMenuServlet extends SecureController {
         if (currentStudy != null) {
             request.setAttribute("studyId", currentStudy.getId());
             // Event Definition list and Group Class list for add suybject window.
-            request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
+            // request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
             request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
         }
 

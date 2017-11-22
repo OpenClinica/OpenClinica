@@ -730,6 +730,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         response.setHeader("Cache-Control", "no-store");
         // YW >>
 
+        // to load all available event from task > add subject
+        request.setAttribute("allDefsArray", this.getEventDefinitionsByCurrentStudy());
+
         if (request.getAttribute(POP_UP_URL) == null) {
             request.setAttribute(POP_UP_URL, "");
         }

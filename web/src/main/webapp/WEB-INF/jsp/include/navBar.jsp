@@ -5,7 +5,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <%
     String currentURL = null;
@@ -22,8 +21,35 @@
     var userName = "<%= userBean.getName() %>";
     var currentURL = "<%= currentURL %>"
 </script>
-<script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
+
+<jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String'/>
+<c:set var="restore" value="true"/>
+<c:if test="${tableFacadeRestore=='false'}"><c:set var="restore" value="false"/></c:if>
+<c:set var="profilePage" value="${param.profilePage}"/>
+<!-- If Controller Spring based append ../ to urls -->
+<c:set var="urlPrefix" value=""/>
+<c:set var="requestFromSpringController" value="${param.isSpringController}"/>
+<c:set var="requestFromSpringControllerCCV" value="${param.isSpringControllerCCV}"/>
+<c:choose>
+    <c:when test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
+        <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
+        <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
+        <link rel="stylesheet" href="../includes/css/icomoon-style.css">
+        <script type="text/javascript" language="JavaScript" src="../includes/sessionTimeout.js"></script>
+        <script type="text/javascript" language="JavaScript" src="../includes/auth0/captureUnloadEvent.js"></script>
+        <script type="text/javascript" language="JavaScript" src="../includes/moment.min.js"></script>
+    </c:when>
+    <c:otherwise>
+        <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+        <link rel="stylesheet" href="includes/css/icomoon-style.css">
+        <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
+        <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
+        <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
+    </c:otherwise>
+</c:choose>
+
 
 <script language="JavaScript">
 
@@ -119,29 +145,6 @@
         document.cookie = "returnTo-" + userName + "=" + encodeURIComponent(returnTo) + expires + "; path=/";
     }
 </script>
-
-
-<jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String'/>
-<c:set var="restore" value="true"/>
-<c:if test="${tableFacadeRestore=='false'}"><c:set var="restore" value="false"/></c:if>
-<c:set var="profilePage" value="${param.profilePage}"/>
-<!-- If Controller Spring based append ../ to urls -->
-<c:set var="urlPrefix" value=""/>
-<c:set var="requestFromSpringController" value="${param.isSpringController}"/>
-<c:set var="requestFromSpringControllerCCV" value="${param.isSpringControllerCCV}"/>
-<c:choose>
-    <c:when test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
-        <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
-        <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
-        <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
-        <link rel="stylesheet" href="../includes/css/icomoon-style.css">
-    </c:when>
-    <c:otherwise>
-        <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-        <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-        <link rel="stylesheet" href="includes/css/icomoon-style.css">
-    </c:otherwise>
-</c:choose>
 
 <!-- Main Navigation -->
 <div class="oc_nav">
@@ -359,12 +362,28 @@
 
 <div id="nav_hide" style="position: absolute; left: 0px; top: 0px; visibility: hidden; z-index: -1; width: 100%; height: 400px;">
 
-    <a href="#" onmouseover="hideSubnavs();"><img src="images/spacer.gif" alt="" width="1000" height="400" border="0"/></a>
+    <a href="#" onmouseover="hideSubnavs();">
+        <c:choose>
+            <c:when test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
+                <img src="../images/spacer.gif" alt="" width="1000" height="400" border="0"/>
+            </c:when>
+            <c:otherwise>
+                <img src="images/spacer.gif" alt="" width="1000" height="400" border="0"/>
+            </c:otherwise>
+        </c:choose>
+    </a>
 </div>
 
 
 </div>
-<img src="${urlPrefix}images/spacer.gif" width="596" height="1"><br>
+<c:choose>
+    <c:when test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
+        <img src="../images/spacer.gif" width="596" height="1"><br>
+    </c:when>
+    <c:otherwise>
+        <img src="images/spacer.gif" width="596" height="1"><br>
+    </c:otherwise>
+</c:choose>
 <!-- End Main Navigation -->
 <div id="subnav_Tasks" class="dropdown">
     <div class="dropdown_BG">
@@ -518,7 +537,7 @@
             return false;
         });
     });
-    
+
     dropdown = document.getElementById("subnav_Tasks");
 
     //close dropdown using esc
@@ -547,7 +566,7 @@
         } else {
             droopdown.style.display = 'none';
         }
-    }  
+    }
 </script>
 
 <div id="navAddSubjectForm" style="display: none">
