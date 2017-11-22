@@ -120,6 +120,8 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                                 OCUserDTO userDTO = getUserDetails(request);
                                 if (userDTO.getUsername().equalsIgnoreCase("root")) {
                                     CoreResources.setRootUserAccountBean(request, dataSource);
+                                    ub.setUserUuid(userDTO.getUuid());
+                                    userAccountDAO.update(ub);
                                 } else {
                                     try {
                                         HashMap<String, String> userAccount = createUserAccount(request, userDTO);
