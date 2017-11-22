@@ -705,7 +705,7 @@
                                             </td>
                                             <td valign="top" class="icon-container">
                                                 <a href="#">
-                                                    <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
+                                                    <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
                                                           title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"
                                                           id="enrollmentDateTrigger_${rand}"/>
                                                     <script type="text/javascript">
@@ -800,7 +800,7 @@
                                                     </td>
                                                     <td valign="top" class="icon-container">
                                                         <a href="#">
-                                                            <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
+                                                            <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
                                                                   title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"
                                                                   id="dobTrigger_${rand}"/>
                                                             <script type="text/javascript">
@@ -938,7 +938,7 @@
                                             </td>
                                             <td valign="top" class="icon-container">
                                                 <a href="#">
-                                                    <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
+                                                    <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>"
                                                           title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0"
                                                           id="enrollmentDateTrigger2_${rand}"/></a>
                                                 <script type="text/javascript">
