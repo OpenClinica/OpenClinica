@@ -229,6 +229,12 @@
             formObj.submit();
         }
     }
+
+    function submitSdv(formObj,crfId) {
+        formObj.action='${pageContext.request.contextPath}/pages/handleSDVGet';
+        formObj.crfId.value=crfId;
+        formObj.submit();
+    }
 </script>
 <div id="subjectSDV">
     <form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp">

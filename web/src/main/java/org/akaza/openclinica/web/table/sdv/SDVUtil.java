@@ -90,7 +90,7 @@ public class SDVUtil {
 
     String getIconForSdvStatusPrefix() {
         String prefix = pathPrefix == null ? "../" : pathPrefix;
-        return "<span hspace='2' border='0'  title='SDV Complete' alt='SDV Complete' class='icon icon-ok'>";
+        return "<span hspace='2' border='0'  title='SDV Complete' alt='SDV Complete' class='icon icon-icon-SDV-doubleCheck'>";
     }
 
     String getIconForCrfStatusPrefix() {
@@ -968,12 +968,12 @@ public class SDVUtil {
             actions = new StringBuilder("");
             //append("<input type='hidden' name='crfId' value='").append(crfBean.getId()).append("'").append("/> ")
             if (!crfBean.isSdvStatus()) {
-                StringBuilder jsCodeString =
-                    new StringBuilder("this.form.method='GET'; this.form.action='").append(request.getContextPath()).append("/pages/handleSDVGet").append("';")
-                            .append("this.form.crfId.value='").append(crfBean.getId()).append("';").append("this.form.submit();");
-
-                actions.append("<input type=\"submit\" class=\"button_medium\" value=\"Mark as SDV'd\" name=\"sdvSubmit\" ").append("onclick=\"").append(
-                        jsCodeString.toString()).append("\" />");
+//                StringBuilder jsCodeString =
+//                    new StringBuilder("this.form.method='GET'; this.form.action='").append(request.getContextPath()).append("/pages/handleSDVGet").append("';")
+//                            .append("this.form.crfId.value='").append(crfBean.getId()).append("';").append("this.form.submit();");
+//                actions.append("<input type=\"submit\" class=\"button_medium\" value=\"Mark as SDV'd\" name=\"sdvSubmit\" ").append("onclick=\"").append(
+//                        jsCodeString.toString()).append("\" />");
+                actions.append("<a class='icon icon-icon-sdv-text' href='javascript:void(0)' onclick='submitSdv(document.sdvForm,").append(crfBean.getId()).append(")'></a>");
             }
 
             //Only implement the view icon if it is a event crf request
