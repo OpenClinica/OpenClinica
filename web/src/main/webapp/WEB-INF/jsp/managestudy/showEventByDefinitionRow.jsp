@@ -20,7 +20,7 @@
     <tr valign="top">  
    </c:otherwise>   
    </c:choose>    
-      <td class="table_cell_left"><c:out value="${currRow.bean.studySubjectLabel}"/></td>
+      <td class="table_cell_left"><c:out value="${currRow.bean.id}"/></td>
 
       <td class="table_cell">
       <c:choose>
