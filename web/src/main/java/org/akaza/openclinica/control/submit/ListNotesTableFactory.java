@@ -106,24 +106,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-        tableFacade.setColumnProperties("studySubject.label",
-                "siteId",
-                "discrepancyNoteBean.resolutionStatus",
-                "discrepancyNoteBean.createdDate",
-                "discrepancyNoteBean.updatedDate",
-                "age",
-                "days",
-                "eventName",
-                "eventStartDate",
-                "crfName",
-                "crfStatus",
-                "entityName",
-                "entityValue",
-                "discrepancyNoteBean.entityType",
-                "discrepancyNoteBean.detailedNotes",
-                "numberOfNotes",
-                "discrepancyNoteBean.user",
-                "actions");
+        tableFacade.setColumnProperties("studySubject.label", "siteId", "discrepancyNoteBean.resolutionStatus", "discrepancyNoteBean.createdDate",
+                "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus", "entityName", "entityValue",
+                "discrepancyNoteBean.entityType", "discrepancyNoteBean.detailedNotes", "numberOfNotes", "discrepancyNoteBean.user", "actions");
 
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
@@ -150,7 +135,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
     }
-
 
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
@@ -186,7 +170,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
         Limit limit = tableFacade.getLimit();
         // Show only QUERY note type
-        limit.getFilterSet().addFilter(new Filter("discrepancyNoteBean.discrepancyNoteTypeId","Query"));
+        limit.getFilterSet().addFilter(new Filter("discrepancyNoteBean.discrepancyNoteTypeId", "Query"));
 
         if (!limit.isComplete()) {
             parentStudyId = currentStudy.getId();
@@ -293,7 +277,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
                 if (reterm.getString("New_and_Updated").equalsIgnoreCase(value)) {
                     value = ListNotesFilter.filterResStatusNewAndUpdated + "";
-                } else if (reterm.getString("Closed_And_Closed_Modified").equalsIgnoreCase(value)){
+                } else if (reterm.getString("Closed_And_Closed_Modified").equalsIgnoreCase(value)) {
                     value = ListNotesFilter.filterResStatusClosedAndClosedModified + "";
                 } else {
                     value = ResolutionStatus.getByNameResStatus(value).getId() + "";
@@ -468,19 +452,19 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 if (dnb.getEntityType() != "eventCrf") {
                     builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
                     builder.close();
-                    builder.append("<span title='" + resword.getString("View_Query_Within_Record") + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
+                    builder.append("<span title='" + resword.getString("View_Query_Within_Record")
+                            + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
                     builder.aEnd();
                 } else {
                     if (dnb.getStageId() == 5) {
                         builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
                         builder.close();
-                        builder.append("<span title='" + resword.getString("View_Query_Within_Record") + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign\" hspace=\"6\"/>");
+                        builder.append("<span title='" + resword.getString("View_Query_Within_Record")
+                                + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
                         builder.aEnd();
                     }
                 }
             }
-
-
 
             return builder.toString();
         }
@@ -492,12 +476,14 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             if (this.getResolutionStatus() >= 1 && this.getResolutionStatus() <= 5) {
                 actionLink.a().href("javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
                         + "&resolutionStatus=" + resolutionStatus + "')");
-                actionLink.append("<span title=\"Download queries for all subjects\" border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"4\" width=\"24 \" height=\"15\"/>");
+                actionLink.append(
+                        "<span title=\"Download queries for all subjects\" border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"4\" width=\"24 \" height=\"15\"/>");
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             } else {
                 actionLink.a().href("javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
                         + "&module=" + module + "')");
-                 actionLink.append("<span title=\"Download queries for all subjects\" border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"4\" width=\"24 \" height=\"15\"/>");
+                actionLink.append(
+                        "<span title=\"Download queries for all subjects\" border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"4\" width=\"24 \" height=\"15\"/>");
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             }
         }
