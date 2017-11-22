@@ -24,9 +24,20 @@
 </script>
 <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
+<script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
+<script type="text/javascript" src="js/lib/client.js"></script>
 
 <script language="JavaScript">
+    var storage = new CrossStorageClient('http://localhost:3000/example/hub.html');
 
+    storage.onConnect()
+        .then(function() {
+            return storage.get('key1');
+        }).then(function(res) {
+        console.log(res); // 'foo'
+    })['catch'](function(err) {
+        console.log(err);
+    });
     var isTimedOut = isSessionTimedOut(encodeURIComponent(currentURL));
     if (isTimedOut) {
         window.location.replace (myContextPath + '/pages/logout');
