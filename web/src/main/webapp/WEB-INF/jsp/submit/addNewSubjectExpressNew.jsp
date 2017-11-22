@@ -351,7 +351,8 @@
 
                 <tr valign="top">
                     <td class="formlabel" align="left">
-                        <span class="addNewStudyLayout"><fmt:message key="start_date" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
+                        <span class="addNewStudyLayout"><fmt:message key="start_date" bundle="${resword}"/></span>
+                        <c:if test="${studyEventDefinition > 0}">&nbsp;<small class="required">*</c:if>
                     </td>
                     <td valign="top">
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
