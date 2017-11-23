@@ -402,7 +402,7 @@
                     <c:otherwise></c:otherwise>
                     </c:choose>
                     <td class="table_cell">
-                     <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&crfVersionId=<c:out value="${dedc.edc.defaultVersionId}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+                                   <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
                       name="bt_View1" align="left" class="icon icon-search" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></a>&nbsp;
@@ -464,19 +464,19 @@
                     <c:set var="actionQuery" value="" />
 
                     <c:if test="${dec.continueInitialDataEntryPermitted}">
-                        <c:set var="actionQuery" value="InitialDataEntry?eventCRFId=${dec.eventCRF.id}" />
+                        <c:set var="actionQuery" value="EnketoFormServlet?formLayoutId=${dec.eventCRF.formLayout.id}&studyEventId=${studyEvent.id}&eventCrfId=${dec.eventCRF.id}&originatingPage=${originatingPage}&mode=edit"/>
                     </c:if>
 
                     <c:if test="${dec.startDoubleDataEntryPermitted}">
-                        <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
+                        <c:set var="actionQuery" value="EnketoFormServlet?formLayoutId=${dec.eventCRF.formLayout.id}&studyEventId=${studyEvent.id}&eventCrfId=${dec.eventCRF.id}&originatingPage=${originatingPage}&mode=edit"/>
                     </c:if>
 
                     <c:if test="${dec.continueDoubleDataEntryPermitted}">
-                        <c:set var="actionQuery" value="DoubleDataEntry?eventCRFId=${dec.eventCRF.id}" />
+                        <c:set var="actionQuery" value="EnketoFormServlet?formLayoutId=${dec.eventCRF.formLayout.id}&studyEventId=${studyEvent.id}&eventCrfId=${dec.eventCRF.id}&originatingPage=${originatingPage}&mode=edit"/>
                     </c:if>
 
                     <c:if test="${dec.performAdministrativeEditingPermitted}">
-                        <c:set var="actionQuery" value="AdministrativeEditing?eventCRFId=${dec.eventCRF.id}" />
+                        <c:set var="actionQuery" value="EnketoFormServlet?formLayoutId=${dec.eventCRF.formLayout.id}&studyEventId=${studyEvent.id}&eventCrfId=${dec.eventCRF.id}&originatingPage=${originatingPage}&mode=edit"/>
                     </c:if>
 
 <%--
@@ -488,7 +488,7 @@
 
                     <c:choose>
                         <c:when test='${actionQuery == "" && dec.stage.name =="invalid" }'>
-                            <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+                                   <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                                 onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                 onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                 ><span name="bt_Print<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="2"></a>&nbsp;
@@ -510,7 +510,7 @@
                         </c:when>
 
                         <c:when test='${actionQuery == ""}'>
-                            <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+                                   <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                                 onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                                 onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
                                 ><span name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></a>
@@ -525,23 +525,18 @@
                         </c:when>
                         <c:otherwise>
                             <c:if test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
-                            <a href="<c:out value="${actionQuery}"/>&<c:out value="${getQuery}"/>"
+                            <a href="<c:out value="${actionQuery}"/>"
                                 onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                                 onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');"
                                 ><span name="bt_EnterData<c:out value="${rowCount}"/>" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></a>&nbsp;
                             </c:if>
-                            <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${dedc.edc.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>&tabId=1&eventId=<c:out value="${eventId}"/>"
+                                   <a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                                 onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                                 onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-                                ><span name="bt_Print<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
+                                ><span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
 <!--
          <a href="javascript:openDocWindow('PrintDataEntry?ecId=<c:out value="${dec.eventCRF.id}"/>')"
    -->                         
-    <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/<c:out value="${study.oid}"/>/<c:out value="${studySubject.oid}"/>/<c:out value="${studyEvent.studyEventDefinition.oid}"/>/<c:out value="${dec.eventCRF.formLayout.oid}"/>')"
-                            
-                                onMouseDown="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-                                onMouseUp="javascript:setImage('bt_Print<c:out value="${rowCount}"/>','images/bt_Print.gif');"
-                                ><span name="bt_Print<c:out value="${rowCount}"/>" class="icon icon-print" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>"  hspace="2"></a>&nbsp;
 
                             <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
                             <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
@@ -579,7 +574,7 @@
 <%-- Subject discrepancy note table--%>
 <div id="subjDiscNoteDivTitle" class="subjDiscNoteDivTitle">
     <a id="discNoteDivParent" href="javascript:void(0)"
-       onclick="showSummaryBox(document.getElementById('subjDiscNoteDiv'),document.getElementById('discNoteDivParent'),'<fmt:message key="show_event_notes" bundle="${resword}"/>','<fmt:message key="hide_event_notes" bundle="${resword}"/>')"><fmt:message key="show_event_notes" bundle="${resword}"/></a>
+       onclick="showSummaryBox('subjDiscNoteDiv',document.getElementById('discNoteDivParent'),'<fmt:message key="show_event_notes" bundle="${resword}"/>','<fmt:message key="hide_event_notes" bundle="${resword}"/>')"><fmt:message key="show_event_notes" bundle="${resword}"/></a>
 </div>
 <div id="subjDiscNoteDiv" class="subjDiscNoteDiv" style="display:none">
     <table class="subjDiscNoteTable" cellpadding="0" cellspacing="0">
