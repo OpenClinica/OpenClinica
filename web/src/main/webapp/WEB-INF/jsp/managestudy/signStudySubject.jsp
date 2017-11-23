@@ -134,7 +134,7 @@
 </table>
 <p><fmt:message key="sure_to_sign_subject" bundle="${resword}"/></p>
 
-<p><fmt:message key="sure_to_sign_subject1" bundle="${resword}"/></p>
+<p><fmt:message key="sure_to_sign_subject3" bundle="${resword}"/></p>
 
 <b><fmt:message key="user_full_name" bundle="${resword}"/>: <c:out value="${userBean.firstName}"/>&nbsp;<c:out value="${userBean.lastName}"/>
     <br/>
@@ -186,7 +186,6 @@
     <%--
         <a href="#events"><fmt:message key="events" bundle="${resword}"/></a> &nbsp; &nbsp; &nbsp;
     --%>
-    <a href="#group"><fmt:message key="group" bundle="${resword}"/></a> &nbsp;&nbsp;&nbsp;
     <a href="#global"><fmt:message key="global_subject_record" bundle="${resword}"/></a> &nbsp;&nbsp;&nbsp;
     <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')"><fmt:message key="audit_logs" bundle="${resword}"/></a>
 </p>
@@ -433,7 +432,7 @@
 <%-- Subject discrepancy note table--%>
 <div id="subjDiscNoteDivTitle" class="subjDiscNoteDivTitle">
     <a id="discNoteDivParent" href="javascript:void(0)"
-       onclick="showSummaryBox(document.getElementById('subjDiscNoteDiv'),document.getElementById('discNoteDivParent'),'<fmt:message key="show_event_notes" bundle="${resword}"/>','<fmt:message key="hide_event_notes" bundle="${resword}"/>')"><fmt:message key="show_event_notes" bundle="${resword}"/></a>
+       onclick="showSummaryBox('subjDiscNoteDiv',document.getElementById('discNoteDivParent'),'<fmt:message key="show_event_notes" bundle="${resword}"/>','<fmt:message key="hide_event_notes" bundle="${resword}"/>')"><fmt:message key="show_event_notes" bundle="${resword}"/></a>
 </div>
 <div id="subjDiscNoteDiv" class="subjDiscNoteDiv" style="display:none">
     <table class="subjDiscNoteTable" cellpadding="0" cellspacing="0">
@@ -529,80 +528,8 @@
     </c:choose>
 
     </c:otherwise>
-    </c:choose><a name="group"><a href="javascript:leftnavExpand('groups');javascript:setImage('ExpandGroup3','images/bt_Collapse.gif');"><img
-  name="ExpandGroup3" src="images/bt_Expand.gif" border="0"> <fmt:message key="group" bundle="${resword}"/></a></a></div>
-<div id="groups" style="display:none">
-    <div style="width: 600px">
-        <!-- These DIVs define shaded box borders -->
-        <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-
-            <div class="tablebox_center">
-
-                <table border="0" cellpadding="0" cellspacing="0" width="100%">
-
-                    <!-- Table Actions row (pagination, search, tools) -->
-
-                    <tr>
-
-                        <!-- Table Tools/Actions cell -->
-
-                        <td align="right" valign="top" class="table_actions">
-                            <table border="0" cellpadding="0" cellspacing="0">
-                                <tr>
-                                    <td class="table_tools"><a href="UpdateStudySubject?id=<c:out value="${studySub.id}"/>&action=show"><fmt:message key="assign_subject_to_group" bundle="${resworkflow}"/></a></td>
-                                </tr>
-                            </table>
-                        </td>
-
-                        <!-- End Table Tools/Actions cell -->
-                    </tr>
-
-                    <!-- end Table Actions row (pagination, search, tools) -->
-
-                    <tr>
-                        <td valign="top">
-
-                            <!-- Table Contents -->
-
-                            <table border="0" cellpadding="0" cellspacing="0" width="100%">
-                                <tr>
-                                    <td class="table_header_row_left"><fmt:message key="subject_group_class" bundle="${resword}"/></td>
-                                    <td class="table_header_row"><fmt:message key="study_group" bundle="${resword}"/></td>
-                                    <td class="table_header_row"><fmt:message key="notes" bundle="${resword}"/></td>
-                                </tr>
-                                <c:choose>
-                                    <c:when test="${!empty groups}">
-                                        <c:forEach var="group" items="${groups}">
-                                            <tr>
-                                                <td class="table_cell_left"><c:out value="${group.groupClassName}"/></td>
-                                                <td class="table_cell"><c:out value="${group.studyGroupName}"/></td>
-                                                <td class="table_cell"><c:out value="${group.notes}"/>&nbsp;</td>
-                                            </tr>
-                                        </c:forEach>
-                                    </c:when>
-                                    <c:otherwise>
-                                        <tr>
-                                            <td class="table_cell" colspan="2"><fmt:message key="currently_no_groups" bundle="${resword}"/></td>
-                                        </tr>
-                                    </c:otherwise>
-                                </c:choose>
-                            </table>
-
-                            <!-- End Table Contents -->
-
-                        </td>
-                    </tr>
-                </table>
-
-
-            </div>
-
-        </div></div></div></div></div></div></div></div>
-
-    </div>
-
-    <br><br>
-</div>
+    </c:choose>
+    
 
 <div style="width: 250px">
 
