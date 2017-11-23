@@ -276,7 +276,7 @@ public class AddNewSubjectServlet extends SecureController {
             v.addValidation(INPUT_ENROLLMENT_DATE, Validator.DATE_IN_PAST);
 
             boolean locationError = false;
-            if (fp.getBoolean("addWithEvent")) {
+            if (fp.getBoolean("addWithEvent") && fp.getInt("studyEventDefinition") > 0) {
                 v.addValidation(INPUT_EVENT_START_DATE, Validator.IS_A_DATE);
                 v.alwaysExecuteLastValidation(INPUT_EVENT_START_DATE);
                 if(currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")){

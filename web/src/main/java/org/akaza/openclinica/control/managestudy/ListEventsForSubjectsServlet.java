@@ -129,7 +129,7 @@ public class ListEventsForSubjectsServlet extends SecureController {
         request.setAttribute("defId", definitionId);
         // A. Hamid.
         // For event definitions and group class list in the add subject popup
-        request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
+        // request.setAttribute("allDefsArray", super.getEventDefinitionsByCurrentStudy());
         request.setAttribute("studyGroupClasses", super.getStudyGroupClassesByCurrentStudy());
         FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
         session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, discNotes);

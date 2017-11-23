@@ -1760,12 +1760,13 @@ public class StudyController {
 
     public Boolean isDataManagerOrStudyDirector(UserAccountBean userAccount, StudyBean currentStudy){
 
-        logger.error("All Roles:" + userAccount.getRoles().toString());
-        logger.error("Current study Id:" + currentStudy.getId());
-        for (StudyUserRoleBean userRoleBean : userAccount.getRoles()) {
-            logger.error("***************inside StudyController study: " + userRoleBean.getStudyId() + " role: " + userRoleBean.getRoleName());
+        if (logger.isDebugEnabled()) {
+            logger.error("All Roles:" + userAccount.getRoles().toString());
+            logger.error("Current study Id:" + currentStudy.getId());
+            for (StudyUserRoleBean userRoleBean : userAccount.getRoles()) {
+                logger.error("***************inside StudyController study: " + userRoleBean.getStudyId() + " role: " + userRoleBean.getRoleName());
+            }
         }
-
         long result = userAccount.getRoles()
                 .stream()
                 .filter(role -> currentStudy.getId() == (role.getStudyId())

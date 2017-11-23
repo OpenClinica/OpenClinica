@@ -186,7 +186,7 @@
                                 </td>
                                 <td valign="top" class="icon-container">
                                     <a href="#">
-                                         <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger_${rand}" />
+                                         <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger_${rand}" />
                                             <script type="text/javascript">
                                             Calendar.setup({inputField  : "enrollmentDateField_${rand}", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger_${rand}", customPX: 300, customPY: 10, randomize: "${rand}" });
                                             </script>
@@ -258,7 +258,7 @@
                                 </td>
                                 <td valign="top" class="icon-container">
                                     <a href="#">
-                                        <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger_${rand}" />
+                                        <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="dobTrigger_${rand}" />
                                         <script type="text/javascript">
                                         Calendar.setup({inputField  : "dobField_${rand}", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "dobTrigger_${rand}", customPX: 300, customPY: 10, randomize: "${rand}" });
                                         </script>
@@ -351,7 +351,8 @@
 
                 <tr valign="top">
                     <td class="formlabel" align="left">
-                        <span class="addNewStudyLayout"><fmt:message key="start_date" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
+                        <span class="addNewStudyLayout"><fmt:message key="start_date" bundle="${resword}"/></span>
+                        <c:if test="${studyEventDefinition > 0}">&nbsp;<small class="required">*</c:if>
                     </td>
                     <td valign="top">
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
@@ -361,7 +362,7 @@
                                 </td>
                                 <td valign="top" class="icon-container">
                                      <a href="#">
-                                         <span class="icon icon-calendarGB" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2_${rand}"/></a>
+                                         <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger2_${rand}"/></a>
                                          <script type="text/javascript">
                                          Calendar.setup({inputField  : "enrollmentDateField2_${rand}", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger2_${rand}" ,customPX: 300, customPY: 10, randomize: "${rand}" });
                                          </script>
