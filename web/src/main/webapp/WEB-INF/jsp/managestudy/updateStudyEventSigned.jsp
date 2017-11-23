@@ -91,7 +91,10 @@
 
  </c:otherwise>
 </c:choose>
-<fmt:message key="update_study_event" bundle="${resworkflow}"/>
+  <fmt:message key="sign_event_for_subject" bundle="${resworkflow}">
+          <fmt:param><c:out value="${studyEvent.studyEventDefinition.name}" /></fmt:param>
+          <fmt:param><c:out value="${studySubject.label}" /></fmt:param>
+  </fmt:message>
 </div></h1>
 
 <p><fmt:message key="sure_to_sign_subject" bundle="${resword}"/></p>
