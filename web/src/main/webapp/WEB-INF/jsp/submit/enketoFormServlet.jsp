@@ -40,10 +40,6 @@
     <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
     <script type="text/javascript" language="javascript">
-        //var isTimedOut = isSessionTimedOut(encodeURIComponent(currentURL));
-        //if (isTimedOut) {
-        //    window.location.replace (myContextPath + '/pages/logout');
-        //}
 
         $(document).ready(function(){
             var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
@@ -70,6 +66,9 @@
     <c:set var="urlPrefix" value="../"/>
 </c:if>
 <body style="width:1024px;" class="main_BG">
+<script type="application/javascript">
+    isSessionTimedOut(encodeURIComponent(currentURL));
+</script>
 <iframe id="enketo" style="position:fixed;z-index:1011;top:0;left:0;width:100vw;height:100vh;"/>
 </body>
 
