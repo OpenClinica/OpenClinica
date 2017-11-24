@@ -18,6 +18,8 @@
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
+    <script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
+    <script type="text/javascript" src="js/lib/client.js"></script>
     <%
         String currentURL = null;
         if (request.getAttribute("javax.servlet.forward.request_uri") != null) {
@@ -32,15 +34,16 @@
         var sessionTimeout = "<%= session.getMaxInactiveInterval() %>";
         var userName = "<%= userBean.getName() %>";
         var currentURL = "<%= currentURL %>"
+        var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
     </script>
 
     <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
     <script type="text/javascript" language="javascript">
-        var isTimedOut = isSessionTimedOut(encodeURIComponent(currentURL));
-        if (isTimedOut) {
-            window.location.replace (myContextPath + '/pages/logout');
-        }
+        //var isTimedOut = isSessionTimedOut(encodeURIComponent(currentURL));
+        //if (isTimedOut) {
+        //    window.location.replace (myContextPath + '/pages/logout');
+        //}
 
         $(document).ready(function(){
             var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
