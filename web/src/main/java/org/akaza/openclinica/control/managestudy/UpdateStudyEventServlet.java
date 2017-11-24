@@ -474,7 +474,7 @@ public class UpdateStudyEventServlet extends SecureController {
                         + fp.getString(INPUT_STARTDATE_PREFIX + "Minute") + "%26startHalf=" + fp.getString(INPUT_STARTDATE_PREFIX + "Half") + "%26endDate="
                         + end_date + "%26endHour=" + fp.getString(INPUT_ENDDATE_PREFIX + "Hour") + "%26endMinute="
                         + fp.getString(INPUT_ENDDATE_PREFIX + "Minute") + "%26endHalf=" + fp.getString(INPUT_ENDDATE_PREFIX + "Half") + "%26statusId="
-                        + fp.getInt(SUBJECT_EVENT_STATUS_ID);
+                        + studyEvent.getSubjectEventStatus().getId();
 
                 request.setAttribute(ORIGINATING_PAGE, originationUrl);
 
@@ -530,6 +530,10 @@ public class UpdateStudyEventServlet extends SecureController {
             // status
             String username = request.getParameter("j_user");
             String password = request.getParameter("j_pass");
+            if (username == null)
+                username = "";
+            if (password == null)
+                password = "";
 
             // tring encodedUserPass =
             // org.akaza.openclinica.core.SecurityManager.getInstance().encrytPassword(password);
@@ -610,7 +614,7 @@ public class UpdateStudyEventServlet extends SecureController {
                         + fp.getString(INPUT_STARTDATE_PREFIX + "Minute") + "%26startHalf=" + fp.getString(INPUT_STARTDATE_PREFIX + "Half") + "%26endDate="
                         + end_date + "%26endHour=" + fp.getString(INPUT_ENDDATE_PREFIX + "Hour") + "%26endMinute="
                         + fp.getString(INPUT_ENDDATE_PREFIX + "Minute") + "%26endHalf=" + fp.getString(INPUT_ENDDATE_PREFIX + "Half") + "%26statusId="
-                        + fp.getInt(SUBJECT_EVENT_STATUS_ID);
+                        + studyEvent.getSubjectEventStatus().getId();
 
                 request.setAttribute(ORIGINATING_PAGE, originationUrl);
                 forwardPage(Page.UPDATE_STUDY_EVENT_SIGNED);
