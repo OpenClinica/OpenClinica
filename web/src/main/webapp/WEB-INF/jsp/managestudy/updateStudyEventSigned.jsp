@@ -609,7 +609,7 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['New']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon-flag red"  border="0"
+                                        <span class="fa fa-bubble-red"  border="0"
                                           alt="<fmt:message key="Open" bundle="${resterm}"/>" title="<fmt:message key="Open" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
@@ -618,7 +618,7 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['Updated']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon icon-flag orange" border="0"
+                                        <span class="fa fa-bubble-orange" border="0"
                                           alt="<fmt:message key="Updated" bundle="${resterm}"/>" title="<fmt:message key="Updated" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
@@ -627,7 +627,7 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['Closed']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon-flag black" border="0"
+                                        <span class="fa fa-bubble-white" border="0"
                                           alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
