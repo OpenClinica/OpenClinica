@@ -19,7 +19,8 @@
     var myContextPath = "${pageContext.request.contextPath}";
     var sessionTimeout = "<%= session.getMaxInactiveInterval() %>";
     var userName = "<%= userBean.getName() %>";
-    var currentURL = "<%= currentURL %>"
+    var currentURL = "<%= currentURL %>";
+    var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
 </script>
 
 <jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String'/>
@@ -50,13 +51,13 @@
     </c:otherwise>
 </c:choose>
 
+<script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
+<script type="text/javascript" src="js/lib/client.js"></script>
+
 
 <script language="JavaScript">
 
-    var isTimedOut = isSessionTimedOut(encodeURIComponent(currentURL));
-    if (isTimedOut) {
-        window.location.replace (myContextPath + '/pages/logout');
-    }
+    isSessionTimedOut(encodeURIComponent(currentURL));
 
     //Piwik
     var _paq = _paq || [];

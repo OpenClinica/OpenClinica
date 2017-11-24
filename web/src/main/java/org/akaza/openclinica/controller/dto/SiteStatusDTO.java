@@ -21,6 +21,7 @@ public class SiteStatusDTO {
     }
 
     public void setStatus(String status) {
+        status = status.equalsIgnoreCase("design") ? "pending" : status;
         status = status.toUpperCase();
         this.status = status;
     }

@@ -587,6 +587,7 @@
             <th class="table_header_row">New</th>
             <th class="table_header_row">Updated</th>
             <th class="table_header_row">Closed</th>
+            <th class="table_header_row">Closed-Modified</th>                        
             <th class="table_header_row">Actions</th>
         </thead>
         <tbody>
@@ -609,7 +610,7 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['New']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon-flag red"  border="0"
+                                        <span class="fa fa-bubble-red"  border="0"
                                           alt="<fmt:message key="Open" bundle="${resterm}"/>" title="<fmt:message key="Open" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
@@ -618,7 +619,7 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['Updated']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon icon-flag orange" border="0"
+                                        <span class="fa fa-bubble-orange" border="0"
                                           alt="<fmt:message key="Updated" bundle="${resterm}"/>" title="<fmt:message key="Updated" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
@@ -627,12 +628,23 @@
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['Closed']}"/>
                                     <c:if test="${discNoteCount > 0}">
-                                        <span class="icon icon-flag black" border="0"
+                                        <span class="fa fa-bubble-black" border="0"
                                           alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>" align="left"/>
                                         (${discNoteCount})
                                         <c:set var="discNoteCount" value="${0}"/>
                                     </c:if>
                                 </td><%-- closed --%>
+                                
+                                <td class="table_cell">
+                                    <c:set var="discNoteCount" value="${discNoteMap['Closed-Modified']}"/>
+                                    <c:if test="${discNoteCount > 0}">
+                                        <span class="fa fa-bubble-black" border="0"
+                                          alt="<fmt:message key="Closed_Modified" bundle="${resterm}"/>" title="<fmt:message key="Closed_Modified" bundle="${resterm}"/>" align="left"/>
+                                        (${discNoteCount})
+                                        <c:set var="discNoteCount" value="${0}"/>
+                                    </c:if>
+                                </td><%-- Closed-Modified--%>
+                                
                                 <td class="table_cell">
                                     <a onmouseup="javascript:setImage('bt_View1','images/bt_View.gif');" onmousedown="javascript:setImage('bt_View1','images/bt_View_d.gif');" href="EnterDataForStudyEvent?eventId=${studyEvent.id}">
                                         <span hspace="6" border="0" align="left" title="View" alt="View" class="icon icon-search" name="bt_View1"/>
