@@ -1,5 +1,5 @@
 function isSessionTimedOut(currentURL) {
-    var storage = new CrossStorageClient('http://localhost:3000/example/hub.html');
+    var storage = new CrossStorageClient(crossStorageURL);
 
 
     var newExpiration = moment().add(sessionTimeout, 's').valueOf();
