@@ -30,11 +30,9 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
-import org.akaza.openclinica.core.SecurityManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -151,10 +149,10 @@ public class SignStudySubjectServlet extends SecureController {
                 // DiscrepancyNoteBean discBean = (DiscrepancyNoteBean)
                 // discList.get(j);
                 // if
-                //(discBean.getResStatus().equals(org.akaza.openclinica.bean.core
+                // (discBean.getResStatus().equals(org.akaza.openclinica.bean.core
                 // .ResolutionStatus.OPEN)
                 // ||
-                //discBean.getResStatus().equals(org.akaza.openclinica.bean.core
+                // discBean.getResStatus().equals(org.akaza.openclinica.bean.core
                 // .ResolutionStatus.UPDATED))
                 // {
                 // sign = false;
@@ -162,8 +160,8 @@ public class SignStudySubjectServlet extends SecureController {
                 // }
                 // }
                 EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(), ecrf.getCRFVersionId());
-                if (ecrf.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) || ecrf.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
-                    && edcBean.isDoubleEntry() == true) {
+                if (ecrf.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)
+                        || ecrf.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) && edcBean.isDoubleEntry() == true) {
                     sign = false;
                     break;
                 }
@@ -207,7 +205,6 @@ public class SignStudySubjectServlet extends SecureController {
 
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);
-
         if (studySubId == 0) {
             addPageMessage(respage.getString("please_choose_a_subject_to_view"));
             forwardPage(Page.LIST_STUDY_SUBJECTS);
@@ -215,6 +212,7 @@ public class SignStudySubjectServlet extends SecureController {
         }
         CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
         StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
+        request.setAttribute("studySub", studySub);
 
         if (!permitSign(studySub, sm.getDataSource())) {
             addPageMessage(respage.getString("subject_event_cannot_signed"));
@@ -253,12 +251,10 @@ public class SignStudySubjectServlet extends SecureController {
             } else {
                 request.setAttribute("id", new Integer(studySubId).toString());
                 addPageMessage(restext.getString("password_match"));
-                forwardPage(Page.LIST_STUDY_SUBJECTS);
+                forwardPage(Page.SIGN_STUDY_SUBJECT);
                 return;
             }
         }
-
-        request.setAttribute("studySub", studySub);
 
         int studyId = studySub.getStudyId();
         int subjectId = studySub.getSubjectId();
@@ -278,13 +274,12 @@ public class SignStudySubjectServlet extends SecureController {
 
         request.setAttribute("subject", subject);
 
-
         StudyDAO studydao = new StudyDAO(sm.getDataSource());
         StudyBean study = (StudyBean) studydao.findByPK(studyId);
 
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
         study.getStudyParameterConfig().setCollectDob(spvdao.findByHandleAndStudy(studyId, "collectDob").getValue());
-        //request.setAttribute("study", study);
+        // request.setAttribute("study", study);
 
         if (study.getParentStudyId() > 0) {// this is a site,find parent
             StudyBean parentStudy = (StudyBean) studydao.findByPK(study.getParentStudyId());
@@ -327,16 +322,15 @@ public class SignStudySubjectServlet extends SecureController {
         // desc
         ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
 
-        String[] columns =
-            { resword.getString("event") + " (" + resword.getString("occurrence_number") + ")", resword.getString("start_date1"),
+        String[] columns = { resword.getString("event") + " (" + resword.getString("occurrence_number") + ")", resword.getString("start_date1"),
                 resword.getString("location"), resword.getString("status"), resword.getString("actions"), resword.getString("CRFs_atrib") };
         table.setColumns(new ArrayList(Arrays.asList(columns)));
         table.hideColumnLink(4);
         table.hideColumnLink(5);
 
         if (!"removed".equalsIgnoreCase(studySub.getStatus().getName()) && !"auto-removed".equalsIgnoreCase(studySub.getStatus().getName())) {
-            table.addLink(resword.getString("add_new_event"), "CreateNewStudyEvent?" + CreateNewStudyEventServlet.INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT + "="
-                + studySub.getId());
+            table.addLink(resword.getString("add_new_event"),
+                    "CreateNewStudyEvent?" + CreateNewStudyEventServlet.INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT + "=" + studySub.getId());
         }
 
         HashMap args = new HashMap();
@@ -463,9 +457,9 @@ public class SignStudySubjectServlet extends SecureController {
                 // System.out.println("edc.isDoubleEntry()" +
                 // edc.isDoubleEntry() + ecb.getId());
                 dec.setFlags(ecb, ub, currentRole, edc.isDoubleEntry());
-//                if (dec.isLocked()) {
-//                    System.out.println("*** found a locked DEC: " + edc.getCrfName());
-//                }
+                // if (dec.isLocked()) {
+                // System.out.println("*** found a locked DEC: " + edc.getCrfName());
+                // }
                 ArrayList idata = iddao.findAllByEventCRFId(ecb.getId());
                 if (!idata.isEmpty()) {
                     // consider an event crf started only if item data get
