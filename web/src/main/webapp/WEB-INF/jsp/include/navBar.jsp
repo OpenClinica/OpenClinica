@@ -57,10 +57,7 @@
 
 <script language="JavaScript">
 
-    var isTimedOut = isSessionTimedOut(encodeURIComponent(currentURL));
-    if (isTimedOut) {
-        window.location.replace (myContextPath + '/pages/logout');
-    }
+    isSessionTimedOut(encodeURIComponent(currentURL));
 
     //Piwik
     var _paq = _paq || [];

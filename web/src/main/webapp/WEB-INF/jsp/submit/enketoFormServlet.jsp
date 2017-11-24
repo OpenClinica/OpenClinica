@@ -31,7 +31,8 @@
         var myContextPath = "${pageContext.request.contextPath}";
         var sessionTimeout = "<%= session.getMaxInactiveInterval() %>";
         var userName = "<%= userBean.getName() %>";
-        var currentURL = "<%= currentURL %>"
+        var currentURL = "<%= currentURL %>";
+        var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
     </script>
 
     <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
