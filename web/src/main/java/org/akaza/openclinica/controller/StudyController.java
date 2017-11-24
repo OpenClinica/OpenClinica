@@ -1127,6 +1127,7 @@ public class StudyController {
             } else {
                 statusStr = statusStr.toLowerCase();
             }
+            statusStr = statusStr.equalsIgnoreCase("PENDING") ? "Design" : statusStr;
             status = Status.getByName(statusStr);
 
             if (status == null) {
