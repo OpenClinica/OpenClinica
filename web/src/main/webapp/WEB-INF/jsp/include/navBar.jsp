@@ -50,6 +50,9 @@
     </c:otherwise>
 </c:choose>
 
+<script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
+<script type="text/javascript" src="js/lib/client.js"></script>
+
 
 <script language="JavaScript">
 

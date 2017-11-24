@@ -221,7 +221,7 @@ public class StudyController {
             // get the new bean
             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
             ub = (UserAccountBean) userAccountDAO.findByUserUuid(ub.getUserUuid());
-            if (!isDataManagerOrStudyDirector(ub,currentPublicStudy)){
+            if (!roleValidForStatusChange(ub,currentPublicStudy)){
                 logger.error("User does not have a proper role to do this operation");
                 return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
             }
@@ -1758,7 +1758,7 @@ public class StudyController {
         return studyBean;
     }
 
-    public Boolean isDataManagerOrStudyDirector(UserAccountBean userAccount, StudyBean currentStudy){
+    public Boolean roleValidForStatusChange(UserAccountBean userAccount, StudyBean currentStudy){
 
         if (logger.isDebugEnabled()) {
             logger.error("All Roles:" + userAccount.getRoles().toString());
@@ -1771,7 +1771,8 @@ public class StudyController {
                 .stream()
                 .filter(role -> currentStudy.getId() == (role.getStudyId())
                         && (role.getRole().equals(Role.STUDYDIRECTOR)
-                                || role.getRole().equals(Role.COORDINATOR)))
+                                || role.getRole().equals(Role.COORDINATOR)
+                                || role.getRole().equals(Role.STUDY_MONITOR)))
                 .count();
 
         logger.error("Status returned from role check:" + (result > 0));
