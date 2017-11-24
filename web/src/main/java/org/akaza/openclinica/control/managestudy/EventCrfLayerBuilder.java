@@ -185,12 +185,6 @@ public class EventCrfLayerBuilder {
                 html.nbsp().nbsp();
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
                 html.tdEnd().trEnd(0);
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                printDataEntry(html, eventCrfBean);
-                html.nbsp().nbsp();
-                printDataEntry(html, eventCrfBean, reswords.getString("print"));
-                html.tdEnd().trEnd(0);
             }
 
             // if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() ||
@@ -266,18 +260,6 @@ public class EventCrfLayerBuilder {
                 html.nbsp().nbsp();
                 viewSectionDataEntryParameterized(html, eventCrfBean, eventDefinitionCrf, reswords.getString("view"), getStudyEvent());
                 html.tdEnd().trEnd(0);
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                if (eventCrfBean == null)
-                    printCrf(html, eventDefinitionCrf);
-                else
-                    printDataEntry(html, eventCrfBean);
-                html.nbsp().nbsp();
-                if (eventCrfBean == null)
-                    printCrf(html, eventDefinitionCrf, reswords.getString("print"));
-                else
-                    printDataEntry(html, eventCrfBean, reswords.getString("print"));
-                html.tdEnd().trEnd(0);
             }
         } else if (eventCrfStatus == DataEntryStage.INVALID) {
             if (!hiddenCrf()) {
@@ -286,12 +268,6 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf, getStudyEvent());
                 html.nbsp().nbsp();
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
-                html.tdEnd().trEnd(0);
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                printDataEntry(html, eventCrfBean);
-                html.nbsp().nbsp();
-                printDataEntry(html, eventCrfBean, reswords.getString("print"));
                 html.tdEnd().trEnd(0);
             }
             if (studySubject.getStatus() != Status.DELETED && studySubject.getStatus() != Status.AUTO_DELETED
@@ -331,12 +307,6 @@ public class EventCrfLayerBuilder {
                 viewSectionDataEntry(html, eventCrfBean, eventDefinitionCrf, getStudyEvent());
                 html.nbsp().nbsp();
                 viewSectionDataEntry(html, eventCrfBean, reswords.getString("view"), eventDefinitionCrf, getStudyEvent());
-                html.tdEnd().trEnd(0);
-                html.tr(0).valign("top").close();
-                html.td(0).styleClass(table_cell_left).close();
-                printDataEntry(html, eventCrfBean);
-                html.nbsp().nbsp();
-                printDataEntry(html, eventCrfBean, reswords.getString("print"));
                 html.tdEnd().trEnd(0);
             }
             if (currentStudy.getStatus() == Status.AVAILABLE && (currentRole.isDirector() || currentUser.isSysAdmin())) {
