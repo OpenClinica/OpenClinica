@@ -7,24 +7,32 @@ function isSessionTimedOut(currentURL) {
     var key = "OCAppTimeout-" + userName;
     storage.onConnect()
         .then(function() {
+            console.log("in first function****");
             return storage.get(key);
         }).then(function(res) {
             console.log(res);
             if (res == null) {
-                storage.set(key, newExpiration + ";" + currentURL);
+                storage.set(key, newExpiration);
+                console.log("no value for " + key + "found");
                 return false;
             } else {
-                var values = res.split(';');
-                var existingTimeout = values[0];
+
+                var existingTimeout = res;
                 if (currentTime > existingTimeout) {
+                    storage.del(key);
+/*
                     // expired
                     var bridgeTimeoutReturnExp = "; expires=" + moment().add(7, 'days').toDate();
-                    storage.del(key);
                     // create a return cookie
                     document.cookie = "bridgeTimeoutReturn-" + userName + "=" + values[1] + bridgeTimeoutReturnExp + "; path=/";
+  */
+                    console.log("currentTime > existingTimeout: returning to Login screen");
+                    console.log("navBar:" + myContextPath + '/pages/logout');
+                    window.location.replace (myContextPath + '/pages/logout');
                     return true;
                 } else {
-                    storage.set(key, newExpiration + ";" + currentURL);
+                    storage.set(key, newExpiration);
+                    console.log("currentTime <= existingTimeout");
                     return false;
                 }
             }
