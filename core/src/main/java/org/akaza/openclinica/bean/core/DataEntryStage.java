@@ -27,7 +27,7 @@ public class DataEntryStage extends Term {
     public static final DataEntryStage LOCKED = new DataEntryStage(7, "locked", "locked");
 
     private static final DataEntryStage[] members =
-        { UNCOMPLETED, INITIAL_DATA_ENTRY, DOUBLE_DATA_ENTRY_COMPLETE, ADMINISTRATIVE_EDITING, LOCKED };
+        { UNCOMPLETED, INITIAL_DATA_ENTRY, DOUBLE_DATA_ENTRY_COMPLETE, LOCKED };
 
     public boolean isInvalid() {
         return this == DataEntryStage.INVALID;
