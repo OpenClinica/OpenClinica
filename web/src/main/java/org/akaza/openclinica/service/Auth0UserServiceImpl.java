@@ -30,8 +30,8 @@ public class Auth0UserServiceImpl implements Auth0UserService {
             int index = SBSUrl.indexOf("//");
             String protocol = SBSUrl.substring(0, index) + "//";
             String subDomain = SBSUrl.substring(SBSUrl.indexOf("//")  + 2,  SBSUrl.indexOf("."));
-            String SBSDomainURl = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + "/customer-service/api/allowed-connections?subdomain=" + subDomain;
-            response = Unirest.get(SBSDomainURl)
+            String SBSDomainURL = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + "/customer-service/api/allowed-connections?subdomain=" + subDomain;
+            response = Unirest.get(SBSDomainURL)
                     .header("content-type", "application/json")
                     .asString();
         } catch (UnirestException e) {
