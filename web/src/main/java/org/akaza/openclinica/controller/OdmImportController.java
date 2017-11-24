@@ -35,7 +35,7 @@ public class OdmImportController {
             Map<String, Object> map = (Map<String, Object>) odmImportServiceImpl.importOdm(odm, boardId, request);
             Study study = (Study) map.get("study");
             Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
-            odmImportServiceImpl.updatePublicStudypublishedFlag(publicStudy);
+            odmImportServiceImpl.updatePublicStudyPublishedFlag(publicStudy);
             odmImportServiceImpl.setPublishedVersionsInFM(map, request);
             return new ResponseEntity<>(HttpStatus.OK);
         } catch (CustomRuntimeException e) {

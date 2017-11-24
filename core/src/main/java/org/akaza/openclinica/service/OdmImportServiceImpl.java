@@ -123,18 +123,11 @@ public class OdmImportServiceImpl implements OdmImportService {
     @Transactional
     public Map<String, Object> importOdm(ODM odm, String boardId, HttpServletRequest request) {
         Map<String, Object> map = importOdmToOC(odm, boardId, request);
-        Study study = (Study) map.get("study");
-        study.setPublished(true);
-        study = getStudyDao().saveOrUpdate(study);
-        for (Study site : study.getStudies()) {
-            site.setPublished(true);
-            studyDao.saveOrUpdate(site);
-        }
         return map;
     }
 
     @Transactional
-    private Map<String, Object> importOdmToOC(ODM odm, String boardId, HttpServletRequest request) {
+    public Map<String, Object> importOdmToOC(ODM odm, String boardId, HttpServletRequest request) {
         DataBinder dataBinder = new DataBinder(new Study());
         Errors errors = dataBinder.getBindingResult();
         printOdm(odm);
@@ -267,7 +260,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         return map;
     }
 
-    public void updatePublicStudypublishedFlag(Study publicStudy) {
+    public void updatePublicStudyPublishedFlag(Study publicStudy) {
         publicStudy.setPublished(true);
         studyDao.updatePublicStudy(publicStudy);
         for (Study publicStudySite : publicStudy.getStudies()) {
