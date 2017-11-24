@@ -4,27 +4,19 @@
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 
-<!-- casebookGenerationForm.jsp - BEGIN -->
-
-<div class="table_titla_manage">
-        <a name="global"></a><a style="text-decoration: none" href="javascript:leftnavExpand('archivableCasebook');">
-        <img id="excl_archivableCasebook" src="images/bt_Expand.gif" border="0" height="20px">
-    <fmt:message key="viewStudySubject.casebookGenerationForm.title" bundle="${resword}"/></a></div>
-
 <div style="display:none" id="archivableCasebook">
     <div style="width: 750px">
 
         <div class="tablebox_center">
 
             <form name="casebookLink">
-                <br>
 
                 <div style="margin-top:0;margin-bottom:10px;" class="connect-widget">
                     <b><fmt:message key="viewStudySubject.casebookGenerationForm.casebookFormat"
                                     bundle="${resword}"/></b><br>
-                    <input type="radio" checked="" value="html/print" id="casebookTypeHtml" name="casebookType">
-                    <fmt:message key="viewStudySubject.casebookGenerationForm.format.html" bundle="${resword}"/><br>
-                    <input type="radio" value="json/view" id="casebookTypeJson" name="casebookType">
+                    <!-- <input type="radio" checked="" value="html/print" id="casebookTypeHtml" name="casebookType">
+                    <fmt:message key="viewStudySubject.casebookGenerationForm.format.html" bundle="${resword}"/><br> -->
+                    <input type="radio" checked="" value="json/view" id="casebookTypeJson" name="casebookType">
                     <fmt:message key="viewStudySubject.casebookGenerationForm.format.json" bundle="${resword}"/><br>
                     <input type="radio" value="xml/view" id="casebookTypeXml" name="casebookType">
                     <fmt:message key="viewStudySubject.casebookGenerationForm.format.xml" bundle="${resword}"/><br>
