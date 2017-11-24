@@ -624,7 +624,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
         @Override
         protected List<Option> getOptions() {
             List<Option> options = new ArrayList<Option>();
-            for (Object eventCRFStatus : DataEntryStage.toArrayList()) {
+            for (Object eventCRFStatus : DataEntryStage.toArrayListLayoutOfEvent()) {
                 if (((DataEntryStage) eventCRFStatus).getId() != 0) {
                     options.add(new Option(((DataEntryStage) eventCRFStatus).getName(), ((DataEntryStage) eventCRFStatus).getName()));
                 }

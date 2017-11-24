@@ -27,6 +27,9 @@ public class DataEntryStage extends Term {
     public static final DataEntryStage LOCKED = new DataEntryStage(7, "locked", "locked");
 
     private static final DataEntryStage[] members =
+        { UNCOMPLETED, INITIAL_DATA_ENTRY, INITIAL_DATA_ENTRY_COMPLETE, DOUBLE_DATA_ENTRY, DOUBLE_DATA_ENTRY_COMPLETE, ADMINISTRATIVE_EDITING, LOCKED  };
+
+    private static final DataEntryStage[] membersLayoutOfEvent =
         { UNCOMPLETED, INITIAL_DATA_ENTRY, DOUBLE_DATA_ENTRY_COMPLETE, LOCKED };
 
     public boolean isInvalid() {
@@ -63,6 +66,8 @@ public class DataEntryStage extends Term {
 
     public static final List<DataEntryStage> list = Arrays.asList(members);
 
+    public static final List<DataEntryStage> listLayoutOfEvent = Arrays.asList(membersLayoutOfEvent);
+
     private List privileges;
 
     private DataEntryStage(int id, String name) {
@@ -86,6 +91,10 @@ public class DataEntryStage extends Term {
 
     public static ArrayList toArrayList() {
         return new ArrayList(list);
+    }
+
+    public static ArrayList toArrayListLayoutOfEvent() {
+        return new ArrayList(listLayoutOfEvent);
     }
 
     public String getNameRaw() {
