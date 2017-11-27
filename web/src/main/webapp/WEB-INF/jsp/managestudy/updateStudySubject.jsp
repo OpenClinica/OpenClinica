@@ -83,24 +83,31 @@
     <table border="0" cellpadding="0" cellspacing="0">
 
       <tr valign="top">
-      <td class="formlabel">
-        <fmt:message key="study_subject_ID" bundle="${resword}"/>:
-      </td>
-      <td>
-        <div class="formfieldXL_BG">
-        <input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL">*
-        </div>
-        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include>
-      </td>
-      <td>
-       
-      </td>
+        <td class="formlabel">
+          <fmt:message key="study_subject_ID" bundle="${resword}"/>:
+        </td>
+        <td>
+          <div class="formfieldXL_BG">
+          <input type="text" name="label" value="<c:out value="${studySub.label}"/>" class="formfieldXL">*
+          </div>
+        </td>
+      </tr>
+      <tr valign="top">
+        <td></td>
+        <td>
+          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include>
+        </td>
       </tr>
 
       <tr valign="top">
-      <td class="formlabel"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="text" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" class="formfieldXL"></div>
-        <td><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include></td>      
-      </td>
+        <td class="formlabel"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="text" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" class="formfieldXL"></div>
+        </td>
+      </tr>
+      <tr valign="top">
+        <td></td>
+        <td>
+          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include>  
+        </td>
       </tr>
 
       <tr valign="top">
@@ -144,7 +151,6 @@
             <td class="form_label"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
             <td colspan="1">
               <div class="formfieldXL_BG"><input type="text" name="uniqueIdentifier" value="<c:out value="${subject.uniqueIdentifier}"/>" class="formfieldXL"></div>
-              <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include>
             </td>
             <td>
               <c:if test="${study.studyParameterConfig.subjectPersonIdRequired == 'required'}">&nbsp;*</c:if>
@@ -165,6 +171,12 @@
                 </c:choose>
               </c:if>
             </td>
+        </tr>
+        <tr valign="top">
+          <td></td>
+          <td>
+            <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include>
+          </td>
         </tr>
     </c:if>
 
@@ -206,7 +218,6 @@
           <div class="formfieldXL_BG">
             <input type="text" name="localBirthDate" value="<c:out value="${localBirthDate}"/>" class="formfieldXL">
           </div>
-          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="localBirthDate"/></jsp:include>
         </td><td class="formlabel" style="padding-left: 0px;padding-right: 0px;">(
         <c:if test="${study.studyParameterConfig.collectDob=='1'}"><fmt:message key="date_format" bundle="${resformat}"/></c:if>
         <c:if test="${study.studyParameterConfig.collectDob=='2'}"><fmt:message key="date_format_year" bundle="${resformat}"/></c:if>
@@ -232,7 +243,11 @@
         </td>
         </tr>
      <tr valign="top">
-      <td></td><td></td><td><Br><fmt:message key="field_required" bundle="${resword}"/></td>
+      <td></td>
+      <td>
+        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="localBirthDate"/></jsp:include>
+      </td>
+      <td><Br><fmt:message key="field_required" bundle="${resword}"/></td>
       </tr>
 
     </c:if>

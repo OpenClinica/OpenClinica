@@ -110,7 +110,7 @@
           <c:choose>
             <c:when test="${studyRole.parentStudyId > 0}">
                <c:if test="${!studyRole.invalid}">
-                <c:if test="${study.status.available || study.status.locked || study.status.frozen}">
+                <c:if test="${studyRole.status.name != 'Design'}">
                  <tr>
                   <td class="table_cell">&nbsp;&nbsp;<img src="images/bullet.gif">
                       <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>" <c:if test="${statusId==4}">disabled="true"</c:if>>

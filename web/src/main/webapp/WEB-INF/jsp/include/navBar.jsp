@@ -326,7 +326,7 @@
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message
                                                                                                 key="queries" bundle="${resword}"/></a></li>
                                                                                     </c:if>
-                                                                                    <li id="nav_Tasks" style="position: relative; z-index: 3;">
+                                                                                    <li class="nav_TaskB" id="nav_Tasks" style="position: relative; z-index: 1;">
                                                                                         <a href="#" onmouseover="setNav('nav_Tasks');"
                                                                                            id="nav_Tasks_link"><fmt:message key="nav_tasks"
                                                                                                                             bundle="${resword}"/>
