@@ -65,7 +65,7 @@
 </c:when>
 <c:otherwise>
     <h1><span class="title_manage">
-    <fmt:message key="assign_subject_to_group" bundle="${resworkflow}"/>
+    <fmt:message key="update_study_subject_details" bundle="${resword}"/>
     </span></h1>
 </c:otherwise>
 </c:choose>
@@ -74,7 +74,7 @@
 <input type="hidden" name="action" value="confirm">
 <input type="hidden" name="id" value="<c:out value="${studySub.id}"/>">
 <c:choose>
-<c:when test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy || userRole.investigator 
+<c:when test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy || userRole.investigator
     || (study.parentStudyId > 0 && userRole.researchAssistant ||study.parentStudyId > 0 && userRole.researchAssistant2)}">
      <div style="width: 550px">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -106,7 +106,7 @@
       <tr valign="top">
         <td></td>
         <td>
-          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include>  
+          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include>
         </td>
       </tr>
 
@@ -117,15 +117,15 @@
 
         <input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" class="formfieldXL" id="enrollmentDateField">
         <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger"/>
-          <script type="text/javascript"> 
+          <script type="text/javascript">
           Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger" });
           </script>
       </div>
       <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
       <td valign="top">
-      
+
       <a href="#" >
-          
+
       </a>&nbsp;*
                             <%-- DN for enrollment date goes here --%>
                             <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
@@ -363,7 +363,7 @@
 
 </div>
 </c:if>
-<c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy || userRole.investigator 
+<c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy || userRole.investigator
     || (study.parentStudyId > 0 && userRole.researchAssistant ||study.parentStudyId > 0 && userRole.researchAssistant2)}">
  <input type="submit" name="Submit" value="<fmt:message key="confirm_changes" bundle="${resword}"/>" class="button_long">
  </c:if>
