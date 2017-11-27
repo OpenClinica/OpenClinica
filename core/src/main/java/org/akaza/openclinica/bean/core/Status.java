@@ -35,10 +35,10 @@ public class Status extends Term implements Comparable {
 
     private static final Status[] members =
         { INVALID, AVAILABLE, PENDING, PRIVATE, UNAVAILABLE, LOCKED, DELETED, AUTO_DELETED, SIGNED, FROZEN, SOURCE_DATA_VERIFICATION, RESET, ARCHIVED };
-    private static List list = Arrays.asList(members);  
+    private static List list = Arrays.asList(members);
 
     private static final Status[] activeMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
-    private static List activeList = Arrays.asList(activeMembers);  
+    private static List activeList = Arrays.asList(activeMembers);
 
     private static final Status[] studySubjectDropDownMembers = { AVAILABLE, SIGNED, DELETED, AUTO_DELETED };
     private static List studySubjectDropDownList = Arrays.asList(studySubjectDropDownMembers);
@@ -87,11 +87,10 @@ public class Status extends Term implements Comparable {
         }
         return (Status) get(id, list);
     }
-    
+
     public static Status getByName(String name) {
         for (int i = 0; i < list.size(); i++) {
             Status temp = (Status) list.get(i);
-            name = name.equalsIgnoreCase("pending") ? "design" : name;
             if (temp.getName().equalsIgnoreCase(name)) {
                 return temp;
             }
