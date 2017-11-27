@@ -1768,18 +1768,41 @@ public class StudyController {
                 logger.error("***************inside StudyController study: " + userRoleBean.getStudyId() + " role: " + userRoleBean.getRoleName());
             }
         }
+
         long result = userAccount.getRoles()
                 .stream()
                 .filter(role -> currentStudy.getId() == (role.getStudyId())
                         && (role.getRole().equals(Role.STUDYDIRECTOR)
-                                || role.getRole().equals(Role.COORDINATOR)
-                                || role.getRole().equals(Role.STUDY_MONITOR)))
+                                || role.getRole().equals(Role.COORDINATOR)))
                 .count();
-
         logger.error("Status returned from role check:" + (result > 0));
-        return result > 0;
+
+        if (result > 0)
+            return true;
+        return otherEnvHasProperRole(userAccount, currentStudy);
     }
 
+
+    private boolean otherEnvHasProperRole(UserAccountBean userAccount, StudyBean currentStudy) {
+        boolean result = false;
+        StudyEnvEnum altEnv;
+        switch (currentStudy.getEnvType()) {
+        case PROD:
+            altEnv = StudyEnvEnum.TEST;
+            break;
+        case TEST:
+            altEnv = StudyEnvEnum.PROD;
+            break;
+        default:
+            altEnv = null;
+            break;
+        }
+        String newOcId = currentStudy.getOid().replaceFirst("\\(" + currentStudy.getEnvType() + "\\)", "(" + altEnv.toString() + ")");
+        // get the new study with thus id
+        StudyDAO studyDAO = new StudyDAO(dataSource);
+        StudyBean altStudy = studyDAO.findByPublicOid(newOcId);
+        return roleValidForStatusChange(userAccount, altStudy);
+    }
 
     public UserAccountBean getStudyOwnerAccount(HttpServletRequest request) {
         UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
