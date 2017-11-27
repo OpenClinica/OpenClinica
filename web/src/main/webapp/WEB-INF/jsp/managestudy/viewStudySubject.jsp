@@ -23,6 +23,7 @@
 <script type="text/javascript">
     function onInvokeAction(id,action) {
         if(id.indexOf('findSubjects') == -1)  {
+            
         setExportToLimit(id, '');
         }
         createHiddenInputFieldsForLimitAndSubmit(id);
@@ -42,6 +43,31 @@
             return false;
         });
     });
+</script>
+
+<script type="text/javascript" language="javascript">
+    function studySubjectResource()  { return "${study.oid}/${studySub.oid}"; }
+
+    function checkCRFLocked(ecId, url){
+        jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
+            if(data == 'true'){
+                window.location = url;
+            }else{
+                alert(data);return false;
+            }
+        });
+    }
+    
+    function checkCRFLockedInitial(ecId, formName){
+        if(ecId==0) {formName.submit(); return;}
+        jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
+            if(data == 'true'){
+                formName.submit();
+            }else{
+                alert(data);
+            }
+        });
+    }
 </script>
 
 <!-- then instructions-->
