@@ -34,6 +34,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -460,11 +461,12 @@ public class UpdateStudyEventServlet extends SecureController {
                 // inner Map maps the resolution status name to the number of
                 // notes for that
                 // eventCRF id, as in New --> 2
+                displayEvBean.setDisplayEventCRFs(displayEventCRFs);
                 displayEvBean.setStudyEvent(studyEvent);
                 displayEvents.add(displayEvBean);
                 // Don't filter for res status or disc note type; disc note
                 // beans are returned with eventCRFId set
-                discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
+                discNoteUtil.injectAllChildrenDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
                 Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
                 request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
                 session.setAttribute("signatureURL", request.getRequestURL());
@@ -598,9 +600,18 @@ public class UpdateStudyEventServlet extends SecureController {
                 ArrayList uncompletedEventDefinitionCRFs = getUncompletedCRFs(eventDefinitionCRFs, eventCRFs);
                 populateUncompletedCRFsWithCRFAndVersions(uncompletedEventDefinitionCRFs);
 
-                ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub, currentRole,
-                        studyEvent.getSubjectEventStatus(), study);
+                ArrayList<DisplayEventCRFBean> displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs,
+                        eventDefinitionCRFs, ub, currentRole, studyEvent.getSubjectEventStatus(), study);
 
+                DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
+                DisplayStudyEventBean displayEvBean = new DisplayStudyEventBean();
+                List<DisplayStudyEventBean> displayEvents = new ArrayList<DisplayStudyEventBean>();
+                displayEvBean.setDisplayEventCRFs(displayEventCRFs);
+                displayEvBean.setStudyEvent(studyEvent);
+                displayEvents.add(displayEvBean);
+                discNoteUtil.injectAllChildrenDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
+                Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
+                request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
                 request.setAttribute("studySubject", ssb);
                 request.setAttribute("uncompletedEventDefinitionCRFs", uncompletedEventDefinitionCRFs);
                 request.setAttribute("displayEventCRFs", displayEventCRFs);
