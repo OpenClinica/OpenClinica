@@ -40,6 +40,8 @@
         <script type="text/javascript" language="JavaScript" src="../includes/sessionTimeout.js"></script>
         <script type="text/javascript" language="JavaScript" src="../includes/auth0/captureUnloadEvent.js"></script>
         <script type="text/javascript" language="JavaScript" src="../includes/moment.min.js"></script>
+        <script type="text/javascript" src="../js/lib/es6-promise.auto.min.js"></script>
+        <script type="text/javascript" src="../js/lib/client.js"></script>
     </c:when>
     <c:otherwise>
         <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
@@ -48,11 +50,12 @@
         <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
         <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
         <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
+        <script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
+        <script type="text/javascript" src="js/lib/client.js"></script>
     </c:otherwise>
 </c:choose>
 
-<script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
-<script type="text/javascript" src="js/lib/client.js"></script>
+
 
 
 <script language="JavaScript">
