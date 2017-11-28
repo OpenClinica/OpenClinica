@@ -1720,7 +1720,7 @@ public class StudyController {
         return studyUserRoleBean;
     }
 
-    public StudyUserRoleBean createUserRole(UserAccountBean ownerUserAccount, StudyBean study) {
+    public StudyUserRoleBean getUserRole(UserAccountBean ownerUserAccount, StudyBean study) {
         udao = new UserAccountDAO(dataSource);
         StudyUserRoleBean surBean = udao.findRoleByUserNameAndStudyId(ownerUserAccount.getName(), study.getId());
         return surBean;
@@ -1779,11 +1779,11 @@ public class StudyController {
 
         if (result > 0)
             return true;
-        return otherEnvHasProperRole(userAccount, currentStudy);
+        return searchOtherEnvForRole(userAccount, currentStudy);
     }
 
 
-    private boolean otherEnvHasProperRole(UserAccountBean userAccount, StudyBean currentStudy) {
+    private boolean searchOtherEnvForRole(UserAccountBean userAccount, StudyBean currentStudy) {
         boolean result = false;
         StudyEnvEnum altEnv;
         switch (currentStudy.getEnvType()) {
@@ -1839,13 +1839,17 @@ public class StudyController {
         UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
         studyBuildService.updateStudyUserRoles(request, studyBuildService.getUserAccountObject(ownerUserAccount)
                 , ownerUserAccount.getActiveStudyId());
-        StudyUserRoleBean currentRole = createUserRole(ownerUserAccount, study);
+        StudyUserRoleBean currentRole = getUserRole(ownerUserAccount, study);
 
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
             return ownerUserAccount;
         }
 
-        return null;
+        logger.debug("Checking other study environments for a proper role");
+        if (searchOtherEnvForRole(ownerUserAccount, study))
+            return ownerUserAccount;
+        else
+            return null;
     }
 
     public StudyDTO buildStudyDTO(String uniqueStudyID, String name, String briefSummary, String principalInvestigator, String sponsor,
