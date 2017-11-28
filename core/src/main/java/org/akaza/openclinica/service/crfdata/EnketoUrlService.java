@@ -440,6 +440,14 @@ public class EnketoUrlService {
         String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOid, filePath, crfBean.getOcOid(), formLayout.getOcOid());
         File dir = new File(directoryPath);
         File[] directoryListing = dir.listFiles();
+
+        while (directoryListing == null) {
+            filePath = filePath - 1;
+            directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOid, filePath, crfBean.getOcOid(), formLayout.getOcOid());
+            dir = new File(directoryPath);
+            directoryListing = dir.listFiles();
+        }
+
         if (directoryListing != null) {
             for (File child : directoryListing) {
 

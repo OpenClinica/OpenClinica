@@ -367,7 +367,7 @@ public class DiscrepancyNoteUtil {
         return newBeans;
     }
 
-    public void injectParentDiscNotesIntoDisplayStudyEvents(List<DisplayStudyEventBean> displayStudyBeans, Set<Integer> resolutionStatusIds,
+    public void injectAllChildrenDiscNotesIntoDisplayStudyEvents(List<DisplayStudyEventBean> displayStudyBeans, Set<Integer> resolutionStatusIds,
             DataSource dataSource, int discNoteType) {
 
         if (displayStudyBeans == null) {
@@ -393,7 +393,7 @@ public class DiscrepancyNoteUtil {
 
             for (EventCRFBean eventCrfBean : eventCRFBeans) {
                 // Find ItemData type notes associated with an event crf
-                foundDiscNotes = discrepancyNoteDAO.findParentItemDataDNotesFromEventCRF(eventCrfBean);
+                foundDiscNotes = discrepancyNoteDAO.findAllChildrenItemDataDNotesFromEventCRF(eventCrfBean);
 
                 // filter for any specified disc note type
                 if (!foundDiscNotes.isEmpty() && hasDiscNoteType) {
@@ -1346,39 +1346,45 @@ public class DiscrepancyNoteUtil {
         return "";
     }
 
-    public Map<Integer, Map<String, Integer>> createDiscNoteMapByEventCRF(List<DisplayStudyEventBean> displayEvents) {
+    public Map<Integer, Map<String, Integer>> createDiscNoteMapByEventCRF(List<DisplayStudyEventBean> displayStudyEvents) {
 
         Map<Integer, Map<String, Integer>> discNoteMap = new HashMap<Integer, Map<String, Integer>>();
-        if (displayEvents == null || displayEvents.isEmpty()) {
+        if (displayStudyEvents == null || displayStudyEvents.isEmpty()) {
             return discNoteMap;
         }
         Map<String, Integer> innerMap = new HashMap<String, Integer>();
 
-        SortedSet<Integer> allEventCRFIds = getEventCRFIdsFromDisplayEvents(displayEvents);
+        SortedSet<Integer> allEventCRFIds = getEventCRFIdsFromDisplayEvents(displayStudyEvents);
 
         for (Integer eventCRFId : allEventCRFIds) {
-            innerMap = getDiscNoteCountFromDisplayEvents(displayEvents, eventCRFId);
+            innerMap = getDiscNoteCountFromDisplayEvents(displayStudyEvents, eventCRFId);
             discNoteMap.put(eventCRFId, innerMap);
         }
 
         return discNoteMap;
     }
 
-    private Map<String, Integer> getDiscNoteCountFromDisplayEvents(List<DisplayStudyEventBean> disBeans, int eventCRFId) {
+    private Map<String, Integer> getDiscNoteCountFromDisplayEvents(List<DisplayStudyEventBean> displayStudyEvents, int eventCRFId) {
 
-        Map<String, Integer> discNoteMap = new HashMap<String, Integer>();
-        if (eventCRFId == 0 || disBeans == null) {
-            return discNoteMap;
+        Map<String, Integer> innerMap = new HashMap<String, Integer>();
+        if (eventCRFId == 0 || displayStudyEvents == null) {
+            return innerMap;
         }
 
         List<DiscrepancyNoteBean> dnBeans;
-        for (DisplayStudyEventBean eventBean : disBeans) {
-            dnBeans = eventBean.getStudyEvent().getDiscBeanList();
-            for (String statusName : RESOLUTION_STATUS.keySet()) {
-                discNoteMap.put(statusName, getDiscNoteCountByStatusEventCRFId(dnBeans, RESOLUTION_STATUS.get(statusName), eventCRFId));
+        for (DisplayStudyEventBean displayStudyEvent : displayStudyEvents) {
+            for (DisplayEventCRFBean decBean : displayStudyEvent.getDisplayEventCRFs()) {
+                if (decBean.getEventCRF().getId() == eventCRFId) {
+                    dnBeans = displayStudyEvent.getStudyEvent().getDiscBeanList();
+                    for (String statusName : RESOLUTION_STATUS.keySet()) {
+                        innerMap.put(statusName, getDiscNoteCountByStatusEventCRFId(dnBeans, RESOLUTION_STATUS.get(statusName), eventCRFId));
+                    }
+                    break;
+                }
             }
         }
-        return discNoteMap;
+
+        return innerMap;
     }
 
     private SortedSet<Integer> getEventCRFIdsFromDisplayEvents(List<DisplayStudyEventBean> displayEvents) {
