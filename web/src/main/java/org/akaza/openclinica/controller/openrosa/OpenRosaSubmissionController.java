@@ -43,6 +43,7 @@ import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.CustomRuntimeException;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -357,6 +358,10 @@ public class OpenRosaSubmissionController {
             // Execute save as Hibernate transaction to avoid partial imports
             openRosaSubmissionService.processFieldSubmissionRequest(study, subjectContext, instanceId, requestBody, errors, locale, listOfUploadFilePaths,
                     SubmissionContainer.FieldRequestTypeEnum.FORM_FIELD);
+        } catch (CustomRuntimeException cre) {
+            logger.error("Repeat_Count Exception while processing xform submission.");
+            logger.error(cre.getMessage());
+            logger.error(ExceptionUtils.getStackTrace(cre));
 
         } catch (Exception e) {
             logger.error("Exception while processing xform submission.");
