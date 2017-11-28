@@ -66,6 +66,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
  */
 public class SignStudySubjectServlet extends SecureController {
     private WebApplicationContext ctx = null;
+    public static final String ORIGINATING_PAGE = "originatingPage";
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -249,6 +250,37 @@ public class SignStudySubjectServlet extends SecureController {
                     return;
                 }
             } else {
+
+                int studyId = studySub.getStudyId();
+                StudyDAO studydao = new StudyDAO(sm.getDataSource());
+                StudyBean study = (StudyBean) studydao.findByPK(studyId);
+
+                StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+                StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+                EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
+
+                // find all eventcrfs for each event
+                EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
+                ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(study, studySub, sm.getDataSource(), ub, currentRole);
+
+                for (DisplayStudyEventBean displayEvent : displayEvents) {
+                    StudyEventBean studyEvent = displayEvent.getStudyEvent();
+                    ArrayList eventCRFs = ecdao.findAllByStudyEvent(displayEvent.getStudyEvent());
+                    ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
+                    ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub,
+                            currentRole, studyEvent.getSubjectEventStatus(), study);
+                    displayEvent.setDisplayEventCRFs(displayEventCRFs);
+                }
+
+                DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
+                discNoteUtil.injectAllChildrenDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
+
+                Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
+                String originationUrl = "SignStudySubject?id=" + studySub.getId();
+
+                request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
+                request.setAttribute("displayStudyEvents", displayEvents);
+                request.setAttribute(ORIGINATING_PAGE, originationUrl);
                 request.setAttribute("id", new Integer(studySubId).toString());
                 addPageMessage(restext.getString("password_match"));
                 forwardPage(Page.SIGN_STUDY_SUBJECT);
@@ -302,20 +334,33 @@ public class SignStudySubjectServlet extends SecureController {
 
         ArrayList<DisplayStudyEventBean> displayEvents = getDisplayStudyEventsForStudySubject(study, studySub, sm.getDataSource(), ub, currentRole);
 
+        for (DisplayStudyEventBean displayEvent : displayEvents) {
+            StudyEventBean studyEvent = displayEvent.getStudyEvent();
+            ArrayList eventCRFs = ecdao.findAllByStudyEvent(displayEvent.getStudyEvent());
+            ArrayList eventDefinitionCRFs = (ArrayList) edcdao.findAllActiveByEventDefinitionId(study, studyEvent.getStudyEventDefinitionId());
+            ArrayList displayEventCRFs = ViewStudySubjectServlet.getDisplayEventCRFs(sm.getDataSource(), eventCRFs, eventDefinitionCRFs, ub, currentRole,
+                    studyEvent.getSubjectEventStatus(), study);
+            displayEvent.setDisplayEventCRFs(displayEventCRFs);
+        }
+
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
         // Don't filter for now; disc note beans are returned with eventCRFId
         // set
-        discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
+        discNoteUtil.injectAllChildrenDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
         // All the displaystudyevents for one subject
-        request.setAttribute("displayStudyEvents", displayEvents);
 
         // Set up a Map for the JSP view, mapping the eventCRFId to another Map:
         // the
         // inner Map maps the resolution status name to the number of notes for
         // that
         // eventCRF id, as in New --> 2
+
         Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
+        String originationUrl = "SignStudySubject?id=" + studySub.getId();
+
         request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
+        request.setAttribute("displayStudyEvents", displayEvents);
+        request.setAttribute(ORIGINATING_PAGE, originationUrl);
 
         EntityBeanTable table = fp.getEntityBeanTable();
         table.setSortingIfNotExplicitlySet(1, false);// sort by start date,
