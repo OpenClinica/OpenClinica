@@ -2,7 +2,6 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
-
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -22,7 +21,8 @@
 
 
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
- <meta http-equiv="X-UA-Compatible" content="IE=8" />
+<meta http-equiv="X-UA-Compatible" content="IE=8" />
+
 
 <link rel="stylesheet" href="includes/styles.css" type="text/css">
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
