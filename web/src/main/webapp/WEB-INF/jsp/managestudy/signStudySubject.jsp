@@ -462,6 +462,12 @@
             <c:otherwise>
             <c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}" />
                 <tr valign="top">
+                            <c:set var="repeat" value="${dse.studyEvent.studyEventDefinition.name}(${dse.studyEvent.sampleOrdinal})" />
+            <c:set var="non_repeat" value="${dse.studyEvent.studyEventDefinition.name}" />            
+            
+                <td class="table_cell"><c:out value="${ dse.studyEvent.studyEventDefinition.repeating ? repeat :non_repeat }" />&nbsp;</td>
+                <td class="table_cell"><fmt:formatDate value="${dse.studyEvent.dateStarted}" pattern="${dteFormat}"/>&nbsp;</td>              
+                
                     <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" /></td>
                   <td class="table_cell">
 
@@ -568,22 +574,18 @@
                     </c:when>
 
                     <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed'}">
-                    <td class="table_cell">
-                            <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
+                            <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${dse.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                             onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                             onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData.gif');"
                             ><span name="bt_EnterData<c:out value="${rowCount}"/>" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></a>&nbsp;
-                    </td>
                     </c:when>
 
                     <c:otherwise></c:otherwise>
                     </c:choose>
-                    <td class="table_cell">
-                                   <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
+                                   <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${dse.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                       onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                       onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
                       name="bt_View1" align="left" class="icon icon-search" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></a>&nbsp;
-                  </td>
                   </tr>
                     </table>
 
