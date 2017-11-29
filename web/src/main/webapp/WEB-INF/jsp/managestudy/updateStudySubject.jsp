@@ -76,7 +76,7 @@
 <c:choose>
 <c:when test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy || userRole.investigator
     || (study.parentStudyId > 0 && userRole.researchAssistant ||study.parentStudyId > 0 && userRole.researchAssistant2)}">
-     <div style="width: 550px">
+     <div style="width: 850px">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
     <div class="tablebox_center">
