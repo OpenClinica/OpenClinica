@@ -56,11 +56,22 @@
 </c:choose>
 
 
+<script type="text/javascript">
+    var realInterval = 60;
+    if (sessionTimeout < realInterval)
+        realInterval = sessionTimeout;
 
+    setInterval(function () {
+            console.log("*******************inactivity timer");
+            isSessionTimedOut(encodeURIComponent(currentURL), false);
+        },
+        realInterval * 1000
+    );
+</script>
 
 <script language="JavaScript">
 
-    isSessionTimedOut(encodeURIComponent(currentURL));
+    isSessionTimedOut(encodeURIComponent(currentURL), true);
 
     //Piwik
     var _paq = _paq || [];
