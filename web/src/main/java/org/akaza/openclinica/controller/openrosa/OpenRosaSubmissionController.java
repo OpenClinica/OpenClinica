@@ -358,11 +358,6 @@ public class OpenRosaSubmissionController {
             // Execute save as Hibernate transaction to avoid partial imports
             openRosaSubmissionService.processFieldSubmissionRequest(study, subjectContext, instanceId, requestBody, errors, locale, listOfUploadFilePaths,
                     SubmissionContainer.FieldRequestTypeEnum.FORM_FIELD);
-        } catch (CustomRuntimeException cre) {
-            logger.error("Repeat_Count Exception while processing xform submission.");
-            logger.error(cre.getMessage());
-            logger.error(ExceptionUtils.getStackTrace(cre));
-
         } catch (Exception e) {
             logger.error("Exception while processing xform submission.");
             logger.error(e.getMessage());

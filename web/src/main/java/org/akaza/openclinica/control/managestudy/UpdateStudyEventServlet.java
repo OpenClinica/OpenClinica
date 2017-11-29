@@ -466,7 +466,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 displayEvents.add(displayEvBean);
                 // Don't filter for res status or disc note type; disc note
                 // beans are returned with eventCRFId set
-                discNoteUtil.injectAllChildrenDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
+                discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
                 Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
                 request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
                 session.setAttribute("signatureURL", request.getRequestURL());
@@ -609,7 +609,7 @@ public class UpdateStudyEventServlet extends SecureController {
                 displayEvBean.setDisplayEventCRFs(displayEventCRFs);
                 displayEvBean.setStudyEvent(studyEvent);
                 displayEvents.add(displayEvBean);
-                discNoteUtil.injectAllChildrenDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
+                discNoteUtil.injectParentDiscNotesIntoDisplayStudyEvents(displayEvents, new HashSet(), sm.getDataSource(), 0);
                 Map discNoteByEventCRFid = discNoteUtil.createDiscNoteMapByEventCRF(displayEvents);
                 request.setAttribute("discNoteByEventCRFid", discNoteByEventCRFid);
                 request.setAttribute("studySubject", ssb);

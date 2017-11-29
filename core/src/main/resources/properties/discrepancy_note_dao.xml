@@ -1020,18 +1020,6 @@ union
         </sql>
     </query>
 
-     <query>
-        <name>findAllChildrenItemDataDNotesFromEventCRF</name>
-        <sql>
-            SELECT dn.* FROM discrepancy_note dn, dn_item_data_map dn_idmap,
-            item_data idata, event_crf eventcrf WHERE eventcrf.event_crf_id = ?
-            AND
-            idata.event_crf_id = eventcrf.event_crf_id
-            AND idata.item_data_id =dn_idmap.item_data_id
-            AND dn_idmap.discrepancy_note_id=dn.discrepancy_note_id
-            AND ((dn.parent_dn_id IS NOT NULL) or (dn.parent_dn_id != 0))
-        </sql>
-    </query>
 
     <query>
         <name>findEventCRFDNotesFromEventCRF</name>
