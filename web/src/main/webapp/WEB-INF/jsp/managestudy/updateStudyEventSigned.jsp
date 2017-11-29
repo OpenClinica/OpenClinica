@@ -405,7 +405,7 @@
                                    <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                       onMouseDown="javascript:setImage('bt_View','images/bt_View_d.gif');"
                       onMouseUp="javascript:setImage('bt_View','images/bt_View.gif');"><span
-                      name="bt_View" align="left" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" hspace="2"></a>&nbsp;
+                      name="bt_View" align="left" class="icon icon-search" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></a>&nbsp;
                   </tr>
                     </table>
 
