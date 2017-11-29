@@ -277,7 +277,6 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 }
             } else {
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
-                throw new CustomRuntimeException("Item does not exist", null);
             }
         }
     }
