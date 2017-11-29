@@ -367,7 +367,7 @@ public class DiscrepancyNoteUtil {
         return newBeans;
     }
 
-    public void injectAllChildrenDiscNotesIntoDisplayStudyEvents(List<DisplayStudyEventBean> displayStudyBeans, Set<Integer> resolutionStatusIds,
+    public void injectParentDiscNotesIntoDisplayStudyEvents(List<DisplayStudyEventBean> displayStudyBeans, Set<Integer> resolutionStatusIds,
             DataSource dataSource, int discNoteType) {
 
         if (displayStudyBeans == null) {
@@ -393,7 +393,7 @@ public class DiscrepancyNoteUtil {
 
             for (EventCRFBean eventCrfBean : eventCRFBeans) {
                 // Find ItemData type notes associated with an event crf
-                foundDiscNotes = discrepancyNoteDAO.findAllChildrenItemDataDNotesFromEventCRF(eventCrfBean);
+                foundDiscNotes = discrepancyNoteDAO.findParentItemDataDNotesFromEventCRF(eventCrfBean);
 
                 // filter for any specified disc note type
                 if (!foundDiscNotes.isEmpty() && hasDiscNoteType) {
