@@ -27,6 +27,7 @@ import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
+import org.akaza.openclinica.dao.hibernate.RepeatCountDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.domain.Status;
@@ -41,10 +42,10 @@ import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
+import org.akaza.openclinica.domain.datamap.RepeatCount;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
-import org.akaza.openclinica.service.CustomRuntimeException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -88,10 +89,13 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     FormLayoutMediaDao formLayoutMediaDao;
     @Autowired
     AuditLogEventDao auditLogEventDao;
+    @Autowired
+    RepeatCountDao repeatCountDao;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String STUDYEVENT = "study_event";
     public static final String STUDYSUBJECT = "study_subject";
+    public static final String REPEATCOUNT = "_count";
 
     public ProcessorEnum process(SubmissionContainer container) throws Exception {
 
@@ -277,6 +281,26 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 }
             } else {
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
+                int lastIndexOf = itemName.lastIndexOf(REPEATCOUNT);
+                ItemGroup iGroup = itemGroupDao.findByCrfAndGroupLayout(formLayout.getCrf(), itemName.substring(0, lastIndexOf));
+                if (iGroup != null) {
+
+                    RepeatCount repeatCount = repeatCountDao.findByEventCrfIdAndRepeatName(container.getEventCrf().getEventCrfId(), itemName);
+                    if (repeatCount == null) {
+                        repeatCount = new RepeatCount();
+                        repeatCount.setEventCrf(container.getEventCrf());
+                        repeatCount.setGroupName(itemName);
+                        repeatCount.setGroupCount(itemValue);
+                        repeatCount.setDateCreated(new Date());
+                        repeatCount.setUserAccount(container.getUser());
+                        repeatCountDao.saveOrUpdate(repeatCount);
+                    } else if (repeatCount != null && !repeatCount.getGroupCount().equals(itemValue)) {
+                        repeatCount.setGroupCount(itemValue);
+                        repeatCount.setUpdateId(container.getUser().getUserId());
+                        repeatCount.setDateUpdated(new Date());
+                        repeatCountDao.saveOrUpdate(repeatCount);
+                    }
+                }
             }
         }
     }

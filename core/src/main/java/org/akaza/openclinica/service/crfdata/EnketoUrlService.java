@@ -33,6 +33,7 @@ import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.ItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
+import org.akaza.openclinica.dao.hibernate.RepeatCountDao;
 import org.akaza.openclinica.dao.hibernate.ResponseTypeDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
@@ -54,6 +55,7 @@ import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
 import org.akaza.openclinica.domain.datamap.ItemGroup;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
+import org.akaza.openclinica.domain.datamap.RepeatCount;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
@@ -165,6 +167,9 @@ public class EnketoUrlService {
 
     @Autowired
     private EventDefinitionCrfDao eventDefinitionCrfDao;
+
+    @Autowired
+    private RepeatCountDao repeatCountDao;
 
     public static final String FORM_CONTEXT = "ecid";
     ParticipantPortalRegistrar participantPortalRegistrar;
@@ -461,6 +466,10 @@ public class EnketoUrlService {
         }
 
         data.put("instanceID", "uuid:1234");
+        List<RepeatCount> repeatCounts = repeatCountDao.findAllByEventCrfId(eventCrf.getEventCrfId());
+        for (RepeatCount repeatCount : repeatCounts) {
+            data.put(repeatCount.getGroupName(), repeatCount.getGroupCount());
+        }
 
         Template template = new Template("template name", new StringReader(templateStr), new Configuration());
 
