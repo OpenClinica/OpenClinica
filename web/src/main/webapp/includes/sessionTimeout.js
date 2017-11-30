@@ -1,4 +1,4 @@
-function isSessionTimedOut(currentURL) {
+function isSessionTimedOut(currentURL, setStorageFlag) {
     var storage = new CrossStorageClient(crossStorageURL);
 
 
@@ -7,14 +7,14 @@ function isSessionTimedOut(currentURL) {
     var key = "OCAppTimeout-" + userName;
     storage.onConnect()
         .then(function() {
-            console.log("in first function****");
+            console.log("After connecting crossStorage");
             return storage.get(key);
         }).then(function(res) {
             console.log(res);
             if (res == null) {
-                storage.set(key, newExpiration);
-                console.log("no value for " + key + "found");
-                return false;
+                if (setStorageFlag)
+                    storage.set(key, newExpiration);
+                console.log("no value for " + key + " found");
             } else {
 
                 var existingTimeout = res;
@@ -29,11 +29,10 @@ function isSessionTimedOut(currentURL) {
                     console.log("currentTime: " + currentTime + " > existingTimeout: " + existingTimeout + " returning to Login screen");
                     console.log("navBar:" + myContextPath + '/pages/logout');
                     window.location.replace (myContextPath + '/pages/logout');
-                    return true;
                 } else {
-                    storage.set(key, newExpiration);
-                    console.log("currentTime <= existingTimeout");
-                    return false;
+                    console.log("currentTime: " + currentTime + " <= existingTimeout: " + existingTimeout);
+                    if (setStorageFlag)
+                        storage.set(key, newExpiration);
                 }
             }
         })['catch'](function(err) {
