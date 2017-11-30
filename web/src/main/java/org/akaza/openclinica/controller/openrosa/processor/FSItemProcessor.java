@@ -284,22 +284,7 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 int lastIndexOf = itemName.lastIndexOf(REPEATCOUNT);
                 ItemGroup iGroup = itemGroupDao.findByCrfAndGroupLayout(formLayout.getCrf(), itemName.substring(0, lastIndexOf));
                 if (iGroup != null) {
-
-                    RepeatCount repeatCount = repeatCountDao.findByEventCrfIdAndRepeatName(container.getEventCrf().getEventCrfId(), itemName);
-                    if (repeatCount == null) {
-                        repeatCount = new RepeatCount();
-                        repeatCount.setEventCrf(container.getEventCrf());
-                        repeatCount.setGroupName(itemName);
-                        repeatCount.setGroupCount(itemValue);
-                        repeatCount.setDateCreated(new Date());
-                        repeatCount.setUserAccount(container.getUser());
-                        repeatCountDao.saveOrUpdate(repeatCount);
-                    } else if (repeatCount != null && !repeatCount.getGroupCount().equals(itemValue)) {
-                        repeatCount.setGroupCount(itemValue);
-                        repeatCount.setUpdateId(container.getUser().getUserId());
-                        repeatCount.setDateUpdated(new Date());
-                        repeatCountDao.saveOrUpdate(repeatCount);
-                    }
+                    saveOrUpdateRepeatCount(container, itemName, itemValue);
                 }
             }
         }
@@ -363,6 +348,24 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 studySubject.setDateUpdated(new Date());
                 studySubjectDao.saveOrUpdate(studySubject);
             }
+        }
+    }
+
+    public void saveOrUpdateRepeatCount(SubmissionContainer container, String itemName, String itemValue) {
+        RepeatCount repeatCount = repeatCountDao.findByEventCrfIdAndRepeatName(container.getEventCrf().getEventCrfId(), itemName);
+        if (repeatCount == null) {
+            repeatCount = new RepeatCount();
+            repeatCount.setEventCrf(container.getEventCrf());
+            repeatCount.setGroupName(itemName);
+            repeatCount.setGroupCount(itemValue);
+            repeatCount.setDateCreated(new Date());
+            repeatCount.setUserAccount(container.getUser());
+            repeatCountDao.saveOrUpdate(repeatCount);
+        } else if (repeatCount != null && !repeatCount.getGroupCount().equals(itemValue)) {
+            repeatCount.setGroupCount(itemValue);
+            repeatCount.setUpdateId(container.getUser().getUserId());
+            repeatCount.setDateUpdated(new Date());
+            repeatCountDao.saveOrUpdate(repeatCount);
         }
     }
 
