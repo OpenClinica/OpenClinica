@@ -89,6 +89,7 @@
 
                 <value>org.akaza.openclinica.domain.datamap.IdtView   </value>
                 <value>org.akaza.openclinica.domain.datamap.Tag   </value>
+                <value>org.akaza.openclinica.domain.datamap.RepeatCount   </value>
 
                 <value>org.akaza.openclinica.domain.datamap.ItemDataType         </value>
                 <value>org.akaza.openclinica.domain.datamap.ItemFormMetadata      </value>
@@ -214,6 +215,7 @@
     <bean id="sectionDao" class="org.akaza.openclinica.dao.hibernate.SectionDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="itemGroupDao" class="org.akaza.openclinica.dao.hibernate.ItemGroupDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="itemDao" class="org.akaza.openclinica.dao.hibernate.ItemDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="repeatCountDao" class="org.akaza.openclinica.dao.hibernate.RepeatCountDao" parent="abstractDomainDao" autowire="byName" />
 
 
     <bean id="eventDefinitionCrfItemTagDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfItemTagDao" parent="abstractDomainDao" autowire="byName" />
