@@ -16,16 +16,14 @@ function isSessionTimedOut(currentURL, setStorageFlag) {
                     storage.set(key, newExpiration);
                 console.log("no value for " + key + " found");
             } else {
-
                 var existingTimeout = res;
                 if (currentTime > existingTimeout) {
                     storage.del(key);
-/*
+
                     // expired
                     var bridgeTimeoutReturnExp = "; expires=" + moment().add(7, 'days').toDate();
                     // create a return cookie
-                    document.cookie = "bridgeTimeoutReturn-" + userName + "=" + values[1] + bridgeTimeoutReturnExp + "; path=/";
-  */
+                    document.cookie = "bridgeTimeoutReturn-" + userName + "=" + currentURL + bridgeTimeoutReturnExp + "; path=/";
                     console.log("currentTime: " + currentTime + " > existingTimeout: " + existingTimeout + " returning to Login screen");
                     console.log("navBar:" + myContextPath + '/pages/logout');
                     window.location.replace (myContextPath + '/pages/logout');
