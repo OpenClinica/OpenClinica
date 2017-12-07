@@ -23,7 +23,9 @@ function isSessionTimedOut(currentURL, setStorageFlag) {
                     // expired
                     var bridgeTimeoutReturnExp = "; expires=" + moment().add(7, 'days').toDate();
                     // create a return cookie
-                    document.cookie = "bridgeTimeoutReturn-" + userName + "=" + currentURL + bridgeTimeoutReturnExp + "; path=/";
+                    if (currentURL.indexOf("/pages/logout") == -1) {
+                        document.cookie = "bridgeTimeoutReturn-" + userName + "=" + currentURL + bridgeTimeoutReturnExp + "; path=/";
+                    }
                     console.log("currentTime: " + currentTime + " > existingTimeout: " + existingTimeout + " returning to Login screen");
                     console.log("navBar:" + myContextPath + '/pages/logout');
                     window.location.replace (myContextPath + '/pages/logout');
