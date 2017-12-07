@@ -953,8 +953,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public ArrayList getEventDefinitionsByCurrentStudy() {
         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(sm.getDataSource());
-        int parentStudyId = currentStudy.getParentStudyId();
         ArrayList allDefs = new ArrayList();
+        if (currentStudy == null)
+            return allDefs;
+        int parentStudyId = currentStudy.getParentStudyId();
         if (parentStudyId > 0) {
             StudyBean parentStudy = (StudyBean) studyDAO.findByPK(parentStudyId);
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(parentStudy);

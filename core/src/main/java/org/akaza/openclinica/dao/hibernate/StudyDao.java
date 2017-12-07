@@ -1,6 +1,7 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import java.math.BigInteger;
+import java.util.List;
 
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.datamap.Study;
@@ -85,5 +86,10 @@ public class StudyDao extends AbstractDomainDao<Study> {
         this.saveOrUpdate(study);
         CoreResources.setRequestSchema(schema);
         return study;
+    }
+    public List<String> findAllSchemas() {
+        Query query = getCurrentSession().createQuery("SELECT s.schemaName FROM Study s");
+        List<String> result = (List<String>) query.getResultList();
+        return result;
     }
 }
