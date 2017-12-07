@@ -157,7 +157,8 @@
         var date = new Date();
         date.setTime(date.getTime() + (60 * 1000));
         var expires = "; expires=" + date.toGMTString();
-        document.cookie = "returnTo-" + userName + "=" + encodeURIComponent(returnTo) + expires + "; path=/";
+        document.cookie = "bridgeTimeoutReturn-" + userName + "=" + encodeURIComponent(returnTo) + expires + "; path=/";
+        deleteOCAppTimeout();
     }
 </script>
 

@@ -12,8 +12,7 @@ function isSessionTimedOut(currentURL, setStorageFlag) {
         }).then(function(res) {
             console.log(res);
             if (res == null) {
-                if (setStorageFlag)
-                    storage.set(key, newExpiration);
+                storage.set(key, newExpiration);
                 console.log("no value for " + key + " found");
             } else {
                 var existingTimeout = res;
@@ -38,4 +37,15 @@ function isSessionTimedOut(currentURL, setStorageFlag) {
         })['catch'](function(err) {
         console.log(err);
     });
+}
+function deleteOCAppTimeout() {
+    var storage = new CrossStorageClient(crossStorageURL);
+    storage.onConnect()
+        .then(function () {
+            console.log("Deleting crossStorage key");
+            storage.del(key);
+        })['catch'](function (err) {
+            console.log(err);
+        });
+
 }
