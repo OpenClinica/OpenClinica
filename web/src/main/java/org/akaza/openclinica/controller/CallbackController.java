@@ -61,7 +61,7 @@ public class CallbackController {
     private void handle(HttpServletRequest req, HttpServletResponse res) throws Exception {
         try {
             String error = req.getParameter("error");
-            if (error != null && error.equals("login_required")) {
+            if (error != null && (error.equals("login_required") || error.equals("unauthorized"))) {
                 res.sendRedirect(controller.buildAuthorizeUrl(req, false /* don't do SSO, SSO already failed */));
             } else {
                 Tokens tokens = controller.handle(req);
