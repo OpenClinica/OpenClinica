@@ -283,7 +283,7 @@ public class ImportCRFDataServlet extends SecureController {
             // signed or locked.
             // Instead of repeating the code to fetch the events in xml file,
             // method in the ImportCRFDataService is modified for this fix.
-            if (eventCRFBeans == null || eventCRFBeans.size() == 0) {
+            if (eventCRFBeans == null) {
                 fail = true;
                 addPageMessage(respage.getString("no_event_status_matching"));
             } else {
@@ -417,7 +417,7 @@ public class ImportCRFDataServlet extends SecureController {
             }
             // }
         }
-        
+
     }
 
     /*
