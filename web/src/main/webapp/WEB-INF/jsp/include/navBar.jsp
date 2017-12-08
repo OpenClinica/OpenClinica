@@ -62,7 +62,6 @@
         realInterval = sessionTimeout;
 
     setInterval(function () {
-            console.log("*******************inactivity timer");
             isSessionTimedOut(encodeURIComponent(currentURL), false);
         },
         realInterval * 1000
