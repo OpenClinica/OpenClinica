@@ -106,7 +106,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-        tableFacade.setColumnProperties("studySubject.label", "siteId", "discrepancyNoteBean.resolutionStatus", "discrepancyNoteBean.createdDate",
+        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "siteId", "discrepancyNoteBean.resolutionStatus", "discrepancyNoteBean.createdDate",
                 "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus", "entityName", "entityValue",
                 "discrepancyNoteBean.entityType", "discrepancyNoteBean.detailedNotes", "numberOfNotes", "discrepancyNoteBean.user", "actions");
 
@@ -131,7 +131,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("numberOfNotes"), resword.getString("of_notes"), null, null, false, false);
         configureColumn(row.getColumn("discrepancyNoteBean.user"), resword.getString("assigned_user"), new AssignedUserCellEditor(), null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.entityType"), resword.getString("entity_type"), null, null, true, false);
-
+        configureColumn(row.getColumn("discrepancyNoteBean.disType"), resword.getString("type"), new DiscrepancyNoteTypeCellEditor(),
+                discrepancyNoteTypeDropdown, true, false);
+        
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
     }
@@ -211,6 +213,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             HashMap<Object, Object> h = new HashMap<Object, Object>();
 
             h.put("studySubject", discrepancyNoteBean.getStudySub());
+            h.put("discrepancyNoteBean.disType", discrepancyNoteBean.getDisType());
             h.put("studySubject.label", discrepancyNoteBean.getStudySub().getLabel());
             h.put("discrepancyNoteBean.resolutionStatus", discrepancyNoteBean.getResStatus());
             h.put("age", discrepancyNoteBean.getAge());
