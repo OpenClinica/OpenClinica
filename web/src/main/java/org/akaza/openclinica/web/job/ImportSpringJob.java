@@ -385,8 +385,6 @@ public class ImportSpringJob extends QuartzJobBean {
             }
             // next: check, then import
             List<String> errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getId());
-            errors = getImportCRFDataService(dataSource).eventCRFStatusesValid(odmContainer, ub, errors);
-
             // this needs to be replaced with the study name from the job, since
             // the user could be in any study ...
             if (errors != null) {
@@ -434,6 +432,7 @@ public class ImportSpringJob extends QuartzJobBean {
             // validation errors, the same as in the ImportCRFDataServlet. DRY?
             List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, ub);
             List<EventCRFBean> permittedEventCRFs = new ArrayList<EventCRFBean>();
+            Boolean eventCRFStatusesValid = getImportCRFDataService(dataSource).eventCRFStatusesValid(odmContainer, ub);
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
@@ -518,6 +517,12 @@ public class ImportSpringJob extends QuartzJobBean {
                     out.write(oce1.getOpenClinicaMessage() + "<br/>");
 
                 }
+            } else if (!eventCRFStatusesValid) {
+                fail = true;
+                msg.append(respage.getString("the_event_crf_not_correct_status"));
+                out.write(respage.getString("the_event_crf_not_correct_status"));
+                out.close();
+                continue;
             } else {
                 // fail = true;
                 // break here with an exception
