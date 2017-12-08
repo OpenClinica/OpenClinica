@@ -19,21 +19,16 @@ public class OCMultiTenantSpringLiquibase extends CustomMultiTenantSpringLiquiba
     @Autowired StudyDao studyDao;
     @Override
     public void afterPropertiesSet() throws Exception {
-        List<String> schemas = new ArrayList<>();
-        schemas.add("public");
-        ArrayList<Study> studies = null;
+        List<String> schemas = null;
         try {
-            studies = studyDao.findAll();
-            for (Study study: studies) {
-                if (StringUtils.isNotEmpty(study.getSchemaName())) {
-                    logger.info("Adding a schema:" + study.getSchemaName() + " to Liquibase");
-                    schemas.add(study.getSchemaName());
-                }
-            }
+            schemas = studyDao.findAllSchemas();
         } catch (Exception e) {
             logger.info("There is no study created as of yet.", e.getMessage());
         }
-
+        if (schemas == null) {
+            schemas = new ArrayList<>();
+        }
+        schemas.add("public");
         super.setSchemas(schemas);
         super.afterPropertiesSet();
     }

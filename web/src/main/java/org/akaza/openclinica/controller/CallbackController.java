@@ -95,7 +95,7 @@ public class CallbackController {
         } catch (InvalidRequestException e) {
             e.printStackTrace();
             SecurityContextHolder.clearContext();
-            res.sendRedirect(redirectOnFail);
+            res.sendRedirect(req.getContextPath());
         } catch (IdentityVerificationException e) {
             e.printStackTrace();
             SecurityContextHolder.clearContext();
