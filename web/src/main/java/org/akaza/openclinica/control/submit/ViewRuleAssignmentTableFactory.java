@@ -865,7 +865,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         actionLink.a().href("ViewRuleSet?ruleSetId=" + ruleSetId);
         actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
-        actionLink.append("<span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_View\"").end().aEnd();
+        actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt("View").title("View").append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
@@ -874,13 +874,13 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
     private String executeLinkBuilder(Integer ruleSetId, Integer ruleId , String targetValue) {
         HtmlBuilder actionLink = new HtmlBuilder();
        
-        if  (!(targetValue.startsWith(ExpressionService.STUDY_EVENT_OID_START_KEY)&& (targetValue.endsWith(ExpressionService.STARTDATE)|| targetValue.endsWith(ExpressionService.STATUS))))
-        {   
-            actionLink.a().href("RunRuleSet?ruleSetId=" + ruleSetId + "&ruleId=" + ruleId);
-            actionLink.append("onMouseDown=\"javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');\"");
-            actionLink.append("onMouseUp=\"javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');\"").close();
-        }
-        actionLink.append("<span hspace=\"2\" border=\"0\" title=\"Run\" alt=\"Run\" class=\"icon icon-plus\" name=\"bt_Run\"").end().aEnd();
+     if  (!(targetValue.startsWith(ExpressionService.STUDY_EVENT_OID_START_KEY)&& (targetValue.endsWith(ExpressionService.STARTDATE)|| targetValue.endsWith(ExpressionService.STATUS))))
+     {   
+        actionLink.a().href("RunRuleSet?ruleSetId=" + ruleSetId + "&ruleId=" + ruleId);
+        actionLink.append("onMouseDown=\"javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');\"");
+        actionLink.append("onMouseUp=\"javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');\"").close();
+     }
+        actionLink.img().name("bt_Run1").src("images/bt_ExexuteRules.gif").border("0").alt("Run").title("Run").append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         
         return actionLink.toString();
@@ -919,8 +919,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         actionLink.a().href("RunRuleSet?ruleSetId=" + ruleSetId);
         actionLink.append("onMouseDown=\"javascript:setImage('bt_run','images/bt_ExexuteRules.gif');\"");
         actionLink.append("onMouseUp=\"javascript:setImage('bt_run','images/bt_ExexuteRules.gif');\"").close();
-        actionLink.append("<span hspace=\"2\" border=\"0\" title=\"Run\" alt=\"Run\" class=\"icon icon-plus\" name=\"bt_Run\"").end().aEnd();
+        actionLink.img().name("Run").src("images/bt_ExexuteRules.gif").border("0").alt("Run").title("Run").append("hspace=\"2\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
+  
         return actionLink.toString();
 
     }
