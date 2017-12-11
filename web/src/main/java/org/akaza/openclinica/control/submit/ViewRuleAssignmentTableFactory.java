@@ -927,12 +927,25 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
 
     private String testLinkBuilder(Integer ruleSetRuleId) {
         HtmlBuilder actionLink = new HtmlBuilder();
+        actionLink.a().href("TestRule?ruleSetRuleId=" + ruleSetRuleId);
+        actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
+        actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_Reassign_d.gif');\"").close();
+        actionLink.img().name("bt_test").src("images/bt_Reassign_d.gif").border("0").alt("Test").title("Test").append("hspace=\"2\"").end().aEnd();
+        actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
     }
 
     private String testEditByDesignerBuilder(String target, String ruleOid, String runTime, String message) {
         HtmlBuilder actionLink = new HtmlBuilder();
+        // String designerURL = "http://localhost:8080/Designer-0.1.0.BUILD-SNAPSHOT/";
+        setDesignerLink(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName());
+        actionLink.a().href(designerURL  + "&target=" + target + "&ruleOid=" + ruleOid +"&study_oid=" +currentStudy.getOid()+"&provider_user="+getCurrentUser().getName()+"&path=ViewRuleAssignment&runTime="+ runTime +"&msg="+ convertMessage(message));
+        actionLink.append("target=\"_parent\"");
+        actionLink.append("onMouseDown=\"javascript:setImage('bt_test','images/bt_EnterData_d.gif');\"");
+        actionLink.append("onMouseUp=\"javascript:setImage('bt_test','images/bt_EnterData.gif');\"").close();
+        actionLink.img().name("bt_test").src("images/bt_EnterData.gif").border("0").alt("Rule Designer").title("Rule Designer").append("hspace=\"2\"").end().aEnd();
+        actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
 
     }
