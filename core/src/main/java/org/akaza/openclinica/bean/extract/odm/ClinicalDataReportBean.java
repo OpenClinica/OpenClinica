@@ -441,7 +441,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         if (dn.getDateUpdated() != null) {
             Date d = dn.getDateUpdated();
             if (d.toString().length() > 0) {
-                xml.append("DateUpdated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(d) + "\" ");
+                xml.append("DateUpdated=\"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(d) + "\" ");
             }
         }
         if (dn.getEntityName() != null) {
@@ -475,7 +475,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 if (cn.getDateCreated() != null) {
                     Date d = cn.getDateCreated();
                     if (d.toString().length() > 0) {
-                        xml.append("DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd").format(d) + "\" ");
+                        xml.append("DateCreated=\"" + new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(d) + "\" ");
                     }
                 }
                 if (cn.getOwnerUserName() != "") {

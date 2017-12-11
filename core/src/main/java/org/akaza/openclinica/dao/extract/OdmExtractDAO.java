@@ -530,7 +530,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.INT); // owner_id
         ++i;
-        this.setTypeExpected(i, TypeNames.DATE); // date_created
+        this.setTypeExpected(i, TypeNames.TIMESTAMP); // date_created
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
@@ -554,7 +554,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.INT); // owner_id
         ++i;
-        this.setTypeExpected(i, TypeNames.DATE); // date_created
+        this.setTypeExpected(i, TypeNames.TIMESTAMP); // date_created
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
@@ -576,7 +576,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.INT); // owner_id
         ++i;
-        this.setTypeExpected(i, TypeNames.DATE); // date_created
+        this.setTypeExpected(i, TypeNames.TIMESTAMP); // date_created
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
@@ -598,7 +598,7 @@ public class OdmExtractDAO extends DatasetDAO {
         ++i;
         this.setTypeExpected(i, TypeNames.INT); // owner_id
         ++i;
-        this.setTypeExpected(i, TypeNames.DATE); // date_created
+        this.setTypeExpected(i, TypeNames.TIMESTAMP); // date_created
         ++i;
         this.setTypeExpected(i, TypeNames.STRING); // status
         ++i;
