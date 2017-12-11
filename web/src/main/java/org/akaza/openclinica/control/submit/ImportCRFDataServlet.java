@@ -242,15 +242,23 @@ public class ImportCRFDataServlet extends SecureController {
             // 3.f. are those items in that item group?
 
             List<String> errors = getImportCRFDataService().validateStudyMetadata(odmContainer, ub.getActiveStudyId());
-            errorCheck(errors);
-            if (errors.size() == 0) {
-                errors = getImportCRFDataService().eventCRFStatusesValid(odmContainer, ub, errors);
-                errorCheck(errors);
+            if (errors != null) {
+                // add to session
+                // forward to another page
+                logger.info(errors.toString());
+                for (String error : errors) {
+                    addPageMessage(error);
+                }
+                if (errors.size() > 0) {
+                    // fail = true;
+                    forwardPage(Page.IMPORT_CRF_DATA);
+                } else {
+                    addPageMessage(respage.getString("passed_study_check"));
+                    addPageMessage(respage.getString("passed_oid_metadata_check"));
+                }
+
             }
-            if (errors.size() != 0) {
-                logger.debug("failed error check");
-                return;
-            }
+            logger.debug("passed error check");
             // TODO ADD many validation steps before we get to the
             // session-setting below
             // 4. is the event in the correct status to accept data import?
@@ -259,6 +267,7 @@ public class ImportCRFDataServlet extends SecureController {
             // (and the event should be independent, ie not affected by other
             // events)
 
+            Boolean eventCRFStatusesValid = getImportCRFDataService().eventCRFStatusesValid(odmContainer, ub);
             ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, sm.getDataSource());
             // The eventCRFBeans list omits EventCRFs that don't match UpsertOn rules. If EventCRF did not exist and
             // doesn't match upsert, it won't be created.
@@ -368,6 +377,9 @@ public class ImportCRFDataServlet extends SecureController {
                         logger.debug("threw an OCE after calling lookup validation errors " + oce1.getOpenClinicaMessage());
                         addPageMessage(oce1.getOpenClinicaMessage());
                     }
+                } else if (!eventCRFStatusesValid) {
+                    fail = true;
+                    addPageMessage(respage.getString("the_event_crf_not_correct_status"));
                 } else {
                     fail = true;
                     addPageMessage(respage.getString("no_event_crfs_matching_the_xml_metadata"));
