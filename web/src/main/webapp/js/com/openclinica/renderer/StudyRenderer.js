@@ -953,12 +953,11 @@ function StudyRenderer(json) {
 			}
 
 			if (app_displayAudits == 'y' || app_displayDNs == 'y') {
-				if (typeof itemOids === 'undefined'
-						|| itemOids.toString().indexOf(itemDef["@OID"]) < 0) {
+					var index=itemOids.indexOf(itemOID);
+					if (index==-1){
 					logs += this.printItemMetadata(itemGroupName);
 
 					if (app_displayDNs == 'y') {
-
 						logs += this.printDiscrepancies(itemDefRenderer,
 								repeatRowNumber, repeating);
 					}
