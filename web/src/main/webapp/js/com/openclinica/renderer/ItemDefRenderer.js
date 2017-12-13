@@ -26,18 +26,21 @@ function ItemDefRenderer(json, itemDetails, mandatory, formOID, repeatRowNumber,
   this.itemNameLink = undefined;
   this.studyEventOID = studyEventOID;
   this.studyEventRepeatKey = studyEventRepeatKey;
+  this.dash="-";
+  this.key=this.studyEventOID+this.dash+this.studyEventRepeatKey+this.dash+this.OID;
+  this.keyAndRepeat=this.key+this.dash+repeatRowNumber;
   
   
   
-  if (this.studyEventOID!=undefined && app_itemValuesMap[this.studyEventOID+this.studyEventRepeatKey+this.OID+repeatRowNumber]) { 
-    this.itemValue = app_itemValuesMap[this.studyEventOID+this.studyEventRepeatKey+this.OID+repeatRowNumber]; 
+  if (this.studyEventOID!=undefined && app_itemValuesMap[this.keyAndRepeat]) { 
+    this.itemValue = app_itemValuesMap[this.keyAndRepeat]; 
     
     }
   
-  if(this.studyEventOID!=undefined && app_displayAudits=='y' && app_audits[this.studyEventOID+this.studyEventRepeatKey+this.OID])
-	    this.audits = app_audits[this.studyEventOID+this.studyEventRepeatKey+this.OID];
-	    if(this.studyEventOID!=undefined && app_displayDNs=='y' && app_dns[this.studyEventOID+this.studyEventRepeatKey+this.OID])
-	    this.dns = app_dns[this.studyEventOID+this.studyEventRepeatKey+this.OID];
+  if(this.studyEventOID!=undefined && app_displayAudits=='y' && app_audits[this.key])
+	    this.audits = app_audits[this.key];
+	    if(this.studyEventOID!=undefined && app_displayDNs=='y' && app_dns[this.key])
+	    this.dns = app_dns[this.key];
   
   
   if (this.responseType!=undefined) {
