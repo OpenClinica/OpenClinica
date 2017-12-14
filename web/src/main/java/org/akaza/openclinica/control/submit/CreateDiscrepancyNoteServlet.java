@@ -491,8 +491,7 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
                     dnb.setDiscrepancyNoteTypeId(DiscrepancyNoteType.QUERY.getId());
                     // remove this option for CRCs and Investigators
                     //if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) && currentStudy.getId() != currentStudy.getParentStudyId()
-                    if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)
-                        || currentRole.getRole().equals(Role.INVESTIGATOR)) {
+                    if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) {
                         request.setAttribute("autoView", "0");
                     } else {
                         request.setAttribute("autoView", "1");
