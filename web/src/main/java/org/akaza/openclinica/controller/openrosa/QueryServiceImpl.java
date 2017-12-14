@@ -138,6 +138,7 @@ public class QueryServiceImpl implements QueryService {
                 parentDN.setUserAccountByOwnerId(helperBean.getContainer().getUser());
                 parentDN.setDetailedNotes(childDN.getDetailedNotes());
                 parentDN.setDiscrepancyNoteType(childDN.getDiscrepancyNoteType());
+                parentDN.setDateCreated(new Date());
                 parentDN = discrepancyNoteDao.saveOrUpdate(parentDN);
 
                 helperBean.setDn(childDN);

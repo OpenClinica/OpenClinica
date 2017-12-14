@@ -183,9 +183,7 @@ public class ImportCRFDataService {
     /*
      * purpose: returns false if any of the forms/EventCRFs fail the UpsertOnBean rules.
      */
-    public List<String> eventCRFStatusesValid(ODMContainer odmContainer, UserAccountBean ub, List<String> errors) {
-        MessageFormat mf = new MessageFormat("");
-
+    public boolean eventCRFStatusesValid(ODMContainer odmContainer, UserAccountBean ub) {
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
@@ -221,9 +219,7 @@ public class ImportCRFDataService {
                 if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)
                         || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)
                         || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.STOPPED)) {
-                    mf.applyPattern(respage.getString("the_event_crf_not_correct_status"));
-                    Object[] arguments = {};
-                    errors.add(mf.format(arguments));
+                    return true;
                 }
                 for (FormDataBean formDataBean : formDataBeans) {
                     ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
@@ -235,23 +231,14 @@ public class ImportCRFDataService {
                         // have us with a study event, but no corresponding
                         // event crf, yet.
                         if (eventCrfBeans.isEmpty()) {
-                            eventCrfBeans = eventCrfDAO.findAllByStudyEventAndFormOrFormLayoutOid(studyEventBean, formDataBean.getFormOID());
-                            if (eventCrfBeans.size() > 0) {
-                                mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid_for_form_oid"));
-                                Object[] arguments = { studyEventDefinitionBean.getOid(), subjectDataBean.getSubjectOID(), formDataBean.getFormOID() };
-                                errors.add(mf.format(arguments));
-                            }
-
                             logger.debug("   found no event crfs from Study Event id " + studyEventBean.getId() + ", location " + studyEventBean.getLocation());
                             if ((studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
                                     || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
                                     || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED))) {
 
-                                if (!upsert.isNotStarted()) {
-                                    mf.applyPattern(respage.getString("the_event_crf_not_correct_status"));
-                                    Object[] arguments = {};
-                                    errors.add(mf.format(arguments));
-                                }
+                                if (!upsert.isNotStarted())
+                                    return false;
+
                             }
                         }
 
@@ -260,16 +247,14 @@ public class ImportCRFDataService {
                         for (EventCRFBean ecb : eventCrfBeans) {
                             if (!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
                                     && !(ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && upsert.isDataEntryComplete())) {
-                                mf.applyPattern(respage.getString("the_event_crf_not_correct_status"));
-                                Object[] arguments = {};
-                                errors.add(mf.format(arguments));
+                                return false;
                             }
                         }
                     }
                 }
             }
         }
-        return errors;
+        return true;
     }
 
     /*
