@@ -61,7 +61,7 @@ public class CallbackController {
     private void handle(HttpServletRequest req, HttpServletResponse res) throws Exception {
         try {
             String error = req.getParameter("error");
-            if (error != null && error.equals("login_required")) {
+            if (error != null && (error.equals("login_required") || error.equals("unauthorized"))) {
                 res.sendRedirect(controller.buildAuthorizeUrl(req, false /* don't do SSO, SSO already failed */));
             } else {
                 Tokens tokens = controller.handle(req);
@@ -81,8 +81,10 @@ public class CallbackController {
                 }
                 UserAccountBean ub = userAccountHelper.getUb();
                 if (ub != null) {
-                    if (userAccountHelper.isUpdated())
+                    if (userAccountHelper.isUpdated()) {
                         ub = callbackService.getUpdatedUser(ub);
+                        req.getSession().setAttribute("userRole", null);
+                    }
                     req.getSession().setAttribute(USER_BEAN_NAME, ub);
                 } else {
                     unauthorized(res, "Bad credentials");
