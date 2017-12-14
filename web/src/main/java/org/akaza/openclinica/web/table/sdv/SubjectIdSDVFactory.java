@@ -1,5 +1,15 @@
 package org.akaza.openclinica.web.table.sdv;
 
+import java.util.ArrayList;
+import java.util.Collection;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
+
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -39,16 +49,6 @@ import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
 import org.jmesa.web.WebContext;
 
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-
 /**
  * A Jmesa table that represents study subjects in each row.
  */
@@ -75,7 +75,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
     @Override
     protected String getTableName() {
-        //This name creates the underlying id of the HTML table
+        // This name creates the underlying id of the HTML table
         return "s_sdv";
     }
 
@@ -94,23 +94,22 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         Row row = tableFacade.getTable().getRow();
 
         SDVUtil sdvUtil = new SDVUtil();
-        String[] allTitles =
-        	new String[] { resword.getString("SDV_status"), resword.getString("study_subject_ID"), resword.getString("site_id"), resword.getString("person_ID"), resword.getString("study_subject_status"), resword.getString("group"), resword.getString("num_CRFs_completed"),
-        		resword.getString("num_CRFs_SDV"), resword.getString("total_events_CRF"), resword.getString("actions") };
+        String[] allTitles = new String[] { resword.getString("SDV_status"), resword.getString("study_subject_ID"), resword.getString("site_id"),
+                resword.getString("person_ID"), resword.getString("study_subject_status"), resword.getString("group"), resword.getString("num_CRFs_completed"),
+                resword.getString("num_CRFs_SDV"), resword.getString("total_events_CRF"), resword.getString("actions") };
 
         sdvUtil.setTitles(allTitles, (HtmlTable) tableFacade.getTable());
-        sdvUtil.turnOffFilters(tableFacade, new String[] { "personId", "studySubjectStatus", "group", "numberCRFComplete", "numberOfCRFsSDV", "totalEventCRF",
-            "actions" });
+        sdvUtil.turnOffFilters(tableFacade,
+                new String[] { "personId", "studySubjectStatus", "group", "numberCRFComplete", "numberOfCRFsSDV", "totalEventCRF", "actions" });
         sdvUtil.turnOffSorts(tableFacade, new String[] { "sdvStatus", "studySubjectId", "siteId", "personId", "studySubjectStatus", "group",
-            "numberCRFComplete", "numberOfCRFsSDV", "totalEventCRF" });
+                "numberCRFComplete", "numberOfCRFsSDV", "totalEventCRF" });
 
         sdvUtil.setHtmlCellEditors(tableFacade, new String[] { "sdvStatus", "actions" }, false);
 
         HtmlColumn sdvStatus = ((HtmlRow) row).getColumn("sdvStatus");
         sdvStatus.getFilterRenderer().setFilterEditor(new SdvStatusFilter());
 
-        String actionsHeader =
-            resword.getString("rule_actions")
+        String actionsHeader = resword.getString("rule_actions")
                 + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, sdvUtil.getCellEditorNoEscapes(), new DefaultActionsEditor(locale), true, false);
 
@@ -136,7 +135,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
             contextPath = context.getContextPath();
         }
 
-        String restore = context.getRequestAttribute(limit.getId()+"_restore") + "";
+        String restore = context.getRequestAttribute(limit.getId() + "_restore") + "";
         if (!limit.isComplete()) {
             int totalRows = getTotalRowCount(studySubjectSDVFilter);
             tableFacade.setTotalRows(totalRows);
@@ -153,31 +152,32 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
         int rowStart = limit.getRowSelect().getRowStart();
         int rowEnd = limit.getRowSelect().getRowEnd();
-        //Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), studySubjectSDVFilter, subjectSort, rowStart, rowEnd);
+        // Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(),
+        // studySubjectSDVFilter, subjectSort, rowStart, rowEnd);
         Collection<SubjectAggregateContainer> items = getFilteredItems(studySubjectSDVFilter, studySubjectSDVSort, rowStart, rowEnd);
         tableFacade.setItems(items);
 
         /*
-        
-
-        Limit limit = tableFacade.getLimit();
-        FilterSet filterSet = limit.getFilterSet();
-        WebContext context = tableFacade.getWebContext();
-        if (context != null) {
-            studyId = Integer.parseInt(context.getParameter("studyId"));
-            contextPath = context.getContextPath();
-        }
-        int totalRows = getTotalRowCount();
-
-        tableFacade.setTotalRows(totalRows);
-        SortSet sortSet = limit.getSortSet();
-        int rowStart = limit.getRowSelect().getRowStart();
-        int rowEnd = limit.getRowSelect().getRowEnd();
-        Collection<SubjectAggregateContainer> items = getFilteredItems(filterSet, sortSet, rowStart, rowEnd);
-        ;
-
-        tableFacade.setItems(items);
-        */
+         * 
+         * 
+         * Limit limit = tableFacade.getLimit();
+         * FilterSet filterSet = limit.getFilterSet();
+         * WebContext context = tableFacade.getWebContext();
+         * if (context != null) {
+         * studyId = Integer.parseInt(context.getParameter("studyId"));
+         * contextPath = context.getContextPath();
+         * }
+         * int totalRows = getTotalRowCount();
+         * 
+         * tableFacade.setTotalRows(totalRows);
+         * SortSet sortSet = limit.getSortSet();
+         * int rowStart = limit.getRowSelect().getRowStart();
+         * int rowEnd = limit.getRowSelect().getRowEnd();
+         * Collection<SubjectAggregateContainer> items = getFilteredItems(filterSet, sortSet, rowStart, rowEnd);
+         * ;
+         * 
+         * tableFacade.setItems(items);
+         */
 
     }
 
@@ -193,7 +193,7 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
 
         return studySubjectSDVFilter;
     }
-    
+
     public StudySubjectSDVFilter createStudySubjectSDVFilter(Limit limit) {
         return getStudySubjectSDVFilter(limit);
     }
@@ -212,8 +212,8 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
     }
 
     /*
-    Returns how many subjects exist in the study.
-    */
+     * Returns how many subjects exist in the study.
+     */
     public int getTotalRowCount(StudySubjectSDVFilter studySubjectSDVFilter) {
 
         StudySubjectDAO studySubDAO = new StudySubjectDAO(dataSource);
@@ -263,18 +263,20 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         StudyBean studyBean = (StudyBean) studyDAO.findByPK(studySubjectBean.getStudyId());
         row.setSiteId(studyBean.getIdentifier());
 
-        List<EventCRFBean> eventCRFBeans =
-            eventCRFDAO.getEventCRFsByStudySubject(studySubjectBean.getId(), studySubjectBean.getStudyId(), studySubjectBean.getStudyId());
+        List<EventCRFBean> eventCRFBeans = eventCRFDAO.getEventCRFsByStudySubject(studySubjectBean.getId(), studySubjectBean.getStudyId(),
+                studySubjectBean.getStudyId());
 
         HashMap<String, Integer> stats = getEventCRFStats(eventCRFBeans, studySubjectBean);
 
-        //int numberCRFComplete = getNumberCompletedEventCRFs(eventCRFBeans);
-        //row.setNumberCRFComplete(numberCRFComplete + "");
+        // int numberCRFComplete = getNumberCompletedEventCRFs(eventCRFBeans);
+        // row.setNumberCRFComplete(numberCRFComplete + "");
         row.setNumberCRFComplete(stats.get("numberOfCompletedEventCRFs") + "");
         row.setNumberOfCRFsSDV(stats.get("numberOfSDVdEventCRFs") + "");
 
-        //row.setNumberOfCRFsSDV(getNumberSDVdEventCRFs(eventCRFBeans) + "");
-        //boolean studySubjectSDVd = eventCRFDAO.countEventCRFsByByStudySubjectCompleteOrLockedAndNotSDVd(studySubjectBean.getId()) == 0 && numberCRFComplete > 0;
+        // row.setNumberOfCRFsSDV(getNumberSDVdEventCRFs(eventCRFBeans) + "");
+        // boolean studySubjectSDVd =
+        // eventCRFDAO.countEventCRFsByByStudySubjectCompleteOrLockedAndNotSDVd(studySubjectBean.getId()) == 0 &&
+        // numberCRFComplete > 0;
 
         boolean studySubjectSDVd = stats.get("areEventCRFsSDVd") == -1 || stats.get("areEventCRFsSDVd") == 1 ? false : true;
 
@@ -293,8 +295,8 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         }
         row.setSdvStatus(sdvStatus.toString());
 
-        List<StudyGroupBean> studyGroupBeans =
-            studyGroupDAO.getGroupByStudySubject(studySubjectBean.getId(), studySubjectBean.getStudyId(), studySubjectBean.getStudyId());
+        List<StudyGroupBean> studyGroupBeans = studyGroupDAO.getGroupByStudySubject(studySubjectBean.getId(), studySubjectBean.getStudyId(),
+                studySubjectBean.getStudyId());
 
         if (studyGroupBeans != null && !studyGroupBeans.isEmpty()) {
             row.setGroup(studyGroupBeans.get(0).getName());
@@ -307,12 +309,12 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
         actions.append(urlPrefix).append(SDVUtil.VIEW_ICON_HTML).append("</a></td>");
 
         if (!studySubjectSDVd && stats.get("shouldDisplaySDVButton") == 1) {
-            StringBuilder jsCodeString =
-                new StringBuilder("this.form.method='GET'; this.form.action='").append(contextPath).append("/pages/sdvStudySubject").append("';").append(
-                        "this.form.theStudySubjectId.value='").append(studySubjectBean.getId()).append("';").append("this.form.submit();");
-
-            actions.append("<td><input type=\"submit\" class=\"button\" value=\"SDV\" name=\"sdvSubmit\" ").append("onclick=\"")
-                    .append(jsCodeString.toString()).append("\" /></td>");
+            StringBuilder jsCodeString = new StringBuilder("this.form.method='GET'; this.form.action='").append(contextPath).append("/pages/sdvStudySubject")
+                    .append("';").append("this.form.theStudySubjectId.value='").append(studySubjectBean.getId()).append("';").append("this.form.submit();");
+            if (!studyBean.getStatus().isLocked()) {
+                actions.append("<td><input type=\"submit\" class=\"button\" value=\"SDV\" name=\"sdvSubmit\" ").append("onclick=\"")
+                        .append(jsCodeString.toString()).append("\" /></td>");
+            }
         } else if (!studySubjectSDVd) {
             actions.append("<td>&nbsp;&nbsp;&nbsp;&nbsp;&nbsp;SDV N/A</td>");
         }
@@ -378,27 +380,29 @@ public class SubjectIdSDVFactory extends AbstractTableFactory {
                 numberOfCompletedEventCRFs++;
             }
             /*
-            if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.COMPLETED) {
-                numberOfCompletedEventCRFs++;
-            }*/
+             * if (studyEventBean.getSubjectEventStatus() == SubjectEventStatus.COMPLETED) {
+             * numberOfCompletedEventCRFs++;
+             * }
+             */
             // get number of completed event SDVd events
             if (eventBean.isSdvStatus()) {
                 numberOfSDVdEventCRFs++;
             }
             // get number of all non SDVd events that are 100% or partial required
-            EventDefinitionCRFBean eventDefinitionCrf =
-                eventDefinitionCrfDAO.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventBean.getStudyEventDefinitionId(), crfBean.getId(), studySubject
-                        .getStudyId());
+            EventDefinitionCRFBean eventDefinitionCrf = eventDefinitionCrfDAO
+                    .findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventBean.getStudyEventDefinitionId(), crfBean.getId(), studySubject.getStudyId());
             if (eventDefinitionCrf.getId() == 0) {
-                eventDefinitionCrf =
-                    eventDefinitionCrfDAO.findForStudyByStudyEventDefinitionIdAndCRFId(studyEventBean.getStudyEventDefinitionId(), crfBean.getId());
+                eventDefinitionCrf = eventDefinitionCrfDAO.findForStudyByStudyEventDefinitionIdAndCRFId(studyEventBean.getStudyEventDefinitionId(),
+                        crfBean.getId());
             }
-            if ((eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED || eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)
-                && (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED)) {
+            if ((eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
+                    || eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)
+                    && (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED)) {
                 partialOrHundred = true;
             }
-            if ((eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED || eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED)
-                && eventBean.isSdvStatus() == false && (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED)) {
+            if ((eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.AllREQUIRED
+                    || eventDefinitionCrf.getSourceDataVerification() == SourceDataVerification.PARTIALREQUIRED) && eventBean.isSdvStatus() == false
+                    && (eventBean.getStatus() == Status.UNAVAILABLE || eventBean.getStatus() == Status.LOCKED)) {
                 areEventCRFsSDVd = 1;
             }
 

@@ -105,7 +105,9 @@
 
         ${sdvTableAttribute}
         <br />
-        <input type="submit" name="sdvAllFormSubmit" class="button_medium" value="<fmt:message key="sdv_all_checked" bundle="${resword}"/>" onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/sdvStudySubjects';this.form.submit();"/>
+            <c:if test="${!(study.status.locked)}">
+              <input type="submit" name="sdvAllFormSubmit" class="button_medium" value="<fmt:message key="sdv_all_checked" bundle="${resword}"/>" onclick="this.form.method='POST';this.form.action='${pageContext.request.contextPath}/pages/sdvStudySubjects';this.form.submit();"/>
+           </c:if>
         <%--<input type="submit" name="sdvAllFormCancel" class="button_medium" value="Cancel" onclick="this.form.action='${pageContext.request.contextPath}/pages/viewSubjectAggregate';this.form.submit();"/>
     </form>--%>
     <script type="text/javascript">hideCols('s_sdv',[2,3,4])</script>
