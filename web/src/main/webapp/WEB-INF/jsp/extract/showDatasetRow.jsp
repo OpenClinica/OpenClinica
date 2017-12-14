@@ -64,7 +64,7 @@
                     <a href="ExportDataset?datasetId=<c:out value="${currRow.bean.id}"/>"
                     onMouseDown="javascript:setImage('bt_Export1','images/bt_Export_d.gif');"
                     onMouseUp="javascript:setImage('bt_Export1','images/bt_Export.gif');"><span
-                    name="bt_Export1" class="icon icon-icon-reassign3" border="0" alt="<fmt:message key="export_dataset" bundle="${resword}"/>" title="<fmt:message key="export_dataset" bundle="${resword}"/>" align="left" hspace="6"></a>
+                    name="bt_Export1" class="icon icon-upload" border="0" alt="<fmt:message key="export_dataset" bundle="${resword}"/>" title="<fmt:message key="export_dataset" bundle="${resword}"/>" align="left" hspace="6"></a>
                     </td>
                     </c:otherwise>
                 </c:choose>

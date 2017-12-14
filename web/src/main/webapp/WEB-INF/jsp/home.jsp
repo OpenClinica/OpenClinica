@@ -69,6 +69,7 @@
         if (data && data.sso === true) {
             // have SSO session
             //alert('SSO: an Auth0 SSO session already exists');
+            console.log('SSO: an Auth0 SSO session already exists');
             <c:choose>
                 <c:when test="${authenticated}">
                     var loggedIn = true;
@@ -90,10 +91,12 @@
                     connection: data.lastUsedConnection.name
                 }, function (err) {
                     // this only gets called if there was a login error
+                    console.error('Error logging in: ' + err);
                 });
             } else {
                // alert("SSO Session and locally authenticated ");
                 // have SSO session and valid user - display page
+                console.log("SSO Session and locally authenticated ");
                 $('body').show();
                 $.growl({title: "Welcome  ${user.nickname}", message: "We hope you enjoy using the Partner Site!"});
                 $("#logout").click(function(e) {
@@ -107,6 +110,7 @@
             <c:choose>
                 <c:when test="${authenticated}">
                     //alert("NO SSO Session but locally authenticated ");
+                    console.log("NO SSO Session but locally authenticated ");
                     // user is logged in locally, but no SSO session exists -> log them out locally
                     window.location = '${fn:replace(pageContext.request.requestURL, pageContext.request.requestURI, '')}${logoutEndpoint}';
 
@@ -115,6 +119,7 @@
                     //alert("NO SSO Session and NOT locally authenticated ")
                     // user is not logged in locally and no SSO session exists - send to the portal application's partner login page
                     localStorage.removeItem('userToken');
+                    console.log("NO SSO Session and NOT locally authenticated ");
                     window.location = '${partnerLoginUrl}?externalReturnUrl=' + encodeURIComponent(window.location);
             </c:otherwise>
             </c:choose>

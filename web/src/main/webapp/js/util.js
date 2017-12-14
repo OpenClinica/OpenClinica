@@ -3,6 +3,7 @@ var util_logDebug = 2;
 
 var debug = function (logText, logLevel) {
   if (window.console != undefined && logLevel <= app_logLevel) {
+    console.log(logText);
   }
 }
 
