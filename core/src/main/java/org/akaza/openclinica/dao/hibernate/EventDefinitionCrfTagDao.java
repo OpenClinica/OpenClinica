@@ -1,8 +1,5 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.List;
-
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
 
 public class EventDefinitionCrfTagDao extends AbstractDomainDao<EventDefinitionCrfTag> {
@@ -14,8 +11,11 @@ public class EventDefinitionCrfTagDao extends AbstractDomainDao<EventDefinitionC
     }
 
     public EventDefinitionCrfTag findByCrfPath(int tagId, String path, boolean active) {
-        String query = "from " + getDomainClassName() + " where path = '" + path + "' and tagId=" + tagId + "and active=" + active;
+        String query = "from " + getDomainClassName() + " where path = :path and tagId= :tagId and active= :active ";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("tagId", tagId);
+        q.setString("path", path);
+        q.setBoolean("active", active);
         return (EventDefinitionCrfTag) q.uniqueResult();
 
     }
