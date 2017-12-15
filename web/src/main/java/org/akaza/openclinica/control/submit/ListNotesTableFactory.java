@@ -452,20 +452,18 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             builder.append("&nbsp;");
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
-                if (dnb.getEntityType() != "eventCrf") {
-                    builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
+                if (dnb.getEventStart() == null) {
+                    builder.a().href("ViewStudySubject?id="+ studySubjectId);
                     builder.close();
                     builder.append("<span title='" + resword.getString("View_Query_Within_Record")
                             + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
                     builder.aEnd();
                 } else {
-                    if (dnb.getStageId() == 5) {
-                        builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
-                        builder.close();
-                        builder.append("<span title='" + resword.getString("View_Query_Within_Record")
-                                + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
-                        builder.aEnd();
-                    }
+                    builder.a().href("EnterDataForStudyEvent?eventId="+ studySubjectId);
+                    builder.close();
+                    builder.append("<span title='" + resword.getString("View_Query_Within_Record")
+                            + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
+                    builder.aEnd();
                 }
             }
 
