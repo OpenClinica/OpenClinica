@@ -1,12 +1,39 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
+<%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-
 <jsp:include page="../include/admin-header.jsp"/>
 
+<script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+
+      <script type="text/javascript">
+        jQuery(document).ready(function() {
+            jQuery('#addNewStudy').click(function() {
+                jQuery.blockUI({ message: jQuery('#addNewStudyForm'), css:{left: "300px", top:"10px" } });
+            });
+
+            jQuery('#cancelRandomizationAccessRequest').click(function() {
+                jQuery.unblockUI();
+                $('#randomizationWarnings').empty();
+            });
+            // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
+            var warnings = "${regMessages}";
+            if (warnings.length > 0) {
+            	jQuery.blockUI({ message: jQuery('#requestRandomizationForm'), css:{left: "300px", top:"10px" } });
+            }
+        });
+
+        // Hide the popup window if the escape key is pressed
+        jQuery(document).keyup(function(keyPressed) {
+            if(keyPressed.keyCode === 27) {
+                $('#randomizationWarnings').empty();
+                jQuery.unblockUI();
+            }
+        });
+    </script>
 
 <!-- move the alert message to the sidebar-->
 <jsp:include page="../include/sideAlert.jsp"/>
@@ -41,10 +68,25 @@
 
 <h1><span class="title_manage"><fmt:message key="administer_studies" bundle="${resword}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/administer-study')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 
-<div class="homebox_bullets"><a href="CreateStudy"><fmt:message key="create_a_new_study" bundle="${resword}"/></a></div>
+<div class="homebox_bullets"> <a href="javascript:;" id="addNewStudy" name="addNewStudy"><fmt:message key="create_a_new_study" bundle="${resword}"/></a></div>
+
 <p>
 <fmt:message key="studies_are_indicated_in_bold" bundle="${restext}"/>
 </p>
+
+    <div align="left" id="addNewStudyForm" class="randomization-registration-div">
+        <form action="CreateStudy" method="post">
+            <h1>
+                <fmt:message key="add_new_study_title" bundle="${resword}"/>
+            </h1>
+            <p><fmt:message key="add_new_study_screen_content" bundle="${resword}"/></p>
+            <br>
+       
+
+       <a href="CreateStudy"><input type="button" class="button_medium" value="Continue in OC3" /></a>       
+       <a href="https://openclinica.com/upgrade">   <input type="button" class="button_xlong" value="Tell me more about new OpenClinica" /></a>       
+           </form>
+    </div>
 
 <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showStudyRow.jsp" /></c:import>
 <br><br>
