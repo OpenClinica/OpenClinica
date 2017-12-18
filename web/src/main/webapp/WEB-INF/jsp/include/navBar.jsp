@@ -156,7 +156,7 @@
         var date = new Date();
         date.setTime(date.getTime() + (60 * 1000));
         var expires = "; expires=" + date.toGMTString();
-        document.cookie = "returnTo-" + userName + "=" + encodeURIComponent(returnTo) + expires + "; path=/";
+        document.cookie = "bridgeTimeoutReturn-" + userName + "=" + encodeURIComponent(returnTo) + expires + "; path=/";
     }
 </script>
 
@@ -239,6 +239,7 @@
                                 <li><a onclick="javascript:ConfirmLeave();" href="${study.manager}"><fmt:message key="return_to_my_studies"
                                                                                                                  bundle="${resworkflow}"/></a></li>
                             </c:if>
+                            <li><a onclick="javascript:ConfirmLeave();" href="${(study.manager).replace('account-study','my-profile')}"><fmt:message key="return_to_my_profile" bundle="${resworkflow}"/></a></li>
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback"
                                                                                                                                 bundle="${resword}"/></a></li>
                             <li><a onClick="javascript:createReturnToCookie('<%=currentURL%>');" href="${urlPrefix}pages/logout"><fmt:message key="log_out"
