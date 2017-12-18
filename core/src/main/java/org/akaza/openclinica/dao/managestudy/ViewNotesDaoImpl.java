@@ -144,7 +144,12 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
             for (String filterKey : filter.getFilters().keySet()) {
                 String filterQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter." + filterKey);
                 terms.add(filterQuery);
-                arguments.put(filterKey, filter.getFilters().get(filterKey));
+                if (filterKey.equalsIgnoreCase("discrepancy_note_type_id")) {
+                    // summary count only Query type
+                    arguments.put(filterKey, 3);
+                } else {
+                    arguments.put(filterKey, filter.getFilters().get(filterKey));
+                }
             }
         }
 
