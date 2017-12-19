@@ -84,7 +84,7 @@
        
 
        <a href="CreateStudy"><input type="button" class="button_medium" value="Continue in OC3" /></a>       
-       <a href="https://openclinica.com/upgrade">   <input type="button" class="button_xlong" value="Tell me more about new OpenClinica" /></a>       
+       <a href="https://openclinica.com/upgrade">   <input type="button" class="button_long" value="Tell me more about OCv4" /></a>       
            </form>
     </div>
 
