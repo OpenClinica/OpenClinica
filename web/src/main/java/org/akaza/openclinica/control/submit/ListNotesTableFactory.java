@@ -171,8 +171,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         int parentStudyId = 0;
 
         Limit limit = tableFacade.getLimit();
-        // Show only QUERY note type
-        limit.getFilterSet().addFilter(new Filter("discrepancyNoteBean.discrepancyNoteTypeId", "Query"));
+        // Defaults to show QUERY note type only
+        if (limit.getFilterSet().getFilter("discrepancyNoteBean.disType") == null) {
+            limit.getFilterSet().addFilter(new Filter("discrepancyNoteBean.discrepancyNoteTypeId", "Query"));
+        }
 
         if (!limit.isComplete()) {
             parentStudyId = currentStudy.getId();
@@ -339,9 +341,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         public TypeDroplistFilterEditor() {
             ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
             for (DiscrepancyNoteType type : DiscrepancyNoteType.list) {
-                this.addOption(Integer.toString(type.getId()), type.getName());
+                // filter only show query and reason_for_change type
+                if (type.getId() == 3 || type.getId() == 4) {
+                    this.addOption(Integer.toString(type.getId()), type.getName());
+                }
             }
-            this.addOption("1,3", reterm.getString("Query_and_Failed_Validation_Check"));
+//            this.addOption("1,3", reterm.getString("Query_and_Failed_Validation_Check"));
         }
     }
 
