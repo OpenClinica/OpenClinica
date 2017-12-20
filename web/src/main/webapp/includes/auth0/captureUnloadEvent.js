@@ -5,16 +5,11 @@ $(window).on('mouseover', (function () {
     window.onbeforeunload = null;
 }));
 $(window).on('mouseout', (function () {
-    window.onbeforeunload = ConfirmLeave;
+    window.addEventListener("mousemove", ConfirmLeave);
 }));
 function ConfirmLeave() {
-
-
-    jQuery.get(myContextPath + '/pages/invalidateAuth0Token')
-        .error(function(jqXHR, textStatus, errorThrown) {
-            "Error calling :" + myContextPath + '/pages/invalidateAuth0Token' + " " + textStatus + " " + errorThrown
-        });
-
+    console.log("From mousemove***************")
+    processLoggedOutKey(true);
     return null;
 }
 var prevKey = "";

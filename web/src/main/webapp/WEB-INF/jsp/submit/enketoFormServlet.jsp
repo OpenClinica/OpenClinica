@@ -35,10 +35,11 @@
         var userName = "<%= userBean.getName() %>";
         var currentURL = "<%= currentURL %>";
         var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
+        var ocAppTimeoutKey = "OCAppTimeout-" + userName;
+        var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
     </script>
 
     <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
-    <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
     <script type="text/javascript" language="javascript">
 
         $(document).ready(function(){
@@ -59,6 +60,17 @@
             }
         }
     </script>
+    <script type="text/javascript">
+        var realInterval = 60;
+        if (sessionTimeout < realInterval)
+            realInterval = sessionTimeout;
+
+        setInterval(function () {
+                isSessionTimedOut(encodeURIComponent(currentURL), false);
+            },
+            realInterval * 1000
+        );
+    </script>
 </head>
 <c:set var="urlPrefix" value=""/>
 <c:set var="requestFromSpringController" value="${param.isSpringController}" />
@@ -67,6 +79,7 @@
 </c:if>
 <body style="width:1024px;" class="main_BG">
 <script type="application/javascript">
+    processLoggedOutKey(true);
     isSessionTimedOut(encodeURIComponent(currentURL), true);
 </script>
 <iframe id="enketo" style="position:fixed;z-index:1011;top:0;left:0;width:100vw;height:100vh;"/>
