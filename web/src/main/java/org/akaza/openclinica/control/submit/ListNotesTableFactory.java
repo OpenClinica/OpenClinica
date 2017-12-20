@@ -171,8 +171,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         int parentStudyId = 0;
 
         Limit limit = tableFacade.getLimit();
-        // Show only QUERY note type
-        limit.getFilterSet().addFilter(new Filter("discrepancyNoteBean.discrepancyNoteTypeId", "Query"));
+        // Defaults to show QUERY note type only
+        if (limit.getFilterSet().getFilter("discrepancyNoteBean.disType") == null) {
+            limit.getFilterSet().addFilter(new Filter("discrepancyNoteBean.discrepancyNoteTypeId", "Query"));
+        }
 
         if (!limit.isComplete()) {
             parentStudyId = currentStudy.getId();
@@ -339,9 +341,12 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         public TypeDroplistFilterEditor() {
             ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
             for (DiscrepancyNoteType type : DiscrepancyNoteType.list) {
-                this.addOption(Integer.toString(type.getId()), type.getName());
+                // filter only show query and reason_for_change type
+                if (type.getId() == 3 || type.getId() == 4) {
+                    this.addOption(Integer.toString(type.getId()), type.getName());
+                }
             }
-            this.addOption("1,3", reterm.getString("Query_and_Failed_Validation_Check"));
+//            this.addOption("1,3", reterm.getString("Query_and_Failed_Validation_Check"));
         }
     }
 
@@ -452,20 +457,18 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             builder.append("&nbsp;");
             builder.aEnd();
             if (!getCurrentStudy().getStatus().isLocked()) {
-                if (dnb.getEntityType() != "eventCrf") {
-                    builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
+                if (dnb.getEventStart() == null) {
+                    builder.a().href("ViewStudySubject?id="+ studySubjectId);
                     builder.close();
                     builder.append("<span title='" + resword.getString("View_Query_Within_Record")
                             + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
                     builder.aEnd();
                 } else {
-                    if (dnb.getStageId() == 5) {
-                        builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId());
-                        builder.close();
-                        builder.append("<span title='" + resword.getString("View_Query_Within_Record")
-                                + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
-                        builder.aEnd();
-                    }
+                    builder.a().href("EnterDataForStudyEvent?eventId="+ studySubjectId);
+                    builder.close();
+                    builder.append("<span title='" + resword.getString("View_Query_Within_Record")
+                            + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
+                    builder.aEnd();
                 }
             }
 
