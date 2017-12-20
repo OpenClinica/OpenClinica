@@ -865,9 +865,10 @@ public class SystemController {
         String filePath = CoreResources.getField("filePath");
         File file = new File(filePath);
 
-        String tomcatPath = filePath.substring(0, filePath.indexOf("/openclinica.data"));
-        File tomcatFile = new File(tomcatPath);
+        filePath = filePath.substring(0, filePath.indexOf(".data"));
 
+        String tomcatPath = filePath.substring(0, filePath.lastIndexOf("/"));
+        File tomcatFile = new File(tomcatPath);
         float freeSpace = new File("/").getFreeSpace();
 
         map.put("Tomcat Directory Ownership", displayOwnerShipForTomcatDirectory(tomcatFile));
