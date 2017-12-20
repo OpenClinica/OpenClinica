@@ -191,14 +191,16 @@ public class ViewNotesServlet extends SecureController {
         // factory.setResolutionStatusIds(resolutionStatusIds);
         TableFacade tf = factory.createTable(request, response);
 
-        Map<String, Map<String, String>> stats = generateDiscrepancyNotesSummary(factory.getNotesSummary());
-        Map<String, String> totalMap = generateDiscrepancyNotesTotal(stats);
+        Map<String, Map<String, String>> stats = generateDiscrepancyNotesSummary(factory.getNotesSummaryForQuery());
+        Map<String, String> totalSummary = generateDiscrepancyNotesTotal(stats);
+        Map<String, String> totalMap = generateDiscrepancyNotesTotal(generateDiscrepancyNotesSummary(factory.getNotesSummary()));
 
         int grandTotal = 0;
         for (String typeName : totalMap.keySet()) {
             String total = totalMap.get(typeName);
             grandTotal = total.equals("--") ? grandTotal + 0 : grandTotal + Integer.parseInt(total);
         }
+
         request.setAttribute("summaryMap", stats);
 
         tf.setTotalRows(grandTotal);
@@ -213,7 +215,7 @@ public class ViewNotesServlet extends SecureController {
         request.setAttribute("mapKeys", ResolutionStatus.getMembers());
         request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames());
         request.setAttribute("typeKeys", totalMap);
-        request.setAttribute("grandTotal", grandTotal);
+        request.setAttribute("grandTotal", totalSummary.get("Query"));
 
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
             List<DiscrepancyNoteBean> allNotes = factory.findAllNotes(tf);
