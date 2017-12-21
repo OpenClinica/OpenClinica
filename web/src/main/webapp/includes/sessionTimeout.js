@@ -9,6 +9,7 @@ function createReturnLogoutCookie(currentURL) {
 }
 
 function isSessionTimedOut(currentURL, setStorageFlag) {
+    processLoggedOutKey(true);
     var storage = new CrossStorageClient(crossStorageURL);
     var newExpiration = moment().add(sessionTimeout, 's').valueOf();
     var currentTime = moment().valueOf();
