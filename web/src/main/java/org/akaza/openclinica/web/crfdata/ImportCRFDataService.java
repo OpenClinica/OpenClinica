@@ -261,8 +261,8 @@ public class ImportCRFDataService {
      * purpose: Build a map of EventCRFs and the statuses they should have post-import. Assumes EventCRFs have been
      * created for "Not Started" forms.
      */
-    public HashMap<Integer, String> fetchEventCRFStatuses(ODMContainer odmContainer) {
-        HashMap<Integer, String> eventCRFStatuses = new HashMap<Integer, String>();
+    public HashMap<String, String> fetchEventCRFStatuses(ODMContainer odmContainer) {
+        HashMap<String, String> eventCRFStatuses = new HashMap<String, String>();
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
@@ -297,11 +297,18 @@ public class ImportCRFDataService {
                     for (FormLayoutBean formLayoutBean : formLayoutBeans) {
 
                         ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
-                        for (EventCRFBean ecb : eventCrfBeans) {
-                            Integer ecbId = new Integer(ecb.getId());
 
+                        if (eventCrfBeans == null || eventCrfBeans.size() == 0) {
+                            String ecbId = studySubjectBean.getId() + "-" + studyEventBean.getId() + "-" + formLayoutBean.getId();
                             if (!eventCRFStatuses.keySet().contains(ecbId) && formDataBean.getEventCRFStatus() != null) {
-                                eventCRFStatuses.put(ecb.getId(), formDataBean.getEventCRFStatus());
+                                eventCRFStatuses.put(ecbId, formDataBean.getEventCRFStatus());
+                            }
+                        }
+
+                        for (EventCRFBean ecb : eventCrfBeans) {
+                            String ecbId = ecb.getStudySubjectId() + "-" + ecb.getStudyEventId() + "-" + ecb.getFormLayoutId();
+                            if (!eventCRFStatuses.keySet().contains(ecbId) && formDataBean.getEventCRFStatus() != null) {
+                                eventCRFStatuses.put(ecbId, formDataBean.getEventCRFStatus());
                             }
                         }
                     }
