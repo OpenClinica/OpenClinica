@@ -363,18 +363,8 @@ public class CreateDiscrepancyNoteServlet extends SecureController {
             request.setAttribute("hasNotes", "no");
             logger.debug("has notes:" + "no");
         }
-
-              //only for adding a new thread
-        if (currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2) || currentRole.getRole().equals(Role.INVESTIGATOR)) {
-            ArrayList<ResolutionStatus> resStatuses = new ArrayList<ResolutionStatus>();
-            resStatuses.add(ResolutionStatus.OPEN);
-            resStatuses.add(ResolutionStatus.RESOLVED);
-            request.setAttribute(RES_STATUSES, resStatuses);
-            List<DiscrepancyNoteType> types2 = new ArrayList<DiscrepancyNoteType>(DiscrepancyNoteType.list);
-            types2.remove(DiscrepancyNoteType.QUERY);
-            request.setAttribute(DIS_TYPES, types2);
-            request.setAttribute(WHICH_RES_STATUSES, "22");
-        } else if(currentRole.getRole().equals(Role.MONITOR)){
+        
+        if(currentRole.getRole().equals(Role.MONITOR)){
             ArrayList<ResolutionStatus> resStatuses = new ArrayList();
             resStatuses.add(ResolutionStatus.OPEN);
             resStatuses.add(ResolutionStatus.UPDATED);
