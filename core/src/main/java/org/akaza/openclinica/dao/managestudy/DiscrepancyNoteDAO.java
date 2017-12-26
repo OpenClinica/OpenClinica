@@ -39,7 +39,8 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 /**
  * @author jxu
  *
- *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style - Code Templates
+ *         TODO To change the template for this generated type comment go to Window - Preferences - Java - Code Style -
+ *         Code Templates
  */
 public class DiscrepancyNoteDAO extends AuditableEntityDAO {
     // if true, we fetch the mapping along with the bean
@@ -249,7 +250,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(1), currentStudyId);
         variables.put(Integer.valueOf(2), currentStudyId);
         String sql = digester.getQuery("getSubjectDNCountWithFilter");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
 
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
@@ -270,7 +271,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(1), currentStudyId);
         variables.put(Integer.valueOf(2), currentStudyId);
         String sql = digester.getQuery("getStudySubjectDNCountWithFilter");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
 
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
@@ -291,7 +292,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(1), currentStudyId);
         variables.put(Integer.valueOf(2), currentStudyId);
         String sql = digester.getQuery("getStudyEventDNCountWithFilter");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
 
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
@@ -312,7 +313,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(1), currentStudyId);
         variables.put(Integer.valueOf(2), currentStudyId);
         String sql = digester.getQuery("getEventCrfDNCountWithFilter");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
 
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
@@ -333,7 +334,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(1), currentStudyId);
         variables.put(Integer.valueOf(2), currentStudyId);
         String sql = digester.getQuery("getItemDataDNCountWithFilter");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
 
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();
@@ -354,7 +355,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(1), currentStudy.getId());
         variables.put(Integer.valueOf(2), currentStudy.getId());
         String sql = digester.getQuery("getWithFilterAndSort");
-        sql = sql + filter.execute("");
+        sql += filter.execute("", variables);
 
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
             sql += " AND rownum <= " + rowEnd + " and rownum >" + rowStart;
@@ -393,25 +394,25 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(10), currentStudy.getId());
         String sql = "select count(all_dn.discrepancy_note_id) as COUNT from (";
         sql += digester.getQuery("findAllSubjectDNByStudy");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllStudySubjectDNByStudy");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllStudyEventDNByStudy");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllEventCrfDNByStudy");
         if (currentStudy.isSite(currentStudy.getParentStudyId())) {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllItemDataDNByStudy");
         if (currentStudy.isSite(currentStudy.getParentStudyId())) {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
             sql += " ) all_dn";
         } else {
@@ -481,71 +482,72 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
     }
 
     /*
-    public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort, int rowStart,
-            int rowEnd) {
-        ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
-        setTypesExpected();
-        this.setTypeExpected(12, TypeNames.STRING);
-        this.setTypeExpected(13, TypeNames.INT);
-        this.setTypeExpected(14, TypeNames.INT);
-        this.setTypeExpected(15, TypeNames.INT);
-
-        HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), currentStudy.getId());
-        variables.put(Integer.valueOf(2), currentStudy.getId());
-        variables.put(Integer.valueOf(3), currentStudy.getId());
-        variables.put(Integer.valueOf(4), currentStudy.getId());
-        variables.put(Integer.valueOf(5), currentStudy.getId());
-        variables.put(Integer.valueOf(6), currentStudy.getId());
-        variables.put(Integer.valueOf(7), currentStudy.getId());
-        variables.put(Integer.valueOf(8), currentStudy.getId());
-        variables.put(Integer.valueOf(9), currentStudy.getId());
-        variables.put(Integer.valueOf(10), currentStudy.getId());
-
-        String sql = "";
-        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-            sql = sql + "SELECT * FROM ( SELECT x.*, ROWNUM as rnum FROM (";
-        }
-        sql = sql + digester.getQuery("findAllSubjectDNByStudy");
-        sql = sql + filter.execute("");
-        sql += " UNION ";
-        sql += digester.getQuery("findAllStudySubjectDNByStudy");
-        sql += filter.execute("");
-        sql += " UNION ";
-        sql += digester.getQuery("findAllStudyEventDNByStudy");
-        sql += filter.execute("");
-        sql += " UNION ";
-        sql += digester.getQuery("findAllEventCrfDNByStudy");
-        if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-            sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
-        }
-        sql += filter.execute("");
-        sql += " UNION ";
-        sql += digester.getQuery("findAllItemDataDNByStudy");
-        if (currentStudy.isSite(currentStudy.getParentStudyId())) {
-            sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
-        }
-        sql += filter.execute("");
-
-        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-            sql += ") x )  WHERE rnum BETWEEN " + (rowStart + 1) + " and " + rowEnd;
-            sql += sort.execute("");
-        } else {
-            sql += sort.execute("");
-            sql += " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
-        }
-        // System.out.println(sql);
-        ArrayList rows = select(sql, variables);
-
-        Iterator it = rows.iterator();
-        while (it.hasNext()) {
-            DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) it.next());
-            discBean = findSingleMapping(discBean);
-            discNotes.add(discBean);
-        }
-        return discNotes;
-    }
-    */
+     * public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy, ListNotesFilter
+     * filter, ListNotesSort sort, int rowStart,
+     * int rowEnd) {
+     * ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
+     * setTypesExpected();
+     * this.setTypeExpected(12, TypeNames.STRING);
+     * this.setTypeExpected(13, TypeNames.INT);
+     * this.setTypeExpected(14, TypeNames.INT);
+     * this.setTypeExpected(15, TypeNames.INT);
+     * 
+     * HashMap variables = new HashMap();
+     * variables.put(Integer.valueOf(1), currentStudy.getId());
+     * variables.put(Integer.valueOf(2), currentStudy.getId());
+     * variables.put(Integer.valueOf(3), currentStudy.getId());
+     * variables.put(Integer.valueOf(4), currentStudy.getId());
+     * variables.put(Integer.valueOf(5), currentStudy.getId());
+     * variables.put(Integer.valueOf(6), currentStudy.getId());
+     * variables.put(Integer.valueOf(7), currentStudy.getId());
+     * variables.put(Integer.valueOf(8), currentStudy.getId());
+     * variables.put(Integer.valueOf(9), currentStudy.getId());
+     * variables.put(Integer.valueOf(10), currentStudy.getId());
+     * 
+     * String sql = "";
+     * if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+     * sql = sql + "SELECT * FROM ( SELECT x.*, ROWNUM as rnum FROM (";
+     * }
+     * sql = sql + digester.getQuery("findAllSubjectDNByStudy");
+     * sql = sql + filter.execute("");
+     * sql += " UNION ";
+     * sql += digester.getQuery("findAllStudySubjectDNByStudy");
+     * sql += filter.execute("");
+     * sql += " UNION ";
+     * sql += digester.getQuery("findAllStudyEventDNByStudy");
+     * sql += filter.execute("");
+     * sql += " UNION ";
+     * sql += digester.getQuery("findAllEventCrfDNByStudy");
+     * if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+     * sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
+     * }
+     * sql += filter.execute("");
+     * sql += " UNION ";
+     * sql += digester.getQuery("findAllItemDataDNByStudy");
+     * if (currentStudy.isSite(currentStudy.getParentStudyId())) {
+     * sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
+     * }
+     * sql += filter.execute("");
+     * 
+     * if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+     * sql += ") x )  WHERE rnum BETWEEN " + (rowStart + 1) + " and " + rowEnd;
+     * sql += sort.execute("");
+     * } else {
+     * sql += sort.execute("");
+     * sql += " LIMIT " + (rowEnd - rowStart) + " OFFSET " + rowStart;
+     * }
+     * // System.out.println(sql);
+     * ArrayList rows = select(sql, variables);
+     * 
+     * Iterator it = rows.iterator();
+     * while (it.hasNext()) {
+     * DiscrepancyNoteBean discBean = (DiscrepancyNoteBean) this.getEntityFromHashMap((HashMap) it.next());
+     * discBean = findSingleMapping(discBean);
+     * discNotes.add(discBean);
+     * }
+     * return discNotes;
+     * }
+     */
 
     public ArrayList<DiscrepancyNoteBean> getViewNotesWithFilterAndSort(StudyBean currentStudy, ListNotesFilter filter, ListNotesSort sort) {
         ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
@@ -568,29 +570,29 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(10), currentStudy.getId());
 
         String sql = "";
-//        if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-//            sql = sql + "SELECT * FROM ( SELECT x.*, ROWNUM as rnum FROM (";
-//        }
+        // if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
+        // sql = sql + "SELECT * FROM ( SELECT x.*, ROWNUM as rnum FROM (";
+        // }
         sql = sql + digester.getQuery("findAllSubjectDNByStudy");
-        sql = sql + filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllStudySubjectDNByStudy");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllStudyEventDNByStudy");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllEventCrfDNByStudy");
         if (currentStudy.isSite(currentStudy.getParentStudyId())) {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllItemDataDNByStudy");
         if (currentStudy.isSite(currentStudy.getParentStudyId())) {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += sort.execute("");
 
         ArrayList rows = select(sql, variables);
@@ -603,7 +605,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         }
         return discNotes;
     }
-
 
     public ArrayList<DiscrepancyNoteBean> findAllDiscrepancyNotesDataByStudy(StudyBean currentStudy) {
         ArrayList<DiscrepancyNoteBean> discNotes = new ArrayList<DiscrepancyNoteBean>();
@@ -669,25 +670,25 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         variables.put(Integer.valueOf(9), currentStudy.getId());
         variables.put(Integer.valueOf(10), currentStudy.getId());
         String sql = digester.getQuery("findAllSubjectDNByStudy");
-        sql = sql + filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllStudySubjectDNByStudy");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllStudyEventDNByStudy");
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllEventCrfDNByStudy");
         if (currentStudy.isSite(currentStudy.getParentStudyId())) {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += " UNION ";
         sql += digester.getQuery("findAllItemDataDNByStudy");
         if (currentStudy.isSite(currentStudy.getParentStudyId())) {
             sql += " and ec.event_crf_id not in ( " + this.findSiteHiddenEventCrfIdsString(currentStudy) + " ) ";
         }
-        sql += filter.execute("");
+        sql += filter.execute("", variables);
         sql += " order by label";
 
         ArrayList rows = select(sql, variables);
@@ -1228,6 +1229,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return returnedNotelist;
 
     }
+
     public ArrayList<DiscrepancyNoteBean> findEventCRFDNotesToolTips(EventCRFBean eventCRFBean) {
 
         this.setTypesExpected();
@@ -1608,7 +1610,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return dnb;
     }
 
-    
     public EntityBean updateAssignedUserToNull(EntityBean eb) {
         // update discrepancy_note set
         // assigned_user_id = null
@@ -1627,8 +1628,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
 
         return dnb;
     }
-
-
 
     public void deleteNotes(int id) {
         HashMap<Integer, Comparable> variables = new HashMap<Integer, Comparable>();
@@ -1707,15 +1706,12 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         sql += constraints.toString();
         if (isSite) {
             if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-                sql +=
-                    " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
+                sql += " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
                         + "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = " + studyEvent.getId()
-                        + " AND edc.study_event_definition_id = se.study_event_definition_id AND edc.hide_crf = 1"
-                        + " AND edc.event_definition_crf_id not in ("
+                        + " AND edc.study_event_definition_id = se.study_event_definition_id AND edc.hide_crf = 1" + " AND edc.event_definition_crf_id not in ("
                         + "select parent_id from event_definition_crf where study_event_definition_id = se.study_event_definition_id and parent_id > 0)) )";
             } else {
-                sql +=
-                    " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
+                sql += " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
                         + "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = " + studyEvent.getId()
                         + " AND edc.study_event_definition_id = se.study_event_definition_id AND edc.hide_crf = 'true'"
                         + " AND edc.event_definition_crf_id not in ("
@@ -1750,15 +1746,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
             temp = " and (dn.entity_type='itemData' or dn.entity_type='ItemData') ";
             if (isSite) {
                 if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-                    temp +=
-                        " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
+                    temp += " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
                             + "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = " + studyEvent.getId()
                             + " AND edc.study_event_definition_id = se.study_event_definition_id AND edc.hide_crf = 1"
                             + " AND edc.event_definition_crf_id not in ("
                             + "select parent_id from event_definition_crf where study_event_definition_id = se.study_event_definition_id and parent_id > 0)) )";
                 } else {
-                    temp +=
-                        " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
+                    temp += " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
                             + "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = " + studyEvent.getId()
                             + " AND edc.study_event_definition_id = se.study_event_definition_id AND edc.hide_crf = 'true'"
                             + " AND edc.event_definition_crf_id not in ("
@@ -1771,15 +1765,13 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
             temp = " and dn.entity_type='eventCrf' ";
             if (isSite) {
                 if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-                    temp +=
-                        " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
+                    temp += " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
                             + "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = " + studyEvent.getId()
                             + " AND edc.study_event_definition_id = se.study_event_definition_id AND edc.hide_crf = 1"
                             + " AND edc.event_definition_crf_id not in ("
                             + "select parent_id from event_definition_crf where study_event_definition_id = se.study_event_definition_id and parent_id > 0)) )";
                 } else {
-                    temp +=
-                        " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
+                    temp += " AND ec.crf_version_id not in (select cv.crf_version_id from crf_version cv where cv.crf_id in ("
                             + "select edc.crf_id from event_definition_crf edc, study_event se where se.study_event_id = " + studyEvent.getId()
                             + " AND edc.study_event_definition_id = se.study_event_definition_id AND edc.hide_crf = 'true'"
                             + " AND edc.event_definition_crf_id not in ("
@@ -1947,8 +1939,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return 0;
     }
 
-
-    
     public ArrayList findExistingNotesForItemData(int itemDataId) {
         this.setTypesExpected();
         ArrayList alist = new ArrayList();
@@ -1983,16 +1973,17 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
             al.add(eb);
         }
 
-//        alist = this.select(digester.getQuery("findParentNotesForToolTip"), variables);
-//         it = alist.iterator();
-//        while (it.hasNext()) {
-//            HashMap hm = (HashMap) it.next();
-//            DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
-//            al.add(eb);
-//        }
+        // alist = this.select(digester.getQuery("findParentNotesForToolTip"), variables);
+        // it = alist.iterator();
+        // while (it.hasNext()) {
+        // HashMap hm = (HashMap) it.next();
+        // DiscrepancyNoteBean eb = (DiscrepancyNoteBean) this.getEntityFromHashMap(hm);
+        // al.add(eb);
+        // }
         return al;
 
     }
+
     public ArrayList findParentNotesForToolTip(int itemDataId) {
         this.setTypesExpected();
         ArrayList alist = new ArrayList();
@@ -2028,7 +2019,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return al;
     }
 
-    
     public ArrayList<DiscrepancyNoteBean> findAllTopNotesByEventCRF(int eventCRFId) {
         this.setTypesExpected();
         ArrayList alist = new ArrayList();
@@ -2069,17 +2059,15 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
     public String findSiteHiddenEventCrfIdsString(StudyBean site) {
         String sql = "";
         if ("oracle".equalsIgnoreCase(CoreResources.getDBName())) {
-            sql =
-                "select ec.event_crf_id from event_crf ec, study_event se, crf_version cv, " + "(select edc.study_event_definition_id, edc.crf_id, crf.name "
+            sql = "select ec.event_crf_id from event_crf ec, study_event se, crf_version cv, " + "(select edc.study_event_definition_id, edc.crf_id, crf.name "
                     + "from event_definition_crf edc, crf, study s " + "where s.study_id=" + site.getId()
                     + " and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id)" + "    and edc.event_definition_crf_id not in ( "
                     + "        select parent_id from event_definition_crf where study_id=s.study_id) "
-                    + "            and edc.status_id=1 and edc.hide_crf = 1 and edc.crf_id = crf.crf_id) sedc "
-                    + "where ec.study_event_id = se.study_event_id " + "and se.study_event_definition_id = sedc.study_event_definition_id "
+                    + "            and edc.status_id=1 and edc.hide_crf = 1 and edc.crf_id = crf.crf_id) sedc " + "where ec.study_event_id = se.study_event_id "
+                    + "and se.study_event_definition_id = sedc.study_event_definition_id "
                     + "and ec.crf_version_id = cv.crf_version_id and cv.crf_id = sedc.crf_id";
         } else {
-            sql =
-                "select ec.event_crf_id from event_crf ec, study_event se, crf_version cv, " + "(select edc.study_event_definition_id, edc.crf_id, crf.name "
+            sql = "select ec.event_crf_id from event_crf ec, study_event se, crf_version cv, " + "(select edc.study_event_definition_id, edc.crf_id, crf.name "
                     + "from event_definition_crf edc, crf, study s " + "where s.study_id=" + site.getId()
                     + " and (edc.study_id = s.study_id or edc.study_id = s.parent_study_id)" + "    and edc.event_definition_crf_id not in ( "
                     + "        select parent_id from event_definition_crf where study_id=s.study_id) "
@@ -2089,7 +2077,6 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         }
         return sql;
     }
-
 
     public EntityBean findLatestChildByParent(int parentId) {
         DiscrepancyNoteBean eb = new DiscrepancyNoteBean();
@@ -2131,7 +2118,7 @@ public class DiscrepancyNoteDAO extends AuditableEntityDAO {
         return id;
     }
 
-    //Yufang code, addded by Jamuna
+    // Yufang code, addded by Jamuna
     public Integer getViewNotesCountWithFilter(Integer assignedUserId, Integer studyId) {
         this.unsetTypeExpected();
         this.setTypeExpected(1, TypeNames.INT);
