@@ -1,37 +1,40 @@
+
+function createReturnLogoutCookie(currentURL) {
+// expired
+    var bridgeTimeoutReturnExp = "; expires=" + moment().add(14, 'days').toDate();
+    // create a return cookie
+    if (currentURL.indexOf("/pages/logout") == -1) {
+        document.cookie = "bridgeTimeoutReturn-" + userName + "=" + currentURL + bridgeTimeoutReturnExp + "; path=/";
+    }
+}
+
 function isSessionTimedOut(currentURL, setStorageFlag) {
+    processLoggedOutKey(true);
     var storage = new CrossStorageClient(crossStorageURL);
-
-
     var newExpiration = moment().add(sessionTimeout, 's').valueOf();
     var currentTime = moment().valueOf();
-    var key = "OCAppTimeout-" + userName;
     storage.onConnect()
         .then(function() {
             console.log("After connecting crossStorage");
-            return storage.get(key);
+            return storage.get(ocAppTimeoutKey);
         }).then(function(res) {
         console.log(res);
         if (res == null) {
-            storage.set(key, newExpiration);
-            console.log("no value for " + key + " found");
+            storage.set(ocAppTimeoutKey, newExpiration);
+            console.log("no value for " + ocAppTimeoutKey + " found");
         } else {
             var existingTimeout = res;
             if (currentTime > existingTimeout) {
-                storage.del(key);
+                storage.del(ocAppTimeoutKey);
 
-                // expired
-                var bridgeTimeoutReturnExp = "; expires=" + moment().add(7, 'days').toDate();
-                // create a return cookie
-                if (currentURL.indexOf("/pages/logout") == -1) {
-                    document.cookie = "bridgeTimeoutReturn-" + userName + "=" + currentURL + bridgeTimeoutReturnExp + "; path=/";
-                }
+                createReturnLogoutCookie(currentURL);
                 console.log("currentTime: " + currentTime + " > existingTimeout: " + existingTimeout + " returning to Login screen");
                 console.log("navBar:" + myContextPath + '/pages/logout');
                 window.location.replace (myContextPath + '/pages/logout');
             } else {
                 console.log("currentTime: " + currentTime + " <= existingTimeout: " + existingTimeout);
                 if (setStorageFlag)
-                    storage.set(key, newExpiration);
+                    storage.set(ocAppTimeoutKey, newExpiration);
             }
         }
     })['catch'](function(err) {
@@ -43,9 +46,46 @@ function deleteOCAppTimeout() {
     storage.onConnect()
         .then(function () {
             console.log("Deleting crossStorage key");
-            storage.del(key);
+            storage.del(ocAppTimeoutKey);
         })['catch'](function (err) {
         console.log(err);
     });
 
+}
+function processLoggedOutKey(processLogout) {
+    var storage = new CrossStorageClient(crossStorageURL);
+    console.log("processLoggedOutKey called:" + currentURL);
+    storage.onConnect()
+        .then(function () {
+            console.log("********************" + storage.get("loggedOut"));
+            return storage.get("loggedOut");
+        }).then(function(res) {
+            console.log(res);
+            if (res == null) {
+                console.log("no value for loggedOut found");
+            } else if (res == "true") {
+                if (firstLoginCheck == "true") {
+                    console.log("Setting loggedOut to false");
+                    storage.set("loggedOut", false);
+                } else {
+                    console.log("Setting the cookie");
+                    createReturnLogoutCookie(currentURL);
+                    if (processLogout) {
+                        console.log("navBar:" + myContextPath + '/pages/logout');
+                        window.location.replace (myContextPath + '/pages/logout');
+                    }
+                }
+            }
+        })['catch'](function(err) {
+            console.log(err);
+        });
+}
+
+function setLoggedOutToTrue() {
+    var storage = new CrossStorageClient(crossStorageURL);
+    storage.onConnect()
+        .then(function () {
+            console.log("Setting loggedOut to true");
+            storage.set("loggedOut", true);
+        });
 }

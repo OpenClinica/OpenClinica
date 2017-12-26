@@ -86,6 +86,7 @@ public class CallbackController {
                         req.getSession().setAttribute("userRole", null);
                     }
                     req.getSession().setAttribute(USER_BEAN_NAME, ub);
+                    req.getSession().setAttribute("firstLoginCheck", true);
                 } else {
                     unauthorized(res, "Bad credentials");
                     return;
