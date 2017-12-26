@@ -9,7 +9,7 @@ $(window).on('mouseout', (function () {
 }));
 function ConfirmLeave() {
     console.log("From mousemove***************")
-    processLoggedOutKey(true);
+    processLoggedOutKey(true, false);
     return null;
 }
 var prevKey = "";

@@ -69,7 +69,7 @@
 </script>
 
 <script language="JavaScript">
-    processLoggedOutKey(true);
+    processLoggedOutKey(true, false);
     isSessionTimedOut(encodeURIComponent(currentURL), true);
 
     //Piwik
@@ -150,7 +150,7 @@
 
     function createReturnToCookie(returnTo) {
         deleteOCAppTimeout();
-        processLoggedOutKey(false);
+        processLoggedOutKey(false, true);
     }
 </script>
 

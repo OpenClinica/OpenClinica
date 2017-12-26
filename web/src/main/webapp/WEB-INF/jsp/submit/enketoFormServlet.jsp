@@ -79,7 +79,7 @@
 </c:if>
 <body style="width:1024px;" class="main_BG">
 <script type="application/javascript">
-    processLoggedOutKey(true);
+    processLoggedOutKey(true, false);
     isSessionTimedOut(encodeURIComponent(currentURL), true);
 </script>
 <iframe id="enketo" style="position:fixed;z-index:1011;top:0;left:0;width:100vw;height:100vh;"/>

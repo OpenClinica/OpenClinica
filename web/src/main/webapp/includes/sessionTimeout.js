@@ -9,7 +9,7 @@ function createReturnLogoutCookie(currentURL) {
 }
 
 function isSessionTimedOut(currentURL, setStorageFlag) {
-    processLoggedOutKey(true);
+    processLoggedOutKey(true, false);
     var storage = new CrossStorageClient(crossStorageURL);
     var newExpiration = moment().add(sessionTimeout, 's').valueOf();
     var currentTime = moment().valueOf();
@@ -52,11 +52,14 @@ function deleteOCAppTimeout() {
     });
 
 }
-function processLoggedOutKey(processLogout) {
+function processLoggedOutKey(processLogout, setLoggedOutFlag) {
     var storage = new CrossStorageClient(crossStorageURL);
     console.log("processLoggedOutKey called:" + currentURL);
     storage.onConnect()
         .then(function () {
+            if (setLoggedOutFlag) {
+                storage.set("loggedOut", "true");
+            }
             console.log("********************" + storage.get("loggedOut"));
             return storage.get("loggedOut");
         }).then(function(res) {
@@ -66,7 +69,7 @@ function processLoggedOutKey(processLogout) {
             } else if (res == "true") {
                 if (firstLoginCheck == "true") {
                     console.log("Setting loggedOut to false");
-                    storage.set("loggedOut", false);
+                    storage.set("loggedOut", "false");
                 } else {
                     console.log("Setting the cookie");
                     createReturnLogoutCookie(currentURL);
@@ -78,14 +81,5 @@ function processLoggedOutKey(processLogout) {
             }
         })['catch'](function(err) {
             console.log(err);
-        });
-}
-
-function setLoggedOutToTrue() {
-    var storage = new CrossStorageClient(crossStorageURL);
-    storage.onConnect()
-        .then(function () {
-            console.log("Setting loggedOut to true");
-            storage.set("loggedOut", true);
         });
 }
