@@ -55,10 +55,12 @@ function deleteOCAppTimeout() {
 function processLoggedOutKey(processLogout, setLoggedOutFlag) {
     var storage = new CrossStorageClient(crossStorageURL);
     console.log("processLoggedOutKey called:" + currentURL);
+    console.log("firstLoginCheck*******" + firstLoginCheck);
     storage.onConnect()
         .then(function () {
             if (setLoggedOutFlag) {
                 storage.set("loggedOut", "true");
+                console.log("setting loggedOut to true(((((");
             }
             console.log("********************" + storage.get("loggedOut"));
             return storage.get("loggedOut");
@@ -67,7 +69,7 @@ function processLoggedOutKey(processLogout, setLoggedOutFlag) {
             if (res == null) {
                 console.log("no value for loggedOut found");
             } else if (res == "true") {
-                if (firstLoginCheck == "true") {
+                if (firstLoginCheck == true) {
                     console.log("Setting loggedOut to false");
                     storage.set("loggedOut", "false");
                 } else {
