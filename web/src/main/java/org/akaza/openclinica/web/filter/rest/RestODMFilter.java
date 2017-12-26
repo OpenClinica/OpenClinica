@@ -57,7 +57,7 @@ public class RestODMFilter implements ContainerRequestFilter, ResourceFilter {
             }
         } else {
             StudyBean studyBean = getStudyByOID(studyOID, getDataSource());
-            if (checkAuth(studyBean, userBean)) {
+x            if (checkAuth(studyBean, userBean)) {
                 request.setAttribute("requestSchema", studyBean.getSchemaName());
                 return containerRequest;
             } else {
@@ -65,7 +65,8 @@ public class RestODMFilter implements ContainerRequestFilter, ResourceFilter {
                     int parentStudyID = studyBean.getParentStudyId();
                     studyBean = getStudyByID(parentStudyID, getDataSource());
                     if (checkAuth(studyBean, userBean))
-                        return containerRequest;
+                        request.setAttribute("requestSchema", studyBean.getSchemaName());
+                    return containerRequest;
                 }
             }
 
