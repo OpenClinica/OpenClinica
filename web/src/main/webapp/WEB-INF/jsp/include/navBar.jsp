@@ -21,6 +21,8 @@
     var userName = "<%= userBean.getName() %>";
     var currentURL = "<%= currentURL %>";
     var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
+    var ocAppTimeoutKey = "OCAppTimeout-" + userName;
+    var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
 </script>
 
 <jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String'/>
@@ -38,7 +40,6 @@
         <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="../includes/css/icomoon-style.css">
         <script type="text/javascript" language="JavaScript" src="../includes/sessionTimeout.js"></script>
-        <script type="text/javascript" language="JavaScript" src="../includes/auth0/captureUnloadEvent.js"></script>
         <script type="text/javascript" language="JavaScript" src="../includes/moment.min.js"></script>
         <script type="text/javascript" src="../js/lib/es6-promise.auto.min.js"></script>
         <script type="text/javascript" src="../js/lib/client.js"></script>
@@ -48,7 +49,6 @@
         <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="includes/css/icomoon-style.css">
         <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
-        <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
         <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
         <script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
         <script type="text/javascript" src="js/lib/client.js"></script>
@@ -69,7 +69,7 @@
 </script>
 
 <script language="JavaScript">
-
+    processLoggedOutKey(true, false);
     isSessionTimedOut(encodeURIComponent(currentURL), true);
 
     //Piwik
@@ -149,14 +149,8 @@
     }
 
     function createReturnToCookie(returnTo) {
-        // Do not create a cookie for a redirect from Auth0
-        if ((returnTo.indexOf("/logoutSuccess") >= 0) ||
-            (returnTo.indexOf("/login") >= 0))
-            return;
-        var date = new Date();
-        date.setTime(date.getTime() + (60 * 1000));
-        var expires = "; expires=" + date.toGMTString();
-        document.cookie = "bridgeTimeoutReturn-" + userName + "=" + encodeURIComponent(returnTo) + expires + "; path=/";
+        deleteOCAppTimeout();
+        processLoggedOutKey(false, true);
     }
 </script>
 
@@ -188,6 +182,9 @@
         </div>
 
         <div id="StudyInfo">
+            <c:if test="${sessionScope.firstLoginCheck == true}">
+                <c:set value="false" scope="session" var="firstLoginCheck"/>
+            </c:if>
             <c:choose>
                 <c:when test='${study.parentStudyId > 0}'>
                     <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes"
