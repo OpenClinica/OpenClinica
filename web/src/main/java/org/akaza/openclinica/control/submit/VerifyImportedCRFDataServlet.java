@@ -160,7 +160,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = (List<DisplayItemBeanWrapper>) session.getAttribute("importedData");
             // System.out.println("Size of displayItemBeanWrappers : " +
             // displayItemBeanWrappers.size());
-            HashMap<Integer, String> importedCRFStatuses = (HashMap<Integer, String>) session.getAttribute("importedCRFStatuses");
+            HashMap<String, String> importedCRFStatuses = (HashMap<String, String>) session.getAttribute("importedCRFStatuses");
 
             for (DisplayItemBeanWrapper wrapper : displayItemBeanWrappers) {
                 boolean resetSDV = false;
@@ -284,17 +284,16 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         }
                         // logger.info("created:
                         // "+displayItemBean.getDbData().getName());
-                        if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
 
-                            String eventCRFStatus = importedCRFStatuses.get(new Integer(eventCrfBean.getId()));
-                            if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
-                                    && eventCrfBean.getStatus().isAvailable()) {
-                                crfBusinessLogicHelper.markCRFStarted(eventCrfBean, ub);
-                            } else {
-                                crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
-                            }
-                            eventCrfInts.add(new Integer(eventCrfBean.getId()));
+                        String eventCRFStatus = importedCRFStatuses
+                                .get(eventCrfBean.getStudySubjectId() + "-" + eventCrfBean.getStudyEventId() + "-" + eventCrfBean.getFormLayoutId());
+                        if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
+                                && eventCrfBean.getStatus().isAvailable()) {
+                            crfBusinessLogicHelper.markCRFStarted(eventCrfBean, ub);
+                        } else {
+                            crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
                         }
+
                     }
                     // Reset the SDV status if item data has been changed or added
                     if (eventCrfBean != null && resetSDV)

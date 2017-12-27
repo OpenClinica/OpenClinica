@@ -276,7 +276,7 @@ public class ImportCRFDataServlet extends SecureController {
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
             // The following map is used for setting the EventCRF status post import.
-            HashMap<Integer, String> importedCRFStatuses = getImportCRFDataService().fetchEventCRFStatuses(odmContainer);
+            HashMap<String, String> importedCRFStatuses = getImportCRFDataService().fetchEventCRFStatuses(odmContainer);
             // @pgawade 17-May-2011 Fix for issue#9590 - collection of
             // eventCRFBeans is returned as null
             // when status of one the events in xml file is either stopped,
