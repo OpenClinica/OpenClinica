@@ -12,12 +12,12 @@
       <script type="text/javascript">
         jQuery(document).ready(function() {
             jQuery('#addNewStudy').click(function() {
-                jQuery.blockUI({ message: jQuery('#addNewStudyForm'), css:{left: "300px", top:"10px" } });
+                jQuery.blockUI({ message: jQuery('#addNewStudyForm'), css:{left: "300px", top:"10px", cursor:'default' } });
             });
 
-            jQuery('#cancelRandomizationAccessRequest').click(function() {
+            jQuery('#closeDialogBox').click(function() {
                 jQuery.unblockUI();
-                $('#randomizationWarnings').empty();
+                $('#closeDialogBoxWarnings').empty();
             });
             // If there are warnings, we failed in a previous submission and should display the warnings on the popup window.
             var warnings = "${regMessages}";
@@ -29,7 +29,7 @@
         // Hide the popup window if the escape key is pressed
         jQuery(document).keyup(function(keyPressed) {
             if(keyPressed.keyCode === 27) {
-                $('#randomizationWarnings').empty();
+                $('#closeDialogBoxWarnings').empty();
                 jQuery.unblockUI();
             }
         });
@@ -74,8 +74,9 @@
 <fmt:message key="studies_are_indicated_in_bold" bundle="${restext}"/>
 </p>
 
-    <div align="left" id="addNewStudyForm" class="randomization-registration-div">
-        <form action="CreateStudy" method="post">
+    <div align="left" id="addNewStudyForm" class="add-new-study-div">  
+    <div style="float: right;"> <a href="javascript:;" id="closeDialogBox" name="closeDialogBox"><fmt:message key="exit_add_new_study_window" bundle="${resword}"/></a></div>
+            <form action="CreateStudy" method="post">
             <h1>
                 <fmt:message key="add_new_study_title" bundle="${resword}"/>
             </h1>
@@ -84,7 +85,7 @@
        
 
        <a href="CreateStudy"><input type="button" class="button_medium" value="Continue in OC3" /></a>       
-       <a href="https://openclinica.com/upgrade">   <input type="button" class="button_long" value="Tell me more about OCv4" /></a>       
+       <a href="https://openclinica.com/upgrade" target="_blank">   <input type="button" class="button_long" value="Tell me more about OC4" /></a>       
            </form>
     </div>
 
