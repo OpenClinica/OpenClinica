@@ -278,13 +278,12 @@ public class OpenRosaSubmissionController {
             if (count == eventDefinitionCrfs.size()) {
                 studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
                 studyEvent.setUserAccount(userAccount);
+                persistStudyEvent(studyEvent);
             } else if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()) {
                 studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
                 studyEvent.setUserAccount(userAccount);
+                persistStudyEvent(studyEvent);
             }
-            StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true, false);
-            StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
-            studyEventDao.saveOrUpdateTransactional(container);
         }
         String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
         return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
@@ -599,6 +598,12 @@ public class OpenRosaSubmissionController {
         itemData.setUserAccount(userAccount);
         itemData.setDeleted(false);
         itemDataDao.saveOrUpdate(itemData);
+    }
+
+    private void persistStudyEvent(StudyEvent studyEvent) {
+        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true, false);
+        StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
+        studyEventDao.saveOrUpdateTransactional(container);
     }
 
 }
