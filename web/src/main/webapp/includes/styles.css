@@ -2110,6 +2110,14 @@ margin: 2px;;
 	display:none;
 }
 
+
+.add-new-study-div {
+	padding-left:10px;
+	padding-bottom:10px;
+	padding-right:10px;
+	display:none;
+}
+
 .crf-upload-div {
 	display:inline;
 }
