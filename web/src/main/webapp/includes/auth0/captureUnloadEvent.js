@@ -8,8 +8,7 @@ $(window).on('mouseout', (function () {
     window.addEventListener("mousemove", ConfirmLeave);
 }));
 function ConfirmLeave() {
-    console.log("From mousemove***************")
-    processLoggedOutKey(true, false);
+    processLoggedOutKey(true);
     return null;
 }
 var prevKey = "";

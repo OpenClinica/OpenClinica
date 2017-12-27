@@ -69,7 +69,6 @@
 </script>
 
 <script language="JavaScript">
-    processLoggedOutKey(true, false);
     isSessionTimedOut(encodeURIComponent(currentURL), true);
 
     //Piwik
@@ -150,7 +149,8 @@
 
     function createReturnToCookie(returnTo) {
         deleteOCAppTimeout();
-        processLoggedOutKey(false, true);
+        setLoggedOutFlag("true");
+        processLoggedOutKey(false);
     }
 </script>
 
@@ -182,9 +182,8 @@
         </div>
 
         <div id="StudyInfo">
-            <c:if test="${sessionScope.firstLoginCheck == true}">
-                <c:set value="false" scope="session" var="firstLoginCheck"/>
-            </c:if>
+            <c:set value="false" scope="session" var="firstLoginCheck"/>
+
             <c:choose>
                 <c:when test='${study.parentStudyId > 0}'>
                     <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes"
@@ -236,10 +235,10 @@
                         <!-- First Tier Drop Down -->
                         <ul class="dropdown_BG">
                             <c:if test="${userBean.sysAdmin || userBean.techAdmin || userRole.coordinator}">
-                                <li><a onclick="javascript:ConfirmLeave();" href="${study.manager}"><fmt:message key="return_to_my_studies"
+                                <li><a onclick="javascript:invalidateToken();" href="${study.manager}"><fmt:message key="return_to_my_studies"
                                                                                                                  bundle="${resworkflow}"/></a></li>
                             </c:if>
-                            <li><a onclick="javascript:ConfirmLeave();" href="${(study.manager).replace('account-study','my-profile')}?returnTo=<%=returnToURL%>"><fmt:message key="return_to_my_profile" bundle="${resworkflow}"/></a></li>
+                            <li><a onclick="javascript:invalidateToken();" href="${(study.manager).replace('account-study','my-profile')}?returnTo=<%=returnToURL%>"><fmt:message key="return_to_my_profile" bundle="${resworkflow}"/></a></li>
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback"
                                                                                                                                 bundle="${resword}"/></a></li>
                             <li><a onClick="javascript:createReturnToCookie('<%=currentURL%>');" href="${urlPrefix}pages/logout"><fmt:message key="log_out"
