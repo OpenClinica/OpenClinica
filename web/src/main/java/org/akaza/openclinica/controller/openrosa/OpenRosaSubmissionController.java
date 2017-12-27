@@ -43,6 +43,8 @@ import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
+import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.fileupload.FileItem;
 import org.apache.commons.fileupload.disk.DiskFileItemFactory;
@@ -276,12 +278,13 @@ public class OpenRosaSubmissionController {
             if (count == eventDefinitionCrfs.size()) {
                 studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
                 studyEvent.setUserAccount(userAccount);
-                studyEventDao.saveOrUpdate(studyEvent);
             } else if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()) {
                 studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
                 studyEvent.setUserAccount(userAccount);
-                studyEventDao.saveOrUpdate(studyEvent);
             }
+            StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true, false);
+            StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
+            studyEventDao.saveOrUpdateTransactional(container);
         }
         String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
         return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
