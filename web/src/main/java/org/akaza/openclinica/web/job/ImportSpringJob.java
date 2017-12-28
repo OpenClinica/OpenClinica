@@ -437,7 +437,7 @@ public class ImportSpringJob extends QuartzJobBean {
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
             // The following map is used for setting the EventCRF status post import.
-            HashMap<Integer, String> importedCRFStatuses = getImportCRFDataService(dataSource).fetchEventCRFStatuses(odmContainer);
+            HashMap<String, String> importedCRFStatuses = getImportCRFDataService(dataSource).fetchEventCRFStatuses(odmContainer);
 
             // -- does the event already exist? if not, fail
             if (eventCRFBeans == null) {
@@ -622,7 +622,6 @@ public class ImportSpringJob extends QuartzJobBean {
 
                     logger.debug("right before we check to make sure it is savable: " + wrapper.isSavable());
                     if (wrapper.isSavable()) {
-                        ArrayList<Integer> eventCrfInts = new ArrayList<Integer>();
                         logger.debug("wrapper problems found : " + wrapper.getValidationErrors().toString());
                         itemDataDao.setFormatDates(false);
                         for (DisplayItemBean displayItemBean : wrapper.getDisplayItemBeans()) {
@@ -672,17 +671,16 @@ public class ImportSpringJob extends QuartzJobBean {
                                 }
                             }
                             // Update CRF status
-                            if (!eventCrfInts.contains(new Integer(eventCrfBean.getId()))) {
-                                String eventCRFStatus = importedCRFStatuses.get(new Integer(eventCrfBean.getId()));
-                                if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
-                                        && eventCrfBean.getStatus().isAvailable()) {
-                                    crfBusinessLogicHelper.markCRFStarted(eventCrfBean, ub);
-                                } else {
-                                    crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
-                                }
-                                logger.debug("*** just updated event crf bean: " + eventCrfBean.getId());
-                                eventCrfInts.add(new Integer(eventCrfBean.getId()));
+                            String eventCRFStatus = importedCRFStatuses
+                                    .get(eventCrfBean.getStudySubjectId() + "-" + eventCrfBean.getStudyEventId() + "-" + eventCrfBean.getFormLayoutId());
+                            if (eventCRFStatus != null && eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName())
+                                    && eventCrfBean.getStatus().isAvailable()) {
+                                crfBusinessLogicHelper.markCRFStarted(eventCrfBean, ub);
+                            } else {
+                                crfBusinessLogicHelper.markCRFComplete(eventCrfBean, ub);
                             }
+                            logger.debug("*** just updated event crf bean: " + eventCrfBean.getId());
+
                         }
                         itemDataDao.setFormatDates(true);
                         // Reset the SDV status if item data has been changed or added
