@@ -99,13 +99,3 @@ function processLoggedOutKey(processLogout) {
             console.log(err);
         });
 }
-
-function invalidateToken() {
-
-    jQuery.get(myContextPath + '/pages/invalidateAuth0Token')
-        .error(function(jqXHR, textStatus, errorThrown) {
-            "Error calling :" + myContextPath + '/pages/invalidateAuth0Token' + " " + textStatus + " " + errorThrown
-        });
-
-    return null;
-}

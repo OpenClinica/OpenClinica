@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control;
 
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -33,6 +34,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -40,11 +43,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * The main controller servlet for all the work behind study sites for
@@ -127,6 +129,7 @@ public class MainMenuServlet extends SecureController {
         if (StringUtils.isEmpty(studyEnvUuid)) {
             return;
         }
+        processForceRenewAuth(request);
         ServletContext context = getServletContext();
         WebApplicationContext ctx =
                 WebApplicationContextUtils
@@ -177,7 +180,23 @@ public class MainMenuServlet extends SecureController {
         }
     }
 
+    private void processForceRenewAuth(HttpServletRequest request) throws IOException {
+        String renewAuth = (String) request.getParameter("forceRenewAuth");
+        if (StringUtils.isNotEmpty(renewAuth)) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null)
+                auth.setAuthenticated(false);
+            Map<String, String[]> parameterMap = request.getParameterMap();
+            Map<String, String[]> keyMap = new HashMap<>();
+            keyMap.putAll(parameterMap);
+            keyMap.remove("forceRenewAuth");
+            String paramStr = Utils.getParamsString(keyMap);
+            response.sendRedirect(request.getRequestURI() + "?" + paramStr);
+        }
+    }
+
     @Override public void processRequest() throws Exception {
+
         String queryStrCookie = getQueryStrCookie(request, response);
         if (StringUtils.isNotEmpty(queryStrCookie)) {
             response.sendRedirect(queryStrCookie);
