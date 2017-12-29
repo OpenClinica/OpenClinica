@@ -124,12 +124,14 @@ public class MainMenuServlet extends SecureController {
         return queryStr;
     }
 
-    public void processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) throws Exception {
+    public boolean processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) throws Exception {
+        boolean isRenewAuth = false;
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
         if (StringUtils.isEmpty(studyEnvUuid)) {
-            return;
+            return isRenewAuth;
         }
-        processForceRenewAuth();
+        if (processForceRenewAuth())
+            return true;
         ServletContext context = getServletContext();
         WebApplicationContext ctx =
                 WebApplicationContextUtils
@@ -146,7 +148,7 @@ public class MainMenuServlet extends SecureController {
         StudyBean study = sd.findByStudyEnvUuid(studyEnvUuid);
         if (study == null) {
             CoreResources.setRequestSchema(request,currentSchema);
-            return;
+            return isRenewAuth;
         }
         currentPublicStudy = study;
         CoreResources.setRequestSchema(request, study.getSchemaName());
@@ -175,12 +177,14 @@ public class MainMenuServlet extends SecureController {
             currentRole = roleInParent;
             session.setAttribute("userRole", roleInParent);
             if (ub.getActiveStudyId() == parentStudyId)
-                return;
+                return isRenewAuth;
             ub.setActiveStudyId(parentStudyId);
         }
+        return isRenewAuth;
     }
 
-    private void processForceRenewAuth() throws IOException {
+    private boolean processForceRenewAuth() throws IOException {
+        boolean isRenewAuth = false;
         String renewAuth = (String) request.getParameter("forceRenewAuth");
         if (StringUtils.isNotEmpty(renewAuth)) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
@@ -192,7 +196,9 @@ public class MainMenuServlet extends SecureController {
             keyMap.remove("forceRenewAuth");
             String paramStr = Utils.getParamsString(keyMap);
             response.sendRedirect(request.getRequestURI() + "?" + paramStr);
+            return true;
         }
+        return isRenewAuth;
     }
 
     @Override public void processRequest() throws Exception {
@@ -224,7 +230,9 @@ public class MainMenuServlet extends SecureController {
         // update last visit date to current date
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
-        processSpecificStudyEnvUuid(request, ub1);
+        if (processSpecificStudyEnvUuid(request, ub1))
+            return;
+
         ub1.setLastVisitDate(new Date(System.currentTimeMillis()));
         // have to actually set the above to a timestamp? tbh
         ub1.setOwner(ub1);
