@@ -129,7 +129,7 @@ public class MainMenuServlet extends SecureController {
         if (StringUtils.isEmpty(studyEnvUuid)) {
             return;
         }
-        processForceRenewAuth(request);
+        processForceRenewAuth();
         ServletContext context = getServletContext();
         WebApplicationContext ctx =
                 WebApplicationContextUtils
@@ -180,7 +180,7 @@ public class MainMenuServlet extends SecureController {
         }
     }
 
-    private void processForceRenewAuth(HttpServletRequest request) throws IOException {
+    private void processForceRenewAuth() throws IOException {
         String renewAuth = (String) request.getParameter("forceRenewAuth");
         if (StringUtils.isNotEmpty(renewAuth)) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
