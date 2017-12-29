@@ -106,9 +106,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
 
-        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "siteId", "discrepancyNoteBean.resolutionStatus", "discrepancyNoteBean.createdDate",
-                "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus", "entityName", "entityValue",
-                "discrepancyNoteBean.entityType", "discrepancyNoteBean.detailedNotes", "numberOfNotes", "discrepancyNoteBean.user", "actions");
+        tableFacade.setColumnProperties("studySubject.label", "discrepancyNoteBean.disType", "siteId", "discrepancyNoteBean.resolutionStatus",
+                "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus",
+                "entityName", "entityValue", "discrepancyNoteBean.entityType", "discrepancyNoteBean.detailedNotes", "numberOfNotes", "discrepancyNoteBean.user",
+                "actions");
 
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null, true, true);
@@ -133,7 +134,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         configureColumn(row.getColumn("discrepancyNoteBean.entityType"), resword.getString("entity_type"), null, null, true, false);
         configureColumn(row.getColumn("discrepancyNoteBean.disType"), resword.getString("type"), new DiscrepancyNoteTypeCellEditor(),
                 discrepancyNoteTypeDropdown, true, false);
-        
+
         String actionsHeader = resword.getString("actions") + "&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;&#160;";
         configureColumn(row.getColumn("actions"), actionsHeader, new ActionsCellEditor(), new DefaultActionsEditor(locale), true, false);
     }
@@ -346,7 +347,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                     this.addOption(Integer.toString(type.getId()), type.getName());
                 }
             }
-//            this.addOption("1,3", reterm.getString("Query_and_Failed_Validation_Check"));
+            // this.addOption("1,3", reterm.getString("Query_and_Failed_Validation_Check"));
         }
     }
 
@@ -456,24 +457,23 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             builder.append("<span title='" + resword.getString("View_Query_Only") + "' border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
             builder.append("&nbsp;");
             builder.aEnd();
-            if (!getCurrentStudy().getStatus().isLocked()) {
-                if (dnb.getEventStart() == null) {
-                    builder.a().href("ViewStudySubject?id="+ studySubjectId);
-                    builder.close();
-                    builder.append("<span title='" + resword.getString("View_Query_Within_Record")
-                            + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
-                    builder.aEnd();
-                } else {
-                    builder.a().href("EnterDataForStudyEvent?eventId="+ studySubjectId);
-                    builder.close();
-                    builder.append("<span title='" + resword.getString("View_Query_Within_Record")
-                            + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
-                    builder.aEnd();
-                }
+            if (dnb.getEntityType().equals(DiscrepancyNoteBean.ITEM_DATA)) {
+                builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
+            } else if (dnb.getEntityType().equals(DiscrepancyNoteBean.STUDY_EVENT)) {
+                builder.a().href("EnterDataForStudyEvent?eventId=" + studySubjectId);
+            } else if (dnb.getEntityType().equals(DiscrepancyNoteBean.SUBJECT)) {
+                builder.a().href("ViewStudySubject?id=" + studySubjectId);
+            } else if (dnb.getEntityType().equals(DiscrepancyNoteBean.EVENT_CRF)) {
+                builder.a().href("ViewStudySubject?id=" + studySubjectId);
             }
+            builder.close();
+            builder.append("<span title='" + resword.getString("View_Query_Within_Record")
+                    + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
+            builder.aEnd();
 
             return builder.toString();
         }
+
     }
 
     private String downloadNotesLinkBuilder(StudySubjectBean studySubject) {

@@ -27,6 +27,9 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     // detailed_notes varchar(1000),
     // parent_dn_id numeric,
     public static final String ITEM_DATA = "itemData";
+    public static final String STUDY_EVENT = "studyEvent";
+    public static final String SUBJECT = "subject";
+    public static final String EVENT_CRF = "eventCrf";
     private String description = "";
     private int discrepancyNoteTypeId;
     private int resolutionStatusId;
@@ -56,7 +59,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private String entityName = "";
     private String entityValue = "";
     private boolean isSaved = true;
-    private boolean activated= true;
+    private boolean activated = true;
 
     private StudySubjectBean studySub = new StudySubjectBean();
 
@@ -80,12 +83,11 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     private Integer days;
     private Integer age;
 
-    //Non Persistent Beans - The downstream implementations eg.DiscrepancyNoteOutputServlet make you do this...
+    // Non Persistent Beans - The downstream implementations eg.DiscrepancyNoteOutputServlet make you do this...
     private StudyEventBean event = new StudyEventBean();
     private StudyEventDefinitionBean studyEventDefinitionBean = new StudyEventDefinitionBean();
     private Integer itemDataOrdinal;
     private String itemGroupName;
-
 
     private StudyBean study = new StudyBean();
 
@@ -140,7 +142,7 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
     // YW >>
 
     public DiscrepancyNoteBean() {
-    	activated = true;
+        activated = true;
         disType = DiscrepancyNoteType.QUERY;
         resStatus = ResolutionStatus.OPEN;
         children = new ArrayList();
@@ -621,13 +623,12 @@ public class DiscrepancyNoteBean extends AuditableEntityBean implements Comparab
         this.itemGroupName = itemGroupName;
     }
 
-	public boolean isActivated() {
-		return activated;
-	}
+    public boolean isActivated() {
+        return activated;
+    }
 
-	public void setActivated(boolean activated) {
-		this.activated = activated;
-	}
-
+    public void setActivated(boolean activated) {
+        this.activated = activated;
+    }
 
 }
