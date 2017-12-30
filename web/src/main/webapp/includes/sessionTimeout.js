@@ -9,7 +9,7 @@ function createReturnLogoutCookie(currentURL) {
 }
 
 function isSessionTimedOut(currentURL, setStorageFlag) {
-    processLoggedOutKey(true, false);
+    processLoggedOutKey(true);
     var storage = new CrossStorageClient(crossStorageURL);
     var newExpiration = moment().add(sessionTimeout, 's').valueOf();
     var currentTime = moment().valueOf();
@@ -52,26 +52,40 @@ function deleteOCAppTimeout() {
     });
 
 }
-function processLoggedOutKey(processLogout, setLoggedOutFlag) {
+
+function setLoggedOutFlag(flagValue) {
+    var storage = new CrossStorageClient(crossStorageURL);
+    storage.onConnect()
+        .then(function () {
+            console.log("setting loggedOut to " + flagValue + "(((((");
+            storage.set("loggedOut", flagValue);
+        }).then(function(res) {
+    })['catch'](function(err) {
+        console.log(err);
+    });
+
+
+}
+
+function processLoggedOutKey(processLogout) {
     var storage = new CrossStorageClient(crossStorageURL);
     console.log("processLoggedOutKey called:" + currentURL);
     console.log("firstLoginCheck*******" + firstLoginCheck);
+    console.log("processLogout:" + processLogout);
     storage.onConnect()
         .then(function () {
-            if (setLoggedOutFlag) {
-                storage.set("loggedOut", "true");
-                console.log("setting loggedOut to true(((((");
-            }
-            console.log("********************" + storage.get("loggedOut"));
-            return storage.get("loggedOut");
+            var isLoggedOut = storage.get("loggedOut");
+            console.log("isLoggedOut:" + isLoggedOut);
+            return isLoggedOut;
         }).then(function(res) {
-            console.log(res);
-            if (res == null) {
+            console.log("loggedOut:" + res);
+            if (res === null) {
                 console.log("no value for loggedOut found");
-            } else if (res == "true") {
-                if (firstLoginCheck == true) {
+            } else if (res === "true") {
+                if (firstLoginCheck == "true") {
                     console.log("Setting loggedOut to false");
-                    storage.set("loggedOut", "false");
+                    setLoggedOutFlag("false");
+                    firstLoginCheck = "false";
                 } else {
                     console.log("Setting the cookie");
                     createReturnLogoutCookie(currentURL);

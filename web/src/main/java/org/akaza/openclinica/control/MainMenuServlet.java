@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control;
 
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -33,6 +34,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -40,11 +43,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.Cookie;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.Locale;
+import java.util.*;
 
 /**
  * The main controller servlet for all the work behind study sites for
@@ -122,11 +124,14 @@ public class MainMenuServlet extends SecureController {
         return queryStr;
     }
 
-    public void processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) throws Exception {
+    public boolean processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) throws Exception {
+        boolean isRenewAuth = false;
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
         if (StringUtils.isEmpty(studyEnvUuid)) {
-            return;
+            return isRenewAuth;
         }
+        if (processForceRenewAuth())
+            return true;
         ServletContext context = getServletContext();
         WebApplicationContext ctx =
                 WebApplicationContextUtils
@@ -143,7 +148,7 @@ public class MainMenuServlet extends SecureController {
         StudyBean study = sd.findByStudyEnvUuid(studyEnvUuid);
         if (study == null) {
             CoreResources.setRequestSchema(request,currentSchema);
-            return;
+            return isRenewAuth;
         }
         currentPublicStudy = study;
         CoreResources.setRequestSchema(request, study.getSchemaName());
@@ -172,12 +177,32 @@ public class MainMenuServlet extends SecureController {
             currentRole = roleInParent;
             session.setAttribute("userRole", roleInParent);
             if (ub.getActiveStudyId() == parentStudyId)
-                return;
+                return isRenewAuth;
             ub.setActiveStudyId(parentStudyId);
         }
+        return isRenewAuth;
+    }
+
+    private boolean processForceRenewAuth() throws IOException {
+        boolean isRenewAuth = false;
+        String renewAuth = (String) request.getParameter("forceRenewAuth");
+        if (StringUtils.isNotEmpty(renewAuth)) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null)
+                auth.setAuthenticated(false);
+            Map<String, String[]> parameterMap = request.getParameterMap();
+            Map<String, String[]> keyMap = new HashMap<>();
+            keyMap.putAll(parameterMap);
+            keyMap.remove("forceRenewAuth");
+            String paramStr = Utils.getParamsString(keyMap);
+            response.sendRedirect(request.getRequestURI() + "?" + paramStr);
+            return true;
+        }
+        return isRenewAuth;
     }
 
     @Override public void processRequest() throws Exception {
+
         String queryStrCookie = getQueryStrCookie(request, response);
         if (StringUtils.isNotEmpty(queryStrCookie)) {
             response.sendRedirect(queryStrCookie);
@@ -205,7 +230,9 @@ public class MainMenuServlet extends SecureController {
         // update last visit date to current date
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
-        processSpecificStudyEnvUuid(request, ub1);
+        if (processSpecificStudyEnvUuid(request, ub1))
+            return;
+
         ub1.setLastVisitDate(new Date(System.currentTimeMillis()));
         // have to actually set the above to a timestamp? tbh
         ub1.setOwner(ub1);
