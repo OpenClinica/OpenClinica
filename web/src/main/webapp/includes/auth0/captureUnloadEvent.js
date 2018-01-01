@@ -1,15 +1,17 @@
 /**
  * Created by yogi on 10/13/17.
  */
-$(window).on('mouseover', (function () {
-    window.onbeforeunload = null;
-}));
 $(window).on('mouseout', (function () {
-    window.addEventListener("mousemove", ConfirmLeave);
+    window.onbeforeunload = ConfirmLeave;
 }));
 function ConfirmLeave() {
-    console.log("From mousemove***************")
-    processLoggedOutKey(true, false);
+
+
+    jQuery.get(myContextPath + '/pages/invalidateAuth0Token')
+        .error(function(jqXHR, textStatus, errorThrown) {
+            "Error calling :" + myContextPath + '/pages/invalidateAuth0Token' + " " + textStatus + " " + errorThrown
+        });
+
     return null;
 }
 var prevKey = "";
