@@ -89,6 +89,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private ViewNotesService viewNotesService;
     private final boolean showMoreLink;
     private DiscrepancyNotesSummary notesSummary;
+    private DiscrepancyNotesSummary notesSummaryOnlyForQuery;
     private final TypeDroplistFilterEditor discrepancyNoteTypeDropdown = new TypeDroplistFilterEditor();
     private final ResolutionStatusDroplistFilterEditor resolutionStatusDropdown = new ResolutionStatusDroplistFilterEditor();
     private static final String QUERY_FLAVOR = "-query";
@@ -172,10 +173,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         int parentStudyId = 0;
 
         Limit limit = tableFacade.getLimit();
-        // Defaults to show QUERY note type only
-        if (limit.getFilterSet().getFilter("discrepancyNoteBean.disType") == null) {
-            limit.getFilterSet().addFilter(new Filter("discrepancyNoteBean.discrepancyNoteTypeId", "Query"));
-        }
 
         if (!limit.isComplete()) {
             parentStudyId = currentStudy.getId();
@@ -192,7 +189,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(), discrepancyNoteTypeDropdown.getDecoder(),
                 resolutionStatusDropdown.getDecoder());
 
-        notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter);
+        notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter, false);
+        notesSummaryOnlyForQuery = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter, true);
 
         int pageSize = limit.getRowSelect().getMaxRows();
         int firstRecordShown = (limit.getRowSelect().getPage() - 1) * pageSize;
@@ -676,6 +674,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     public DiscrepancyNotesSummary getNotesSummary() {
         return notesSummary;
+    }
+
+    public DiscrepancyNotesSummary getNotesSummaryForQuery() {
+        return notesSummaryOnlyForQuery;
     }
 
 }

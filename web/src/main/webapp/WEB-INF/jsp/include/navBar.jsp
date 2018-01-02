@@ -298,7 +298,7 @@
                                                                                         </li>
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
-                                                                                        <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message
+                                                                                        <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
                                                                                                 key="queries" bundle="${resword}"/></a></li>
                                                                                         <li><a href="${urlPrefix}StudyAuditLog"><fmt:message
                                                                                                 key="nav_study_audit_log" bundle="${resword}"/></a></li>
@@ -313,7 +313,7 @@
                                                                                             <li><a href="javascript:;" id="navAddSubject"><fmt:message
                                                                                                     key="nav_add_subject" bundle="${resword}"/></a></li>
                                                                                         </c:if>
-                                                                                        <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message
+                                                                                        <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
                                                                                                 key="queries" bundle="${resword}"/></a></li>
                                                                                     </c:if>
                                                                                     <c:if test="${userRole.investigator}">
@@ -326,7 +326,7 @@
                                                                                             <li><a href="javascript:;" id="navAddSubject"><fmt:message
                                                                                                     key="nav_add_subject" bundle="${resword}"/></a></li>
                                                                                         </c:if>
-                                                                                        <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message
+                                                                                        <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
                                                                                                 key="queries" bundle="${resword}"/></a></li>
                                                                                     </c:if>
                                                                                     <c:if test="${userRole.monitor }">
@@ -338,7 +338,7 @@
                                                                                         <li>
                                                                                             <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
                                                                                                     key="nav_sdv" bundle="${resword}"/></a></li>
-                                                                                        <li><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message
+                                                                                        <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
                                                                                                 key="queries" bundle="${resword}"/></a></li>
                                                                                     </c:if>
                                                                                     <li class="nav_TaskB" id="nav_Tasks" style="position: relative; z-index: 1;">
@@ -412,7 +412,7 @@
                         key="nav_source_data_verification" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
-                <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}StudyAuditLog"><fmt:message key="nav_study_audit_log" bundle="${resword}"/></a></div>
             </div>
             <br clear="all">
@@ -432,7 +432,7 @@
                 <c:if test="${study.status.available}">
                     <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
-                <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
                 <c:if test="${!study.status.frozen && !study.status.locked}">
@@ -452,7 +452,7 @@
                 <c:if test="${study.status.available}">
                     <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
-                <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
                 <c:if test="${!study.status.frozen && !study.status.locked}">
@@ -480,7 +480,7 @@
                 <c:if test="${study.status.available}">
                     <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
-                <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit"><fmt:message key="queries" bundle="${resword}"/></a></div>
+                <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
                 <c:if test="${!study.status.frozen && !study.status.locked}">
