@@ -146,6 +146,8 @@ public class MainMenuServlet extends SecureController {
         ub.setRoles(userRoleBeans);
         StudyDAO sd = getStudyDAO();
         StudyBean study = sd.findByStudyEnvUuid(studyEnvUuid);
+        session.setAttribute("firstLoginCheck", "false");
+
         if (study == null) {
             CoreResources.setRequestSchema(request,currentSchema);
             return isRenewAuth;
@@ -180,6 +182,7 @@ public class MainMenuServlet extends SecureController {
                 return isRenewAuth;
             ub.setActiveStudyId(parentStudyId);
         }
+
         return isRenewAuth;
     }
 
