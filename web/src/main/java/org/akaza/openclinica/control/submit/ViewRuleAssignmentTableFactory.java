@@ -879,7 +879,7 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
             actionLink.append("onMouseDown=\"javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');\"");
             actionLink.append("onMouseUp=\"javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');\"").close();
         }
-        actionLink.append("<span hspace=\"2\" border=\"0\" title=\"Run\" alt=\"Run\" class=\"icon icon-plus\" name=\"bt_Run\"").end().aEnd();
+        actionLink.append("<span hspace=\"2\" border=\"0\" title=\"Run\" alt=\"Run\" class=\"icon icon-caret-right-blue\" name=\"bt_Run\"").end().aEnd();
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         
         return actionLink.toString();

@@ -108,6 +108,9 @@
 .icon-caret-right:before {
   content: "\e928";
 }
+.icon-caret-right-blue:before {
+  content: "\e928";
+}
 .icon-caret-left:before {
   content: "\e929";
 }

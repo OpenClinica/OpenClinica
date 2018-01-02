@@ -60,7 +60,7 @@
          </c:otherwise>
         </c:choose>
 
-        <c:if test="${currRow.bean.studyEvent.subjectEventStatus.scheduled && userRole.manageStudy && study.status.available}">
+        <c:if test="${userRole.manageStudy && study.status.available}">
             
             <td>
                 <a href="DeleteStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
