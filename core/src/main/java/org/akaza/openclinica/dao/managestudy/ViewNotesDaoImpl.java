@@ -125,7 +125,7 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
     }
 
     @Override
-    public DiscrepancyNotesSummary calculateNotesSummary(StudyBean currentStudy, ViewNotesFilterCriteria filter) {
+    public DiscrepancyNotesSummary calculateNotesSummary(StudyBean currentStudy, ViewNotesFilterCriteria filter, boolean isQueryOnly) {
         Map<String, Object> arguments = new HashMap<String, Object>(2);
         arguments.put("studyId", currentStudy.getId());
 
@@ -145,8 +145,12 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
                 String filterQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.filter." + filterKey);
                 terms.add(filterQuery);
                 if (filterKey.equalsIgnoreCase("discrepancy_note_type_id")) {
-                    // summary count only Query type
-                    arguments.put(filterKey, 3);
+                    // summary notes only count query type
+                    if (isQueryOnly) {
+                        arguments.put(filterKey, 3);
+                    } else {
+                        arguments.put(filterKey, filter.getFilters().get(filterKey));
+                    }
                 } else {
                     arguments.put(filterKey, filter.getFilters().get(filterKey));
                 }

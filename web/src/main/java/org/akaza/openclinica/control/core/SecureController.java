@@ -739,7 +739,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         response.setHeader("Cache-Control", "no-store");
         // YW >>
 
-        // to load all available event from task > add subject
+        // to load all available event based on currentStudy for Task > Add Subject 
+        request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
         request.setAttribute("allDefsArray", this.getEventDefinitionsByCurrentStudy());
 
         if (request.getAttribute(POP_UP_URL) == null) {
@@ -961,7 +962,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             StudyBean parentStudy = (StudyBean) studyDAO.findByPK(parentStudyId);
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(parentStudy);
         } else {
-            parentStudyId = currentStudy.getId();
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(currentStudy);
         }
         return allDefs;

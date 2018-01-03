@@ -37,8 +37,8 @@ public class ViewNotesServiceImpl implements ViewNotesService {
 
     @Override
     public DiscrepancyNotesSummary calculateNotesSummary(StudyBean currentStudy,
-            ViewNotesFilterCriteria filter) {
-        DiscrepancyNotesSummary result = viewNotesDao.calculateNotesSummary(currentStudy, filter);
+            ViewNotesFilterCriteria filter, boolean isQueryOnly) {
+        DiscrepancyNotesSummary result = viewNotesDao.calculateNotesSummary(currentStudy, filter, isQueryOnly);
         return result;
     }
 
