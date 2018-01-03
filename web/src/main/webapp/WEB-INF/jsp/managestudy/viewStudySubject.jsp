@@ -139,7 +139,7 @@
             <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/>
         </a>
     </div>
-<div id="studySubjectRecord" style="display: none">
+<div id="studySubjectRecord">
 
 <table border="0" cellpadding="0" cellspacing="0">
         <tbody><tr>
