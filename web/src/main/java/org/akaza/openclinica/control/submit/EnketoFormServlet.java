@@ -62,12 +62,7 @@ public class EnketoFormServlet extends SecureController {
             subjectContext.setStudyEventDefinitionId(String.valueOf(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId()));
             subjectContext.setOrdinal(String.valueOf(studyEvent.getSampleOrdinal()));
             subjectContext.setStudyEventId(String.valueOf(studyEvent.getStudyEventId()));
-            context.setAttribute("SS_OID", studySubject.getOcOid());
-        } else {
-            context.setAttribute("SS_OID", "");
         }
-        String userId = String.valueOf(ub.getId());
-        context.setAttribute("USER_ID", userId);
         subjectContext.setFormLayoutOid(formLayout.getOcOid());
         subjectContext.setUserAccountId(String.valueOf(ub.getId()));
         subjectContext.setStudyOid((currentStudy.getOid()));
