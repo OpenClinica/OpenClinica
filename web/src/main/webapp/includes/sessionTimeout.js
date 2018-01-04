@@ -17,7 +17,6 @@ function isSessionTimedOut(currentURL, setStorageFlag) {
         .then(function() {
             return storage.get(ocAppTimeoutKey);
         }).then(function(res) {
-        console.log(res);
         if (res == null) {
             storage.set(ocAppTimeoutKey, newExpiration);
         } else {
