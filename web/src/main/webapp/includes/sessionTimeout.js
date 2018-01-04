@@ -27,7 +27,6 @@ function isSessionTimedOut(currentURL, setStorageFlag) {
 
                 createReturnLogoutCookie(currentURL);
                 console.log("currentTime: " + currentTime + " > existingTimeout: " + existingTimeout + " returning to Login screen");
-                console.log("navBar:" + myContextPath + '/pages/logout');
                 window.location.replace (myContextPath + '/pages/logout');
             } else {
                 if (setStorageFlag)
