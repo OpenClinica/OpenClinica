@@ -15,13 +15,11 @@ function isSessionTimedOut(currentURL, setStorageFlag) {
     var currentTime = moment().valueOf();
     storage.onConnect()
         .then(function() {
-            console.log("After connecting crossStorage");
             return storage.get(ocAppTimeoutKey);
         }).then(function(res) {
         console.log(res);
         if (res == null) {
             storage.set(ocAppTimeoutKey, newExpiration);
-            console.log("no value for " + ocAppTimeoutKey + " found");
         } else {
             var existingTimeout = res;
             if (currentTime > existingTimeout) {
@@ -32,7 +30,6 @@ function isSessionTimedOut(currentURL, setStorageFlag) {
                 console.log("navBar:" + myContextPath + '/pages/logout');
                 window.location.replace (myContextPath + '/pages/logout');
             } else {
-                console.log("currentTime: " + currentTime + " <= existingTimeout: " + existingTimeout);
                 if (setStorageFlag)
                     storage.set(ocAppTimeoutKey, newExpiration);
             }
@@ -69,9 +66,6 @@ function setLoggedOutFlag(flagValue) {
 
 function processLoggedOutKey(processLogout) {
     var storage = new CrossStorageClient(crossStorageURL);
-    console.log("processLoggedOutKey called:" + currentURL);
-    console.log("firstLoginCheck*******" + firstLoginCheck);
-    console.log("processLogout:" + processLogout);
     storage.onConnect()
         .then(function () {
             var isLoggedOut = storage.get("loggedOut");
@@ -83,14 +77,11 @@ function processLoggedOutKey(processLogout) {
                 console.log("no value for loggedOut found");
             } else if (res === "true") {
                 if (firstLoginCheck == "true") {
-                    console.log("Setting loggedOut to false");
                     setLoggedOutFlag("false");
                     firstLoginCheck = "false";
                 } else {
-                    console.log("Setting the cookie");
                     createReturnLogoutCookie(currentURL);
                     if (processLogout) {
-                        console.log("navBar:" + myContextPath + '/pages/logout');
                         window.location.replace (myContextPath + '/pages/logout');
                     }
                 }
