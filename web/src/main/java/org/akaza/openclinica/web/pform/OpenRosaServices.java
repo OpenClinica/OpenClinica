@@ -83,6 +83,7 @@ import org.akaza.openclinica.web.pform.formlist.XForm;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
 import org.akaza.openclinica.web.pform.manifest.Manifest;
 import org.akaza.openclinica.web.pform.manifest.MediaFile;
+import org.akaza.openclinica.web.restful.ODMClinicaDataResource;
 import org.apache.commons.codec.digest.DigestUtils;
 import org.apache.commons.io.IOUtils;
 import org.apache.commons.lang.StringUtils;
@@ -134,6 +135,9 @@ public class OpenRosaServices {
 
     @Autowired
     XformParserHelper xformParserHelper;
+
+    @Autowired
+    ODMClinicaDataResource odmClinicalDataRestResource;
 
     public static final String INPUT_USER_SOURCE = "userSource";
     public static final String INPUT_FIRST_NAME = "Participant";
@@ -189,7 +193,7 @@ public class OpenRosaServices {
      *                    <version>1</version>
      *                    <hash>8678370cd92814d4e3216d58d821403f</hash>
      *                    <downloadUrl>http://oc1.openclinica.com/OpenClinica-web/rest2/openrosa/S_SAMPLTE/formXml?
-     *                    formId=F_FIRSTFORM_1</downloadUrl>
+     *                    formID=F_FIRSTFORM_1</downloadUrl>
      *                    </xform>
      *                    <xform>
      *                    <formID>F_SECONDFORM_1</formID>
@@ -198,7 +202,7 @@ public class OpenRosaServices {
      *                    <version>1</version>
      *                    <hash>7ee60d1c6516b730bbe9bdbd7cad942f</hash>
      *                    <downloadUrl>http://oc1.openclinica.com/OpenClinica-web/rest2/openrosa/S_SAMPLTE/formXml?
-     *                    formId=F_SECONDFORM_1</downloadUrl>
+     *                    formID=F_SECONDFORM_1</downloadUrl>
      *                    </xform>
      *                    </xforms>
      */
@@ -206,14 +210,14 @@ public class OpenRosaServices {
     @Path("/{studyOID}/formList")
     @Produces(MediaType.TEXT_XML)
     public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formID") String formId, @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
+            @QueryParam("formID") String formID, @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
             @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
         XFormList formList = null;
 
         try {
-            if (StringUtils.isEmpty(formId)) {
+            if (StringUtils.isEmpty(formID)) {
                 List<CrfBean> crfs = crfDao.findAll();
                 List<FormLayout> formLayouts = formLayoutDao.findAll();
                 formList = new XFormList();
@@ -228,21 +232,24 @@ public class OpenRosaServices {
                             // TODO: them.
 
                             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
-                            form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formId=" + formLayout.getOcOid() + DASH
-                                    + formLayout.getXform());
+                            String downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
+                                    + formLayout.getXform();
+                            form.setDownloadURL(downloadURL);
 
                             List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
                             if (mediaList != null && mediaList.size() > 0) {
-                                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formId=" + formLayout.getOcOid()
-                                        + DASH + formLayout.getXform());
+                                String manifestURL = urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formID=" + formLayout.getOcOid()
+                                        + DASH + formLayout.getXform();
+                                form.setManifestURL(manifestURL);
                             }
+
                             formList.add(form);
                         }
                     }
                 }
             } else {
                 request.setAttribute("requestSchema", "public");
-                formList = getForm(request, response, studyOID, formId, authorization, context, ecid);
+                formList = getForm(request, response, studyOID, formID, authorization, context, ecid);
             }
 
             // Create the XML formList using a Castor mapping file.
@@ -265,7 +272,10 @@ public class OpenRosaServices {
             response.setHeader("Content-Type", "text/xml; charset=UTF-8");
             response.setHeader("Date", format.format(currentDate));
             response.setHeader("X-OpenRosa-Version", "1.0");
-            return writer.toString();
+            String result = writer.toString();
+            result = result.replaceAll("&amp;form", "&form");
+            System.out.println(result);
+            return result;
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -278,7 +288,7 @@ public class OpenRosaServices {
     @Path("/{studyOID}/form")
     @Produces(MediaType.TEXT_XML)
     public XFormList getForm(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formID") String formId, @RequestHeader("Authorization") String authorization, @Context ServletContext context,
+            @QueryParam("formID") String formID, @RequestHeader("Authorization") String authorization, @Context ServletContext context,
             @QueryParam(FORM_CONTEXT) String ecid) throws Exception {
 
         LoggerContext lc = (LoggerContext) LoggerFactory.getILoggerFactory();
@@ -286,9 +296,9 @@ public class OpenRosaServices {
         StatusPrinter.print(lc);
         if (!mayProceedPreview(request, studyOID))
             return null;
-        String flavor = getQuerySet(formId);
+        String flavor = getQuerySet(formID);
 
-        String formLayoutOid = getFormLayoutOid(formId);
+        String formLayoutOid = getFormLayoutOid(formID);
 
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
         CrfBean crf = crfDao.findById(formLayout.getCrf().getCrfId());
@@ -297,7 +307,7 @@ public class OpenRosaServices {
         String xformOutput = "";
         String attribute = "";
         if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
-            attribute = formId.substring(formId.indexOf(SINGLE_ITEM_FLAVOR));
+            attribute = formID.substring(formID.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
             String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, study.getFilePath(), crf.getOcOid(), formLayout.getOcOid());
@@ -331,23 +341,34 @@ public class OpenRosaServices {
 
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
             List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
+            String manifestURL = null;
+            String downloadURL = null;
             if (flavor.equals(QUERY_FLAVOR)) {
-                form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formId=" + formLayout.getOcOid() + DASH
-                        + formLayout.getXform() + QUERY_FLAVOR);
-                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formId=" + formLayout.getOcOid() + DASH
-                        + formLayout.getXform() + QUERY_FLAVOR);
+                downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
+                        + formLayout.getXform() + QUERY_FLAVOR;
+                form.setDownloadURL(downloadURL);
+
+                manifestURL = urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
+                        + formLayout.getXform() + QUERY_FLAVOR;
+                form.setManifestURL(manifestURL);
+
                 form.setFormID(formLayout.getOcOid() + DASH + formLayout.getXform() + QUERY_FLAVOR);
             } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
-                form.setDownloadURL(urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formId=" + formLayout.getOcOid() + DASH
-                        + formLayout.getXform() + attribute);
-                form.setManifestURL(urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formId=" + formLayout.getOcOid() + DASH
-                        + formLayout.getXform() + attribute);
+                downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
+                        + formLayout.getXform() + attribute;
+                form.setDownloadURL(downloadURL);
+                manifestURL = urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
+                        + formLayout.getXform() + attribute;
+                form.setManifestURL(manifestURL);
                 form.setFormID(formLayout.getOcOid() + DASH + formLayout.getXform() + attribute);
             } else {
-                form.setDownloadURL(
-                        urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formId=" + formLayout.getOcOid() + DASH + formLayout.getXform());
-                form.setManifestURL(
-                        urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formId=" + formLayout.getOcOid() + DASH + formLayout.getXform());
+                downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
+                        + formLayout.getXform();
+                form.setDownloadURL(downloadURL);
+                manifestURL = urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
+                        + formLayout.getXform();
+                form.setManifestURL(manifestURL);
+
             }
             formList.add(form);
 
@@ -373,11 +394,11 @@ public class OpenRosaServices {
     @Path("/{studyOID}/manifest")
     @Produces(MediaType.TEXT_XML)
     public String getManifest(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formId") String formId, @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
+            @QueryParam("formID") String formID, @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
             @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
-        String formLayoutOid = getFormLayoutOid(formId);
+        String formLayoutOid = getFormLayoutOid(formID);
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
 
         Manifest manifest = new Manifest();
@@ -400,13 +421,21 @@ public class OpenRosaServices {
 
         // Add user list
         MediaFile userList = new MediaFile();
-
         String userXml = getUserXml(context, studyOID, ecid);
         userList.setHash((DigestUtils.md5Hex(userXml)));
-
         userList.setFilename("users.xml");
         userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers?ecid=" + ecid);
         manifest.add(userList);
+
+        MediaFile odmPayload = new MediaFile();
+        HashMap<String, String> subjectContext = null;
+        PFormCache cache = PFormCache.getInstance(context);
+        subjectContext = cache.getSubjectContext(ecid);
+        String studySubjectOID = subjectContext.get("studySubjectOID");
+        int userAccountID = Integer.valueOf(subjectContext.get("userAccountID"));
+        odmPayload.setFilename("clinicaldata.xml");
+        odmPayload.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/" + studySubjectOID + "/" + userAccountID);
+        manifest.add(odmPayload);
 
         try {
             // Create the XML manifest using a Castor mapping file.
@@ -429,7 +458,10 @@ public class OpenRosaServices {
             response.setHeader("Content-Type", "text/xml; charset=UTF-8");
             response.setHeader("Date", format.format(currentDate));
             response.setHeader("X-OpenRosa-Version", "1.0");
-            return writer.toString();
+            String result = writer.toString();
+            result = result.replaceAll("&amp;form", "&form");
+            System.out.println(result);
+            return result;
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
@@ -451,26 +483,26 @@ public class OpenRosaServices {
     @Path("/{studyOID}/formXml")
     @Produces(MediaType.APPLICATION_XML)
     public String getFormXml(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formId") String formId, @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
+            @QueryParam("formID") String formID, @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
             @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
 
         String xform = null;
         // get parameters
-        if (formId == null) {
+        if (formID == null) {
             return "<error>formID is null :(</error>";
         }
 
-        String flavor = getQuerySet(formId);
-        String formLayoutOid = getFormLayoutOid(formId);
+        String flavor = getQuerySet(formID);
+        String formLayoutOid = getFormLayoutOid(formID);
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
         Study study = studyDao.findByOcOID(studyOID);
         CrfBean crf = formLayout.getCrf();
 
         String xformOutput = "";
         if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
-            String attribute = formId.substring(formId.indexOf(SINGLE_ITEM_FLAVOR));
+            String attribute = formID.substring(formID.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
             String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, study.getFilePath(), crf.getOcOid(), formLayout.getOcOid());
@@ -496,7 +528,7 @@ public class OpenRosaServices {
             return "<error>" + e.getMessage() + "</error>";
         }
         response.setHeader("Content-Type", "text/xml; charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=\"" + formId + ".xml" + "\";");
+        response.setHeader("Content-Disposition", "attachment; filename=\"" + formID + ".xml" + "\";");
         response.setContentType("text/xml; charset=utf-8");
         return xform;
 
@@ -918,7 +950,7 @@ public class OpenRosaServices {
 
     private boolean mayProceedSubmission(String studyOid, StudySubjectBean ssBean) throws Exception {
         boolean accessPermission = false;
-        StudyBean study = getParentStudy(studyOid);
+        StudyBean study = getParentPublicStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
         participantPortalRegistrar = new ParticipantPortalRegistrar();
@@ -938,7 +970,7 @@ public class OpenRosaServices {
 
     private boolean mayProceedPreview(HttpServletRequest request, String studyOid) throws Exception {
         boolean accessPermission = false;
-        StudyBean study = getParentStudy(studyOid);
+        StudyBean study = getParentPublicStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         request.setAttribute("requestSchema", study.getSchemaName());
         // PENDING ,
@@ -993,20 +1025,20 @@ public class OpenRosaServices {
         return resultBean;
     }
 
-    private String getFormLayoutOid(String formId) {
-        if (formId.endsWith(QUERY_FLAVOR)) {
-            formId = formId.substring(0, formId.length() - QUERY_FLAVOR.length());
-        } else if (formId.contains(SINGLE_ITEM_FLAVOR)) {
-            formId = formId.substring(0, formId.indexOf(SINGLE_ITEM_FLAVOR));
+    private String getFormLayoutOid(String formID) {
+        if (formID.endsWith(QUERY_FLAVOR)) {
+            formID = formID.substring(0, formID.length() - QUERY_FLAVOR.length());
+        } else if (formID.contains(SINGLE_ITEM_FLAVOR)) {
+            formID = formID.substring(0, formID.indexOf(SINGLE_ITEM_FLAVOR));
         }
-        formId = formId.substring(0, formId.lastIndexOf(DASH));
-        return formId;
+        formID = formID.substring(0, formID.lastIndexOf(DASH));
+        return formID;
     }
 
-    private String getQuerySet(String formId) {
-        if (formId.endsWith(QUERY_FLAVOR)) {
+    private String getQuerySet(String formID) {
+        if (formID.endsWith(QUERY_FLAVOR)) {
             return QUERY_FLAVOR;
-        } else if (formId.contains(SINGLE_ITEM_FLAVOR)) {
+        } else if (formID.contains(SINGLE_ITEM_FLAVOR)) {
             return SINGLE_ITEM_FLAVOR;
         } else {
             return NO_FLAVOR;
@@ -1021,4 +1053,14 @@ public class OpenRosaServices {
         this.xformParserHelper = xformParserHelper;
     }
 
+    @GET
+    @Path("/{studyOID}/{studySubjectOID}/{userAccountID}")
+    @Produces(MediaType.TEXT_XML)
+    public String getODMMetadata(@Context HttpServletRequest request, @PathParam("studyOID") String studyOID,
+            @PathParam("studySubjectOID") String studySubjectOID, @PathParam("userAccountID") String userAccountID) throws Exception {
+        if (!mayProceedPreview(request, studyOID))
+            return null;
+        String result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID);
+        return result;
+    }
 }
