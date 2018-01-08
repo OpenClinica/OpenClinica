@@ -232,7 +232,7 @@ public class OpenRosaServices {
                             // TODO: them.
 
                             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
-                            String downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
+                            String downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formID=" + formLayout.getOcOid() + DASH
                                     + formLayout.getXform();
                             form.setDownloadURL(downloadURL);
 
@@ -273,8 +273,6 @@ public class OpenRosaServices {
             response.setHeader("Date", format.format(currentDate));
             response.setHeader("X-OpenRosa-Version", "1.0");
             String result = writer.toString();
-            result = result.replaceAll("&amp;form", "&form");
-            System.out.println(result);
             return result;
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
@@ -336,7 +334,7 @@ public class OpenRosaServices {
             // TODO: them.
             // TODO Uncomment this before checking in
             if (StringUtils.isNotEmpty(xformOutput)) {
-                form.setHash(DigestUtils.md5Hex(xformOutput));
+                form.setHash(DigestUtils.md5Hex(xformOutput + ecid));
             }
 
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
@@ -344,8 +342,8 @@ public class OpenRosaServices {
             String manifestURL = null;
             String downloadURL = null;
             if (flavor.equals(QUERY_FLAVOR)) {
-                downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
-                        + formLayout.getXform() + QUERY_FLAVOR;
+                downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formID=" + formLayout.getOcOid() + DASH + formLayout.getXform()
+                        + QUERY_FLAVOR;
                 form.setDownloadURL(downloadURL);
 
                 manifestURL = urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
@@ -354,16 +352,14 @@ public class OpenRosaServices {
 
                 form.setFormID(formLayout.getOcOid() + DASH + formLayout.getXform() + QUERY_FLAVOR);
             } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
-                downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
-                        + formLayout.getXform() + attribute;
+                downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formID=" + formLayout.getOcOid() + DASH + formLayout.getXform() + attribute;
                 form.setDownloadURL(downloadURL);
                 manifestURL = urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
                         + formLayout.getXform() + attribute;
                 form.setManifestURL(manifestURL);
                 form.setFormID(formLayout.getOcOid() + DASH + formLayout.getXform() + attribute);
             } else {
-                downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
-                        + formLayout.getXform();
+                downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formID=" + formLayout.getOcOid() + DASH + formLayout.getXform();
                 form.setDownloadURL(downloadURL);
                 manifestURL = urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
                         + formLayout.getXform();
@@ -428,13 +424,10 @@ public class OpenRosaServices {
         manifest.add(userList);
 
         MediaFile odmPayload = new MediaFile();
-        HashMap<String, String> subjectContext = null;
-        PFormCache cache = PFormCache.getInstance(context);
-        subjectContext = cache.getSubjectContext(ecid);
-        String studySubjectOID = subjectContext.get("studySubjectOID");
-        int userAccountID = Integer.valueOf(subjectContext.get("userAccountID"));
+        String odm = getODMMetadata(request, studyOID, ecid, context);
+        odmPayload.setHash((DigestUtils.md5Hex(odm)));
         odmPayload.setFilename("clinicaldata.xml");
-        odmPayload.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/" + studySubjectOID + "/" + userAccountID);
+        odmPayload.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/" + ecid);
         manifest.add(odmPayload);
 
         try {
@@ -459,7 +452,6 @@ public class OpenRosaServices {
             response.setHeader("Date", format.format(currentDate));
             response.setHeader("X-OpenRosa-Version", "1.0");
             String result = writer.toString();
-            result = result.replaceAll("&amp;form", "&form");
             System.out.println(result);
             return result;
         } catch (Exception e) {
@@ -1054,13 +1046,19 @@ public class OpenRosaServices {
     }
 
     @GET
-    @Path("/{studyOID}/{studySubjectOID}/{userAccountID}")
+    @Path("/{studyOID}/{ecid}")
     @Produces(MediaType.TEXT_XML)
-    public String getODMMetadata(@Context HttpServletRequest request, @PathParam("studyOID") String studyOID,
-            @PathParam("studySubjectOID") String studySubjectOID, @PathParam("userAccountID") String userAccountID) throws Exception {
+    public String getODMMetadata(@Context HttpServletRequest request, @PathParam("studyOID") String studyOID, @PathParam("ecid") String ecid,
+            @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
+        HashMap<String, String> subjectContext = null;
+        PFormCache cache = PFormCache.getInstance(context);
+        subjectContext = cache.getSubjectContext(ecid);
+        String studySubjectOID = subjectContext.get("studySubjectOID");
+        String userAccountID = subjectContext.get("userAccountID");
         String result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID);
+        result = result.replaceAll("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"", "");
         return result;
     }
 }
