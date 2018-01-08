@@ -463,8 +463,9 @@ public class ListNotesTableFactory extends AbstractTableFactory {
                 builder.a().href("ViewStudySubject?id=" + studySubjectId);
             } else if (dnb.getEntityType().equals(DiscrepancyNoteBean.EVENT_CRF)) {
                 builder.a().href("ViewStudySubject?id=" + studySubjectId);
+            } else if (!dnb.getEntityType().equals(DiscrepancyNoteBean.SUBJECT) && !dnb.getEntityType().equals(DiscrepancyNoteBean.ITEM_DATA) && !dnb.getEntityType().equals(DiscrepancyNoteBean.STUDY_EVENT) && !dnb.getEntityType().equals(DiscrepancyNoteBean.EVENT_CRF)){
+               builder.a().href("ViewStudySubject?id=" + studySubjectId); 
             }
-            builder.close();
             builder.append("<span title='" + resword.getString("View_Query_Within_Record")
                     + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
             builder.aEnd();

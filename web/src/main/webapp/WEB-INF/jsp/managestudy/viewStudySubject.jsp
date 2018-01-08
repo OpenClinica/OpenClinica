@@ -139,7 +139,18 @@
             <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/>
         </a>
     </div>
-<div id="studySubjectRecord" style="display: none">
+<div id="studySubjectRecord">
+<script type="text/javascript" language="javascript">
+    var oldURL = document.referrer;
+    var parts = oldURL.split('/');
+    var lastSegment = parts.pop() || parts.pop();//get last segmen of url
+    
+    if(lastSegment=='ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query'){
+        document.getElementById('studySubjectRecord').style.display = "block";
+    }else{
+        document.getElementById('studySubjectRecord').style.display = "none";
+    }
+</script>
 
 <table border="0" cellpadding="0" cellspacing="0">
         <tbody><tr>
