@@ -550,7 +550,7 @@
                   </td>
             </c:if>
 
-            <c:if test="${userBean.sysAdmin && (study.status.available)}">
+            <c:if test="${study.status.available}">
                <td> <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
                    onMouseDown="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                    onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
