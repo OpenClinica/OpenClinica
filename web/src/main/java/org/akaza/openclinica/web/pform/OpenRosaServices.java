@@ -334,7 +334,7 @@ public class OpenRosaServices {
             // TODO: them.
             // TODO Uncomment this before checking in
             if (StringUtils.isNotEmpty(xformOutput)) {
-                form.setHash(DigestUtils.md5Hex(xformOutput + ecid));
+                form.setHash(DigestUtils.md5Hex(xformOutput));
             }
 
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
