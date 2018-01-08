@@ -206,11 +206,17 @@ public class ODMClinicaDataResource {
     public String getODMMetadata(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
             @PathParam("studySubjectIdentifier") String studySubjectIdentifier, @PathParam("studyEventOID") String studyEventOID,
             @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
-            @Context HttpServletRequest request) {
+            @Context HttpServletRequest request, String userAccountID) {
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
-        int userId = ((UserAccountBean) request.getSession().getAttribute("userBean")).getId();
+        int userId = 0;
+        UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+        if (userBean != null) {
+            userId = userBean.getId();
+        } else {
+            userId = Integer.valueOf(userAccountID);
+        }
 
         if (includeDns.equalsIgnoreCase("no") || includeDns.equalsIgnoreCase("n"))
             includeDN = false;
