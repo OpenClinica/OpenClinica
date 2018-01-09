@@ -226,9 +226,6 @@
             <a href="${urlPrefix}ChangeStudy"><fmt:message key="change" bundle="${resword}"/></a>
         </div>
 
-        <%
-            String returnToURL=request.getRequestURL().toString();
-        %>
         <div id="UserInfo">
             <div id="userDropdown">
                 <ul>
@@ -240,7 +237,7 @@
                                 <li><a href="${study.manager}"><fmt:message key="return_to_my_studies"
                                                                                                                  bundle="${resworkflow}"/></a></li>
                             </c:if>
-                            <li><a href="${(study.manager).replace('account-study','my-profile')}?returnTo=<%=returnToURL%>"><fmt:message key="return_to_my_profile" bundle="${resworkflow}"/></a></li>
+                            <li><a href="${(study.manager).replace('account-study','my-profile')}?returnTo=${currentPageUrl}"><fmt:message key="return_to_my_profile" bundle="${resworkflow}"/></a></li>
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback"
                                                                                                                                 bundle="${resword}"/></a></li>
                             <li><a onClick="javascript:createReturnToCookie('<%=currentURL%>');" href="${urlPrefix}pages/logout"><fmt:message key="log_out"

@@ -742,6 +742,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         // to load all available event based on currentStudy for Task > Add Subject 
         request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
         request.setAttribute("allDefsArray", this.getEventDefinitionsByCurrentStudy());
+        request.setAttribute("currentPageUrl", request.getRequestURL().toString());
 
         if (request.getAttribute(POP_UP_URL) == null) {
             request.setAttribute(POP_UP_URL, "");
