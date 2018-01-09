@@ -23,6 +23,8 @@
     var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
     var ocAppTimeoutKey = "OCAppTimeout-" + userName;
     var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
+    var logoutByKey = userName + "-logoutBy";
+    var appName = "RU";
 </script>
 
 <jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String'/>
@@ -149,9 +151,9 @@
         }
     }
 
-    function createReturnToCookie(returnTo) {
+    function processLogoutClick(returnTo) {
         deleteOCAppTimeout();
-        setLoggedOutFlag("true");
+        setLoggedOutFlag();
         processLoggedOutKey(false);
     }
 </script>
@@ -243,7 +245,7 @@
                             <li><a href="${(study.manager).replace('account-study','my-profile')}?returnTo=<%=returnToURL%>"><fmt:message key="return_to_my_profile" bundle="${resworkflow}"/></a></li>
                             <li><a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback"
                                                                                                                                 bundle="${resword}"/></a></li>
-                            <li><a onClick="javascript:createReturnToCookie('<%=currentURL%>');" href="${urlPrefix}pages/logout"><fmt:message key="log_out"
+                            <li><a onClick="javascript:processLogoutClick('<%=currentURL%>');" href="${urlPrefix}pages/logout"><fmt:message key="log_out"
                                                                                                                                               bundle="${resword}"/></a>
                             </li>
                         </ul>

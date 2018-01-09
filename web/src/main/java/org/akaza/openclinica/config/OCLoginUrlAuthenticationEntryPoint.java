@@ -35,28 +35,6 @@ public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEn
             returnTo = request.getRequestURI();
             SessionUtils.set(request, Auth0Controller.RETURN_TO, returnTo);
         }
-        Enumeration<String> parameterNames = request.getParameterNames();
-        String queryStr = "";
-        if (isUrlSuitableToCreateCookie(request) == false)
-            return this.getLoginFormUrl();
-
-        while (parameterNames.hasMoreElements()) {
-            String element = parameterNames.nextElement();
-            if (StringUtils.isEmpty(queryStr))
-                queryStr += "?" + element + "=" + request.getParameter(element);
-            else
-                queryStr += "&" + element + "=" + request.getParameter(element);
-        }
-        Cookie cookie = null;
-        try {
-            cookie = new Cookie("queryStr", URLEncoder.encode(request.getRequestURL() + queryStr, "UTF-8"));
-        } catch (UnsupportedEncodingException e) {
-            e.printStackTrace();
-        }
-        cookie.setPath("/");
-        cookie.setMaxAge(3600);
-        response.addCookie(cookie);
-
         return this.getLoginFormUrl();
     }
 
@@ -64,7 +42,8 @@ public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEn
         StringBuffer url = request.getRequestURL();
         if (Pattern.matches(".*(css|jpg|png|gif|js|htm|html)$", url))
             return false;
-        if (url.indexOf("pages/invalidateAuth0Token") > 0)
+        if (url.indexOf("pages/invalidateAuth0Token") > 0
+                || url.indexOf("pages/logout") > 0)
             return false;
 
         return true;
