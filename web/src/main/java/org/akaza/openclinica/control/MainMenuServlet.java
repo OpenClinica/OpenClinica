@@ -204,10 +204,17 @@ public class MainMenuServlet extends SecureController {
         return isRenewAuth;
     }
 
+    private boolean isValidRedirectUrl(String url) {
+        if (StringUtils.isEmpty(url))
+            return false;
+        if (url.endsWith(request.getContextPath()))
+                return false;
+        return true;
+    }
     @Override public void processRequest() throws Exception {
 
         String queryStrCookie = getQueryStrCookie(request, response);
-        if (StringUtils.isNotEmpty(queryStrCookie)) {
+        if (isValidRedirectUrl(queryStrCookie)) {
             response.sendRedirect(queryStrCookie);
             return;
         }
