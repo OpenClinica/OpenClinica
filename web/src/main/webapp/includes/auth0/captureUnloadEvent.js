@@ -1,6 +1,7 @@
 /**
  * Created by yogi on 10/13/17.
  */
+
 $(window).on('mouseout', (function () {
     window.onbeforeunload = checkSessionTimeout;
 }));

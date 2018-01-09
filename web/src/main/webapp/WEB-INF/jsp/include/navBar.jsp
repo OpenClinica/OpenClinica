@@ -15,6 +15,7 @@
         currentURL += "?" + request.getQueryString();
     }
 %>
+
 <script>
     var myContextPath = "${pageContext.request.contextPath}";
     var sessionTimeout = "<%= session.getMaxInactiveInterval() %>";
@@ -24,7 +25,7 @@
     var ocAppTimeoutKey = "OCAppTimeout-" + userName;
     var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
     var logoutByKey = userName + "-logoutBy";
-    var appName = "RU";
+    var appName = "RT";
 </script>
 
 <jsp:useBean scope='session' id='tableFacadeRestore' class='java.lang.String'/>
