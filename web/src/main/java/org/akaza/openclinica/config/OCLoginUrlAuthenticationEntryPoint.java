@@ -37,15 +37,4 @@ public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEn
         }
         return this.getLoginFormUrl();
     }
-
-    protected boolean isUrlSuitableToCreateCookie(HttpServletRequest request) {
-        StringBuffer url = request.getRequestURL();
-        if (Pattern.matches(".*(css|jpg|png|gif|js|htm|html)$", url))
-            return false;
-        if (url.indexOf("pages/invalidateAuth0Token") > 0
-                || url.indexOf("pages/logout") > 0)
-            return false;
-
-        return true;
-    }
 }
