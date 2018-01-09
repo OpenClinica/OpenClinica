@@ -8,7 +8,27 @@
 "http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd">
 <html xmlns="http://www.w3.org/1999/xhtml">
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+<%
+    String currentURL = null;
+    if (request.getAttribute("javax.servlet.forward.request_uri") != null) {
+        currentURL = (String) request.getAttribute("javax.servlet.forward.request_uri");
+    }
+    if (currentURL != null && request.getQueryString() != null) {
+        currentURL += "?" + request.getQueryString();
+    }
+%>
 
+<script>
+    var myContextPath = "${pageContext.request.contextPath}";
+    var sessionTimeout = "<%= session.getMaxInactiveInterval() %>";
+    var userName = "<%= userBean.getName() %>";
+    var currentURL = "<%= currentURL %>";
+    var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
+    var ocAppTimeoutKey = "OCAppTimeout-" + userName;
+    var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
+    var logoutByKey = userName + "-logoutBy";
+    var appName = "RT";
+</script>
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=8"/>
@@ -20,24 +40,6 @@
     <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
     <script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
     <script type="text/javascript" src="js/lib/client.js"></script>
-    <%
-        String currentURL = null;
-        if (request.getAttribute("javax.servlet.forward.request_uri") != null) {
-            currentURL = (String) request.getAttribute("javax.servlet.forward.request_uri");
-        }
-        if (currentURL != null && request.getQueryString() != null) {
-            currentURL += "?" + request.getQueryString();
-        }
-    %>
-    <script>
-        var myContextPath = "${pageContext.request.contextPath}";
-        var sessionTimeout = "<%= session.getMaxInactiveInterval() %>";
-        var userName = "<%= userBean.getName() %>";
-        var currentURL = "<%= currentURL %>";
-        var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
-        var ocAppTimeoutKey = "OCAppTimeout-" + userName;
-        var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
-    </script>
 
     <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
     <script type="text/javascript" language="javascript">
