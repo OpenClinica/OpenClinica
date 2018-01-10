@@ -41,7 +41,9 @@ import javax.ws.rs.core.Response.ResponseBuilder;
 import javax.ws.rs.core.StreamingOutput;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
 import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
 import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
@@ -892,16 +894,10 @@ public class OpenRosaServices {
         subjectContext = cache.getSubjectContext(ecid);
         int userAccountID = Integer.valueOf(subjectContext.get("userAccountID"));
         String studySubjectOID = subjectContext.get("studySubjectOID");
-
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-
-        Document doc = docBuilder.newDocument();
-        Element root = doc.createElement("root");
-        doc.appendChild(root);
+        Document doc = buildDocument();
+        Element root = appendRootElement(doc);
 
         List<UserAccount> users = null;
-
         StudySubject ssBean = ssDao.findByOcOID(studySubjectOID);
 
         if (ssBean != null) {
@@ -928,16 +924,8 @@ public class OpenRosaServices {
                 root.appendChild(item);
             }
         }
-        DOMSource dom = new DOMSource(doc);
-        StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        transformer.transform(dom, result);
-        String userXml = writer.toString();
-
-        return userXml;
-
+        String writer = getWriter(doc);
+        return writer;
     }
 
     private boolean mayProceedSubmission(String studyOid, StudySubjectBean ssBean) throws Exception {
@@ -1056,9 +1044,38 @@ public class OpenRosaServices {
         PFormCache cache = PFormCache.getInstance(context);
         subjectContext = cache.getSubjectContext(ecid);
         String studySubjectOID = subjectContext.get("studySubjectOID");
+        if (studySubjectOID == null) {
+            Document doc = buildDocument();
+            appendRootElement(doc);
+            String writer = getWriter(doc);
+            return writer;
+        }
         String userAccountID = subjectContext.get("userAccountID");
         String result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID);
         result = result.replaceAll("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"", "");
         return result;
+    }
+
+    private Document buildDocument() throws ParserConfigurationException {
+        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
+        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
+        Document doc = docBuilder.newDocument();
+        return doc;
+    }
+
+    private Element appendRootElement(Document doc) {
+        Element root = doc.createElement("root");
+        doc.appendChild(root);
+        return root;
+    }
+
+    private String getWriter(Document doc) throws TransformerException {
+        DOMSource dom = new DOMSource(doc);
+        StringWriter writer = new StringWriter();
+        StreamResult result = new StreamResult(writer);
+        TransformerFactory tf = TransformerFactory.newInstance();
+        Transformer transformer = tf.newTransformer();
+        transformer.transform(dom, result);
+        return writer.toString();
     }
 }
