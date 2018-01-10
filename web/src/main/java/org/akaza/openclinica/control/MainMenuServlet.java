@@ -204,25 +204,7 @@ public class MainMenuServlet extends SecureController {
         return isRenewAuth;
     }
 
-    private boolean isValidRedirectUrl(String url) {
-        if (StringUtils.isEmpty(url))
-            return false;
-        if (url.endsWith(request.getContextPath()))
-                return false;
-        return true;
-    }
     @Override public void processRequest() throws Exception {
-
-        String queryStrCookie = getQueryStrCookie(request, response);
-        if (isValidRedirectUrl(queryStrCookie)) {
-            response.sendRedirect(queryStrCookie);
-            return;
-        }
-        queryStrCookie = getTimeoutReturnToCookie(request, response);
-        if (StringUtils.isNotEmpty(queryStrCookie)) {
-            response.sendRedirect(queryStrCookie);
-            return;
-        }
 
         FormProcessor fp = new FormProcessor(request);
         session.setAttribute(USER_BEAN_NAME, ub);
