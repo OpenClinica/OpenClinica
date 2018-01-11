@@ -89,6 +89,33 @@
 				<c:out value="<%=ResourceBundleProvider.getLocale().toString()%>"/>
             </a>&nbsp;|&nbsp;
             <a href="${urlPrefix}j_spring_security_logout"><fmt:message key="log_out" bundle="${resword}"/></a>
+
+            <div id="userDropdown">
+                <ul>
+                    <li><a href="#"><b><c:out value="${userBean.name}"/></b> (<c:out value="${userRole.role.description}"/>)<span
+                            class="icon icon-caret-down white"></span></a></a>
+                        <!-- First Tier Drop Down -->
+                        <ul class="dropdown_BG">
+                            <c:if test="${userBean.sysAdmin || userBean.techAdmin || userRole.coordinator}">
+                                <li><a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a></li>
+                            </c:if>
+                            <li>
+                                <a href="${(study.manager).replace('account-study','my-profile')}?returnTo=${currentPageUrl}"><fmt:message key="return_to_my_profile" bundle="${resworkflow}"/></a></li>
+                            <c:if test="${userBean.sysAdmin || userBean.techAdmin}">
+                                <li>
+                                    <a href="${(study.manager).replace('account-study','admin')}"><fmt:message key="return_to_admin" bundle="${resworkflow}"/></a>
+                                </li>
+                            </c:if>
+                            <li>
+                                <a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a>
+                            </li>
+                            <li>
+                                <a onClick="javascript:processLogoutClick('<%=currentURL%>');" href="${urlPrefix}pages/logout"><fmt:message key="sign_out" bundle="${resworkflow}"/></a>
+                            </li>
+                        </ul>
+                    </li>
+                </ul>
+            </div>
         </div>
         <br/><br style="line-height: 4px;"/>
         <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
