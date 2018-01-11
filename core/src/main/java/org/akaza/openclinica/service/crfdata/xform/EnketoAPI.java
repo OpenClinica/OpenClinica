@@ -151,6 +151,28 @@ public class EnketoAPI {
             return "";
     }
 
+    public EnketoURLResponse registerAndDeleteCache(URL url, String crfOID) {
+        EnketoURLResponse urlResponse = null;
+        try {
+            deleteCache(url, crfOID);
+        } catch (Exception e) {
+            if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized") || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
+                savePformRegistration();
+                try {
+                    deleteCache(url, crfOID);
+                } catch (Exception e1) {
+                    logger.error(e.getMessage());
+                    logger.error(ExceptionUtils.getStackTrace(e));
+                }
+            } else {
+                logger.error(e.getMessage());
+                logger.error(ExceptionUtils.getStackTrace(e));
+            }
+        } finally {
+            return urlResponse;
+        }
+    }
+
     private EnketoURLResponse registerAndGetURL(URL url, String crfOID) {
         EnketoURLResponse urlResponse = null;
         try {
@@ -193,6 +215,17 @@ public class EnketoAPI {
             }
         }
         return urlResponse;
+    }
+
+    private void deleteCache(URL url, String crfOID) throws Exception {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        headers.add("Authorization", "Basic " + new String(Base64.encodeBase64((token + ":").getBytes())));
+        headers.add("Accept-Charset", "UTF-8");
+        EnketoURLRequest body = new EnketoURLRequest(ocURL, crfOID);
+        HttpEntity<EnketoURLRequest> request = new HttpEntity<EnketoURLRequest>(body, headers);
+        RestTemplate rest = new RestTemplate();
+        ResponseEntity<String> result = rest.exchange(url.toString(), HttpMethod.DELETE, request, String.class);
     }
 
     private EnketoURLResponse getURL(URL url, String crfOID) throws Exception {
@@ -321,33 +354,29 @@ public class EnketoAPI {
                 // https://jira.openclinica.com/browse/OC-8266 Data Entry Person edits XForms.
                 // https://jira.openclinica.com/browse/OC-7572 Investigator edits XForms.
                 // https://jira.openclinica.com/browse/OC-7571 CRC edits XForms.
-            } else if (flavor.equals(QUERY_FLAVOR) &&
-                    ((!parentStudy.getStatus().equals(Status.FROZEN) || (site != null && !site.getStatus().equals(Status.FROZEN))))
-                    && mode.equals(EDIT_MODE)
+            } else if (flavor.equals(QUERY_FLAVOR)
+                    && ((!parentStudy.getStatus().equals(Status.FROZEN) || (site != null && !site.getStatus().equals(Status.FROZEN)))) && mode.equals(EDIT_MODE)
                     && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
                 eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN);
 
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
                 // https://jira.openclinica.com/browse/OC-8279 Study Director edits XForms.
                 // https://jira.openclinica.com/browse/OC-8278 Data Manager edits XForms.
-            } else if (flavor.equals(QUERY_FLAVOR) &&
-                    ((!parentStudy.getStatus().equals(Status.FROZEN)) || (site != null && !site.getStatus().equals(Status.FROZEN)))
-                    && mode.equals(EDIT_MODE)
+            } else if (flavor.equals(QUERY_FLAVOR)
+                    && ((!parentStudy.getStatus().equals(Status.FROZEN)) || (site != null && !site.getStatus().equals(Status.FROZEN))) && mode.equals(EDIT_MODE)
                     && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
                 eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN_CLOSE_BUTTON);
 
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
-            } else if (flavor.equals(QUERY_FLAVOR) &&
-                    ((parentStudy.getStatus().equals(Status.FROZEN)) || (site != null && site.getStatus().equals(Status.FROZEN)))
-                    && mode.equals(EDIT_MODE)
+            } else if (flavor.equals(QUERY_FLAVOR)
+                    && ((parentStudy.getStatus().equals(Status.FROZEN)) || (site != null && site.getStatus().equals(Status.FROZEN))) && mode.equals(EDIT_MODE)
                     && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
                 eURL = new URL(enketoURL + INSTANCE_READONLY_DN);
                 markComplete = false;
 
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
-            } else if (flavor.equals(QUERY_FLAVOR) &&
-                    ((parentStudy.getStatus().equals(Status.FROZEN)) || (site != null && site.getStatus().equals(Status.FROZEN)))
-                    && mode.equals(EDIT_MODE)
+            } else if (flavor.equals(QUERY_FLAVOR)
+                    && ((parentStudy.getStatus().equals(Status.FROZEN)) || (site != null && site.getStatus().equals(Status.FROZEN))) && mode.equals(EDIT_MODE)
                     && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
                 eURL = new URL(enketoURL + INSTANCE_READONLY_DN_CLOSE_BUTTON);
                 markComplete = false;

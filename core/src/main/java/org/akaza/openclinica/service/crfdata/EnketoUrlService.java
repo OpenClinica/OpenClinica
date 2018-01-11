@@ -3,6 +3,7 @@ package org.akaza.openclinica.service.crfdata;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
+import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -101,6 +102,7 @@ public class EnketoUrlService {
     public static final String AUDIT = "audit";
     public static final String ITEMDATA = "item_data";
     public static final String STUDYEVENT = "study_event";
+    public static final String SURVEY_CACHE = "/api/v2/survey/cache";
 
     public static final String DASH = "-";
 
@@ -183,13 +185,16 @@ public class EnketoUrlService {
         // Call Enketo api to get edit url
         Study parentStudy = enketoCredentials.getParentStudy(studyOid);
         studyOid = parentStudy.getOc_oid();
-        EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOid));
+        EnketoCredentials credentials = EnketoCredentials.getInstance(studyOid);
+        EnketoAPI enketo = new EnketoAPI(credentials);
         StudyEvent studyEvent = null;
         if (subjectContext.getStudyEventId() != null) {
             studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
         }
-        return enketo.getFormURL(subjectContext.getFormLayoutOid() + DASH + hash + flavor, studyOid, role, parentStudy, studyEvent, mode) + "?ecid="
-                + subjectContextKey;
+        String crfOID = subjectContext.getFormLayoutOid() + DASH + hash + flavor;
+        URL eURL = new URL(credentials.getServerUrl() + SURVEY_CACHE);
+        enketo.registerAndDeleteCache(eURL, crfOID);
+        return enketo.getFormURL(crfOID, studyOid, role, parentStudy, studyEvent, mode) + "?ecid=" + subjectContextKey;
 
     }
 
@@ -257,6 +262,10 @@ public class EnketoUrlService {
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
         EditUrlObject editUrlObject = new EditUrlObject(formLayout, crfOid, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
                 mediaList, goTo, flavor, role, study, site, studyEvent, mode, edc, eventCrf);
+
+        EnketoCredentials credentials = EnketoCredentials.getInstance(studyOid);
+        URL eURL = new URL(credentials.getServerUrl() + SURVEY_CACHE);
+        enketo.registerAndDeleteCache(eURL, crfOid);
 
         EnketoURLResponse eur = enketo.registerAndGetEditURL(editUrlObject);
 
