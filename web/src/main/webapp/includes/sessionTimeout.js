@@ -1,6 +1,6 @@
 
-function isSessionTimedOut(currentURL, setStorageFlag, invalidateFlag) {
-    processLoggedOutKey(invalidateFlag);
+function isSessionTimedOut(currentURL, setStorageFlag) {
+    processLoggedOutKey();
     var newExpiration = moment().add(sessionTimeout, 's').valueOf();
     var currentTime = moment().valueOf();
     storage.onConnect()
@@ -33,7 +33,6 @@ function deleteOCAppTimeout() {
         })['catch'](function (err) {
         console.log(err);
     });
-
 }
 
 function setLoggedOutFlag() {
@@ -45,8 +44,6 @@ function setLoggedOutFlag() {
     })['catch'](function(err) {
         console.log(err);
     });
-
-
 }
 
 function processLoggedOutKey(invalidateFlag) {
@@ -68,19 +65,16 @@ function processLoggedOutKey(invalidateFlag) {
                 } else {
                     console.log("Firstlogincheck is false");
                     console.log("Current URL&&&&&&&&&" + currentURL + "invalidateFlag " + invalidateFlag);
-                    if (invalidateFlag) {
-                        console.log("************userName:" + userName);
-                        if (logoutByKey.startsWith(userName + "-")) {
-                            console.log("backend invalidateAuth0Token");
-                            window.location.replace (myContextPath + '/pages/invalidateAuth0Token');
-                        } else {
-                            jQuery.get(myContextPath + '/pages/invalidateAuth0Token')
-                                .error(function(jqXHR, textStatus, errorThrown) {
-                                    "Error calling :" + myContextPath + '/pages/invalidateAuth0Token' + " " + textStatus + " " + errorThrown
-                                });
-                            return null;
-                        }
-
+                    console.log("************userName:" + userName);
+                    if (logoutByKey.startsWith(userName + "-")) {
+                        console.log("backend invalidateAuth0Token");
+                        window.location.replace (myContextPath + '/pages/invalidateAuth0Token');
+                    } else {
+                        jQuery.get(myContextPath + '/pages/invalidateAuth0Token')
+                            .error(function(jqXHR, textStatus, errorThrown) {
+                                "Error calling :" + myContextPath + '/pages/invalidateAuth0Token' + " " + textStatus + " " + errorThrown
+                            });
+                        return null;
                     }
                 }
             }
