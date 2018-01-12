@@ -6,7 +6,7 @@ $(window).on('mouseout', (function () {
     window.onbeforeunload = checkSessionTimeout;
 }));
 function checkSessionTimeout() {
-    isSessionTimedOut(currentURL, true);
+    //isSessionTimedOut(currentURL, false, false);
 }
 var prevKey = "";
 $(document).keydown(function (e) {

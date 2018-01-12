@@ -18,6 +18,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.Map;
@@ -46,11 +47,12 @@ public class LogoutController {
         String urlPrefix = req.getRequestURL().substring(0, req.getRequestURL().lastIndexOf("/"));
         int index = urlPrefix.indexOf(req.getContextPath());
         String returnURL = urlPrefix.substring(0, index).concat(req.getContextPath()).concat("/pages/logoutSuccess");
-        return String.format("redirect:%s", controller.buildLogoutURL(returnURL));
+        String logoutURL = controller.buildLogoutURL(returnURL);
+        return String.format("redirect:%s", logoutURL);
     }
 
     @RequestMapping(value="/logoutSuccess", method = RequestMethod.GET)
-    protected String logout(final HttpServletRequest request, HttpServletResponse response) {
+    protected String logout(final HttpServletRequest request, final HttpServletResponse response) {
         String returnToCookie = null;
         try {
             returnToCookie = URLDecoder.decode(logoutService.getReturnToCookie(request, response), "UTF-8");
@@ -66,9 +68,14 @@ public class LogoutController {
 
     @RequestMapping(value="/invalidateAuth0Token", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
-    public void invalidateAccessToken(final HttpServletRequest req) {
+    public void invalidateAccessToken(final HttpServletRequest request,
+                                      final HttpServletResponse response) throws IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null)
+        if (auth != null) {
+            System.out.println("Invalidating token");
             auth.setAuthenticated(false);
+            request.getSession().setAttribute("userRole", null);
+            response.sendRedirect(controller.buildAuthorizeUrl(request, true /* don't do SSO, SSO already failed */));
+        }
     }
 }
