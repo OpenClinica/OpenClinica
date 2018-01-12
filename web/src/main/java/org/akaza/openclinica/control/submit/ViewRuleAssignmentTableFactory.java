@@ -815,9 +815,9 @@ public class ViewRuleAssignmentTableFactory extends AbstractTableFactory {
         //    if (isDesignerRequest)
           //  {
             //} else
-                if (ruleSetRule.getStatus() != Status.DELETED) {
+            if (ruleSetRule.getStatus() != Status.DELETED) {
                 value +=
-                    viewLinkBuilder(ruleSetId) + executeLinkBuilder(ruleSetId, ruleId , target) + removeLinkBuilder(ruleSetRuleId, ruleSetId)
+                    viewLinkBuilder(ruleSetId) + removeLinkBuilder(ruleSetRuleId, ruleSetId)
                         + extractXmlLinkBuilder(ruleSetRuleId) + testLinkBuilder(ruleSetRuleId);
             } else {
                 value +=
