@@ -46,7 +46,7 @@
     this._connected = false;
     this._closed    = false;
     this._count     = 0;
-    this._timeout   = opts.timeout || 8000;
+    this._timeout   = opts.timeout || 4000;
     this._listener  = null;
 
     this._installListener();

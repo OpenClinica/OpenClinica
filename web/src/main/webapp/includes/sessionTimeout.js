@@ -1,7 +1,6 @@
 
 function isSessionTimedOut(currentURL, setStorageFlag) {
-    processLoggedOutKey(true);
-    var storage = new CrossStorageClient(crossStorageURL);
+    processLoggedOutKey();
     var newExpiration = moment().add(sessionTimeout, 's').valueOf();
     var currentTime = moment().valueOf();
     storage.onConnect()
@@ -14,6 +13,7 @@ function isSessionTimedOut(currentURL, setStorageFlag) {
             var existingTimeout = res;
             if (currentTime > existingTimeout) {
                 storage.del(ocAppTimeoutKey);
+                setLoggedOutFlag();
                 console.log("currentTime: " + currentTime + " > existingTimeout: " + existingTimeout + " returning to Login screen");
                 window.location.replace (myContextPath + '/pages/logout');
             } else {
@@ -26,7 +26,6 @@ function isSessionTimedOut(currentURL, setStorageFlag) {
     });
 }
 function deleteOCAppTimeout() {
-    var storage = new CrossStorageClient(crossStorageURL);
     storage.onConnect()
         .then(function () {
             console.log("Deleting crossStorage key");
@@ -34,11 +33,9 @@ function deleteOCAppTimeout() {
         })['catch'](function (err) {
         console.log(err);
     });
-
 }
 
 function setLoggedOutFlag() {
-    var storage = new CrossStorageClient(crossStorageURL);
     storage.onConnect()
         .then(function () {
             console.log("setting loggedOut to " + appName + "(((((");
@@ -47,12 +44,10 @@ function setLoggedOutFlag() {
     })['catch'](function(err) {
         console.log(err);
     });
-
-
 }
 
-function processLoggedOutKey(processLogout) {
-    var storage = new CrossStorageClient(crossStorageURL);
+function processLoggedOutKey(invalidateFlag) {
+    console.log("In processLoggedOutKey");
     storage.onConnect()
         .then(function () {
             var isLoggedOut = storage.get(logoutByKey);
@@ -68,8 +63,18 @@ function processLoggedOutKey(processLogout) {
                     storage.del(logoutByKey);
                     firstLoginCheck = "false";
                 } else {
-                    if (processLogout) {
-                        window.location.replace (myContextPath + '/pages/logout');
+                    console.log("Firstlogincheck is false");
+                    console.log("Current URL&&&&&&&&&" + currentURL + "invalidateFlag " + invalidateFlag);
+                    console.log("************userName:" + userName);
+                    if (logoutByKey.startsWith(userName + "-")) {
+                        console.log("backend invalidateAuth0Token");
+                        window.location.replace (myContextPath + '/pages/invalidateAuth0Token');
+                    } else {
+                        jQuery.get(myContextPath + '/pages/invalidateAuth0Token')
+                            .error(function(jqXHR, textStatus, errorThrown) {
+                                "Error calling :" + myContextPath + '/pages/invalidateAuth0Token' + " " + textStatus + " " + errorThrown
+                            });
+                        return null;
                     }
                 }
             }
