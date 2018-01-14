@@ -68,7 +68,7 @@
             realInterval = sessionTimeout;
 
         setInterval(function () {
-                isSessionTimedOut(encodeURIComponent(currentURL), false);
+                isSessionTimedOut(encodeURIComponent(currentURL), false, true);
             },
             realInterval * 1000
         );
@@ -81,7 +81,7 @@
 </c:if>
 <body style="width:1024px;" class="main_BG">
 <script type="application/javascript">
-    isSessionTimedOut(encodeURIComponent(currentURL), true);
+    isSessionTimedOut(encodeURIComponent(currentURL), true, true);
 </script>
 <iframe id="enketo" style="position:fixed;z-index:1011;top:0;left:0;width:100vw;height:100vh;"/>
 </body>

@@ -62,20 +62,21 @@
 
 
 <script type="text/javascript">
+    var storage = new CrossStorageClient(crossStorageURL);
+
     var realInterval = 60;
     if (sessionTimeout < realInterval)
         realInterval = sessionTimeout;
 
     setInterval(function () {
-            isSessionTimedOut(encodeURIComponent(currentURL), false);
+            isSessionTimedOut(encodeURIComponent(currentURL), false, true);
         },
         realInterval * 1000
     );
 </script>
 
 <script language="JavaScript">
-    isSessionTimedOut(encodeURIComponent(currentURL), true);
-
+    isSessionTimedOut(currentURL, false, true);
     //Piwik
     var _paq = _paq || [];
     /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
@@ -155,7 +156,6 @@
     function processLogoutClick(returnTo) {
         deleteOCAppTimeout();
         setLoggedOutFlag();
-        processLoggedOutKey(false);
     }
 </script>
 
@@ -187,8 +187,11 @@
         </div>
 
         <div id="StudyInfo">
-            <c:set value="false" scope="session" var="firstLoginCheck"/>
 
+            <c:set value="false" scope="session" var="firstLoginCheck"/>
+            <!--<script type="application/javascript">
+                firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
+            </script>-->
             <c:choose>
                 <c:when test='${study.parentStudyId > 0}'>
                     <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes"
