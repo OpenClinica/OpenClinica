@@ -3,7 +3,6 @@ package org.akaza.openclinica.service.crfdata;
 import java.io.File;
 import java.io.StringReader;
 import java.io.StringWriter;
-import java.net.URL;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.ArrayList;
@@ -192,8 +191,8 @@ public class EnketoUrlService {
             studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
         }
         String crfOID = subjectContext.getFormLayoutOid() + DASH + hash + flavor;
-        URL eURL = new URL(credentials.getServerUrl() + SURVEY_CACHE);
-        enketo.registerAndDeleteCache(eURL, crfOID);
+        // URL eURL = new URL(credentials.getServerUrl() + SURVEY_CACHE);
+        // enketo.registerAndDeleteCache(eURL, crfOID);
         return enketo.getFormURL(crfOID, studyOid, role, parentStudy, studyEvent, mode) + "?ecid=" + subjectContextKey;
 
     }
@@ -263,9 +262,9 @@ public class EnketoUrlService {
         EditUrlObject editUrlObject = new EditUrlObject(formLayout, crfOid, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
                 mediaList, goTo, flavor, role, study, site, studyEvent, mode, edc, eventCrf);
 
-        EnketoCredentials credentials = EnketoCredentials.getInstance(studyOid);
-        URL eURL = new URL(credentials.getServerUrl() + SURVEY_CACHE);
-        enketo.registerAndDeleteCache(eURL, crfOid);
+        // EnketoCredentials credentials = EnketoCredentials.getInstance(studyOid);
+        // URL eURL = new URL(credentials.getServerUrl() + SURVEY_CACHE);
+        // enketo.registerAndDeleteCache(eURL, crfOid);
 
         EnketoURLResponse eur = enketo.registerAndGetEditURL(editUrlObject);
 
