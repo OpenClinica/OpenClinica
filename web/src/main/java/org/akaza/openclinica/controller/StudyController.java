@@ -1208,6 +1208,15 @@ public class StudyController {
             if (!vError2.isEmpty()) {
                 ErrorObject errorObject = createErrorObject("Site Object", "This field cannot be blank.", "BriefTitle");
                 errorObjects.add(errorObject);
+            } else {
+                // make sure no duplicate name sites are allowed for the same parent
+                if (parentStudy != null) {
+                    int nameStudiesCount = studyDao.findCntByNameAndParent(name, parentStudy.getId());
+                    if (nameStudiesCount != 0) {
+                        ErrorObject errorObject = createErrorObject("Site Object", "Duplicate site name for the same parent study is not allowed.", "name");
+                        errorObjects.add(errorObject);
+                    }
+                }
             }
             Validator v3 = new Validator(request);
             v3.addValidation("prinInvestigator", Validator.NO_BLANKS);
@@ -1225,7 +1234,7 @@ public class StudyController {
                 errorObjects.add(errorObject);
             }
 
-            if (request.getAttribute("name") != null && ((String) request.getAttribute("name")).length() > 100) {
+            if (request.getAttribute("name") != null && ((String) request.getAttribute("name")).length() > 255) {
                 ErrorObject errorObject = createErrorObject("Site Object", "BriefTitle Length exceeds the max length 100", "BriefTitle");
                 errorObjects.add(errorObject);
             }
