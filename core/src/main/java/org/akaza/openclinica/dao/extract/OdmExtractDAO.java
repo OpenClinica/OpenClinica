@@ -2111,7 +2111,7 @@ private void fetchItemGroupMetaData(MetaDataVersionBean metadata,String cvIds, S
         String itemIds = sss[0];
         String dateConstraint = "";
         if ("postgres".equalsIgnoreCase(dbName)) {
-            dateConstraint = "and " + sss[1] + " and " + sss[2];
+        	 dateConstraint = "and (ss.enrollment_date is NULL OR (" + sss[1] + " and " + sss[2] +"))";
             dateConstraint = dateConstraint.replace("date_created", "ss.enrollment_date");
         } else if ("oracle".equalsIgnoreCase(dbName)) {
             String[] os = (sss[1] + sss[2]).split("'");
