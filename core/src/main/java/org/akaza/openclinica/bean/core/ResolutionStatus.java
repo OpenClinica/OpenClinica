@@ -39,9 +39,9 @@ public class ResolutionStatus extends Term {
 
     public static final ResolutionStatus CLOSED = new ResolutionStatus(4, "Closed", null, "fa fa-bubble-black");
 
-    public static final ResolutionStatus NOT_APPLICABLE = new ResolutionStatus(5, "Not_Applicable", null, "");
+    public static final ResolutionStatus CLOSED_MODIFIED = new ResolutionStatus(5, "Closed_Modified", null, "fa fa-bubble-gray");
 
-    public static final ResolutionStatus CLOSED_MODIFIED = new ResolutionStatus(6, "Closed_Modified", null, "fa fa-bubble-gray");
+    public static final ResolutionStatus NOT_APPLICABLE = new ResolutionStatus(6, "Not_Applicable", null, "fa fa-bubble-white");
 
     private String iconFilePath;
 
@@ -73,7 +73,7 @@ public class ResolutionStatus extends Term {
         return this == ResolutionStatus.NOT_APPLICABLE;
     }
 
-    private static final ResolutionStatus[] members = { OPEN, UPDATED, RESOLVED, CLOSED, NOT_APPLICABLE, CLOSED_MODIFIED };
+    private static final ResolutionStatus[] members = { OPEN, UPDATED, RESOLVED, CLOSED, CLOSED_MODIFIED, NOT_APPLICABLE };
 
     public static ResolutionStatus[] getMembers() {
         return members;
