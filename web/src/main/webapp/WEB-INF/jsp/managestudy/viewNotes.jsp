@@ -136,12 +136,8 @@
 <br><br>
 --%>
 
-<div><a style="text-decoration: none;" id="sumBoxParent" href="javascript:void(0)"
-        onclick="showSummaryBox('topTable',document.getElementById('sumBoxParent'),
-        '<fmt:message key="show_summary_statistics" bundle="${resword}"/>',
-        '<fmt:message key="hide_summary_statistics" bundle="${resword}"/>')">
-    <img name="ExpandGroup1" src="images/bt_Collapse.gif" border="0">
-    <fmt:message key="hide_summary_statistics" bundle="${resword}"/></a>
+<div>
+    <fmt:message key="Summary_count_by_status" bundle="${resword}"/>
 </div>
 <div id="topTable" style="display:block; width:600px;">
     <%--<h3>Summary statistics</h3>--%>
@@ -149,7 +145,7 @@
     <!-- NEW Summary-->
     <table border="0" cellspacing="0" class="summaryTable" style="width:600px;">
         <c:forEach var="status" items="${mapKeys}">
-            <c:if test="${(status.name != 'Resolution Proposed') && (status.name != 'Not Applicable')}">
+            <c:if test="${(status.name != 'Resolution Proposed')}">
                 <tr>
                     <td><b>${status.name}</b></td>
                     <td><span class="${status.iconFilePath}" border="0"></span></td>
