@@ -16,7 +16,6 @@
 
 
 <link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
-<link rel="stylesheet" href="includes/css/oc2017_styles.css" type="text/css">
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
