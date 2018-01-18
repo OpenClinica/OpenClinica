@@ -91,7 +91,9 @@ public class StudySubjectProcessor implements Processor, Ordered {
         } else {
             // create Subject & Study Subject
             Study study = studyDao.findByOcOID(container.getSubjectContext().get("studyOID"));
-            int nextLabel = studySubjectDao.findTheGreatestLabelByStudy(study.getStudyId()) + 1;
+            // Need to pass parent study Id if this is a site
+            Integer studyId = study.getStudy() != null ? study.getStudy().getStudyId() : study.getStudyId();
+            int nextLabel = studySubjectDao.findTheGreatestLabelByStudy(studyId) + 1;
             Subject subject = createSubject(currentDate, rootUser);
             StudySubject studySubject = createStudySubject(Integer.toString(nextLabel), subject, study,rootUser,currentDate, null);
             container.setSubject(studySubject);
