@@ -92,7 +92,12 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
     }
 
     public int findTheGreatestLabelByStudy(Integer studyId) {
-        List<StudySubject> allStudySubjects = findAllByStudy(studyId);
+        getSessionFactory().getStatistics().logSummary();
+        String query = "from " + getDomainClassName() + " do  where (do.study.studyId = :studyid or do.study.study.studyId = :studyid)";
+
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyid", studyId);
+        List<StudySubject> allStudySubjects = (ArrayList<StudySubject>) q.list();
         
         int greatestLabel = 0;
         for (StudySubject subject:allStudySubjects) {
