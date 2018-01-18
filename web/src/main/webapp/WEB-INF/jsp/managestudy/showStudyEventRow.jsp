@@ -383,7 +383,7 @@
 		 </c:if>
 		</c:otherwise>
 		</c:choose>
-		<c:if test="${(study.status.available) && (dec.eventCRF.status.name != 'completed') }">
+		<c:if test="${(study.status.available) && (!userRole.monitor) && (dec.eventCRF.status.name != 'completed') }">
 		<td>
 		 <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
 			onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
