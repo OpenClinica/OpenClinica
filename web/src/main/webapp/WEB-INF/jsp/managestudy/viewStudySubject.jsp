@@ -140,12 +140,14 @@
         </a>
     </div>
 <div id="studySubjectRecord">
+
 <script type="text/javascript" language="javascript">
     var oldURL = document.referrer;
     var parts = oldURL.split('/');
     var lastSegment = parts.pop() || parts.pop();//get last segmen of url
+    var beforePage = lastSegment.substring(0,lastSegment.indexOf("?")); 
     
-    if(lastSegment=='ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query'){
+    if(beforePage=='ViewNotes'){
         document.getElementById('studySubjectRecord').style.display = "block";
     }else{
         document.getElementById('studySubjectRecord').style.display = "none";
