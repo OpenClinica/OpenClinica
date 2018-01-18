@@ -40,8 +40,8 @@
     <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
     <script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
     <script type="text/javascript" src="js/lib/client.js"></script>
-
     <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
+    <script type="text/javascript" language="JavaScript" src="includes/auth0/captureKeyboardMouseEvents.js"></script>
     <script type="text/javascript" language="javascript">
 
         $(document).ready(function(){
@@ -81,6 +81,7 @@
 </c:if>
 <body style="width:1024px;" class="main_BG">
 <script type="application/javascript">
+    updateOCAppTimeout();
     isSessionTimedOut(encodeURIComponent(currentURL), true, true);
 </script>
 <iframe id="enketo" style="position:fixed;z-index:1011;top:0;left:0;width:100vw;height:100vh;"/>

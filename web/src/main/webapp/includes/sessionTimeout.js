@@ -1,5 +1,45 @@
 
+function setCurrentLogin(key) {
+    storage.onConnect()
+        .then(function() {
+            storage.set("currentLogin", key);
+        })['catch'](function(err) {
+        console.log(err);
+    });
+}
+function processCurrentLogin() {
+    storage.onConnect()
+    .then(function() {
+        return storage.get("currentLogin");
+    }).then(function(res) {
+        if (res == null) {
+            storage.set("currentLogin", userName);
+        } else {
+            console.log("In processCurrentLogin");
+            var prevLogin = res;
+            if (prevLogin !== userName) {
+                console.log("another user: " +
+                    +" currently loggedIn: New user is:" + userName);
+                setLoggedOutFlag(prevLogin + "-logoutBy", appName);
+            }
+            storage.set("currentLogin", userName);
+        }
+    })['catch'](function(err) {
+        console.log(err);
+    });
+}
+
+function updateOCAppTimeout() {
+    var newExpiration = moment().add(sessionTimeout, 's').valueOf();
+    storage.onConnect()
+        .then(function() {
+            storage.set(ocAppTimeoutKey, newExpiration);
+        })['catch'](function(err) {
+        console.log(err);
+    });
+}
 function isSessionTimedOut(currentURL, setStorageFlag) {
+    processCurrentLogin();
     processLoggedOutKey();
     var newExpiration = moment().add(sessionTimeout, 's').valueOf();
     var currentTime = moment().valueOf();
@@ -13,7 +53,7 @@ function isSessionTimedOut(currentURL, setStorageFlag) {
             var existingTimeout = res;
             if (currentTime > existingTimeout) {
                 storage.del(ocAppTimeoutKey);
-                setLoggedOutFlag();
+                setLoggedOutFlag(logoutByKey);
                 console.log("currentTime: " + currentTime + " > existingTimeout: " + existingTimeout + " returning to Login screen");
                 window.location.replace (myContextPath + '/pages/logout');
             } else {
@@ -35,11 +75,11 @@ function deleteOCAppTimeout() {
     });
 }
 
-function setLoggedOutFlag() {
+function setLoggedOutFlag(key) {
     storage.onConnect()
         .then(function () {
             console.log("setting loggedOut to " + appName + "(((((");
-            storage.set(logoutByKey, appName);
+            storage.set(key, appName);
         }).then(function(res) {
     })['catch'](function(err) {
         console.log(err);
@@ -67,7 +107,8 @@ function processLoggedOutKey(invalidateFlag) {
                     console.log("Current URL&&&&&&&&&" + currentURL + "invalidateFlag " + invalidateFlag);
                     console.log("************userName:" + userName);
                     if (logoutByKey.startsWith(userName + "-")) {
-                        console.log("backend invalidateAuth0Token");
+                        console.log("backend invalidateAuth0Token and deleting currentLogin key");
+                        storage.del("currentLogin");
                         window.location.replace (myContextPath + '/pages/invalidateAuth0Token');
                     } else {
                         jQuery.get(myContextPath + '/pages/invalidateAuth0Token')

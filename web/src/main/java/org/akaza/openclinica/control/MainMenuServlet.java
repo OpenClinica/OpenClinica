@@ -186,19 +186,16 @@ public class MainMenuServlet extends SecureController {
         return isRenewAuth;
     }
 
-    private boolean processForceRenewAuth() throws IOException {
+    private boolean
+    processForceRenewAuth() throws IOException {
         boolean isRenewAuth = false;
         String renewAuth = (String) request.getParameter("forceRenewAuth");
         if (StringUtils.isNotEmpty(renewAuth)) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null)
+            if (auth != null) {
                 auth.setAuthenticated(false);
-            Map<String, String[]> parameterMap = request.getParameterMap();
-            Map<String, String[]> keyMap = new HashMap<>();
-            keyMap.putAll(parameterMap);
-            keyMap.remove("forceRenewAuth");
-            String paramStr = Utils.getParamsString(keyMap);
-            response.sendRedirect(request.getRequestURI() + "?" + paramStr);
+                SecurityContextHolder.clearContext();
+            }
             return true;
         }
         return isRenewAuth;

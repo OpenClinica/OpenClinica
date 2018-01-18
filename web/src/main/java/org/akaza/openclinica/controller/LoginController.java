@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import com.auth0.SessionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;

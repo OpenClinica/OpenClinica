@@ -4,6 +4,7 @@ import org.akaza.openclinica.config.AppConfig;
 import org.akaza.openclinica.service.LogoutService;
 import org.akaza.openclinica.view.Page;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,17 +54,15 @@ public class LogoutController {
 
     @RequestMapping(value="/logoutSuccess", method = RequestMethod.GET)
     protected String logout(final HttpServletRequest request, final HttpServletResponse response) {
-        String returnToCookie = null;
-        try {
-            returnToCookie = URLDecoder.decode(logoutService.getReturnToCookie(request, response), "UTF-8");
-        } catch (UnsupportedEncodingException e) {
-            logger.error("Error parsing returnToCookie:" + e.getMessage());
-        }
+
         int index = request.getRequestURL().indexOf(request.getContextPath());
-        String returnURL = request.getRequestURL().substring(0, index);
-        if (StringUtils.isEmpty(returnToCookie))
-            returnToCookie = request.getContextPath() + Page.MENU_SERVLET.getFileName();
-        return "redirect:" + returnURL + returnToCookie;
+        String returnURL = request.getRequestURL().substring(0, index)
+                + request.getContextPath() + Page.MENU_SERVLET.getFileName();
+        String param = "";
+        if (request.getParameter("studyEnvUuid") != null) {
+            param = "?studyEnvUuid=" + request.getParameter("studyEnvUuid");
+        }
+        return "redirect:" + returnURL + param;
     }
 
     @RequestMapping(value="/invalidateAuth0Token", method = RequestMethod.GET)
@@ -75,7 +74,7 @@ public class LogoutController {
             System.out.println("Invalidating token");
             auth.setAuthenticated(false);
             request.getSession().setAttribute("userRole", null);
-            response.sendRedirect(controller.buildAuthorizeUrl(request, true /* don't do SSO, SSO already failed */));
+            response.sendRedirect(controller.buildAuthorizeUrl(request, true));
         }
     }
 }
