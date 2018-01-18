@@ -1,8 +1,12 @@
 package org.akaza.openclinica.controller;
 
 import com.auth0.*;
+import net.sf.json.util.JSONUtils;
+import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.config.AppConfig;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -11,6 +15,7 @@ import org.springframework.stereotype.Component;
 import javax.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
+import java.util.Map;
 
 /**
  * Created by yogi on 9/6/17.
@@ -64,6 +69,38 @@ public class Auth0Controller {
         AuthorizeUrl authUrl = controller
                 .buildAuthorizeUrl(request, redirectUri)
                 .withAudience(userInfoAudience);
+
+        JSONObject json = null;
+        for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
+            switch ((entry.getKey())) {
+                case "studyEnvUuid":
+                    if (json == null)
+                        json = new JSONObject();
+                    json.put(entry.getKey(), entry.getValue()[0]);
+                    break;
+                case "forceRenewAuth":
+                    if (json == null)
+                        json = new JSONObject();
+                    json.put(entry.getKey(), entry.getValue()[0]);
+                    UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
+                    if (ub != null && StringUtils.isNotEmpty(ub.getName()))
+                        json.put("loggedUser", ub.getName());
+                    break;
+                case "state":
+                    if (JSONUtils.mayBeJSON(entry.getValue()[0])) {
+                        json = new JSONObject(entry.getValue()[0]);
+                        try {
+                            json.remove("forceRenewAuth");
+                        } catch (Exception e) {
+                            e.printStackTrace();
+                        }
+                    }
+                    break;
+                default:
+                    break;
+            }
+        };
+
         String returnTo = (String)SessionUtils.get(request, RETURN_TO);
         if (returnTo == null) {
             returnTo = request.getRequestURI();
@@ -74,7 +111,10 @@ public class Auth0Controller {
         if (sso) authUrl.withParameter("prompt", "none");
         else authUrl.withParameter("prompt", "login");
         authUrl.withAudience("https://www.openclinica.com");
-        return authUrl.build();
+        if (json != null)
+            authUrl.withState(json.toString());
+        String urlStr = authUrl.build();
+        return urlStr;
     }
 
     public String buildLogoutURL (String redirectURI) {

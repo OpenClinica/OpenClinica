@@ -7,12 +7,16 @@ import com.auth0.Tokens;
 import com.auth0.jwt.JWT;
 import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import net.sf.json.util.JSONUtils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.config.TokenAuthentication;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.Auth0User;
 import org.akaza.openclinica.service.CallbackService;
+import org.apache.commons.lang.StringUtils;
+import org.json.JSONException;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -93,8 +97,36 @@ public class CallbackController {
                     return;
                 }
                 String returnTo = controller.getReturnTo(req);
+                String state = req.getParameter("state");
+                String param = "";
+                JSONObject jsonObject;
+                if (JSONUtils.mayBeJSON(state)) {
+                    jsonObject = new JSONObject(state);
+
+                    Object newJSON;
+                    try {
+                        newJSON = jsonObject.get("studyEnvUuid");
+                        logger.debug(newJSON.toString());
+                        param = "?studyEnvUuid=" + newJSON.toString();
+                    } catch (JSONException e) {
+                        logger.debug("studyEnvUuid is not in the state");
+                    }
+
+                    try {
+                        newJSON = jsonObject.get("forceRenewAuth");
+                        logger.debug(newJSON.toString());
+                        if (StringUtils.isEmpty(param))
+                            param += "?";
+                        else
+                            param += "&";
+                        param += "forceRenewAuth=" + newJSON.toString();
+                    } catch (JSONException e) {
+                        logger.debug("forceRenewAuth is not in the state");
+                    }
+
+                }
                 if (returnTo == null) returnTo = this.redirectOnSuccess;
-                res.sendRedirect(returnTo);
+                res.sendRedirect(returnTo + param);
             }
         } catch (InvalidRequestException e) {
             e.printStackTrace();

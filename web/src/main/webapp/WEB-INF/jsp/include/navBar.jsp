@@ -52,8 +52,8 @@
         <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
         <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="includes/css/icomoon-style.css">
-        <script type="text/javascript" language="JavaScript" src="includes/auth0/captureUnloadEvent.js"></script>
         <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
+        <script type="text/javascript" language="JavaScript" src="includes/auth0/captureKeyboardMouseEvents.js"></script>
         <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
         <script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
         <script type="text/javascript" src="js/lib/client.js"></script>
@@ -76,6 +76,7 @@
 </script>
 
 <script language="JavaScript">
+    updateOCAppTimeout();
     isSessionTimedOut(currentURL, false, true);
     //Piwik
     var _paq = _paq || [];
@@ -155,7 +156,7 @@
 
     function processLogoutClick(returnTo) {
         deleteOCAppTimeout();
-        setLoggedOutFlag();
+        setLoggedOutFlag(logoutByKey);
     }
 </script>
 
