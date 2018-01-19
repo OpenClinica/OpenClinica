@@ -182,7 +182,13 @@
                         <table border="0" cellpadding="0" cellspacing="0" class="full-width">
                             <tr>
                                 <td>
-                                    <input onfocus="this.select()" type="text" name="enrollmentDate" size="16" class="formfieldM form-control" id="enrollmentDateField_${rand}" />
+                                    <c:if test="${studyEventDefinition > 0}">
+                                        <script type="text/javascript">
+                                            document.getElementById("enrollmentDateField_${rand}").setAttribute('value','${enrollmentDate}');
+                                        </script>
+                                    </c:if>
+                                    
+                                    <input onfocus="this.select()" type="text" name="enrollmentDate" size="16" class="formfieldM form-control" id="enrollmentDateField_${rand}"/>
                                 </td>
                                 <td valign="top" class="icon-container">
                                     <a href="#">
