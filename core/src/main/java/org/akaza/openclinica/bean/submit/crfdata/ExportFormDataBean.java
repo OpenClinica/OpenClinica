@@ -22,6 +22,7 @@ public class ExportFormDataBean extends FormDataBean {
     private String interviewDate;
     private String status;
     private String formLayout;
+    private String formName;
 
     public ExportFormDataBean() {
         super();
@@ -65,6 +66,14 @@ public class ExportFormDataBean extends FormDataBean {
 
     public void setFormLayout(String formLayout) {
         this.formLayout = formLayout;
+    }
+
+    public String getFormName() {
+        return formName;
+    }
+
+    public void setFormName(String formName) {
+        this.formName = formName;
     }
 
 }

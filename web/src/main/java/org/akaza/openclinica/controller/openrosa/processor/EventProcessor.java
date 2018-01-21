@@ -111,23 +111,26 @@ public class EventProcessor implements Processor {
         } else
             container.setStudyEvent(existingEvent);
 
-        EventCrf existingEventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(container.getStudyEvent().getStudyEventId(),
+        List<EventCrf> existingEventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(container.getStudyEvent().getStudyEventId(),
                 container.getSubject().getStudySubjectId(), container.getFormLayout().getCrf().getCrfId());
-        if (existingEventCrf == null) {
+        if (existingEventCrfs == null || existingEventCrfs.size() == 0) {
             logger.info("***New EventCrf is created***");
             // create event crf
             container.setEventCrf(createEventCrf(container.getFormLayout(), container.getStudyEvent(), container.getSubject(), container.getUser()));
-        } else if (existingEventCrf.getCrfVersion().getOcOid().equals(container.getCrfVersion().getOcOid())) {
-            logger.info("***  Existing EventCrf with same CRF Version  ***");
-            // use existing event crf
-            container.setEventCrf(existingEventCrf);
         } else {
-            // different version already exists. log error and abort submission
-            errors.reject("Existing EventCrf with other CRF version");
-            logger.info("***  Existing EventCrf with other CRF version  ***");
-            throw new Exception("***  Existing EventCrf with other CRF version  ***");
+            for (EventCrf existingEventCrf : existingEventCrfs) {
+                if (existingEventCrf.getCrfVersion().getOcOid().equals(container.getCrfVersion().getOcOid())) {
+                    logger.info("***  Existing EventCrf with same CRF Version  ***");
+                    // use existing event crf
+                    container.setEventCrf(existingEventCrf);
+                } else {
+                    // different version already exists. log error and abort submission
+                    errors.reject("Existing EventCrf with other CRF version");
+                    logger.info("***  Existing EventCrf with other CRF version  ***");
+                    throw new Exception("***  Existing EventCrf with other CRF version  ***");
+                }
+            }
         }
-
     }
 
     private void processAnonymous(SubmissionContainer container, Errors errors, StudySubject studySubject, StudyEventDefinition studyEventDefinition)
@@ -157,26 +160,27 @@ public class EventProcessor implements Processor {
                     throw new Exception("***  Existing StudyEvent is not Available and EventDef is not repeating  ***");
                 }
             } else {
-                EventCrf existingEventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(existingStudyEvent.getStudyEventId(),
+                List<EventCrf> existingEventCrfs = eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(existingStudyEvent.getStudyEventId(),
                         container.getSubject().getStudySubjectId(), formLayout.getCrf().getCrfId());
-                if (existingEventCrf == null) {
+                if (existingEventCrfs == null || existingEventCrfs.size() == 0) {
                     container.setStudyEvent(existingStudyEvent);
                     container.setEventCrf(createEventCrf(formLayout, container.getStudyEvent(), container.getSubject(), container.getUser()));
                     break;
                 } else {
-
-                    List<ItemData> itemDataList = itemDataDao.findByEventCrfId(existingEventCrf.getEventCrfId());
-                    if (existingEventCrf.getStatusId().equals(Status.AVAILABLE.getCode()) && itemDataList.size() == 0) {
-                        container.setStudyEvent(existingStudyEvent);
-                        container.setEventCrf(existingEventCrf);
-                        break;
-                    } else if (studyEventDefinition.getRepeating()) {
-                        ordinal++;
-                        continue;
-                    } else {
-                        errors.reject("Existing EventCRF is not usable and EventDef is not repeating");
-                        logger.info("***  Existing EventCRF is not usable and EventDef is not repeating  ***");
-                        throw new Exception("***  Existing EventCRF is not usable and EventDef is not repeating  ***");
+                    for (EventCrf existingEventCrf : existingEventCrfs) {
+                        List<ItemData> itemDataList = itemDataDao.findByEventCrfId(existingEventCrf.getEventCrfId());
+                        if (existingEventCrf.getStatusId().equals(Status.AVAILABLE.getCode()) && itemDataList.size() == 0) {
+                            container.setStudyEvent(existingStudyEvent);
+                            container.setEventCrf(existingEventCrf);
+                            break;
+                        } else if (studyEventDefinition.getRepeating()) {
+                            ordinal++;
+                            continue;
+                        } else {
+                            errors.reject("Existing EventCRF is not usable and EventDef is not repeating");
+                            logger.info("***  Existing EventCRF is not usable and EventDef is not repeating  ***");
+                            throw new Exception("***  Existing EventCRF is not usable and EventDef is not repeating  ***");
+                        }
                     }
                 }
             }

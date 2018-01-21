@@ -205,7 +205,8 @@ public class QueryServiceImpl implements QueryService {
 
         ItemData itemData = itemDataDao.findByEventCrfItemNameDeletedOrNot(eventCrfId, itemName, ordinal);
         if (itemData == null) {
-            List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEventId, studySubjectOid);
+            List<EventCrf> eventCrfs = (List<EventCrf>) eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEventId,
+                    helperBean.getContainer().getSubject().getStudySubjectId(), helperBean.getContainer().getFormLayout().getCrf().getCrfId());
             for (EventCrf eCrf : eventCrfs) {
                 itemData = itemDataDao.findByEventCrfItemNameDeletedOrNot(eCrf.getEventCrfId(), itemName, ordinal);
                 if (itemData != null)
@@ -229,7 +230,7 @@ public class QueryServiceImpl implements QueryService {
         itemData.setUserAccount(helperBean.getUserAccount());
         itemData.setDeleted(false);
         itemData.setInstanceId(helperBean.getContainer().getInstanceId());
-        itemDataDao.saveOrUpdate(itemData);
+        itemData = itemDataDao.saveOrUpdate(itemData);
         return itemData;
     }
 

@@ -65,6 +65,7 @@ import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
 import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -77,6 +78,7 @@ import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
@@ -119,6 +121,9 @@ public class OpenRosaServices {
 
     @Autowired
     StudyEventDao studyEventDao;
+
+    @Autowired
+    StudyEventDefinitionDao studyEventDefinitionDao;
 
     @Autowired
     StudySubjectDao ssDao;
@@ -1050,10 +1055,23 @@ public class OpenRosaServices {
             String writer = getWriter(doc);
             return writer;
         }
+
+        String studyEventDefinitionID = subjectContext.get("studyEventDefinitionID");
+        String studyEventRepeat = subjectContext.get("studyEventOrdinal");
+        StudyEventDefinition sed = studyEventDefinitionDao.findById(Integer.valueOf(studyEventDefinitionID));
+        String phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\" StudyEventRepeatKey=\"" + studyEventRepeat + "\"";
+
         String userAccountID = subjectContext.get("userAccountID");
         String result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID);
-        result = result.replaceAll("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"", "");
-        return result;
+        result = result.replaceAll("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"", "")
+                .replaceAll("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"", "").replaceAll("OpenClinica:", "");
+        int index = result.indexOf(phraseToLookForInOdm);
+
+        String part1 = result.substring(0, index + phraseToLookForInOdm.length());
+        String part2 = result.substring(index + phraseToLookForInOdm.length() + 1);
+        String output = part1 + " Current=\"Yes\" " + part2;
+
+        return output;
     }
 
     private Document buildDocument() throws ParserConfigurationException {

@@ -14,6 +14,7 @@ public class ImportItemDataBean {
     private AuditLogsBean auditLogs = new AuditLogsBean();
     private DiscrepancyNotesBean discrepancyNotes = new DiscrepancyNotesBean();
     private boolean deleted;
+    private String itemName;
 
     private boolean hasValueWithNull; // this is just a flag, it is not an attribute/element
 
@@ -95,6 +96,14 @@ public class ImportItemDataBean {
 
     public void setDeleted(boolean deleted) {
         this.deleted = deleted;
+    }
+
+    public String getItemName() {
+        return itemName;
+    }
+
+    public void setItemName(String itemName) {
+        this.itemName = itemName;
     }
 
 }
