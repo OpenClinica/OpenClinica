@@ -41,6 +41,7 @@ public class LogoutController {
         logger.info("Logout page");
         session.removeAttribute("userBean");
         session.removeAttribute("study");
+        session.removeAttribute("publicStudy");
         session.removeAttribute("userRole");
         session.removeAttribute("passwordExpired");
         SecurityContextHolder.clearContext();
@@ -73,8 +74,13 @@ public class LogoutController {
         if (auth != null) {
             System.out.println("Invalidating token");
             auth.setAuthenticated(false);
+            final HttpSession session = request.getSession();
             SecurityContextHolder.clearContext();
-            request.getSession().setAttribute("userRole", null);
+            session.removeAttribute("userBean");
+            session.removeAttribute("study");
+            session.removeAttribute("publicStudy");
+            session.removeAttribute("userRole");
+            session.removeAttribute("passwordExpired");
             response.sendRedirect(controller.buildAuthorizeUrl(request, true));
         }
     }
