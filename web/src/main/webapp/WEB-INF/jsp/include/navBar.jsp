@@ -25,6 +25,7 @@
     var ocAppTimeoutKey = "OCAppTimeout-" + userName;
     var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
     var logoutByKey = userName + "-logoutBy";
+    const currentUser = "currentUser";
     var appName = "RT";
 </script>
 
@@ -156,7 +157,7 @@
 
     function processLogoutClick(returnTo) {
         deleteOCAppTimeout();
-        setLoggedOutFlag(logoutByKey);
+        setCurrentUser("");
     }
 </script>
 
