@@ -73,6 +73,7 @@ public class LogoutController {
         if (auth != null) {
             System.out.println("Invalidating token");
             auth.setAuthenticated(false);
+            SecurityContextHolder.clearContext();
             request.getSession().setAttribute("userRole", null);
             response.sendRedirect(controller.buildAuthorizeUrl(request, true));
         }
