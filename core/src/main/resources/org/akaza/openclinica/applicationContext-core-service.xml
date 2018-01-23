@@ -126,6 +126,8 @@
         <property name="auditEventDAO" ref="auditLogEventDaoDomain"/>
         <property name="userAccountDao" ref="userDaoDomain"/>
         <property name="studyUserRoleDao" ref="studyUserRoleDao"/>        
+        <property name="itemGroupDao" ref="itemGroupDao"/>
+        <property name="itemDao" ref="itemDao"/>
     </bean>
 
     <bean id="beanPropertyService" class="org.akaza.openclinica.service.crfdata.BeanPropertyService" autowire="byName">

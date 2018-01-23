@@ -6,7 +6,8 @@ public class ImportItemGroupDataBean {
     private ArrayList<ImportItemDataBean> itemData;
     private String itemGroupOID;
     private String itemGroupRepeatKey;
-    
+    private String itemGroupName;
+
     public ImportItemGroupDataBean() {
         itemData = new ArrayList<ImportItemDataBean>();
     }
@@ -34,4 +35,13 @@ public class ImportItemGroupDataBean {
     public void setItemData(ArrayList<ImportItemDataBean> itemData) {
         this.itemData = itemData;
     }
+
+    public String getItemGroupName() {
+        return itemGroupName;
+    }
+
+    public void setItemGroupName(String itemGroupName) {
+        this.itemGroupName = itemGroupName;
+    }
+
 }

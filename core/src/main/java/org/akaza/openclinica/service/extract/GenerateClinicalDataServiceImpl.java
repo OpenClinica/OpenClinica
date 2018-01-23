@@ -24,6 +24,8 @@ import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
 import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
+import org.akaza.openclinica.dao.hibernate.ItemDao;
+import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
@@ -43,6 +45,7 @@ import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.Item;
 import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.ItemGroup;
 import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
@@ -88,6 +91,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
     private UserAccountDao userAccountDao;
     private StudyUserRoleDao studyUserRoleDao;
+    private ItemDao itemDao;
+    private ItemGroupDao itemGroupDao;
 
     public AuditLogEventDao getAuditEventDAO() {
         return auditEventDAO;
@@ -289,6 +294,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
                     expSEBean.setStartDate(temp);
                 }
 
+                expSEBean.setEventName(se.getStudyEventDefinition().getName());
                 expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
 
                 expSEBean.setStudyEventRepeatKey(se.getSampleOrdinal().toString());
@@ -347,6 +353,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
                 }
                 if (formCheck) {
                     ExportFormDataBean dataBean = new ExportFormDataBean();
+                    dataBean.setFormName(ecrf.getCrfVersion().getCrf().getName());
                     dataBean.setItemGroupData(
                             fetchItemData(ecrf.getCrfVersion().getItemGroupMetadatas(), ecrf.getEventCrfId(), ecrf.getCrfVersion().getVersioningMaps(), ecrf));
                     dataBean.setFormOID(ecrf.getCrfVersion().getCrf().getOcOid());
@@ -533,8 +540,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
             // int groupIdx = grpOID.indexOf(GROUPOID_ORDINAL_DELIM);
             if (firstIndexOf != -1) {
-                importItemGrpDataBean.setItemGroupOID(grpOID.substring(0, firstIndexOf));
+                String itemGroupOid = grpOID.substring(0, firstIndexOf);
+                importItemGrpDataBean.setItemGroupOID(itemGroupOid);
                 importItemGrpDataBean.setItemGroupRepeatKey(grpOID.substring(firstIndexOf + 1, secondIndexOf));
+                ItemGroup itemGroup = itemGroupDao.findByOcOID(itemGroupOid);
+                importItemGrpDataBean.setItemGroupName(itemGroup.getName());
                 boolean isDeleted = Boolean.parseBoolean(grpOID.substring(secondIndexOf + 1));
                 ArrayList<ImportItemDataBean> iiDList = new ArrayList<ImportItemDataBean>();
 
@@ -542,9 +552,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
                     ImportItemDataBean iiDataBean = new ImportItemDataBean();
                     int index = value.indexOf(DELIMITER);
                     if (!value.trim().equalsIgnoreCase(DELIMITER)) {
-                        iiDataBean.setItemOID(value.substring(0, index));
+                        String itemOid = value.substring(0, index);
+                        iiDataBean.setItemOID(itemOid);
                         iiDataBean.setValue(value.substring(index + 1, value.length()));
                         iiDataBean.setDeleted(isDeleted);
+                        Item item = itemDao.findByOcOID(itemOid);
+                        iiDataBean.setItemName(item.getName());
                         if (isCollectAudits() || isCollectDns()) {
                             iiDataBean = fetchItemDataAuditValue(oidDNAuditMap.get(grpOID), iiDataBean);
                         }
@@ -938,6 +951,22 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
     public void setStudyUserRoleDao(StudyUserRoleDao studyUserRoleDao) {
         this.studyUserRoleDao = studyUserRoleDao;
+    }
+
+    public ItemDao getItemDao() {
+        return itemDao;
+    }
+
+    public void setItemDao(ItemDao itemDao) {
+        this.itemDao = itemDao;
+    }
+
+    public ItemGroupDao getItemGroupDao() {
+        return itemGroupDao;
+    }
+
+    public void setItemGroupDao(ItemGroupDao itemGroupDao) {
+        this.itemGroupDao = itemGroupDao;
     }
 
 }

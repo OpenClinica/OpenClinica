@@ -104,19 +104,26 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             //
             ArrayList<ExportStudyEventDataBean> ses = (ArrayList<ExportStudyEventDataBean>) sub.getExportStudyEventData();
             for (ExportStudyEventDataBean se : ses) {
+                // For developers, please do not change order of properties sorted, it will break OpenRosaService
+                // Manifest Call for odm file
                 xml.append(indent + indent + indent + "<StudyEventData StudyEventOID=\"" + StringEscapeUtils.escapeXml(se.getStudyEventOID()));
                 if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                    xml.append("\" StudyEventRepeatKey=\"" + se.getStudyEventRepeatKey());
+                    String eventName = se.getEventName();
+                    if (eventName != null && eventName.length() > 0) {
+                        xml.append("\" OpenClinica:EventName=\"" + StringEscapeUtils.escapeXml(eventName));
+                    }
                     String location = se.getLocation();
                     if (location != null && location.length() > 0) {
                         xml.append("\" OpenClinica:StudyEventLocation=\"" + StringEscapeUtils.escapeXml(location));
                     }
                     String startDate = se.getStartDate();
                     if (startDate != null && startDate.length() > 0) {
-                        xml.append("\" OpenClinica:StartDate=\"" + startDate);
+                        xml.append("\" OpenClinica:StartDate=\"" + StringEscapeUtils.escapeXml(startDate));
                     }
                     String endDate = se.getEndDate();
                     if (endDate != null && endDate.length() > 0) {
-                        xml.append("\" OpenClinica:EndDate=\"" + endDate);
+                        xml.append("\" OpenClinica:EndDate=\"" + StringEscapeUtils.escapeXml(endDate));
                     }
                     String status = se.getStatus();
                     if (status != null && status.length() > 0) {
@@ -126,19 +133,18 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         xml.append("\" OpenClinica:SubjectAgeAtEvent=\"" + se.getAgeAtEvent());
                     }
                 }
-                xml.append("\"");
-                if (!"-1".equals(se.getStudyEventRepeatKey())) {
-                    xml.append(" StudyEventRepeatKey=\"" + se.getStudyEventRepeatKey() + "\"");
-                }
-                xml.append(">");
+                xml.append("\">");
                 xml.append(nls);
                 //
                 ArrayList<ExportFormDataBean> forms = se.getExportFormData();
                 for (ExportFormDataBean form : forms) {
                     xml.append(indent + indent + indent + indent + "<FormData FormOID=\"" + StringEscapeUtils.escapeXml(form.getFormOID()));
                     if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                        String formName = form.getFormName();
+                        if (!StringUtils.isEmpty(formName)) {
+                            xml.append("\" OpenClinica:FormName=\"" + StringEscapeUtils.escapeXml(formName));
+                        }
                         String formLayout = form.getFormLayout();
-
                         if (!StringUtils.isEmpty(formLayout)) {
                             xml.append("\" OpenClinica:FormLayoutOID=\"" + StringEscapeUtils.escapeXml(formLayout));
                         }
@@ -165,6 +171,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         if (!"-1".equals(ig.getItemGroupRepeatKey())) {
                             xml.append("ItemGroupRepeatKey=\"" + ig.getItemGroupRepeatKey() + "\" ");
                         }
+                        String itemGroupName = ig.getItemGroupName();
+                        if (!StringUtils.isEmpty(itemGroupName)) {
+                            xml.append("OpenClinica:ItemGroupName=\"" + itemGroupName + "\" ");
+                        }
                         if (ig.getItemData().get(0).isDeleted()) {
                             xml.append("OpenClinica:Removed=\"" + (ig.getItemData().get(0).isDeleted() ? "Yes" : "No") + "\" ");
                         }
@@ -176,6 +186,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             boolean printValue = true;
                             xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
                                     + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" ");
+                            String itemName = item.getItemName();
+                            if (!StringUtils.isEmpty(itemName)) {
+                                xml.append(" OpenClinica:ItemName=\"" + StringEscapeUtils.escapeXml(itemName) + "\" ");
+                            }
                             if ("Yes".equals(item.getIsNull())) {
                                 xml.append("IsNull=\"Yes\"");
                                 if (!item.isHasValueWithNull()) {

@@ -351,6 +351,7 @@ public class OdmExtractDAO extends DatasetDAO {
             this.setTypeExpected(27, TypeNames.DATE);// date_interviewed
             this.setTypeExpected(28, TypeNames.STRING);// interviewer_name
             this.setTypeExpected(29, TypeNames.INT);// validator_id
+            this.setTypeExpected(30, TypeNames.STRING);// definition_name;
         }
     }
 
@@ -366,7 +367,8 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setTypeExpected(8, TypeNames.STRING);// value
         this.setTypeExpected(9, TypeNames.INT);// item_data_type_id
         this.setTypeExpected(10, TypeNames.INT);// item_data_id
-        this.setTypeExpected(11, TypeNames.STRING);// mu_oid
+        this.setTypeExpected(11, TypeNames.STRING);// item_name
+        this.setTypeExpected(12, TypeNames.STRING);// mu_oid
     }
 
     public void setEventCrfIdsByItemDataTypesExpected() {
@@ -2320,6 +2322,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 String itValue = (String) row.get("value");
                 Integer datatypeid = (Integer) row.get("item_data_type_id");
                 Integer idataId = (Integer) row.get("item_data_id");
+                String itemName = (String) row.get("item_name");
                 String muOid = (String) row.get("mu_oid");
                 String key = "";
                 if (ecId != ecprev) {
@@ -2343,6 +2346,7 @@ public class OdmExtractDAO extends DatasetDAO {
                         igpos.put(key + itDataOrdinal, form.getItemGroupData().size());
                         igprev = key;
                         ig.setItemGroupOID(igOID + "");
+                        ig.setItemGroupName(igName);
                         ig.setItemGroupRepeatKey("ungrouped".equalsIgnoreCase(igName) ? "-1" : itDataOrdinal + "");
                         form.getItemGroupData().add(ig);
                     } else {
@@ -2360,6 +2364,7 @@ public class OdmExtractDAO extends DatasetDAO {
                         ImportItemDataBean it = new ImportItemDataBean();
                         it.setItemOID(itOID);
                         it.setTransactionType("Insert");
+                        it.setItemName(itemName);
                         String nullKey = study.getId() + "-" + se.getStudyEventOID() + "-" + form.getFormOID();
                         if (ClinicalDataUtil.isNull(itValue, nullKey, nullValueCVs)) {
                             // if
@@ -3000,6 +3005,7 @@ public class OdmExtractDAO extends DatasetDAO {
             Integer sgcId = (Integer) row.get("sgc_id");
             String sgcName = (String) row.get("sgc_name");
             String sgName = (String) row.get("sg_name");
+            String sedName = (String) row.get("definition_name");
             String sedOID = (String) row.get("definition_oid");
             Boolean studyEventRepeating = (Boolean) row.get("definition_repeating");
             Integer sampleOrdinal = (Integer) row.get("sample_ordinal");
@@ -3092,6 +3098,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 seprev = key;
                 sedOids += "'" + sedOID + "', ";
                 se.setStudyEventOID(sedOID);
+                se.setEventName(sedName);
                 // ----- add openclinica study event attributes
                 if (startDate != null && dataset.isShowSubjectAgeAtEvent() && dob != null) {
                     se.setAgeAtEvent(Utils.getAge(dob, startDate));
@@ -3135,6 +3142,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 formprev = key;
                 ecIds += "'" + ecId + "', ";
                 form.setFormOID(cBean.getOid());
+                form.setFormName(cBean.getName());
                 // ----- add openclinica crf attributes
                 if (dataset.isShowCRFversion()) {
                     form.setCrfVersion((String) row.get("crf_version"));
@@ -3474,7 +3482,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 + " se.sample_ordinal as sample_ordinal, se.se_location, se.date_start, se.date_end, se.start_time_flag,"
                 + " se.end_time_flag, se.subject_event_status_id as event_status_id, edc.ordinal as crf_order,"
                 + " cv.oc_oid as crf_version_oid, cv.name as crf_version, cv.status_id as cv_status_id, ec.status_id as ec_status_id, ec.event_crf_id, ec.date_interviewed,"
-                + " ec.interviewer_name, ec.validator_id from (select study_event_id, study_event_definition_id, study_subject_id, location as se_location,"
+                + " ec.interviewer_name, ec.validator_id ,sed.name as definition_name from (select study_event_id, study_event_definition_id, study_subject_id, location as se_location,"
                 + " sample_ordinal, date_start, date_end, subject_event_status_id, start_time_flag, end_time_flag from study_event "
                 + " where study_event_definition_id in " + sedIds + " and study_subject_id in (" + studySubjectIds
                 + ")) se, ( select st_sub.oc_oid, st_sub.study_subject_id, st_sub.label,"
@@ -3500,9 +3508,9 @@ public class OdmExtractDAO extends DatasetDAO {
         String ecStatusConstraint = this.getECStatusConstraint(datasetItemStatusId);
         String itStatusConstraint = this.getItemDataStatusConstraint(datasetItemStatusId);
         return "select cvidata.event_crf_id, ig.item_group_id, ig.oc_oid as item_group_oid, ig.name as item_group_name,"
-                + " cvidata.item_id, cvidata.item_oid, cvidata.item_data_ordinal, cvidata.value, cvidata.item_data_type_id, cvidata.item_data_id"
+                + " cvidata.item_id, cvidata.item_oid, cvidata.item_data_ordinal, cvidata.value, cvidata.item_data_type_id, cvidata.item_data_id , cvidata.item_name"
                 + " from (select ec.event_crf_id, ec.crf_version_id, item.item_id, item.oc_oid as item_oid,"
-                + " idata.ordinal as item_data_ordinal, idata.value as value, item.item_data_type_id, idata.item_data_id as item_data_id from item,"
+                + " idata.ordinal as item_data_ordinal, idata.value as value, item.item_data_type_id, idata.item_data_id as item_data_id, item.name as item_name from item,"
                 + " (select event_crf_id, item_id, ordinal, value, item_data_id from item_data where (status_id " + itStatusConstraint + ")"
                 + " and event_crf_id in (select distinct event_crf_id from event_crf where study_subject_id in (select distinct"
                 + " ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ") " + dateConstraint + ") and study_event_id"

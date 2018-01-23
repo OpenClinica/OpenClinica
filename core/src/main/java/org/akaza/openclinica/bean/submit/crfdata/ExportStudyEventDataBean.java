@@ -24,6 +24,7 @@ public class ExportStudyEventDataBean extends StudyEventDataBean {
     private String endDate;
     private String status;
     private Integer ageAtEvent;
+    private String eventName;
     private ArrayList<ExportFormDataBean> exportFormData;
 
     public ExportStudyEventDataBean() {
@@ -78,4 +79,13 @@ public class ExportStudyEventDataBean extends StudyEventDataBean {
     public Integer getAgeAtEvent() {
         return this.ageAtEvent;
     }
+
+    public String getEventName() {
+        return eventName;
+    }
+
+    public void setEventName(String eventName) {
+        this.eventName = eventName;
+    }
+
 }
