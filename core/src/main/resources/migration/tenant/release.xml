@@ -11,4 +11,5 @@
        <include file="migration/tenant/4.0-2017-11-08-OC-8483.xml"/>   
        <include file="migration/tenant/4.0-2017-11-13-OC-8498.xml"/>    
        <include file="migration/tenant/4.0-2017-11-29-OC-8299.xml"/>                              
+       <include file="migration/tenant/4.0-2018-01-23-OC-8741.xml"/>                              
 </databaseChangeLog>

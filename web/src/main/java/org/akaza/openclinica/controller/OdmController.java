@@ -321,7 +321,7 @@ public class OdmController {
         StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
         String enketoURL = cache.getPFormURL(studyOID, formLayout.getOid(), studyEvent);
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
-                formLayout.getOid(), String.valueOf(nextEvent.getId()), studyOID);
+                formLayout.getOid(), String.valueOf(nextEvent.getId()), studyOID, null);
 
         String url = enketoURL + "?" + FORM_CONTEXT + "=" + contextHash;
         logger.debug("Enketo URL for " + formLayout.getName() + "= " + url);
@@ -332,7 +332,7 @@ public class OdmController {
     private String createEditUrl(String studyOID, FormLayoutBean formLayout, StudyEventBean nextEvent, String ssoid) throws Exception {
         PFormCache cache = PFormCache.getInstance(context);
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
-                formLayout.getOid(), String.valueOf(nextEvent.getId()), studyOID);
+                formLayout.getOid(), String.valueOf(nextEvent.getId()), studyOID, null);
         String editURL = CoreResources.getField("sysURL.base") + "pages/api/v1/editform/" + studyOID + "/url";
 
         String url = editURL + "?" + FORM_CONTEXT + "=" + contextHash;

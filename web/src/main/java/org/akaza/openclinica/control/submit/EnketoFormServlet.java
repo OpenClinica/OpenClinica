@@ -66,7 +66,7 @@ public class EnketoFormServlet extends SecureController {
         subjectContext.setFormLayoutOid(formLayout.getOcOid());
         subjectContext.setUserAccountId(String.valueOf(ub.getId()));
         subjectContext.setStudyOid((currentStudy.getOid()));
-
+        subjectContext.setFormLoadMode(mode);
         contextHash = cache.putSubjectContext(subjectContext);
 
         Study parentStudy = enketoCredentials.getParentStudy(currentStudy.getOid());

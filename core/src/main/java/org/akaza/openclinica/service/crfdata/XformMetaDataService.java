@@ -558,7 +558,7 @@ public class XformMetaDataService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_OCTET_STREAM));
         HttpEntity<String> entity = new HttpEntity<String>(headers);
 
-         ResponseEntity<byte[]> response = restTemplate.exchange(replaceUrlWithServiceGatewayURL(uri), HttpMethod.GET, entity, byte[].class, "1");
+        ResponseEntity<byte[]> response = restTemplate.exchange(replaceUrlWithServiceGatewayURL(uri), HttpMethod.GET, entity, byte[].class, "1");
 
         File file = new File(dir + File.separator + fileName);
         if (response.getStatusCode().equals(HttpStatus.OK)) {
@@ -571,6 +571,7 @@ public class XformMetaDataService {
             String hash = DigestUtils.md5Hex(xformOutput);
             if (formLayout.getXform() == null || !formLayout.getXform().equals(hash)) {
                 formLayout.setXform(DigestUtils.md5Hex(xformOutput));
+                formLayout.setExternalInstance("");
                 formLayoutDao.saveOrUpdate(formLayout);
             }
         }
