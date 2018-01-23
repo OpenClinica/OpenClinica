@@ -57,6 +57,7 @@ public class FormLayout extends DataMapDomainObject {
     private Set decisionConditions = new HashSet(0);
     private List<FileItem> fileItems;
     private List<VersioningMap> versioningMaps;
+    private String externalInstance;
 
     public FormLayout() {
     }
@@ -250,6 +251,15 @@ public class FormLayout extends DataMapDomainObject {
 
     public void setVersioningMaps(List<VersioningMap> versioningMaps) {
         this.versioningMaps = versioningMaps;
+    }
+
+    @Column(name = "external_instance")
+    public String getExternalInstance() {
+        return externalInstance;
+    }
+
+    public void setExternalInstance(String externalInstance) {
+        this.externalInstance = externalInstance;
     }
 
 }

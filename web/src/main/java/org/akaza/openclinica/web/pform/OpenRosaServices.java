@@ -341,6 +341,9 @@ public class OpenRosaServices {
             // TODO: them.
             // TODO Uncomment this before checking in
             if (StringUtils.isNotEmpty(xformOutput)) {
+                if (formLayout.getExternalInstance() == null) {
+                    checkForCllinicalDataInstanceInXform(formLayout, xformOutput);
+                }
                 form.setHash(DigestUtils.md5Hex(xformOutput));
             }
 
@@ -431,12 +434,11 @@ public class OpenRosaServices {
         manifest.add(userList);
 
         MediaFile odmPayload = new MediaFile();
-        String odm = getODMMetadata(request, studyOID, ecid, context);
+        String odm = getODMMetadata(request, studyOID, ecid, context, formID);
         odmPayload.setHash((DigestUtils.md5Hex(odm)));
         odmPayload.setFilename("clinicaldata.xml");
-        odmPayload.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/" + ecid);
+        odmPayload.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/" + ecid + "/" + formID);
         manifest.add(odmPayload);
-
         try {
             // Create the XML manifest using a Castor mapping file.
             XMLContext xmlContext = new XMLContext();
@@ -519,6 +521,9 @@ public class OpenRosaServices {
         }
         try {
             if (StringUtils.isNotEmpty(xformOutput)) {
+                if (formLayout.getExternalInstance() == null) {
+                    checkForCllinicalDataInstanceInXform(formLayout, xformOutput);
+                }
                 xform = xformOutput;
             }
         } catch (Exception e) {
@@ -793,7 +798,7 @@ public class OpenRosaServices {
             for (CRFVersionBean crfVersion : crfs) {
                 String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid(), studyEvent);
                 String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
-                        String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid(), null, studyOID);
+                        String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid(), null, studyOID, null);
             }
         } catch (Exception e) {
             LOGGER.debug(e.getMessage());
@@ -1039,17 +1044,22 @@ public class OpenRosaServices {
     }
 
     @GET
-    @Path("/{studyOID}/{ecid}")
+    @Path("/{studyOID}/{ecid}/{formID}")
     @Produces(MediaType.TEXT_XML)
     public String getODMMetadata(@Context HttpServletRequest request, @PathParam("studyOID") String studyOID, @PathParam("ecid") String ecid,
-            @Context ServletContext context) throws Exception {
+            @Context ServletContext context, @PathParam("formID") String formID) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
         HashMap<String, String> subjectContext = null;
         PFormCache cache = PFormCache.getInstance(context);
         subjectContext = cache.getSubjectContext(ecid);
         String studySubjectOID = subjectContext.get("studySubjectOID");
-        if (studySubjectOID == null) {
+        String formLayoutOID = subjectContext.get("formLayoutOID");
+        String formLoadMode = subjectContext.get("formLoadMode");
+        String externalInstance = getFormLayout(formLayoutOID).getExternalInstance();
+        String flavor = getQuerySet(formID);
+
+        if (studySubjectOID == null || externalInstance.equals("FALSE") || formLoadMode.equals("view") || flavor.equals(SINGLE_ITEM_FLAVOR)) {
             Document doc = buildDocument();
             appendRootElement(doc);
             String writer = getWriter(doc);
@@ -1063,13 +1073,12 @@ public class OpenRosaServices {
 
         String userAccountID = subjectContext.get("userAccountID");
         String result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID);
-        result = result.replaceAll("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"", "")
-                .replaceAll("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"", "").replaceAll("OpenClinica:", "");
+        result = result.replaceAll("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"", "");
         int index = result.indexOf(phraseToLookForInOdm);
 
         String part1 = result.substring(0, index + phraseToLookForInOdm.length());
         String part2 = result.substring(index + phraseToLookForInOdm.length() + 1);
-        String output = part1 + " Current=\"Yes\" " + part2;
+        String output = part1 + " OpenClinica:Current=\"Yes\" " + part2;
 
         return output;
     }
@@ -1095,5 +1104,19 @@ public class OpenRosaServices {
         Transformer transformer = tf.newTransformer();
         transformer.transform(dom, result);
         return writer.toString();
+    }
+
+    private FormLayout getFormLayout(String formLayoutOID) {
+        return formLayoutDao.findByOcOID(formLayoutOID);
+
+    }
+
+    private void checkForCllinicalDataInstanceInXform(FormLayout formLayout, String xformOutput) {
+        if (xformOutput.contains("<instance id=\"clinicaldata\" src=\"jr://file/clinicaldata.xml\"/>")) {
+            formLayout.setExternalInstance("TRUE");
+        } else {
+            formLayout.setExternalInstance("FALSE");
+        }
+        formLayoutDao.saveOrUpdate(formLayout);
     }
 }

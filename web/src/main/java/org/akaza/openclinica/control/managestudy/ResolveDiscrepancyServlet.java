@@ -252,6 +252,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             subjectContext.setItemInRepeatingGroup(igmBean.isRepeatingGroup());
             subjectContext.setItemRepeatGroupName(igBean.getLayoutGroupPath());
             subjectContext.setStudyEventId(String.valueOf(seb.getId()));
+            subjectContext.setFormLoadMode(EDIT_MODE);
             String contextHash = cache.putSubjectContext(subjectContext);
             StudyBean parentStudyBean = getParentStudy(currentStudy.getOid(), ds);
 

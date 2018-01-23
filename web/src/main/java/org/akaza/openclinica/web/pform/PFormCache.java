@@ -103,16 +103,16 @@ public class PFormCache {
 
     public String putSubjectContext(PFormCacheSubjectContextEntry entry) {
         return putSubjectContext(entry.getStudySubjectOid(), entry.getStudyEventDefinitionId(), entry.getOrdinal(), entry.getFormLayoutOid(),
-                entry.getUserAccountId(), entry.getStudyEventId(),entry.getStudyOid());
+                entry.getUserAccountId(), entry.getStudyEventId(), entry.getStudyOid(), entry.getFormLoadMode());
     }
 
-    public String putSubjectContext(String studySubjectOID, String studyEventDefinitionID, String studyEventOrdinal, String formLayoutOID,
-            String studyEventID, String studyOid) {
-        return putSubjectContext(studySubjectOID, studyEventDefinitionID, studyEventOrdinal, formLayoutOID, null, studyEventID, studyOid);
+    public String putSubjectContext(String studySubjectOID, String studyEventDefinitionID, String studyEventOrdinal, String formLayoutOID, String studyEventID,
+            String studyOid, String formLoadMode) {
+        return putSubjectContext(studySubjectOID, studyEventDefinitionID, studyEventOrdinal, formLayoutOID, null, studyEventID, studyOid, formLoadMode);
     }
 
     public String putSubjectContext(String studySubjectOID, String studyEventDefinitionID, String studyEventOrdinal, String formLayoutOID, String userAccountID,
-            String studyEventID,String studyOid) {
+            String studyEventID, String studyOid, String formLoadMode) {
         HashMap<String, String> contextMap = new HashMap<String, String>();
         contextMap.put("studySubjectOID", studySubjectOID);
         contextMap.put("studyEventDefinitionID", studyEventDefinitionID);
@@ -120,6 +120,7 @@ public class PFormCache {
         contextMap.put("formLayoutOID", formLayoutOID);
         contextMap.put("userAccountID", userAccountID);
         contextMap.put("studyEventID", studyEventID);
+        contextMap.put("formLoadMode", formLoadMode);
 
         contextMap.put("studyOid", studyOid);
         String hashString = userAccountID + "." + studySubjectOID + "." + studyEventDefinitionID + "." + studyEventOrdinal + "." + formLayoutOID;
