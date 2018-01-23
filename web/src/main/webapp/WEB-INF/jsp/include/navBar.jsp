@@ -24,7 +24,6 @@
     var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
     var ocAppTimeoutKey = "OCAppTimeout-" + userName;
     var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
-    var logoutByKey = userName + "-logoutBy";
     const currentUser = "currentUser";
     var appName = "RT";
 </script>
@@ -43,7 +42,7 @@
         <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
         <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="../includes/css/icomoon-style.css">
-        <script type="text/javascript" language="JavaScript" src="../includes/auth0/captureUnloadEvent.js"></script>
+        <script type="text/javascript" language="JavaScript" src="../includes/auth0/captureKeyboardMouseEvents.js"></script>
         <script type="text/javascript" language="JavaScript" src="../includes/sessionTimeout.js"></script>
         <script type="text/javascript" language="JavaScript" src="../includes/moment.min.js"></script>
         <script type="text/javascript" src="../js/lib/es6-promise.auto.min.js"></script>
@@ -70,15 +69,14 @@
         realInterval = sessionTimeout;
 
     setInterval(function () {
-            isSessionTimedOut(encodeURIComponent(currentURL), false, true);
+            isSessionTimedOut(encodeURIComponent(currentURL), false);
         },
         realInterval * 1000
     );
 </script>
 
 <script language="JavaScript">
-    updateOCAppTimeout();
-    isSessionTimedOut(currentURL, false, true);
+    isSessionTimedOut(currentURL, false);
     //Piwik
     var _paq = _paq || [];
     /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
