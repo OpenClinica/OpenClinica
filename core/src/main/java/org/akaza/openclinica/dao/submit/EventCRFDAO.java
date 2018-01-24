@@ -12,7 +12,6 @@ import java.sql.Connection;
 import java.sql.Timestamp;
 import java.sql.Types;
 import java.util.ArrayList;
-import java.util.Arrays;
 import java.util.Collection;
 import java.util.Comparator;
 import java.util.Date;
@@ -28,13 +27,13 @@ import java.util.TreeSet;
 
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.EventCRFSDVFilter;
 import org.akaza.openclinica.dao.EventCRFSDVSort;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
@@ -43,7 +42,6 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.apache.commons.lang.StringUtils;
-import org.hibernate.validator.util.SetAccessibility;
 
 /**
  * <P>
@@ -440,6 +438,15 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return executeFindAllQuery("findByEventSubjectVersion", variables);
     }
 
+    public ArrayList findByEventSubjectCrf(StudyEventBean studyEvent, StudySubjectBean studySubject, CRFBean crf) {
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(studyEvent.getId()));
+        variables.put(new Integer(2), new Integer(crf.getId()));
+        variables.put(new Integer(3), new Integer(studySubject.getId()));
+
+        return executeFindAllQuery("findByEventSubjectCrf", variables);
+    }
+
     // TODO: to get rid of warning refactor executeFindAllQuery method in
     // superclass
     public EventCRFBean findByEventCrfVersion(StudyEventBean studyEvent, CRFVersionBean crfVersion) {
@@ -453,6 +460,18 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
             eventCrfBean = eventCrfs.get(0);
         }
         return eventCrfBean;
+
+    }
+
+    // TODO: to get rid of warning refactor executeFindAllQuery method in
+    // superclass
+    public List<EventCRFBean> findByStudyEventCrf(StudyEventBean studyEvent, CRFBean crf) {
+        HashMap<Integer, Integer> variables = new HashMap<Integer, Integer>();
+        variables.put(new Integer(1), new Integer(studyEvent.getId()));
+        variables.put(new Integer(2), new Integer(crf.getId()));
+
+        ArrayList<EventCRFBean> eventCrfs = executeFindAllQuery("findByStudyEventCrf", variables);
+        return eventCrfs;
 
     }
 
