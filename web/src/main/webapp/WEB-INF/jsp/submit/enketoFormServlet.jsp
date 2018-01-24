@@ -26,6 +26,7 @@
     var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
     var ocAppTimeoutKey = "OCAppTimeout-" + userName;
     var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
+    const currentUser = "currentUser";
     var appName = "RT";
 </script>
 <head>
@@ -80,10 +81,13 @@
 </c:if>
 <body style="width:1024px;" class="main_BG">
 <script type="application/javascript">
+    var storage = new CrossStorageClient(crossStorageURL);
     updateOCAppTimeout();
     isSessionTimedOut(encodeURIComponent(currentURL), false);
 </script>
-<iframe id="enketo" style="position:fixed;z-index:1011;top:0;left:0;width:100vw;height:100vh;"/>
+<iframe id="enketo" style="position:fixed;z-index:1011;top:0;left:0;width:100vw;height:100vh;">
+
+</iframe>
 </body>
 
 </html>
