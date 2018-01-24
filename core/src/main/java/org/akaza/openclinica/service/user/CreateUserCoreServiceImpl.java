@@ -133,7 +133,8 @@ public class CreateUserCoreServiceImpl implements CreateUserCoreService {
         return userAccountBean;
     }
 
-    private UserAccountBean buildUserAccount(String username, String fName, String lName, String password, String institution,  UserAccountBean ownerUserAccount, String email,
+    private UserAccountBean buildUserAccount(String username, String fName, String lName, String password, String institution,
+                                             UserAccountBean ownerUserAccount, String email,
             String passwordHash, Boolean authorizeSoap, Role roleName, UserType userType) throws Exception {
 
         UserAccountBean createdUserAccountBean = new UserAccountBean();
