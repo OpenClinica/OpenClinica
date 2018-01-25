@@ -24,7 +24,7 @@
     var userName = "<%= userBean.getName() %>";
     var currentURL = "<%= currentURL %>";
     var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
-    var ocAppTimeoutKey = "OCAppTimeout-" + userName;
+    const ocAppTimeoutKey = "OCAppTimeout";
     var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
     const currentUser = "currentUser";
     var appName = "RT";
