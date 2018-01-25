@@ -39,12 +39,7 @@ public class LogoutController {
     protected String home(final Map<String, Object> model, final HttpServletRequest req) {
         HttpSession session = req.getSession();
         logger.info("Logout page");
-        session.removeAttribute("userBean");
-        session.removeAttribute("study");
-        session.removeAttribute("publicStudy");
-        session.removeAttribute("userRole");
-        session.removeAttribute("passwordExpired");
-        SecurityContextHolder.clearContext();
+        resetSessionAttributes(session);
         session.invalidate();
         String urlPrefix = req.getRequestURL().substring(0, req.getRequestURL().lastIndexOf("/"));
         int index = urlPrefix.indexOf(req.getContextPath());
@@ -75,13 +70,17 @@ public class LogoutController {
             System.out.println("Invalidating token");
             auth.setAuthenticated(false);
             final HttpSession session = request.getSession();
-            SecurityContextHolder.clearContext();
-            session.removeAttribute("userBean");
-            session.removeAttribute("study");
-            session.removeAttribute("publicStudy");
-            session.removeAttribute("userRole");
-            session.removeAttribute("passwordExpired");
+            resetSessionAttributes(session);
             response.sendRedirect(controller.buildAuthorizeUrl(request, true));
         }
+    }
+
+    private void resetSessionAttributes(HttpSession session) {
+        SecurityContextHolder.clearContext();
+        session.removeAttribute("userBean");
+        session.removeAttribute("study");
+        session.removeAttribute("publicStudy");
+        session.removeAttribute("userRole");
+        session.removeAttribute("passwordExpired");
     }
 }
