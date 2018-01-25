@@ -216,7 +216,7 @@ public class UpdateStudyEventServlet extends SecureController {
         ArrayList eventCrfs = studyEvent.getEventCRFs();
         for (int i = 0; i < eventCrfs.size(); i++) {
             EventCRFBean ecrf = (EventCRFBean) eventCrfs.get(i);
-            EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndCRFVersionId(studyBean, studyEventId, ecrf.getCRFVersionId());
+            EventDefinitionCRFBean edcBean = edcdao.findByStudyEventIdAndFormLayoutId(studyBean, studyEventId, ecrf.getFormLayoutId());
             if (ecrf.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY)
                     || ecrf.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) && edcBean.isDoubleEntry() == true) {
                 removeSign = true;
