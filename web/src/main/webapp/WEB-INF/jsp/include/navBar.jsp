@@ -76,13 +76,14 @@
      * @param {function} errorFunc (Optional) Callback to run if the drift
      *                             exceeds interval
      */
+    /*
     function AdjustingInterval(workFunc, interval, errorFunc) {
         var that = this;
         var expected, timeout;
         this.interval = interval;
 
         this.start = function() {
-            expected = Date.now() + this.interval;
+            expected = moment().valueOf() + this.interval;
             timeout = setTimeout(step, this.interval);
         }
 
@@ -91,7 +92,7 @@
         }
 
         function step() {
-            var drift = Date.now() - expected;
+            var drift = moment().valueOf() - expected;
             if (drift > that.interval) {
                 // You could have some default stuff here too...
                 if (errorFunc) errorFunc();
@@ -109,8 +110,9 @@
         console.warn('The drift exceeded the interval.');
     };
 
-    /*var ticker = new AdjustingInterval(doWork, realInterval * 1000, doError);
-    ticker.start();*/
+    var ticker = new AdjustingInterval(doWork, realInterval * 1000, doError);
+    ticker.start();
+    */
     setInterval(function () {
             isSessionTimedOut(false);
         },
