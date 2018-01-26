@@ -926,6 +926,7 @@ public class ImportCRFDataService {
             ItemGroupDAO itemGroupDAO = new ItemGroupDAO(ds);
             ItemDAO itemDAO = new ItemDAO(ds);
             CRFDAO crfDAO = new CRFDAO(ds);
+            EventDefinitionCRFDAO edcDAO = new EventDefinitionCRFDAO(ds);
 
             if (subjectDataBeans != null) {// need to do this so as not to
                 // throw the exception below and
@@ -937,9 +938,6 @@ public class ImportCRFDataService {
                         mf.applyPattern(respage.getString("your_subject_oid_does_not_reference"));
                         Object[] arguments = { oid };
                         errors.add(mf.format(arguments));
-
-                        // errors.add("Your Subject OID " + oid + " does not
-                        // reference an existing Subject in the Study.");
                         logger.debug("logged an error with subject oid " + oid);
                     }
 
@@ -949,170 +947,101 @@ public class ImportCRFDataService {
                             String sedOid = studyEventDataBean.getStudyEventOID();
                             StudyEventDefinitionBean studyEventDefintionBean = studyEventDefinitionDAO.findByOidAndStudy(sedOid, studyBean.getId(),
                                     studyBean.getParentStudyId());
-                            if (studyEventDefintionBean == null) {
-                                mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
-                                Object[] arguments = { sedOid, oid };
-                                errors.add(mf.format(arguments));
-                                // errors.add("Your Study Event OID " + sedOid +
-                                // " for Subject OID " + oid
-                                // + " does not reference an existing Study
-                                // Event in the Study.");
-                                logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
-                            }
                             if (studyEventDataBean.getStudyEventRepeatKey() == null)
                                 studyEventDataBean.setStudyEventRepeatKey("1");
-                            StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
-                                    studyEventDefintionBean.getId(), Integer.valueOf(studyEventDataBean.getStudyEventRepeatKey()));
-                            if (studyEvent == null || studyEvent.getId() == 0) {
+
+                            if (studyEventDefintionBean != null && studySubjectBean != null) {
+                                StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(
+                                        studySubjectBean.getId(), studyEventDefintionBean.getId(),
+                                        Integer.valueOf(studyEventDataBean.getStudyEventRepeatKey()));
+                                if (studyEvent == null || studyEvent.getId() == 0) {
+                                    mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
+                                    Object[] arguments = { sedOid, oid };
+                                    errors.add(mf.format(arguments));
+                                    logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
+                                }
+
+                            } else if (studyEventDefintionBean == null) {
                                 mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
                                 Object[] arguments = { sedOid, oid };
                                 errors.add(mf.format(arguments));
-                                // errors.add("Your Study Event OID " + sedOid +
-                                // " for Subject OID " + oid
-                                // + " does not reference an existing Study
-                                // Event in the Study.");
                                 logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
                             }
+
                             ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
                             if (formDataBeans != null) {
                                 for (FormDataBean formDataBean : formDataBeans) {
                                     String formOid = formDataBean.getFormOID();
-                                    ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
-                                    // ideally we should look to compare
-                                    // versions within
-                                    // seds;
-                                    // right now just check nulls
-                                    if (formLayoutBeans != null && formLayoutBeans.size() > 0) {
-                                        for (FormLayoutBean formLayoutBean : formLayoutBeans) {
-                                            if (formLayoutBean == null) {
-                                                mf.applyPattern(respage.getString("your_crf_version_oid_for_study_event_oid"));
-                                                Object[] arguments = { formOid, sedOid };
-                                                errors.add(mf.format(arguments));
+                                    String formLayoutName = formDataBean.getFormLayoutName();
+                                    CRFBean crfBean = crfDAO.findByOid(formOid);
+                                    if (crfBean != null && studyEventDefintionBean != null) {
+                                        EventDefinitionCRFBean edcBean = edcDAO.findByStudyEventDefinitionIdAndCRFId(studyEventDefintionBean.getId(),
+                                                crfBean.getId());
+                                        if (edcBean == null || edcBean.getId() == 0) {
+                                            mf.applyPattern(respage.getString("your_form_oid_for_study_event_oid"));
+                                            Object[] arguments = { formOid, sedOid };
+                                            errors.add(mf.format(arguments));
+                                        }
+                                    }
 
-                                                // errors.add("Your CRF Version
-                                                // OID " + formOid + " for Study
-                                                // Event OID " + sedOid
-                                                // + " does not reference a
-                                                // proper CRF Version in that
-                                                // Study Event.");
-                                                logger.debug("logged an error with form " + formOid + " and se oid " + sedOid);
-                                            }
+                                    if (crfBean != null) {
+                                        FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByFullName(formLayoutName, crfBean.getName());
+                                        if (formLayoutBean == null || formLayoutBean.getId() == 0) {
+                                            mf.applyPattern(respage.getString("your_form_layout_oid_for_form_oid"));
+                                            Object[] arguments = { formLayoutName, formOid };
+                                            errors.add(mf.format(arguments));
                                         }
                                     } else {
-                                        mf.applyPattern(respage.getString("your_crf_version_oid_did_not_generate"));
+                                        mf.applyPattern(respage.getString("your_form_oid_did_not_generate"));
                                         Object[] arguments = { formOid };
                                         errors.add(mf.format(arguments));
-
-                                        // errors.add("Your CRF Version OID " +
-                                        // formOid
-                                        // + " did not generate any results in
-                                        // the database. Please check it and try
-                                        // again.");
                                     }
 
                                     ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
                                     if (itemGroupDataBeans != null) {
                                         for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
                                             String itemGroupOID = itemGroupDataBean.getItemGroupOID();
-                                            List<ItemGroupBean> itemGroupBeans = itemGroupDAO.findAllByOid(itemGroupOID);
-                                            if (itemGroupBeans != null) {
-                                                logger.debug("number of item group beans: " + itemGroupBeans.size());
-                                                logger.debug("item group oid: " + itemGroupOID);
-                                                for (ItemGroupBean itemGroupBean : itemGroupBeans) {
-                                                    if (itemGroupBean == null) {
-                                                        mf.applyPattern(respage.getString("your_item_group_oid_for_form_oid"));
-                                                        Object[] arguments = { itemGroupOID, formOid };
-                                                        errors.add(mf.format(arguments));
-
-                                                        // errors.add("Your Item
-                                                        // Group OID " +
-                                                        // itemGroupOID + " for
-                                                        // Form OID " + formOid
-                                                        // + " does not
-                                                        // reference a proper
-                                                        // Item Group in that
-                                                        // CRF Version.");
-                                                    }
+                                            ItemGroupBean itemGroupBean = itemGroupDAO.findByOid(itemGroupOID);
+                                            if (itemGroupBean != null && crfBean != null) {
+                                                itemGroupBean = itemGroupDAO.findByOidAndCrf(itemGroupOID, crfBean.getId());
+                                                if (itemGroupBean == null) {
+                                                    mf.applyPattern(respage.getString("your_item_group_oid_for_form_oid"));
+                                                    Object[] arguments = { itemGroupOID, formOid };
+                                                    errors.add(mf.format(arguments));
                                                 }
-                                            } else {
+                                            } else if (itemGroupBean == null) {
                                                 mf.applyPattern(respage.getString("the_item_group_oid_did_not"));
                                                 Object[] arguments = { itemGroupOID };
                                                 errors.add(mf.format(arguments));
-
-                                                // errors.add("The Item Group
-                                                // OID " + itemGroupOID
-                                                // + " did not generate any
-                                                // results in the database,
-                                                // please check it and try
-                                                // again.");
                                             }
 
                                             ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
                                             if (itemDataBeans != null) {
                                                 for (ImportItemDataBean itemDataBean : itemDataBeans) {
                                                     String itemOID = itemDataBean.getItemOID();
-                                                    List<ItemBean> itemBeans = itemDAO.findByOid(itemOID);
-                                                    if (itemBeans != null) {
-
-                                                        logger.debug("found itembeans: ");
-
-                                                        for (ItemBean itemBean : itemBeans) {
-
-                                                            if (itemBean == null) {
-                                                                mf.applyPattern(respage.getString("your_item_oid_for_item_group_oid"));
-                                                                Object[] arguments = { itemOID, itemGroupOID };
-                                                                errors.add(mf.format(arguments));
-
-                                                                // errors.add(
-                                                                // "Your
-                                                                // Item OID " +
-                                                                // itemOID + "
-                                                                // for Item
-                                                                // Group OID " +
-                                                                // itemGroupOID
-                                                                // + " does not
-                                                                // reference a
-                                                                // proper Item
-                                                                // in the Item
-                                                                // Group.");
-
-                                                            } else {
-                                                                logger.debug("found " + itemBean.getOid() + ", passing");
-
-                                                            }
+                                                    List<ItemBean> itemBeans = (List<ItemBean>) itemDAO.findByOid(itemOID);
+                                                    if (itemBeans.size() != 0 && itemGroupBean != null) {
+                                                        ItemBean itemBean = itemDAO.findItemByGroupIdandItemOid(itemGroupBean.getId(), itemOID);
+                                                        if (itemBean == null) {
+                                                            mf.applyPattern(respage.getString("your_item_oid_for_item_group_oid"));
+                                                            Object[] arguments = { itemOID, itemGroupOID };
+                                                            errors.add(mf.format(arguments));
                                                         }
+                                                    } else if (itemBeans.size() == 0) {
+                                                        mf.applyPattern(respage.getString("the_item_oid_did_not"));
+                                                        Object[] arguments = { itemOID };
+                                                        errors.add(mf.format(arguments));
                                                     }
-                                                }
-                                            } else {
-                                                mf.applyPattern(respage.getString("the_item_group_oid_did_not_contain_item_data"));
-                                                Object[] arguments = { itemGroupOID };
-                                                errors.add(mf.format(arguments));
-
-                                                // errors.add("The Item Group
-                                                // OID " + itemGroupOID
-                                                // + " did not contain any Item
-                                                // Data in the XML file, please
-                                                // check it and try again.");
-                                            }
-                                        }
-                                    } else {
-                                        mf.applyPattern(respage.getString("your_study_event_contains_no_form_data"));
-                                        Object[] arguments = { sedOid };
-                                        errors.add(mf.format(arguments));
-
-                                        // errors.add("Your Study Event " +
-                                        // sedOid
-                                        // + " contains no Form Data, or the
-                                        // Form OIDs are incorrect. Please check
-                                        // it and try again.");
-                                    }
-                                }
-
-                            }
-                        }
-                    }
-                }
-            }
+                                                } // itemDataBean
+                                            } // if (itemDataBeans != null)
+                                        } // itemGroupDataBean
+                                    } // if (itemGroupDataBeans != null)
+                                } // formDataBean
+                            } // if (formDataBeans != null)
+                        } // StudyEventDataBean
+                    } // if (studyEventDataBeans != null)
+                } // subjectDataBean
+            } // if (subjectDataBean !=null)
         } catch (OpenClinicaException oce) {
 
         } catch (NullPointerException npe) {
