@@ -257,6 +257,10 @@ public class UpdateStudyEventServlet extends SecureController {
         if (studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)) {
             statuses.remove(SubjectEventStatus.SKIPPED);
         }
+        if ((studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
+                || studyEvent.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)) && currentRole.isInvestigator()) {
+            statuses.remove(SubjectEventStatus.SIGNED);
+        }
 
         ArrayList getECRFs = studyEvent.getEventCRFs();
         // above removed tbh 102007, require to get all definitions, no matter
