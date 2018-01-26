@@ -162,10 +162,9 @@ public class MainMenuServlet extends SecureController {
         session.setAttribute("publicStudy", currentPublicStudy);
         session.setAttribute("study", currentStudy);
 
-        int parentStudyId = currentPublicStudy.getParentStudyId() > 0 ? currentPublicStudy.getParentStudyId() : currentPublicStudy.getId();
-        StudyUserRoleBean roleInParent = ub.getRoleByStudy(parentStudyId);
+        StudyUserRoleBean role = ub.getRoleByStudy(currentPublicStudy.getId());
 
-        if (roleInParent.getStudyId() != parentStudyId) {
+        if (role.getStudyId() == 0) {
             logger.error("You have no roles for this study.");
             //throw new Exception("You have no roles for this study.");
             currentStudy = new StudyBean();
@@ -176,11 +175,11 @@ public class MainMenuServlet extends SecureController {
             session.setAttribute("study", currentStudy);
             session.setAttribute("userRole", currentRole);
         } else {
-            currentRole = roleInParent;
-            session.setAttribute("userRole", roleInParent);
-            if (ub.getActiveStudyId() == parentStudyId)
+            currentRole = role;
+            session.setAttribute("userRole", role);
+            if (ub.getActiveStudyId() == currentPublicStudy.getId())
                 return isRenewAuth;
-            ub.setActiveStudyId(parentStudyId);
+            ub.setActiveStudyId(currentPublicStudy.getId());
         }
 
         return isRenewAuth;

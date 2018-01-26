@@ -97,7 +97,7 @@
                     <tr>
                         <td class="table_tools">
                             &nbsp;
-                            <c:if test="${studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && study.status.available && studyEvent.editable}">
+                            <c:if test="${studySubject.status.name != 'removed' && studySubject.status.name != 'auto-removed' && study.status.available && studyEvent.editable && !userRole.monitor}">
                                 <a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"></a>
                                 &nbsp;
                                 <a href="UpdateStudyEvent?event_id=<c:out value="${studyEvent.id}"/>&ss_id=<c:out value="${studySubject.id}"/>"><fmt:message key="edit_study_event" bundle="${resword}"/></a>
