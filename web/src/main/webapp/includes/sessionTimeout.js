@@ -53,7 +53,7 @@ function updateOCAppTimeout() {
         console.log(err);
     });
 }
-function isSessionTimedOut(currentURL, setStorageFlag) {
+function isSessionTimedOut(setStorageFlag) {
     //console.log("setStorageFlag:" + setStorageFlag);
     processCurrentUser();
     var newExpiration = moment().add(sessionTimeout, 's').valueOf();

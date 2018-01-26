@@ -68,7 +68,7 @@
             realInterval = sessionTimeout;
 
         setInterval(function () {
-                isSessionTimedOut(encodeURIComponent(currentURL), false, true);
+                isSessionTimedOut(false);
             },
             realInterval * 1000
         );
@@ -83,7 +83,7 @@
 <script type="application/javascript">
     var storage = new CrossStorageClient(crossStorageURL);
     updateOCAppTimeout();
-    isSessionTimedOut(encodeURIComponent(currentURL), false);
+    isSessionTimedOut(false);
 </script>
 <iframe id="enketo" style="position:fixed;z-index:1011;top:0;left:0;width:100vw;height:100vh;">
 
