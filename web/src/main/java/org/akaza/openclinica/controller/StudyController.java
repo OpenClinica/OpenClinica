@@ -1407,6 +1407,9 @@ public class StudyController {
         siteDTO.setErrors(errorObjects);
         siteDTO.setSiteOid(envSiteUuidStudy.getOc_oid());
         if (errorObjects != null && errorObjects.size() != 0) {
+            for (ErrorObject errorObject : errorObjects) {
+                logger.error(errorObject.toString());
+            }
             siteDTO.setMessage(validation_failed_message);
             response = new ResponseEntity(siteDTO, HttpStatus.BAD_REQUEST);
         } else {

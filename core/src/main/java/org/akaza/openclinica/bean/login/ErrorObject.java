@@ -23,6 +23,9 @@ public String getCode() {
 public void setCode(String code) {
 	this.code = code;
 }
-		
-	
+
+	@Override
+	public String toString() {
+		return "Code:" + code + " resource:" + resource + " field:" + field;
+	}
 }
