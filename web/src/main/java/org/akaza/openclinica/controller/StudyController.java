@@ -1061,7 +1061,7 @@ public class StudyController {
         UserAccountBean ownerUserAccount = null;
         Date formattedStartDate = null;
         Date formattedStudyDate = null;
-
+        boolean checkForDuplicateSite = true;
         public SiteParameters(HashMap<String, Object> map, String studyEnvUuid) {
             this.map = map;
             this.studyEnvUuid = studyEnvUuid;
@@ -1210,7 +1210,8 @@ public class StudyController {
                 errorObjects.add(errorObject);
             } else {
                 // make sure no duplicate name sites are allowed for the same parent
-                if (parentStudy != null) {
+                if (checkForDuplicateSite &&
+                        (parentStudy != null)) {
                     int nameStudiesCount = studyDao.findCntByNameAndParent(name, parentStudy.getId());
                     if (nameStudiesCount != 0) {
                         ErrorObject errorObject = createErrorObject("Site Object", "Duplicate site name for the same parent study is not allowed.", "name");
@@ -1394,6 +1395,7 @@ public class StudyController {
         ResourceBundleProvider.updateLocale(locale);
         SiteParameters siteParameters = new SiteParameters(map, studyEnvUuid);
         siteParameters.setParameters();
+        siteParameters.checkForDuplicateSite = false;
         ArrayList<ErrorObject> errorObjects = siteParameters.validateParameters(request);
         Study envSiteUuidStudy = studyDao.findByStudyEnvUuid(siteParameters.studyEnvSiteUuid);
         if (envSiteUuidStudy == null || envSiteUuidStudy.getStudyId() == 0) {
