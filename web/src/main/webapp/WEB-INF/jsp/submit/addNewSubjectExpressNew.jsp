@@ -338,7 +338,7 @@
                         <table border="0" cellpadding="0" cellspacing="0">
                             <tr><td>
                                 <div class="selectS">
-                                    <select name="studyEventDefinition" class="formfieldM">
+                                    <select onchange="events(this)" id="select_event" name="studyEventDefinition" class="formfieldM">
                                         <option value="">-<fmt:message key="select" bundle="${resword}"/>-</option>
                                         <c:forEach var="event" items="${allDefsArray}">
                                             <option <c:if test="${studyEventDefinition == event.id}">SELECTED</c:if> value="<c:out value="${event.id}"/>"><c:out value="${event.name}" />
@@ -357,7 +357,21 @@
 
                 <tr valign="top">
                     <td class="formlabel" align="left">
-                        <span class="addNewStudyLayout"><fmt:message key="start_date" bundle="${resword}"/></span>
+                        <span class="addNewStudyLayout"><fmt:message key="start_date" bundle="${resword}"/></span><small id="req" class="required">
+                        <script>
+                            function events(thisEvent) {
+                                var event = (thisEvent.value || thisEvent.options[thisEvent.selectedIndex].value);
+                                if(thisEvent.options[thisEvent.selectedIndex].value >= 1){
+                                    var div = document.getElementById("req");  
+                                    div.textContent = " *";  
+                                    var text = div.textContent;
+                                }else{
+                                    var div = document.getElementById("req");  
+                                    div.textContent = "";  
+                                    var text = div.textContent;
+                                }
+                            }
+                        </script>
                         <c:if test="${studyEventDefinition > 0}">&nbsp;<small class="required">*</c:if>
                     </td>
                     <td valign="top">
