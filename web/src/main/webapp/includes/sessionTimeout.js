@@ -26,8 +26,10 @@ function processCurrentUser(newExpiration) {
             storage.set(currentUser, userName);
         } else if (res === "-1") {
             firstLoginCheck = false;
-            // set the backend
-            window.location.replace (myContextPath + '/pages/resetFirstLogin?redirectURL='+ encodeURI(currentURL));
+            jQuery.get(myContextPath + '/pages/resetFirstLogin')
+                .error(function(jqXHR, textStatus, errorThrown) {
+                    "Error calling :" + myContextPath + '/pages/resetFirstLogin' + " " + textStatus + " " + errorThrown
+                });
         } else if (res === "") {
             storage.del(ocAppTimeoutKey);
             console.log(" returning to Login screen");
