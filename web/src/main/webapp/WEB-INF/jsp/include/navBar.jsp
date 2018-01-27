@@ -24,6 +24,7 @@
     var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
     var ocAppTimeoutKey = "OCAppTimeout";
     var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
+    console.log("Firstr time first:" + firstLoginCheck);
     const currentUser = "currentUser";
     var appName = "RT";
 </script>
@@ -233,11 +234,6 @@
         </div>
 
         <div id="StudyInfo">
-
-            <c:set value="false" scope="session" var="firstLoginCheck"/>
-            <!--<script type="application/javascript">
-                firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
-            </script>-->
             <c:choose>
                 <c:when test='${study.parentStudyId > 0}'>
                     <b><a href="${urlPrefix}ViewStudy?id=${study.parentStudyId}&viewFull=yes"
@@ -1131,3 +1127,6 @@
 
     </form>
 </div>
+<script type="application/javascript">
+    console.log("First check:" + firstLoginCheck);
+</script>

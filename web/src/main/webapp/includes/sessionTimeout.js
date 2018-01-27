@@ -12,18 +12,24 @@ function processCurrentUser() {
     storage.onConnect()
     .then(function() {
         if (firstLoginCheck === "true") {
+            console.log("***********returning null");
             storage.set(currentUser, userName);
-            return null;
+            return "-1";
         } else {
             return storage.get(currentUser);
         }
     }).then(function(res) {
         console.log("Result:" + res);
         if (res === null) {
+            console.log("result is null");
             storage.set(currentUser, userName);
+        } else if (res === "-1") {
+            firstLoginCheck = false;
+            // set the backend
+            window.location.replace (myContextPath + '/pages/resetFirstLogin?redirectURL='+ encodeURI(currentURL));
         } else if (res === "") {
             storage.del(ocAppTimeoutKey);
-            //console.log(" returning to Login screen");
+            console.log(" returning to Login screen");
             window.location.replace (myContextPath + '/pages/logout');
         } else {
             var thisUser = res;
