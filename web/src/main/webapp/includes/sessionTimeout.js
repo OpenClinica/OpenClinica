@@ -8,12 +8,13 @@ function setCurrentUser(thisUser) {
 
 }
 
-function processCurrentUser() {
+function processCurrentUser(newExpiration) {
     storage.onConnect()
     .then(function() {
         if (firstLoginCheck === "true") {
             console.log("***********returning null");
             storage.set(currentUser, userName);
+            storage.set(ocAppTimeoutKey, newExpiration);
             return "-1";
         } else {
             return storage.get(currentUser);
@@ -60,9 +61,9 @@ function updateOCAppTimeout() {
     });
 }
 function isSessionTimedOut(setStorageFlag) {
-    //console.log("setStorageFlag:" + setStorageFlag);
-    processCurrentUser();
     var newExpiration = moment().add(sessionTimeout, 's').valueOf();
+    //console.log("setStorageFlag:" + setStorageFlag);
+    processCurrentUser(newExpiration);
     var currentTime = moment().valueOf();
     storage.onConnect()
         .then(function() {
