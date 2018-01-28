@@ -75,6 +75,16 @@ public class LogoutController {
         }
     }
 
+    @RequestMapping(value="/resetFirstLogin", method = RequestMethod.GET)
+    @ResponseStatus(value = HttpStatus.OK)
+    public void resetFirstLogin(final HttpServletRequest request,
+                                      final HttpServletResponse response) throws IOException {
+        final HttpSession session = request.getSession();
+        //String redirectURL = request.getParameter("redirectURL");
+        session.setAttribute("firstLoginCheck", false);
+        //response.sendRedirect(URLDecoder.decode(redirectURL, "UTF-8"));
+    }
+
     private void resetSessionAttributes(HttpSession session) {
         SecurityContextHolder.clearContext();
         session.removeAttribute("userBean");
