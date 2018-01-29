@@ -22,11 +22,7 @@ import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
 import javax.sql.DataSource;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerConfigurationException;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.TransformerFactoryConfigurationError;
+import javax.xml.transform.*;
 import javax.xml.transform.stream.StreamResult;
 import javax.xml.transform.stream.StreamSource;
 
@@ -102,7 +98,8 @@ public class XsltTransformJob extends QuartzJobBean {
     private AuditEventDAO auditEventDAO;
     private DatasetDAO datasetDao;
 
-    private final TransformerFactory transformerFactory = TransformerFactory.newInstance();
+    //private final SaxonTransformerFactory transformerFactory = SaxonTransformerFactory.newInstance();
+    private final TransformerFactory transformerFactory = new net.sf.saxon.TransformerFactoryImpl();
 
     // POST PROCESSING VARIABLES
     public static final String POST_PROC_DELETE_OLD = "postProcDeleteOld";
@@ -565,7 +562,7 @@ public class XsltTransformJob extends QuartzJobBean {
      * Initializes the dependencies of this job with the components from the Spring application context.
      *
      * @param scheduler
-     * @param dataMap 
+     * @param dataMap
      */
     private void initDependencies(Scheduler scheduler, JobDataMap dataMap) {
         try {
