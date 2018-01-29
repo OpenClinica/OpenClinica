@@ -2886,8 +2886,8 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         String sql = eb.getDataset().getSQLStatement();
         String[] os = sql.split("'");
         if ("postgres".equalsIgnoreCase(dbName)) {
-            dateConstraint = " (date(study_subject.enrollment_date) >= date('" + os[1] + "')) and (date(study_subject.enrollment_date) <= date('" + os[3]
-                    + "'))";
+        	dateConstraint = "(study_subject.enrollment_date is NULL OR ((date(study_subject.enrollment_date) >= date('" + os[1] + "')) and (date(study_subject.enrollment_date) <= date('" + os[3]
+                    + "'))))";
         } else if ("oracle".equalsIgnoreCase(dbName)) {
             dateConstraint = " trunc(study_subject.enrollment_date) >= to_date('" + os[1] + "') and trunc(study_subject.enrollment_date) <= to_date('" + os[3]
                     + "')";
