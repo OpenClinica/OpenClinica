@@ -50,22 +50,14 @@ function processCurrentUser(newExpiration) {
 }
 
 function updateOCAppTimeout() {
-    var newExpiration = moment().add(sessionTimeout, 's').valueOf();
-    storage.onConnect()
-        .then(function() {
-            storage.set(ocAppTimeoutKey, newExpiration);
-            var login = storage.get(currentUser);
-            if (login === null) {
-                storage.set(currentUser, userName);
-            }
-        })['catch'](function(err) {
-        console.log(err);
-    });
+    isSessionTimedOut(false, true);
 }
-function isSessionTimedOut(setStorageFlag) {
+function isSessionTimedOut(checkCurrentUser, storageFlag) {
     var newExpiration = moment().add(sessionTimeout, 's').valueOf();
-    //console.log("setStorageFlag:" + setStorageFlag);
-    processCurrentUser(newExpiration);
+    if (checkCurrentUser) {
+        processCurrentUser(newExpiration);
+    }
+
     var currentTime = moment().valueOf();
     storage.onConnect()
         .then(function() {
@@ -83,8 +75,8 @@ function isSessionTimedOut(setStorageFlag) {
                 console.log("currentTime: " + currentTime + " > existingTimeout: " + existingTimeout + " returning to Login screen");
                 window.location.replace (myContextPath + '/pages/logout');
             } else {
-                if (setStorageFlag) {
-                    console.log("setStorageFlag is true: setting newExpiration:" + newExpiration);
+                if (storageFlag) {
+                    console.log("setting newExpiration:" + newExpiration);
                     storage.set(ocAppTimeoutKey, newExpiration);
                 }
             }

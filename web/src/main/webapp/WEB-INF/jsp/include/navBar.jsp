@@ -104,7 +104,7 @@
         }
     }
     var doWork = function () {
-        isSessionTimedOut(false);
+        isSessionTimedOut(true, false);
     };
     // Define what to do if something goes wrong
     var doError = function() {
@@ -115,7 +115,7 @@
     ticker.start();
     */
     setInterval(function () {
-            isSessionTimedOut(false);
+            isSessionTimedOut(true, false);
         },
         realInterval * 1000
     );
@@ -123,7 +123,7 @@
 </script>
 
 <script language="JavaScript">
-    isSessionTimedOut(false);
+    isSessionTimedOut(true, false);
     //Piwik
     var _paq = _paq || [];
     /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
