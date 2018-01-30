@@ -74,7 +74,7 @@
 <input type="hidden" name="action" value="confirm">
 <input type="hidden" name="id" value="<c:out value="${studySub.id}"/>">
 <c:choose>
-<c:when test="${!useBean.monitor}">
+<c:when test="${!userRole.researchAssistant}">
      <div style="width: 1050px">
     <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 
@@ -354,7 +354,7 @@
 
 </div>
 </c:if>
-<c:if test="${!useBean.monitor}">
+<c:if test="${!userRole.researchAssistant}">
  <input type="submit" name="Submit" value="<fmt:message key="confirm_changes" bundle="${resword}"/>" class="button_long">
  </c:if>
  <a href="javascript:history.back()"><input type="button"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/></a>
