@@ -82,7 +82,9 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
                         "/pages/accounts/**",
                         "/pages/itemdata/**",
                         "/pages/auth/api/v1/studies/**",
-                        "/pages/odmss/**"
+                        "/pages/odmss/**",
+                        "/v2/api-docs",
+                        "/pages/swagger-resources/**"
                 ).permitAll()
                 .antMatchers("/partner/home").permitAll()
                 .antMatchers(securedRoute).hasAnyAuthority("ROLE_USER")
