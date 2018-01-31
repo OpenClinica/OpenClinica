@@ -155,6 +155,9 @@ public class MainMenuServlet extends SecureController {
         currentPublicStudy = study;
         CoreResources.setRequestSchema(request, study.getSchemaName());
         currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
+        if (currentStudy.getParentStudyId() != 0) {
+            session.setAttribute("firstLoginCheck", "true");
+        }
         
         StudyConfigService scs = new StudyConfigService(sm.getDataSource());
         scs.setParametersForStudy(currentStudy);
