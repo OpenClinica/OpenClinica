@@ -798,7 +798,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         eventDiv.td(0).styleClass(tableHeaderRowLeftStyleClass).align("right").colspan("3").close();
         divCloseRepeatinglinkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
         eventDiv.br();
-        if (eventSysStatus != Status.DELETED && eventSysStatus != Status.AUTO_DELETED && studyBean.getStatus() == Status.AVAILABLE) {
+        if (studyBean.getStatus() == Status.AVAILABLE) {
             eventDiv.span().styleClass("font-weight: normal;").close();
             eventDiv.ahref("CreateNewStudyEvent?studySubjectId=" + studySubject.getId() + "&studyEventDefinition=" + sed.getId(), add_another_occurrence);
         }
@@ -1010,7 +1010,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
                 eventDiv.append(status + " : " + SubjectEventStatus.NOT_SCHEDULED.getName());
             }
             eventDiv.boldEnd().tdEnd().trEnd(0);
-            if (eventStatus != SubjectEventStatus.NOT_SCHEDULED && eventSysStatus != Status.DELETED && eventSysStatus != Status.AUTO_DELETED) {
+            if (studyBean.getStatus() == Status.AVAILABLE) {
                 eventDiv.tr(0).close().td(0).styleClass("table_cell_left").close();
                 eventDiv.ahref("CreateNewStudyEvent?studySubjectId=" + studySubject.getId() + "&studyEventDefinition=" + sed.getId(), add_another_occurrence);
                 eventDiv.tdEnd().trEnd(0);
