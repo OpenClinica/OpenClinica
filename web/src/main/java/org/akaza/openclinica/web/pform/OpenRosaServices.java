@@ -315,18 +315,11 @@ public class OpenRosaServices {
             attribute = formID.substring(formID.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
-            String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, study.getFilePath(), crf.getOcOid(), formLayout.getOcOid());
-            File dir = new File(directoryPath);
-            File[] directoryListing = dir.listFiles();
-            if (directoryListing != null) {
-                for (File child : directoryListing) {
-                    if ((flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(QUERY_SUFFIX))
-                            || (flavor.equals(NO_FLAVOR) && child.getName().endsWith(NO_SUFFIX))) {
-                        xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
-                        break;
-                    }
-                }
-            }
+            int studyFilePath = study.getFilePath();
+            do {
+                xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
+                studyFilePath--;
+            } while (xformOutput.equals("") && studyFilePath > 0);
         }
         XFormList formList = null;
 
@@ -483,21 +476,32 @@ public class OpenRosaServices {
     @GET
     @Path("/{studyOID}/formXml")
     @Produces(MediaType.APPLICATION_XML)
-    public String getFormXml(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
+    public Response getFormXml(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formID") String formID, @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
             @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
 
         String xform = null;
+        ResponseBuilder builder = null;
+
         // get parameters
         if (formID == null) {
-            return "<error>formID is null :(</error>";
+            LOGGER.error("<error>formID is null </error>");
+            builder = Response.ok("<error>formID is null </error>");
+            builder = builder.header("Content-Type", "text/xml");
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
 
         String flavor = getQuerySet(formID);
         String formLayoutOid = getFormLayoutOid(formID);
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
+        if (formLayout == null) {
+            LOGGER.error("<error>formID is incorrect </error>");
+            builder = Response.ok("<error>formID is incorrect or does not exist in database </error>");
+            builder = builder.header("Content-Type", "text/xml");
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+        }
         Study study = studyDao.findByOcOID(studyOID);
         CrfBean crf = formLayout.getCrf();
 
@@ -506,35 +510,38 @@ public class OpenRosaServices {
             String attribute = formID.substring(formID.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
-            String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, study.getFilePath(), crf.getOcOid(), formLayout.getOcOid());
-            File dir = new File(directoryPath);
-            File[] directoryListing = dir.listFiles();
-            if (directoryListing != null) {
-                for (File child : directoryListing) {
-                    if ((flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(QUERY_SUFFIX))
-                            || (flavor.equals(NO_FLAVOR) && child.getName().endsWith(NO_SUFFIX))) {
-                        xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
-                        break;
-                    }
-                }
-            }
+            int studyFilePath = study.getFilePath();
+            do {
+                xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
+                studyFilePath--;
+            } while (xformOutput.equals("") && studyFilePath > 0);
         }
         try {
             if (StringUtils.isNotEmpty(xformOutput)) {
+                builder = Response.ok(xformOutput);
+                builder = builder.header("Content-Type", "text/xml");
                 if (formLayout.getExternalInstance() == null) {
                     checkForCllinicalDataInstanceInXform(formLayout, xformOutput);
                 }
                 xform = xformOutput;
+            } else {
+                builder = Response.ok("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory </error>");
+                builder = builder.header("Content-Type", "text/xml");
+                LOGGER.error("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory </error>");
+                return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
             LOGGER.error(ExceptionUtils.getStackTrace(e));
-            return "<error>" + e.getMessage() + "</error>";
+            builder = Response.ok(e.getMessage());
+            builder = builder.header("Content-Type", "text/xml");
+            return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
+
         }
         response.setHeader("Content-Type", "text/xml; charset=UTF-8");
         response.setHeader("Content-Disposition", "attachment; filename=\"" + formID + ".xml" + "\";");
         response.setContentType("text/xml; charset=utf-8");
-        return xform;
+        return builder.status(Response.Status.OK).build();
 
     }
 
@@ -1119,5 +1126,22 @@ public class OpenRosaServices {
             formLayout.setExternalInstance("FALSE");
         }
         formLayoutDao.saveOrUpdate(formLayout);
+    }
+
+    private String getXformOutput(String studyOID, int studyFilePath, String crfOID, String formLayoutOID, String flavor) throws IOException {
+        String xformOutput = "";
+        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, studyFilePath, crfOID, formLayoutOID);
+        File dir = new File(directoryPath);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if ((flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(QUERY_SUFFIX))
+                        || (flavor.equals(NO_FLAVOR) && child.getName().endsWith(NO_SUFFIX))) {
+                    xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                    break;
+                }
+            }
+        }
+        return xformOutput;
     }
 }
