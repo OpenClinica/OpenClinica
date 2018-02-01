@@ -31,7 +31,6 @@ function processCurrentUser(newExpiration) {
                     "Error calling :" + myContextPath + '/pages/resetFirstLogin' + " " + textStatus + " " + errorThrown
                 });
         } else if (res === "") {
-            storage.del(ocAppTimeoutKey);
             console.log(" returning to Login screen");
             window.location.replace (myContextPath + '/pages/logout');
         } else {
@@ -70,7 +69,6 @@ function isSessionTimedOut(checkCurrentUser, storageFlag) {
             var existingTimeout = res;
             //console.log("currentTime: " + currentTime + " existingTimeout: " + existingTimeout);
             if (currentTime > existingTimeout) {
-                storage.del(ocAppTimeoutKey);
                 storage.set(currentUser, "");
                 console.log("currentTime: " + currentTime + " > existingTimeout: " + existingTimeout + " returning to Login screen");
                 window.location.replace (myContextPath + '/pages/logout');
