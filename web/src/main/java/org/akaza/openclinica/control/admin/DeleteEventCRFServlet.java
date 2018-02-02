@@ -12,6 +12,7 @@ import java.util.List;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -72,9 +73,10 @@ public class DeleteEventCRFServlet extends SecureController {
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-        if (ub.isSysAdmin()) {
+        if (!currentRole.getRole().equals(Role.MONITOR)) {
             return;
         }
+
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
         throw new InsufficientPermissionException(Page.LIST_STUDY_SUBJECTS, resexception.getString("not_admin"), "1");
 
