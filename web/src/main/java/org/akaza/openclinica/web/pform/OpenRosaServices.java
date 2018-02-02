@@ -219,6 +219,10 @@ public class OpenRosaServices {
     public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formID") String formID, @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
             @Context ServletContext context) throws Exception {
+        if (request.getMethod().equals("HEAD")) {
+            response.setStatus(200);
+            return null;
+        }
         if (!mayProceedPreview(request, studyOID))
             return null;
         XFormList formList = null;
@@ -301,21 +305,28 @@ public class OpenRosaServices {
         StatusPrinter.print(lc);
         if (!mayProceedPreview(request, studyOID))
             return null;
+        if (formID == null) {
+            LOGGER.error("<error> formID is null </error>");
+        }
         String flavor = getQuerySet(formID);
 
         String formLayoutOid = getFormLayoutOid(formID);
 
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
+        if (formLayout == null) {
+            LOGGER.error("<error> formID is incorrect </error>");
+        }
         CrfBean crf = crfDao.findById(formLayout.getCrf().getCrfId());
         Study study = studyDao.findByOcOID(studyOID);
 
         String xformOutput = "";
         String attribute = "";
+        int studyFilePath = 0;
         if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             attribute = formID.substring(formID.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
-            int studyFilePath = study.getFilePath();
+            studyFilePath = study.getFilePath();
             do {
                 xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
                 studyFilePath--;
@@ -338,6 +349,9 @@ public class OpenRosaServices {
                     checkForCllinicalDataInstanceInXform(formLayout, xformOutput);
                 }
                 form.setHash(DigestUtils.md5Hex(xformOutput));
+            } else {
+                LOGGER.error("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory. StudyPath is : " + studyFilePath
+                        + "</error> ");
             }
 
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
@@ -504,13 +518,13 @@ public class OpenRosaServices {
         }
         Study study = studyDao.findByOcOID(studyOID);
         CrfBean crf = formLayout.getCrf();
-
+        int studyFilePath = 0;
         String xformOutput = "";
         if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             String attribute = formID.substring(formID.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
-            int studyFilePath = study.getFilePath();
+            studyFilePath = study.getFilePath();
             do {
                 xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
                 studyFilePath--;
@@ -525,9 +539,11 @@ public class OpenRosaServices {
                 }
                 xform = xformOutput;
             } else {
-                builder = Response.ok("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory </error>");
+                builder = Response.ok("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory. StudyPath is : "
+                        + studyFilePath + "</error> ");
                 builder = builder.header("Content-Type", "text/xml");
-                LOGGER.error("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory </error>");
+                LOGGER.error("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory. StudyPath is : " + studyFilePath
+                        + "</error> ");
                 return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
         } catch (Exception e) {
