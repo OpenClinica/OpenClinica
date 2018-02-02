@@ -316,7 +316,8 @@ public class OpenRosaServices {
         if (formLayout == null) {
             LOGGER.error("<error> formID is incorrect </error>");
         }
-        CrfBean crf = crfDao.findById(formLayout.getCrf().getCrfId());
+
+        CrfBean crf = crfDao.findByCrfId(formLayout.getCrf().getCrfId());
         Study study = studyDao.findByOcOID(studyOID);
 
         String xformOutput = "";
@@ -338,6 +339,10 @@ public class OpenRosaServices {
             formList = new XFormList();
             XForm form = new XForm(crf, formLayout);
 
+            LOGGER.info("FormID: " + formID);
+            LOGGER.info("formLayoutOid: " + formLayoutOid);
+            LOGGER.info("formLayout database Id: " + formLayout.getId());
+            LOGGER.info("Crf  database Id: " + crf.getCrfId());
             // TODO: Need to generate hash based on contents of
             // XForm. Will be done in a later story.
             // TODO: For now all XForms get a date based hash to
