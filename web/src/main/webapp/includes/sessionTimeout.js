@@ -33,7 +33,8 @@ function processCurrentUser(currentTime, newExpiration) {
         if (firstLoginCheck === "true") {
             var prevUser = res;
             console.log("prevUser in firstLoginCheck:" + prevUser);
-            if (prevUser !== "") {
+            if (prevUser !== ""
+                && prevUser !== null) {
                 console.log("prevUser is not blank");
                 storage.get(ocAppTimeoutKey).then(function(res) {
                     // the user closed the browser session before the session timeout and reopened it after the timeout
