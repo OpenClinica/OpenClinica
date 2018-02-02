@@ -82,7 +82,9 @@ function processUserData(inputPromise) {
         console.log("Result:" + res);
         if (res === null) {
             console.log("result is null");
-            return storage.set(currentUser, userName);
+            storage.set(currentUser, userName).then(function(res1) {
+                console.log("set user when currentUser was null:" + res1);
+            });
         } else if (res === "") {
             if (firstLoginCheck === "true") {
                 firstLoginCheck = false;
