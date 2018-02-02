@@ -104,7 +104,7 @@
         }
     }
     var doWork = function () {
-        isSessionTimedOut(true, false);
+        processTimedOuts(true, false);
     };
     // Define what to do if something goes wrong
     var doError = function() {
@@ -115,7 +115,7 @@
     ticker.start();
     */
     setInterval(function () {
-            isSessionTimedOut(true, false);
+            processTimedOuts(true, false);
         },
         realInterval * 1000
     );
@@ -123,7 +123,7 @@
 </script>
 
 <script language="JavaScript">
-    isSessionTimedOut(true, false);
+    processTimedOuts(true, false);
     //Piwik
     var _paq = _paq || [];
     /* tracker methods like "setCustomDimension" should be called before "trackPageView" */
@@ -201,7 +201,6 @@
     }
 
     function processLogoutClick(returnTo) {
-        deleteOCAppTimeout();
         setCurrentUser("");
     }
 </script>
