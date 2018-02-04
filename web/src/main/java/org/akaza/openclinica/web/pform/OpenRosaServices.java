@@ -76,7 +76,6 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
-import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
@@ -316,9 +315,14 @@ public class OpenRosaServices {
         if (formLayout == null) {
             LOGGER.error("<error> formID is incorrect </error>");
         }
-
         CrfBean crf = crfDao.findByCrfId(formLayout.getCrf().getCrfId());
-        Study study = studyDao.findByOcOID(studyOID);
+        LOGGER.info("Schema name before: " + CoreResources.getRequestSchema());
+
+        StudyBean publicStudy = getPublicStudy(studyOID);
+        CoreResources.setRequestSchema(publicStudy.getSchemaName());
+        LOGGER.info("Schema name after: " + CoreResources.getRequestSchema());
+
+        StudyBean study = getParentStudy(studyOID);
 
         String xformOutput = "";
         String attribute = "";
@@ -341,7 +345,7 @@ public class OpenRosaServices {
 
             LOGGER.info("FormID: " + formID);
             LOGGER.info("formLayoutOid: " + formLayoutOid);
-            LOGGER.info("formLayout database Id: " + formLayout.getId());
+            LOGGER.info("formLayout database Id: " + formLayout.getFormLayoutId());
             LOGGER.info("Crf  database Id: " + crf.getCrfId());
             // TODO: Need to generate hash based on contents of
             // XForm. Will be done in a later story.
@@ -521,7 +525,13 @@ public class OpenRosaServices {
             builder = builder.header("Content-Type", "text/xml");
             return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        Study study = studyDao.findByOcOID(studyOID);
+        LOGGER.info("Schema name before: " + CoreResources.getRequestSchema());
+
+        StudyBean publicStudy = getPublicStudy(studyOID);
+        CoreResources.setRequestSchema(publicStudy.getSchemaName());
+        StudyBean study = getParentStudy(studyOID);
+        LOGGER.info("Schema name after: " + CoreResources.getRequestSchema());
+
         CrfBean crf = formLayout.getCrf();
         int studyFilePath = 0;
         String xformOutput = "";

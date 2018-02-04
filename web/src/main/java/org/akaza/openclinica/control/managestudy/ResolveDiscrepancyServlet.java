@@ -271,18 +271,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 // Get Original formLayout file from data directory
 
                 String xformOutput = "";
-                String directoryPath = Utils.getFilePath()
-                        + Utils.getCrfMediaPath(parentStudyBean.getOid(), parentStudyBean.getFilePath(), crf.getOid(), formLayout.getOid());
-                File dir = new File(directoryPath);
-                File[] directoryListing = dir.listFiles();
-                if (directoryListing != null) {
-                    for (File child : directoryListing) {
-                        if ((child.getName().endsWith(QUERY_SUFFIX))) {
-                            xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
-                            break;
-                        }
-                    }
-                }
+                int studyFilePath = parentStudyBean.getFilePath();
+
+                do {
+                    xformOutput = getXformOutput(parentStudyBean.getOid(), studyFilePath, crf.getOid(), formLayout.getOid());
+                    studyFilePath--;
+                } while (xformOutput.equals("") && studyFilePath > 0);
+
                 // Unmarshal original form layout form
                 Html html = xformParser.unMarshall(xformOutput);
                 Body body = html.getBody();
@@ -828,4 +823,21 @@ public class ResolveDiscrepancyServlet extends SecureController {
             return parentStudy;
         }
     }
+
+    private String getXformOutput(String studyOID, int studyFilePath, String crfOID, String formLayoutOID) throws IOException {
+        String xformOutput = "";
+        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, studyFilePath, crfOID, formLayoutOID);
+        File dir = new File(directoryPath);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if (child.getName().endsWith(QUERY_SUFFIX)) {
+                    xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                    break;
+                }
+            }
+        }
+        return xformOutput;
+    }
+
 }
