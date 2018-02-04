@@ -317,10 +317,25 @@ public class OpenRosaServices {
         }
         CrfBean crf = crfDao.findByCrfId(formLayout.getCrf().getCrfId());
         LOGGER.info("Schema name before: " + CoreResources.getRequestSchema());
+        LOGGER.info("StudyOid is :" + studyOID);
+
+        if (ecid != null) {
+            HashMap<String, String> subjectContext = null;
+            PFormCache cache = PFormCache.getInstance(context);
+            subjectContext = cache.getSubjectContext(ecid);
+            String studySubjectOID = subjectContext.get("studySubjectOID");
+            String formLayoutOID = subjectContext.get("formLayoutOID");
+            String formLoadMode = subjectContext.get("formLoadMode");
+            LOGGER.info("studySubjectOID from ecid: " + studySubjectOID);
+            LOGGER.info("formLayoutOID from ecid: " + formLayoutOID);
+            LOGGER.info("formLoadMode from ecid: " + formLoadMode);
+
+        }
 
         StudyBean publicStudy = getPublicStudy(studyOID);
         CoreResources.setRequestSchema(publicStudy.getSchemaName());
         LOGGER.info("Schema name after: " + CoreResources.getRequestSchema());
+        LOGGER.info("StudyOid is :" + studyOID);
 
         StudyBean study = getParentStudy(studyOID);
 
@@ -526,7 +541,19 @@ public class OpenRosaServices {
             return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
         LOGGER.info("Schema name before: " + CoreResources.getRequestSchema());
+        LOGGER.info("StudyOid is :" + studyOID);
 
+        if (ecid != null) {
+            HashMap<String, String> subjectContext = null;
+            PFormCache cache = PFormCache.getInstance(context);
+            subjectContext = cache.getSubjectContext(ecid);
+            String studySubjectOID = subjectContext.get("studySubjectOID");
+            String formLayoutOID = subjectContext.get("formLayoutOID");
+            String formLoadMode = subjectContext.get("formLoadMode");
+            LOGGER.info("studySubjectOID from ecid: " + studySubjectOID);
+            LOGGER.info("formLayoutOID from ecid: " + formLayoutOID);
+            LOGGER.info("formLoadMode from ecid: " + formLoadMode);
+        }
         StudyBean publicStudy = getPublicStudy(studyOID);
         CoreResources.setRequestSchema(publicStudy.getSchemaName());
         StudyBean study = getParentStudy(studyOID);
