@@ -316,8 +316,8 @@ public class OpenRosaServices {
             LOGGER.error("<error> formID is incorrect </error>");
         }
         CrfBean crf = crfDao.findByCrfId(formLayout.getCrf().getCrfId());
-        LOGGER.info("Schema name before: " + CoreResources.getRequestSchema());
-        LOGGER.info("StudyOid is :" + studyOID);
+        LOGGER.info("Schema name before setting it to: " + CoreResources.getRequestSchema());
+        LOGGER.info("Check if study a site Oid - StudyOid is :" + studyOID);
 
         if (ecid != null) {
             HashMap<String, String> subjectContext = null;
@@ -334,7 +334,7 @@ public class OpenRosaServices {
 
         StudyBean publicStudy = getPublicStudy(studyOID);
         CoreResources.setRequestSchema(publicStudy.getSchemaName());
-        LOGGER.info("Schema name after: " + CoreResources.getRequestSchema());
+        LOGGER.info("Schema name after setting it to : " + CoreResources.getRequestSchema());
         LOGGER.info("StudyOid is :" + studyOID);
 
         StudyBean study = getParentStudy(studyOID);
@@ -347,10 +347,12 @@ public class OpenRosaServices {
             xformOutput = (String) context.getAttribute(attribute);
         } else {
             studyFilePath = study.getFilePath();
+            LOGGER.info("From Database original studyFilePath is" + studyFilePath);
             do {
                 xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
                 studyFilePath--;
             } while (xformOutput.equals("") && studyFilePath > 0);
+            LOGGER.info(" Final studyFilePath is" + studyFilePath);
         }
         XFormList formList = null;
 
@@ -540,8 +542,8 @@ public class OpenRosaServices {
             builder = builder.header("Content-Type", "text/xml");
             return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        LOGGER.info("Schema name before: " + CoreResources.getRequestSchema());
-        LOGGER.info("StudyOid is :" + studyOID);
+        LOGGER.info("Schema name before setting it to: " + CoreResources.getRequestSchema());
+        LOGGER.info("Check if study a site Oid - StudyOid is :" + studyOID);
 
         if (ecid != null) {
             HashMap<String, String> subjectContext = null;
@@ -557,7 +559,7 @@ public class OpenRosaServices {
         StudyBean publicStudy = getPublicStudy(studyOID);
         CoreResources.setRequestSchema(publicStudy.getSchemaName());
         StudyBean study = getParentStudy(studyOID);
-        LOGGER.info("Schema name after: " + CoreResources.getRequestSchema());
+        LOGGER.info("Schema name after setting it to: " + CoreResources.getRequestSchema());
 
         CrfBean crf = formLayout.getCrf();
         int studyFilePath = 0;
@@ -567,10 +569,12 @@ public class OpenRosaServices {
             xformOutput = (String) context.getAttribute(attribute);
         } else {
             studyFilePath = study.getFilePath();
+            LOGGER.info("From Database original studyFilePath is" + studyFilePath);
             do {
                 xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
                 studyFilePath--;
             } while (xformOutput.equals("") && studyFilePath > 0);
+            LOGGER.info(" Final studyFilePath is" + studyFilePath);
         }
         try {
             if (StringUtils.isNotEmpty(xformOutput)) {
