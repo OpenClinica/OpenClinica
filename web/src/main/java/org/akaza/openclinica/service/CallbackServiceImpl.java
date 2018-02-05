@@ -66,10 +66,50 @@ public class CallbackServiceImpl implements CallbackService {
         if (ub.getId() == 0) {
             ub = createUserAccount(request, user, userContextMap);
         }
-        boolean isUserUpdated = updateStudyUserRoles(request, ub, user, userContextMap);
+        updateUser(request, ub, user, userContextMap);
+        boolean isUserUpdated = updateStudyUserRoles(request, ub);
         return new UserAccountHelper(ub, isUserUpdated);
     }
 
+    private void updateUser(HttpServletRequest request, UserAccountBean ub,
+                            Auth0User user, Map<String, Object> userContextMap) throws Exception {
+        boolean isUpdated = false;
+        UserType updatedUserType = null;
+        switch ((String) userContextMap.get("userType")) {
+            case "Business Admin":
+                updatedUserType = UserType.SYSADMIN;
+                break;
+            case "Tech Admin":
+                updatedUserType = UserType.TECHADMIN;
+                break;
+            case "User":
+                updatedUserType = UserType.USER;
+                break;
+            default:
+                String error = "Invalid userType:" + (String) userContextMap.get("userType");
+                logger.error(error);
+                throw new Exception(error);
+        }
+        if (ub.hasUserType(updatedUserType) != true) {
+            ub.addUserType(updatedUserType);
+            isUpdated = true;
+        }
+        if (StringUtils.equals(ub.getLastName(), user.getFamilyName()) != true) {
+            ub.setLastName(user.getFamilyName());
+            isUpdated = true;
+
+        }
+        if (StringUtils.equals(ub.getEmail(), user.getEmail()) != true) {
+            ub.setEmail(user.getEmail());
+            isUpdated = true;
+
+        }
+        if (isUpdated) {
+            UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+            userAccountDAO.update(ub);
+        }
+
+    }
     public void getUserDetails(HttpServletRequest request, Auth0User user) {
         ResponseEntity<OCUserDTO> userDetails = studyBuildService.getUserDetails(request);
         OCUserDTO userDTO = userDetails.getBody();
@@ -88,7 +128,7 @@ public class CallbackServiceImpl implements CallbackService {
         return userContext;
     }
     @Modifying
-    private boolean updateStudyUserRoles(HttpServletRequest request, UserAccountBean ub, Auth0User user, Map<String, Object> userContextMap) throws Exception {
+    private boolean updateStudyUserRoles(HttpServletRequest request, UserAccountBean ub) throws Exception {
         return studyBuildService.saveStudyEnvRoles(request, ub);
     }
 
