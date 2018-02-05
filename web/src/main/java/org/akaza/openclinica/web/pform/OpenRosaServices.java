@@ -76,7 +76,6 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
-import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
@@ -316,9 +315,29 @@ public class OpenRosaServices {
         if (formLayout == null) {
             LOGGER.error("<error> formID is incorrect </error>");
         }
-
         CrfBean crf = crfDao.findByCrfId(formLayout.getCrf().getCrfId());
-        Study study = studyDao.findByOcOID(studyOID);
+        LOGGER.info("Schema name before setting it to: " + CoreResources.getRequestSchema());
+        LOGGER.info("Check if study a site Oid - StudyOid is :" + studyOID);
+
+        if (ecid != null) {
+            HashMap<String, String> subjectContext = null;
+            PFormCache cache = PFormCache.getInstance(context);
+            subjectContext = cache.getSubjectContext(ecid);
+            String studySubjectOID = subjectContext.get("studySubjectOID");
+            String formLayoutOID = subjectContext.get("formLayoutOID");
+            String formLoadMode = subjectContext.get("formLoadMode");
+            LOGGER.info("studySubjectOID from ecid: " + studySubjectOID);
+            LOGGER.info("formLayoutOID from ecid: " + formLayoutOID);
+            LOGGER.info("formLoadMode from ecid: " + formLoadMode);
+
+        }
+
+        StudyBean publicStudy = getPublicStudy(studyOID);
+        CoreResources.setRequestSchema(publicStudy.getSchemaName());
+        LOGGER.info("Schema name after setting it to : " + CoreResources.getRequestSchema());
+        LOGGER.info("StudyOid is :" + studyOID);
+
+        StudyBean study = getParentStudy(studyOID);
 
         String xformOutput = "";
         String attribute = "";
@@ -328,10 +347,12 @@ public class OpenRosaServices {
             xformOutput = (String) context.getAttribute(attribute);
         } else {
             studyFilePath = study.getFilePath();
+            LOGGER.info("From Database original studyFilePath is" + studyFilePath);
             do {
                 xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
                 studyFilePath--;
             } while (xformOutput.equals("") && studyFilePath > 0);
+            LOGGER.info(" Final studyFilePath is" + studyFilePath);
         }
         XFormList formList = null;
 
@@ -341,7 +362,7 @@ public class OpenRosaServices {
 
             LOGGER.info("FormID: " + formID);
             LOGGER.info("formLayoutOid: " + formLayoutOid);
-            LOGGER.info("formLayout database Id: " + formLayout.getId());
+            LOGGER.info("formLayout database Id: " + formLayout.getFormLayoutId());
             LOGGER.info("Crf  database Id: " + crf.getCrfId());
             // TODO: Need to generate hash based on contents of
             // XForm. Will be done in a later story.
@@ -521,7 +542,25 @@ public class OpenRosaServices {
             builder = builder.header("Content-Type", "text/xml");
             return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        Study study = studyDao.findByOcOID(studyOID);
+        LOGGER.info("Schema name before setting it to: " + CoreResources.getRequestSchema());
+        LOGGER.info("Check if study a site Oid - StudyOid is :" + studyOID);
+
+        if (ecid != null) {
+            HashMap<String, String> subjectContext = null;
+            PFormCache cache = PFormCache.getInstance(context);
+            subjectContext = cache.getSubjectContext(ecid);
+            String studySubjectOID = subjectContext.get("studySubjectOID");
+            String formLayoutOID = subjectContext.get("formLayoutOID");
+            String formLoadMode = subjectContext.get("formLoadMode");
+            LOGGER.info("studySubjectOID from ecid: " + studySubjectOID);
+            LOGGER.info("formLayoutOID from ecid: " + formLayoutOID);
+            LOGGER.info("formLoadMode from ecid: " + formLoadMode);
+        }
+        StudyBean publicStudy = getPublicStudy(studyOID);
+        CoreResources.setRequestSchema(publicStudy.getSchemaName());
+        StudyBean study = getParentStudy(studyOID);
+        LOGGER.info("Schema name after setting it to: " + CoreResources.getRequestSchema());
+
         CrfBean crf = formLayout.getCrf();
         int studyFilePath = 0;
         String xformOutput = "";
@@ -530,10 +569,12 @@ public class OpenRosaServices {
             xformOutput = (String) context.getAttribute(attribute);
         } else {
             studyFilePath = study.getFilePath();
+            LOGGER.info("From Database original studyFilePath is" + studyFilePath);
             do {
                 xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
                 studyFilePath--;
             } while (xformOutput.equals("") && studyFilePath > 0);
+            LOGGER.info(" Final studyFilePath is" + studyFilePath);
         }
         try {
             if (StringUtils.isNotEmpty(xformOutput)) {
