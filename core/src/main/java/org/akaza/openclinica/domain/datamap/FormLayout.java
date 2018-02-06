@@ -35,7 +35,6 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "form_layout", uniqueConstraints = @UniqueConstraint(columnNames = "oc_oid"))
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "form_layout_form_layout_id_seq") })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class FormLayout extends DataMapDomainObject {
 
     private int formLayoutId;
