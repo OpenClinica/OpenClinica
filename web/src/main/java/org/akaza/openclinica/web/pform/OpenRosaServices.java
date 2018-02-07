@@ -76,7 +76,6 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
-import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
@@ -219,6 +218,10 @@ public class OpenRosaServices {
     public String getFormList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formID") String formID, @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
             @Context ServletContext context) throws Exception {
+        if (request.getMethod().equals("HEAD")) {
+            response.setStatus(200);
+            return null;
+        }
         if (!mayProceedPreview(request, studyOID))
             return null;
         XFormList formList = null;
@@ -301,25 +304,55 @@ public class OpenRosaServices {
         StatusPrinter.print(lc);
         if (!mayProceedPreview(request, studyOID))
             return null;
+        if (formID == null) {
+            LOGGER.error("<error> formID is null </error>");
+        }
         String flavor = getQuerySet(formID);
 
         String formLayoutOid = getFormLayoutOid(formID);
 
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
-        CrfBean crf = crfDao.findById(formLayout.getCrf().getCrfId());
-        Study study = studyDao.findByOcOID(studyOID);
+        if (formLayout == null) {
+            LOGGER.error("<error> formID is incorrect </error>");
+        }
+        CrfBean crf = crfDao.findByCrfId(formLayout.getCrf().getCrfId());
+        LOGGER.info("Schema name before setting it to: " + CoreResources.getRequestSchema());
+        LOGGER.info("Check if study a site Oid - StudyOid is :" + studyOID);
+
+        if (ecid != null) {
+            HashMap<String, String> subjectContext = null;
+            PFormCache cache = PFormCache.getInstance(context);
+            subjectContext = cache.getSubjectContext(ecid);
+            String studySubjectOID = subjectContext.get("studySubjectOID");
+            String formLayoutOID = subjectContext.get("formLayoutOID");
+            String formLoadMode = subjectContext.get("formLoadMode");
+            LOGGER.info("studySubjectOID from ecid: " + studySubjectOID);
+            LOGGER.info("formLayoutOID from ecid: " + formLayoutOID);
+            LOGGER.info("formLoadMode from ecid: " + formLoadMode);
+
+        }
+
+        StudyBean publicStudy = getPublicStudy(studyOID);
+        CoreResources.setRequestSchema(publicStudy.getSchemaName());
+        LOGGER.info("Schema name after setting it to : " + CoreResources.getRequestSchema());
+        LOGGER.info("StudyOid is :" + studyOID);
+
+        StudyBean study = getParentStudy(studyOID);
 
         String xformOutput = "";
         String attribute = "";
+        int studyFilePath = 0;
         if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             attribute = formID.substring(formID.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
-            int studyFilePath = study.getFilePath();
+            studyFilePath = study.getFilePath();
+            LOGGER.info("From Database original studyFilePath is" + studyFilePath);
             do {
                 xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
                 studyFilePath--;
             } while (xformOutput.equals("") && studyFilePath > 0);
+            LOGGER.info(" Final studyFilePath is" + studyFilePath);
         }
         XFormList formList = null;
 
@@ -327,6 +360,10 @@ public class OpenRosaServices {
             formList = new XFormList();
             XForm form = new XForm(crf, formLayout);
 
+            LOGGER.info("FormID: " + formID);
+            LOGGER.info("formLayoutOid: " + formLayoutOid);
+            LOGGER.info("formLayout database Id: " + formLayout.getFormLayoutId());
+            LOGGER.info("Crf  database Id: " + crf.getCrfId());
             // TODO: Need to generate hash based on contents of
             // XForm. Will be done in a later story.
             // TODO: For now all XForms get a date based hash to
@@ -338,6 +375,9 @@ public class OpenRosaServices {
                     checkForCllinicalDataInstanceInXform(formLayout, xformOutput);
                 }
                 form.setHash(DigestUtils.md5Hex(xformOutput));
+            } else {
+                LOGGER.error("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory. StudyPath is : " + studyFilePath
+                        + "</error> ");
             }
 
             String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
@@ -502,19 +542,39 @@ public class OpenRosaServices {
             builder = builder.header("Content-Type", "text/xml");
             return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
         }
-        Study study = studyDao.findByOcOID(studyOID);
-        CrfBean crf = formLayout.getCrf();
+        LOGGER.info("Schema name before setting it to: " + CoreResources.getRequestSchema());
+        LOGGER.info("Check if study a site Oid - StudyOid is :" + studyOID);
 
+        if (ecid != null) {
+            HashMap<String, String> subjectContext = null;
+            PFormCache cache = PFormCache.getInstance(context);
+            subjectContext = cache.getSubjectContext(ecid);
+            String studySubjectOID = subjectContext.get("studySubjectOID");
+            String formLayoutOID = subjectContext.get("formLayoutOID");
+            String formLoadMode = subjectContext.get("formLoadMode");
+            LOGGER.info("studySubjectOID from ecid: " + studySubjectOID);
+            LOGGER.info("formLayoutOID from ecid: " + formLayoutOID);
+            LOGGER.info("formLoadMode from ecid: " + formLoadMode);
+        }
+        StudyBean publicStudy = getPublicStudy(studyOID);
+        CoreResources.setRequestSchema(publicStudy.getSchemaName());
+        StudyBean study = getParentStudy(studyOID);
+        LOGGER.info("Schema name after setting it to: " + CoreResources.getRequestSchema());
+
+        CrfBean crf = formLayout.getCrf();
+        int studyFilePath = 0;
         String xformOutput = "";
         if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             String attribute = formID.substring(formID.indexOf(SINGLE_ITEM_FLAVOR));
             xformOutput = (String) context.getAttribute(attribute);
         } else {
-            int studyFilePath = study.getFilePath();
+            studyFilePath = study.getFilePath();
+            LOGGER.info("From Database original studyFilePath is" + studyFilePath);
             do {
                 xformOutput = getXformOutput(studyOID, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
                 studyFilePath--;
             } while (xformOutput.equals("") && studyFilePath > 0);
+            LOGGER.info(" Final studyFilePath is" + studyFilePath);
         }
         try {
             if (StringUtils.isNotEmpty(xformOutput)) {
@@ -525,9 +585,11 @@ public class OpenRosaServices {
                 }
                 xform = xformOutput;
             } else {
-                builder = Response.ok("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory </error>");
+                builder = Response.ok("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory. StudyPath is : "
+                        + studyFilePath + "</error> ");
                 builder = builder.header("Content-Type", "text/xml");
-                LOGGER.error("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory </error>");
+                LOGGER.error("<error> xform is null or xform file with name " + formLayoutOid + " not found in data directory. StudyPath is : " + studyFilePath
+                        + "</error> ");
                 return builder.status(Response.Status.INTERNAL_SERVER_ERROR).build();
             }
         } catch (Exception e) {

@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service.crfdata;
 
 import java.io.File;
+import java.io.IOException;
 import java.io.StringReader;
 import java.io.StringWriter;
 import java.nio.file.Files;
@@ -35,6 +36,7 @@ import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.RepeatCountDao;
 import org.akaza.openclinica.dao.hibernate.ResponseTypeDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
@@ -126,6 +128,9 @@ public class EnketoUrlService {
 
     @Autowired
     private StudySubjectDao studySubjectDao;
+
+    @Autowired
+    private StudyDao studyDao;
 
     @Autowired
     private EventCrfDao eventCrfDao;
@@ -448,30 +453,15 @@ public class EnketoUrlService {
                 }
             }
         }
-        String templateStr = null;
-        CrfBean crfBean = crfDao.findById(formLayout.getCrf().getCrfId());
-        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOid, filePath, crfBean.getOcOid(), formLayout.getOcOid());
-        File dir = new File(directoryPath);
-        File[] directoryListing = dir.listFiles();
+        Study study = studyDao.findByOcOID(studyOid);
+        String templateStr = "";
+        int studyFilePath = study.getFilePath();
+        CrfBean crf = crfDao.findById(formLayout.getCrf().getCrfId());
 
-        while (directoryListing == null) {
-            filePath = filePath - 1;
-            directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOid, filePath, crfBean.getOcOid(), formLayout.getOcOid());
-            dir = new File(directoryPath);
-            directoryListing = dir.listFiles();
-        }
-
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-
-                if (flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(INSTANCE_QUERIES_SUFFIX)
-                        || flavor.equals(NO_FLAVOR) && child.getName().endsWith(INSTANCE_SUFFIX)) {
-                    templateStr = new String(Files.readAllBytes(Paths.get(child.getPath())));
-                    break;
-                }
-
-            }
-        }
+        do {
+            templateStr = getTemplate(studyOid, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
+            studyFilePath--;
+        } while (templateStr.equals("") && studyFilePath > 0);
 
         data.put("instanceID", "uuid:1234");
         List<RepeatCount> repeatCounts = repeatCountDao.findAllByEventCrfId(eventCrf.getEventCrfId());
@@ -577,4 +567,20 @@ public class EnketoUrlService {
         return sb.toString();
     }
 
+    private String getTemplate(String studyOID, int studyFilePath, String crfOID, String formLayoutOID, String flavor) throws IOException {
+        String templateStr = "";
+        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, studyFilePath, crfOID, formLayoutOID);
+        File dir = new File(directoryPath);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if ((flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(INSTANCE_QUERIES_SUFFIX))
+                        || (flavor.equals(NO_FLAVOR) && child.getName().endsWith(INSTANCE_SUFFIX))) {
+                    templateStr = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                    break;
+                }
+            }
+        }
+        return templateStr;
+    }
 }

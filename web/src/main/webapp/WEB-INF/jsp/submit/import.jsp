@@ -100,6 +100,8 @@
 <input type="button" onclick="goBack()"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
 
 </form>
+<br/>
+<div class="homebox_bullets"><a href="ImportRule?action=downloadImportTemplate"><b><fmt:message key="download_import_template" bundle="${resword}"/></b></a></div>
 
 
 <jsp:include page="../include/footer.jsp"/>
