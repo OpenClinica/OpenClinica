@@ -80,7 +80,7 @@ public class CallbackController {
                 try {
                     userAccountHelper = callbackService.isCallbackSuccessful(req, user);
                 } catch (Exception e) {
-                    logger.error(e.getMessage());
+                    logger.error("UserAccountHelper:", e);
                     throw e;
                 }
                 UserAccountBean ub = userAccountHelper.getUb();
@@ -94,6 +94,7 @@ public class CallbackController {
                     logger.debug("Setting firstLoginCheck to true");
                     req.getSession().setAttribute("firstLoginCheck", "true");
                 } else {
+                    logger.error("UserAccountBean ub ");
                     unauthorized(res, "Bad credentials");
                     return;
                 }
@@ -130,11 +131,11 @@ public class CallbackController {
                 res.sendRedirect(returnTo + param);
             }
         } catch (InvalidRequestException e) {
-            e.printStackTrace();
+            logger.error("CallbackController:" + e);
             SecurityContextHolder.clearContext();
             res.sendRedirect(req.getContextPath());
         } catch (IdentityVerificationException e) {
-            e.printStackTrace();
+            logger.error("CallbackController:" + e);
             SecurityContextHolder.clearContext();
             res.sendRedirect(redirectOnFail);
         }
