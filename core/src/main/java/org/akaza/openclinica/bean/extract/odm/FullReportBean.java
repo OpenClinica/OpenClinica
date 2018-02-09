@@ -7,13 +7,13 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
+import java.util.Iterator;
+import java.util.LinkedHashMap;
+
 import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
-
-import java.util.Iterator;
-import java.util.LinkedHashMap;
 
 /**
  * Create one ODM XML file.
@@ -32,7 +32,7 @@ public class FullReportBean extends OdmXmlReportBean {
      * Create one ODM XML This method is still under construction. Right now it is for Snapshot filetype only.
      */
     @Override
-    public void createOdmXml(boolean isDataset) {
+    public void createOdmXml(boolean isDataset, boolean enketo) {
         this.addHeading();
         this.addRootStartLine();
 
@@ -60,7 +60,7 @@ public class FullReportBean extends OdmXmlReportBean {
             while (itc.hasNext()) {
                 OdmClinicalDataBean c = itc.next();
                 if (c.getExportSubjectData().size() > 0) {
-                    addNodeClinicalData(c);
+                    addNodeClinicalData(c, enketo);
                 }
             }
         }
@@ -97,7 +97,7 @@ public class FullReportBean extends OdmXmlReportBean {
         ClinicalDataReportBean data = new ClinicalDataReportBean(this.clinicaldata);
         data.setXmlOutput(this.getXmlOutput());
         data.setODMVersion(this.getODMVersion());
-        data.addNodeClinicalData(header, footer);
+        data.addNodeClinicalData(header, footer, false);
     }
 
     public void addNodeStudy(OdmStudyBean odmstudy, boolean isDataset) {
@@ -117,11 +117,11 @@ public class FullReportBean extends OdmXmlReportBean {
         admin.addNodeAdminData();
     }
 
-    public void addNodeClinicalData(OdmClinicalDataBean clinicaldata) {
+    public void addNodeClinicalData(OdmClinicalDataBean clinicaldata, boolean enketo) {
         ClinicalDataReportBean data = new ClinicalDataReportBean(clinicaldata);
         data.setODMVersion(this.getODMVersion());
         data.setXmlOutput(this.getXmlOutput());
-        data.addNodeClinicalData(true, true);
+        data.addNodeClinicalData(true, true, enketo);
     }
 
     public LinkedHashMap<String, OdmStudyBean> getOdmStudyMap() {
