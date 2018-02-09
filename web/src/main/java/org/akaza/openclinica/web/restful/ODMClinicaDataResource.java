@@ -118,10 +118,11 @@ public class ODMClinicaDataResource {
         XMLSerializer xmlSerializer = new XMLSerializer();
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId));
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
+                false);
         if (report.getClinicalDataMap() == null)
             return null;
-        report.createOdmXml(true);
+        report.createOdmXml(true, false);
         // xmlSerializer.setForceTopLevelObject(true);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -206,10 +207,14 @@ public class ODMClinicaDataResource {
     public String getODMMetadata(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
             @PathParam("studySubjectIdentifier") String studySubjectIdentifier, @PathParam("studyEventOID") String studyEventOID,
             @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
-            @Context HttpServletRequest request, String userAccountID) {
+            @Context HttpServletRequest request, String userAccountID, String enketo) {
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
+        boolean enk = false;
+        if (enketo.equals("true"))
+            enk = true;
+
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         if (userBean != null) {
@@ -228,9 +233,10 @@ public class ODMClinicaDataResource {
             includeAudit = true;
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId));
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
+                enk);
 
-        report.createOdmXml(true);
+        report.createOdmXml(true, enk);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();
