@@ -188,7 +188,7 @@ public class MetadataCollectorResource {
     }
 
     public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
-            boolean enketo) {
+            boolean clinical) {
         StudyBean studyBean = getStudyDao().findByOid(studyOID);
         if (studyBean != null)
             studyBean = populateStudyBean(studyBean);
@@ -214,7 +214,7 @@ public class MetadataCollectorResource {
         adc.collectFileData();
 
         FullReportBean report = new FullReportBean();
-        if (!enketo) {
+        if (!clinical) {
             report.setAdminDataMap(adc.getOdmAdminDataMap());
             report.setOdmStudyMap(mdc.getOdmStudyMap());
         } else {

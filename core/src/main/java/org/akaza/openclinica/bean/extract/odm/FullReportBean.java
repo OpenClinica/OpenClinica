@@ -32,7 +32,7 @@ public class FullReportBean extends OdmXmlReportBean {
      * Create one ODM XML This method is still under construction. Right now it is for Snapshot filetype only.
      */
     @Override
-    public void createOdmXml(boolean isDataset, boolean enketo) {
+    public void createOdmXml(boolean isDataset, boolean clinical) {
         this.addHeading();
         this.addRootStartLine();
 
@@ -60,7 +60,7 @@ public class FullReportBean extends OdmXmlReportBean {
             while (itc.hasNext()) {
                 OdmClinicalDataBean c = itc.next();
                 if (c.getExportSubjectData().size() > 0) {
-                    addNodeClinicalData(c, enketo);
+                    addNodeClinicalData(c, clinical);
                 }
             }
         }
@@ -117,11 +117,11 @@ public class FullReportBean extends OdmXmlReportBean {
         admin.addNodeAdminData();
     }
 
-    public void addNodeClinicalData(OdmClinicalDataBean clinicaldata, boolean enketo) {
+    public void addNodeClinicalData(OdmClinicalDataBean clinicaldata, boolean clinical) {
         ClinicalDataReportBean data = new ClinicalDataReportBean(clinicaldata);
         data.setODMVersion(this.getODMVersion());
         data.setXmlOutput(this.getXmlOutput());
-        data.addNodeClinicalData(true, true, enketo);
+        data.addNodeClinicalData(true, true, clinical);
     }
 
     public LinkedHashMap<String, OdmStudyBean> getOdmStudyMap() {

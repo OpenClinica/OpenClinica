@@ -49,7 +49,7 @@ public class AdminDataReportBean extends OdmXmlReportBean {
      * has not been implemented yet
      */
     @Override
-    public void createOdmXml(boolean isDataset, boolean enketo) {
+    public void createOdmXml(boolean isDataset, boolean clinical) {
     }
 
     public void createChunkedOdmXml(boolean isDataset) {
