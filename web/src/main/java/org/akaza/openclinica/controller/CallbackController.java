@@ -87,9 +87,8 @@ public class CallbackController {
                 if (ub != null) {
                     if (userAccountHelper.isUpdated()) {
                         ub = callbackService.getUpdatedUser(ub);
-                        req.getSession().removeAttribute("userRole");
-
                     }
+                    req.getSession().removeAttribute("userRole");
                     req.getSession().setAttribute(USER_BEAN_NAME, ub);
                     logger.debug("Setting firstLoginCheck to true");
                     req.getSession().setAttribute("firstLoginCheck", "true");
