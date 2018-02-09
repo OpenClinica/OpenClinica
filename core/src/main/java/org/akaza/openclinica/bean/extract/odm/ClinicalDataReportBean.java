@@ -58,7 +58,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         // this.addRootEndLine();
     }
 
-    public void addNodeClinicalData(boolean header, boolean footer, boolean enketo) {
+    public void addNodeClinicalData(boolean header, boolean footer, boolean clinical) {
         String ODMVersion = this.getODMVersion();
         // when collecting data, only item with value has been collected.
         StringBuffer xml = this.getXmlOutput();
@@ -110,7 +110,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             ArrayList<ExportStudyEventDataBean> ses = (ArrayList<ExportStudyEventDataBean>) sub.getExportStudyEventData();
             for (ExportStudyEventDataBean se : ses) {
 
-                if (!enketo || (enketo && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) {
+                if (!clinical || (clinical && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) {
                     // For developers, please do not change order of properties sorted, it will break OpenRosaService
                     // Manifest Call for odm file
                     xml.append(indent + indent + indent + "<StudyEventData StudyEventOID=\"" + StringEscapeUtils.escapeXml(se.getStudyEventOID()));
@@ -145,7 +145,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     //
                     ArrayList<ExportFormDataBean> forms = se.getExportFormData();
                     for (ExportFormDataBean form : forms) {
-                        if (!enketo || (enketo && !form.getStatus().equals(EventCRFStatus.INVALID.getI18nDescription(getLocale())))) {
+                        if (!clinical || (clinical && !form.getStatus().equals(EventCRFStatus.INVALID.getI18nDescription(getLocale())))) {
 
                             xml.append(indent + indent + indent + indent + "<FormData FormOID=\"" + StringEscapeUtils.escapeXml(form.getFormOID()));
                             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
