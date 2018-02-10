@@ -192,10 +192,13 @@ public class MainMenuServlet extends SecureController {
     private boolean
     processForceRenewAuth() throws IOException {
         String renewAuth = request.getParameter("forceRenewAuth");
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            auth.setAuthenticated(false);
-            SecurityContextHolder.clearContext();
+        String firstLoginCheck = (String) session.getAttribute("firstLoginCheck");
+        if (StringUtils.equals(renewAuth, "true") || StringUtils.equals(firstLoginCheck, "false")) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null) {
+                auth.setAuthenticated(false);
+                SecurityContextHolder.clearContext();
+            }
         }
         if (StringUtils.isNotEmpty(renewAuth))
             return true;
