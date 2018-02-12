@@ -102,10 +102,16 @@ public class ODMClinicaDataResource {
     public String getODMClinicaldata(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
             @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
             @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
-            @Context HttpServletRequest request) {
+            @Context HttpServletRequest request, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData) {
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
+        boolean clinical = false;
+
+        if (clinicalData.equalsIgnoreCase("no") || clinicalData.equalsIgnoreCase("n"))
+            clinical = false;
+        if (clinicalData.equalsIgnoreCase("yes") || clinicalData.equalsIgnoreCase("y"))
+            clinical = true;
         if (includeDns.equalsIgnoreCase("no") || includeDns.equalsIgnoreCase("n"))
             includeDN = false;
         if (includeAudits.equalsIgnoreCase("no") || includeAudits.equalsIgnoreCase("n"))
@@ -118,10 +124,12 @@ public class ODMClinicaDataResource {
         XMLSerializer xmlSerializer = new XMLSerializer();
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId));
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
+                clinical);
         if (report.getClinicalDataMap() == null)
             return null;
-        report.createOdmXml(true);
+
+        report.createOdmXml(true, clinical);
         // xmlSerializer.setForceTopLevelObject(true);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -206,10 +214,12 @@ public class ODMClinicaDataResource {
     public String getODMMetadata(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
             @PathParam("studySubjectIdentifier") String studySubjectIdentifier, @PathParam("studyEventOID") String studyEventOID,
             @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
-            @Context HttpServletRequest request, String userAccountID) {
+            @Context HttpServletRequest request, String userAccountID, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData) {
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
+        boolean clinical = false;
+
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         if (userBean != null) {
@@ -218,6 +228,10 @@ public class ODMClinicaDataResource {
             userId = Integer.valueOf(userAccountID);
         }
 
+        if (clinicalData.equalsIgnoreCase("no") || clinicalData.equalsIgnoreCase("n"))
+            clinical = false;
+        if (clinicalData.equalsIgnoreCase("yes") || clinicalData.equalsIgnoreCase("y"))
+            clinical = true;
         if (includeDns.equalsIgnoreCase("no") || includeDns.equalsIgnoreCase("n"))
             includeDN = false;
         if (includeAudits.equalsIgnoreCase("no") || includeAudits.equalsIgnoreCase("n"))
@@ -228,9 +242,10 @@ public class ODMClinicaDataResource {
             includeAudit = true;
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId));
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
+                clinical);
 
-        report.createOdmXml(true);
+        report.createOdmXml(true, clinical);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();

@@ -12,6 +12,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Comparator;
 import java.util.Date;
+import java.util.Locale;
 
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
@@ -25,6 +26,9 @@ import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
+import org.akaza.openclinica.domain.EventCRFStatus;
+import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.util.StringUtils;
 
@@ -36,6 +40,7 @@ import org.springframework.util.StringUtils;
 
 public class ClinicalDataReportBean extends OdmXmlReportBean {
     private OdmClinicalDataBean clinicalData;
+    protected Locale locale = ResourceBundleProvider.getLocale();
 
     public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata) {
         super();
@@ -46,14 +51,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
      * has not been implemented yet
      */
     @Override
-    public void createOdmXml(boolean isDataset) {
+    public void createOdmXml(boolean isDataset, boolean enketo) {
         // this.addHeading();
         // this.addRootStartLine();
         // addNodeClinicalData();
         // this.addRootEndLine();
     }
 
-    public void addNodeClinicalData(boolean header, boolean footer) {
+    public void addNodeClinicalData(boolean header, boolean footer, boolean clinical) {
         String ODMVersion = this.getODMVersion();
         // when collecting data, only item with value has been collected.
         StringBuffer xml = this.getXmlOutput();
@@ -104,182 +109,189 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             //
             ArrayList<ExportStudyEventDataBean> ses = (ArrayList<ExportStudyEventDataBean>) sub.getExportStudyEventData();
             for (ExportStudyEventDataBean se : ses) {
-                // For developers, please do not change order of properties sorted, it will break OpenRosaService
-                // Manifest Call for odm file
-                xml.append(indent + indent + indent + "<StudyEventData StudyEventOID=\"" + StringEscapeUtils.escapeXml(se.getStudyEventOID()));
-                if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                    xml.append("\" StudyEventRepeatKey=\"" + se.getStudyEventRepeatKey());
-                    String eventName = se.getEventName();
-                    if (eventName != null && eventName.length() > 0) {
-                        xml.append("\" OpenClinica:EventName=\"" + StringEscapeUtils.escapeXml(eventName));
-                    }
-                    String location = se.getLocation();
-                    if (location != null && location.length() > 0) {
-                        xml.append("\" OpenClinica:StudyEventLocation=\"" + StringEscapeUtils.escapeXml(location));
-                    }
-                    String startDate = se.getStartDate();
-                    if (startDate != null && startDate.length() > 0) {
-                        xml.append("\" OpenClinica:StartDate=\"" + StringEscapeUtils.escapeXml(startDate));
-                    }
-                    String endDate = se.getEndDate();
-                    if (endDate != null && endDate.length() > 0) {
-                        xml.append("\" OpenClinica:EndDate=\"" + StringEscapeUtils.escapeXml(endDate));
-                    }
-                    String status = se.getStatus();
-                    if (status != null && status.length() > 0) {
-                        xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(status));
-                    }
-                    if (se.getAgeAtEvent() != null) {
-                        xml.append("\" OpenClinica:SubjectAgeAtEvent=\"" + se.getAgeAtEvent());
-                    }
-                }
-                xml.append("\">");
-                xml.append(nls);
-                //
-                ArrayList<ExportFormDataBean> forms = se.getExportFormData();
-                for (ExportFormDataBean form : forms) {
-                    xml.append(indent + indent + indent + indent + "<FormData FormOID=\"" + StringEscapeUtils.escapeXml(form.getFormOID()));
+
+                if (!clinical || (clinical && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) {
+                    // For developers, please do not change order of properties sorted, it will break OpenRosaService
+                    // Manifest Call for odm file
+                    xml.append(indent + indent + indent + "<StudyEventData StudyEventOID=\"" + StringEscapeUtils.escapeXml(se.getStudyEventOID()));
                     if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                        String formName = form.getFormName();
-                        if (!StringUtils.isEmpty(formName)) {
-                            xml.append("\" OpenClinica:FormName=\"" + StringEscapeUtils.escapeXml(formName));
+                        xml.append("\" StudyEventRepeatKey=\"" + se.getStudyEventRepeatKey());
+                        String eventName = se.getEventName();
+                        if (eventName != null && eventName.length() > 0) {
+                            xml.append("\" OpenClinica:EventName=\"" + StringEscapeUtils.escapeXml(eventName));
                         }
-                        String formLayout = form.getFormLayout();
-                        if (!StringUtils.isEmpty(formLayout)) {
-                            xml.append("\" OpenClinica:FormLayoutOID=\"" + StringEscapeUtils.escapeXml(formLayout));
+                        String location = se.getLocation();
+                        if (location != null && location.length() > 0) {
+                            xml.append("\" OpenClinica:StudyEventLocation=\"" + StringEscapeUtils.escapeXml(location));
                         }
-                        String interviewerName = form.getInterviewerName();
-                        if (interviewerName != null && interviewerName.length() > 0) {
-                            xml.append("\" OpenClinica:InterviewerName=\"" + StringEscapeUtils.escapeXml(interviewerName));
+                        String startDate = se.getStartDate();
+                        if (startDate != null && startDate.length() > 0) {
+                            xml.append("\" OpenClinica:StartDate=\"" + StringEscapeUtils.escapeXml(startDate));
                         }
-                        if (form.getInterviewDate() != null && form.getInterviewDate().length() > 0) {
-                            xml.append("\" OpenClinica:InterviewDate=\"" + form.getInterviewDate());
+                        String endDate = se.getEndDate();
+                        if (endDate != null && endDate.length() > 0) {
+                            xml.append("\" OpenClinica:EndDate=\"" + StringEscapeUtils.escapeXml(endDate));
                         }
-                        String status = form.getStatus();
+                        String status = se.getStatus();
                         if (status != null && status.length() > 0) {
                             xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(status));
+                        }
+                        if (se.getAgeAtEvent() != null) {
+                            xml.append("\" OpenClinica:SubjectAgeAtEvent=\"" + se.getAgeAtEvent());
                         }
                     }
                     xml.append("\">");
                     xml.append(nls);
                     //
-                    ArrayList<ImportItemGroupDataBean> igs = form.getItemGroupData();
-                    sortImportItemGroupDataBeanList(igs);
-                    for (ImportItemGroupDataBean ig : igs) {
-                        xml.append(indent + indent + indent + indent + indent + "<ItemGroupData ItemGroupOID=\""
-                                + StringEscapeUtils.escapeXml(ig.getItemGroupOID()) + "\" ");
-                        if (!"-1".equals(ig.getItemGroupRepeatKey())) {
-                            xml.append("ItemGroupRepeatKey=\"" + ig.getItemGroupRepeatKey() + "\" ");
-                        }
-                        String itemGroupName = ig.getItemGroupName();
-                        if (!StringUtils.isEmpty(itemGroupName)) {
-                            xml.append("OpenClinica:ItemGroupName=\"" + itemGroupName + "\" ");
-                        }
-                        if (ig.getItemData().get(0).isDeleted()) {
-                            xml.append("OpenClinica:Removed=\"" + (ig.getItemData().get(0).isDeleted() ? "Yes" : "No") + "\" ");
-                        }
-                        xml.append("TransactionType=\"Insert\">");
-                        xml.append(nls);
-                        ArrayList<ImportItemDataBean> items = ig.getItemData();
-                        sortImportItemDataBeanList(items);
-                        for (ImportItemDataBean item : items) {
-                            boolean printValue = true;
-                            xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
-                                    + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" ");
-                            String itemName = item.getItemName();
-                            if (!StringUtils.isEmpty(itemName)) {
-                                xml.append(" OpenClinica:ItemName=\"" + StringEscapeUtils.escapeXml(itemName) + "\" ");
-                            }
-                            if ("Yes".equals(item.getIsNull())) {
-                                xml.append("IsNull=\"Yes\"");
-                                if (!item.isHasValueWithNull()) {
-                                    printValue = false;
-                                }
-                                if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                                    xml.append(" OpenClinica:ReasonForNull=\"" + StringEscapeUtils.escapeXml(item.getReasonForNull()) + "\" ");
-                                    if (!printValue) {
-                                        xml.append("/>");
-                                        xml.append(nls);
-                                    }
-                                }
-                            }
-                            if (printValue) {
-                                Boolean hasElm = false;
-                                xml.append("Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\"");
+                    ArrayList<ExportFormDataBean> forms = se.getExportFormData();
+                    for (ExportFormDataBean form : forms) {
+                        if (!clinical || (clinical && !form.getStatus().equals(EventCRFStatus.INVALID.getI18nDescription(getLocale())))) {
 
-                                String muRefOid = item.getMeasurementUnitRef().getElementDefOID();
-                                if (muRefOid != null && muRefOid.length() > 0) {
-                                    if (hasElm) {
-                                    } else {
-                                        xml.append(">");
-                                        xml.append(nls);
-                                        hasElm = true;
+                            xml.append(indent + indent + indent + indent + "<FormData FormOID=\"" + StringEscapeUtils.escapeXml(form.getFormOID()));
+                            if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                                String formName = form.getFormName();
+                                if (!StringUtils.isEmpty(formName)) {
+                                    xml.append("\" OpenClinica:FormName=\"" + StringEscapeUtils.escapeXml(formName));
+                                }
+                                String formLayout = form.getFormLayout();
+                                if (!StringUtils.isEmpty(formLayout)) {
+                                    xml.append("\" OpenClinica:FormLayoutOID=\"" + StringEscapeUtils.escapeXml(formLayout));
+                                }
+                                String interviewerName = form.getInterviewerName();
+                                if (interviewerName != null && interviewerName.length() > 0) {
+                                    xml.append("\" OpenClinica:InterviewerName=\"" + StringEscapeUtils.escapeXml(interviewerName));
+                                }
+                                if (form.getInterviewDate() != null && form.getInterviewDate().length() > 0) {
+                                    xml.append("\" OpenClinica:InterviewDate=\"" + form.getInterviewDate());
+                                }
+                                String status = form.getStatus();
+                                if (status != null && status.length() > 0) {
+                                    xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(status));
+                                }
+                            }
+                            xml.append("\">");
+                            xml.append(nls);
+                            //
+                            ArrayList<ImportItemGroupDataBean> igs = form.getItemGroupData();
+                            sortImportItemGroupDataBeanList(igs);
+                            for (ImportItemGroupDataBean ig : igs) {
+                                xml.append(indent + indent + indent + indent + indent + "<ItemGroupData ItemGroupOID=\""
+                                        + StringEscapeUtils.escapeXml(ig.getItemGroupOID()) + "\" ");
+                                if (!"-1".equals(ig.getItemGroupRepeatKey())) {
+                                    xml.append("ItemGroupRepeatKey=\"" + ig.getItemGroupRepeatKey() + "\" ");
+                                }
+                                String itemGroupName = ig.getItemGroupName();
+                                if (!StringUtils.isEmpty(itemGroupName)) {
+                                    xml.append("OpenClinica:ItemGroupName=\"" + itemGroupName + "\" ");
+                                }
+                                if (ig.getItemData().get(0).isDeleted()) {
+                                    xml.append("OpenClinica:Removed=\"" + (ig.getItemData().get(0).isDeleted() ? "Yes" : "No") + "\" ");
+                                }
+                                xml.append("TransactionType=\"Insert\">");
+                                xml.append(nls);
+                                ArrayList<ImportItemDataBean> items = ig.getItemData();
+                                sortImportItemDataBeanList(items);
+                                for (ImportItemDataBean item : items) {
+                                    boolean printValue = true;
+                                    xml.append(indent + indent + indent + indent + indent + indent + "<ItemData ItemOID=\""
+                                            + StringEscapeUtils.escapeXml(item.getItemOID()) + "\" ");
+                                    String itemName = item.getItemName();
+                                    if (!StringUtils.isEmpty(itemName)) {
+                                        xml.append(" OpenClinica:ItemName=\"" + StringEscapeUtils.escapeXml(itemName) + "\" ");
                                     }
-                                    xml.append(indent + indent + indent + indent + indent + indent + indent + "<MeasurementUnitRef MeasurementUnitOID=\""
-                                            + StringEscapeUtils.escapeXml(muRefOid) + "\"/>");
-                                    xml.append(nls);
+                                    if ("Yes".equals(item.getIsNull())) {
+                                        xml.append("IsNull=\"Yes\"");
+                                        if (!item.isHasValueWithNull()) {
+                                            printValue = false;
+                                        }
+                                        if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                                            xml.append(" OpenClinica:ReasonForNull=\"" + StringEscapeUtils.escapeXml(item.getReasonForNull()) + "\" ");
+                                            if (!printValue) {
+                                                xml.append("/>");
+                                                xml.append(nls);
+                                            }
+                                        }
+                                    }
+                                    if (printValue) {
+                                        Boolean hasElm = false;
+                                        xml.append("Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\"");
+
+                                        String muRefOid = item.getMeasurementUnitRef().getElementDefOID();
+                                        if (muRefOid != null && muRefOid.length() > 0) {
+                                            if (hasElm) {
+                                            } else {
+                                                xml.append(">");
+                                                xml.append(nls);
+                                                hasElm = true;
+                                            }
+                                            xml.append(indent + indent + indent + indent + indent + indent + indent
+                                                    + "<MeasurementUnitRef MeasurementUnitOID=\"" + StringEscapeUtils.escapeXml(muRefOid) + "\"/>");
+                                            xml.append(nls);
+                                        }
+                                        //
+
+                                        if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                                            if (item.getAuditLogs() != null && item.getAuditLogs().getAuditLogs().size() > 0) {
+                                                if (hasElm) {
+                                                } else {
+                                                    xml.append(">");
+                                                    xml.append(nls);
+                                                    hasElm = true;
+                                                }
+                                                this.addAuditLogs(item.getAuditLogs(), indent + indent + indent + indent + indent + indent + indent, "item");
+                                            }
+                                            //
+                                            if (item.getDiscrepancyNotes() != null && item.getDiscrepancyNotes().getDiscrepancyNotes().size() > 0) {
+                                                if (hasElm) {
+                                                } else {
+                                                    xml.append(">");
+                                                    xml.append(nls);
+                                                    hasElm = true;
+                                                }
+                                                this.addDiscrepancyNotes(item.getDiscrepancyNotes(),
+                                                        indent + indent + indent + indent + indent + indent + indent);
+                                            }
+                                        }
+                                        if (hasElm) {
+                                            xml.append(indent + indent + indent + indent + indent + indent + "</ItemData>");
+                                            xml.append(nls);
+                                            hasElm = false;
+                                        } else {
+                                            xml.append("/>");
+                                            xml.append(nls);
+                                        }
+                                    }
+                                }
+                                xml.append(indent + indent + indent + indent + indent + "</ItemGroupData>");
+                                xml.append(nls);
+                            }
+                            //
+                            if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                                if (form.getAuditLogs() != null && form.getAuditLogs().getAuditLogs().size() > 0) {
+                                    this.addAuditLogs(form.getAuditLogs(), indent + indent + indent + indent + indent, "form");
                                 }
                                 //
-
-                                if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                                    if (item.getAuditLogs() != null && item.getAuditLogs().getAuditLogs().size() > 0) {
-                                        if (hasElm) {
-                                        } else {
-                                            xml.append(">");
-                                            xml.append(nls);
-                                            hasElm = true;
-                                        }
-                                        this.addAuditLogs(item.getAuditLogs(), indent + indent + indent + indent + indent + indent + indent, "item");
-                                    }
-                                    //
-                                    if (item.getDiscrepancyNotes() != null && item.getDiscrepancyNotes().getDiscrepancyNotes().size() > 0) {
-                                        if (hasElm) {
-                                        } else {
-                                            xml.append(">");
-                                            xml.append(nls);
-                                            hasElm = true;
-                                        }
-                                        this.addDiscrepancyNotes(item.getDiscrepancyNotes(), indent + indent + indent + indent + indent + indent + indent);
-                                    }
-                                }
-                                if (hasElm) {
-                                    xml.append(indent + indent + indent + indent + indent + indent + "</ItemData>");
-                                    xml.append(nls);
-                                    hasElm = false;
-                                } else {
-                                    xml.append("/>");
-                                    xml.append(nls);
+                                if (form.getDiscrepancyNotes() != null && form.getDiscrepancyNotes().getDiscrepancyNotes().size() > 0) {
+                                    this.addDiscrepancyNotes(form.getDiscrepancyNotes(), indent + indent + indent + indent + indent);
                                 }
                             }
+                            xml.append(indent + indent + indent + indent + "</FormData>");
+                            xml.append(nls);
                         }
-                        xml.append(indent + indent + indent + indent + indent + "</ItemGroupData>");
-                        xml.append(nls);
                     }
                     //
                     if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                        if (form.getAuditLogs() != null && form.getAuditLogs().getAuditLogs().size() > 0) {
-                            this.addAuditLogs(form.getAuditLogs(), indent + indent + indent + indent + indent, "form");
+                        if (se.getAuditLogs() != null && se.getAuditLogs().getAuditLogs().size() > 0) {
+                            this.addAuditLogs(se.getAuditLogs(), indent + indent + indent + indent, "se");
                         }
                         //
-                        if (form.getDiscrepancyNotes() != null && form.getDiscrepancyNotes().getDiscrepancyNotes().size() > 0) {
-                            this.addDiscrepancyNotes(form.getDiscrepancyNotes(), indent + indent + indent + indent + indent);
+                        if (se.getDiscrepancyNotes() != null && se.getDiscrepancyNotes().getDiscrepancyNotes().size() > 0) {
+                            this.addDiscrepancyNotes(se.getDiscrepancyNotes(), indent + indent + indent + indent);
                         }
                     }
-                    xml.append(indent + indent + indent + indent + "</FormData>");
+                    xml.append(indent + indent + indent + "</StudyEventData>");
                     xml.append(nls);
                 }
-                //
-                if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-                    if (se.getAuditLogs() != null && se.getAuditLogs().getAuditLogs().size() > 0) {
-                        this.addAuditLogs(se.getAuditLogs(), indent + indent + indent + indent, "se");
-                    }
-                    //
-                    if (se.getDiscrepancyNotes() != null && se.getDiscrepancyNotes().getDiscrepancyNotes().size() > 0) {
-                        this.addDiscrepancyNotes(se.getDiscrepancyNotes(), indent + indent + indent + indent);
-                    }
-                }
-                xml.append(indent + indent + indent + "</StudyEventData>");
-                xml.append(nls);
             }
             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
                 ArrayList<SubjectGroupDataBean> sgddata = (ArrayList<SubjectGroupDataBean>) sub.getSubjectGroupData();
@@ -594,6 +606,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                 return i1.compareTo(i2);
             }
         });
+    }
+
+    public Locale getLocale() {
+        return locale;
     }
 
 }

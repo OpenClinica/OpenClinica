@@ -98,7 +98,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
      * has not been implemented yet
      */
     @Override
-    public void createOdmXml(boolean isDataset) {
+    public void createOdmXml(boolean isDataset, boolean enketo) {
         // this.addHeading();
         // this.addRootStartLine();
         // addNodeStudy();

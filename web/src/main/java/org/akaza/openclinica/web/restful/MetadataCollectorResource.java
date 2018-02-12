@@ -8,7 +8,9 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
+import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
+import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -185,8 +187,8 @@ public class MetadataCollectorResource {
         return report.getXmlOutput().toString().trim();
     }
 
-    public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID,
-            LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap) {
+    public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
+            boolean clinical) {
         StudyBean studyBean = getStudyDao().findByOid(studyOID);
         if (studyBean != null)
             studyBean = populateStudyBean(studyBean);
@@ -212,12 +214,16 @@ public class MetadataCollectorResource {
         adc.collectFileData();
 
         FullReportBean report = new FullReportBean();
-        report.setAdminDataMap(adc.getOdmAdminDataMap());
-        report.setOdmStudyMap(mdc.getOdmStudyMap());
+        if (!clinical) {
+            report.setAdminDataMap(adc.getOdmAdminDataMap());
+            report.setOdmStudyMap(mdc.getOdmStudyMap());
+        } else {
+            report.setAdminDataMap(new LinkedHashMap<String, OdmAdminDataBean>());
+            report.setOdmStudyMap(new LinkedHashMap<String, OdmStudyBean>());
+        }
         report.setCoreResources(getCoreResources());
         report.setOdmBean(mdc.getODMBean());
         // report.setClinicalData(odmClinicalDataBean);
-
         report.setClinicalDataMap(clinicalDataMap);
         report.setODMVersion("oc1.3");
 
