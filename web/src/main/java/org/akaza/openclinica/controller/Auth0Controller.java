@@ -28,10 +28,12 @@ public class Auth0Controller {
     private final String userInfoAudience;
     public static final String RETURN_TO = "auth0_return_to";
     private String domain;
+    private String clientId;
 
     @Autowired public Auth0Controller(AppConfig config) {
         domain = config.getDomain();
         userInfoAudience = String.format("https://%s/userinfo", domain);
+        clientId = config.getClientId();
     }
     public Tokens handle(HttpServletRequest request) throws IdentityVerificationException {
         return controller.handle(request);
@@ -124,6 +126,7 @@ public class Auth0Controller {
         } catch (UnsupportedEncodingException e) {
             logger.error("Bad redirect URI %s Error message %s", redirectURI, e.getMessage());
         }
-        return String.format("https://%s/v2/logout/?returnTo=%s", domain, encodedURL);
+        return String.format("https://%s/v2/logout/?returnTo=%s&clientId=%s"
+                , domain, encodedURL, clientId);
     }
 }
