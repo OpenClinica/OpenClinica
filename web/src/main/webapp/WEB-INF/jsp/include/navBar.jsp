@@ -203,20 +203,6 @@
     function processLogoutClick(returnTo) {
         setCurrentUser("");
     }
-
-    function processStudiesClick(e) {
-        e = e || window.event;
-        switch (e.which) {
-            case 1:
-            case 2:
-            case 3:
-                jQuery.get(myContextPath + '/pages/setFirstLogin')
-                    .error(function (jqXHR, textStatus, errorThrown) {
-                        "Error calling :" + myContextPath + '/pages/setFirstLogin' + " " + textStatus + " " + errorThrown
-                    });
-                break;
-        }
-    }
 </script>
 
 <!-- Main Navigation -->
@@ -295,7 +281,7 @@
                         <!-- First Tier Drop Down -->
                         <ul class="dropdown_BG">
                             <c:if test="${userBean.sysAdmin || userBean.techAdmin || userRole.coordinator}">
-                                <li><a onmousedown="javascript:processStudiesClick(event);" href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a></li>
+                                <li><a href="${study.manager}"><fmt:message key="return_to_my_studies" bundle="${resworkflow}"/></a></li>
                             </c:if>
                             <li>
                                 <a href="${(study.manager).replace('account-study','my-profile')}?returnTo=${currentPageUrl}"><fmt:message key="return_to_my_profile" bundle="${resworkflow}"/></a></li>

@@ -81,17 +81,8 @@ public class LogoutController {
                                       final HttpServletResponse response) throws IOException {
         final HttpSession session = request.getSession();
         //String redirectURL = request.getParameter("redirectURL");
-        session.setAttribute("firstLoginCheck", "false");
+        session.setAttribute("firstLoginCheck", false);
         //response.sendRedirect(URLDecoder.decode(redirectURL, "UTF-8"));
-    }
-
-    @RequestMapping(value="/setFirstLogin", method = RequestMethod.GET)
-    @ResponseStatus(value = HttpStatus.OK)
-    public void setFirstLogin(final HttpServletRequest request,
-                                final HttpServletResponse response) throws IOException {
-        final HttpSession session = request.getSession();
-        logger.error("Setting the firstLoginCheck to true");
-        session.setAttribute("firstLoginCheck", "true");
     }
 
     private void resetSessionAttributes(HttpSession session) {
