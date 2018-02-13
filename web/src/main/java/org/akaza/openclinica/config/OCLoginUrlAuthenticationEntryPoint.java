@@ -46,6 +46,7 @@ public class OCLoginUrlAuthenticationEntryPoint extends LoginUrlAuthenticationEn
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }
-        return getLoginFormUrl() + "?" + paramsString;
+        String loginUrl = getLoginFormUrl()  + "?" + paramsString;
+        return loginUrl;
     }
 }

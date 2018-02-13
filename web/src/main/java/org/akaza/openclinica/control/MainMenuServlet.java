@@ -125,6 +125,7 @@ public class MainMenuServlet extends SecureController {
     }
 
     public boolean processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) throws Exception {
+        logger.debug("MainMenuServlet processSpecificStudyEnvUuid:%%%%%%%%" + session.getAttribute("firstLoginCheck"));
         boolean isRenewAuth = false;
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
         if (StringUtils.isEmpty(studyEnvUuid)) {
@@ -147,7 +148,6 @@ public class MainMenuServlet extends SecureController {
         ub.setRoles(userRoleBeans);
         StudyDAO sd = getStudyDAO();
         StudyBean study = sd.findByStudyEnvUuid(studyEnvUuid);
-        session.setAttribute("firstLoginCheck", "false");
 
         if (study == null) {
             CoreResources.setRequestSchema(request,currentSchema);
@@ -156,9 +156,6 @@ public class MainMenuServlet extends SecureController {
         currentPublicStudy = study;
         CoreResources.setRequestSchema(request, study.getSchemaName());
         currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
-        if (currentStudy.getParentStudyId() != 0) {
-            session.setAttribute("firstLoginCheck", "true");
-        }
         
         StudyConfigService scs = new StudyConfigService(sm.getDataSource());
         scs.setParametersForStudy(currentStudy);
