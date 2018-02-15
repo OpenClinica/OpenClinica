@@ -36,12 +36,13 @@ public class ODMClinicalDataController {
     public @ResponseBody JsonNode getClinicalData(@PathVariable("studyOID") String studyOID, @PathVariable("formVersionOID") String formVersionOID,
             @PathVariable("studyEventOID") String studyEventOID, @PathVariable("studySubjectIdentifier") String studySubjectIdentifier,
             @RequestParam(value = "includeDNs", defaultValue = "n", required = false) String includeDns,
-            @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request) throws Exception {
+            @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request,
+            @RequestParam(value = "clinicalData", defaultValue = "n", required = false) String clinicalData) throws Exception {
 
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
         String result = odmClinicaDataResource.getODMClinicaldata(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
-                request);
+                request, clinicalData);
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readTree(result);
 

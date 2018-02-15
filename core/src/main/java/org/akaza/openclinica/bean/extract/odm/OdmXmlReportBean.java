@@ -54,7 +54,7 @@ public abstract class OdmXmlReportBean {
         sasFormatValidator.setUniqueNameTable(this.uniqueNameTable);
     }
 
-    public abstract void createOdmXml(boolean isDataset);
+    public abstract void createOdmXml(boolean isDataset, boolean enketo);
 
     public void addHeading() {
         xmlOutput.append(this.xmlHeading);
@@ -71,8 +71,8 @@ public abstract class OdmXmlReportBean {
         String ov = odmbean.getODMVersion();
         ov = ov.startsWith("oc") ? ov.substring(2) : ov;
         xmlOutput.append("<ODM FileOID=\"" + StringEscapeUtils.escapeXml(odmbean.getFileOID()) + "\" Description=\""
-            + StringEscapeUtils.escapeXml(odmbean.getDescription()) + "\" CreationDateTime=\"" + odmbean.getCreationDateTime() + "\" FileType=\""
-            + odmbean.getFileType() + "\" ODMVersion=\"" + StringEscapeUtils.escapeXml(ov) + "\" ");
+                + StringEscapeUtils.escapeXml(odmbean.getDescription()) + "\" CreationDateTime=\"" + odmbean.getCreationDateTime() + "\" FileType=\""
+                + odmbean.getFileType() + "\" ODMVersion=\"" + StringEscapeUtils.escapeXml(ov) + "\" ");
         for (String s : odmbean.getXmlnsList()) {
             xmlOutput.append(s + " ");
         }
