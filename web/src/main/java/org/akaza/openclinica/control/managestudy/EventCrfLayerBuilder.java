@@ -209,7 +209,8 @@ public class EventCrfLayerBuilder {
                     html.tdEnd().trEnd(0);
                 }
             }
-            if (currentStudy.getStatus() == Status.AVAILABLE && currentUser.isSysAdmin()) {
+            // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
+            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 deleteEventCrf(html, eventCrfBean, studySubject);
@@ -317,7 +318,8 @@ public class EventCrfLayerBuilder {
                 removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
                 html.tdEnd().trEnd(0);
             }
-            if (currentStudy.getStatus() == Status.AVAILABLE && currentUser.isSysAdmin()) {
+            // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
+            if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
                 html.tr(0).valign("top").close();
                 html.td(0).styleClass(table_cell_left).close();
                 deleteEventCrf(html, eventCrfBean, studySubject);
