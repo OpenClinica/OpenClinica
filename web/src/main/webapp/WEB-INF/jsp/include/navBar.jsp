@@ -18,14 +18,16 @@
 
 <script>
     var myContextPath = "${pageContext.request.contextPath}";
-    var sessionTimeout = "<%= session.getMaxInactiveInterval() %>";
+    var sessionTimeoutVal = '<%= session.getMaxInactiveInterval() %>';
+    console.log("***********************************sessionTimeoutVal:"+ sessionTimeoutVal);
     var userName = "<%= userBean.getName() %>";
     var currentURL = "<%= currentURL %>";
-    var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
+    var crossStorageURL = '<%= session.getAttribute("crossStorageURL")%>';
+    console.log("***********************************Getting crossStorage:"+ crossStorageURL);
     var ocAppTimeoutKey = "OCAppTimeout";
-    var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
+    var firstLoginCheck = '<%= session.getAttribute("firstLoginCheck")%>';
     console.log("Firstr time first:" + firstLoginCheck);
-    const currentUser = "currentUser";
+    var currentUser = "currentUser";
     var appName = "RT";
 </script>
 
@@ -43,31 +45,45 @@
         <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
         <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="../includes/css/icomoon-style.css">
-        <script type="text/javascript" language="JavaScript" src="../includes/auth0/captureKeyboardMouseEvents.js"></script>
-        <script type="text/javascript" language="JavaScript" src="../includes/sessionTimeout.js"></script>
-        <script type="text/javascript" language="JavaScript" src="../includes/moment.min.js"></script>
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
         <script type="text/javascript" src="../js/lib/es6-promise.auto.min.js"></script>
         <script type="text/javascript" src="../js/lib/client.js"></script>
+        <script type="text/javascript">
+            var storage = new CrossStorageClient(crossStorageURL);
+        </script>
+        <script type="text/javascript" language="JavaScript" src="../includes/sessionTimeout.js"></script>
+        <script type="text/javascript" language="JavaScript" src="../includes/auth0/captureKeyboardMouseEvents.js"></script>
+        <script type="text/javascript">
+            console.log("***********************************Getting crossStorage");
+            var storage = new CrossStorageClient(crossStorageURL, {
+                timeout: 7000
+            });
+        </script>
+        <script type="text/javascript" language="JavaScript" src="../includes/moment.min.js"></script>
     </c:when>
     <c:otherwise>
         <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
         <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
         <link rel="stylesheet" href="includes/css/icomoon-style.css">
+        <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
+        <script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
+        <script type="text/javascript" src="js/lib/client.js"></script>
+        <script type="text/javascript">
+            var storage = new CrossStorageClient(crossStorageURL, {
+                timeout: 7000});
+        </script>
         <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
         <script type="text/javascript" language="JavaScript" src="includes/auth0/captureKeyboardMouseEvents.js"></script>
         <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
-        <script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
-        <script type="text/javascript" src="js/lib/client.js"></script>
     </c:otherwise>
 </c:choose>
 
 
 <script type="text/javascript">
-    var storage = new CrossStorageClient(crossStorageURL);
 
     var realInterval = 60;
-    if (sessionTimeout < realInterval)
-        realInterval = sessionTimeout;
+    if (sessionTimeoutVal < realInterval)
+        realInterval = sessionTimeoutVal;
     /**
      * Self-adjusting interval to account for drifting
      *
@@ -122,7 +138,7 @@
 
 </script>
 
-<script language="JavaScript">
+<script type="text/javaScript">
     processTimedOuts(true, false);
     //Piwik
     var _paq = _paq || [];
@@ -1126,6 +1142,3 @@
 
     </form>
 </div>
-<script type="application/javascript">
-    console.log("First check:" + firstLoginCheck);
-</script>

@@ -80,6 +80,7 @@ public class LogoutController {
     public void resetFirstLogin(final HttpServletRequest request,
                                       final HttpServletResponse response) throws IOException {
         final HttpSession session = request.getSession();
+        logger.error("**********Resetting first time to false**********");
         //String redirectURL = request.getParameter("redirectURL");
         session.setAttribute("firstLoginCheck", false);
         //response.sendRedirect(URLDecoder.decode(redirectURL, "UTF-8"));

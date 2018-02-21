@@ -4,6 +4,7 @@ import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
+import java.util.List;
 import java.util.Locale;
 
 import javax.sql.DataSource;
@@ -13,6 +14,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -33,6 +35,7 @@ import org.akaza.openclinica.service.rule.RuleSetService;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
 
@@ -41,7 +44,8 @@ public class JobTriggerService {
 	RuleSetDao ruleSetDao;
 	DataSource ds;
 	UserAccountDAO userAccountDao;
-	StudyDAO studyDao;
+	@Autowired
+	StudyDao studyDao;
 	StudySubjectDAO ssdao;
 	StudyEventDAO sedao;
 	StudyEventDefinitionDAO seddao;
@@ -67,8 +71,7 @@ public class JobTriggerService {
 	}
 
 	// @Scheduled(cron = "0 0/2 * * * ?") // trigger every 2 minutes
-	// @Scheduled(cron = "0 0/1 * * * ?")
-	// trigger every minute
+	// @Scheduled(cron = "0 0/1 * * * ?") // trigger every minute
 	@Scheduled(cron = "0 0 0/1 * * ?")
 	// trigger every hour
 	public void hourlyJobTrigger() throws NumberFormatException, ParseException {
@@ -84,31 +87,34 @@ public class JobTriggerService {
 
 	public void triggerJob(){
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
-		ArrayList<RuleSetBean> ruleSets = ruleSetDao.findAllRunOnSchedules(true);
-		for (RuleSetBean ruleSet : ruleSets) {
-			if (ruleSet.getStatus().AVAILABLE != null && ruleSet.isRunSchedule()) {
-				if(ruleSet.getItemId()!=null){ 
-                 // item Specific Rule
-					System.out.println("*** Item Specific Rule ***");
-				ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
-				StudyBean currentStudy = (StudyBean) getStudyDao().findByPK(ruleSet.getStudyId());
-				ResourceBundleProvider.updateLocale(Locale.getDefault());
-				UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(1);
-				ruleSetBeans.add(ruleSet);
-				ruleSetService.runRulesInBulk(ruleSetBeans, false, currentStudy, ub, true);
-				}else{
-			// Event Specific Rule		
-					System.out.println("*** Event Specific Rule ***");
-				    StudyEventChangeDetails studyEventChangeDetails = new StudyEventChangeDetails(true, true);
-					ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
-					ExpressionBean eBean = new ExpressionBean();
-					eBean.setValue(ruleSet.getTarget().getValue()+".A.B");
-					
-					ruleSet.setTarget(eBean);
-					ruleSetBeans.add(ruleSet);
-		
-					ruleSetService.runRulesInBeanProperty(ruleSetBeans ,1, studyEventChangeDetails);
+		List<String> schemas = studyDao.findAllSchemas();
+		for (String schema : schemas) {
+			ArrayList<RuleSetBean> ruleSets = ruleSetDao.findAllRunOnSchedulesPerSchema(true, schema);
+			for (RuleSetBean ruleSet : ruleSets) {
+				if (ruleSet.getStatus().AVAILABLE != null && ruleSet.isRunSchedule()) {
+					if(ruleSet.getItemId()!=null){
+						// item Specific Rule
+						System.out.println("*** Item Specific Rule ***");
+						ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
+						StudyBean currentStudy = (StudyBean) getStudyDao().findByPK(ruleSet.getStudyId());
+						ResourceBundleProvider.updateLocale(Locale.getDefault());
+						UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(1);
+						ruleSetBeans.add(ruleSet);
+						ruleSetService.runRulesInBulk(ruleSetBeans, false, currentStudy, ub, true);
+					} else {
+						// Event Specific Rule
+						System.out.println("*** Event Specific Rule ***");
+						StudyEventChangeDetails studyEventChangeDetails = new StudyEventChangeDetails(true, true);
+						ArrayList<RuleSetBean> ruleSetBeans = new ArrayList<>();
+						ExpressionBean eBean = new ExpressionBean();
+						eBean.setValue(ruleSet.getTarget().getValue()+".A.B");
 
+						ruleSet.setTarget(eBean);
+						ruleSetBeans.add(ruleSet);
+
+						ruleSetService.runRulesInBeanProperty(ruleSetBeans ,1, studyEventChangeDetails);
+
+					}
 				}
 			}
 		}
