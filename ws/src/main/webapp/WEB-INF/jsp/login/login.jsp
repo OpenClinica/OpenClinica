@@ -9,7 +9,7 @@
 <title>OpenClinica</title>
 
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
- <meta http-equiv="X-UA-Compatible" content="IE=8" />
+ <meta http-equiv="X-UA-Compatible" content="IE=11" />
 <link rel="shortcut icon" type="image/x-icon" href="<c:url value='/images/favicon.ico'/>">
 
 <link rel="stylesheet" href="<c:url value='/includes/styles.css'/>" type="text/css"/>

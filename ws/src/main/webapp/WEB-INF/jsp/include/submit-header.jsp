@@ -20,7 +20,7 @@
 <title><fmt:message key="openclinica" bundle="${resword}"/></title>
 
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
- <meta http-equiv="X-UA-Compatible" content="IE=8" />
+ <meta http-equiv="X-UA-Compatible" content="IE=11" />
 
 <link rel="stylesheet" href="includes/styles.css" type="text/css">
 <link rel="stylesheet" href="includes/styles2.css" type="text/css">

@@ -29,6 +29,7 @@ function processCurrentUser(currentTime, newExpiration) {
     .then(function() {
         return storage.get(currentUser);
     }).then(function(res) {
+        console.log("Current user in processCurrentUser****************" + res);
         dupeFirstUserCheck = firstLoginCheck;
         if (firstLoginCheck === "true") {
             var prevUser = res;
@@ -42,13 +43,15 @@ function processCurrentUser(currentTime, newExpiration) {
                     var prevTimeout = res;
                     console.log("prevTimeout:processCurrentUser:" + prevTimeout);
                     if (prevTimeout < currentTime) {
-                        console.log("prevTimeout is less than currentTime");
+                        console.log("prevTimeout: " +  prevTimeout
+                            + " is less than currentTime:" + currentTime);
                         storage.set(currentUser, "").then(function() {
                             processUserData(getPromise(""));
                         });
                     } else {
-                            console.log("prevTimeout is greater than currentTime");
-                            storage.set(currentUser, userName).then(function() {
+                        console.log("prevTimeout: " +  prevTimeout
+                            + " is greater than currentTime:" + currentTime);
+                        storage.set(currentUser, userName).then(function() {
                             storage.set(ocAppTimeoutKey, newExpiration).then(function() {
                                 processUserData(getPromise("-1"));
                             });
@@ -87,16 +90,9 @@ function processUserData(inputPromise) {
                 console.log("set user when currentUser was null:" + res1);
             });
         } else if (res === "") {
-            if (firstLoginCheck === "true") {
-                firstLoginCheck = false;
-                jQuery.get(myContextPath + '/pages/resetFirstLogin')
-                    .error(function(jqXHR, textStatus, errorThrown) {
-                        "Error calling :" + myContextPath + '/pages/resetFirstLogin' + " " + textStatus + " " + errorThrown
-                    });
-            } else {
-                console.log(" returning to Login screen");
-                window.location.replace(myContextPath + '/pages/logout');
-            }
+            firstLoginCheck = false;
+            console.log(" returning to Login screen");
+            window.location.replace(myContextPath + '/pages/logout');
         } else if (res === "-1") {
             firstLoginCheck = false;
             storage.set(currentUser, userName).then(function() {
@@ -122,9 +118,10 @@ function updateOCAppTimeout() {
     processTimedOuts(false, true);
 }
 function processTimedOuts(checkCurrentUser, storageFlag) {
-    var newExpiration = moment().add(sessionTimeout, 's').valueOf();
+    var newExpiration = moment().add(sessionTimeoutVal, 's').valueOf();
     var currentTime = moment().valueOf();
     if (checkCurrentUser) {
+        console.log("***&&&&&&&&&&& processCurrentUser");
         processCurrentUser(currentTime, newExpiration);
     }
 
