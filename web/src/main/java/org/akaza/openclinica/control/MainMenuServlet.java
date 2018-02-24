@@ -47,6 +47,7 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
 
 /**
  * The main controller servlet for all the work behind study sites for
@@ -219,8 +220,14 @@ public class MainMenuServlet extends SecureController {
         // update last visit date to current date
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
-        if (processSpecificStudyEnvUuid(request, ub1))
+        if (processSpecificStudyEnvUuid(request, ub1)) {
+            Map<String, String[]> targetMap = new ConcurrentHashMap<>(request.getParameterMap());
+            targetMap.remove("forceRenewAuth");
+            String paramStr = Utils.getParamsString(targetMap);
+            session.removeAttribute("userRole");
+            response.sendRedirect(request.getRequestURI() + "?" + paramStr);
             return;
+        }
 
         ub1.setLastVisitDate(new Date(System.currentTimeMillis()));
         // have to actually set the above to a timestamp? tbh
