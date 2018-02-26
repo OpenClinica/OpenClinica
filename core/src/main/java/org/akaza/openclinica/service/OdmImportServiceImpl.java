@@ -48,7 +48,6 @@ import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.dto.Bucket;
 import org.akaza.openclinica.service.dto.Form;
 import org.apache.commons.io.FileUtils;
-import org.cdisc.ns.odm.v130.EventType;
 import org.cdisc.ns.odm.v130.ODM;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormDef;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormRef;
@@ -402,7 +401,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         } else {
             studyEventDefinition.setRepeating(false);
         }
-        studyEventDefinition.setType(EventType.SCHEDULED.value().toLowerCase());
+        studyEventDefinition.setType(odmStudyEventDef.getType().toString());
         studyEventDefinition.setStudy(study);
         studyEventDefinition.setUserAccount(userAccount);
         if (odmStudyEventDef.getStudyEventDefElementExtension().size() != 0) {

@@ -122,6 +122,7 @@ public class OpenRosaSubmissionController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String FORM_CONTEXT = "ecid";
+    private final String COMMON = "Common";
 
     /**
      * @api {post} /pages/api/v1/editform/:studyOid/submission Submit form data
@@ -275,7 +276,7 @@ public class OpenRosaSubmissionController {
                 }
             }
 
-            if (count == eventDefinitionCrfs.size()) {
+            if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
                 studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
                 studyEvent.setUserAccount(userAccount);
                 persistStudyEvent(studyEvent);
