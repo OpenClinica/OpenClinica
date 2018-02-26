@@ -251,7 +251,7 @@ public class EventProcessor implements Processor {
         if (!isAnonymous) {
             if ((studyEvent.getSubjectEventStatusId().intValue() == SubjectEventStatus.SCHEDULED.getCode().intValue())
                     || (studyEvent.getSubjectEventStatusId().intValue() == SubjectEventStatus.NOT_SCHEDULED.getCode().intValue()
-                            && studyEventDefinition.getType().equals(COMMON))) {
+                            && studyEventDefinition.getType().equalsIgnoreCase(COMMON))) {
             }
 
             newStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
@@ -276,7 +276,7 @@ public class EventProcessor implements Processor {
                 }
             } else if ((studyEvent.getSubjectEventStatusId().intValue() == SubjectEventStatus.SCHEDULED.getCode().intValue())
                     || (studyEvent.getSubjectEventStatusId().intValue() == SubjectEventStatus.NOT_SCHEDULED.getCode().intValue()
-                            && studyEventDefinition.getType().equals(COMMON))) {
+                            && studyEventDefinition.getType().equalsIgnoreCase(COMMON))) {
                 newStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
             }
         }

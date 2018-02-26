@@ -276,7 +276,7 @@ public class OpenRosaSubmissionController {
                 }
             }
 
-            if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
+            if (count == eventDefinitionCrfs.size() || sed.getType().equalsIgnoreCase(COMMON)) {
                 studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
                 studyEvent.setUserAccount(userAccount);
                 persistStudyEvent(studyEvent);
