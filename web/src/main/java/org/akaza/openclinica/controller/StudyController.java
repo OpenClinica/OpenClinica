@@ -102,7 +102,13 @@ public class StudyController {
     private SchemaCleanupService schemaCleanupService;
     @Autowired
     StudyParameterDao studyParameterDao;
-
+    private enum SiteSaveCheck {
+        CHECK_UNIQUE_SAVE(0), CHECK_UNIQUE_UPDATE(1), NO_CHECK(2);
+        private int code;
+        SiteSaveCheck(int code) {
+            this.code = code;
+        }
+    }
 
     private static final String validation_failed_message = "VALIDATION FAILED";
     private static final String validation_passed_message = "SUCCESS";
@@ -1061,7 +1067,7 @@ public class StudyController {
         UserAccountBean ownerUserAccount = null;
         Date formattedStartDate = null;
         Date formattedStudyDate = null;
-        boolean checkForDuplicateSite = true;
+        SiteSaveCheck siteSaveCheck;
         public SiteParameters(HashMap<String, Object> map, String studyEnvUuid) {
             this.map = map;
             this.studyEnvUuid = studyEnvUuid;
@@ -1210,12 +1216,20 @@ public class StudyController {
                 errorObjects.add(errorObject);
             } else {
                 // make sure no duplicate name sites are allowed for the same parent
-                if (checkForDuplicateSite &&
-                        (parentStudy != null)) {
-                    int nameStudiesCount = studyDao.findCntByNameAndParent(name, parentStudy.getId());
-                    if (nameStudiesCount != 0) {
-                        ErrorObject errorObject = createErrorObject("Site Object", "Duplicate site name for the same parent study is not allowed.", "name");
-                        errorObjects.add(errorObject);
+                if (parentStudy != null) {
+
+                        Study siteToVerify = studyDao.findByNameAndParent(name, parentStudy.getId());
+                        if (siteToVerify != null && siteToVerify.getStudyId() != 0) {
+                            if (siteSaveCheck == SiteSaveCheck.CHECK_UNIQUE_SAVE) {
+                                ErrorObject errorObject = createErrorObject("Site Object", "Duplicate site name during creation for the same parent study is not allowed.", "name");
+                                errorObjects.add(errorObject);
+                            } else if (siteSaveCheck == SiteSaveCheck.CHECK_UNIQUE_UPDATE) {
+                                if (siteToVerify.getStudyEnvSiteUuid().equalsIgnoreCase(studyEnvSiteUuid) != true) {
+                                    ErrorObject errorObject = createErrorObject("Site Object", "Updating site name to other existing site name for the same parent study is not allowed.", "name");
+                                    errorObjects.add(errorObject);
+                                }
+                            }
+
                     }
                 }
             }
@@ -1345,6 +1359,7 @@ public class StudyController {
         request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
         ResourceBundleProvider.updateLocale(locale);
         SiteParameters siteParameters = new SiteParameters(map, studyEnvUuid);
+        siteParameters.siteSaveCheck = SiteSaveCheck.CHECK_UNIQUE_SAVE;
         siteParameters.setParameters();
         ArrayList<ErrorObject> errorObjects = siteParameters.validateParameters(request);
         Study envSiteUuidStudy = studyDao.findByStudyEnvUuid(siteParameters.studyEnvSiteUuid);
@@ -1394,8 +1409,8 @@ public class StudyController {
         request.getSession().setAttribute(LocaleResolver.getLocaleSessionAttributeName(), locale);
         ResourceBundleProvider.updateLocale(locale);
         SiteParameters siteParameters = new SiteParameters(map, studyEnvUuid);
+        siteParameters.siteSaveCheck = SiteSaveCheck.CHECK_UNIQUE_UPDATE;
         siteParameters.setParameters();
-        siteParameters.checkForDuplicateSite = false;
         ArrayList<ErrorObject> errorObjects = siteParameters.validateParameters(request);
         Study envSiteUuidStudy = studyDao.findByStudyEnvUuid(siteParameters.studyEnvSiteUuid);
         if (envSiteUuidStudy == null || envSiteUuidStudy.getStudyId() == 0) {
@@ -1792,7 +1807,7 @@ public class StudyController {
                         && (role.getRole().equals(Role.STUDYDIRECTOR)
                                 || role.getRole().equals(Role.COORDINATOR)))
                 .count();
-        logger.error("Status returned from role check:" + (result > 0));
+        logger.info("Status returned from role check:" + (result > 0));
 
         if (result > 0)
             return true;

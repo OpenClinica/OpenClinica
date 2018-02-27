@@ -32,13 +32,13 @@ public class StudyDao extends AbstractDomainDao<Study> {
         return (Study) q.uniqueResult();
     }
 
-    public int findCntByNameAndParent(String name, Integer parentStudyId) {
+    public Study findByNameAndParent(String name, Integer parentStudyId) {
         getSessionFactory().getStatistics().logSummary();
-        String query = " select count(do.name) from Study do  where do.name = :name and parent_study_id=:parentStudyId";
+        String query = " from Study do  where do.name = :name and parent_study_id=:parentStudyId";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("name", name);
         q.setParameter("parentStudyId", parentStudyId);
-        return ((Number) q.uniqueResult()).intValue();
+        return (Study) q.uniqueResult();
     }
 
     public Study findByOidEnvType(String oid, StudyEnvEnum envType) {
