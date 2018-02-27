@@ -341,7 +341,8 @@ public class UpdateStudySubjectServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         java.util.Date enrollDate = studySub.getEnrollmentDate();
 
-        if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator() || currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant() || currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant2()){
+        // Update: allow data entry person role to edit subject on study level (https://jira.openclinica.com/browse/OC-8620)
+        if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant2()){
 
             v.addValidation("label", Validator.NO_BLANKS);
             v.addValidation("label", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
