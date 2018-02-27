@@ -37,12 +37,13 @@ public class ListNotesTableToolbar extends DefaultToolbar {
     private SortSet sortSet;
 
     public void setFilterSet(FilterSet filterSet) {
-		this.filterSet = filterSet;
-	}
+        this.filterSet = filterSet;
+    }
+
     public void setSortSet(SortSet sortSet) {
-		this.sortSet = sortSet;
-	}
-    
+        this.sortSet = sortSet;
+    }
+
     @Override
     protected void addToolbarItems() {
         addToolbarItem(ToolbarItemType.SEPARATOR);
@@ -51,8 +52,8 @@ public class ListNotesTableToolbar extends DefaultToolbar {
             addToolbarItem(createDownloadLinkItem());
             addToolbarItem(createNotePopupLinkItem());
         }
-//        addToolbarItem(ToolbarItemType.SEPARATOR);
-//        addToolbarItem(createBackToNotesMatrixListItem());
+        // addToolbarItem(ToolbarItemType.SEPARATOR);
+        // addToolbarItem(createBackToNotesMatrixListItem());
         addToolbarItem(createCustomItem(new NewHiddenItem()));
 
     }
@@ -91,7 +92,6 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         renderer.setOnInvokeAction("onInvokeAction");
         item.setToolbarItemRenderer(renderer);
 
-        
         return item;
     }
 
@@ -106,22 +106,25 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            if(showMoreLink){
-                           html.a().id("showMore").style("text-decoration: none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
-            html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
-            html.a().id("hide").style("display: none;text-decoration:none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],false);").close();
-            html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
+            if (showMoreLink) {
+                html.a().id("showMore").style("text-decoration: none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
+                html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
+                html.a().id("hide").style("display: none;text-decoration:none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],false);").close();
+                html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
-                html.script().type("text/javascript").close().append(
-                        "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listNotes',[" + getIndexes() + "],false);});").scriptEnd();
-            }else{
-                html.a().id("showMore").style("display:none;").style("text-decoration: none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
+                html.script().type("text/javascript").close()
+                        .append("$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listNotes',[" + getIndexes() + "],false);});")
+                        .scriptEnd();
+            } else {
+                html.a().id("showMore").style("display:none;").style("text-decoration: none;")
+                        .href("javascript:hideCols('listNotes',[" + getIndexes() + "],true);").close();
                 html.div().close().nbsp().append(reswords.getString("show_more")).nbsp().divEnd().aEnd();
                 html.a().id("hide").style("text-decoration: none;").href("javascript:hideCols('listNotes',[" + getIndexes() + "],false);").close();
                 html.div().close().nbsp().append(reswords.getString("hide")).nbsp().divEnd().aEnd();
 
-                html.script().type("text/javascript").close().append(
-                        "$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listNotes',[" + getIndexes() + "],true);});").scriptEnd();
+                html.script().type("text/javascript").close()
+                        .append("$j = jQuery.noConflict(); $j(document).ready(function(){ " + "hideCols('listNotes',[" + getIndexes() + "],true);});")
+                        .scriptEnd();
             }
 
             return html.toString();
@@ -129,18 +132,19 @@ public class ListNotesTableToolbar extends DefaultToolbar {
 
         /**
          * @return These indexes represent the 0-based column indexes on the Notes page.
-         *         Columns in this list are hidden by default and can be revealed by clicking 
+         *         Columns in this list are hidden by default and can be revealed by clicking
          *         a link in the table..
-         *         
+         * 
          * @see ListNotesTableFactory#configureColumns(org.jmesa.facade.TableFacade,
          *      java.util.Locale)
          */
         String getIndexes() {
-            String result = "1, 4, 5, 9, 11, 14, 16";
+            String result = "4, 5, 9, 11, 14, 16";
             return result;
         }
 
     }
+
     private class ShowLinkToNotesMatrix extends AbstractItem {
         @Override
         public String disabled() {
@@ -182,33 +186,32 @@ public class ListNotesTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             HtmlBuilder html = new HtmlBuilder();
-            String js = "javascript:openDocWindow('ChooseDownloadFormat" +
-            		"?resolutionStatus=" + resolutionStatus
-            		+ "&discNoteType=" + discNoteType
-            		+ "&module=" + module;
-            
-            for (Filter f: filterSet.getFilters()) {
-            	js += "&" + f.getProperty() + "=" + f.getValue();
+            String js = "javascript:openDocWindow('ChooseDownloadFormat" + "?resolutionStatus=" + resolutionStatus + "&discNoteType=" + discNoteType
+                    + "&module=" + module;
+
+            for (Filter f : filterSet.getFilters()) {
+                js += "&" + f.getProperty() + "=" + f.getValue();
             }
 
             Sort sorts[] = sortSet.getSorts().toArray(new Sort[0]);
             sort(sorts, new Comparator<Sort>() {
-				@Override
-				public int compare(Sort s1, Sort s2) {
-					return s1.getPosition() - s2.getPosition();
-				}
+                @Override
+                public int compare(Sort s1, Sort s2) {
+                    return s1.getPosition() - s2.getPosition();
+                }
             });
-            for (Sort s: sorts) {
-            	js += "&" + "sort." + s.getProperty() + "=" + s.getOrder().name();
+            for (Sort s : sorts) {
+                js += "&" + "sort." + s.getProperty() + "=" + s.getOrder().name();
             }
-            
+
             js += "')";
 
             html.a().href(js);
             html.quote();
             html.append(getAction());
             html.quote().close();
-            html.append("<span title=\"Download queries for all subjects\" border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"6\" width=\"24 \" height=\"15\"/>");
+            html.append(
+                    "<span title=\"Download queries for all subjects\" border=\"0\" align=\"left\" class=\"icon icon-download\" hspace=\"6\" width=\"24 \" height=\"15\"/>");
             return html.toString();
         }
     }
@@ -231,8 +234,6 @@ public class ListNotesTableToolbar extends DefaultToolbar {
             return html.toString();
         }
     }
-
-    
 
     public String getModule() {
         return module;
