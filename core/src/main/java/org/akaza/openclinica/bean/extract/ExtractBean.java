@@ -420,7 +420,7 @@ public class ExtractBean {
                     eventDescriptions.put(eventStatus, description);
                 }
                 if (dataset.isShowSubjectAgeAtEvent()
-                    && ("1".equals(study.getStudyParameterConfig().getCollectDob()) || "2".equals(study.getStudyParameterConfig().getCollectDob()))) {
+                        && ("1".equals(study.getStudyParameterConfig().getCollectDob()) || "2".equals(study.getStudyParameterConfig().getCollectDob()))) {
                     String subjectAgeAtEvent = getColumnLabel(i, j, "AgeAtEvent", numSamples);
                     String description = getColumnDescription(i, j, "Age At Event for ", currentDef.getName(), numSamples);
                     answer.nextCell(subjectAgeAtEvent);
@@ -647,10 +647,10 @@ public class ExtractBean {
                             answer.nextCell("");
 
                             didb.setGroupName(Integer.valueOf(sgcBean.getId()), "");
-                        }// end if
-                    }// end while
-                }// end for
-            }// end if
+                        } // end if
+                    } // end while
+                } // end for
+            } // end if
 
             // sed column values
             for (int i = 1; i <= numSEDs; i++) {
@@ -680,7 +680,7 @@ public class ExtractBean {
                         didb.getEventValues().add(status);
                     }
                     if (dataset.isShowSubjectAgeAtEvent()
-                        && ("1".equals(study.getStudyParameterConfig().getCollectDob()) || "2".equals(study.getStudyParameterConfig().getCollectDob()))) {
+                            && ("1".equals(study.getStudyParameterConfig().getCollectDob()) || "2".equals(study.getStudyParameterConfig().getCollectDob()))) {
                         String ageAtEvent = currentSubject.getDateOfBirth() != null ? getAgeAtEvent(h, i, j) : "";
                         answer.nextCell(ageAtEvent);
                         didb.getEventValues().add(ageAtEvent);
@@ -727,9 +727,9 @@ public class ExtractBean {
                         didb.getEventValues().add(crfVersion);
 
                     }
-                }// end j
+                } // end j
             }
-            
+
             for (int i = 1; i <= numSEDs; i++) {
                 int numSamples = getSEDNumSamples(i);
                 // restart j so that text reports match tbh 03/08
@@ -879,8 +879,8 @@ public class ExtractBean {
                             }
                         }
                     }
-                }// else
-            }// for
+                } // else
+            } // for
 
             sed.setCrfs(CRFsDisplayedInThisSED);
             finalStudyEvents.add(sed); // make the setCrfs call "stick"
@@ -963,7 +963,7 @@ public class ExtractBean {
             StudySubjectBean sub = new StudySubjectBean();
             sub = (StudySubjectBean) objs.get(i);
             subjects.add(sub);
-        }// for
+        } // for
     }// addStudySubjectData
 
     /*
@@ -1098,10 +1098,9 @@ public class ExtractBean {
                 // not rly, the above is only used in auditlogging
                 // could fit in crf and crf version ids here, though
                 // FIXME def not one to one relationship, tbh, 03.08
-                String key = getStudyEventDataKey(
-                /* studySubjectId.intValue() */objev.studySubjectId.intValue(),
-                /* studyEventDefinitionId.intValue() */objev.studyEvenetDefinitionId.intValue(),
-                /* sampleOrdinal.intValue()) */objev.sampleOrdinal.intValue());
+                String key = getStudyEventDataKey(/* studySubjectId.intValue() */objev.studySubjectId.intValue(),
+                        /* studyEventDefinitionId.intValue() */objev.studyEvenetDefinitionId.intValue(),
+                        /* sampleOrdinal.intValue()) */objev.sampleOrdinal.intValue());
 
                 if (eventData == null) {
                     eventData = new HashMap();
@@ -1120,10 +1119,8 @@ public class ExtractBean {
 
             } else {
                 isfnd = true;
-            }//
-        }// for
-
-     
+            } //
+        } // for
 
         // before return quick count
         logger.debug("Number of entries in the eventData is:" + eventData.size());
@@ -1250,7 +1247,7 @@ public class ExtractBean {
         buf.append("event crf count: " + seb.getEventCRFs().size() + " ");
         buf.append("study event bean location: " + seb.getLocation() + " ");
         buf.append("study event def id: " + seb.getStudyEventDefinitionId() + " ");
-        buf.append("study Event Start Date: " + seb.getDateStarted() + " ");
+        buf.append("study Event Start Date: " + seb.getDateStarted() != null ? seb.getDateStarted() : "" + " ");
         buf.append("study event date ended: " + seb.getDateEnded() + " ");
         buf.append("study event status: " + seb.getStatus().getName() + " ");
         buf.append("***** ***** *****\n");
@@ -1356,12 +1353,10 @@ public class ExtractBean {
                      *      TODO - validate the logic
                      */
                     String key = getDataKey(/* studySubjectId.intValue() */objev.studySubjectId.intValue(),
-                    /* studyEventDefinitionId.intValue() */objev.studyEvenetDefinitionId.intValue(),
-                    /* sampleOrdinal.intValue() */objev.sampleOrdinal.intValue(),
-                    /* crfId.intValue() */objgrp.crfid.intValue(),
-                    /* itemId.intValue() */objgrp.itemId.intValue(),
-                    /* itemDataOrdinal.intValue() */objgrp.itemGroupRepeatNumber.intValue(),
-                    /* groupName */objgrp.itemGroupName);
+                            /* studyEventDefinitionId.intValue() */objev.studyEvenetDefinitionId.intValue(),
+                            /* sampleOrdinal.intValue() */objev.sampleOrdinal.intValue(), /* crfId.intValue() */objgrp.crfid.intValue(),
+                            /* itemId.intValue() */objgrp.itemId.intValue(), /* itemDataOrdinal.intValue() */objgrp.itemGroupRepeatNumber.intValue(),
+                            /* groupName */objgrp.itemGroupName);
 
                     data.put(key, objgrp.itemValue/* itemValue */);
                     // logger.info("*** just put in data for " + key + " and
@@ -1377,7 +1372,7 @@ public class ExtractBean {
                         // intValue
                         // ()*/
                         setMaxOrdinal(objev.studyEvenetDefinitionId.intValue(), objev.sampleOrdinal.intValue());
-                    }// if
+                    } // if
 
                     selectedItems.put(objgrp.itemId /* itemId */, Boolean.TRUE);
                     selectedSEDCRFs.put(objev.studyEvenetDefinitionId.intValue() + "_" + objgrp.crfid.intValue()
@@ -1402,8 +1397,8 @@ public class ExtractBean {
                 addGroupName(/* itemGroupName_temp, itemDataOrdinal */objgrp.itemGroupName, objgrp.itemGroupRepeatNumber);
             } else {
                 // ERROR - not match
-            }// if
-        }// for
+            } // if
+        } // for
 
     }
 
@@ -1415,7 +1410,7 @@ public class ExtractBean {
             // event
             // sample
             // ordinal
-            Integer crfId, Integer itemId, String itemValue, Integer itemDataOrdinal,// item
+            Integer crfId, Integer itemId, String itemValue, Integer itemDataOrdinal, // item
             // data
             // ordinal,
             // having
@@ -1430,7 +1425,7 @@ public class ExtractBean {
         }
 
         if (studyEventDefinitionId.intValue() <= 0 || studySubjectId.intValue() <= 0 || crfId.intValue() <= 0 || itemId.intValue() <= 0
-            || sampleOrdinal.intValue() <= 0) {
+                || sampleOrdinal.intValue() <= 0) {
             return;
         }
 
@@ -1448,9 +1443,8 @@ public class ExtractBean {
         // this number
         // from another source. tbh 03/08
 
-        String key =
-            getDataKey(studySubjectId.intValue(), studyEventDefinitionId.intValue(), sampleOrdinal.intValue(), crfId.intValue(), itemId.intValue(),
-                    itemDataOrdinal.intValue(), groupName);
+        String key = getDataKey(studySubjectId.intValue(), studyEventDefinitionId.intValue(), sampleOrdinal.intValue(), crfId.intValue(), itemId.intValue(),
+                itemDataOrdinal.intValue(), groupName);
 
         data.put(key, itemValue);
         logger.info("*** just put in data for " + key + " and value " + itemValue);
@@ -1852,7 +1846,7 @@ public class ExtractBean {
         // currentCRF.getStatus().getName();
         //
         logger.info("event crf stage: " + stage.getName() + ", event crf status: " + ecStatus.getName() + ", STATUS: " + status.getName() + " crf version: "
-            + crfv.getStatus().getName() + " data entry stage: " + stage.getName());
+                + crfv.getStatus().getName() + " data entry stage: " + stage.getName());
 
         if (stage.equals(DataEntryStage.INVALID) || ecStatus.equals(Status.INVALID)) {
             stage = DataEntryStage.UNCOMPLETED;
@@ -1991,7 +1985,7 @@ public class ExtractBean {
             return false;
         } else {
             return true;
-        }// if
+        } // if
 
         /*
          * for (Iterator iter = data.entrySet().iterator(); iter.hasNext();) {
@@ -2391,16 +2385,17 @@ public class ExtractBean {
      * @param pitemId
      * @param pcrfVersionId
      */
-    public void addEntryBASE_ITEMGROUPSIDE(Integer pitemDataId, Integer pitemdataordinal, Integer pitemGroupId, String pitemGroupName, Integer pitemDatatypeId, String pitemDescription,
-            String pitemName, String pitemValue, String pitemUnits, String pcrfVersionName, Integer pcrfVersionStatusId, Date pdateInterviewed,
-            String pinterviewerName, Timestamp peventCrfDateCompleted, Timestamp peventCrfDateValidateCompleted, Integer peventCrfCompletionStatusId,
-            Integer pitemGroupRepeatNumber, Integer pcrfId, Integer pstudySubjectId, Integer peventCrfId, Integer pitemId, Integer pcrfVersionId,
-            Integer eventcrfStatusId) {
+    public void addEntryBASE_ITEMGROUPSIDE(Integer pitemDataId, Integer pitemdataordinal, Integer pitemGroupId, String pitemGroupName, Integer pitemDatatypeId,
+            String pitemDescription, String pitemName, String pitemValue, String pitemUnits, String pcrfVersionName, Integer pcrfVersionStatusId,
+            Date pdateInterviewed, String pinterviewerName, Timestamp peventCrfDateCompleted, Timestamp peventCrfDateValidateCompleted,
+            Integer peventCrfCompletionStatusId, Integer pitemGroupRepeatNumber, Integer pcrfId, Integer pstudySubjectId, Integer peventCrfId, Integer pitemId,
+            Integer pcrfVersionId, Integer eventcrfStatusId) {
         extractDataset_ITEMGROUPSIDE obj = new extractDataset_ITEMGROUPSIDE();
 
-        obj.setSQLDatasetBASE_ITEMGROUPSIDE(pitemDataId, pitemdataordinal, pitemGroupId, pitemGroupName, pitemDatatypeId, pitemDescription, pitemName, pitemValue, pitemUnits,
-                pcrfVersionName, pcrfVersionStatusId, pdateInterviewed, pinterviewerName, peventCrfDateCompleted, peventCrfDateValidateCompleted,
-                peventCrfCompletionStatusId, pitemGroupRepeatNumber, pcrfId, pstudySubjectId, peventCrfId, pitemId, pcrfVersionId, eventcrfStatusId);
+        obj.setSQLDatasetBASE_ITEMGROUPSIDE(pitemDataId, pitemdataordinal, pitemGroupId, pitemGroupName, pitemDatatypeId, pitemDescription, pitemName,
+                pitemValue, pitemUnits, pcrfVersionName, pcrfVersionStatusId, pdateInterviewed, pinterviewerName, peventCrfDateCompleted,
+                peventCrfDateValidateCompleted, peventCrfCompletionStatusId, pitemGroupRepeatNumber, pcrfId, pstudySubjectId, peventCrfId, pitemId,
+                pcrfVersionId, eventcrfStatusId);
 
         hBASE_ITEMGROUPSIDE.add(obj);
         // TODO - verify that the order is the same
@@ -2435,8 +2430,8 @@ public class ExtractBean {
     {
         extractDataset_EVENTSIDE obj = new extractDataset_EVENTSIDE();
 
-        obj.setSQLDatasetBASE_EVENTSIDE(pitemDataId, pstudySubjectId, psampleOrdinal, pstudyEvenetDefinitionId, pstudyEventDefinitionName,
-                pstudyEventLoacation, pstudyEventDateStart, pstudyEventDateEnd, pstudyEventStartTimeFlag, pstudyEventEndTimeFlag, pstudyEventStatusId,
+        obj.setSQLDatasetBASE_EVENTSIDE(pitemDataId, pstudySubjectId, psampleOrdinal, pstudyEvenetDefinitionId, pstudyEventDefinitionName, pstudyEventLoacation,
+                pstudyEventDateStart, pstudyEventDateEnd, pstudyEventStartTimeFlag, pstudyEventEndTimeFlag, pstudyEventStatusId,
                 pstudyEventSubjectEventStatusId, pitemId, pcrfVersionId, peventCrfId, pstudyEventId);
 
         hBASE_EVENTSIDE.add(obj);
@@ -2698,10 +2693,10 @@ public class ExtractBean {
         }
 
         public void setSQLDatasetBASE_ITEMGROUPSIDE(Integer pitemDataId, Integer pitemdataordinal, Integer pitemGroupId, String pitemGroupName,
-                Integer pitemDatatypeId, String pitemDescription, String pitemName, String pitemValue, String pitemUnits, String pcrfVersionName, Integer pcrfVersionStatusId,
-                Date pdateInterviewed, String pinterviewerName, Timestamp peventCrfDateCompleted, Timestamp peventCrfDateValidateCompleted,
-                Integer peventCrfCompletionStatusId, Integer pitemGroupMetatdatrepeatNumber, Integer pcrfId, Integer pstudySubjectId, Integer peventCrfId,
-                Integer pitemId, Integer pcrfVersionId, Integer eventcrfStatusId) {
+                Integer pitemDatatypeId, String pitemDescription, String pitemName, String pitemValue, String pitemUnits, String pcrfVersionName,
+                Integer pcrfVersionStatusId, Date pdateInterviewed, String pinterviewerName, Timestamp peventCrfDateCompleted,
+                Timestamp peventCrfDateValidateCompleted, Integer peventCrfCompletionStatusId, Integer pitemGroupMetatdatrepeatNumber, Integer pcrfId,
+                Integer pstudySubjectId, Integer peventCrfId, Integer pitemId, Integer pcrfVersionId, Integer eventcrfStatusId) {
             // assign
             itemDataId = pitemDataId;
             itemGroupId = pitemGroupId;
@@ -2709,7 +2704,7 @@ public class ExtractBean {
             itemDescription = pitemDescription;
             itemName = pitemName;
 
-            if(pitemDatatypeId==9) {
+            if (pitemDatatypeId == 9) {
                 SimpleDateFormat sdf = new SimpleDateFormat(ApplicationConstants.getDateFormatInItemData());
                 sdf.setLenient(false);
                 try {
@@ -2717,7 +2712,8 @@ public class ExtractBean {
                     itemValue = new SimpleDateFormat("yyyy-MM-dd").format(date);
                 } catch (ParseException fe) {
                     itemValue = pitemValue;
-                    logger.info("Failed date format for: item-data-id="+pitemDataId+" with data-type-id="+pitemDatatypeId+" and item-data-value="+pitemValue);
+                    logger.info("Failed date format for: item-data-id=" + pitemDataId + " with data-type-id=" + pitemDatatypeId + " and item-data-value="
+                            + pitemValue);
                 }
             } else {
                 itemValue = pitemValue;

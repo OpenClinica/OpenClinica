@@ -7,15 +7,15 @@
  */
 package org.akaza.openclinica.web.bean;
 
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-
 import java.util.ArrayList;
+
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 
 /**
  * @author jxu
  *
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ *         TODO To change the template for this generated type comment go to Window -
+ *         Preferences - Java - Code Style - Code Templates
  */
 public class StudyEventRow extends EntityBeanRow {
     // columns:
@@ -30,7 +30,7 @@ public class StudyEventRow extends EntityBeanRow {
      * (non-Javadoc)
      *
      * @see org.akaza.openclinica.core.EntityBeanRow#compareColumn(java.lang.Object,
-     *      int)
+     * int)
      */
     @Override
     protected int compareColumn(Object row, int sortingColumn) {
@@ -49,7 +49,8 @@ public class StudyEventRow extends EntityBeanRow {
             break;
 
         case COL_START_DATE:
-            answer = compareDate(thisEvent.getDateStarted(), argEvent.getDateStarted());
+            if (thisEvent.getDateStarted() != null && argEvent.getDateStarted() != null)
+                answer = compareDate(thisEvent.getDateStarted(), argEvent.getDateStarted());
             break;
 
         case COL_SUBJECT_EVENT_STATUS:

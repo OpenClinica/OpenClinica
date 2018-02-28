@@ -7,6 +7,17 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Locale;
+import java.util.Set;
+import java.util.TreeSet;
+
+import javax.sql.DataSource;
+
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
@@ -32,18 +43,6 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-import java.util.TreeSet;
-
-import javax.sql.DataSource;
 
 // TODO: support YYYY-MM-DD HH:MM time formats
 
@@ -78,14 +77,15 @@ public class CreateNewStudyEventServlet extends SecureController {
     public static final String INPUT_REQUEST_STUDY_SUBJECT = "requestStudySubject";
 
     public static final String INPUT_LOCATION = "location";
+    private final String COMMON = "common";
 
     // public static final String INPUT_SCHEDULED_LOCATION =
     // "locationScheduled";
 
     private FormProcessor fp;
 
-    public final static String[] INPUT_STUDY_EVENT_DEFINITION_SCHEDULED =
-        { "studyEventDefinitionScheduled0", "studyEventDefinitionScheduled1", "studyEventDefinitionScheduled2", "studyEventDefinitionScheduled3" };
+    public final static String[] INPUT_STUDY_EVENT_DEFINITION_SCHEDULED = { "studyEventDefinitionScheduled0", "studyEventDefinitionScheduled1",
+            "studyEventDefinitionScheduled2", "studyEventDefinitionScheduled3" };
     public final static String[] INPUT_SCHEDULED_LOCATION = { "locationScheduled0", "locationScheduled1", "locationScheduled2", "locationScheduled3" };
     public final static String[] INPUT_STARTDATE_PREFIX_SCHEDULED = { "startScheduled0", "startScheduled1", "startScheduled2", "startScheduled3" };
     public final static String[] INPUT_ENDDATE_PREFIX_SCHEDULED = { "endScheduled0", "endScheduled1", "endScheduled2", "endScheduled3" };
@@ -114,7 +114,7 @@ public class CreateNewStudyEventServlet extends SecureController {
             Status s = ssb.getStatus();
             if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
                 addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be") + resterm.getString("added") + "."
-                    + respage.getString("study_subject_has_been_deleted"));
+                        + respage.getString("study_subject_has_been_deleted"));
                 request.setAttribute("id", new Integer(studySubjectId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
@@ -135,7 +135,14 @@ public class CreateNewStudyEventServlet extends SecureController {
             studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
         }
         // find all active definitions with CRFs
-        ArrayList eventDefinitions = seddao.findAllActiveByStudy(studyWithEventDefinitions);
+        ArrayList<StudyEventDefinitionBean> eventDefinitions = seddao.findAllActiveByStudy(studyWithEventDefinitions);
+        ArrayList<StudyEventDefinitionBean> tempList = new ArrayList<>();
+        for (StudyEventDefinitionBean eventDefinition : eventDefinitions) {
+            if (!eventDefinition.getType().equals(COMMON)) {
+            	tempList.add(eventDefinition);
+            }
+        }
+        eventDefinitions = new ArrayList(tempList);
         // EventDefinitionCRFDAO edcdao = new
         // EventDefinitionCRFDAO(sm.getDataSource());
         // ArrayList definitionsWithCRF = new ArrayList();
@@ -160,7 +167,7 @@ public class CreateNewStudyEventServlet extends SecureController {
          * eventDefinitionsScheduled.add(sed); } }
          */
         // all definitions will appear in scheduled event creation box-11/26/05
-        ArrayList eventDefinitionsScheduled = eventDefinitions;
+        ArrayList eventDefinitionsScheduled = new ArrayList(eventDefinitions);
 
         if (!fp.isSubmitted()) {
             // StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
@@ -277,11 +284,11 @@ public class CreateNewStudyEventServlet extends SecureController {
             v.addValidation(INPUT_STUDY_EVENT_DEFINITION, Validator.ENTITY_EXISTS_IN_STUDY, seddao, studyWithEventDefinitions);
             // v.addValidation(INPUT_STUDY_SUBJECT, Validator.ENTITY_EXISTS_IN_STUDY, sdao, currentStudy);
             // removed tbh 11/2009
-            //Made optional field-issue-4904.
-            //v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
+            // Made optional field-issue-4904.
+            // v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
             v.addValidation(INPUT_STUDY_SUBJECT_LABEL, Validator.NO_BLANKS);
             v.addValidation(INPUT_LOCATION, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
-            if(currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")){
+            if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
                 v.addValidation(INPUT_LOCATION, Validator.NO_BLANKS);
             }
 
@@ -292,9 +299,10 @@ public class CreateNewStudyEventServlet extends SecureController {
                 if (!StringUtil.isBlank(fp.getString(this.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i]))) {
                     // logger.debug("has scheduled definition******");
                     v.addValidation(this.INPUT_STUDY_EVENT_DEFINITION_SCHEDULED[i], Validator.ENTITY_EXISTS_IN_STUDY, seddao, studyWithEventDefinitions);
-                    if(currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")){
+                    if (currentStudy.getStudyParameterConfig().getEventLocationRequired().equalsIgnoreCase("required")) {
                         v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.NO_BLANKS);
-                        v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
+                        v.addValidation(INPUT_SCHEDULED_LOCATION[i], Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO,
+                                2000);
                         v.alwaysExecuteLastValidation(INPUT_SCHEDULED_LOCATION[i]);
                     }
                     v.addValidation(INPUT_STARTDATE_PREFIX_SCHEDULED[i], Validator.IS_DATE_TIME);
@@ -328,12 +336,12 @@ public class CreateNewStudyEventServlet extends SecureController {
             // >> 4358 tbh, 11/2009
             // what if we are sent here from AddNewSubjectServlet.java??? we need to get that study subject bean
             if (request.getAttribute(INPUT_STUDY_SUBJECT) != null) {
-            	studySubject = (StudySubjectBean) request.getAttribute(INPUT_STUDY_SUBJECT);
+                studySubject = (StudySubjectBean) request.getAttribute(INPUT_STUDY_SUBJECT);
             }
             // << tbh
             if (studySubject.getLabel() == "") {
-            	// add an error here, tbh
-            	Validator.addError(errors, INPUT_STUDY_SUBJECT, respage.getString("must_enter_subject_ID_for_identifying"));
+                // add an error here, tbh
+                Validator.addError(errors, INPUT_STUDY_SUBJECT, respage.getString("must_enter_subject_ID_for_identifying"));
             }
 
             if (!subjectMayReceiveStudyEvent(sm.getDataSource(), definition, studySubject)) {
@@ -370,8 +378,8 @@ public class CreateNewStudyEventServlet extends SecureController {
                     // if in same date, only check when both had time entered
                     if (fp.timeEntered(INPUT_STARTDATE_PREFIX) && fp.timeEntered(INPUT_ENDDATE_PREFIX)) {
                         if (end.before(start) || end.equals(start)) {
-                            Validator
-                                    .addError(errors, INPUT_ENDDATE_PREFIX, resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
+                            Validator.addError(errors, INPUT_ENDDATE_PREFIX,
+                                    resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
                         }
                     }
                 }
@@ -384,14 +392,12 @@ public class CreateNewStudyEventServlet extends SecureController {
             scheduledSeds.put(studyEventDefinitionId, -1);
             for (int i = 0; i < ADDITIONAL_SCHEDULED_NUM; ++i) {
                 if (scheduledDefinitionIds[i] > 0 && !errors.containsKey(INPUT_STARTDATE_PREFIX_SCHEDULED[i])
-                    && !errors.containsKey(INPUT_ENDDATE_PREFIX_SCHEDULED[i])) {
+                        && !errors.containsKey(INPUT_ENDDATE_PREFIX_SCHEDULED[i])) {
                     if (scheduledSeds.containsKey(scheduledDefinitionIds[i])) {
                         int prevStart = scheduledSeds.get(scheduledDefinitionIds[i]);
                         prevStartPrefix = prevStart == -1 ? INPUT_STARTDATE_PREFIX : INPUT_STARTDATE_PREFIX_SCHEDULED[prevStart];
-                        Date prevStartDate =
-                            prevStart == -1 ? this.getInputStartDate() : this.getInputStartDateScheduled(Integer.parseInt(prevStartPrefix
-                                    .charAt(prevStartPrefix.length() - 1)
-                                + ""));
+                        Date prevStartDate = prevStart == -1 ? this.getInputStartDate()
+                                : this.getInputStartDateScheduled(Integer.parseInt(prevStartPrefix.charAt(prevStartPrefix.length() - 1) + ""));
                         if (fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date").equals(fp.getString(prevStartPrefix + "Date"))) {
                             // if in same day, only check when both have time
                             // inputs.
@@ -399,14 +405,14 @@ public class CreateNewStudyEventServlet extends SecureController {
                             boolean startTime = fp.timeEntered(prevStartPrefix);
                             if (schStartTime && startTime) {
                                 if (startScheduled[i].before(prevStartDate)) {
-                                    Validator.addError(errors, INPUT_STARTDATE_PREFIX_SCHEDULED[i], resexception
-                                            .getString("input_provided_not_occure_after_previous_start_date_time"));
+                                    Validator.addError(errors, INPUT_STARTDATE_PREFIX_SCHEDULED[i],
+                                            resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
                                 }
                             }
                         } else {
                             if (startScheduled[i].before(prevStartDate)) {
-                                Validator.addError(errors, INPUT_STARTDATE_PREFIX_SCHEDULED[i], resexception
-                                        .getString("input_provided_not_occure_after_previous_start_date_time"));
+                                Validator.addError(errors, INPUT_STARTDATE_PREFIX_SCHEDULED[i],
+                                        resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
                             }
                         }
                     }
@@ -416,16 +422,16 @@ public class CreateNewStudyEventServlet extends SecureController {
                         String prevEndPrefix = i > 0 ? INPUT_ENDDATE_PREFIX_SCHEDULED[i - 1] : INPUT_ENDDATE_PREFIX;
                         if (!fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Date").equals(fp.getString(prevEndPrefix + "Date"))) {
                             if (endScheduled[i].before(startScheduled[i])) {
-                                Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i], resexception
-                                        .getString("input_provided_not_occure_after_previous_start_date_time"));
+                                Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i],
+                                        resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
                             }
                         } else {
                             // if in same date, only check when both had time
                             // entered
                             if (fp.timeEntered(INPUT_STARTDATE_PREFIX_SCHEDULED[i]) && fp.timeEntered(INPUT_ENDDATE_PREFIX_SCHEDULED[i])) {
                                 if (endScheduled[i].before(startScheduled[i]) || endScheduled[i].equals(startScheduled[i])) {
-                                    Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i], resexception
-                                            .getString("input_provided_not_occure_after_previous_start_date_time"));
+                                    Validator.addError(errors, INPUT_ENDDATE_PREFIX_SCHEDULED[i],
+                                            resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
                                 }
                             }
                         }
@@ -473,7 +479,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                 request.setAttribute("eventDefinitionsScheduled", eventDefinitionsScheduled);
                 forwardPage(Page.CREATE_NEW_STUDY_EVENT);
             } else {
-            	logger.debug("error is empty");
+                logger.debug("error is empty");
                 StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
 
                 StudyEventBean studyEvent = new StudyEventBean();
@@ -516,14 +522,13 @@ public class CreateNewStudyEventServlet extends SecureController {
                 studyEvent.setSampleOrdinal(sed.getMaxSampleOrdinal(definition, studySubject) + 1);
 
                 studyEvent = (StudyEventBean) sed.create(studyEvent);
-               // getRuleSetService().runRulesInBeanProperty(createRuleSet(studySubject,definition),currentStudy,ub,request,studySubject);
+                // getRuleSetService().runRulesInBeanProperty(createRuleSet(studySubject,definition),currentStudy,ub,request,studySubject);
 
-                
                 if (!studyEvent.isActive()) {
                     throw new OpenClinicaException(restext.getString("event_not_created_in_database"), "2");
                 }
-                addPageMessage(restext.getString("X_event_wiht_definition") + definition.getName() + restext.getString("X_and_subject")
-                    + studySubject.getName() + respage.getString("X_was_created_succesfully"));
+                addPageMessage(restext.getString("X_event_wiht_definition") + definition.getName() + restext.getString("X_and_subject") + studySubject.getName()
+                        + respage.getString("X_was_created_succesfully"));
 
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
@@ -548,8 +553,8 @@ public class CreateNewStudyEventServlet extends SecureController {
 
                                 // YW 11-14-2007
                                 if ("-1".equals(fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Hour"))
-                                    && "-1".equals(fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Minute"))
-                                    && "".equals(fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Half"))) {
+                                        && "-1".equals(fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Minute"))
+                                        && "".equals(fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Half"))) {
                                     studyEventScheduled.setStartTimeFlag(false);
                                 } else {
                                     studyEventScheduled.setStartTimeFlag(true);
@@ -561,8 +566,8 @@ public class CreateNewStudyEventServlet extends SecureController {
                                 if (!"".equals(strEndScheduled[i])) {
                                     endScheduled[i] = fp.getDateTime(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
                                     if ("-1".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Hour"))
-                                        && "-1".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Minute"))
-                                        && "".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Half"))) {
+                                            && "-1".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Minute"))
+                                            && "".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Half"))) {
                                         studyEventScheduled.setEndTimeFlag(false);
                                     } else {
                                         studyEventScheduled.setEndTimeFlag(true);
@@ -580,7 +585,7 @@ public class CreateNewStudyEventServlet extends SecureController {
                                 // currentStudy,
                                 // studySubject.getId());
                                 studyEventScheduled.setSampleOrdinal(sed.getMaxSampleOrdinal(definitionScheduleds.get(i), studySubject) + 1);
-                                //System.out.println("create scheduled events");
+                                // System.out.println("create scheduled events");
                                 studyEventScheduled = (StudyEventBean) sed.create(studyEventScheduled);
                                 if (!studyEventScheduled.isActive()) {
                                     throw new OpenClinicaException(restext.getString("scheduled_event_not_created_in_database"), "2");
@@ -596,8 +601,8 @@ public class CreateNewStudyEventServlet extends SecureController {
                                 // YW >>
                             } else {
                                 addPageMessage(restext.getString("scheduled_event_definition") + definitionScheduleds.get(i).getName()
-                                    + restext.getString("X_and_subject") + studySubject.getName() + restext.getString("not_created_since_event_not_repeating")
-                                    + restext.getString("event_type_already_exists"));
+                                        + restext.getString("X_and_subject") + studySubject.getName()
+                                        + restext.getString("not_created_since_event_not_repeating") + restext.getString("event_type_already_exists"));
                             }
                         }
                     }
@@ -606,12 +611,11 @@ public class CreateNewStudyEventServlet extends SecureController {
 
                 session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 request.setAttribute(EnterDataForStudyEventServlet.INPUT_EVENT_ID, String.valueOf(studyEvent.getId()));
-                ArrayList <String> pMessage =  (ArrayList<String>) request.getAttribute(SecureController.PAGE_MESSAGE);
+                ArrayList<String> pMessage = (ArrayList<String>) request.getAttribute(SecureController.PAGE_MESSAGE);
 
-
-                String url=response.encodeRedirectURL("ViewStudySubject?id="+ studySubject.getId());
+                String url = response.encodeRedirectURL("ViewStudySubject?id=" + studySubject.getId());
                 response.sendRedirect(url);
-//                forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET);
+                // forwardPage(Page.ENTER_DATA_FOR_STUDY_EVENT_SERVLET);
                 // we want to actually have url of entering data in browser, so
                 // redirecting
                 // response.sendRedirect(response.encodeRedirectURL(
@@ -684,7 +688,8 @@ public class CreateNewStudyEventServlet extends SecureController {
     }
 
     private void setupBeans(ArrayList subjects, ArrayList eventDefinitions) throws Exception {
-        // addEntityList("subjects", subjects, restext.getString("cannot_create_event_because_no_subjects"), Page.LIST_STUDY_SUBJECTS_SERVLET);
+        // addEntityList("subjects", subjects, restext.getString("cannot_create_event_because_no_subjects"),
+        // Page.LIST_STUDY_SUBJECTS_SERVLET);
         // removed by tbh, 10/2009
         addEntityList("eventDefinitions", eventDefinitions, restext.getString("cannot_create_event_because_no_event_definitions"),
                 Page.LIST_STUDY_SUBJECTS_SERVLET);
@@ -732,23 +737,21 @@ public class CreateNewStudyEventServlet extends SecureController {
     private String getInputEndHalf() {
         return fp.getString(INPUT_ENDDATE_PREFIX + "Half");
     }
+
     // YW >>
-    private List<RuleSetBean> createRuleSet(StudySubjectBean ssub,
-			StudyEventDefinitionBean sed) {
-    	
-    	return getRuleSetDao().findAllByStudyEventDef(sed);
-    	
-    	
-	}
+    private List<RuleSetBean> createRuleSet(StudySubjectBean ssub, StudyEventDefinitionBean sed) {
+
+        return getRuleSetDao().findAllByStudyEventDef(sed);
+
+    }
+
     private RuleSetService getRuleSetService() {
         return (RuleSetService) SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
     }
 
-    
     private RuleSetDao getRuleSetDao() {
-       return (RuleSetDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetDao");
-        
-    }
+        return (RuleSetDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetDao");
 
+    }
 
 }

@@ -78,6 +78,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     private CRFDAO crfDAO;
     private CRFVersionDAO crfVersionDAO;
     private FormLayoutDAO formLayoutDAO;
+    private final String COMMON = "common";
 
     public CRFVersionDAO getCrfVersionDAO() {
         return crfVersionDAO;
@@ -276,7 +277,7 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 DisplayBean d = new DisplayBean();
                 d.getProps().put("event", studyEventBean);
                 d.getProps().put("event.status", studyEventBean.getSubjectEventStatus());
-                d.getProps().put("studySubject.createdDate", studyEventBean.getDateStarted());
+                d.getProps().put("studySubject.createdDate", studyEventBean.getCreatedDate());
                 for (int i = 0; i < getCrfs(selectedStudyEventDefinition).size(); i++) {
                     CRFBean crf = getCrfs(selectedStudyEventDefinition).get(i);
                     EventCRFBean eventCRFBean = crfAsKeyEventCrfAsValue.get(crf.getId() + "_" + studyEventBean.getId());
@@ -377,7 +378,8 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
     }
 
     @SuppressWarnings("unchecked")
-    private ArrayList<StudyEventDefinitionBean> getStudyEventDefinitions() {
+    public ArrayList<StudyEventDefinitionBean> getStudyEventDefinitions() {
+        ArrayList<StudyEventDefinitionBean> tempList = new ArrayList<>();
         if (this.studyEventDefinitions == null) {
             if (studyBean.getParentStudyId() > 0) {
                 StudyBean parentStudy = (StudyBean) getStudyDAO().findByPK(studyBean.getParentStudyId());
@@ -386,7 +388,13 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
                 studyEventDefinitions = getStudyEventDefinitionDao().findAllByStudy(studyBean);
             }
         }
-        return this.studyEventDefinitions;
+        for (StudyEventDefinitionBean studyEventDefinition : this.studyEventDefinitions) {
+            if (!studyEventDefinition.getType().equals(COMMON)) {
+                tempList.add(studyEventDefinition);
+            }
+        }
+
+        return tempList;
     }
 
     @SuppressWarnings("unchecked")
@@ -823,7 +831,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     private String viewStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"ViewStudySubject?id="+studySubject.getId());
+        builder.append(
+                "<a onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"ViewStudySubject?id="
+                        + studySubject.getId());
         builder.append("\"><span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
@@ -831,7 +841,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     private String removeStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-cancel');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-cancel');\" href=\"RemoveStudySubject?action=confirm&id="+studySubject.getId()+"&subjectId="+studySubject.getSubjectId()+"&studyId="+studySubject.getStudyId());
+        builder.append(
+                "<a onmouseup=\"javascript:setImage('bt_View1','icon icon-cancel');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-cancel');\" href=\"RemoveStudySubject?action=confirm&id="
+                        + studySubject.getId() + "&subjectId=" + studySubject.getSubjectId() + "&studyId=" + studySubject.getStudyId());
         builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Remove\" alt=\"View\" class=\"icon icon-cancel\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
@@ -839,7 +851,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     private String reAssignStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-reassign3');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-icon-reassign3');\" href=\"ReassignStudySubject?id="+studySubject.getId());
+        builder.append(
+                "<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-reassign3');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-icon-reassign3');\" href=\"ReassignStudySubject?id="
+                        + studySubject.getId());
         builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Reassign\" alt=\"Reassign\" class=\"icon icon-icon-reassign3\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
@@ -847,7 +861,9 @@ public class ListEventsForSubjectTableFactory extends AbstractTableFactory {
 
     private String restoreStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"RestoreStudySubject?action=confirm&id="+studySubject.getId() + "&subjectId"+studySubject.getSubjectId()+"&studyId="+studySubject.getStudyId());
+        builder.append(
+                "<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"RestoreStudySubject?action=confirm&id="
+                        + studySubject.getId() + "&subjectId" + studySubject.getSubjectId() + "&studyId=" + studySubject.getStudyId());
         builder.append("\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
