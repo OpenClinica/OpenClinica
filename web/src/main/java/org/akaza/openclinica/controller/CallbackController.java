@@ -49,7 +49,7 @@ public class CallbackController {
 
     public CallbackController() {
         this.redirectOnFail = "/error";
-        this.redirectOnSuccess = "/portal/home";
+        this.redirectOnSuccess = "/MainMenu";
     }
 
     @RequestMapping(value = "/callback", method = RequestMethod.GET)
@@ -66,8 +66,10 @@ public class CallbackController {
         try {
             String error = req.getParameter("error");
             if (error != null && (error.equals("login_required") || error.equals("unauthorized"))) {
+                logger.debug("CallbackController In login_required:%%%%%%%%");
                 res.sendRedirect(controller.buildAuthorizeUrl(req, false /* don't do SSO, SSO already failed */));
             } else {
+                logger.debug("CallbackController In not login_required:%%%%%%%%");
                 Tokens tokens = controller.handle(req);
                 DecodedJWT decodedJWT = JWT.decode(tokens.getAccessToken());
 
@@ -92,6 +94,7 @@ public class CallbackController {
                     req.getSession().setAttribute(USER_BEAN_NAME, ub);
                     logger.debug("Setting firstLoginCheck to true");
                     req.getSession().setAttribute("firstLoginCheck", "true");
+                    logger.debug("CallbackController set firstLoginCheck to true:%%%%%%%%");
                 } else {
                     logger.error("UserAccountBean ub ");
                     unauthorized(res, "Bad credentials");
@@ -127,6 +130,7 @@ public class CallbackController {
 
                 }
                 if (returnTo == null) returnTo = this.redirectOnSuccess;
+                logger.debug("CallbackController returnTo URL:%%%%%%%%" + returnTo);
                 res.sendRedirect(returnTo + param);
             }
         } catch (InvalidRequestException e) {

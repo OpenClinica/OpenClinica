@@ -145,6 +145,9 @@ public class OpenRosaServices {
     @Autowired
     ODMClinicaDataResource odmClinicalDataRestResource;
 
+    @Autowired
+    StudySubjectDao studySubjectDao;
+
     public static final String INPUT_USER_SOURCE = "userSource";
     public static final String INPUT_FIRST_NAME = "Participant";
     public static final String INPUT_LAST_NAME = "User";
@@ -174,7 +177,6 @@ public class OpenRosaServices {
     ParticipantPortalRegistrar participantPortalRegistrar;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     StudyDAO sdao;
-    StudySubjectDAO studySubjectDao;
 
     /**
      * @api {get} /rest2/openrosa/:studyOID/formList Get Form List
@@ -1134,6 +1136,8 @@ public class OpenRosaServices {
             String writer = getWriter(doc);
             return writer;
         }
+        StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOID);
+        studyOID = studySubject.getStudy().getOc_oid();
 
         String studyEventDefinitionID = subjectContext.get("studyEventDefinitionID");
         String studyEventRepeat = subjectContext.get("studyEventOrdinal");
@@ -1145,6 +1149,10 @@ public class OpenRosaServices {
         result = result.replaceAll("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"", "");
         result = result.replaceAll("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"", "xmlns:OpenClinica=\"http://openclinica.com/odm\"");
         int index = result.indexOf(phraseToLookForInOdm);
+        if (index == -1) {
+            logger.error(" Current Study Event location can't be found in ODM ");
+            return null;
+        }
 
         String part1 = result.substring(0, index + phraseToLookForInOdm.length());
         String part2 = result.substring(index + phraseToLookForInOdm.length() + 1);

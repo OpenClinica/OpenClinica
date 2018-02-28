@@ -221,7 +221,7 @@ public class StudyController {
             // get the new bean
             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
             ub = (UserAccountBean) userAccountDAO.findByUserUuid(ub.getUserUuid());
-            if (!roleValidForStatusChange(ub,currentPublicStudy)){
+            if (!roleValidForStatusChange(ub,currentPublicStudy, 1)){
                 logger.error("User does not have a proper role to do this operation");
                 return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);
             }
@@ -1773,7 +1773,10 @@ public class StudyController {
         return studyBean;
     }
 
-    public Boolean roleValidForStatusChange(UserAccountBean userAccount, StudyBean currentStudy){
+    public Boolean roleValidForStatusChange(UserAccountBean userAccount, StudyBean currentStudy, int interations){
+
+        if (interations > 2)
+            return false;
 
         if (logger.isDebugEnabled()) {
             logger.error("All Roles:" + userAccount.getRoles().toString());
@@ -1793,11 +1796,12 @@ public class StudyController {
 
         if (result > 0)
             return true;
-        return searchOtherEnvForRole(userAccount, currentStudy);
+
+        return searchOtherEnvForRole(userAccount, currentStudy, interations);
     }
 
 
-    private boolean searchOtherEnvForRole(UserAccountBean userAccount, StudyBean currentStudy) {
+    private boolean searchOtherEnvForRole(UserAccountBean userAccount, StudyBean currentStudy, int iterations) {
         boolean result = false;
         StudyEnvEnum altEnv;
         switch (currentStudy.getEnvType()) {
@@ -1815,7 +1819,7 @@ public class StudyController {
         // get the new study with thus id
         StudyDAO studyDAO = new StudyDAO(dataSource);
         StudyBean altStudy = studyDAO.findByPublicOid(newOcId);
-        return roleValidForStatusChange(userAccount, altStudy);
+        return roleValidForStatusChange(userAccount, altStudy, ++iterations);
     }
 
     public UserAccountBean getStudyOwnerAccount(HttpServletRequest request) {
@@ -1860,7 +1864,7 @@ public class StudyController {
         }
 
         logger.debug("Checking other study environments for a proper role");
-        if (searchOtherEnvForRole(ownerUserAccount, study))
+        if (searchOtherEnvForRole(ownerUserAccount, study, 0))
             return ownerUserAccount;
         else
             return null;

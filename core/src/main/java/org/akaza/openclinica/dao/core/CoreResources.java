@@ -462,7 +462,7 @@ public class CoreResources implements ResourceLoaderAware {
         Statement statement = conn.createStatement();
         String schema = null;
 
-        schema = handleMultiSchemaConnection(conn, schema);
+        schema = handleMultiSchemaConnection(conn);
 
         logger.debug("Using schema in CoreResources:schema:" + schema);
         if (conn.getSchema().equalsIgnoreCase(schema))
@@ -535,7 +535,8 @@ public class CoreResources implements ResourceLoaderAware {
             setRequestSchema(studyBean.getSchemaName());
     }
 
-    private static String handleMultiSchemaConnection(Connection conn, String schema) throws SQLException {
+    private static String handleMultiSchemaConnection(Connection conn) throws SQLException {
+        String schema = null;
         if (tenantSchema.get() == null)
             tenantSchema.set(conn.getSchema());
 

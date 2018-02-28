@@ -11,6 +11,7 @@ package org.akaza.openclinica.control.core;
 import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
+import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -38,6 +39,7 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -735,7 +737,16 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         // to load all available event based on currentStudy for Task > Add Subject 
         request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
         request.setAttribute("allDefsArray", this.getEventDefinitionsByCurrentStudy());
-        request.setAttribute("currentPageUrl", request.getRequestURL().toString());
+        try {
+            String paramsString = Utils.getParamsString(request.getParameterMap());
+
+            request.setAttribute("currentPageUrl",
+                    URLEncoder.encode(request.getRequestURL().toString() + "?" + paramsString, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Error getting parameters:" + e);
+        }
+
+
 
         if (request.getAttribute(POP_UP_URL) == null) {
             request.setAttribute(POP_UP_URL, "");
