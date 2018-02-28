@@ -8,7 +8,12 @@
 
 package org.akaza.openclinica.control.core;
 
-import java.io.*;
+import java.io.DataInputStream;
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.PrintWriter;
+import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
@@ -31,8 +36,10 @@ import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
 import javax.servlet.SingleThreadModel;
-import javax.servlet.annotation.MultipartConfig;
-import javax.servlet.http.*;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -78,8 +85,6 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.StudyBuildService;
-import org.akaza.openclinica.service.StudyBuildServiceImpl;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -103,43 +108,55 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.web.context.WebApplicationContext;
-import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * This class enhances the Controller in several ways.
  *
  * <ol>
- * <li>The method mayProceed, for which the class is named, is declared abstract and is called before processRequest. This
- * method indicates whether the user may proceed with the action he wishes to perform (as indicated by various attributes or
+ * <li>The method mayProceed, for which the class is named, is declared abstract and is called before processRequest.
+ * This
+ * method indicates whether the user may proceed with the action he wishes to perform (as indicated by various
+ * attributes or
  * parameters in request or session). Note, howeveer, that the method has a void return, and throws
- * InsufficientPermissionException. The intention is that if the user may not proceed with his desired action, the method
- * should throw an exception. InsufficientPermissionException will accept a Page object which indicates where the user should
- * be redirected in order to be informed that he has insufficient permission, and the process method enforces this redirection
+ * InsufficientPermissionException. The intention is that if the user may not proceed with his desired action, the
+ * method
+ * should throw an exception. InsufficientPermissionException will accept a Page object which indicates where the user
+ * should
+ * be redirected in order to be informed that he has insufficient permission, and the process method enforces this
+ * redirection
  * by catching an InsufficientPermissionException object.
  *
- * <li>Four new members, session, request, response, and the UserAccountBean object ub have been declared protected, and are
+ * <li>Four new members, session, request, response, and the UserAccountBean object ub have been declared protected, and
+ * are
  * set in the process method. This allows developers to avoid passing these objects between methods, and moreover it
  * accurately encodes the fact that these objects represent the state of the servlet.
  *
  * <br/>
- * In particular, please note that it is no longer necessary to generate a bean for the session manager, the current user or
+ * In particular, please note that it is no longer necessary to generate a bean for the session manager, the current
+ * user or
  * the current study.
  *
- * <li>The method processRequest has been declared abstract. This change is unlikely to affect most code, since by custom
+ * <li>The method processRequest has been declared abstract. This change is unlikely to affect most code, since by
+ * custom
  * processRequest is declared in each subclass anyway.
  *
- * <li>The standard try-catch block within most processRequest methods has been included in the process method, which calls
- * the processRequest method. Therefore, subclasses may throw an Exception in the processRequest method without having to
+ * <li>The standard try-catch block within most processRequest methods has been included in the process method, which
+ * calls
+ * the processRequest method. Therefore, subclasses may throw an Exception in the processRequest method without having
+ * to
  * handle it.
  *
- * <li>The addPageMessage method has been declared to streamline the process of setting page-level messages. The accompanying
- * showPageMessages.jsp file in jsp/include/ automatically displays all of the page messages; the developer need only include
+ * <li>The addPageMessage method has been declared to streamline the process of setting page-level messages. The
+ * accompanying
+ * showPageMessages.jsp file in jsp/include/ automatically displays all of the page messages; the developer need only
+ * include
  * this file in the jsp.
  *
- * <li>The addEntityList method makes it easy to add a Collection of EntityBeans to the request. Note that this method should
+ * <li>The addEntityList method makes it easy to add a Collection of EntityBeans to the request. Note that this method
+ * should
  * only be used for Collections from which one EntityBean must be selected by the user. If the Collection is empty, this
- * method will throw an InconsistentStateException, taking the user to an error page and settting a page message indicating
+ * method will throw an InconsistentStateException, taking the user to an error page and settting a page message
+ * indicating
  * that the user may not proceed because no entities are present. Note that the error page and the error message must be
  * specified.
  * </ol>
@@ -275,15 +292,20 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public void passwdTimeOut() {
         Date lastChangeDate = ub.getPasswdTimestamp();
         if (!ub.isLdapUser() && lastChangeDate == null) {
-        	//@pgawade 18-Sep-2012: fix for issue #14506 (https://issuetracker.openclinica.com/view.php?id=14506#c58197)
-            //addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"));
+            // @pgawade 18-Sep-2012: fix for issue #14506
+            // (https://issuetracker.openclinica.com/view.php?id=14506#c58197)
+            // addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " +
+            // respage.getString("password_set"));
             // + "<a href=\"UpdateProfile\">" + respage.getString("user_profile") + " </a>");
             int pwdChangeRequired = new Integer(SQLInitServlet.getField("change_passwd_required")).intValue();
-            /*if (pwdChangeRequired == 1) {
-            	addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " + respage.getString("password_set"));
-                request.setAttribute("mustChangePass", "yes");
-                forwardPage(Page.RESET_PASSWORD);
-            }*/
+            /*
+             * if (pwdChangeRequired == 1) {
+             * addPageMessage(respage.getString("welcome") + " " + ub.getFirstName() + " " + ub.getLastName() + ". " +
+             * respage.getString("password_set"));
+             * request.setAttribute("mustChangePass", "yes");
+             * forwardPage(Page.RESET_PASSWORD);
+             * }
+             */
         }
     }
 
@@ -310,7 +332,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // ProcessingResultType message = (ProcessingResultType) details.getResult();
                 org.quartz.JobDataMap dataMap = details.getJobDataMap();
                 String failMessage = dataMap.getString("failMessage");
-                if (triggerState == Trigger.TriggerState.NONE || triggerState== Trigger.TriggerState.COMPLETE) {
+                if (triggerState == Trigger.TriggerState.NONE || triggerState == Trigger.TriggerState.COMPLETE) {
                     // add the message here that your export is done
                     // TODO make absolute paths in the message, for example a link from /pages/* would break
                     // TODO i18n
@@ -319,26 +341,24 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         // ERROR: relation "demographics" already exists
                         // More information may be available in the log files.
                         addPageMessage("The extract data job failed with the message: <br/><br/>" + failMessage
-                            + "<br/><br/>More information may be available in the log files.");
+                                + "<br/><br/>More information may be available in the log files.");
                         request.getSession().removeAttribute("jobName");
                         request.getSession().removeAttribute("groupName");
                         request.getSession().removeAttribute("datasetId");
                     } else {
                         String successMsg = dataMap.getString("SUCCESS_MESSAGE");
                         String success = dataMap.getString("successMsg");
-                        if (success != null ) {
+                        if (success != null) {
 
                             if (successMsg.contains("$linkURL")) {
                                 successMsg = decodeLINKURL(successMsg, datasetId);
                             }
 
-                            if(successMsg!=null && !successMsg.isEmpty())
-                            {
+                            if (successMsg != null && !successMsg.isEmpty()) {
                                 addPageMessage(successMsg);
-                            }
-                            else {
-                            addPageMessage("Your Extract is now completed. Please go to review them at <a href='ExportDataset?datasetId="
-                                + datasetId + "'> Here </a>." );
+                            } else {
+                                addPageMessage("Your Extract is now completed. Please go to review them at <a href='ExportDataset?datasetId=" + datasetId
+                                        + "'> Here </a>.");
                             }
                             request.getSession().removeAttribute("jobName");
                             request.getSession().removeAttribute("groupName");
@@ -362,17 +382,15 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         ArrayList<ArchivedDatasetFileBean> fileBeans = asdfDAO.findByDatasetId(datasetId);
 
-        successMsg =
-            successMsg.replace("$linkURL", "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fileBeans.get(0).getId()
-                + "\">here </a>");
+        successMsg = successMsg.replace("$linkURL",
+                "<a href=\"" + CoreResources.getField("sysURL.base") + "AccessFile?fileId=" + fileBeans.get(0).getId() + "\">here </a>");
 
         return successMsg;
     }
 
     private StdScheduler getScheduler(HttpServletRequest request) {
-        scheduler =
-            this.scheduler != null ? scheduler : (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(
-                    SCHEDULER);
+        scheduler = this.scheduler != null ? scheduler
+                : (StdScheduler) SpringServletAccess.getApplicationContext(request.getSession().getServletContext()).getBean(SCHEDULER);
         return scheduler;
     }
 
@@ -388,7 +406,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
                 int index = smURL.indexOf("//");
                 String protocol = smURL.substring(0, index) + "//";
-                String subDomain = smURL.substring(smURL.indexOf("//")  + 2,  smURL.indexOf("/", protocol.length()));
+                String subDomain = smURL.substring(smURL.indexOf("//") + 2, smURL.indexOf("/", protocol.length()));
                 String crossStorageURL = protocol + subDomain + "/hub/hub.html";
                 session.setAttribute("crossStorageURL", crossStorageURL);
             }
@@ -416,7 +434,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
         currentStudy = (StudyBean) session.getAttribute("study");
-        currentPublicStudy  = (StudyBean) session.getAttribute("publicStudy");
+        currentPublicStudy = (StudyBean) session.getAttribute("publicStudy");
         currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
         // Set current language preferences
@@ -441,7 +459,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // from the perspective of
             // JUnit servlets tests
             /*
-             * if(sm==null && (!StringUtil.isBlank(userName))) {//check if user logged in, then create a new sessionmanger to
+             * if(sm==null && (!StringUtil.isBlank(userName))) {//check if user logged in, then create a new
+             * sessionmanger to
              * get ub //create a new sm in order to get a new ub object sm = new SessionManager(ub, userName); }
              */
             // BWP 01/08 >>
@@ -470,8 +489,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     // set up the panel here, tbh
                     panel.reset();
                     /*
-                     * panel.setData("Study", currentPublicStudy.getName()); panel.setData("Summary", currentPublicStudy.getSummary());
-                     * panel.setData("Start Date", sdf.format(currentPublicStudy.getDatePlannedStart())); panel.setData("End Date",
+                     * panel.setData("Study", currentPublicStudy.getName()); panel.setData("Summary",
+                     * currentPublicStudy.getSummary());
+                     * panel.setData("Start Date", sdf.format(currentPublicStudy.getDatePlannedStart()));
+                     * panel.setData("End Date",
                      * sdf.format(currentPublicStudy.getDatePlannedEnd())); panel.setData("Principal Investigator",
                      * currentPublicStudy.getPrincipalInvestigator());
                      */
@@ -591,7 +612,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
             // YW << For the case that current role is not "invalid" but current
             // active study has been removed.
-            else if (currentRole.getId() > 0 && (currentPublicStudy.getStatus().equals(Status.DELETED) || currentPublicStudy.getStatus().equals(Status.AUTO_DELETED))) {
+            else if (currentRole.getId() > 0
+                    && (currentPublicStudy.getStatus().equals(Status.DELETED) || currentPublicStudy.getStatus().equals(Status.AUTO_DELETED))) {
                 currentRole.setRole(Role.INVALID);
                 currentRole.setStatus(Status.DELETED);
                 session.setAttribute("userRole", currentRole);
@@ -625,7 +647,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
             request.setAttribute("requestSchema", getRequestSchema(request));
             mayProceed();
-      //      pingJobServer(request);
+            // pingJobServer(request);
             processRequest();
         } catch (InconsistentStateException ise) {
             ise.printStackTrace();
@@ -652,7 +674,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     public String getRequestSchema(HttpServletRequest request) {
-        switch(StringUtils.substringAfterLast(request.getRequestURI(), "/")) {
+        switch (StringUtils.substringAfterLast(request.getRequestURI(), "/")) {
         case "ChangeStudy":
         case "DeleteStudyUserRole":
         case "DeleteUser":
@@ -701,8 +723,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     /**
      * Handles the HTTP <code>POST</code> method.
      *
-     * @param request servlet request
-     * @param response servlet response
+     * @param request
+     *            servlet request
+     * @param response
+     *            servlet response
      */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, java.io.IOException {
@@ -716,37 +740,37 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * <P>
-     * Forwards to a jsp page. Additions to the forwardPage() method involve checking the session for the bread crumb trail
+     * Forwards to a jsp page. Additions to the forwardPage() method involve checking the session for the bread crumb
+     * trail
      * and setting it, if necessary. Setting it here allows the developer to only have to update the
      * <code>BreadcrumbTrail</code> class.
      *
-     * @param jspPage The page to go to.
-     * @param checkTrail The command to check for, and set a trail in the session.
+     * @param jspPage
+     *            The page to go to.
+     * @param checkTrail
+     *            The command to check for, and set a trail in the session.
      */
     protected void forwardPage(Page jspPage, boolean checkTrail) {
-    	Page page1 = Page.valueOf(jspPage.name());
-    	String temp;
+        Page page1 = Page.valueOf(jspPage.name());
+        String temp;
 
-    	// YW 10-03-2007 <<
+        // YW 10-03-2007 <<
         response.setHeader("Cache-Control", "no-cache");
         response.setHeader("Pragma", "no-cache");
         response.setDateHeader("Expires", -1);
         response.setHeader("Cache-Control", "no-store");
         // YW >>
 
-        // to load all available event based on currentStudy for Task > Add Subject 
+        // to load all available event based on currentStudy for Task > Add Subject
         request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
         request.setAttribute("allDefsArray", this.getEventDefinitionsByCurrentStudy());
         try {
             String paramsString = Utils.getParamsString(request.getParameterMap());
 
-            request.setAttribute("currentPageUrl",
-                    URLEncoder.encode(request.getRequestURL().toString() + "?" + paramsString, "UTF-8"));
+            request.setAttribute("currentPageUrl", URLEncoder.encode(request.getRequestURL().toString() + "?" + paramsString, "UTF-8"));
         } catch (UnsupportedEncodingException e) {
             logger.error("Error getting parameters:" + e);
         }
-
-
 
         if (request.getAttribute(POP_UP_URL) == null) {
             request.setAttribute(POP_UP_URL, "");
@@ -757,14 +781,16 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             if (checkTrail) {
                 BreadcrumbTrail bt = new BreadcrumbTrail();
                 if (session != null) {// added bu jxu, fixed bug for log out
-                /*    ArrayList trail = (ArrayList) session.getAttribute("trail");
-                    if (trail == null) {
-                        trail = bt.generateTrail(jspPage, request);
-                    } else {
-                        bt.setTrail(trail);
-                        trail = bt.generateTrail(jspPage, request);
-                    }
-                    session.setAttribute("trail", trail);*/
+                    /*
+                     * ArrayList trail = (ArrayList) session.getAttribute("trail");
+                     * if (trail == null) {
+                     * trail = bt.generateTrail(jspPage, request);
+                     * } else {
+                     * bt.setTrail(trail);
+                     * trail = bt.generateTrail(jspPage, request);
+                     * }
+                     * session.setAttribute("trail", trail);
+                     */
                     panel = (StudyInfoPanel) session.getAttribute(STUDY_INFO_PANEL);
                     if (panel == null) {
                         panel = new StudyInfoPanel();
@@ -779,39 +805,39 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 // 01/31/2005
             }
 
-             temp = page1.getFileName();
+            temp = page1.getFileName();
             // above added 01/19/2005, tbh
             context.getRequestDispatcher(temp).forward(request, response);
         } catch (Exception se) {
-/*            if ("View Notes".equals(jspPage.getTitle())) {
-                String viewNotesURL = jspPage.getFileName();
-                if (viewNotesURL != null && viewNotesURL.contains("listNotes_p_=")) {
-                    String[] ps = viewNotesURL.split("listNotes_p_=");
-                    String t = ps[1].split("&")[0];
-                    int p = t.length() > 0 ? Integer.valueOf(t).intValue() : -1;
-                    if (p > 1) {
-                        viewNotesURL = viewNotesURL.replace("listNotes_p_=" + p, "listNotes_p_=" + (p - 1));
-                        //forwardPage(Page.setNewPage(viewNotesURL, "View Notes"));
-                    	try {
-							getServletContext().getRequestDispatcher(viewNotesURL).forward(request, response);
-						} catch (ServletException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						} catch (IOException e) {
-							// TODO Auto-generated catch block
-							e.printStackTrace();
-						}
-                    } else if (p <= 0) {
-                        forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY);
-                    }
-                }
-            }
-*/          	logger.error(se.getMessage(),se);
-        }
-        finally {
-        	page1 = null;
-        	jspPage = null;
-        	temp= null;
+            /*
+             * if ("View Notes".equals(jspPage.getTitle())) {
+             * String viewNotesURL = jspPage.getFileName();
+             * if (viewNotesURL != null && viewNotesURL.contains("listNotes_p_=")) {
+             * String[] ps = viewNotesURL.split("listNotes_p_=");
+             * String t = ps[1].split("&")[0];
+             * int p = t.length() > 0 ? Integer.valueOf(t).intValue() : -1;
+             * if (p > 1) {
+             * viewNotesURL = viewNotesURL.replace("listNotes_p_=" + p, "listNotes_p_=" + (p - 1));
+             * //forwardPage(Page.setNewPage(viewNotesURL, "View Notes"));
+             * try {
+             * getServletContext().getRequestDispatcher(viewNotesURL).forward(request, response);
+             * } catch (ServletException e) {
+             * // TODO Auto-generated catch block
+             * e.printStackTrace();
+             * } catch (IOException e) {
+             * // TODO Auto-generated catch block
+             * e.printStackTrace();
+             * }
+             * } else if (p <= 0) {
+             * forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY);
+             * }
+             * }
+             * }
+             */ logger.error(se.getMessage(), se);
+        } finally {
+            page1 = null;
+            jspPage = null;
+            temp = null;
         }
     }
 
@@ -821,16 +847,22 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     /**
      * This method supports functionality of the type
-     * "if a list of entities is empty, then jump to some page and display an error message." This prevents users from seeing
-     * empty drop-down lists and being given error messages when they can't choose an entity from the drop-down list. Use,
+     * "if a list of entities is empty, then jump to some page and display an error message." This prevents users from
+     * seeing
+     * empty drop-down lists and being given error messages when they can't choose an entity from the drop-down list.
+     * Use,
      * e.g.:
      * <code>addEntityList("groups", allGroups, "There are no groups to display, so you cannot add a subject to this Study.",
      * Page.SUBMIT_DATA)</code>
      *
-     * @param beanName The name of the entity list as it should be stored in the request object.
-     * @param list The Collection of entities.
-     * @param messageIfEmpty The message to display if the collection is empty.
-     * @param destinationIfEmpty The Page to go to if the collection is empty.
+     * @param beanName
+     *            The name of the entity list as it should be stored in the request object.
+     * @param list
+     *            The Collection of entities.
+     * @param messageIfEmpty
+     *            The message to display if the collection is empty.
+     * @param destinationIfEmpty
+     *            The Page to go to if the collection is empty.
      * @throws InconsistentStateException
      */
     protected void addEntityList(String beanName, Collection list, String messageIfEmpty, Page destinationIfEmpty) throws InconsistentStateException {
@@ -859,16 +891,25 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     /**
-     * <p>Check if an entity with passed entity id is included in studies of current user.</p>
+     * <p>
+     * Check if an entity with passed entity id is included in studies of current user.
+     * </p>
      *
-     * <p>Note: This method called AuditableEntityDAO.findByPKAndStudy which required
+     * <p>
+     * Note: This method called AuditableEntityDAO.findByPKAndStudy which required
      * "The subclass must define findByPKAndStudyName before calling this
-     * method. Otherwise an inactive AuditableEntityBean will be returned."</p>
+     * method. Otherwise an inactive AuditableEntityBean will be returned."
+     * </p>
+     * 
      * @author ywang 10-18-2007
-     * @param entityId int
-     * @param userName String
-     * @param adao AuditableEntityDAO
-     * @param ds javax.sql.DataSource
+     * @param entityId
+     *            int
+     * @param userName
+     *            String
+     * @param adao
+     *            AuditableEntityDAO
+     * @param ds
+     *            javax.sql.DataSource
      */
     protected boolean entityIncluded(int entityId, String userName, AuditableEntityDAO adao, DataSource ds) {
         StudyDAO sdao = new StudyDAO(ds);
@@ -1025,13 +1066,14 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         Boolean messageSent = true;
         try {
             JavaMailSenderImpl mailSender = (JavaMailSenderImpl) SpringServletAccess.getApplicationContext(context).getBean("mailSender");
-            //@pgawade 09-Feb-2012 #issue 13201 - setting the "mail.smtp.localhost" property to localhost when java API is not able to
-            //retrieve the host name
+            // @pgawade 09-Feb-2012 #issue 13201 - setting the "mail.smtp.localhost" property to localhost when java API
+            // is not able to
+            // retrieve the host name
             Properties javaMailProperties = mailSender.getJavaMailProperties();
-            if(null != javaMailProperties){
-            	if (javaMailProperties.get("mail.smtp.localhost") == null || ((String)javaMailProperties.get("mail.smtp.localhost")).equalsIgnoreCase("") ){
-            		javaMailProperties.put("mail.smtp.localhost", "localhost");
-            	}
+            if (null != javaMailProperties) {
+                if (javaMailProperties.get("mail.smtp.localhost") == null || ((String) javaMailProperties.get("mail.smtp.localhost")).equalsIgnoreCase("")) {
+                    javaMailProperties.put("mail.smtp.localhost", "localhost");
+                }
             }
 
             MimeMessage mimeMessage = mailSender.createMimeMessage();
@@ -1132,7 +1174,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return url;
     }
 
-
     public DiscrepancyNoteBean getNoteInfo(DiscrepancyNoteBean note) {
         StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
         if ("itemData".equalsIgnoreCase(note.getEntityType())) {
@@ -1154,7 +1195,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(event.getStudyEventDefinitionId());
             note.setEventName(sed.getName());
-            note.setEventStart(event.getDateStarted());
+            if (event.getDateStarted() != null)
+                note.setEventStart(event.getDateStarted());
 
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
             CRFBean crf = cdao.findByVersionId(ec.getCRFVersionId());
@@ -1217,7 +1259,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         return note;
     }
-    public void checkRoleByUserAndStudy(UserAccountBean ub, StudyBean tenantStudy, StudyDAO studyDAO){
+
+    public void checkRoleByUserAndStudy(UserAccountBean ub, StudyBean tenantStudy, StudyDAO studyDAO) {
         StudyBean study = null;
 
         if (StringUtils.isNotEmpty(tenantStudy.getSchemaName()))
@@ -1230,32 +1273,31 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         if (study.getId() != 0) {
             siteUserRole = ub.getRoleByStudy(study.getId());
         }
-        if(studyUserRole.getRole().equals(Role.INVALID) && siteUserRole.getRole().equals(Role.INVALID)){
-            addPageMessage(respage.getString("no_have_correct_privilege_current_study")
-                    + " " + respage.getString("change_active_study_or_contact"));
+        if (studyUserRole.getRole().equals(Role.INVALID) && siteUserRole.getRole().equals(Role.INVALID)) {
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study") + " " + respage.getString("change_active_study_or_contact"));
             forwardPage(Page.MENU_SERVLET);
             return;
         }
     }
 
-    protected void baseUrl() throws MalformedURLException{
+    protected void baseUrl() throws MalformedURLException {
         String portalURL = CoreResources.getField("portalURL");
         URL pManageUrl = new URL(portalURL);
 
-    ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
-    Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
-    String url="";
-    if (pManageAuthorization!=null)
-          url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
+        ParticipantPortalRegistrar registrar = new ParticipantPortalRegistrar();
+        Authorization pManageAuthorization = registrar.getAuthorization(currentStudy.getOid());
+        String url = "";
+        if (pManageAuthorization != null)
+            url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
                     + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
-        System.out.println("the url :  "+ url);
-        request.setAttribute("participantUrl",url+"/");
+        System.out.println("the url :  " + url);
+        request.setAttribute("participantUrl", url + "/");
 
     }
 
-
     /**
-     * A inner class designed to allow the implementation of a JUnit test case for abstract SecureController. The inner class
+     * A inner class designed to allow the implementation of a JUnit test case for abstract SecureController. The inner
+     * class
      * allows the test case to call the outer class' private process() method.
      *
      * @author Bruce W. Perry 01/2008
@@ -1271,12 +1313,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
     }
 
-
     public CRFLocker getCrfLocker() {
         return crfLocker;
     }
-
-
-
 
 }

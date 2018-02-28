@@ -372,7 +372,8 @@ public class OdmController {
 
     private ODMcomplexTypeDefinitionStudyEventData generateStudyEventData(StudyEventBean studyEvent) {
         ODMcomplexTypeDefinitionStudyEventData studyEventData = new ODMcomplexTypeDefinitionStudyEventData();
-        studyEventData.setStartDate(studyEvent.getDateStarted().toString());
+        if (studyEvent.getDateStarted() != null)
+            studyEventData.setStartDate(studyEvent.getDateStarted().toString());
         StudyEventDefinitionBean studyEventDefBean = getStudyEventDefinitionBean(studyEvent.getStudyEventDefinitionId());
         studyEventData.setEventName(studyEventDefBean.getName());
         studyEventData.setStudyEventOID(studyEventDefBean.getOid());

@@ -652,28 +652,30 @@ public class UpdateStudyEventServlet extends SecureController {
 
             HashMap presetValues = new HashMap();
             // YW 08-17-2007 <<
-            if (studyEvent.getStartTimeFlag() == true) {
-                Calendar c = new GregorianCalendar();
-                c.setTime(studyEvent.getDateStarted());
-                presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", new Integer(c.get(Calendar.HOUR_OF_DAY)));
-                presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", new Integer(c.get(Calendar.MINUTE)));
-                // Later it could be put to somewhere as a static method if
-                // necessary.
-                switch (c.get(Calendar.AM_PM)) {
-                case 0:
-                    presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "am");
-                    break;
-                case 1:
-                    presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "pm");
-                    break;
-                default:
+            if (studyEvent.getDateStarted() != null) {
+                if (studyEvent.getStartTimeFlag() == true) {
+                    Calendar c = new GregorianCalendar();
+                    c.setTime(studyEvent.getDateStarted());
+                    presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", new Integer(c.get(Calendar.HOUR_OF_DAY)));
+                    presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", new Integer(c.get(Calendar.MINUTE)));
+                    // Later it could be put to somewhere as a static method if
+                    // necessary.
+                    switch (c.get(Calendar.AM_PM)) {
+                    case 0:
+                        presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "am");
+                        break;
+                    case 1:
+                        presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "pm");
+                        break;
+                    default:
+                        presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
+                        break;
+                    }
+                } else {
+                    presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", new Integer(-1));
+                    presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", new Integer(-1));
                     presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
-                    break;
                 }
-            } else {
-                presetValues.put(INPUT_STARTDATE_PREFIX + "Hour", new Integer(-1));
-                presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", new Integer(-1));
-                presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
             }
             // YW >>
 

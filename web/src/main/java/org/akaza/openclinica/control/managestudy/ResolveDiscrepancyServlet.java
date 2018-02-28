@@ -608,8 +608,14 @@ public class ResolveDiscrepancyServlet extends SecureController {
         Group group = new Group();
         group.setRef("/form/group_layout");
         Label metaLabel = new Label();
-        metaLabel.setLabel(resword.getString("subject_id") + ": " + ssb.getLabel() + "\n" + resword.getString("event_name") + ": " + sed.getName() + "\n"
-                + resword.getString("event_date") + ": " + formatDate(seb.getDateStarted()) + "\n" + resword.getString("form_title") + ": " + title + "\n\n ");
+        if (seb.getDateStarted() != null) {
+            metaLabel.setLabel(resword.getString("subject_id") + ": " + ssb.getLabel() + "\n" + resword.getString("event_name") + ": " + sed.getName() + "\n"
+                    + resword.getString("event_date") + ": " + formatDate(seb.getDateStarted()) + "\n" + resword.getString("form_title") + ": " + title
+                    + "\n\n ");
+        } else {
+            metaLabel.setLabel(resword.getString("subject_id") + ": " + ssb.getLabel() + "\n" + resword.getString("event_name") + ": " + sed.getName() + "\n"
+                    + resword.getString("form_title") + ": " + title + "\n\n ");
+        }
         group.setLabel(metaLabel);
         group.setUsercontrol(userControls);
         List<Group> groups = new ArrayList<>();

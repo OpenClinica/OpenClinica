@@ -7,6 +7,11 @@
  */
 package org.akaza.openclinica.control.submit;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -29,11 +34,6 @@ import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
 
 /**
  * @author ssachs
@@ -181,7 +181,7 @@ public class MarkEventCRFCompleteServlet extends SecureController {
         if (!fp.isSubmitted()) {
             DisplayTableOfContentsBean toc = TableOfContentsServlet.getDisplayBean(ecb, sm.getDataSource(), currentStudy);
             toc = TableOfContentsServlet.getDisplayBeanWithShownSections(sm.getDataSource(), toc,
-                    (DynamicsMetadataService)SpringServletAccess.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService"));
+                    (DynamicsMetadataService) SpringServletAccess.getApplicationContext(getServletContext()).getBean("dynamicsMetadataService"));
             request.setAttribute(BEAN_DISPLAY, toc);
 
             resetPanel();
@@ -192,7 +192,8 @@ public class MarkEventCRFCompleteServlet extends SecureController {
 
             StudyEventBean seb = toc.getStudyEvent();
             setToPanel(resword.getString("location"), seb.getLocation());
-            setToPanel(resword.getString("start_date"), seb.getDateStarted().toString());
+            if (seb.getDateStarted() != null)
+                setToPanel(resword.getString("start_date"), seb.getDateStarted().toString());
             setToPanel(resword.getString("end_date"), seb.getDateEnded().toString());
 
             setToPanel(resword.getString("CRF"), toc.getCrf().getName());

@@ -15,8 +15,8 @@ import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 /**
  * @author jxu
  *
- * TODO To change the template for this generated type comment go to Window -
- * Preferences - Java - Code Style - Code Templates
+ *         TODO To change the template for this generated type comment go to Window -
+ *         Preferences - Java - Code Style - Code Templates
  */
 public class DisplayStudyEventRow extends EntityBeanRow {
 
@@ -38,7 +38,7 @@ public class DisplayStudyEventRow extends EntityBeanRow {
      * (non-Javadoc)
      *
      * @see org.akaza.openclinica.core.EntityBeanRow#compareColumn(java.lang.Object,
-     *      int)
+     * int)
      */
     @Override
     protected int compareColumn(Object row, int sortingColumn) {
@@ -52,12 +52,12 @@ public class DisplayStudyEventRow extends EntityBeanRow {
         int answer = 0;
         switch (sortingColumn) {
         case COL_EVENT:
-            answer =
-                thisEvent.getStudyEvent().getStudyEventDefinition().getName().toLowerCase().compareTo(
-                        argEvent.getStudyEvent().getStudyEventDefinition().getName().toLowerCase());
+            answer = thisEvent.getStudyEvent().getStudyEventDefinition().getName().toLowerCase()
+                    .compareTo(argEvent.getStudyEvent().getStudyEventDefinition().getName().toLowerCase());
             break;
         case COL_START_DATE:
-            answer = compareDate(thisEvent.getStudyEvent().getDateStarted(), argEvent.getStudyEvent().getDateStarted());
+            if (thisEvent.getStudyEvent().getDateStarted() != null && argEvent.getStudyEvent().getDateStarted() != null)
+                answer = compareDate(thisEvent.getStudyEvent().getDateStarted(), argEvent.getStudyEvent().getDateStarted());
             break;
         // case COL_LAST_UPDATED:
         // answer =
