@@ -55,7 +55,6 @@
     }
 </script>
 
-
 <style>
     .section {
         background-color: #f1f1f1;
@@ -341,8 +340,6 @@ $(function() {
     });
 });
 </script>
-
-
 <jsp:include page="include/footer.jsp"/>
 </body>
 </html>
