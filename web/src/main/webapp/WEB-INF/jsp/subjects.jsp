@@ -119,7 +119,7 @@
             <span>{{sectionName}}</span>
         </td>
     </tr>
-    <tr class="section-body collapsed">
+    <tr class="section-body collapsed" data-study-event-oid="{{studyEventOid}}">
     <td>
     <div class="box_T">
     <div class="box_L">
@@ -135,7 +135,7 @@
         {{#each forms as |form|}}
         <tr>
             <td colspan="3" valign="top">
-                <input type="button" value="Add New">
+                <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}">
                 <h3 class="form-name">{{form.[@Name]}}</h3>
                 <table border="0" cellpadding="0" cellspacing="0" class="datatable">
                 <thead>
@@ -214,7 +214,7 @@
 <script>
 $(function() {
     $.get("..${jsonPath}", function(data) {
-        window.studyEvents = {};
+        var studyEvents = {};
         var forms = {};
         var itemGroups = {};
         var items = {};
@@ -255,6 +255,9 @@ $(function() {
         });
         data.ClinicalData.SubjectData.StudyEventData.forEach(function(data) {
             var formData = data.FormData;
+            if (!formData)
+                return;
+
             var form = forms[formData['@FormOID']];
             var submission = $.extend(true, {}, form.submissionObj);
             var status = formData['@OpenClinica:Status'];
@@ -269,17 +272,44 @@ $(function() {
             form.submissions.push(submission);
         });
 
+        var studyOid = data.ClinicalData['@StudyOID'];
+        var studySubjectOid = data.ClinicalData.SubjectData['@SubjectKey'];
+
         var sectionTable = $('#sections');
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
             sectionTable.append(sectionTmpl({
                 sectionName: studyEvent['@Name'],
+                studyEventOid: studyEventId,
                 forms: studyEvent.forms
             }));
         };
         sectionTable.on('click', '.section-header', function() {
             $(this).next().addBack().toggleClass('collapsed expanded');
+        });
+        sectionTable.on('click', '.add-new', function() {
+            var btn = $(this);
+            var formOid = btn.data('form-oid');
+            var studyEventOid = btn.closest('.section-body').data('study-event-oid');
+            $.ajax({
+                type: 'post',
+                url: '${pageContext.request.contextPath}/pages/api/addAnotherForm',
+                cache: false,
+                data: {
+                    studyoid: studyOid,
+                    studyeventdefinitionoid: studyEventOid,
+                    studysubjectoid: studySubjectOid,
+                    crfoid: formOid
+                },
+                success: function(obj) {
+                    window.location.href = '${pageContext.request.contextPath}' + obj.url;
+                },
+                error: function(e) {
+                    alert('Error. See console log.');
+                    console.log(e);
+                }
+            });
         });
         var datatables = $('table.datatable');
         datatables.DataTable({
@@ -306,7 +336,7 @@ $(function() {
         datatables.parent().css({
             'max-width': $(window).width() - 200 + 'px',
             'overflow': 'scroll'
-        });
+        });        
         $('#loading').remove();
     });
 });
