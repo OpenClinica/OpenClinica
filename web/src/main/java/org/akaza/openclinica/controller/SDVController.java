@@ -2,6 +2,8 @@ package org.akaza.openclinica.controller;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -37,6 +39,8 @@ import org.jmesa.facade.TableFacade;
 import org.jmesa.view.html.component.HtmlColumn;
 import org.jmesa.view.html.component.HtmlRow;
 import org.jmesa.view.html.component.HtmlTable;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.propertyeditors.CustomDateEditor;
@@ -54,6 +58,8 @@ import org.springframework.web.bind.annotation.RequestParam;
  */
 @Controller("sdvController")
 public class SDVController {
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
     public final static String SUBJECT_SDV_TABLE_ATTRIBUTE = "sdvTableAttribute";
     @Autowired
     @Qualifier("dataSource")
@@ -210,6 +216,12 @@ public class SDVController {
         }
 
         request.setAttribute("pageMessages", pageMessages);
+        String returnTo = request.getRequestURL().toString() + "?sdv_restore=true&studyId=" + studyId;
+        try {
+            request.setAttribute("currentPageUrl", URLEncoder.encode(returnTo, "UTF-8"));
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Encoding exception:" + e);
+        }
 
         String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "../");
 

@@ -9,6 +9,7 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.hibernate.annotations.Cache;
 import org.hibernate.annotations.CacheConcurrencyStrategy;
+import org.hibernate.query.Query;
 import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
@@ -166,7 +167,14 @@ public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
         return (ArrayList<RuleSetBean>) q.list();
     }
 
-    
+    @Transactional
+    public ArrayList<RuleSetBean> findAllRunOnSchedulesPerSchema(Boolean shedule, String schema){
+        String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.runSchedule = :shedule";
+        Query q = getCurrentSession(schema).createQuery(query);
+        q.setParameter("shedule", shedule);
+        return (ArrayList<RuleSetBean>) q.list();
+    }
+
     @Transactional
     public ArrayList<RuleSetBean> findAllByStudyEventDefIdWhereItemIsNull(Integer studyEventDefId){
     	String query = "from " + getDomainClassName() + " ruleSet  where ruleSet.studyEventDefinitionId = :studyEventDefId  and ruleSet.itemId is null";

@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.DomainObject;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
@@ -99,6 +100,23 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
                 logger.error(e.getMessage(), e);            }
         }
 
+        return session;
+    }
+
+    public Session getCurrentSession(String schema) {
+        Session session = getSessionFactory().getCurrentSession();
+
+        if (StringUtils.isNotEmpty(schema)) {
+            SessionImpl sessionImpl = (SessionImpl) session;
+            try {
+                String currentSchema = sessionImpl.connection().getSchema();
+                if (!schema.equals(currentSchema)) {
+                    sessionImpl.connection().setSchema(schema);
+                    //CoreResources.setSchema(sessionImpl.connection());
+                }
+            } catch (SQLException e) {
+                logger.error(e.getMessage(), e);            }
+        }
         return session;
     }
 

@@ -17,31 +17,35 @@
         currentURL += "?" + request.getQueryString();
     }
 %>
-
 <script>
     var myContextPath = "${pageContext.request.contextPath}";
-    var sessionTimeout = "<%= session.getMaxInactiveInterval() %>";
+    var sessionTimeoutVal = '<%= session.getMaxInactiveInterval() %>';
+    console.log("***********************************sessionTimeoutVal:"+ sessionTimeoutVal);
     var userName = "<%= userBean.getName() %>";
     var currentURL = "<%= currentURL %>";
-    var crossStorageURL = "<%= session.getAttribute("crossStorageURL")%>";
-    const ocAppTimeoutKey = "OCAppTimeout";
-    var firstLoginCheck = "<%= session.getAttribute("firstLoginCheck")%>";
-    const currentUser = "currentUser";
+    var crossStorageURL = '<%= session.getAttribute("crossStorageURL")%>';
+    console.log("***********************************Getting crossStorage:"+ crossStorageURL);
+    var ocAppTimeoutKey = "OCAppTimeout";
+    var firstLoginCheck = '<%= session.getAttribute("firstLoginCheck")%>';
+    console.log("Firstr time first:" + firstLoginCheck);
+    var currentUser = "currentUser";
     var appName = "RT";
 </script>
+
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
-    <meta http-equiv="X-UA-Compatible" content="IE=8"/>
+    <meta http-equiv="X-UA-Compatible" content="IE=11"/>
     <title><fmt:message key="openclinica" bundle="${resword}"/></title>
     <link rel="SHORTCUT ICON" href="images/favicon.ico" type="image/x-icon" />
     <link rel="stylesheet" href="includes/styles.css" type="text/css"/>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
-    <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
     <script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
     <script type="text/javascript" src="js/lib/client.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/sessionTimeout.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/auth0/captureKeyboardMouseEvents.js"></script>
+    <script type="text/javascript" language="JavaScript" src="includes/moment.min.js"></script>
     <script type="text/javascript" language="javascript">
 
         $(document).ready(function(){
@@ -64,8 +68,8 @@
     </script>
     <script type="text/javascript">
         var realInterval = 60;
-        if (sessionTimeout < realInterval)
-            realInterval = sessionTimeout;
+        if (sessionTimeoutVal < realInterval)
+            realInterval = sessionTimeoutVal;
 
         setInterval(function () {
                 processTimedOuts(true, false);

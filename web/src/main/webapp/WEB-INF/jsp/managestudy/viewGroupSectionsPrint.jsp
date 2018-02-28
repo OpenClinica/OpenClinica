@@ -9,7 +9,7 @@
 <html>
 <head><title>Print CRF</title>
   <meta http-equiv="content-type" content="text/html; charset=utf-8" />
-  <meta http-equiv="X-UA-Compatible" content="IE=8" />
+  <meta http-equiv="X-UA-Compatible" content="IE=11" />
   <script type="text/JavaScript" language="JavaScript" src=
     "includes/global_functions_javascript.js"></script>
   <script type="text/javascript"  language="JavaScript" src=
