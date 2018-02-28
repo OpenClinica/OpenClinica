@@ -72,7 +72,8 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
                         "/pages/customer-service/**",
                         "/pages/callback",
                         "/pages/login",
-                        "/pages/logout",
+                        "/pages/resetOCAppTimeout"
+,                       "/pages/logout",
                         "/pages/invalidateAuth0Token",
                         "/pages/auth/api/**",
                         "/pages/studyversion/**",
