@@ -1,9 +1,10 @@
 package org.akaza.openclinica.bean.submit.crfdata;
 
+import java.util.ArrayList;
+import java.util.Date;
+
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
-
-import java.util.ArrayList;
 
 public class FormDataBean {
     private ArrayList<ImportItemGroupDataBean> itemGroupData;
@@ -12,6 +13,10 @@ public class FormDataBean {
     private String formOID;
     private String EventCRFStatus;
     private String formLayoutName;
+    private Date createdDate;
+    private Date updatedDate;
+    private String createdBy;
+    private String updatedBy;
 
     public FormDataBean() {
         itemGroupData = new ArrayList<>();
@@ -66,4 +71,37 @@ public class FormDataBean {
     public void setFormLayoutName(String formLayoutName) {
         this.formLayoutName = formLayoutName;
     }
+
+    public Date getCreatedDate() {
+        return createdDate;
+    }
+
+    public void setCreatedDate(Date createdDate) {
+        this.createdDate = createdDate;
+    }
+
+    public Date getUpdatedDate() {
+        return updatedDate;
+    }
+
+    public void setUpdatedDate(Date updatedDate) {
+        this.updatedDate = updatedDate;
+    }
+
+    public String getCreatedBy() {
+        return createdBy;
+    }
+
+    public void setCreatedBy(String createdBy) {
+        this.createdBy = createdBy;
+    }
+
+    public String getUpdatedBy() {
+        return updatedBy;
+    }
+
+    public void setUpdatedBy(String updatedBy) {
+        this.updatedBy = updatedBy;
+    }
+
 }
