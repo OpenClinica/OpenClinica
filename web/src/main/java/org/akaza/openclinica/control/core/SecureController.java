@@ -227,6 +227,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public static final String MODULE = "module";// to determine which module
 
     private CRFLocker crfLocker;
+    private final String COMMON = "common";
 
     // user is in
 
@@ -1000,7 +1001,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public ArrayList getEventDefinitionsByCurrentStudy() {
         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(sm.getDataSource());
-        ArrayList allDefs = new ArrayList();
+        ArrayList<StudyEventDefinitionBean> tempList = new ArrayList();
+        ArrayList<StudyEventDefinitionBean> allDefs = new ArrayList();
         if (currentStudy == null)
             return allDefs;
         int parentStudyId = currentStudy.getParentStudyId();
@@ -1010,7 +1012,13 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         } else {
             allDefs = studyEventDefinitionDAO.findAllActiveByStudy(currentStudy);
         }
-        return allDefs;
+        for (StudyEventDefinitionBean studyEventDefinition : allDefs) {
+            if (!studyEventDefinition.getType().equals(COMMON)) {
+                tempList.add(studyEventDefinition);
+            }
+        }
+
+        return tempList;
     }
 
     public ArrayList getStudyGroupClassesByCurrentStudy() {
