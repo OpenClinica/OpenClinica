@@ -158,7 +158,7 @@
                 <tbody>
                     {{#each form.submissions as |submission|}}
                         <tr>
-                            {{#each submission as |item|}}
+                            {{#each submission.data as |item|}}
                                 <td class="table_cell">{{item}}</td>
                             {{/each}}
                             <td align="center" class="table_cell">{{submission.status}}</td>
@@ -212,27 +212,31 @@
 
 <script>
 $(function() {
-    $.get("..${jsonPath}", function(data) {
+    function collection(x) {
+        if (x)
+            return x.length ? x : [x];
+        return [];
+    }
+    $.get('..${jsonPath}', function(data) {
         var studyEvents = {};
         var forms = {};
         var itemGroups = {};
         var items = {};
-        data.Study.MetaDataVersion.ItemDef.forEach(function(item) {
+
+        var metadata = data.Study.MetaDataVersion;
+        collection(metadata.ItemDef).forEach(function(item) {
             items[item['@OID']] = item;
         });
-        data.Study.MetaDataVersion.ItemGroupDef.forEach(function(itemGroup) {
+        collection(metadata.ItemGroupDef).forEach(function(itemGroup) {
             itemGroup.items = itemGroup.ItemRef.map(function(ref) {
                 return items[ref['@ItemOID']];
             });
             itemGroups[itemGroup['@OID']] = itemGroup;
         });
-        data.Study.MetaDataVersion.FormDef.forEach(function(form) {
+        collection(metadata.FormDef).forEach(function(form) {
             form.itemGroups = {};
             form.submissionObj = {};
-            var groupRef = form.ItemGroupRef;
-            if (!groupRef.length)
-                groupRef = [groupRef];
-            groupRef.forEach(function(ref) {
+            collection(form.ItemGroupRef).forEach(function(ref) {
                 var id = ref['@ItemGroupOID'];
                 var itemGroup = itemGroups[id]
                 form.itemGroups[id] = itemGroup;
@@ -243,29 +247,29 @@ $(function() {
             form.submissions = [];
             forms[form['@OID']] = form;
         });
-        data.Study.MetaDataVersion.StudyEventDef.forEach(function(studyEvent) {
-            var formRef = studyEvent.FormRef;
-            if (!formRef.length)
-                formRef = [formRef];
-            studyEvent.forms = formRef.map(function(ref) {
+        collection(metadata.StudyEventDef).forEach(function(studyEvent) {
+            studyEvent.forms = collection(studyEvent.FormRef).map(function(ref) {
                 return forms[ref['@FormOID']];
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
-        data.ClinicalData.SubjectData.StudyEventData.forEach(function(data) {
-            var formData = data.FormData;
+
+        collection(data.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEvent) {
+            var formData = studyEvent.FormData;
             if (!formData)
                 return;
 
             var form = forms[formData['@FormOID']];
-            var submission = $.extend(true, {}, form.submissionObj);
-            var status = formData['@OpenClinica:Status'];
-            var itemGroupData = formData.ItemGroupData;
-            if (!itemGroupData.length)
-                itemGroupData = [itemGroupData];
-            itemGroupData.forEach(function(igd) {
-                igd.ItemData.forEach(function(item) {
-                    submission[item['@ItemOID']].push(item['@Value']);
+            if (!form)
+                return;
+
+            var submission = {
+                status: studyEvent['@OpenClinica:Status'],
+                data: $.extend(true, {}, form.submissionObj)
+            };
+            collection(formData.ItemGroupData).forEach(function(igd) {
+                collection(igd.ItemData).forEach(function(item) {
+                    submission.data[item['@ItemOID']].push(item['@Value']);
                 });
             });
             form.submissions.push(submission);
@@ -283,7 +287,7 @@ $(function() {
                 studyEventOid: studyEventId,
                 forms: studyEvent.forms
             }));
-        };
+        }
         sectionTable.on('click', '.section-header', function() {
             $(this).next().addBack().toggleClass('collapsed expanded');
         });
