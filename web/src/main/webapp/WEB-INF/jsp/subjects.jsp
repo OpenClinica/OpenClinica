@@ -214,23 +214,27 @@
 <script>
 $(function() {
     function collection(x) {
-        return x.length ? x : [x];
+        if (x)
+            return x.length ? x : [x];
+        return [];
     }
-    $.get("..${jsonPath}", function(data) {
+    $.get('..${jsonPath}', function(data) {
         var studyEvents = {};
         var forms = {};
         var itemGroups = {};
         var items = {};
-        data.Study.MetaDataVersion.ItemDef.forEach(function(item) {
+
+        var metadata = data.Study.MetaDataVersion;
+        collection(metadata.ItemDef).forEach(function(item) {
             items[item['@OID']] = item;
         });
-        data.Study.MetaDataVersion.ItemGroupDef.forEach(function(itemGroup) {
+        collection(metadata.ItemGroupDef).forEach(function(itemGroup) {
             itemGroup.items = itemGroup.ItemRef.map(function(ref) {
                 return items[ref['@ItemOID']];
             });
             itemGroups[itemGroup['@OID']] = itemGroup;
         });
-        data.Study.MetaDataVersion.FormDef.forEach(function(form) {
+        collection(metadata.FormDef).forEach(function(form) {
             form.itemGroups = {};
             form.submissionObj = {};
             collection(form.ItemGroupRef).forEach(function(ref) {
@@ -244,18 +248,22 @@ $(function() {
             form.submissions = [];
             forms[form['@OID']] = form;
         });
-        data.Study.MetaDataVersion.StudyEventDef.forEach(function(studyEvent) {
+        collection(metadata.StudyEventDef).forEach(function(studyEvent) {
             studyEvent.forms = collection(studyEvent.FormRef).map(function(ref) {
                 return forms[ref['@FormOID']];
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
-        data.ClinicalData.SubjectData.StudyEventData.forEach(function(studyEvent) {
+
+        collection(data.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEvent) {
             var formData = studyEvent.FormData;
             if (!formData)
                 return;
 
             var form = forms[formData['@FormOID']];
+            if (!form)
+                return;
+
             var submission = {
                 status: studyEvent['@OpenClinica:Status'],
                 data: $.extend(true, {}, form.submissionObj)
