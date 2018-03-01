@@ -401,7 +401,7 @@ public class OdmImportServiceImpl implements OdmImportService {
         } else {
             studyEventDefinition.setRepeating(false);
         }
-        studyEventDefinition.setType(odmStudyEventDef.getType().toString());
+        studyEventDefinition.setType(odmStudyEventDef.getType().toString().toLowerCase());
         studyEventDefinition.setStudy(study);
         studyEventDefinition.setUserAccount(userAccount);
         if (odmStudyEventDef.getStudyEventDefElementExtension().size() != 0) {

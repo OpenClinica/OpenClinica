@@ -181,17 +181,14 @@ public class StudySubjectOverhaulController {
         StudyEvent studyEvent = new StudyEvent();
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(maxOrdinal + new Integer(1));
-
         studyEvent.setSubjectEventStatusId(SubjectEventStatus.NOT_SCHEDULED.getCode());
         studyEvent.setStatusId(Status.AVAILABLE.getCode());
-
         studyEvent.setStudySubject(studySubject);
         studyEvent.setDateCreated(new Date());
         studyEvent.setUserAccount(userAccount);
-        studyEvent.setDateStart(new Date());
+        studyEvent.setDateStart(null);
         studyEvent.setStartTimeFlag(new Boolean(false));
         studyEvent.setEndTimeFlag(new Boolean(false));
-
         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
         return studyEvent;
 

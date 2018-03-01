@@ -7,6 +7,15 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.text.DateFormat;
+import java.text.SimpleDateFormat;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Calendar;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.Locale;
+
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
@@ -25,19 +34,10 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
 import org.akaza.openclinica.web.bean.StudyEventRow;
 
-import java.text.DateFormat;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Locale;
-
 /**
  * @author jxu
  *
- * Handles user request of "view study events"
+ *         Handles user request of "view study events"
  */
 public class ViewStudyEventsServlet extends SecureController {
 
@@ -57,6 +57,7 @@ public class ViewStudyEventsServlet extends SecureController {
     public static final String DEFINITION_MAP = "definitions";
 
     public static final String PRINT = "print";
+    private final String COMMON = "common";
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -137,7 +138,15 @@ public class ViewStudyEventsServlet extends SecureController {
         request.setAttribute(STATUS_MAP, SubjectEventStatus.toArrayList());
 
         StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
-        ArrayList definitions = seddao.findAllByStudy(currentStudy);
+        ArrayList<StudyEventDefinitionBean> definitions = seddao.findAllByStudy(currentStudy);
+        ArrayList tempList = new ArrayList<>();
+        for (StudyEventDefinitionBean defn : definitions) {
+            if (!defn.getType().equals(COMMON)) {
+                tempList.add(defn);
+            }
+        }
+        definitions = new ArrayList(tempList);
+
         request.setAttribute(DEFINITION_MAP, definitions);
 
         ArrayList allEvents = new ArrayList();
@@ -146,9 +155,8 @@ public class ViewStudyEventsServlet extends SecureController {
         request.setAttribute("allEvents", allEvents);
 
         // for print version
-        String queryUrl =
-            INPUT_STARTDATE + "=" + local_df.format(startDate) + "&" + INPUT_ENDDATE + "=" + local_df.format(endDate) + "&" + INPUT_DEF_ID + "=" + definitionId
-                + "&" + INPUT_STATUS_ID + "=" + statusId + "&" + "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
+        String queryUrl = INPUT_STARTDATE + "=" + local_df.format(startDate) + "&" + INPUT_ENDDATE + "=" + local_df.format(endDate) + "&" + INPUT_DEF_ID + "="
+                + definitionId + "&" + INPUT_STATUS_ID + "=" + statusId + "&" + "sedId=" + sedId + "&submitted=" + fp.getInt("submitted");
         request.setAttribute("queryUrl", queryUrl);
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
             allEvents = genEventsForPrint(fp, definitions, startDate, endDate, sedId, definitionId, statusId);
@@ -183,7 +191,6 @@ public class ViewStudyEventsServlet extends SecureController {
         for (int i = 0; i < definitions.size(); i++) {
             ViewEventDefinitionBean ved = new ViewEventDefinitionBean();
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) definitions.get(i);
-
             ved.setDefinition(sed);
 
             // YW <<
@@ -193,8 +200,8 @@ public class ViewStudyEventsServlet extends SecureController {
                 ArrayList evts = sedao.findAllWithSubjectLabelByStudySubjectAndDefinition(ssb, sed.getId());
 
                 for (int v = 0; v < evts.size(); ++v) {
-                    StudyEventBean seb = (StudyEventBean)evts.get(v);
-                    if(!(currentRole.isDirector() || currentRole.isCoordinator()) && seb.getSubjectEventStatus().isLocked()){
+                    StudyEventBean seb = (StudyEventBean) evts.get(v);
+                    if (!(currentRole.isDirector() || currentRole.isCoordinator()) && seb.getSubjectEventStatus().isLocked()) {
                         seb.setEditable(false);
                     }
                     events.add(seb);
@@ -220,7 +227,7 @@ public class ViewStudyEventsServlet extends SecureController {
             // find the first lastCompletionDate
             for (int k = 0; k < events.size(); k++) {
                 StudyEventBean se = (StudyEventBean) events.get(k);
-                if (se.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED) && se.getDateEnded()!=null) {
+                if (se.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED) && se.getDateEnded() != null) {
                     lastCompletionDate = se.getDateEnded();
                     break;
                 }
@@ -245,7 +252,7 @@ public class ViewStudyEventsServlet extends SecureController {
                     subjectCompleted++;
                     if (lastCompletionDate == null) {
                         lastCompletionDate = se.getDateEnded();
-                    } else if (se.getDateEnded()!=null && se.getDateEnded().after(lastCompletionDate)) {
+                    } else if (se.getDateEnded() != null && se.getDateEnded().after(lastCompletionDate)) {
                         lastCompletionDate = se.getDateEnded();
                     }
                 } else if (se.getSubjectEventStatus().getId() > 4) {
@@ -273,8 +280,7 @@ public class ViewStudyEventsServlet extends SecureController {
             // desc
             ArrayList allEventRows = StudyEventRow.generateRowsFromBeans(events);
 
-            String[] columns =
-                { resword.getString("study_subject_ID"), resword.getString("event_date_started"), resword.getString("subject_event_status"),
+            String[] columns = { resword.getString("study_subject_ID"), resword.getString("event_date_started"), resword.getString("subject_event_status"),
                     resword.getString("actions") };
             table.setColumns(new ArrayList(Arrays.asList(columns)));
             table.hideColumnLink(3);
@@ -290,14 +296,12 @@ public class ViewStudyEventsServlet extends SecureController {
 
             ved.setStudyEventTable(table);
 
-
-
             if (!events.isEmpty()) {
                 allEvents.add(ved);
             }
         }
 
-        //A. Hamid.
+        // A. Hamid.
         return allEvents;
     }
 
@@ -405,6 +409,7 @@ public class ViewStudyEventsServlet extends SecureController {
                 allEvents.add(ved);
             }
         }
+
         return allEvents;
     }
 

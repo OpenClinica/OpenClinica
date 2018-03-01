@@ -159,3 +159,19 @@ function processTimedOuts(checkCurrentUser, storageFlag) {
             console.log(err);
     });
 }
+
+
+function resetOCAppTimeout() {
+    var newExpiration = 0;
+    var currentTime = moment().valueOf();
+
+
+    storage.onConnect()
+        .then(function() {
+            if (storage.set(ocAppTimeoutKey, newExpiration).then(function() {
+                console.log("reset ocAppTimeout");
+                }));
+        })['catch'](function(err) {
+            console.log(err);
+        });
+}
