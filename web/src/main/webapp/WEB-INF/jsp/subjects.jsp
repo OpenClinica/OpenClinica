@@ -159,7 +159,7 @@
                 <tbody>
                     {{#each form.submissions as |submission|}}
                         <tr>
-                            {{#each submission as |item|}}
+                            {{#each submission.data as |item|}}
                                 <td class="table_cell">{{item}}</td>
                             {{/each}}
                             <td align="center" class="table_cell">{{submission.status}}</td>
@@ -213,6 +213,9 @@
 
 <script>
 $(function() {
+    function collection(x) {
+        return x.length ? x : [x];
+    }
     $.get("..${jsonPath}", function(data) {
         var studyEvents = {};
         var forms = {};
@@ -230,10 +233,7 @@ $(function() {
         data.Study.MetaDataVersion.FormDef.forEach(function(form) {
             form.itemGroups = {};
             form.submissionObj = {};
-            var groupRef = form.ItemGroupRef;
-            if (!groupRef.length)
-                groupRef = [groupRef];
-            groupRef.forEach(function(ref) {
+            collection(form.ItemGroupRef).forEach(function(ref) {
                 var id = ref['@ItemGroupOID'];
                 var itemGroup = itemGroups[id]
                 form.itemGroups[id] = itemGroup;
@@ -245,28 +245,24 @@ $(function() {
             forms[form['@OID']] = form;
         });
         data.Study.MetaDataVersion.StudyEventDef.forEach(function(studyEvent) {
-            var formRef = studyEvent.FormRef;
-            if (!formRef.length)
-                formRef = [formRef];
-            studyEvent.forms = formRef.map(function(ref) {
+            studyEvent.forms = collection(studyEvent.FormRef).map(function(ref) {
                 return forms[ref['@FormOID']];
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
-        data.ClinicalData.SubjectData.StudyEventData.forEach(function(data) {
-            var formData = data.FormData;
+        data.ClinicalData.SubjectData.StudyEventData.forEach(function(studyEvent) {
+            var formData = studyEvent.FormData;
             if (!formData)
                 return;
 
             var form = forms[formData['@FormOID']];
-            var submission = $.extend(true, {}, form.submissionObj);
-            var status = formData['@OpenClinica:Status'];
-            var itemGroupData = formData.ItemGroupData;
-            if (!itemGroupData.length)
-                itemGroupData = [itemGroupData];
-            itemGroupData.forEach(function(igd) {
-                igd.ItemData.forEach(function(item) {
-                    submission[item['@ItemOID']].push(item['@Value']);
+            var submission = {
+                status: studyEvent['@OpenClinica:Status'],
+                data: $.extend(true, {}, form.submissionObj)
+            };
+            collection(formData.ItemGroupData).forEach(function(igd) {
+                collection(igd.ItemData).forEach(function(item) {
+                    submission.data[item['@ItemOID']].push(item['@Value']);
                 });
             });
             form.submissions.push(submission);
@@ -284,7 +280,7 @@ $(function() {
                 studyEventOid: studyEventId,
                 forms: studyEvent.forms
             }));
-        };
+        }
         sectionTable.on('click', '.section-header', function() {
             $(this).next().addBack().toggleClass('collapsed expanded');
         });
