@@ -10,7 +10,7 @@
 
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
  <meta http-equiv="X-UA-Compatible" content="IE=11" />
-<link rel="shortcut icon" type="image/x-icon" href="<c:url value='/images/favicon.ico'/>">
+<link rel="shortcut icon" type="image/x-icon" href="<c:url value='/images/favicon.png'/>">
 
 <link rel="stylesheet" href="<c:url value='/includes/styles.css'/>" type="text/css"/>
 <link rel="stylesheet" href="<c:url value='/includes/styles2.css'/>" type="text/css" />

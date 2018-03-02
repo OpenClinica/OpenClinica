@@ -17,7 +17,7 @@
 <head>
 
 <title><fmt:message key="openclinica" bundle="${resword}"/></title> 
-<link rel="SHORTCUT ICON" href="images/favicon.ico" type="image/x-icon" />
+<link rel="SHORTCUT ICON" href="images/favicon.png" type="image/x-icon" />
 
 
 <meta http-equiv="Content-type" content="text/html; charset=UTF-8"/>
