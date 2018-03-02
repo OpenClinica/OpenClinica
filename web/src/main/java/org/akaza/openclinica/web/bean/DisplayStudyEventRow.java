@@ -56,8 +56,7 @@ public class DisplayStudyEventRow extends EntityBeanRow {
                     .compareTo(argEvent.getStudyEvent().getStudyEventDefinition().getName().toLowerCase());
             break;
         case COL_START_DATE:
-            if (thisEvent.getStudyEvent().getDateStarted() != null && argEvent.getStudyEvent().getDateStarted() != null)
-                answer = compareDate(thisEvent.getStudyEvent().getDateStarted(), argEvent.getStudyEvent().getDateStarted());
+            answer = compareDate(thisEvent.getStudyEvent().getDateStarted(), argEvent.getStudyEvent().getDateStarted());
             break;
         // case COL_LAST_UPDATED:
         // answer =
