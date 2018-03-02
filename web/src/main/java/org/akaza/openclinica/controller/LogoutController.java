@@ -44,7 +44,7 @@ public class LogoutController {
         String urlPrefix = req.getRequestURL().substring(0, req.getRequestURL().lastIndexOf("/"));
         int index = urlPrefix.indexOf(req.getContextPath());
         String returnURL = urlPrefix.substring(0, index).concat(req.getContextPath()).concat("/pages/logoutSuccess");
-        String logoutURL = controller.buildLogoutURL(returnURL);
+        String logoutURL = controller.buildLogoutURL(req, returnURL);
         return String.format("redirect:%s", logoutURL);
     }
 
