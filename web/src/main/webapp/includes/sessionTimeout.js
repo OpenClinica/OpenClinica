@@ -30,6 +30,8 @@ function processCurrentUser(currentTime, newExpiration) {
         return storage.get(currentUser);
     }).then(function(res) {
         console.log("Current user in processCurrentUser****************" + res);
+        // working around for bug title on edge(https://jira.openclinica.com/browse/OC-8814)
+        document.title = 'OpenClinica';
         dupeFirstUserCheck = firstLoginCheck;
         if (firstLoginCheck === "true") {
             var prevUser = res;

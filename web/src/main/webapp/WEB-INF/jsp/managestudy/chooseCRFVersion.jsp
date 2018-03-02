@@ -12,7 +12,7 @@
 
 <link rel="stylesheet" href="../../includes/style_shaded_table.css" type="text/css">
 
-<link rel="SHORTCUT ICON" href="../../images/favicon.ico" type="image/x-icon" />
+<link rel="SHORTCUT ICON" href="../../images/favicon.png" type="image/x-icon" />
 
 <jsp:include page="../include/managestudy_top_pages_new.jsp">
 	<jsp:param name="isSpringControllerCCV" value="true" />
