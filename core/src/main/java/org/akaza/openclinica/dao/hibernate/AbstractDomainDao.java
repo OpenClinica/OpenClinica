@@ -88,16 +88,27 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
             tenant = (String) request.getAttribute("requestSchema");
         }
         session = getSessionFactory().getCurrentSession();
+        SessionImpl sessionImpl = (SessionImpl) session;
 
         if (StringUtils.isNotEmpty(tenant)) {
-            SessionImpl sessionImpl = (SessionImpl) session;
             try {
                 String currentSchema = sessionImpl.connection().getSchema();
                 if (!tenant.equals(currentSchema)) {
                     sessionImpl.connection().setSchema(tenant);
                 }
             } catch (SQLException e) {
-                logger.error(e.getMessage(), e);            }
+                logger.error(e.getMessage(), e);
+            }
+        } else {
+            String schema = CoreResources.tenantSchema.get();
+            if (StringUtils.isNotEmpty(schema)) {
+                try {
+                    sessionImpl.connection().setSchema(schema);
+                } catch (SQLException e) {
+                    logger.error(e.getMessage(), e);
+                }
+            }
+
         }
 
         return session;
@@ -112,6 +123,7 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
                 String currentSchema = sessionImpl.connection().getSchema();
                 if (!schema.equals(currentSchema)) {
                     sessionImpl.connection().setSchema(schema);
+                    CoreResources.tenantSchema.set(schema);
                     //CoreResources.setSchema(sessionImpl.connection());
                 }
             } catch (SQLException e) {

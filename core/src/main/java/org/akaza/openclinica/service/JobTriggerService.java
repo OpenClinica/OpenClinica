@@ -32,6 +32,7 @@ import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.rule.RuleSetService;
+import org.apache.commons.lang.StringUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -71,9 +72,8 @@ public class JobTriggerService {
 	}
 
 	// @Scheduled(cron = "0 0/2 * * * ?") // trigger every 2 minutes
-	// @Scheduled(cron = "0 0/1 * * * ?") // trigger every minute
-	@Scheduled(cron = "0 0 0/1 * * ?")
-	// trigger every hour
+	@Scheduled(cron = "0 0/1 * * * ?") // trigger every minute
+	// @Scheduled(cron = "0 0 0/1 * * ?") // trigger every hour
 	public void hourlyJobTrigger() throws NumberFormatException, ParseException {
 	    try {
     		logger.debug("The time is now " + currentDateFormat.format(new Date()));
@@ -89,6 +89,10 @@ public class JobTriggerService {
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		List<String> schemas = studyDao.findAllSchemas();
 		for (String schema : schemas) {
+			if (StringUtils.isEmpty(schema)) {
+				logger.error("Schema should not be null");
+				continue;
+			}
 			ArrayList<RuleSetBean> ruleSets = ruleSetDao.findAllRunOnSchedulesPerSchema(true, schema);
 			for (RuleSetBean ruleSet : ruleSets) {
 				if (ruleSet.getStatus().AVAILABLE != null && ruleSet.isRunSchedule()) {
