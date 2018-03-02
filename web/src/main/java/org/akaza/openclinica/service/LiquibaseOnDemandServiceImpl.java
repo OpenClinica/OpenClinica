@@ -6,6 +6,7 @@ import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.core.OCCommonTablesSpringLiquibase;
 import org.akaza.openclinica.core.OCMultiTenantSpringLiquibase;
 import org.akaza.openclinica.core.OCSpringLiquibase;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
@@ -85,6 +86,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemaStudy.setPhase(studyInfoObject.getStudy().getPhase());
 
             schemaServiceDao.setConnectionSchemaName(studyInfoObject.getSchema());
+            CoreResources.tenantSchema.set(studyInfoObject.getSchema());
             studyDao.getCurrentSession().clear();
             int studyId = (Integer) studyDao.save(schemaStudy);
             userAccountDao.saveOrUpdate(userAccount);
