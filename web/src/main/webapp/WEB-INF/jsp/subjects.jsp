@@ -96,6 +96,9 @@
         padding-top: 0.5em;
         padding-left: 1.5em;
     }
+    td.highlight {
+        background-color: whitesmoke !important;
+    }
 }
 </style>
 
@@ -138,22 +141,22 @@
                 <h3 class="form-name">{{form.[@Name]}}</h3>
                 <table border="0" cellpadding="0" cellspacing="0" class="datatable">
                 <thead>
-                <tr valign="top">
-                    {{#each form.itemGroups as |itemGroup|}}
-                        {{#each itemGroup.items as |item|}}
-                            <td class="table_cell">{{item.Question.TranslatedText}}</td>
+                    <tr valign="top">
+                        {{#each form.itemGroups as |itemGroup|}}
+                            {{#each itemGroup.items as |item|}}
+                                <td class="table_cell">{{item.Question.TranslatedText}}</td>
+                            {{/each}}
                         {{/each}}
-                    {{/each}}
-                    <td class="table_cell">
-                        <center>Status</center>
-                    </td>
-                    <td class="table_cell">
-                        <center>Updated</center>
-                    </td>
-                    <td class="table_cell">
-                        <center>Actions</center>
-                    </td>
-                </tr>
+                        <td class="table_cell">
+                            <center>Status</center>
+                        </td>
+                        <td class="table_cell">
+                            <center>Updated</center>
+                        </td>
+                        <td class="table_cell">
+                            <center>Actions</center>
+                        </td>
+                    </tr>
                 </thead>
                 <tbody>
                     {{#each form.submissions as |submission|}}
@@ -314,17 +317,64 @@ $(function() {
                 }
             });
         });
+
+        window.cols = [];
+        window.colz = [];
+
         var datatables = $('table.datatable');
-        datatables.DataTable({
-            dom: "frtilp",
-            language: {
-                paginate: {
-                    first: '<<',
-                    previous: '<',
-                    next: '>',
-                    last: '>>'
+        datatables.each(function() {
+            var table = $(this).DataTable({
+                dom: "frtilp",
+                language: {
+                    paginate: {
+                        first: '<<',
+                        previous: '<',
+                        next: '>',
+                        last: '>>'
+                    }
+                },
+                columnDefs: [{
+                    targets: -1,
+                    render: function(data, type, row) {
+                        return data;
+                    }
+                }, {
+                    targets: '_all',
+                    render: function(data, type, row) {
+                        return data.length > 200 ?
+                            data.substr(0, 200) +'…' : data;
+                    }
+                }],
+                initComplete: function () {
+                    var columns = this.api().columns();
+                    colz.push(columns);
+                    columns.every(function() {
+                        var column = this;
+                        cols.push(column);
+                        if (column.index() == columns.indexes().length - 1)
+                            return;
+                        var select = $('<select><option value=""></option></select>')
+                            .prependTo($(column.header()))
+                            .on('change', function () {
+                                var val = $.fn.dataTable.util.escapeRegex(
+                                    $(this).val()
+                                );
+                                column
+                                    .search( val ? '^' + val + '$' : '', true, false )
+                                    .draw();
+                            });
+                        column.data().unique().sort().each(function(val, index, api) {
+                            console.log(select);
+                            select.append('<option value="' + val + '">' + val + '</option>');
+                        });
+                    });
                 }
-            }
+            });
+            $(this).children('tbody').on('mouseenter', 'td.table_cell', function () {
+                var colIdx = table.cell(this).index().column; 
+                $(table.cells().nodes()).removeClass('highlight');
+                $(table.column(colIdx).nodes()).addClass('highlight');
+            });
         });
         datatables.each(function() {
             var theTable = $(this);
@@ -340,6 +390,7 @@ $(function() {
             'max-width': $(window).width() - 200 + 'px',
             'overflow': 'scroll'
         });        
+
         $('#loading').remove();
     });
 });
