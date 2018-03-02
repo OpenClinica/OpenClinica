@@ -86,7 +86,6 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemaStudy.setPhase(studyInfoObject.getStudy().getPhase());
 
             schemaServiceDao.setConnectionSchemaName(studyInfoObject.getSchema());
-            CoreResources.tenantSchema.set(studyInfoObject.getSchema());
             studyDao.getCurrentSession().clear();
             int studyId = (Integer) studyDao.save(schemaStudy);
             userAccountDao.saveOrUpdate(userAccount);
