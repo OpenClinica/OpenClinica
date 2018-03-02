@@ -99,15 +99,15 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(8, "images/icon_Signed.gif");
 
         discNoteIconPaths.put(1, "<span name='icon_Note' class='icon icon-flag red' border='0' alt='" + resterm.getString("Open") + "' title='"
-            + resterm.getString("Open") + "' align='left'/>");
+                + resterm.getString("Open") + "' align='left'/>");
         discNoteIconPaths.put(2, "<span name='icon_flagYellow' class='icon icon icon-flag orange' border='0' alt='" + resterm.getString("Updated") + "' title='"
-            + resterm.getString("Updated") + "' align='left'/>");
+                + resterm.getString("Updated") + "' align='left'/>");
         discNoteIconPaths.put(3, "<span name='icon_flagGreen' class='icon icon icon-flag green' border='0' alt='" + resterm.getString("Resolved") + "' title='"
-            + resterm.getString("Resolved") + "' align='left'/>");
+                + resterm.getString("Resolved") + "' align='left'/>");
         discNoteIconPaths.put(4, "<span name='icon_flagBlack' class='icon icon-flag black' border='0' alt='" + resterm.getString("Closed") + "' title='"
-            + resterm.getString("Closed") + "' align='left'/>");
+                + resterm.getString("Closed") + "' align='left'/>");
         discNoteIconPaths.put(5, "<span name='icon_flagWhite' class='icon icon-flag-empty blue' border='0' alt='" + resterm.getString("Not_Applicable")
-            + "' title='" + resterm.getString("Not_Applicable") + "' align='left'/>");
+                + "' title='" + resterm.getString("Not_Applicable") + "' align='left'/>");
 
     }
 
@@ -672,21 +672,20 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
     private String viewNotesLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder actionLink = new HtmlBuilder();
         if (this.getResolutionStatus() >= 1 && this.getResolutionStatus() <= 5) {
-            actionLink.a().href(
-                    "ViewNotes?viewForOne=y&id=" + studySubject.getId() + "&resolutionStatus=" + resolutionStatus + "discNoteType=" + discNoteType + "&module="
-                        + module + "&listNotes_f_studySubject.label=" + studySubject.getLabel());
+            actionLink.a().href("ViewNotes?viewForOne=y&id=" + studySubject.getId() + "&resolutionStatus=" + resolutionStatus + "discNoteType=" + discNoteType
+                    + "&module=" + module + "&listNotes_f_studySubject.label=" + studySubject.getLabel());
             actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
             actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
-            actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).append(
-                    "hspace=\"4\" style=\"float:left\" width=\"24 \" height=\"15\" align=\"left\"").end().aEnd();
+            actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view"))
+                    .append("hspace=\"4\" style=\"float:left\" width=\"24 \" height=\"15\" align=\"left\"").end().aEnd();
             actionLink.append("&nbsp;&nbsp;&nbsp;");
         } else {
             actionLink.a().href(
                     "ViewNotes?viewForOne=y&id=" + studySubject.getId() + "&module=" + module + "&listNotes_f_studySubject.label=" + studySubject.getLabel());
             actionLink.append("onMouseDown=\"javascript:setImage('bt_View1','images/bt_View_d.gif');\"");
             actionLink.append("onMouseUp=\"javascript:setImage('bt_View1','images/bt_View.gif');\"").close();
-            actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view")).append(
-                    "hspace=\"2\" style=\"float:left\" width=\"24 \" height=\"15\" align=\"left\"").end().aEnd();
+            actionLink.img().name("bt_View1").src("images/bt_View.gif").border("0").alt(resword.getString("view")).title(resword.getString("view"))
+                    .append("hspace=\"2\" style=\"float:left\" width=\"24 \" height=\"15\" align=\"left\"").end().aEnd();
             actionLink.append("&nbsp;&nbsp;&nbsp;");
         }
         return actionLink.toString();
@@ -696,18 +695,16 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         HtmlBuilder actionLink = new HtmlBuilder();
         if (this.isStudyHasDiscNotes()) {
             if (this.getResolutionStatus() >= 1 && this.getResolutionStatus() <= 5) {
-                actionLink.a().href(
-                        "javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
-                            + "&resolutionStatus=" + resolutionStatus + "')").close();
-                actionLink.img().name("bt_Download").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes")).title(
-                        resword.getString("download_discrepancy_notes")).append("hspace=\"4\" width=\"24 \" height=\"15\"").end().aEnd();
+                actionLink.a().href("javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
+                        + "&resolutionStatus=" + resolutionStatus + "')").close();
+                actionLink.img().name("bt_Download").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes"))
+                        .title(resword.getString("download_discrepancy_notes")).append("hspace=\"4\" width=\"24 \" height=\"15\"").end().aEnd();
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             } else {
-                actionLink.a().href(
-                        "javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType + "&module="
-                            + module + "')").close();
-                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes")).title(
-                        resword.getString("download_discrepancy_notes")).append("hspace=\"2\" width=\"24 \" height=\"15\"").end().aEnd();
+                actionLink.a().href("javascript:openDocWindow('ChooseDownloadFormat?subjectId=" + studySubject.getId() + "&discNoteType=" + discNoteType
+                        + "&module=" + module + "')").close();
+                actionLink.img().name("bt_View1").src("images/bt_Download.gif").border("0").alt(resword.getString("download_discrepancy_notes"))
+                        .title(resword.getString("download_discrepancy_notes")).append("hspace=\"2\" width=\"24 \" height=\"15\"").end().aEnd();
                 actionLink.append("&nbsp;&nbsp;&nbsp;");
             }
         }
@@ -716,8 +713,11 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
     private String reAssignStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" href=\"javascript:openDocWindow('ReassignStudySubject?id="+studySubject.getId());
-        builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Reassign\" alt=\"Reassign\" class=\"icon icon-icon-reassign\" name=\"bt_Reassign1\"/></a>");
+        builder.append(
+                "<a onmouseup=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-icon-reassign');\" href=\"javascript:openDocWindow('ReassignStudySubject?id="
+                        + studySubject.getId());
+        builder.append(
+                "')\"><span hspace=\"2\" border=\"0\" title=\"Reassign\" alt=\"Reassign\" class=\"icon icon-icon-reassign\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
 
@@ -725,7 +725,9 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
     private String restoreStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder builder = new HtmlBuilder();
-        builder.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"javascript:openDocWindow('RestoreStudySubject?action=confirm&id="+studySubject.getId()+"&subjectId=" + studySubject.getSubjectId()+"&studyId"+studySubject.getStudyId());
+        builder.append(
+                "<a onmouseup=\"javascript:setImage('bt_View1','icon icon-ccw');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-ccw');\" href=\"javascript:openDocWindow('RestoreStudySubject?action=confirm&id="
+                        + studySubject.getId() + "&subjectId=" + studySubject.getSubjectId() + "&studyId" + studySubject.getStudyId());
         builder.append("')\"><span hspace=\"2\" border=\"0\" title=\"Restore\" alt=\"Restore\" class=\"icon icon-ccw\" name=\"bt_Reassign1\"/></a>");
         builder.append("&nbsp;&nbsp;&nbsp;");
         return builder.toString();
@@ -742,15 +744,15 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
         eventDiv.table(0).border("0").cellpadding("0").cellspacing("0").close();
         // Lock Div
-        eventDiv.div().id("Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style(
-                "position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;").close();
+        eventDiv.div().id("Lock_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
+                .style("position: absolute; visibility: hidden; z-index: 3; width: 50px; height: 30px; top: 0px;").close();
         lockLinkBuilder(eventDiv, studySubjectLabel, rowCount, studyEvents, sed);
         eventDiv.divEnd();
 
         eventDiv.tr(0).valign("top").close().td(0).close();
         // Event Div
-        eventDiv.div().id("Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style(
-                "position: absolute; visibility: hidden; z-index: 3;width:" + divWidth + "px; top: 0px; float: left;").close();
+        eventDiv.div().id("Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount)
+                .style("position: absolute; visibility: hidden; z-index: 3;width:" + divWidth + "px; top: 0px; float: left;").close();
         eventDiv.div().styleClass("box_T").close().div().styleClass("box_L").close().div().styleClass("box_R").close().div().styleClass("box_B").close().div()
                 .styleClass("box_TL").close().div().styleClass("box_TR").close().div().styleClass("box_BL").close().div().styleClass("box_BR").close();
 
@@ -777,7 +779,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         String add_another_occurrence = resword.getString("add_another_occurrence");
         String click_for_more_options = resword.getString("click_for_more_options");
         String schedule = resword.getString("schedule");
-        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
         String remove = resword.getString("remove");
         String occurrence_x_of = resword.getString("ocurrence");
@@ -819,8 +821,8 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         eventDiv.img().src("images/arrow_status_back_dis.gif").border("0").close();
         eventDiv.tdEnd();
         // <td>...</td>
-        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L").width("20").style(
-                "display: none;").close();
+        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").styleClass("statusbox_scroll_L").width("20")
+                .style("display: none;").close();
         // <div>...</div>
         eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_back").style("display: none;").close();
         eventDiv.a().href("javascript:StatusBoxBack('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
@@ -847,7 +849,8 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
             eventDiv.tr(0).valign("top").close();
             eventDiv.td(0).styleClass(tableHeaderRowStyleClass).colspan("2").close();
             eventDiv.bold().append(occurrence_x_of).append("#" + (i + 1) + " of " + studyEventsSize).br();
-            eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
+            if (studyEventBean.getDateStarted() != null)
+                eventDiv.append(formatDate(studyEventBean.getDateStarted())).br();
             eventDiv.append(status + ": " + studyEventBean.getSubjectEventStatus().getName());
             eventDiv.boldEnd().tdEnd().trEnd(0);
             // <tr><td><table>...</table></td></tr>
@@ -867,8 +870,8 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         eventDiv.img().src("images/arrow_status_next_dis.gif").border("0").close();
         eventDiv.tdEnd();
         // <td>...</td>
-        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R").width("20").style(
-                "display: none;").close();
+        eventDiv.td(0).id("Scroll_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").styleClass("statusbox_scroll_R").width("20")
+                .style("display: none;").close();
         // <div>...</div>
         eventDiv.div().id("bt_Scroll_Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "_next").close();
         eventDiv.a().href("javascript:StatusBoxNext('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEventsSize + ");").close();
@@ -882,8 +885,8 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         eventDiv.tdEnd().trEnd(0);
 
         eventDiv.tr(0).id("Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount).style("").close();
-        eventDiv.td(0).styleClass("table_cell_left").colspan(String.valueOf(studyEventsSize)).close().append("<i>").append(click_for_more_options).append(
-                "</i>").tdEnd();
+        eventDiv.td(0).styleClass("table_cell_left").colspan(String.valueOf(studyEventsSize)).close().append("<i>").append(click_for_more_options)
+                .append("</i>").tdEnd();
         eventDiv.trEnd(0);
 
         eventDiv.tableEnd(0);
@@ -899,9 +902,10 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         SubjectEventStatus eventStatus = currentEvent.getSubjectEventStatus();
         String studyEventId = String.valueOf(currentEvent.getId());
 
-        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
-        String remove = resword.getString("remove");;
+        String remove = resword.getString("remove");
+        ;
 
         if (eventSysStatus.getId() == Status.AVAILABLE.getId() || eventSysStatus == Status.SIGNED) {
 
@@ -969,7 +973,7 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
         String add_another_occurrence = resword.getString("add_another_occurrence");
         String click_for_more_options = resword.getString("click_for_more_options");
         String schedule = resword.getString("schedule");
-        String view = resword.getString("view")+"/"+resword.getString("enter_data");
+        String view = resword.getString("view") + "/" + resword.getString("enter_data");
         String edit = resword.getString("edit");
         String remove = resword.getString("remove");
         String occurrence_x_of = resword.getString("ocurrence");
@@ -1004,7 +1008,8 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
             eventDiv.td(0).styleClass(tableHeaderRowStyleClass).colspan("2").close();
             eventDiv.bold().append(occurrence_x_of).append("#1 of 1").br();
             if (studyEvents.size() > 0) {
-                eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
+                if (studyEvents.get(0).getDateStarted() != null)
+                    eventDiv.append(formatDate(studyEvents.get(0).getDateStarted())).br();
                 eventDiv.append(status + " : " + studyEvents.get(0).getSubjectEventStatus().getName());
             } else {
                 eventDiv.append(status + " : " + SubjectEventStatus.NOT_SCHEDULED.getName());
@@ -1138,7 +1143,8 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
     }
 
-    private void lockLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed) {
+    private void lockLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
+            StudyEventDefinitionBean sed) {
         String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onmouseover = "layersShowOrHide('visible','Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
@@ -1175,9 +1181,10 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
 
     }
 
-    private void iconLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents, StudyEventDefinitionBean sed) {
-        String href1Repeating =
-            "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size() + "); ";
+    private void iconLinkBuilder(HtmlBuilder builder, String studySubjectLabel, Integer rowCount, List<StudyEventBean> studyEvents,
+            StudyEventDefinitionBean sed) {
+        String href1Repeating = "javascript:ExpandEventOccurrences('" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'," + studyEvents.size()
+                + "); ";
         String href1 = "javascript:leftnavExpand('Menu_on_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String href2 = "javascript:leftnavExpand('Menu_off_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "'); ";
         String onmouseover = "moveObject('Event_" + studySubjectLabel + "_" + sed.getId() + "_" + rowCount + "', event); ";
@@ -1235,37 +1242,33 @@ public class ListDiscNotesSubjectTableFactory extends AbstractTableFactory {
     public void setResolutionStatusIds(Set<Integer> resolutionStatusIds) {
         this.resolutionStatusIds = resolutionStatusIds;
     }
-    
-    public HashMap<ResolutionStatus, Integer> countAll(HashMap<ResolutionStatus, Integer> discCounts, StudyEventBean studyEvent, StringBuffer constraints, boolean isSite) {
+
+    public HashMap<ResolutionStatus, Integer> countAll(HashMap<ResolutionStatus, Integer> discCounts, StudyEventBean studyEvent, StringBuffer constraints,
+            boolean isSite) {
         HashMap<ResolutionStatus, Integer> temp = new HashMap<ResolutionStatus, Integer>();
-        temp =
-            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("itemData", studyEvent, constraints, isSite);
+        temp = getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("itemData", studyEvent, constraints, isSite);
         this.getTotal(discCounts, temp);
-        temp =
-            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("subject", studyEvent, constraints, isSite);
+        temp = getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("subject", studyEvent, constraints, isSite);
         this.getTotal(discCounts, temp);
-        temp =
-            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("eventCrf", studyEvent, constraints, isSite);
+        temp = getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("eventCrf", studyEvent, constraints, isSite);
         this.getTotal(discCounts, temp);
-        temp =
-            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("StudySub", studyEvent, constraints, isSite);
+        temp = getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("StudySub", studyEvent, constraints, isSite);
         this.getTotal(discCounts, temp);
-        temp =
-            getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("studyEvent", studyEvent, constraints, isSite);
+        temp = getDiscrepancyNoteDAO().countByEntityTypeAndStudyEventWithConstraints("studyEvent", studyEvent, constraints, isSite);
         this.getTotal(discCounts, temp);
-        
+
         return discCounts;
     }
-    
+
     public HashMap<ResolutionStatus, Integer> getTotal(HashMap<ResolutionStatus, Integer> discCounts, HashMap<ResolutionStatus, Integer> discCountsTemp) {
-        if(discCountsTemp.size()>0) {
-            for(int i=1; i<6; ++i) {
+        if (discCountsTemp.size() > 0) {
+            for (int i = 1; i < 6; ++i) {
                 Integer c = 0;
-                if(discCounts.get(ResolutionStatus.get(i))!=null) {
+                if (discCounts.get(ResolutionStatus.get(i)) != null) {
                     c = discCounts.get(ResolutionStatus.get(i));
                 }
-                if(discCountsTemp.get(ResolutionStatus.get(i))!=null) {
-                    discCounts.put(ResolutionStatus.get(i), c+discCountsTemp.get(ResolutionStatus.get(i)));
+                if (discCountsTemp.get(ResolutionStatus.get(i)) != null) {
+                    discCounts.put(ResolutionStatus.get(i), c + discCountsTemp.get(ResolutionStatus.get(i)));
                 }
             }
         }

@@ -3,6 +3,7 @@ package org.akaza.openclinica.controller;
 import java.io.IOException;
 import java.net.URISyntaxException;
 import java.util.Date;
+import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -12,6 +13,7 @@ import javax.ws.rs.core.MediaType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.dto.SSOverhaulDTO;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
@@ -20,6 +22,7 @@ import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.CrfBean;
+import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.Study;
@@ -54,6 +57,9 @@ public class StudySubjectOverhaulController {
 
     @Autowired
     private CrfDao crfDao;
+
+    @Autowired
+    private EventCrfDao eventCrfDao;
 
     @Autowired
     private EventDefinitionCrfDao eventDefinitionCrfDao;
@@ -142,18 +148,33 @@ public class StudySubjectOverhaulController {
             return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        Integer maxOrdinal = studyEventDao.findMaxOrdinalByStudySubjectStudyEventDefinition(studySubject.getStudySubjectId(),
-                studyEventDefinition.getStudyEventDefinitionId());
+        List<StudyEvent> studyEvents = studyEventDao.fetchListByStudyEventDefOID(studyEventDefinitionOid, studySubject.getStudySubjectId());
+        Integer maxOrdinal = null;
+        StudyEvent studyEvent = null;
+        if (studyEvents != null && studyEvents.size() != 0) {
+            maxOrdinal = studyEventDao.findMaxOrdinalByStudySubjectStudyEventDefinition(studySubject.getStudySubjectId(),
+                    studyEventDefinition.getStudyEventDefinitionId());
 
-        if (maxOrdinal == null) {
+            if (!studyEventDefinition.getRepeating()) {
+                logger.error("StudyEventDefinition with Oid {} is Non Repeating", studyEventDefinition.getOc_oid());
+
+                for (StudyEvent sEvent : studyEvents) {
+                    List<EventCrf> eventCrfs = (List<EventCrf>) eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(sEvent.getStudyEventId(),
+                            studySubject.getStudySubjectId(), crf.getCrfId());
+                    if (eventCrfs.size() != 0) {
+                        logger.error("EventCrf with StudyEventDefinition Oid {},Crf Oid {} and StudySubjectOid {} already exist in the System",
+                                studyEventDefinition.getOc_oid(), crf.getOcOid(), studySubject.getOcOid());
+                        return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+                    }
+                }
+            }
+        } else {
             logger.error("No previous study event found for this studyEventDef Oid {} and subject Oid{}", studyEventDefinition.getOc_oid(),
                     studySubject.getOcOid());
             maxOrdinal = new Integer(0);
-        } else if (maxOrdinal.intValue() > 0 && !studyEventDefinition.getRepeating()) {
-            logger.error("StudyEventDefinition with Oid {} is Non Repeating", studyEventDefinition.getOc_oid());
-            return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
         }
-        StudyEvent studyEvent = scheduleNewStudyEvent(studySubject, studyEventDefinition, maxOrdinal, userAccount);
+        studyEvent = scheduleNewStudyEvent(studySubject, studyEventDefinition, maxOrdinal, userAccount);
+
         if (studyEvent == null) {
             logger.error("StudyEvent with studyEventId {} is null", studyEvent.getStudyEventId());
             return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
@@ -181,17 +202,14 @@ public class StudySubjectOverhaulController {
         StudyEvent studyEvent = new StudyEvent();
         studyEvent.setStudyEventDefinition(studyEventDefinition);
         studyEvent.setSampleOrdinal(maxOrdinal + new Integer(1));
-
         studyEvent.setSubjectEventStatusId(SubjectEventStatus.NOT_SCHEDULED.getCode());
         studyEvent.setStatusId(Status.AVAILABLE.getCode());
-
         studyEvent.setStudySubject(studySubject);
         studyEvent.setDateCreated(new Date());
         studyEvent.setUserAccount(userAccount);
-        studyEvent.setDateStart(new Date());
+        studyEvent.setDateStart(null);
         studyEvent.setStartTimeFlag(new Boolean(false));
         studyEvent.setEndTimeFlag(new Boolean(false));
-
         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
         return studyEvent;
 

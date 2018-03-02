@@ -278,22 +278,22 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
                 ExportStudyEventDataBean expSEBean = new ExportStudyEventDataBean();
 
                 expSEBean.setLocation(se.getLocation());
-                if (se.getDateEnd() != null)
-
-                    if (se.getEndTimeFlag())
+                if (se.getDateEnd() != null) {
+                    if (se.getEndTimeFlag()) {
                         expSEBean.setEndDate(se.getDateEnd() + "");
-                    else {
+                    } else {
                         String temp = sdf.format(se.getDateEnd());
                         expSEBean.setEndDate(temp);
                     }
-
-                if (se.getStartTimeFlag())
-                    expSEBean.setStartDate(se.getDateStart() + "");
-                else {
-                    String temp = sdf.format(se.getDateStart());
-                    expSEBean.setStartDate(temp);
                 }
-
+                if (se.getDateStart() != null) {
+                    if (se.getStartTimeFlag()) {
+                        expSEBean.setStartDate(se.getDateStart() + "");
+                    } else {
+                        String temp = sdf.format(se.getDateStart());
+                        expSEBean.setStartDate(temp);
+                    }
+                }
                 expSEBean.setEventName(se.getStudyEventDefinition().getName());
                 expSEBean.setStudyEventOID(se.getStudyEventDefinition().getOc_oid());
 
@@ -363,6 +363,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
                         dataBean.setInterviewerName(ecrf.getInterviewerName());
                     // dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(getLocale()));
                     dataBean.setStatus(fetchEventCRFStatus(ecrf));
+                    dataBean.setCreatedDate(ecrf.getDateCreated());
+                    dataBean.setCreatedBy(ecrf.getUserAccount().getUserName());
+                    dataBean.setUpdatedDate(ecrf.getDateUpdated());
+                    UserAccount updatedUserAccount = userAccountDao.findById(ecrf.getUpdateId());
+                    dataBean.setUpdatedBy(updatedUserAccount.getUserName());
                     if (ecrf.getFormLayout().getName() != null)
                         dataBean.setFormLayout(ecrf.getFormLayout().getName());
                     if (collectAudits)

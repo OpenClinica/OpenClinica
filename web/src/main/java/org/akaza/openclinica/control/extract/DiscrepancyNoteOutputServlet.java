@@ -1,12 +1,9 @@
 package org.akaza.openclinica.control.extract;
 
-import static java.util.Arrays.asList;
 import static java.util.Collections.emptySet;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -26,7 +23,13 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.bean.submit.CRFVersionBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
@@ -38,7 +41,12 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.*;
+import org.akaza.openclinica.dao.submit.CRFVersionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
@@ -51,6 +59,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * A servlet that sends via HTTP a file containing Discrepancy-Note related data.
+ * 
  * @author Bruce W. Perry
  * @see ChooseDownloadFormat
  * @see org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote
@@ -80,15 +89,17 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         String studyIdentifier = request.getParameter("studyIdentifier");
         // Determine whether to limit the displayed DN's to a certain resolutionStatus
         // CHANGED TO LIST OF RESOLUTION STATUS IDS
-        /*int resolutionStatus = 0;
-        try {
-            resolutionStatus = Integer.parseInt(request.getParameter("resolutionStatus"));
-        } catch(NumberFormatException nfe){
-            //Show all DN's
-            resolutionStatus=-1;
-        }*/
+        /*
+         * int resolutionStatus = 0;
+         * try {
+         * resolutionStatus = Integer.parseInt(request.getParameter("resolutionStatus"));
+         * } catch(NumberFormatException nfe){
+         * //Show all DN's
+         * resolutionStatus=-1;
+         * }
+         */
         // possibly for a later implementation: int definitionId = fp.getInt("defId");
-        //here subjectId actually is study_subject_id !!!
+        // here subjectId actually is study_subject_id !!!
         int subjectId = fp.getInt("subjectId");
         int discNoteType = fp.getInt("discNoteType");
 
@@ -105,7 +116,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         // Not needed now: boolean isList = ("y".equalsIgnoreCase(isAList));
         StudyBean studyBean = (StudyBean) session.getAttribute("study");
 
-//        Set<Integer> resolutionStatusIds = (HashSet) session.getAttribute("resolutionStatus");
+        // Set<Integer> resolutionStatusIds = (HashSet) session.getAttribute("resolutionStatus");
 
         // It will also change any resolution status IDs among parents of children that have a different
         // id value (last boolean parameter; 'true' to perform the latter task)
@@ -114,22 +125,15 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         // that might match the desired res status
         ListNotesFilter listNotesFilter = new ListNotesFilter();
 
-        ViewNotesService viewNotesService = (ViewNotesService) WebApplicationContextUtils.getWebApplicationContext(
-        		getServletContext()).getBean("viewNotesService");
+        ViewNotesService viewNotesService = (ViewNotesService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
+                .getBean("viewNotesService");
 
-    	ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(
-    			getFilters(request),
-    			getDateFormat(),
-    	    	discrepancyNoteTypesDecoder,
+        ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(getFilters(request), getDateFormat(), discrepancyNoteTypesDecoder,
                 resolutionStatusDecoder);
-        List<DiscrepancyNoteBean> notes = viewNotesService.listNotes(
-        		currentStudy,
-        		filter,
-                ViewNotesSortCriteria.buildFilterCriteria(getSortOrder(request)));
-        ArrayList<DiscrepancyNoteBean> allDiscNotes = notes instanceof ArrayList
-        		? (ArrayList<DiscrepancyNoteBean>) notes
-        		: new ArrayList<DiscrepancyNoteBean>(notes);
-        
+        List<DiscrepancyNoteBean> notes = viewNotesService.listNotes(currentStudy, filter, ViewNotesSortCriteria.buildFilterCriteria(getSortOrder(request)));
+        ArrayList<DiscrepancyNoteBean> allDiscNotes = notes instanceof ArrayList ? (ArrayList<DiscrepancyNoteBean>) notes
+                : new ArrayList<DiscrepancyNoteBean>(notes);
+
         allDiscNotes = populateRowsWithAttachedData(allDiscNotes);
 
         // Now we have to package all the discrepancy notes in DiscrepancyNoteThread objects
@@ -137,119 +141,103 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
 
         Set<Integer> resolutionStatusIds = emptySet();
-        List<DiscrepancyNoteThread> discrepancyNoteThreads =
-            discNoteUtil.createThreads(allDiscNotes, sm.getDataSource(), studyBean);
+        List<DiscrepancyNoteThread> discrepancyNoteThreads = discNoteUtil.createThreads(allDiscNotes, sm.getDataSource(), studyBean);
 
         if ("csv".equalsIgnoreCase(format)) {
-            /*response.setContentLength(
-              downLoader.getListContentLength(allDiscNotes,DownloadDiscrepancyNote.CSV));*/
-            //3014: this has been changed to only show the parent of the thread; then changed back again!
+            /*
+             * response.setContentLength(
+             * downLoader.getListContentLength(allDiscNotes,DownloadDiscrepancyNote.CSV));
+             */
+            // 3014: this has been changed to only show the parent of the thread; then changed back again!
             int contentLen = downLoader.getThreadListContentLength(discrepancyNoteThreads);
             response.setContentLength(contentLen);
 
-            /*downLoader.downLoadDiscBeans(allDiscNotes,
-              DownloadDiscrepancyNote.CSV,response.getOutputStream(), null);*/
+            /*
+             * downLoader.downLoadDiscBeans(allDiscNotes,
+             * DownloadDiscrepancyNote.CSV,response.getOutputStream(), null);
+             */
             downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.CSV, response, null);
         } else {
             response.setHeader("Pragma", "public");
-            /*downLoader.downLoadDiscBeans(allDiscNotes,
-              DownloadDiscrepancyNote.PDF,
-              response.getOutputStream(), studyIdentifier);*/
+            /*
+             * downLoader.downLoadDiscBeans(allDiscNotes,
+             * DownloadDiscrepancyNote.PDF,
+             * response.getOutputStream(), studyIdentifier);
+             */
             downLoader.downLoadThreadedDiscBeans(discrepancyNoteThreads, DownloadDiscrepancyNote.PDF, response, studyIdentifier);
         }
     }
 
-    private Map<String,String> makeDiscrepancyNoteTypesDecoder() {
-    	Map<String,String> decoder = new HashMap<String,String>();
-    	
+    private Map<String, String> makeDiscrepancyNoteTypesDecoder() {
+        Map<String, String> decoder = new HashMap<String, String>();
+
         ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
         for (DiscrepancyNoteType type : DiscrepancyNoteType.list) {
-        	decoder.put(type.getName(), Integer.toString(type.getId()));
+            decoder.put(type.getName(), Integer.toString(type.getId()));
         }
         decoder.put(reterm.getString("Query_and_Failed_Validation_Check"), "1,3");
 
         return decoder;
     }
 
-    private Map<String,String> discrepancyNoteTypesDecoder = makeDiscrepancyNoteTypesDecoder();
+    private Map<String, String> discrepancyNoteTypesDecoder = makeDiscrepancyNoteTypesDecoder();
 
-    private Map<String,String> makeResolutionStatusDecoder() {
-    	Map<String,String> decoder = new HashMap<String,String>();
-    	
+    private Map<String, String> makeResolutionStatusDecoder() {
+        Map<String, String> decoder = new HashMap<String, String>();
+
         ResourceBundle reterm = ResourceBundleProvider.getTermsBundle();
         for (ResolutionStatus status : ResolutionStatus.list) {
             decoder.put(status.getName(), Integer.toString(status.getId()));
         }
         decoder.put(reterm.getString("New_and_Updated"), "1,2");
-    	return decoder;
+        return decoder;
     }
 
-    private Map<String,String> resolutionStatusDecoder = makeResolutionStatusDecoder();
-    
+    private Map<String, String> resolutionStatusDecoder = makeResolutionStatusDecoder();
+
     private String getDateFormat() {
         Locale locale = LocaleResolver.getLocale(request);
         ResourceBundle resformat = ResourceBundleProvider.getFormatBundle(locale);
         return resformat.getString("date_format_string");
     }
 
-    private Map<String,String> getFilters(HttpServletRequest request) {
-    	Map<String,String> filters = new HashMap<String,String>();
-    	String ids[] = {
-                "studySubject.label",
-                "siteId",
-                "studySubject.labelExact",
-                "discrepancyNoteBean.createdDate",
-                "discrepancyNoteBean.updatedDate",
-                "discrepancyNoteBean.description",
-                "discrepancyNoteBean.user",
-                "discrepancyNoteBean.disType",
-                "discrepancyNoteBean.entityType",
-                "discrepancyNoteBean.resolutionStatus",
-                "age",
-                "days",
+    private Map<String, String> getFilters(HttpServletRequest request) {
+        Map<String, String> filters = new HashMap<String, String>();
+        String ids[] = { "studySubject.label", "siteId", "studySubject.labelExact", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate",
+                "discrepancyNoteBean.description", "discrepancyNoteBean.user", "discrepancyNoteBean.disType", "discrepancyNoteBean.entityType",
+                "discrepancyNoteBean.resolutionStatus", "age", "days",
 
-                "eventName",
-                "crfName",
-                "entityName",
-                "entityValue",
-                "discrepancyNoteBean.description",
-                "discrepancyNoteBean.user"
-    	};
-    	for (String s: ids) {
-    		String val = request.getParameter(s);
-    		if (val != null) {
-    			filters.put(s, val);
-    		}
-    	}
-    	return filters;
+                "eventName", "crfName", "entityName", "entityValue", "discrepancyNoteBean.description", "discrepancyNoteBean.user" };
+        for (String s : ids) {
+            String val = request.getParameter(s);
+            if (val != null) {
+                filters.put(s, val);
+            }
+        }
+        return filters;
     }
 
-    private List<Pair<String,String>> getSortOrder(HttpServletRequest request) {
-    	String ids[] = {
-    			"studySubject.label",
-    			"discrepancyNoteBean.createdDate",
-    			"days",
-    			"age"
-    	};
-    	
-    	List<Pair<String,String>> sortOrders = new ArrayList<Pair<String,String>>(4);
-    	for (String s: ids) {
-    		/*
-    		 * The HTTP parameters for sorting are prefixed with 'sort'.
-    		 */
-    		String orders[] = request.getParameterValues("sort." + s);
-    		if (orders != null) {
-	    		for (String order: orders) {
-	    			if ("ASC".equals(order) || "DESC".equals(order)) {
-	    				sortOrders.add(new Pair<String,String>(s, order));
-	    				break;
-	    			}
-	    		}
-    		}
-    	}
-    	return sortOrders;
+    private List<Pair<String, String>> getSortOrder(HttpServletRequest request) {
+        String ids[] = { "studySubject.label", "discrepancyNoteBean.createdDate", "days", "age" };
+
+        List<Pair<String, String>> sortOrders = new ArrayList<Pair<String, String>>(4);
+        for (String s : ids) {
+            /*
+             * The HTTP parameters for sorting are prefixed with 'sort'.
+             */
+            String orders[] = request.getParameterValues("sort." + s);
+            if (orders != null) {
+                for (String order : orders) {
+                    if ("ASC".equals(order) || "DESC".equals(order)) {
+                        sortOrders.add(new Pair<String, String>(s, order));
+                        break;
+                    }
+                }
+            }
+        }
+        return sortOrders;
     }
-    
+
     private ArrayList<DiscrepancyNoteBean> populateRowsWithAttachedData(ArrayList<DiscrepancyNoteBean> noteRows) {
         Locale l = LocaleResolver.getLocale(request);
         resword = ResourceBundleProvider.getWordsBundle(l);
@@ -272,10 +260,10 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
         for (int i = 0; i < noteRows.size(); i++) {
             DiscrepancyNoteBean dnb = noteRows.get(i);
-            dnb.setCreatedDateString(dnb.getCreatedDate()==null?"":sdf.format(dnb.getCreatedDate()));
+            dnb.setCreatedDateString(dnb.getCreatedDate() == null ? "" : sdf.format(dnb.getCreatedDate()));
             if (dnb.getParentDnId() == 0) {
                 ArrayList children = dndao.findAllByStudyAndParent(currentStudy, dnb.getId());
-                children = children == null? new ArrayList():children;
+                children = children == null ? new ArrayList() : children;
                 dnb.setNumChildren(children.size());
                 dnb.setChildren(children);
                 int lastDnId = dnb.getId();
@@ -283,23 +271,23 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
                 for (int j = 0; j < children.size(); j++) {
                     DiscrepancyNoteBean child = (DiscrepancyNoteBean) children.get(j);
-                    child.setCreatedDateString(child.getCreatedDate()==null?"":sdf.format(child.getCreatedDate()));
-                    child.setUpdatedDateString(child.getCreatedDate()!=null?sdf.format(child.getCreatedDate()):"");
+                    child.setCreatedDateString(child.getCreatedDate() == null ? "" : sdf.format(child.getCreatedDate()));
+                    child.setUpdatedDateString(child.getCreatedDate() != null ? sdf.format(child.getCreatedDate()) : "");
 
                     if (child.getId() > lastDnId) {
                         lastDnId = child.getId();
                         lastChild = j;
                     }
                 }
-                if(children.size()>0) {
+                if (children.size() > 0) {
                     DiscrepancyNoteBean lastdn = (DiscrepancyNoteBean) children.get(lastChild);
-                    //dnb.setResStatus(ResolutionStatus.get(lastdn.getResolutionStatusId()));
+                    // dnb.setResStatus(ResolutionStatus.get(lastdn.getResolutionStatusId()));
                     /*
                      * The update date is the date created of the latest child
                      * note
                      */
                     dnb.setUpdatedDate(lastdn.getCreatedDate());
-                    dnb.setUpdatedDateString(dnb.getUpdatedDate()!=null?sdf.format(dnb.getUpdatedDate()):"");
+                    dnb.setUpdatedDateString(dnb.getUpdatedDate() != null ? sdf.format(dnb.getUpdatedDate()) : "");
                 }
             }
 
@@ -309,7 +297,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                 AuditableEntityBean aeb = dndao.findEntity(dnb);
                 dnb.setEntityName(aeb.getName());
                 if (entityType.equalsIgnoreCase("subject")) {
-//                    allNotes.add(dnb);
+                    // allNotes.add(dnb);
                     SubjectBean sb = (SubjectBean) aeb;
                     StudySubjectBean ssb = studySubjectDAO.findBySubjectIdAndStudy(sb.getId(), currentStudy);
                     dnb.setStudySub(ssb);
@@ -331,7 +319,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                         }
                     }
                 } else if (entityType.equalsIgnoreCase("studySub")) {
-//                    allNotes.add(dnb);
+                    // allNotes.add(dnb);
                     StudySubjectBean ssb = (StudySubjectBean) aeb;
                     dnb.setStudySub(ssb);
                     dnb.setSubjectName(ssb.getLabel());
@@ -361,7 +349,8 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     dnb.setStudySub(ssub);
                     dnb.setSubjectName(ssub.getLabel());
                     if (se != null) {
-                        dnb.setEventStart(se.getDateStarted());
+                        if (se.getDateStarted() != null)
+                            dnb.setEventStart(se.getDateStarted());
                         dnb.setEventName(se.getName());
                     }
                     dnb.setCrfName(cb.getName());
@@ -373,7 +362,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                         crfStatus = "Complete";
                     }
                     dnb.setCrfStatus(crfStatus);
-
 
                     String column = dnb.getColumn().trim();
                     if (!StringUtil.isBlank(column)) {
@@ -392,7 +380,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     dnb.setStudyEventDefinitionBean(sedb);
                     // }
                 } else if (entityType.equalsIgnoreCase("studyEvent")) {
-//                    allNotes.add(dnb);
+                    // allNotes.add(dnb);
                     StudyEventBean se = (StudyEventBean) sedao.findByPK(dnb.getEntityId());
                     StudyEventDefinitionBean sedb = (StudyEventDefinitionBean) seddao.findByPK(se.getStudyEventDefinitionId());
                     se.setName(sedb.getName());
@@ -430,16 +418,15 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                     CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(ec.getCRFVersionId());
                     CRFBean cb = (CRFBean) cdao.findByPK(cvb.getCrfId());
 
-                    ItemGroupMetadataBean itemGroupMetadataBean =
-                            (ItemGroupMetadataBean)igmdao.findByItemAndCrfVersion(ib.getId(), cvb.getId());
+                    ItemGroupMetadataBean itemGroupMetadataBean = (ItemGroupMetadataBean) igmdao.findByItemAndCrfVersion(ib.getId(), cvb.getId());
                     Boolean isRepeatForSure = itemGroupMetadataBean.isRepeatingGroup();
-                    if (isRepeatForSure){
-                        ItemGroupBean ig = (ItemGroupBean)igdao.findByPK(itemGroupMetadataBean.getItemGroupId());
+                    if (isRepeatForSure) {
+                        ItemGroupBean ig = (ItemGroupBean) igdao.findByPK(itemGroupMetadataBean.getItemGroupId());
                         dnb.setItemDataOrdinal(idb.getOrdinal());
                         dnb.setItemGroupName(ig.getName());
                     }
 
-//                    allNotes.add(dnb);
+                    // allNotes.add(dnb);
                     dnb.setStageId(ec.getStage().getId());
                     dnb.setEntityName(ib.getName());
                     dnb.setEntityValue(idb.getValue());
@@ -469,8 +456,8 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
                 }
             }
 
-            dnb.setStudy((StudyBean)studyDao.findByPK(dnb.getStudyId()));
-            if(dnb.getParentDnId()==0 && dnb.getChildren().size()>0) {
+            dnb.setStudy((StudyBean) studyDao.findByPK(dnb.getStudyId()));
+            if (dnb.getParentDnId() == 0 && dnb.getChildren().size() > 0) {
                 ArrayList<DiscrepancyNoteBean> children = dnb.getChildren();
                 int childrenSize = children.size();
                 for (int j = 0; j < childrenSize; j++) {

@@ -36,7 +36,7 @@
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=11"/>
     <title><fmt:message key="openclinica" bundle="${resword}"/></title>
-    <link rel="SHORTCUT ICON" href="images/favicon.ico" type="image/x-icon" />
+    <link rel="SHORTCUT ICON" href="images/favicon.png" type="image/x-icon" />
     <link rel="stylesheet" href="includes/styles.css" type="text/css"/>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
     <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>

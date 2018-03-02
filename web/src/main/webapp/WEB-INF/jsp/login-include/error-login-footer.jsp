@@ -39,7 +39,7 @@
         <div id="contactForm" style="display:none;">
 
         </div>
-        <link rel="shortcut icon" type="image/x-icon" href="${pageContext.request.contextPath}/images/favicon.ico">
+        <link rel="shortcut icon" type="image/x-icon" href="${pageContext.request.contextPath}/images/favicon.png">
 
 </body>
 

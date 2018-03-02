@@ -164,6 +164,24 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 if (form.getInterviewDate() != null && form.getInterviewDate().length() > 0) {
                                     xml.append("\" OpenClinica:InterviewDate=\"" + form.getInterviewDate());
                                 }
+                                Date createdDate = form.getCreatedDate();
+                                if (createdDate != null) {
+                                    xml.append("\" OpenClinica:CreatedDate=\""
+                                            + StringEscapeUtils.escapeXml(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(createdDate)));
+                                }
+                                String createdBy = form.getCreatedBy();
+                                if (createdBy != null && createdBy.length() > 0) {
+                                    xml.append("\" OpenClinica:CreatedBy=\"" + StringEscapeUtils.escapeXml(createdBy));
+                                }
+                                Date updatedDate = form.getUpdatedDate();
+                                if (updatedDate != null) {
+                                    xml.append("\" OpenClinica:UpdatedDate=\""
+                                            + StringEscapeUtils.escapeXml(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss").format(updatedDate)));
+                                }
+                                String updatedBy = form.getUpdatedBy();
+                                if (updatedBy != null && updatedBy.length() > 0) {
+                                    xml.append("\" OpenClinica:UpdatedBy=\"" + StringEscapeUtils.escapeXml(updatedBy));
+                                }
                                 String status = form.getStatus();
                                 if (status != null && status.length() > 0) {
                                     xml.append("\" OpenClinica:Status=\"" + StringEscapeUtils.escapeXml(status));

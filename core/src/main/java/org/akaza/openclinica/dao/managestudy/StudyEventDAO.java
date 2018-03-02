@@ -47,6 +47,7 @@ import org.akaza.openclinica.service.rule.StudyEventBeanListener;
  *
  */
 public class StudyEventDAO extends AuditableEntityDAO implements Listener {
+    private final String COMMON = "common";
 
     private Observer observer;
     // private DAODigester digester;
@@ -574,7 +575,12 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         variables.put(Integer.valueOf(3), sb.getLocation());
         variables.put(Integer.valueOf(4), Integer.valueOf(sb.getSampleOrdinal()));
         // YW 08-17-2007, data type changed from DATE to TIMESTAMP
-        variables.put(Integer.valueOf(5), new Timestamp(sb.getDateStarted().getTime()));
+        if (sb.getDateStarted() == null) {
+            nullVars.put(Integer.valueOf(5), Integer.valueOf(TypeNames.TIMESTAMP));
+            variables.put(Integer.valueOf(5), null);
+        } else {
+            variables.put(Integer.valueOf(5), new Timestamp(sb.getDateStarted().getTime()));
+        }
         if (sb.getDateEnded() == null) {
             nullVars.put(Integer.valueOf(6), Integer.valueOf(TypeNames.TIMESTAMP));
             variables.put(Integer.valueOf(6), null);
@@ -606,15 +612,16 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
             sb.setActive(true);
         }
 
-        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
-        if (oldStudyEventBean.getDateStarted().compareTo(sb.getDateStarted()) != 0)
-            changeDetails.setStartDateChanged(true);
-        if (oldStudyEventBean.getSubjectEventStatus().getId() != sb.getSubjectEventStatus().getId())
-            changeDetails.setStatusChanged(true);
-        changeDetails.setRunningInTransaction(isTransaction);
-        StudyEventBeanContainer container = new StudyEventBeanContainer(sb, changeDetails);
-        notifyObservers(container);
-
+        if (!oldStudyEventBean.getStudyEventDefinition().getType().equals(COMMON) && !oldStudyEventBean.getStudyEventDefinition().getType().equals(COMMON)) {
+            StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
+            if (oldStudyEventBean.getDateStarted().compareTo(sb.getDateStarted()) != 0)
+                changeDetails.setStartDateChanged(true);
+            if (oldStudyEventBean.getSubjectEventStatus().getId() != sb.getSubjectEventStatus().getId())
+                changeDetails.setStatusChanged(true);
+            changeDetails.setRunningInTransaction(isTransaction);
+            StudyEventBeanContainer container = new StudyEventBeanContainer(sb, changeDetails);
+            notifyObservers(container);
+        }
         return sb;
     }
 

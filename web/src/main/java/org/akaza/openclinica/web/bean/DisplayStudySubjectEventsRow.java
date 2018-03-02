@@ -1,18 +1,17 @@
 package org.akaza.openclinica.web.bean;
 
+import java.util.ArrayList;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
 import org.akaza.openclinica.bean.managestudy.DisplayStudySubjectBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 
-import java.util.ArrayList;
-
 /**
  * @author sshamim
- * Date: Nov 17, 2008
- * Time: 7:57:23 PM
+ *         Date: Nov 17, 2008
+ *         Time: 7:57:23 PM
  */
 public class DisplayStudySubjectEventsRow extends EntityBeanRow {
 
@@ -45,152 +44,155 @@ public class DisplayStudySubjectEventsRow extends EntityBeanRow {
             code = sortingColumn;
         }
         switch (code) {
-            case COL_SUBJECT_LABEL:
-                answer = thisStudy.getStudySubject().getLabel().toLowerCase().compareTo(argStudy.getStudySubject().getLabel().toLowerCase());
+        case COL_SUBJECT_LABEL:
+            answer = thisStudy.getStudySubject().getLabel().toLowerCase().compareTo(argStudy.getStudySubject().getLabel().toLowerCase());
+            break;
+        case COL_GENDER:
+            answer = (thisStudy.getStudySubject().getGender() + "").compareTo(argStudy.getStudySubject().getGender() + "");
+            break;
+        case COL_STATUS:
+            answer = thisStudy.getStudySubject().getStatus().compareTo(argStudy.getStudySubject().getStatus());
+            break;
+        case COL_EVENT_STATUS:
+            if (thisStudy.getStudyEvents() == null || thisStudy.getStudyEvents().isEmpty()) {
+                answer = -1;
                 break;
-            case COL_GENDER:
-                answer = (thisStudy.getStudySubject().getGender() + "").compareTo(argStudy.getStudySubject().getGender() + "");
+            }
+            if (argStudy.getStudyEvents() == null || argStudy.getStudyEvents().isEmpty()) {
+                answer = 1;
                 break;
-            case COL_STATUS:
-                answer = thisStudy.getStudySubject().getStatus().compareTo(argStudy.getStudySubject().getStatus());
+            }
+            answer = ((DisplayStudyEventBean) thisStudy.getStudyEvents().get(0)).getStudyEvent().getSubjectEventStatus()
+                    .compareTo(((DisplayStudyEventBean) argStudy.getStudyEvents().get(0)).getStudyEvent().getSubjectEventStatus());
+            break;
+        case COL_EVENT_DATE:
+            if (thisStudy.getStudyEvents() == null || thisStudy.getStudyEvents().isEmpty()) {
+                answer = -1;
                 break;
-            case COL_EVENT_STATUS:
-                if (thisStudy.getStudyEvents() == null || thisStudy.getStudyEvents().isEmpty()) {
-                    answer = -1;
-                    break;
-                }
-                if (argStudy.getStudyEvents() == null || argStudy.getStudyEvents().isEmpty()) {
-                    answer = 1;
-                    break;
-                }
-                answer = ((DisplayStudyEventBean)thisStudy.getStudyEvents().get(0)).getStudyEvent().getSubjectEventStatus().compareTo(
-                         ((DisplayStudyEventBean) argStudy.getStudyEvents().get(0)).getStudyEvent().getSubjectEventStatus());
+            }
+            if (argStudy.getStudyEvents() == null || argStudy.getStudyEvents().isEmpty()) {
+                answer = 1;
                 break;
-            case COL_EVENT_DATE:
-                if (thisStudy.getStudyEvents() == null || thisStudy.getStudyEvents().isEmpty()) {
-                    answer = -1;
-                    break;
-                }
-                if (argStudy.getStudyEvents() == null || argStudy.getStudyEvents().isEmpty()) {
-                    answer = 1;
-                    break;
-                }
-                answer = ((DisplayStudyEventBean)thisStudy.getStudyEvents().get(0)).getStudyEvent().getDateStarted().compareTo(
-                         ((DisplayStudyEventBean) argStudy.getStudyEvents().get(0)).getStudyEvent().getDateStarted());
+            }
+            if (((DisplayStudyEventBean) thisStudy.getStudyEvents().get(0)).getStudyEvent().getDateStarted() != null
+                    && ((DisplayStudyEventBean) argStudy.getStudyEvents().get(0)).getStudyEvent().getDateStarted() != null)
+                answer = ((DisplayStudyEventBean) thisStudy.getStudyEvents().get(0)).getStudyEvent().getDateStarted()
+                        .compareTo(((DisplayStudyEventBean) argStudy.getStudyEvents().get(0)).getStudyEvent().getDateStarted());
+            break;
 
+        case COL_STUDYGROUP:
+            answer = ((SubjectGroupMapBean) thisStudy.getStudyGroups().get(sortingColumn - 5)).getStudyGroupName().toLowerCase()
+                    .compareTo(((SubjectGroupMapBean) argStudy.getStudyGroups().get(sortingColumn - 5)).getStudyGroupName().toLowerCase());
+            break;
+        case COL_STUDYCRF:
+            if (thisStudy.getStudyEvents() == null || thisStudy.getStudyEvents().isEmpty()) {
+                answer = -1;
                 break;
-
-            case COL_STUDYGROUP:
-                answer =
-                    ((SubjectGroupMapBean) thisStudy.getStudyGroups().get(sortingColumn - 5)).getStudyGroupName().toLowerCase().compareTo(
-                            ((SubjectGroupMapBean) argStudy.getStudyGroups().get(sortingColumn - 5)).getStudyGroupName().toLowerCase());
+            }
+            if (argStudy.getStudyEvents() == null || argStudy.getStudyEvents().isEmpty()) {
+                answer = 1;
                 break;
-            case COL_STUDYCRF:
-                if (thisStudy.getStudyEvents() == null || thisStudy.getStudyEvents().isEmpty()) {
-                    answer = -1;
-                    break;
-                }
-                if (argStudy.getStudyEvents() == null || argStudy.getStudyEvents().isEmpty()) {
-                    answer = 1;
-                    break;
-                }
-                ArrayList thisAllEventCRFs = ((DisplayStudyEventBean)thisStudy.getStudyEvents().get(0)).getAllEventCRFs();
-                ArrayList argAllEventCRFs  = ((DisplayStudyEventBean)argStudy.getStudyEvents().get(0)).getAllEventCRFs();
+            }
+            ArrayList thisAllEventCRFs = ((DisplayStudyEventBean) thisStudy.getStudyEvents().get(0)).getAllEventCRFs();
+            ArrayList argAllEventCRFs = ((DisplayStudyEventBean) argStudy.getStudyEvents().get(0)).getAllEventCRFs();
 
-                if (thisAllEventCRFs == null || thisAllEventCRFs.isEmpty()) {
-                    answer = -1;
-                    break;
-                }
-                if (argAllEventCRFs == null || argAllEventCRFs.isEmpty()) {
-                    answer = 1;
-                    break;
-                }
+            if (thisAllEventCRFs == null || thisAllEventCRFs.isEmpty()) {
+                answer = -1;
+                break;
+            }
+            if (argAllEventCRFs == null || argAllEventCRFs.isEmpty()) {
+                answer = 1;
+                break;
+            }
 
-                // Event crf status comparision
-                DataEntryStage thisDes = ((DisplayEventCRFBean) thisAllEventCRFs.get(sortingColumn - 5)).getEventCRF().getStage();
-                DataEntryStage argDes = ((DisplayEventCRFBean) argAllEventCRFs.get(sortingColumn - 5)).getEventCRF().getStage();
-                /*Event crf status is ordered in this sequence, Not Started=1,Data Entry Started=2,Initial Data Entry Completed=3,
-                Double Data Entry Started=4,Double Data Entry Complete=5,Complete=6,Locked=7,Invalid/Removed=0*/
-                switch (thisDes.getId()) {
-                    //DataEntryStage.INVALID
-                    case 0:
-                        if (thisDes.getId() == argDes.getId()) {
-                            answer = 0;
-                        } else {
-                            answer = 1;
-                        }
-                        break;
-                    //DataEntryStage.UNCOMPLETED
-                    case 1:
-                        if (thisDes.getId() == argDes.getId()) {
-                            answer = 0;
-                        } else {
-                            answer = -1;
-                        }
-                        break;
-                    //DataEntryStage.INITIAL_DATA_ENTRY
-                    case 2:
-                        if (thisDes.getId() == argDes.getId()) {
-                            answer = 0;
-                        } else if (argDes.getId() == 1) {
-                            answer = 1;
-                        } else {
-                            answer = -1;
-                        }
-                        break;
-                    //DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE
-                    case 3:
-                        if (thisDes.getId() == argDes.getId()) {
-                            answer = 0;
-                        } else if (argDes.getId() == 1 || argDes.getId() == 2 ) {
-                            answer = 1;
-                        } else {
-                            answer = -1;
-                        }
-                        break;
-                    //DataEntryStage.DOUBLE_DATA_ENTRY
-                    case 4:
-                        if (thisDes.getId() == argDes.getId()) {
-                            answer = 0;
-                        } else if (argDes.getId() == 1 || argDes.getId() == 2 || argDes.getId() == 3 ) {
-                            answer = 1;
-                        } else {
-                            answer = -1;
-                        }
-                        break;
-                    //DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
-                    case 5:
-                        if (thisDes.getId() == argDes.getId()) {
-                            answer = 0;
-                        } else if (argDes.getId() == 0 || argDes.getId() == 7 ) {
-                            answer = -1;
-                        } else {
-                            answer = 1;
-                        }
-                        break;
-                    //DataEntryStage.ADMINISTRATIVE_EDITING
-                    case 6:
-                        if (thisDes.getId() == argDes.getId()) {
-                            answer = 0;
-                        } else if (argDes.getId() == 7 || argDes.getId() == 0) {
-                            answer = -1;
-                        } else {
-                            answer = 1;
-                        }
-                        break;
-                    //DataEntryStage.LOCKED
-                    case 7:
-                        if (thisDes.getId() == argDes.getId()) {
-                            answer = 0;
-                        } else if (argDes.getId() == 0){
-                            answer = -1;
-                        } else {
-                            answer = 1;
-                        }
-                        break;
-                    default:
-                        answer = 1;
+            // Event crf status comparision
+            DataEntryStage thisDes = ((DisplayEventCRFBean) thisAllEventCRFs.get(sortingColumn - 5)).getEventCRF().getStage();
+            DataEntryStage argDes = ((DisplayEventCRFBean) argAllEventCRFs.get(sortingColumn - 5)).getEventCRF().getStage();
+            /*
+             * Event crf status is ordered in this sequence, Not Started=1,Data Entry Started=2,Initial Data Entry
+             * Completed=3,
+             * Double Data Entry Started=4,Double Data Entry Complete=5,Complete=6,Locked=7,Invalid/Removed=0
+             */
+            switch (thisDes.getId()) {
+            // DataEntryStage.INVALID
+            case 0:
+                if (thisDes.getId() == argDes.getId()) {
+                    answer = 0;
+                } else {
+                    answer = 1;
                 }
+                break;
+            // DataEntryStage.UNCOMPLETED
+            case 1:
+                if (thisDes.getId() == argDes.getId()) {
+                    answer = 0;
+                } else {
+                    answer = -1;
+                }
+                break;
+            // DataEntryStage.INITIAL_DATA_ENTRY
+            case 2:
+                if (thisDes.getId() == argDes.getId()) {
+                    answer = 0;
+                } else if (argDes.getId() == 1) {
+                    answer = 1;
+                } else {
+                    answer = -1;
+                }
+                break;
+            // DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE
+            case 3:
+                if (thisDes.getId() == argDes.getId()) {
+                    answer = 0;
+                } else if (argDes.getId() == 1 || argDes.getId() == 2) {
+                    answer = 1;
+                } else {
+                    answer = -1;
+                }
+                break;
+            // DataEntryStage.DOUBLE_DATA_ENTRY
+            case 4:
+                if (thisDes.getId() == argDes.getId()) {
+                    answer = 0;
+                } else if (argDes.getId() == 1 || argDes.getId() == 2 || argDes.getId() == 3) {
+                    answer = 1;
+                } else {
+                    answer = -1;
+                }
+                break;
+            // DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE
+            case 5:
+                if (thisDes.getId() == argDes.getId()) {
+                    answer = 0;
+                } else if (argDes.getId() == 0 || argDes.getId() == 7) {
+                    answer = -1;
+                } else {
+                    answer = 1;
+                }
+                break;
+            // DataEntryStage.ADMINISTRATIVE_EDITING
+            case 6:
+                if (thisDes.getId() == argDes.getId()) {
+                    answer = 0;
+                } else if (argDes.getId() == 7 || argDes.getId() == 0) {
+                    answer = -1;
+                } else {
+                    answer = 1;
+                }
+                break;
+            // DataEntryStage.LOCKED
+            case 7:
+                if (thisDes.getId() == argDes.getId()) {
+                    answer = 0;
+                } else if (argDes.getId() == 0) {
+                    answer = -1;
+                } else {
+                    answer = 1;
+                }
+                break;
+            default:
+                answer = 1;
+            }
         }
         return answer;
     }
@@ -200,22 +202,27 @@ public class DisplayStudySubjectEventsRow extends EntityBeanRow {
         DisplayStudySubjectBean thisStudy = (DisplayStudySubjectBean) bean;
         String searchString = thisStudy.getStudySubject().getLabel();
         String secondaryLabel = thisStudy.getStudySubject().getSecondaryLabel();
-        if(! "".equalsIgnoreCase(secondaryLabel)){
-           searchString += " ";
-           searchString += secondaryLabel;
+        if (!"".equalsIgnoreCase(secondaryLabel)) {
+            searchString += " ";
+            searchString += secondaryLabel;
         }
-        /*String toStr = "";
-        Date enrDate = thisStudy.getStudySubject().getEnrollmentDate();
-        if (enrDate != null) {
-            SimpleDateFormat sdf = new SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString("date_format_string"));
-            toStr = sdf.format(enrDate);
-            // TODO l10n dates?
-        }*/
-        //BWP>>8/6/2008
-        /*return thisStudy.getStudySubject().getLabel() + " "  + thisStudy.getStudySubject().getSecondaryLabel() +
-        " " + thisStudy.getStudySubject().getGender() + " " + toStr;*/
+        /*
+         * String toStr = "";
+         * Date enrDate = thisStudy.getStudySubject().getEnrollmentDate();
+         * if (enrDate != null) {
+         * SimpleDateFormat sdf = new
+         * SimpleDateFormat(ResourceBundleProvider.getFormatBundle().getString("date_format_string"));
+         * toStr = sdf.format(enrDate);
+         * // TODO l10n dates?
+         * }
+         */
+        // BWP>>8/6/2008
+        /*
+         * return thisStudy.getStudySubject().getLabel() + " " + thisStudy.getStudySubject().getSecondaryLabel() +
+         * " " + thisStudy.getStudySubject().getGender() + " " + toStr;
+         */
 
-        return  searchString;
+        return searchString;
     }
 
     /*
@@ -245,6 +252,5 @@ public class DisplayStudySubjectEventsRow extends EntityBeanRow {
 
         return answer;
     }
-
 
 }

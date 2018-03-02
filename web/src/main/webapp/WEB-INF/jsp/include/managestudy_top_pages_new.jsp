@@ -26,7 +26,7 @@
   <meta http-equiv="X-UA-Compatible" content="IE=11" />
 
 <title><fmt:message key="openclinica" bundle="${resword}"/></title> 
-<link rel="SHORTCUT ICON" href="images/favicon.ico" type="image/x-icon" />
+<link rel="SHORTCUT ICON" href="images/favicon.png" type="image/x-icon" />
 
 <link rel="stylesheet" href="../../includes/styles.css" type="text/css">
 <script type="text/JavaScript" language="JavaScript" src="../../includes/global_functions_javascript.js"></script>
