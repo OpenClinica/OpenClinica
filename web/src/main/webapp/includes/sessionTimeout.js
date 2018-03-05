@@ -95,7 +95,7 @@ function processUserData(inputPromise) {
             firstLoginCheck = false;
             console.log(" returning to Login screen");
             var params = "";
-            if (prevPageParams != null)
+            if ((typeof prevPageParams != 'undefined')  && (prevPageParams != null))
                 params = "?" + prevPageParams;
             console.log("passing params:" + params);
             window.location.replace(myContextPath + '/pages/logout' + params);
