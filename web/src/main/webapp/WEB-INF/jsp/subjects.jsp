@@ -157,6 +157,19 @@
                             <center>Actions</center>
                         </td>
                     </tr>
+                    <tr valign="top">
+                        {{#each form.itemGroups as |itemGroup|}}
+                            {{#each itemGroup.items as |item|}}
+                                <td class="table_cell"></td>
+                            {{/each}}
+                        {{/each}}
+                        <td class="table_cell">
+                        </td>
+                        <td class="table_cell">
+                        </td>
+                        <td class="table_cell">
+                        </td>
+                    </tr>
                 </thead>
                 <tbody>
                     {{#each form.submissions as |submission|}}
@@ -318,9 +331,6 @@ $(function() {
             });
         });
 
-        window.cols = [];
-        window.colz = [];
-
         var datatables = $('table.datatable');
         datatables.each(function() {
             var table = $(this).DataTable({
@@ -347,10 +357,8 @@ $(function() {
                 }],
                 initComplete: function () {
                     var columns = this.api().columns();
-                    colz.push(columns);
                     columns.every(function() {
                         var column = this;
-                        cols.push(column);
                         if (column.index() == columns.indexes().length - 1)
                             return;
                         var select = $('<select><option value=""></option></select>')
