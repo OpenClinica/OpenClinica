@@ -7,6 +7,10 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -24,7 +28,6 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -33,21 +36,13 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.service.pmanage.Authorization;
-import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
 
 /**
  * @author jxu
  *
- * Removes a study event and all its related event CRFs, items
+ *         Removes a study event and all its related event CRFs, items
  */
 public class RemoveStudyEventServlet extends SecureController {
     /**
@@ -97,6 +92,9 @@ public class RemoveStudyEventServlet extends SecureController {
 
             StudyDAO studydao = new StudyDAO(sm.getDataSource());
             StudyBean study = (StudyBean) studydao.findByPK(studySub.getStudyId());
+            if (study.getParentStudyId() != 0)
+                study.setParentStudyName(((StudyBean) studydao.findByPK(study.getParentStudyId())).getName());
+
             request.setAttribute("study", study);
 
             String action = request.getParameter("action");
@@ -164,13 +162,12 @@ public class RemoveStudyEventServlet extends SecureController {
                     }
                 }
 
-                String emailBody =
-                    respage.getString("the_event") + " " + event.getStudyEventDefinition().getName() + " "
+                String emailBody = respage.getString("the_event") + " " + event.getStudyEventDefinition().getName() + " "
                         + respage.getString("has_been_removed_from_the_subject_record_for") + " " + studySub.getLabel() + " "
                         + respage.getString("in_the_study") + " " + study.getName() + ".";
 
                 addPageMessage(emailBody);
-//                sendEmail(emailBody);
+                // sendEmail(emailBody);
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
