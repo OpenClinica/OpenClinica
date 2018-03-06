@@ -41,5 +41,6 @@ public class SchemaServiceDao {
     }
     public void setConnectionSchemaName(String schemaName) throws Exception {
         ((SessionImpl) getCurrentSession()).connection().setSchema(schemaName);
+        CoreResources.tenantSchema.set(schemaName);
     }
 }

@@ -226,7 +226,10 @@ public class StudyController {
             studyBuildService.updateStudyUserRoles(request, studyBuildService.getUserAccountObject(ub), ub.getActiveStudyId());
             // get the new bean
             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-            ub = (UserAccountBean) userAccountDAO.findByUserUuid(ub.getUserUuid());
+            if (StringUtils.isEmpty(ub.getUserUuid()))
+                ub = (UserAccountBean) userAccountDAO.findByUserName(ub.getName());
+            else
+                ub = (UserAccountBean) userAccountDAO.findByUserUuid(ub.getUserUuid());
             if (!roleValidForStatusChange(ub,currentPublicStudy, 1)){
                 logger.error("User does not have a proper role to do this operation");
                 return new ResponseEntity<Object>("Not permitted.", HttpStatus.FORBIDDEN);

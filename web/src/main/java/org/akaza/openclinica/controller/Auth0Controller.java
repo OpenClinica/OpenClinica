@@ -119,10 +119,14 @@ public class Auth0Controller {
         return urlStr;
     }
 
-    public String buildLogoutURL (String redirectURI) {
+    public String buildLogoutURL (HttpServletRequest req, String redirectURI) {
         String encodedURL = "";
         try {
-            encodedURL = URLEncoder.encode(redirectURI, "UTF-8");
+            String param = "";
+            if (req.getParameter("studyEnvUuid") != null) {
+                param = "?studyEnvUuid=" + req.getParameter("studyEnvUuid");
+            }
+            encodedURL = URLEncoder.encode(redirectURI + param, "UTF-8");
         } catch (UnsupportedEncodingException e) {
             logger.error("Bad redirect URI %s Error message %s", redirectURI, e.getMessage());
         }

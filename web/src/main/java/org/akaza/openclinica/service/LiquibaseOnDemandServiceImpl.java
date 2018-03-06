@@ -8,7 +8,6 @@ import org.akaza.openclinica.core.OCMultiTenantSpringLiquibase;
 import org.akaza.openclinica.core.OCSpringLiquibase;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.user.UserAccount;

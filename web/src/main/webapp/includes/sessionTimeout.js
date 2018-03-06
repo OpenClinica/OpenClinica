@@ -94,7 +94,11 @@ function processUserData(inputPromise) {
         } else if (res === "") {
             firstLoginCheck = false;
             console.log(" returning to Login screen");
-            window.location.replace(myContextPath + '/pages/logout');
+            var params = "";
+            if ((typeof prevPageParams != 'undefined')  && (prevPageParams != null))
+                params = "?" + prevPageParams;
+            console.log("passing params:" + params);
+            window.location.replace(myContextPath + '/pages/logout' + params);
         } else if (res === "-1") {
             firstLoginCheck = false;
             storage.set(currentUser, userName).then(function() {

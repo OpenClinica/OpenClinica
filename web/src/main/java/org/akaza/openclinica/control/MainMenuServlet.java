@@ -236,6 +236,8 @@ public class MainMenuServlet extends SecureController {
         udao.update(ub1);
 
         if (!currentRole.isActive()) {
+            String paramStr = Utils.getParamsString(request.getParameterMap());
+            request.setAttribute("prevPageParams", paramStr);
             forwardPage(Page.CHANGE_STUDY_SERVLET, false);
             return;
         }
