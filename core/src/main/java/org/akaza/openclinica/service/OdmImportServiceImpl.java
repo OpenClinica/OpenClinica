@@ -3,6 +3,8 @@ package org.akaza.openclinica.service;
 import java.io.File;
 import java.io.IOException;
 import java.text.MessageFormat;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -98,7 +100,6 @@ public class OdmImportServiceImpl implements OdmImportService {
     private XformMetaDataService xformService;
     private CoreResources coreResources;
     private EventService eventService;
-
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public OdmImportServiceImpl(DataSource dataSource) {
@@ -329,7 +330,6 @@ public class OdmImportServiceImpl implements OdmImportService {
             }
             publishedVersions = saveOrUpdateCrfAndFormLayouts(crfOid, formLayoutDefs, fmCrfs, userAccount, study, crfName, publishedVersions, errors);
         }
-
         return publishedVersions;
     }
 
@@ -617,6 +617,7 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     public Form[] getAllCrfsByProtIdFromFormManager(String boardId, Errors errors, HttpServletRequest request) {
+        Instant start = Instant.now();
 
         Bucket[] buckets = null;
         ArrayList<Form> forms = null;
@@ -635,6 +636,9 @@ public class OdmImportServiceImpl implements OdmImportService {
             errors.rejectValue("name", "fm_app_error", "No forms found for this board");
 
         }
+        Instant end = Instant.now();
+        logger.info("***** Time execustion for {} method : {}   *****", new Object() {
+        }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
 
         return forms.toArray(new Form[forms.size()]);
     }
@@ -653,15 +657,20 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     public void setPublishedVersionsInFM(Map<String, Object> map, HttpServletRequest request) {
+        Instant start = Instant.now();
         Study study = (Study) map.get("study");
         PublishingDTO dto = (PublishingDTO) map.get("publishingDTO");
         if (dto.getVersionIds().size() != 0) {
             dto.setPublishedEnvType(study.getEnvType());
             setPublishEnvironment(request, dto);
         }
+        Instant end = Instant.now();
+        logger.info("***** Time execustion for {} method : {}  *****", new Object() {
+        }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
     }
 
     private void setPublishEnvironment(HttpServletRequest request, PublishingDTO publishingDTO) {
+        Instant start = Instant.now();
 
         RestTemplate restTemplate = new RestTemplate();
         MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
@@ -677,6 +686,10 @@ public class OdmImportServiceImpl implements OdmImportService {
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
         restTemplate.postForObject(CoreResources.getSBSFieldFormservice() + "/xlsForm/setPublishedEnvironment", entity, PublishingDTO.class);
+        Instant end = Instant.now();
+        logger.info("***** Time execustion for {} method : {}   *****", new Object() {
+        }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
+
     }
 
     private Bucket[] getBucket(HttpServletRequest request, String boardId) {
@@ -700,4 +713,5 @@ public class OdmImportServiceImpl implements OdmImportService {
         ResponseEntity<Bucket[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Bucket[].class);
         return response.getBody();
     }
+
 }

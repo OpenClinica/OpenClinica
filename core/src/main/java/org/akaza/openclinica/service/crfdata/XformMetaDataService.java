@@ -5,6 +5,8 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Date;
@@ -155,7 +157,6 @@ public class XformMetaDataService {
 
     @Transactional
     public FormLayout createCRFMetaData(CrfMetaDataObject cmdObject) throws Exception {
-
         CrfVersion crfVersion = null;
         FormLayout formLayout = null;
         CrfBean crfBean = null;
@@ -210,6 +211,7 @@ public class XformMetaDataService {
             }
         }
         createGroups(cmdObject.container, crfBean, crfVersion, formLayout, section, cmdObject.ub, cmdObject.errors);
+
         return formLayout;
     }
 
@@ -277,7 +279,6 @@ public class XformMetaDataService {
 
             }
         }
-
     }
 
     private ItemGroupMetadata createItemGroupMetadata(Item item, CrfVersion crfVersion, ItemGroup itemGroup, boolean isRepeating, Integer itemOrdinal) {
@@ -367,7 +368,6 @@ public class XformMetaDataService {
             usedItemOids.add(item.getOcOid());
             item = itemDao.saveOrUpdate(item);
         }
-
         return item;
     }
 
@@ -459,8 +459,8 @@ public class XformMetaDataService {
     }
 
     public Set<Long> executeIndividualCrf(ExecuteIndividualCrfObject eicObject, Set<Long> publishedVersions) {
+        Instant start = Instant.now();
         for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : eicObject.formLayoutDefs) {
-
             List<String> fileLinks = null;
             String vForm = "";
             RestTemplate rest = new RestTemplate();
@@ -471,7 +471,12 @@ public class XformMetaDataService {
                         fileLinks = version.getFileLinks();
                         for (String fileLink : fileLinks) {
                             if (fileLink.endsWith(VERSION)) {
+                                Instant start1 = Instant.now();
+
                                 vForm = rest.getForObject(replaceUrlWithServiceGatewayURL(fileLink), String.class);
+                                Instant end1 = Instant.now();
+                                logger.info("***** Time execustion for Reading fileLink {} : {}   *****", fileLink, Duration.between(start1, end1));
+
                                 break;
                             }
                         }
@@ -509,12 +514,15 @@ public class XformMetaDataService {
                 }
             }
         }
+        Instant end = Instant.now();
+        logger.info("***** Time execustion for {} method : {}   *****", new Object() {
+        }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
         return publishedVersions;
     }
 
     public void saveFormMetadata(ExecuteIndividualCrfObject eicObj, FormVersion version, XformContainer container,
             OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef, List<String> fileLinks) {
-
+        Instant start = Instant.now();
         try {
             try {
                 FormLayout formLayout = createCRFMetaData(
@@ -529,12 +537,16 @@ public class XformMetaDataService {
             logger.error("Error encountered while saving CRF: " + e.getMessage());
             logger.error(ExceptionUtils.getStackTrace(e));
         }
+        Instant end = Instant.now();
+        logger.info("***** Time execustion for {} method : {}   *****", new Object() {
+        }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
+
     }
 
     public void saveFormArtifactsInOCDataDirectory(List<String> fileLinks, Study study, String crfOid, String formLayoutOid, FormLayout formLayout)
             throws IOException {
+        Instant start = Instant.now();
         // Create the directory structure for saving the media
-
         String dir = Utils.getFilePath() + Utils.getCrfMediaPath(study.getOc_oid(), study.getFilePath(), crfOid, formLayoutOid);
         if (!new File(dir).exists()) {
             new File(dir).mkdirs();
@@ -549,9 +561,14 @@ public class XformMetaDataService {
             }
             saveAttachedFiles(fileLink, dir, fileName, formLayout);
         }
+        Instant end = Instant.now();
+        logger.info("***** Time execustion for {} method : {}   *****", new Object() {
+        }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
+
     }
 
     public void saveAttachedFiles(String uri, String dir, String fileName, FormLayout formLayout) throws IOException {
+        Instant start = Instant.now();
         RestTemplate restTemplate = new RestTemplate();
         restTemplate.getMessageConverters().add(new ByteArrayHttpMessageConverter());
         HttpHeaders headers = new HttpHeaders();
@@ -575,6 +592,11 @@ public class XformMetaDataService {
                 formLayoutDao.saveOrUpdate(formLayout);
             }
         }
+
+        Instant end = Instant.now();
+        logger.info("***** Time execustion for {} method : {}   *****", new Object() {
+        }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
+        logger.info("Form name:{} version:{} and Filename: {} wrote in OC directory", formLayout.getCrf().getName(), formLayout.getName(), fileName);
     }
 
     private FormLayout populateFormLayout(FormLayout formLayout, CrfBean crfBean, CrfMetaDataObject cmdObject) {
@@ -630,6 +652,7 @@ public class XformMetaDataService {
 
     private void saveMediaFiles(List<String> fileLinks, Study study, String crfOid, FormLayout formLayout) throws IOException {
         // Create the directory structure for saving the media
+        Instant start = Instant.now();
         String dir = Utils.getCrfMediaPath(study.getOc_oid(), study.getFilePath(), crfOid, formLayout.getOcOid());
         for (String fileLink : fileLinks) {
             String fileName = "";
@@ -652,6 +675,9 @@ public class XformMetaDataService {
                 }
             }
         }
+        Instant end = Instant.now();
+        logger.info("***** Time execustion for {} method : {}   *****", new Object() {
+        }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
     }
 
     private String replaceUrlWithServiceGatewayURL(String url) {
@@ -659,4 +685,5 @@ public class XformMetaDataService {
         return updatedURL;
 
     }
+
 }
