@@ -20,6 +20,7 @@ public class XformItem {
     private String itemOid;
     private boolean published = false;
     private List<String> versions;
+    private String mediaType = "";
 
     public String getItemPath() {
         return itemPath;
@@ -155,6 +156,14 @@ public class XformItem {
 
     public void setRelevant(String relevant) {
         this.relevant = relevant;
+    }
+
+    public String getMediaType() {
+        return mediaType;
+    }
+
+    public void setMediaType(String mediaType) {
+        this.mediaType = mediaType;
     }
 
 }
