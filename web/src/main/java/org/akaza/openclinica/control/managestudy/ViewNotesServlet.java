@@ -191,7 +191,7 @@ public class ViewNotesServlet extends SecureController {
         // factory.setResolutionStatusIds(resolutionStatusIds);
         TableFacade tf = factory.createTable(request, response);
 
-        Map<String, Map<String, String>> stats = generateDiscrepancyNotesSummary(factory.getNotesSummaryForQuery());
+        Map<String, Map<String, String>> stats = generateDiscrepancyNotesSummary(factory.getNotesSummary());
         Map<String, String> totalSummary = generateDiscrepancyNotesTotal(stats);
         Map<String, String> totalMap = generateDiscrepancyNotesTotal(generateDiscrepancyNotesSummary(factory.getNotesSummary()));
 
@@ -215,7 +215,7 @@ public class ViewNotesServlet extends SecureController {
         request.setAttribute("mapKeys", ResolutionStatus.getMembers());
         request.setAttribute("typeNames", DiscrepancyNoteUtil.getTypeNames());
         request.setAttribute("typeKeys", totalMap);
-        request.setAttribute("grandTotal", totalSummary.get("Query"));
+        request.setAttribute("grandTotal", grandTotal);
 
         if ("yes".equalsIgnoreCase(fp.getString(PRINT))) {
             List<DiscrepancyNoteBean> allNotes = factory.findAllNotes(tf);

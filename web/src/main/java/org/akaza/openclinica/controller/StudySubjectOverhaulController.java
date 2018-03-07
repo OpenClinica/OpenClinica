@@ -68,6 +68,7 @@ public class StudySubjectOverhaulController {
     private UserAccountDao userAccountDao;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private final String COMMON = "common";
 
     /**
      * Schedule new event Overhaul and add a form to event
@@ -123,6 +124,9 @@ public class StudySubjectOverhaulController {
         StudyEventDefinition studyEventDefinition = studyEventDefintionDao.findByOcOID(studyEventDefinitionOid);
         if (studyEventDefinition == null) {
             logger.error("StudyEventDefinition with Oid {} is null", studyEventDefinition.getOc_oid());
+            return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+        } else if (!studyEventDefinition.getType().equals(COMMON)) {
+            logger.error("StudyEventDefinition with Oid {} is not a Common Type Event", studyEventDefinition.getOc_oid());
             return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
         }
         CrfBean crf = crfDao.findByOcOID(crfOid);
@@ -180,8 +184,12 @@ public class StudySubjectOverhaulController {
             return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
+        // String url = "/EnketoFormServlet?formLayoutId=" + formLayout.getFormLayoutId() + "&studyEventId=" +
+        // studyEvent.getStudyEventId()
+        // + "&eventCrfId=0&originatingPage=ViewStudySubject%3Fid%3D" + studySubject.getStudySubjectId() + "&mode=edit";
+
         String url = "/EnketoFormServlet?formLayoutId=" + formLayout.getFormLayoutId() + "&studyEventId=" + studyEvent.getStudyEventId()
-                + "&eventCrfId=0&originatingPage=ViewStudySubject%3Fid%3D" + studySubject.getStudySubjectId() + "&mode=edit";
+                + "&eventCrfId=0&originatingPage=pages/subjects%3Flabel%3D" + studySubject.getLabel() + "&mode=edit";
 
         obj = new SSOverhaulDTO();
         obj.setUrl(url);
