@@ -73,6 +73,12 @@
 		</sql>
 	</query>
 	<query>
+		<name>findByPublicPK</name>
+		<sql>SELECT s.* FROM public.study s
+			WHERE s.id = ?
+		</sql>
+	</query>
+	<query>
         <name>findByUniqueIdentifier</name>
         <sql>SELECT s.* FROM study s
            WHERE s.unique_identifier = ?

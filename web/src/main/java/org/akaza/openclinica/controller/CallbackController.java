@@ -30,6 +30,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Set;
 
 import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
 
@@ -107,27 +108,19 @@ public class CallbackController {
                 if (JSONUtils.mayBeJSON(state)) {
                     jsonObject = new JSONObject(state);
 
+                    Set<String> keySet = jsonObject.keySet();
                     Object newJSON;
-                    try {
-                        newJSON = jsonObject.get("studyEnvUuid");
-                        logger.debug(newJSON.toString());
-                        param = "?studyEnvUuid=" + newJSON.toString();
-                    } catch (JSONException e) {
-                        logger.debug("studyEnvUuid is not in the state");
-                    }
+                    for (String key : keySet) {
+                        logger.debug(key);
+                        newJSON = jsonObject.get(key);
 
-                    try {
-                        newJSON = jsonObject.get("forceRenewAuth");
-                        logger.debug(newJSON.toString());
                         if (StringUtils.isEmpty(param))
                             param += "?";
                         else
                             param += "&";
-                        param += "forceRenewAuth=" + newJSON.toString();
-                    } catch (JSONException e) {
-                        logger.debug("forceRenewAuth is not in the state");
-                    }
+                        param += key + "=" + newJSON.toString();
 
+                    }
                 }
                 if (returnTo == null) returnTo = this.redirectOnSuccess;
                 logger.debug("CallbackController returnTo URL:%%%%%%%%" + returnTo);

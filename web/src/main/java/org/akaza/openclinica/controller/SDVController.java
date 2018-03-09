@@ -20,6 +20,7 @@ import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -28,6 +29,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
@@ -155,7 +157,12 @@ public class SDVController {
     }
 
     @RequestMapping("/viewAllSubjectSDVtmp")
-    public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId, @RequestParam(value = "sdv_restore", required = false) String restore, HttpServletResponse response) {
+    public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId,
+                                          @RequestParam(value = "sdv_restore", required = false) String restore,
+                                          HttpServletResponse response) {
+
+        request.setAttribute("studyId", studyId);
+        HttpSession session = request.getSession();
 
         if(!mayProceed(request)){
             try{
@@ -166,15 +173,12 @@ public class SDVController {
             return null;
         }
         
-        UserAccountBean userBean = (UserAccountBean)request.getSession().getAttribute("userBean");
-        StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
 
         ResourceBundleProvider.updateLocale(LocaleResolver.getLocale(request));
         // Reseting the side info panel set by SecureControler Mantis Issue: 8680.
         // Todo need something to reset panel from all the Spring Controllers
         StudyInfoPanel panel = new StudyInfoPanel();
         panel.reset();
-        HttpSession session = request.getSession();
         request.getSession().setAttribute("panel", panel);
 
         ModelMap gridMap = new ModelMap();
@@ -194,10 +198,10 @@ public class SDVController {
             showMoreLink = true;
         }
         
-        if (request.getParameter("studyJustChanged") != null) request.setAttribute("studyJustChanged", request.getParameter("studyJustChanged"));
+        if (request.getParameter("studyJustChanged") != null)
+            request.setAttribute("studyJustChanged", request.getParameter("studyJustChanged"));
         request.setAttribute("showMoreLink", showMoreLink+"");
         session.setAttribute("sdv_showMoreLink", showMoreLink+"");
-        request.setAttribute("studyId", studyId);
         //String restore = (String)request.getAttribute("sdv_restore");
         restore = restore != null && restore.length()>0 ? restore : "false";
         request.setAttribute("sdv_restore", restore);
@@ -606,7 +610,19 @@ public class SDVController {
     }
 
 	 private boolean mayProceed(HttpServletRequest request) {
-        StudyUserRoleBean currentRole = (StudyUserRoleBean)request.getSession().getAttribute("userRole");
+        HttpSession session = request.getSession();
+        StudyUserRoleBean currentRole = (StudyUserRoleBean)session.getAttribute("userRole");
+         UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
+
+         if (currentRole == null || currentRole.getId() <= 0) {
+             if (ub.getId() > 0) {
+                 currentRole = ub.getRoleByStudy(ub.getActiveStudyId());
+                 session.setAttribute("userRole", currentRole);
+             }
+         }
+         if (currentRole == null || currentRole.getId() <= 0) {
+             logger.error("No role found for user:" + ub.getName());
+         }
         Role r = currentRole.getRole();
 
         if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR)) {
