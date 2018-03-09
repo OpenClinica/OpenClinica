@@ -120,16 +120,16 @@ public class ODMClinicaDataResource {
             includeDN = true;
         if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
             includeAudit = true;
-        int userId = ((UserAccountBean) request.getSession().getAttribute("userBean")).getId();
+        UserAccountBean userAccountBean = ((UserAccountBean) request.getSession().getAttribute("userBean"));
         XMLSerializer xmlSerializer = new XMLSerializer();
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId()),
                 clinical);
         if (report.getClinicalDataMap() == null)
             return null;
 
-        report.createOdmXml(true, clinical);
+        report.createOdmXml(true, clinical, getDataSource());
         // xmlSerializer.setForceTopLevelObject(true);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -245,7 +245,7 @@ public class ODMClinicaDataResource {
                         formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
                 clinical);
 
-        report.createOdmXml(true, clinical);
+        report.createOdmXml(true, clinical, getDataSource());
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();

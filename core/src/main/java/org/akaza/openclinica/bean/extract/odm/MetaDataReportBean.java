@@ -94,17 +94,6 @@ public class MetaDataReportBean extends OdmXmlReportBean {
 
     private static String nls = System.getProperty("line.separator");
 
-    /**
-     * has not been implemented yet
-     */
-    @Override
-    public void createOdmXml(boolean isDataset, boolean enketo) {
-        // this.addHeading();
-        // this.addRootStartLine();
-        // addNodeStudy();
-        // this.addRootEndLine();
-    }
-
     public void createChunkedOdmXml(boolean isDataset) {
         this.addHeading();
         this.addRootStartLine();
@@ -1477,4 +1466,16 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         temp = "<MeasurementUnitRef MeasurementUnitOID=\"" + StringEscapeUtils.escapeXml(muRefOid) + "\"/>";
         return temp;
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.akaza.openclinica.bean.extract.odm.OdmXmlReportBean#createOdmXml(boolean)
+     */
+    @Override
+    public void createOdmXml(boolean isDataset) {
+        // TODO Auto-generated method stub
+
+    }
+
 }

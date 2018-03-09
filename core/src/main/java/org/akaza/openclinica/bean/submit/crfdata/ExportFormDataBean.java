@@ -9,6 +9,10 @@
 
 package org.akaza.openclinica.bean.submit.crfdata;
 
+import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.FormLayout;
+
 /**
  * OpenClinica form attributes have been included in addition to ODM FormData
  * attributes
@@ -21,8 +25,11 @@ public class ExportFormDataBean extends FormDataBean {
     private String interviewerName;
     private String interviewDate;
     private String status;
-    private String formLayout;
+    private String formLayoutName;
     private String formName;
+    private FormLayout formLayout;
+    private EventCrf eventCrf;
+    private EventDefinitionCrf eventDefinitionCrf;
 
     public ExportFormDataBean() {
         super();
@@ -60,12 +67,12 @@ public class ExportFormDataBean extends FormDataBean {
         return this.status;
     }
 
-    public String getFormLayout() {
-        return formLayout;
+    public String getFormLayoutName() {
+        return formLayoutName;
     }
 
-    public void setFormLayout(String formLayout) {
-        this.formLayout = formLayout;
+    public void setFormLayoutName(String formLayoutName) {
+        this.formLayoutName = formLayoutName;
     }
 
     public String getFormName() {
@@ -74,6 +81,30 @@ public class ExportFormDataBean extends FormDataBean {
 
     public void setFormName(String formName) {
         this.formName = formName;
+    }
+
+    public FormLayout getFormLayout() {
+        return formLayout;
+    }
+
+    public void setFormLayout(FormLayout formLayout) {
+        this.formLayout = formLayout;
+    }
+
+    public EventCrf getEventCrf() {
+        return eventCrf;
+    }
+
+    public void setEventCrf(EventCrf eventCrf) {
+        this.eventCrf = eventCrf;
+    }
+
+    public EventDefinitionCrf getEventDefinitionCrf() {
+        return eventDefinitionCrf;
+    }
+
+    public void setEventDefinitionCrf(EventDefinitionCrf eventDefinitionCrf) {
+        this.eventDefinitionCrf = eventDefinitionCrf;
     }
 
 }

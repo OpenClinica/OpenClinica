@@ -12,6 +12,8 @@ package org.akaza.openclinica.bean.submit.crfdata;
 import java.util.ArrayList;
 import java.util.List;
 
+import org.akaza.openclinica.domain.datamap.StudySubject;
+
 /**
  * OpenClinica subject attributes have been included in addition to ODM
  * SubjectData attributes
@@ -27,6 +29,7 @@ public class ExportSubjectDataBean extends SubjectDataBean {
     private Integer yearOfBirth;
     private String dateOfBirth;
     private String subjectGender;
+    private StudySubject studySubject;
 
     private String enrollmentDate = "";
     
@@ -111,11 +114,20 @@ public class ExportSubjectDataBean extends SubjectDataBean {
         return this.subjectGroupData;
     }
 
-	public String getEnrollmentDate() {
-		return enrollmentDate;
-	}
+    public String getEnrollmentDate() {
+        return enrollmentDate;
+    }
 
-	public void setEnrollmentDate(String enrollmentDate) {
-		this.enrollmentDate = enrollmentDate;
-	}
+    public void setEnrollmentDate(String enrollmentDate) {
+        this.enrollmentDate = enrollmentDate;
+    }
+
+    public StudySubject getStudySubject() {
+        return studySubject;
+    }
+
+    public void setStudySubject(StudySubject studySubject) {
+        this.studySubject = studySubject;
+    }
+
 }
