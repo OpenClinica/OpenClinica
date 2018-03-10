@@ -131,8 +131,35 @@
 
     </c:otherwise>
 </c:choose>
+<c:choose>
+	<c:when
+		test="${from =='listSubject' && userBean.sysAdmin && module=='admin'}">
+		<p>
+			<a style="text-decoration: none"
+				href="ViewSubject?id=<c:out value="${subject.id}"/>"><fmt:message
+					key="go_back_to_view_subject" bundle="${resword}" /></a>
+		</p>
+	</c:when>
+	<c:otherwise>
 
-        <a id="excl_studySubjectRecord_open" href="javascript:leftnavExpand('studySubjectRecord'); leftnavExpand('excl_studySubjectRecord_open'); leftnavExpand('excl_studySubjectRecord_closed');" style="text-decoration: none; display: all;">
+		<c:choose>
+			<c:when test="${(userRole.manageStudy)&& module=='manage'}">
+				<p>
+					<a style="text-decoration: none" href="ListStudySubject"><fmt:message
+							key="go_back_to_study_subject_list" bundle="${resword}" /></a>
+				</p>
+			</c:when>
+			<c:otherwise>
+				<p>
+					<a href="ListStudySubjects" style="text-decoration: none"><fmt:message
+							key="go_back_to_subject_list" bundle="${resword}" /></a>
+				</p>
+			</c:otherwise>
+		</c:choose>
+	</c:otherwise>
+</c:choose>
+
+<a id="excl_studySubjectRecord_open" href="javascript:leftnavExpand('studySubjectRecord'); leftnavExpand('excl_studySubjectRecord_open'); leftnavExpand('excl_studySubjectRecord_closed');" style="text-decoration: none; display: all;">
             <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/>
         </a>
         <a id="excl_studySubjectRecord_closed" href="javascript:leftnavExpand('studySubjectRecord'); leftnavExpand('excl_studySubjectRecord_open'); leftnavExpand('excl_studySubjectRecord_closed');" style="text-decoration: none; display: none;">
@@ -605,14 +632,6 @@
         </c:otherwise>
     </c:choose>
 
-        <a name="global">
-            <a id="excl_globalRecord_open" style="text-decoration: none; display: all;" href="javascript:leftnavExpand('globalRecord'); leftnavExpand('excl_globalRecord_open'); leftnavExpand('excl_globalRecord_close');">
-                <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="global_subject_record" bundle="${resword}"/>
-            </a>
-            <a id="excl_globalRecord_close" style="text-decoration: none; display: none;" href="javascript:leftnavExpand('globalRecord'); leftnavExpand('excl_globalRecord_open'); leftnavExpand('excl_globalRecord_close');">
-                <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="global_subject_record" bundle="${resword}"/>
-            </a>
-        </a>
     </div>
 
 <div id="globalRecord" style="display:none">
@@ -889,22 +908,7 @@
 
 <jsp:include page="studySubject/casebookGenerationForm.jsp"/>
 
-<c:choose>
-<c:when test="${from =='listSubject' && userBean.sysAdmin && module=='admin'}">
-<p> <a style="text-decoration: none" href="ViewSubject?id=<c:out value="${subject.id}"/>" ><fmt:message key="go_back_to_view_subject" bundle="${resword}"/></a>  </p>
-</c:when>
-<c:otherwise>
 
-<c:choose>
-<c:when test="${(userRole.manageStudy)&& module=='manage'}">
-<p> <a style="text-decoration: none" href="ListStudySubject"><fmt:message key="go_back_to_study_subject_list" bundle="${resword}"/></a>  </p>
-</c:when>
-<c:otherwise>
-<p><a href="ListStudySubjects" style="text-decoration: none"><fmt:message key="go_back_to_subject_list" bundle="${resword}"/></a>  </p>
-</c:otherwise>
-</c:choose>
-</c:otherwise>
-</c:choose>
 <!-- End Main Content Area -->
 
 <jsp:include page="../include/footer.jsp"/>
