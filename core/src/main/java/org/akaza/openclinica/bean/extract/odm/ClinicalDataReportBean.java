@@ -159,6 +159,70 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     }
                     xml.append("\">");
                     xml.append(nls);
+
+                    // ***************** OpenClinica:Links**************
+                    StudySubject studySubject = sub.getStudySubject();
+                    Study study = studySubject.getStudy();
+                    StudyEvent studyEvent = se.getStudyEvent();
+                    HttpServletRequest request = CoreResources.getRequest();
+                    UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+
+                    StudyBean studyBean = CoreResources.getPublicStudy(study.getOc_oid(), dataSource);
+                    StudyUserRoleBean userRole = userBean.getRoleByStudy(studyBean.getId());
+                    if (userRole == null || !userRole.isActive())
+                        userRole = userBean.getRoleByStudy(studyBean.getParentStudyId());
+                    Role role = userRole.getRole();
+                    if (se.getExportFormData().size() != 0) {
+                        xml.append(indent + indent + indent + indent + "<OpenClinica:links>");
+                        xml.append(nls);
+
+                        // ***************** OpenClinica:Link REMOVE EVENT **************
+                        if (studyEvent.getStatusId() != Status.DELETED.getCode() && studyEvent.getStatusId() != Status.AUTO_DELETED.getCode()) {
+                            if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR)) && studySubject.getStatus().equals(Status.AVAILABLE)
+                                    && study.getStatus().equals(Status.AVAILABLE)) {
+                                String removeUrl = "/RemoveStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
+                                        + studySubject.getStudySubjectId();
+                                xml.append(indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"remove\" href=\""
+                                        + StringEscapeUtils.escapeXml(removeUrl) + "\"");
+                                xml.append("/>");
+                                xml.append(nls);
+
+                            }
+                        } else {
+                            // ***************** OpenClinica:Link RESTORE EVENT **************
+                            // userRole.manageStudy &&
+                            if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR)) && studySubject.getStatus().equals(Status.AVAILABLE)
+                                    && study.getStatus().equals(Status.AVAILABLE)) {
+                                String restoreUrl = "/RestoreStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
+                                        + studySubject.getStudySubjectId();
+                                xml.append(indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"restore\" href=\""
+                                        + StringEscapeUtils.escapeXml(restoreUrl) + "\"");
+                                xml.append("/>");
+                                xml.append(nls);
+                            }
+                        }
+
+                        // ***************** OpenClinica:Link SIGN EVENT **************
+
+                        if (role.equals(Role.INVESTIGATOR)
+                                && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.COMPLETED.getCode()
+                                        || studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode()
+                                        || studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode())
+                                && studySubject.getStatus().equals(Status.AVAILABLE) && study.getStatus().equals(Status.AVAILABLE)) {
+                            String signUrl = "/UpdateStudyEvent?action=submit&event_id=" + studyEvent.getStudyEventId() + "&ss_id="
+                                    + studySubject.getStudySubjectId() + "&statusId=8";
+
+                            xml.append(indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"sign\" href=\""
+                                    + StringEscapeUtils.escapeXml(signUrl) + "\"");
+                            xml.append("/>");
+                            xml.append(nls);
+                        }
+
+                        xml.append(indent + indent + indent + indent + "</OpenClinica:links>");
+                        xml.append(nls);
+                    }
+                    // ***************** OpenClinica:Links**************
+
                     //
                     ArrayList<ExportFormDataBean> forms = se.getExportFormData();
                     for (ExportFormDataBean form : forms) {
@@ -208,20 +272,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             xml.append(nls);
 
                             // ***************** OpenClinica:Links**************
-                            StudySubject studySubject = sub.getStudySubject();
-                            Study study = studySubject.getStudy();
-                            StudyEvent studyEvent = se.getStudyEvent();
                             EventCrf eventCrf = form.getEventCrf();
                             FormLayout formLayout = form.getFormLayout();
                             EventDefinitionCrf eventDefinitionCrf = form.getEventDefinitionCrf();
-                            HttpServletRequest request = CoreResources.getRequest();
-                            UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-
-                            StudyBean studyBean = CoreResources.getPublicStudy(study.getOc_oid(), dataSource);
-                            StudyUserRoleBean userRole = userBean.getRoleByStudy(studyBean.getId());
-                            if (userRole == null || !userRole.isActive())
-                                userRole = userBean.getRoleByStudy(studyBean.getParentStudyId());
-                            Role role = userRole.getRole();
 
                             xml.append(indent + indent + indent + indent + indent + "<OpenClinica:links>");
                             xml.append(nls);
@@ -298,30 +351,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 xml.append(nls);
 
                             }
-                            // ***************** OpenClinica:Link SIGN EVENT **************
-                            /*
-                             * if (role.equals(Role.INVESTIGATOR)
-                             * && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.COMPLETED.getCode()
-                             * || studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode()
-                             * || studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode())
-                             * && studySubject.getStatus().equals(Status.AVAILABLE) &&
-                             * study.getStatus().equals(Status.AVAILABLE)) {
-                             * String signUrl = "/UpdateStudyEvent?action=submit&event_id=" +
-                             * studyEvent.getStudyEventId() + "&ss_id="
-                             * + studySubject.getStudySubjectId()
-                             * +
-                             * "&startDate=26-Feb-2018&startHour=-1&startMinute=-1&startHalf=&endDate=&endHour=-1&endMinute=-1&endHalf=&statusId=8";
-                             * 
-                             * xml.append(indent + indent + indent + indent + indent + indent +
-                             * "<OpenClinica:link rel=\"sign\" href=\""
-                             * + StringEscapeUtils.escapeXml(signUrl) + "\"");
-                             * xml.append("/>");
-                             * xml.append(nls);
-                             * }
-                             */
+
                             xml.append(indent + indent + indent + indent + indent + "</OpenClinica:links>");
                             xml.append(nls);
-                            // ***************** OpenClinica:Links**************
+                            // *****************END of OpenClinica:Links**************
 
                             //
                             ArrayList<ImportItemGroupDataBean> igs = form.getItemGroupData();
