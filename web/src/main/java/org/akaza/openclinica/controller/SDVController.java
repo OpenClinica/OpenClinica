@@ -612,17 +612,16 @@ public class SDVController {
 	 private boolean mayProceed(HttpServletRequest request) {
         HttpSession session = request.getSession();
         StudyUserRoleBean currentRole = (StudyUserRoleBean)session.getAttribute("userRole");
-         UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
-
-         if (currentRole == null || currentRole.getId() <= 0) {
-             if (ub.getId() > 0) {
-                 currentRole = ub.getRoleByStudy(ub.getActiveStudyId());
-                 session.setAttribute("userRole", currentRole);
-             }
-         }
-         if (currentRole == null || currentRole.getId() <= 0) {
+        UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
+        if (currentRole == null || currentRole.getId() <= 0) {
+            if (ub.getId() > 0) {
+             currentRole = ub.getRoleByStudy(ub.getActiveStudyId());
+             session.setAttribute("userRole", currentRole);
+            }
+        }
+        if (currentRole == null || currentRole.getId() <= 0) {
              logger.error("No role found for user:" + ub.getName());
-         }
+        }
         Role r = currentRole.getRole();
 
         if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.MONITOR)) {
