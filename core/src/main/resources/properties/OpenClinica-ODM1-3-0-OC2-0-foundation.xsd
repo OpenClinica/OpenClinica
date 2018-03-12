@@ -182,7 +182,7 @@
 		<xs:attributeGroup ref="EventDefinitionDetailsAttributeExtension"/>
 	</xs:complexType>
 	
-	<xs:complexType name="OCodmComplexTypeDefinition-SectionDetailsDefinition">
+	<xs:complexType name="OCodmComplexTypeDefinition-SectionDetails">
 		<xs:sequence>
 		<xs:element ref="Section" minOccurs="1" maxOccurs="unbounded"/>
 		<xs:group ref="SectionDetailsElementExtension" minOccurs="0" maxOccurs="unbounded" />
@@ -196,7 +196,7 @@
 	</xs:complexType>
 	<xs:complexType name="OCodmComplexTypeDefinition-FormDetails">
 		<xs:sequence>
-			<xs:element ref="SectionDetailsDefinition" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element ref="SectionDetails" minOccurs="1" maxOccurs="unbounded"/>
 			<xs:element name="VersionDescription" type="odm:text" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="RevisionNotes" type="odm:text" minOccurs="0" maxOccurs="1"/>
 			<xs:element ref="PresentInEventDefinition" minOccurs="1" maxOccurs="unbounded"/>
