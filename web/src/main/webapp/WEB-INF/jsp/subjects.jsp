@@ -96,8 +96,13 @@
         padding-top: 0.5em;
         padding-left: 1.5em;
     }
-    td.highlight {
+    tr:hover, td.highlight {
         background-color: whitesmoke !important;
+    }
+    input[type=button][disabled], input[type=button][disabled]:hover {
+        background-color: lightgray;
+        background-image: none;
+        color: gray;
     }
 }
 </style>
@@ -137,7 +142,7 @@
         {{#each forms as |form|}}
         <tr>
             <td colspan="3" valign="top">
-                <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}">
+                <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{{form.disabled}}}>
                 <h3 class="form-name">{{form.[@Name]}}</h3>
                 <table border="0" cellpadding="0" cellspacing="0" class="datatable">
                 <thead>
@@ -194,9 +199,6 @@
                                             <td><a href="RemoveEventCRF?action=confirm&amp;id=3&amp;studySubId=1" onmousedown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');" onmouseup="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span name="bt_Remove1" class="icon icon-cancel" border="0" alt="Remove" title="Remove" align="left" hspace="6"></span></a>
                                             </td>
                                             <td>
-                                                <a href="DeleteEventCRF?action=confirm&amp;ssId=1&amp;ecId=3" onmousedown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');" onmouseup="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"><span name="bt_Delete1" class="icon icon-trash red" border="0" alt="Delete" title="Delete" align="left" hspace="6"></span></a>
-                                            </td>
-                                            <td>
                                                 <a href="pages/managestudy/chooseCRFVersion?crfId=2&amp;crfName=Medications&amp;formLayoutId=2&amp;formLayoutName=1&amp;studySubjectLabel=GOGO&amp;studySubjectId=1&amp;eventCRFId=3&amp;eventDefinitionCRFId=2" onmousedown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');" onmouseup="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><span name="Reassign" class="icon icon-icon-reassign3" border="0" alt="Reassign CRF to a New Version" title="Reassign CRF to a New Version" align="left" hspace="6"></span></a>
                                             </td>
                                         </tr>
@@ -233,13 +235,22 @@ $(function() {
             return x.length ? x : [x];
         return [];
     }
-    $.get('..${jsonPath}', function(data) {
+    $.get('../rest/clinicaldata/json/view/${studyOid}/${studySubjectOid}/*/*', function(data) {
+        var studyOid = data.ClinicalData['@StudyOID'];
+        var studySubjectOid = data.ClinicalData.SubjectData['@SubjectKey'];
+
         var studyEvents = {};
         var forms = {};
         var itemGroups = {};
         var items = {};
 
-        var metadata = data.Study.MetaDataVersion;
+        var metadata;
+        for (var i=0, studies=collection(data.Study); i<studies.length; i++) {
+            if (studies[i]['@OID'] === '${studyOid}') {
+                metadata = studies[i].MetaDataVersion;
+                break;
+            }
+        }        
         collection(metadata.ItemDef).forEach(function(item) {
             items[item['@OID']] = item;
         });
@@ -264,8 +275,13 @@ $(function() {
             forms[form['@OID']] = form;
         });
         collection(metadata.StudyEventDef).forEach(function(studyEvent) {
-            studyEvent.forms = collection(studyEvent.FormRef).map(function(ref) {
-                return forms[ref['@FormOID']];
+            studyEvent.forms = collection(studyEvent.FormRef).filter(function(ref) {
+                return ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'No';
+            }).map(function(ref) {
+                var form = forms[ref['@FormOID']];
+                form.studyEvent = studyEvent;
+                form.disabled = '';
+                return form;
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
@@ -279,6 +295,9 @@ $(function() {
             if (!form)
                 return;
 
+            if (form.studyEvent['@Repeating'] === 'No')
+                form.disabled = 'disabled="disabled"';
+
             var submission = {
                 status: studyEvent['@OpenClinica:Status'],
                 data: $.extend(true, {}, form.submissionObj)
@@ -291,13 +310,12 @@ $(function() {
             form.submissions.push(submission);
         });
 
-        var studyOid = data.ClinicalData['@StudyOID'];
-        var studySubjectOid = data.ClinicalData.SubjectData['@SubjectKey'];
-
         var sectionTable = $('#sections');
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
+            if (studyEvent['@OpenClinica:EventType'] !== 'Common')
+                continue;
             sectionTable.append(sectionTmpl({
                 sectionName: studyEvent['@Name'],
                 studyEventOid: studyEventId,
@@ -359,7 +377,7 @@ $(function() {
                     var columns = this.api().columns();
                     columns.every(function() {
                         var column = this;
-                        if (column.index() == columns.indexes().length - 1)
+                        if (column.index() === columns.indexes().length - 1)
                             return;
                         var select = $('<select><option value=""></option></select>')
                             .prependTo($(column.header()))
@@ -372,7 +390,6 @@ $(function() {
                                     .draw();
                             });
                         column.data().unique().sort().each(function(val, index, api) {
-                            console.log(select);
                             select.append('<option value="' + val + '">' + val + '</option>');
                         });
                     });

@@ -75,11 +75,7 @@ public class Auth0Controller {
         JSONObject json = null;
         for (Map.Entry<String, String[]> entry : request.getParameterMap().entrySet()) {
             switch ((entry.getKey())) {
-                case "studyEnvUuid":
-                    if (json == null)
-                        json = new JSONObject();
-                    json.put(entry.getKey(), entry.getValue()[0]);
-                    break;
+
                 case "forceRenewAuth":
                     if (json == null)
                         json = new JSONObject();
@@ -99,6 +95,9 @@ public class Auth0Controller {
                     }
                     break;
                 default:
+                    if (json == null)
+                        json = new JSONObject();
+                    json.put(entry.getKey(), entry.getValue()[0]);
                     break;
             }
         };

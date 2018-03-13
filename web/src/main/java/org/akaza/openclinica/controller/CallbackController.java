@@ -2,12 +2,11 @@ package org.akaza.openclinica.controller;
 
 import com.auth0.IdentityVerificationException;
 import com.auth0.InvalidRequestException;
-import com.auth0.SessionUtils;
 import com.auth0.Tokens;
 import com.auth0.jwt.JWT;
-import com.auth0.jwt.JWTVerifier;
 import com.auth0.jwt.interfaces.DecodedJWT;
 import net.sf.json.util.JSONUtils;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.config.TokenAuthentication;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
@@ -15,7 +14,6 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.Auth0User;
 import org.akaza.openclinica.service.CallbackService;
 import org.apache.commons.lang.StringUtils;
-import org.json.JSONException;
 import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -26,10 +24,10 @@ import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.Set;
 
 import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
 
@@ -90,8 +88,8 @@ public class CallbackController {
                     if (userAccountHelper.isUpdated()) {
                         ub = callbackService.getUpdatedUser(ub);
                     }
-                    req.getSession().removeAttribute("userRole");
                     req.getSession().setAttribute(USER_BEAN_NAME, ub);
+                    refreshUserRole(req, ub);
                     logger.debug("Setting firstLoginCheck to true");
                     req.getSession().setAttribute("firstLoginCheck", "true");
                     logger.debug("CallbackController set firstLoginCheck to true:%%%%%%%%");
@@ -107,29 +105,22 @@ public class CallbackController {
                 if (JSONUtils.mayBeJSON(state)) {
                     jsonObject = new JSONObject(state);
 
+                    Set<String> keySet = jsonObject.keySet();
                     Object newJSON;
-                    try {
-                        newJSON = jsonObject.get("studyEnvUuid");
-                        logger.debug(newJSON.toString());
-                        param = "?studyEnvUuid=" + newJSON.toString();
-                    } catch (JSONException e) {
-                        logger.debug("studyEnvUuid is not in the state");
-                    }
+                    for (String key : keySet) {
+                        logger.debug(key);
+                        newJSON = jsonObject.get(key);
 
-                    try {
-                        newJSON = jsonObject.get("forceRenewAuth");
-                        logger.debug(newJSON.toString());
                         if (StringUtils.isEmpty(param))
                             param += "?";
                         else
                             param += "&";
-                        param += "forceRenewAuth=" + newJSON.toString();
-                    } catch (JSONException e) {
-                        logger.debug("forceRenewAuth is not in the state");
-                    }
+                        param += key + "=" + newJSON.toString();
 
+                    }
                 }
-                if (returnTo == null) returnTo = this.redirectOnSuccess;
+                if (StringUtils.isEmpty(returnTo) || StringUtils.equals(returnTo, "/OpenClinica"))
+                    returnTo = this.redirectOnSuccess;
                 logger.debug("CallbackController returnTo URL:%%%%%%%%" + returnTo);
                 res.sendRedirect(returnTo + param);
             }
@@ -142,6 +133,12 @@ public class CallbackController {
             SecurityContextHolder.clearContext();
             res.sendRedirect(redirectOnFail);
         }
+    }
+
+    private void refreshUserRole(HttpServletRequest req, UserAccountBean ub) {
+        StudyUserRoleBean roleByStudy = ub.getRoleByStudy(ub.getActiveStudyId());
+        req.getSession().setAttribute("userRole", roleByStudy);
+
     }
     private void unauthorized(HttpServletResponse response, String message) throws IOException {
         response.setHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
