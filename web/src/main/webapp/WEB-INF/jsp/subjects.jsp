@@ -96,7 +96,7 @@
         padding-top: 0.5em;
         padding-left: 1.5em;
     }
-    td.highlight {
+    tr:hover, td.highlight {
         background-color: whitesmoke !important;
     }
 }
@@ -194,9 +194,6 @@
                                             <td><a href="RemoveEventCRF?action=confirm&amp;id=3&amp;studySubId=1" onmousedown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');" onmouseup="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span name="bt_Remove1" class="icon icon-cancel" border="0" alt="Remove" title="Remove" align="left" hspace="6"></span></a>
                                             </td>
                                             <td>
-                                                <a href="DeleteEventCRF?action=confirm&amp;ssId=1&amp;ecId=3" onmousedown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');" onmouseup="javascript:setImage('bt_Delete1','images/bt_Delete.gif');"><span name="bt_Delete1" class="icon icon-trash red" border="0" alt="Delete" title="Delete" align="left" hspace="6"></span></a>
-                                            </td>
-                                            <td>
                                                 <a href="pages/managestudy/chooseCRFVersion?crfId=2&amp;crfName=Medications&amp;formLayoutId=2&amp;formLayoutName=1&amp;studySubjectLabel=GOGO&amp;studySubjectId=1&amp;eventCRFId=3&amp;eventDefinitionCRFId=2" onmousedown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');" onmouseup="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><span name="Reassign" class="icon icon-icon-reassign3" border="0" alt="Reassign CRF to a New Version" title="Reassign CRF to a New Version" align="left" hspace="6"></span></a>
                                             </td>
                                         </tr>
@@ -234,12 +231,15 @@ $(function() {
         return [];
     }
     $.get('..${jsonPath}', function(data) {
+        var studyOid = data.ClinicalData['@StudyOID'];
+        var studySubjectOid = data.ClinicalData.SubjectData['@SubjectKey'];
+
         var studyEvents = {};
         var forms = {};
         var itemGroups = {};
         var items = {};
 
-        var metadata = data.Study.MetaDataVersion;
+        var metadata = collection(data.Study)[0].MetaDataVersion;
         collection(metadata.ItemDef).forEach(function(item) {
             items[item['@OID']] = item;
         });
@@ -264,7 +264,10 @@ $(function() {
             forms[form['@OID']] = form;
         });
         collection(metadata.StudyEventDef).forEach(function(studyEvent) {
-            studyEvent.forms = collection(studyEvent.FormRef).map(function(ref) {
+            studyEvent.forms = collection(studyEvent.FormRef).filter(function(ref) {
+                console.log(ref['OpenClinica:ConfigurationParameters']['@HideCRF']);
+                return ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'No';
+            }).map(function(ref) {
                 return forms[ref['@FormOID']];
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
@@ -291,13 +294,12 @@ $(function() {
             form.submissions.push(submission);
         });
 
-        var studyOid = data.ClinicalData['@StudyOID'];
-        var studySubjectOid = data.ClinicalData.SubjectData['@SubjectKey'];
-
         var sectionTable = $('#sections');
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
+            if (studyEvent['@OpenClinica:EventType'] !== 'Common')
+                continue;
             sectionTable.append(sectionTmpl({
                 sectionName: studyEvent['@Name'],
                 studyEventOid: studyEventId,
@@ -372,7 +374,6 @@ $(function() {
                                     .draw();
                             });
                         column.data().unique().sort().each(function(val, index, api) {
-                            console.log(select);
                             select.append('<option value="' + val + '">' + val + '</option>');
                         });
                     });
