@@ -127,6 +127,7 @@
         <property name="userAccountDao" ref="userDaoDomain"/>
         <property name="studyUserRoleDao" ref="studyUserRoleDao"/>        
         <property name="itemGroupDao" ref="itemGroupDao"/>
+        <property name="eventDefinitionCrfDao" ref="eventDefinitionCrfDao"/>
         <property name="itemDao" ref="itemDao"/>
     </bean>
 

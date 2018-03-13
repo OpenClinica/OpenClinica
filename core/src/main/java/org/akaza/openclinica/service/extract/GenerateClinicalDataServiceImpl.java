@@ -24,6 +24,7 @@ import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
 import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
 import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -93,6 +94,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
     private StudyUserRoleDao studyUserRoleDao;
     private ItemDao itemDao;
     private ItemGroupDao itemGroupDao;
+    private EventDefinitionCrfDao eventDefinitionCrfDao;
 
     public AuditLogEventDao getAuditEventDAO() {
         return auditEventDAO;
@@ -228,6 +230,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
                 subjGrpDataBean.setStudyGroupName(subjGrpMap.getStudyGroup().getName());
                 exportSubjectDataBean.getSubjectGroupData().add(subjGrpDataBean);
             }
+            exportSubjectDataBean.setStudySubject(studySubj);
             exportSubjectDataBean.setStudySubjectId(studySubj.getLabel());
             if (studySubj.getSubject().getUniqueIdentifier() != null)
                 exportSubjectDataBean.setUniqueIdentifier(studySubj.getSubject().getUniqueIdentifier());
@@ -276,7 +279,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
         for (StudyEvent se : sEvents) {
             if (se != null) {
                 ExportStudyEventDataBean expSEBean = new ExportStudyEventDataBean();
-
+                expSEBean.setStudyEvent(se);
                 expSEBean.setLocation(se.getLocation());
                 if (se.getDateEnd() != null) {
                     if (se.getEndTimeFlag()) {
@@ -324,7 +327,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
         boolean hiddenCrfCheckPassed = true;
         List<CrfBean> hiddenCrfs = new ArrayList<CrfBean>();
         for (EventCrf ecrf : se.getEventCrfs()) {
-
+            EventDefinitionCrf eventDefinitionCrf = null;
             List<EventDefinitionCrf> edcs = se.getStudyEventDefinition().getEventDefinitionCrfs();
             hiddenCrfCheckPassed = true;
             int siteId = 0;
@@ -340,6 +343,17 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
                 if (hiddenCrfs.contains(ecrf.getCrfVersion().getCrf())) {
                     hiddenCrfCheckPassed = false;
                 }
+                eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+                        se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
+
+                if (eventDefinitionCrf == null) {
+                    eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+                            se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudy().getStudyId());
+                }
+
+            } else {
+                eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+                        se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
 
             }
 
@@ -353,6 +367,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
                 }
                 if (formCheck) {
                     ExportFormDataBean dataBean = new ExportFormDataBean();
+
+                    dataBean.setEventDefinitionCrf(eventDefinitionCrf);
+                    dataBean.setEventCrf(ecrf);
+                    dataBean.setFormLayout(ecrf.getFormLayout());
                     dataBean.setFormName(ecrf.getCrfVersion().getCrf().getName());
                     dataBean.setItemGroupData(
                             fetchItemData(ecrf.getCrfVersion().getItemGroupMetadatas(), ecrf.getEventCrfId(), ecrf.getCrfVersion().getVersioningMaps(), ecrf));
@@ -369,7 +387,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
                     UserAccount updatedUserAccount = userAccountDao.findById(ecrf.getUpdateId());
                     dataBean.setUpdatedBy(updatedUserAccount.getUserName());
                     if (ecrf.getFormLayout().getName() != null)
-                        dataBean.setFormLayout(ecrf.getFormLayout().getName());
+                        dataBean.setFormLayoutName(ecrf.getFormLayout().getName());
                     if (collectAudits)
                         dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(), "event_crf", ecrf.getCrfVersion().getCrf().getOcOid(), null));
                     if (collectDns)
@@ -828,10 +846,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
         LOGGER.debug("Entering the URL with " + studyOID + ":" + studySubjectOID + ":" + studyEventOID + ":" + formVersionOID + ":DNS:" + collectDNs
                 + ":Audits:" + collectAudit);
         LOGGER.info("Determining the generic paramters...");
-        Study study = getStudyDao().findByOcOID(studyOID);
+        StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOID);
+        Study study = studySubject.getStudy();
         int parentStudyId = 0;
         int studyId = study.getStudyId();
-        Study publicStudy = getStudyDao().findPublicStudy(studyOID);
+        Study publicStudy = getStudyDao().findPublicStudy(study.getOc_oid());
 
         if (publicStudy.getStudy() != null) {
             isActiveRoleAtSite = true;
@@ -972,6 +991,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
     public void setItemGroupDao(ItemGroupDao itemGroupDao) {
         this.itemGroupDao = itemGroupDao;
+    }
+
+    public EventDefinitionCrfDao getEventDefinitionCrfDao() {
+        return eventDefinitionCrfDao;
+    }
+
+    public void setEventDefinitionCrfDao(EventDefinitionCrfDao eventDefinitionCrfDao) {
+        this.eventDefinitionCrfDao = eventDefinitionCrfDao;
     }
 
 }

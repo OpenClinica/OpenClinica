@@ -54,7 +54,7 @@ public abstract class OdmXmlReportBean {
         sasFormatValidator.setUniqueNameTable(this.uniqueNameTable);
     }
 
-    public abstract void createOdmXml(boolean isDataset, boolean enketo);
+    public abstract void createOdmXml(boolean isDataset);
 
     public void addHeading() {
         xmlOutput.append(this.xmlHeading);

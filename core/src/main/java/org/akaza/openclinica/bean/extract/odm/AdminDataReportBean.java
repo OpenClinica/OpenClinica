@@ -45,13 +45,6 @@ public class AdminDataReportBean extends OdmXmlReportBean {
 
     private static String nls = System.getProperty("line.separator");
 
-    /**
-     * has not been implemented yet
-     */
-    @Override
-    public void createOdmXml(boolean isDataset, boolean clinical) {
-    }
-
     public void createChunkedOdmXml(boolean isDataset) {
         String ODMVersion = this.getODMVersion();
         if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
@@ -148,4 +141,16 @@ public class AdminDataReportBean extends OdmXmlReportBean {
     public void setAdminData(OdmAdminDataBean adminData) {
         this.adminData = adminData;
     }
+
+    /*
+     * (non-Javadoc)
+     * 
+     * @see org.akaza.openclinica.bean.extract.odm.OdmXmlReportBean#createOdmXml(boolean)
+     */
+    @Override
+    public void createOdmXml(boolean isDataset) {
+        // TODO Auto-generated method stub
+
+    }
+
 }
