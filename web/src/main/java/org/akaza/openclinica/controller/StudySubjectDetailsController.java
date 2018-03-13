@@ -38,8 +38,8 @@ public class StudySubjectDetailsController {
 
         StudyBean study = (StudyBean) request.getSession().getAttribute("study");
         StudySubject studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(label, studyDao.findByOcOID(study.getOid()));
-        modelMap.addAttribute("xmlPath", "/rest/clinicaldata/xml/view/" + study.getOid() + "/" + studySubject.getOcOid() + "/*/*");
-        modelMap.addAttribute("jsonPath", "/rest/clinicaldata/json/view/" + study.getOid() + "/" + studySubject.getOcOid() + "/*/*");
+        modelMap.addAttribute("studyOid", study.getOid());
+        modelMap.addAttribute("studySubjectOid", studySubject.getOcOid());
         return modelMap;
     }
 }

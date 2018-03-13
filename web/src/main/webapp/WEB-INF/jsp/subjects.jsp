@@ -230,7 +230,7 @@ $(function() {
             return x.length ? x : [x];
         return [];
     }
-    $.get('..${jsonPath}', function(data) {
+    $.get('../rest/clinicaldata/json/view/${studyOid}/${studySubjectOid}/*/*', function(data) {
         var studyOid = data.ClinicalData['@StudyOID'];
         var studySubjectOid = data.ClinicalData.SubjectData['@SubjectKey'];
 
@@ -239,7 +239,13 @@ $(function() {
         var itemGroups = {};
         var items = {};
 
-        var metadata = collection(data.Study)[0].MetaDataVersion;
+        var metadata;
+        for (var i=0, studies=collection(data.Study); i<studies.length; i++) {
+            if (studies[i]['@OID'] == '${studyOid}') {
+                metadata = studies[i].MetaDataVersion;
+                break;
+            }
+        }        
         collection(metadata.ItemDef).forEach(function(item) {
             items[item['@OID']] = item;
         });
@@ -265,7 +271,6 @@ $(function() {
         });
         collection(metadata.StudyEventDef).forEach(function(studyEvent) {
             studyEvent.forms = collection(studyEvent.FormRef).filter(function(ref) {
-                console.log(ref['OpenClinica:ConfigurationParameters']['@HideCRF']);
                 return ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'No';
             }).map(function(ref) {
                 return forms[ref['@FormOID']];
