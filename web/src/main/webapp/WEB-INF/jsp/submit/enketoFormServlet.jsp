@@ -30,6 +30,26 @@
     console.log("Firstr time first:" + firstLoginCheck);
     var currentUser = "currentUser";
     var appName = "RT";
+
+    function isEdge() {
+        var ua = window.navigator.userAgent;
+        var edge = ua.indexOf('Edge/');
+        if (edge > 0) {
+           // Edge (IE 12+) => return version number
+           return parseInt(ua.substring(edge + 5, ua.indexOf('.', edge)), 10);
+        }
+        // other browser
+        return false;
+    }
+
+    // working around for bug favicon on edge(https://jira.openclinica.com/browse/OC-8814)
+    if (isEdge()) {
+        var link = document.querySelector("link[rel*='shortcut icon']") || document.createElement('link');
+        link.type = 'image/x-icon';
+        link.rel = 'shortcut icon';
+        link.href = 'https://www.openclinica.com/wp-content/uploads/favicon192.png';
+        document.getElementsByTagName('head')[0].appendChild(link);
+    }
 </script>
 
 <head>
