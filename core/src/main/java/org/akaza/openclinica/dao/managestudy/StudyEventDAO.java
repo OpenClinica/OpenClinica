@@ -612,7 +612,10 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
             sb.setActive(true);
         }
 
-        if (!oldStudyEventBean.getStudyEventDefinition().getType().equals(COMMON) && !oldStudyEventBean.getStudyEventDefinition().getType().equals(COMMON)) {
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO<>(ds);
+        StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(oldStudyEventBean.getStudyEventDefinitionId());
+
+        if (!sed.getType().equals(COMMON) && !sed.getType().equals(COMMON)) {
             StudyEventChangeDetails changeDetails = new StudyEventChangeDetails();
             if (oldStudyEventBean.getDateStarted().compareTo(sb.getDateStarted()) != 0)
                 changeDetails.setStartDateChanged(true);
