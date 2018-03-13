@@ -103,11 +103,18 @@ public class ODMClinicaDataResource {
     public String getODMClinicaldata(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
             @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
             @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
-            @Context HttpServletRequest request, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData) {
+            @Context HttpServletRequest request, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData,
+            @QueryParam("showArchived") String showArchived) {
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
         boolean clinical = false;
+        boolean archived = false;
+
+        if (showArchived != null && (showArchived.equalsIgnoreCase("no") || showArchived.equalsIgnoreCase("n")))
+            archived = false;
+        if (showArchived != null && (showArchived.equalsIgnoreCase("yes") || showArchived.equalsIgnoreCase("y")))
+            archived = true;
 
         if (clinicalData.equalsIgnoreCase("no") || clinicalData.equalsIgnoreCase("n"))
             clinical = false;
@@ -127,7 +134,7 @@ public class ODMClinicaDataResource {
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                         formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId()),
-                clinical);
+                clinical, archived);
         if (report.getClinicalDataMap() == null)
             return null;
 
@@ -216,11 +223,18 @@ public class ODMClinicaDataResource {
     public String getODMMetadata(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
             @PathParam("studySubjectIdentifier") String studySubjectIdentifier, @PathParam("studyEventOID") String studyEventOID,
             @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
-            @Context HttpServletRequest request, String userAccountID, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData) {
+            @Context HttpServletRequest request, String userAccountID, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData,
+            @QueryParam("showArchived") String showArchived) {
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
         boolean clinical = false;
+        boolean archived = false;
+
+        if (showArchived != null && (showArchived.equalsIgnoreCase("no") || showArchived.equalsIgnoreCase("n")))
+            archived = false;
+        if (showArchived != null && (showArchived.equalsIgnoreCase("yes") || showArchived.equalsIgnoreCase("y")))
+            archived = true;
 
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -246,7 +260,7 @@ public class ODMClinicaDataResource {
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                         formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
-                clinical);
+                clinical, archived);
 
         report.createOdmXml(true, clinical, getDataSource(), userBean);
         LOGGER.debug(report.getXmlOutput().toString().trim());

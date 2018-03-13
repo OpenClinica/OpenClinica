@@ -18,6 +18,7 @@ package org.akaza.openclinica.bean.odmbeans;
 public class ElementDefBean extends ElementOIDBean {
     private String name;
     private String repeating;
+    private String status;
 
     public void setName(String name) {
         this.name = name;
@@ -34,4 +35,13 @@ public class ElementDefBean extends ElementOIDBean {
     public String getRepeating() {
         return this.repeating;
     }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
 }
