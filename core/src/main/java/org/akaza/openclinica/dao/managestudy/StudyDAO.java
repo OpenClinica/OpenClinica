@@ -393,6 +393,25 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
 
     }
 
+    public StudyBean findByPublicPK(int id) {
+        StudyBean sb = null;
+        this.unsetTypeExpected();
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), id);
+        ArrayList alist = this.select(digester.getQuery("findByPublicPK"), variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            sb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+            return sb;
+        } else {
+            logger.info("returning null from find by oid...");
+            return null;
+        }
+
+    }
+
     public StudyBean findByUniqueIdentifier(String oid) {
         StudyBean sb = null;
         this.unsetTypeExpected();
