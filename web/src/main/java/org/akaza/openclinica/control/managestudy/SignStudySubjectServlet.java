@@ -374,7 +374,7 @@ public class SignStudySubjectServlet extends SecureController {
         table.hideColumnLink(5);
 
         if (!"removed".equalsIgnoreCase(studySub.getStatus().getName()) && !"auto-removed".equalsIgnoreCase(studySub.getStatus().getName())) {
-            table.addLink(resword.getString("add_new_event"),
+            table.addLink(resword.getString("add_new"),
                     "CreateNewStudyEvent?" + CreateNewStudyEventServlet.INPUT_STUDY_SUBJECT_ID_FROM_VIEWSUBJECT + "=" + studySub.getId());
         }
 

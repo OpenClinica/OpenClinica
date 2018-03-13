@@ -16,6 +16,7 @@ import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.slf4j.Logger;
@@ -121,6 +122,7 @@ public class ODMClinicaDataResource {
         if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
             includeAudit = true;
         UserAccountBean userAccountBean = ((UserAccountBean) request.getSession().getAttribute("userBean"));
+
         XMLSerializer xmlSerializer = new XMLSerializer();
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
@@ -129,7 +131,7 @@ public class ODMClinicaDataResource {
         if (report.getClinicalDataMap() == null)
             return null;
 
-        report.createOdmXml(true, clinical, getDataSource());
+        report.createOdmXml(true, clinical, getDataSource(), userAccountBean);
         // xmlSerializer.setForceTopLevelObject(true);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -226,6 +228,7 @@ public class ODMClinicaDataResource {
             userId = userBean.getId();
         } else {
             userId = Integer.valueOf(userAccountID);
+            userBean = (UserAccountBean) new UserAccountDAO(dataSource).findByPK(userId);
         }
 
         if (clinicalData.equalsIgnoreCase("no") || clinicalData.equalsIgnoreCase("n"))
@@ -245,7 +248,7 @@ public class ODMClinicaDataResource {
                         formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
                 clinical);
 
-        report.createOdmXml(true, clinical, getDataSource());
+        report.createOdmXml(true, clinical, getDataSource(), userBean);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();

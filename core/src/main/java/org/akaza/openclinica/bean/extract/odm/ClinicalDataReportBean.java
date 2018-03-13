@@ -14,7 +14,6 @@ import java.util.Comparator;
 import java.util.Date;
 import java.util.Locale;
 
-import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.Role;
@@ -56,13 +55,15 @@ import org.springframework.util.StringUtils;
 public class ClinicalDataReportBean extends OdmXmlReportBean {
     private OdmClinicalDataBean clinicalData;
     private DataSource dataSource;
+    private UserAccountBean userBean;
     protected Locale locale = ResourceBundleProvider.getLocale();
     private final String COMMON = "common";
 
-    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource) {
+    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean) {
         super();
         this.clinicalData = clinicaldata;
         this.dataSource = dataSource;
+        this.userBean = userBean;
     }
 
     /**
@@ -164,8 +165,6 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     StudySubject studySubject = sub.getStudySubject();
                     Study study = studySubject.getStudy();
                     StudyEvent studyEvent = se.getStudyEvent();
-                    HttpServletRequest request = CoreResources.getRequest();
-                    UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 
                     StudyBean studyBean = CoreResources.getPublicStudy(study.getOc_oid(), dataSource);
                     StudyUserRoleBean userRole = userBean.getRoleByStudy(studyBean.getId());
