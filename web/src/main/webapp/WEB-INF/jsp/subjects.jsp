@@ -99,6 +99,11 @@
     tr:hover, td.highlight {
         background-color: whitesmoke !important;
     }
+    input[type=button][disabled], input[type=button][disabled]:hover {
+        background-color: lightgray;
+        background-image: none;
+        color: gray;
+    }
 }
 </style>
 
@@ -137,7 +142,7 @@
         {{#each forms as |form|}}
         <tr>
             <td colspan="3" valign="top">
-                <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}">
+                <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{{form.disabled}}}>
                 <h3 class="form-name">{{form.[@Name]}}</h3>
                 <table border="0" cellpadding="0" cellspacing="0" class="datatable">
                 <thead>
@@ -241,7 +246,7 @@ $(function() {
 
         var metadata;
         for (var i=0, studies=collection(data.Study); i<studies.length; i++) {
-            if (studies[i]['@OID'] == '${studyOid}') {
+            if (studies[i]['@OID'] === '${studyOid}') {
                 metadata = studies[i].MetaDataVersion;
                 break;
             }
@@ -273,7 +278,10 @@ $(function() {
             studyEvent.forms = collection(studyEvent.FormRef).filter(function(ref) {
                 return ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'No';
             }).map(function(ref) {
-                return forms[ref['@FormOID']];
+                var form = forms[ref['@FormOID']];
+                form.studyEvent = studyEvent;
+                form.disabled = '';
+                return form;
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
@@ -286,6 +294,9 @@ $(function() {
             var form = forms[formData['@FormOID']];
             if (!form)
                 return;
+
+            if (form.studyEvent['@Repeating'] === 'No')
+                form.disabled = 'disabled="disabled"';
 
             var submission = {
                 status: studyEvent['@OpenClinica:Status'],
@@ -366,7 +377,7 @@ $(function() {
                     var columns = this.api().columns();
                     columns.every(function() {
                         var column = this;
-                        if (column.index() == columns.indexes().length - 1)
+                        if (column.index() === columns.indexes().length - 1)
                             return;
                         var select = $('<select><option value=""></option></select>')
                             .prependTo($(column.header()))
