@@ -320,7 +320,8 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         ArrayList<StudyEventDefBean> seds = (ArrayList<StudyEventDefBean>) odmstudy.getMetaDataVersion().getStudyEventDefs();
         for (StudyEventDefBean sed : seds) {
             xml.append(currentIndent + "<StudyEventDef OID=\"" + StringEscapeUtils.escapeXml(sed.getOid()) + "\"  Name=\""
-                    + StringEscapeUtils.escapeXml(sed.getName()) + "\" Repeating=\"" + sed.getRepeating() + "\" EventType=\"" + sed.getType() + "\">");
+                    + StringEscapeUtils.escapeXml(sed.getName()) + "\" Repeating=\"" + sed.getRepeating() + "\" Type=\"" + sed.getType()
+                    + "\" OpenClinica:EventType=\"" + sed.getType() + "\">");
             xml.append(nls);
             ArrayList<ElementRefBean> formRefs = (ArrayList<ElementRefBean>) sed.getFormRefs();
             for (ElementRefBean formRef : formRefs) {

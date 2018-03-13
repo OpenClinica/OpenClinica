@@ -99,6 +99,7 @@ public class ViewStudySubjectServlet extends SecureController {
     public final static String GENDER_NOTE = "genderNote";
     // request attribute for a discrepancy note
     public final static String ENROLLMENT_NOTE = "enrollmentNote";
+    public final static String COMMON = "common";
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -298,6 +299,14 @@ public class ViewStudySubjectServlet extends SecureController {
             StudySubjectService studySubjectService = (StudySubjectService) WebApplicationContextUtils.getWebApplicationContext(getServletContext())
                     .getBean("studySubjectService");
             List<DisplayStudyEventBean> displayEvents = studySubjectService.getDisplayStudyEventsForStudySubject(studySub, ub, currentRole);
+            List<DisplayStudyEventBean> tempList = new ArrayList<>();
+            for (DisplayStudyEventBean displayEvent : displayEvents) {
+                if (!displayEvent.getStudyEvent().getStudyEventDefinition().getType().equals(COMMON)) {
+                    tempList.add(displayEvent);
+                }
+            }
+            displayEvents = new ArrayList(tempList);
+
             for (int i = 0; i < displayEvents.size(); i++) {
                 DisplayStudyEventBean decb = displayEvents.get(i);
                 if (!(currentRole.isDirector() || currentRole.isCoordinator()) && decb.getStudyEvent().getSubjectEventStatus().isLocked()) {
@@ -316,7 +325,8 @@ public class ViewStudySubjectServlet extends SecureController {
             // date, desc
             ArrayList allEventRows = DisplayStudyEventRow.generateRowsFromBeans(displayEvents);
 
-            String[] columns = { resword.getString("event") + " (" + resword.getString("occurrence_number") + ")", resword.getString("start_date1"), resword.getString("status"), resword.getString("event_actions"), resword.getString("CRFs") };
+            String[] columns = { resword.getString("event") + " (" + resword.getString("occurrence_number") + ")", resword.getString("start_date1"),
+                    resword.getString("status"), resword.getString("event_actions"), resword.getString("CRFs") };
             table.setColumns(new ArrayList(Arrays.asList(columns)));
             table.hideColumnLink(4);
             table.hideColumnLink(5);
