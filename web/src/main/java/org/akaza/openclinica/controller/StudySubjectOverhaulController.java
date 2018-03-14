@@ -184,12 +184,8 @@ public class StudySubjectOverhaulController {
             return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
         }
 
-        // String url = "/EnketoFormServlet?formLayoutId=" + formLayout.getFormLayoutId() + "&studyEventId=" +
-        // studyEvent.getStudyEventId()
-        // + "&eventCrfId=0&originatingPage=ViewStudySubject%3Fid%3D" + studySubject.getStudySubjectId() + "&mode=edit";
-
         String url = "/EnketoFormServlet?formLayoutId=" + formLayout.getFormLayoutId() + "&studyEventId=" + studyEvent.getStudyEventId()
-                + "&eventCrfId=0&originatingPage=pages/subjects%3Flabel%3D" + studySubject.getLabel() + "&mode=edit";
+                + "&eventCrfId=0&originatingPage=ViewStudySubject%3Fid%3D" + studySubject.getStudySubjectId() + "&mode=edit";
 
         obj = new SSOverhaulDTO();
         obj.setUrl(url);
