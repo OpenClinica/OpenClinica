@@ -63,11 +63,19 @@ public class CallbackController {
     private void handle(HttpServletRequest req, HttpServletResponse res) throws Exception {
         try {
             String error = req.getParameter("error");
-            if (error != null && (error.equals("login_required") || error.equals("unauthorized"))) {
-                logger.debug("CallbackController In login_required:%%%%%%%%");
-                res.sendRedirect(controller.buildAuthorizeUrl(req, false /* don't do SSO, SSO already failed */));
+            if (error != null) {
+                if (error.equals("login_required")) {
+                    logger.info("CallbackController In login_required:%%%%%%%%");
+                    res.sendRedirect(controller.buildAuthorizeUrl(req, false /* don't do SSO, SSO already failed */));
+                } else if (error.equals("unauthorized")) {
+                    logger.info("CallbackController In unauthorized:%%%%%%%%");
+                    String smURL = CoreResources.getField("smURL");
+                    int lastIndex = smURL.lastIndexOf('/');
+                    String unauthURl = smURL.substring(0, lastIndex) + "/error-user-deactivated";
+                    res.sendRedirect(unauthURl);
+                }
             } else {
-                logger.debug("CallbackController In not login_required:%%%%%%%%");
+                logger.info("CallbackController In not login_required:%%%%%%%%");
                 Tokens tokens = controller.handle(req);
                 DecodedJWT decodedJWT = JWT.decode(tokens.getAccessToken());
 
@@ -90,9 +98,9 @@ public class CallbackController {
                     }
                     req.getSession().setAttribute(USER_BEAN_NAME, ub);
                     refreshUserRole(req, ub);
-                    logger.debug("Setting firstLoginCheck to true");
+                    logger.info("Setting firstLoginCheck to true");
                     req.getSession().setAttribute("firstLoginCheck", "true");
-                    logger.debug("CallbackController set firstLoginCheck to true:%%%%%%%%");
+                    logger.info("CallbackController set firstLoginCheck to true:%%%%%%%%");
                 } else {
                     logger.error("UserAccountBean ub ");
                     unauthorized(res, "Bad credentials");
@@ -121,7 +129,7 @@ public class CallbackController {
                 }
                 if (StringUtils.isEmpty(returnTo) || StringUtils.equals(returnTo, "/OpenClinica"))
                     returnTo = this.redirectOnSuccess;
-                logger.debug("CallbackController returnTo URL:%%%%%%%%" + returnTo);
+                logger.info("CallbackController returnTo URL:%%%%%%%%" + returnTo);
                 res.sendRedirect(returnTo + param);
             }
         } catch (InvalidRequestException e) {

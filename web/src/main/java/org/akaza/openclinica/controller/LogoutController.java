@@ -50,7 +50,6 @@ public class LogoutController {
 
     @RequestMapping(value="/logoutSuccess", method = RequestMethod.GET)
     protected String logout(final HttpServletRequest request, final HttpServletResponse response) {
-
         int index = request.getRequestURL().indexOf(request.getContextPath());
         String returnURL = request.getRequestURL().substring(0, index)
                 + request.getContextPath() + Page.MENU_SERVLET.getFileName();
@@ -58,6 +57,7 @@ public class LogoutController {
         if (request.getParameter("studyEnvUuid") != null) {
             param = "?studyEnvUuid=" + request.getParameter("studyEnvUuid");
         }
+        logger.info("/logoutSuccess" + returnURL + param);
         return "redirect:" + returnURL + param;
     }
 
