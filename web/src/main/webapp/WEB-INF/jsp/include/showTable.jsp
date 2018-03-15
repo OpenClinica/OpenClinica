@@ -150,7 +150,7 @@
 						
 						<c:choose>
 							<c:when test="${link.caption != 'OpenClinica CRF Library'}">
-								<td class="table_tools"><b><a style="text-decoration: none" href="<c:out value="${link.url}"/>"><c:out value="${link.caption}" /></a></b></td>
+								<td class="table_tools"><a style="text-decoration: none" href="<c:out value="${link.url}"/>"><input type="button" value='<c:out value="${link.caption}" />'></a></td>
 							</c:when>
 							<c:otherwise>
 								<td class="table_tools"><b><a style="text-decoration: none" href="<c:out value="${link.url}"/>" target="_blank"><c:out value="${link.caption}" /></a></b></td>
