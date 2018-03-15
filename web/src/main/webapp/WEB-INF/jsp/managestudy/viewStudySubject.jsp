@@ -483,10 +483,10 @@
 </c:choose>
         <a name="events">
             <a id="excl_subjectEvents_close" href="javascript:leftnavExpand('subjectEvents'); leftnavExpand('excl_subjectEvents_open'); leftnavExpand('excl_subjectEvents_close');" style="text-decoration: none; display: all;">
-                <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="events" bundle="${resword}"/>
+                <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="visit_based_events" bundle="${resword}"/>
             </a>
             <a id="excl_subjectEvents_open" href="javascript:leftnavExpand('subjectEvents'); leftnavExpand('excl_subjectEvents_open'); leftnavExpand('excl_subjectEvents_close');" style="text-decoration: none; display: none;">
-                <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="events" bundle="${resword}"/>
+                <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="visit_based_events" bundle="${resword}"/>
             </a>
         </a>
     </div>
