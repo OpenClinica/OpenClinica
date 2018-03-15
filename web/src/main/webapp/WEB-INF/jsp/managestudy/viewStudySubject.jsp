@@ -100,12 +100,49 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 
-<h1>
+<h1 style="display:inline-block; margin-right:10px;">
     <span class="title_manage">
         <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/>
     </span>
 </h1>
-<br/>
+
+<c:choose>
+   <c:when
+      test="${from =='listSubject' && userBean.sysAdmin && module=='admin'}">
+      <span>
+         <a style="text-decoration: none"
+         href="ViewSubject?id=
+         <c:out value="${subject.id}"/>
+         ">
+         <fmt:message
+            key="go_back_to_view_subject" bundle="${resword}" />
+         </a>
+      </span>
+   </c:when>
+   <c:otherwise>
+      <c:choose>
+         <c:when test="${(userRole.manageStudy)&& module=='manage'}">
+            <span>
+               <a style="text-decoration: none" href="ListStudySubject">
+                  <fmt:message
+                     key="go_back_to_study_subject_list" bundle="${resword}" />
+               </a>
+            </span>
+         </c:when>
+         <c:otherwise>
+            <span>
+               <a href="ListStudySubjects" style="text-decoration: none">
+                  <fmt:message
+                     key="go_back_to_subject_list" bundle="${resword}" />
+               </a>
+            </span>
+         </c:otherwise>
+      </c:choose>
+   </c:otherwise>
+</c:choose>
+
+<br>
+<br>
 
 <%-- <p>
     <a href="#events"><fmt:message key="events" bundle="${resword}"/></a> &nbsp; &nbsp; &nbsp;
@@ -115,57 +152,27 @@
 </p> --%>
 
 <c:choose>
-    <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
-        <div class="table_title_Admin">
-    </c:when>
-    <c:otherwise>
-
-        <c:choose>
-            <c:when test="${userRole.manageStudy}">
-                <div class="table_titla_manage">
-            </c:when>
-            <c:otherwise>
-                <div class="table_title_submit">
-            </c:otherwise>
-        </c:choose>
-
-    </c:otherwise>
+   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
+      <div class="table_title_Admin">
+   </c:when>
+   <c:otherwise>
+      <c:choose>
+         <c:when test="${userRole.manageStudy}">
+            <div class="table_titla_manage">
+         </c:when>
+         <c:otherwise>
+            <div class="table_title_submit">
+         </c:otherwise>
+      </c:choose>
+   </c:otherwise>
 </c:choose>
-<c:choose>
-	<c:when
-		test="${from =='listSubject' && userBean.sysAdmin && module=='admin'}">
-		<p>
-			<a style="text-decoration: none"
-				href="ViewSubject?id=<c:out value="${subject.id}"/>"><fmt:message
-					key="go_back_to_view_subject" bundle="${resword}" /></a>
-		</p>
-	</c:when>
-	<c:otherwise>
-
-		<c:choose>
-			<c:when test="${(userRole.manageStudy)&& module=='manage'}">
-				<p>
-					<a style="text-decoration: none" href="ListStudySubject"><fmt:message
-							key="go_back_to_study_subject_list" bundle="${resword}" /></a>
-				</p>
-			</c:when>
-			<c:otherwise>
-				<p>
-					<a href="ListStudySubjects" style="text-decoration: none"><fmt:message
-							key="go_back_to_subject_list" bundle="${resword}" /></a>
-				</p>
-			</c:otherwise>
-		</c:choose>
-	</c:otherwise>
-</c:choose>
-
 <a id="excl_studySubjectRecord_open" href="javascript:leftnavExpand('studySubjectRecord'); leftnavExpand('excl_studySubjectRecord_open'); leftnavExpand('excl_studySubjectRecord_closed');" style="text-decoration: none; display: all;">
-            <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/>
-        </a>
-        <a id="excl_studySubjectRecord_closed" href="javascript:leftnavExpand('studySubjectRecord'); leftnavExpand('excl_studySubjectRecord_open'); leftnavExpand('excl_studySubjectRecord_closed');" style="text-decoration: none; display: none;">
-            <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/>
-        </a>
-    </div>
+<img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/>
+</a>
+<a id="excl_studySubjectRecord_closed" href="javascript:leftnavExpand('studySubjectRecord'); leftnavExpand('excl_studySubjectRecord_open'); leftnavExpand('excl_studySubjectRecord_closed');" style="text-decoration: none; display: none;">
+<img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/>
+</a>
+</div>
 <div id="studySubjectRecord">
 
 <script type="text/javascript" language="javascript">
