@@ -368,9 +368,12 @@ public class UpdateStudyEventServlet extends SecureController {
             // YW 3-12-2008, 2220 fix
             String strEnd = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
             String strEndScheduled = fp.getDateTimeInputString(INPUT_ENDDATE_PREFIX);
+            String strStartScheduled = fp.getDateTimeInputString(INPUT_STARTDATE_PREFIX);
 
-            v.addValidation(INPUT_STARTDATE_PREFIX, Validator.IS_DATE_TIME);
-            v.alwaysExecuteLastValidation(INPUT_STARTDATE_PREFIX);
+            if (!strStartScheduled.equals("")) {
+                v.addValidation(INPUT_STARTDATE_PREFIX, Validator.IS_DATE_TIME);
+                v.alwaysExecuteLastValidation(INPUT_STARTDATE_PREFIX);
+            }
             if (!strEndScheduled.equals("")) {
                 v.addValidation(INPUT_ENDDATE_PREFIX, Validator.IS_DATE_TIME);
                 v.alwaysExecuteLastValidation(INPUT_ENDDATE_PREFIX);
@@ -676,16 +679,17 @@ public class UpdateStudyEventServlet extends SecureController {
                     presetValues.put(INPUT_STARTDATE_PREFIX + "Minute", new Integer(-1));
                     presetValues.put(INPUT_STARTDATE_PREFIX + "Half", "");
                 }
+
+                // YW >>
+
+                String dateValue = local_df.format(studyEvent.getDateStarted());
+                presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
+
+                // YW 3-12-2008, add end datetime for 2220 fix<<
+                presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", new Integer(-1));
+                presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", new Integer(-1));
+                presetValues.put(INPUT_ENDDATE_PREFIX + "Half", "");
             }
-            // YW >>
-
-            String dateValue = local_df.format(studyEvent.getDateStarted());
-            presetValues.put(INPUT_STARTDATE_PREFIX + "Date", dateValue);
-
-            // YW 3-12-2008, add end datetime for 2220 fix<<
-            presetValues.put(INPUT_ENDDATE_PREFIX + "Hour", new Integer(-1));
-            presetValues.put(INPUT_ENDDATE_PREFIX + "Minute", new Integer(-1));
-            presetValues.put(INPUT_ENDDATE_PREFIX + "Half", "");
             if (studyEvent.getDateEnded() != null) {
                 if (studyEvent.getEndTimeFlag() == true) {
                     Calendar c = new GregorianCalendar();

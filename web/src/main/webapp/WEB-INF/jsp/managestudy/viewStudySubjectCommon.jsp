@@ -1,60 +1,3 @@
-<%@ page contentType="text/html; charset=UTF-8" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
-<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="resmessages"/>
-
-
-<jsp:include page="include/managestudy_top_pages.jsp"/>
-
-<!-- move the alert message to the sidebar-->
-<jsp:include page="include/sideAlert.jsp"/>
-<!-- then instructions-->
-<tr id="sidebar_Instructions_open">
-    <td class="sidebar_tab">
-
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray border="0" align="right" hspace="10"></span></a>
-
-        <fmt:message key="instructions" bundle="${restext}"/>
-
-        <div class="sidebar_tab_content">
-
-            <fmt:message key="design_implement_sdv_study_subject" bundle="${restext}"/>
-
-        </div>
-
-    </td>
-
-</tr>
-<tr id="sidebar_Instructions_closed" style="display: none">
-    <td class="sidebar_tab">
-
-        <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
-
-        <fmt:message key="instructions" bundle="${restext}"/>
-
-    </td>
-</tr>
-<jsp:include page="include/sideInfo.jsp"/>
-<link rel="stylesheet" href="../includes/jmesa/jmesa.css" type="text/css">
-<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js"></script>
-<script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery-migrate-1.1.1.js"></script>
-<script type="text/javascript">
-    function onInvokeAction(id,action) {
-        setExportToLimit(id, '');
-        createHiddenInputFieldsForLimitAndSubmit(id);
-    }
-    function onInvokeExportAction(id) {
-        var parameterString = createParameterStringForLimit(id);
-        //location.href = '${pageContext.request.contextPath}/ViewCRF?module=manage&crfId=' + '${crf.id}&' + parameterString;
-    }
-</script>
-
 <style>
     .section {
         background-color: #f1f1f1;
@@ -235,7 +178,7 @@ $(function() {
             return x.length ? x : [x];
         return [];
     }
-    $.get('../rest/clinicaldata/json/view/${studyOid}/${studySubjectOid}/*/*', function(data) {
+    $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*', function(data) {
         var studyOid = data.ClinicalData['@StudyOID'];
         var studySubjectOid = data.ClinicalData.SubjectData['@SubjectKey'];
 
@@ -246,7 +189,7 @@ $(function() {
 
         var metadata;
         for (var i=0, studies=collection(data.Study); i<studies.length; i++) {
-            if (studies[i]['@OID'] === '${studyOid}') {
+            if (studies[i]['@OID'] === '${study.oid}') {
                 metadata = studies[i].MetaDataVersion;
                 break;
             }
@@ -420,6 +363,3 @@ $(function() {
     });
 });
 </script>
-<jsp:include page="include/footer.jsp"/>
-</body>
-</html>
