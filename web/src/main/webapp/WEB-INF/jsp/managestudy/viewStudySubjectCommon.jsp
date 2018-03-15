@@ -47,6 +47,21 @@
         background-image: none;
         color: gray;
     }
+    .actions .icon:before {
+        content: "\f1234";
+    }
+    .actions .icon.icon-remove:before {
+        content: "\e816";
+    }
+    .actions .icon.icon-edit:before {
+        content: "\f14c";
+    }
+    .actions .icon.icon-view:before {
+        content: "\e813";
+    }
+    .actions .icon.icon-reassign:before {
+        content: "\e92f";
+    }
 }
 </style>
 
@@ -131,19 +146,13 @@
                                 <table border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
                                         <tr valign="top">
+                                            {{#each submission.links as |link|}}
                                             <td>
-                                                <a href="EnketoFormServlet?formLayoutId=2&amp;studyEventId=3&amp;eventCrfId=3&amp;originatingPage=ViewStudySubject%3Fid%3D1&amp;mode=edit" onmousedown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');" onmouseup="javascript:setImage('bt_EnterData1','images/bt_EnterData.gif');">
-                                                <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="Administrative Editing" title="Administrative Editing" align="left" hspace="6">
+                                                <a href="${pageContext.request.contextPath}{{link.[@href]}}">
+                                                <span class="icon icon-{{link.[@rel]}}" border="0" alt="{{link.[@rel]}}" title="{{link.[@rel]}}" align="left" hspace="6">
                                                 </span></a>
                                             </td>
-                                            <td>
-                                                <a href="EnketoFormServlet?formLayoutId=2&amp;studyEventId=3&amp;eventCrfId=3&amp;originatingPage=ViewStudySubject%3Fid%3D1&amp;mode=view" onmousedown="javascript:setImage('bt_View1','images/bt_View_d.gif');" onmouseup="javascript:setImage('bt_View1','images/bt_View.gif');"><span name="bt_View1" class="icon icon-search" border="0" alt="View" title="View" align="left" hspace="6"></span></a>
-                                            </td>
-                                            <td><a href="RemoveEventCRF?action=confirm&amp;id=3&amp;studySubId=1" onmousedown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');" onmouseup="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span name="bt_Remove1" class="icon icon-cancel" border="0" alt="Remove" title="Remove" align="left" hspace="6"></span></a>
-                                            </td>
-                                            <td>
-                                                <a href="pages/managestudy/chooseCRFVersion?crfId=2&amp;crfName=Medications&amp;formLayoutId=2&amp;formLayoutName=1&amp;studySubjectLabel=GOGO&amp;studySubjectId=1&amp;eventCRFId=3&amp;eventDefinitionCRFId=2" onmousedown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');" onmouseup="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><span name="Reassign" class="icon icon-icon-reassign3" border="0" alt="Reassign CRF to a New Version" title="Reassign CRF to a New Version" align="left" hspace="6"></span></a>
-                                            </td>
+                                            {{/each}}
                                         </tr>
                                     </tbody>
                                 </table>
@@ -241,9 +250,15 @@ $(function() {
             if (form.studyEvent['@Repeating'] === 'No')
                 form.disabled = 'disabled="disabled"';
 
+            var links = [];
+            $.merge(links, collection(studyEvent['OpenClinica:links']['OpenClinica:link']));
+            $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
+            console.log(links);
+
             var submission = {
                 status: studyEvent['@OpenClinica:Status'],
-                data: $.extend(true, {}, form.submissionObj)
+                data: $.extend(true, {}, form.submissionObj),
+                links: links
             };
             collection(formData.ItemGroupData).forEach(function(igd) {
                 collection(igd.ItemData).forEach(function(item) {
