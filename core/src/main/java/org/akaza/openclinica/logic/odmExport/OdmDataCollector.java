@@ -38,6 +38,8 @@ public abstract class OdmDataCollector {
     protected DataSource ds;
     protected DatasetBean dataset;
     private ODMBean odmbean;
+    protected boolean showArchived;
+
     // key is study/site oc_oid.
     private LinkedHashMap<String, OdmStudyBase> studyBaseMap;
     // 0: one Study Element; 1: one parent study and its sites
@@ -48,9 +50,14 @@ public abstract class OdmDataCollector {
     public OdmDataCollector() {
     }
 
+    public OdmDataCollector(DataSource ds, StudyBean study, boolean showArchived) {
+        this(ds, study);
+        this.showArchived = showArchived;
+    }
+
     /**
      * Constructor for an ODM XML file containing information of the passed
-     * StudyBean. If it is a site, 
+     * StudyBean. If it is a site,
      * only contains information of this site. If it is a study,
      * contains information of this study and its sites if appliable.
      * 
@@ -63,60 +70,54 @@ public abstract class OdmDataCollector {
             logger.info("DataSource is null!");
             return;
         }
-        if(study == null)
-        	    	createFakeStudyObj();
-       
-        else{
-        	
-	        if (study.getId() < 1) {
-	            logger.info("There is no study.");
-	            return;
-	        }
-	        dataset = new DatasetBean();
-	        odmbean = new ODMBean();
-	
-	        if(study!=null)
-	        { 
-		        if (study.isSite(study.getParentStudyId())) {
-		            this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
-		            this.studyBaseMap.put(study.getOid(), new OdmStudyBase(ds, study));
-		            this.category = 0;
-		        } else {
-		            int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
-		            this.studyBaseMap = populateCompletedStudyBaseMap(parentStudyId);
-		            category = 1;
-		        }
-	        }
+        if (study == null)
+            createFakeStudyObj();
+
+        else {
+
+            if (study.getId() < 1) {
+                logger.info("There is no study.");
+                return;
+            }
+            dataset = new DatasetBean();
+            odmbean = new ODMBean();
+
+            if (study != null) {
+                if (study.isSite(study.getParentStudyId())) {
+                    this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
+                    this.studyBaseMap.put(study.getOid(), new OdmStudyBase(ds, study));
+                    this.category = 0;
+                } else {
+                    int parentStudyId = study.getParentStudyId() > 0 ? study.getParentStudyId() : study.getId();
+                    this.studyBaseMap = populateCompletedStudyBaseMap(parentStudyId);
+                    category = 1;
+                }
+            }
         }
     }
 
-    
-    
-    private void createFakeStudyObj()
-    {
+    private void createFakeStudyObj() {
         dataset = new DatasetBean();
         odmbean = new ODMBean();
-        
-    	StudyBean studyBean = new StudyBean();
-    	studyBean.setName(MetadataUnit.FAKE_STUDY_NAME);
-    	studyBean.setOid(MetadataUnit.FAKE_STUDY_OID);
-    	studyBean.setParentStudyId(0);
-    	StudyEventDefinitionBean sedFake =  new StudyEventDefinitionBean();
-    	sedFake.setName(MetadataUnit.FAKE_SE_NAME);
-    	sedFake.setOid(MetadataUnit.FAKE_STUDY_EVENT_OID);
-    	
-    	
-    	List<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
-    	seds.add(sedFake);
-    	
-    	
-    	LinkedHashMap<String, OdmStudyBase> Bases = new LinkedHashMap<String, OdmStudyBase>();
-    	Bases.put(studyBean.getOid(),new OdmStudyBase(ds, studyBean,seds));
-        //this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
+
+        StudyBean studyBean = new StudyBean();
+        studyBean.setName(MetadataUnit.FAKE_STUDY_NAME);
+        studyBean.setOid(MetadataUnit.FAKE_STUDY_OID);
+        studyBean.setParentStudyId(0);
+        StudyEventDefinitionBean sedFake = new StudyEventDefinitionBean();
+        sedFake.setName(MetadataUnit.FAKE_SE_NAME);
+        sedFake.setOid(MetadataUnit.FAKE_STUDY_EVENT_OID);
+
+        List<StudyEventDefinitionBean> seds = new ArrayList<StudyEventDefinitionBean>();
+        seds.add(sedFake);
+
+        LinkedHashMap<String, OdmStudyBase> Bases = new LinkedHashMap<String, OdmStudyBase>();
+        Bases.put(studyBean.getOid(), new OdmStudyBase(ds, studyBean, seds));
+        // this.studyBaseMap = new LinkedHashMap<String, OdmStudyBase>();
         this.studyBaseMap = Bases;
 
-    	
     }
+
     /**
      * Constructor for dataset of current study. If current study is a site,
      * only contains information of this site. If current study is a study,
@@ -144,10 +145,7 @@ public abstract class OdmDataCollector {
             category = 1;
         }
     }
-    
-    
-    
-   
+
     /**
      * Populate a HashMap<String, OdmStudyBase> of a study and its sites if
      * appliable, the key is study/site oc_oid.
@@ -178,8 +176,6 @@ public abstract class OdmDataCollector {
         return Bases;
     }
 
-    public abstract void collectFileData();
-
     /**
      * Create an ODMBean with default ODMBean properties.
      * 
@@ -203,15 +199,15 @@ public abstract class OdmDataCollector {
         int hours = offset / 3600000;
         int minutes = (offset - hours * 3600000) / 60000;
         DecimalFormat twoDigits = new DecimalFormat("00");
-        if(dataset.getId()>0) {
+        if (dataset.getId() > 0) {
             odmbean.setFileOID(this.dataset.getName() + "D" + new SimpleDateFormat("yyyyMMddHHmmssZ").format(creationDatetime));
             odmbean.setDescription(this.dataset.getDescription().trim());
         } else {
-            odmbean.setFileOID( "Study-Meta"+ "D" + new SimpleDateFormat("yyyyMMddHHmmssZ").format(creationDatetime));
+            odmbean.setFileOID("Study-Meta" + "D" + new SimpleDateFormat("yyyyMMddHHmmssZ").format(creationDatetime));
             odmbean.setDescription("Study Metadata");
         }
-        odmbean.setCreationDateTime(new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss" + sign + twoDigits.format(hours) + ":" + twoDigits.format(minutes))
-                .format(creationDatetime));
+        odmbean.setCreationDateTime(
+                new SimpleDateFormat("yyyy-MM-dd'T'HH:mm:ss" + sign + twoDigits.format(hours) + ":" + twoDigits.format(minutes)).format(creationDatetime));
 
     }
 
@@ -261,5 +257,13 @@ public abstract class OdmDataCollector {
 
     public void setCategory(int category) {
         this.category = category;
+    }
+
+    /**
+     * 
+     */
+    public void collectFileData() {
+        // TODO Auto-generated method stub
+
     }
 }

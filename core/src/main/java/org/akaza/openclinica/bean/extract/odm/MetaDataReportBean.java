@@ -310,12 +310,12 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         for (StudyEventDefBean sed : seds) {
             xml.append(currentIndent + "<StudyEventDef OID=\"" + StringEscapeUtils.escapeXml(sed.getOid()) + "\"  Name=\""
                     + StringEscapeUtils.escapeXml(sed.getName()) + "\" Repeating=\"" + sed.getRepeating() + "\" Type=\"" + sed.getType()
-                    + "\" OpenClinica:EventType=\"" + sed.getType() + "\">");
+                    + "\" OpenClinica:EventType=\"" + sed.getType() + "\" OpenClinica:Status=\"" + sed.getStatus() + "\">");
             xml.append(nls);
             ArrayList<ElementRefBean> formRefs = (ArrayList<ElementRefBean>) sed.getFormRefs();
             for (ElementRefBean formRef : formRefs) {
                 xml.append(currentIndent + indent + "<FormRef FormOID=\"" + StringEscapeUtils.escapeXml(formRef.getElementDefOID()) + "\" Mandatory=\""
-                        + formRef.getMandatory() + "\">");
+                        + formRef.getMandatory() + "\" OpenClinica:Status=\"" + formRef.getStatus() + "\">");
                 xml.append(nls);
                 ConfigurationParameters conf = formRef.getConfigurationParameters();
                 if (conf != null) {

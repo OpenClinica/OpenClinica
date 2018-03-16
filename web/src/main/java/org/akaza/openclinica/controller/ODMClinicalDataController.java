@@ -37,12 +37,13 @@ public class ODMClinicalDataController {
             @PathVariable("studyEventOID") String studyEventOID, @PathVariable("studySubjectIdentifier") String studySubjectIdentifier,
             @RequestParam(value = "includeDNs", defaultValue = "n", required = false) String includeDns,
             @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request,
-            @RequestParam(value = "clinicalData", defaultValue = "n", required = false) String clinicalData) throws Exception {
+            @RequestParam(value = "clinicalData", defaultValue = "n", required = false) String clinicalData,
+            @RequestParam(value = "showArchived", defaultValue = "n", required = false) String showArchived) throws Exception {
 
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
         String result = odmClinicaDataResource.getODMClinicaldata(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
-                request, clinicalData);
+                request, clinicalData, showArchived);
         ObjectMapper objectMapper = new ObjectMapper();
         return objectMapper.readTree(result);
 

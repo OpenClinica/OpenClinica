@@ -36,10 +36,16 @@ public class OdmUnit {
     private String parentOdmStudyOid; // ODM Study element OID
     // 0: one Study Element; 1: one parent study and its sites
     private int category;
+    protected boolean showArchived;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public OdmUnit() {
+    }
+
+    public OdmUnit(DataSource ds, boolean showArchived) {
+        this.ds = ds;
+        this.showArchived = showArchived;
     }
 
     public OdmUnit(DataSource ds, StudyBean study, int category) {
@@ -53,9 +59,14 @@ public class OdmUnit {
         this.category = category;
     }
 
+    public OdmUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, boolean showArchived) {
+        this(ds, dataset, odmBean, study, category);
+        this.showArchived = showArchived;
+    }
+
     public OdmUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category) {
         this.ds = ds;
-        this.dataset = dataset.getId()>0 ? dataset : new DatasetBean();
+        this.dataset = dataset.getId() > 0 ? dataset : new DatasetBean();
         this.studyBase = new OdmStudyBase(this.ds, study);
         this.odmBean = odmBean;
         nullValueMap = initialNullValueMap();

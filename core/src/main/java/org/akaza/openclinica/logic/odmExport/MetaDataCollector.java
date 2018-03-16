@@ -31,7 +31,7 @@ import org.akaza.openclinica.job.JobTerminationMonitor;
  * site(s). <br>
  * In this case, Include element can reference to both internal and external
  * MetadataVersion. ODM fields in dataset table are for the study. For site(s),
- * siteOID will be appended automatically. </li>
+ * siteOID will be appended automatically.</li>
  * </ul>
  *
  * @author ywang (May, 2009)
@@ -41,25 +41,31 @@ public class MetaDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmStudyBean> odmStudyMap;
     private static int textLength = 4000;
     private RuleSetRuleDao ruleSetRuleDao;
-
     // protected final Logger logger =
     // LoggerFactory.getLogger(getClass().getName());
 
-    public MetaDataCollector(DataSource ds, StudyBean study,RuleSetRuleDao ruleSetRuleDao) {
-        super(ds, study);
+    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao, boolean showArchived) {
+        super(ds, study, showArchived);
         this.ruleSetRuleDao = ruleSetRuleDao;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
     }
 
-    public MetaDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy,RuleSetRuleDao ruleSetRuleDao) {
+    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao) {
+        super(ds, study);
+        this.ruleSetRuleDao = ruleSetRuleDao;
+        odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
+
+    }
+
+    public MetaDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy, RuleSetRuleDao ruleSetRuleDao) {
         super(ds, dataset, currentStudy);
         this.ruleSetRuleDao = ruleSetRuleDao;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
     }
 
-    public MetaDataCollector(DataSource ds,RuleSetRuleDao ruleSetRuleDao) {
-    	this.ruleSetRuleDao = ruleSetRuleDao;
-    	
+    public MetaDataCollector(DataSource ds, RuleSetRuleDao ruleSetRuleDao) {
+        this.ruleSetRuleDao = ruleSetRuleDao;
+
     }
 
     @Override
@@ -75,7 +81,7 @@ public class MetaDataCollector extends OdmDataCollector {
             JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
             StudyBean study = u.getStudy();
-            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(),getRuleSetRuleDao());
+            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(), getRuleSetRuleDao(), showArchived);
             meta.collectOdmStudy(null);
             if (this.getCategory() == 1) {
                 if (study.isSite(study.getParentStudyId())) {
@@ -89,12 +95,12 @@ public class MetaDataCollector extends OdmDataCollector {
                 } else {
                     protocol = meta.getOdmStudy().getMetaDataVersion().getProtocol();
 
-
                 }
             }
             odmStudyMap.put(u.getStudy().getOid(), meta.getOdmStudy());
         }
     }
+
     public void collectMetadataUnitMap(String formVersionOID) {
         Iterator<OdmStudyBase> it = this.getStudyBaseMap().values().iterator();
         MetaDataVersionProtocolBean protocol = new MetaDataVersionProtocolBean();
@@ -119,7 +125,6 @@ public class MetaDataCollector extends OdmDataCollector {
                     }
                 } else {
                     protocol = meta.getOdmStudy().getMetaDataVersion().getProtocol();
-
 
                 }
             }
@@ -151,9 +156,10 @@ public class MetaDataCollector extends OdmDataCollector {
         this.ruleSetRuleDao = ruleSetRuleDao;
     }
 
-	public void collectFileData(String formVersionOID) {
-		  this.collectOdmRoot();
-	        this.collectMetadataUnitMap(formVersionOID);
-		
-	}
+    public void collectFileData(String formVersionOID) {
+        this.collectOdmRoot();
+        this.collectMetadataUnitMap(formVersionOID);
+
+    }
+
 }
