@@ -132,7 +132,7 @@
             <span>
                <a href="ListStudySubjects" style="text-decoration: none">
                   <fmt:message
-                     key="go_back_to_subject_list" bundle="${resword}" />
+                     key="back_to_subject_matrix" bundle="${resword}" />
                </a>
             </span>
          </c:otherwise>
