@@ -256,7 +256,11 @@ $(function() {
             var links = [];
             $.merge(links, collection(studyEvent['OpenClinica:links']['OpenClinica:link']));
             $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
-            console.log(links);
+            var order = ['edit', 'view', 'remove', 'restore', 'reassign'];
+            links.sort(function(a, b) {
+                return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
+            });
+            window.links = links;
 
             var submission = {
                 status: studyEvent['@OpenClinica:Status'],
