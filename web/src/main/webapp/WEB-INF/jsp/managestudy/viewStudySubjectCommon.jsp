@@ -191,6 +191,9 @@ $(function() {
         return [];
     }
     $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*', function(data) {
+        var numCommons = 0;
+        var numVisitBaseds = 0;
+
         var studyOid = data.ClinicalData['@StudyOID'];
         var studySubjectOid = data.ClinicalData.SubjectData['@SubjectKey'];
 
@@ -260,7 +263,6 @@ $(function() {
             links.sort(function(a, b) {
                 return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
             });
-            window.links = links;
 
             var submission = {
                 status: studyEvent['@OpenClinica:Status'],
@@ -279,13 +281,17 @@ $(function() {
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
-            if (studyEvent['@OpenClinica:EventType'] !== 'Common')
-                continue;
-            sectionTable.append(sectionTmpl({
-                sectionName: studyEvent['@Name'],
-                studyEventOid: studyEventId,
-                forms: studyEvent.forms
-            }));
+            if (studyEvent['@OpenClinica:EventType'] === 'Common') {
+                sectionTable.append(sectionTmpl({
+                    sectionName: studyEvent['@Name'],
+                    studyEventOid: studyEventId,
+                    forms: studyEvent.forms
+                }));
+                numCommons++;
+            }
+            else {
+                numVisitBaseds++;
+            }
         }
         sectionTable.on('click', '.section-header', function() {
             $(this).next().addBack().toggleClass('collapsed expanded');
@@ -313,6 +319,16 @@ $(function() {
                 }
             });
         });
+
+        if (!numCommons) {
+            $('#commonEvents').hide();
+            $('#commonEvents_collapser').hide();
+        }
+        if (!numVisitBaseds) {
+            $('#subjectEvents').hide();
+            $('#excl_subjectEvents_open').hide();
+            $('#excl_subjectEvents_close').hide();
+        }
 
         var datatables = $('table.datatable');
         datatables.each(function() {

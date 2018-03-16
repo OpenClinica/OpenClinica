@@ -509,7 +509,7 @@
     </br></br>
 </div>
 
-<div class="table_titla_manage">
+<div class="table_titla_manage" id="commonEvents_collapser">
   <a id="excl_commonEvents_open" href="javascript:leftnavExpand('commonEvents'); leftnavExpand('excl_commonEvents_open'); leftnavExpand('excl_commonEvents_closed');" style="text-decoration: none; display: none;">
   <img src="images/bt_Expand.gif" border="0" height="20px"> Common Events
   </a>
