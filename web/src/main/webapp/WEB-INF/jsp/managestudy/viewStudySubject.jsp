@@ -100,7 +100,7 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 
-<h1 style="display:inline-block; margin-right:10px;">
+<h1 style="display:inline-block; margin-right:40px;">
     <span class="title_manage">
         <fmt:message key="view_subject2" bundle="${resword}"/><c:out value="${studySub.label}"/>
     </span>
@@ -124,8 +124,7 @@
          <c:when test="${(userRole.manageStudy)&& module=='manage'}">
             <span>
                <a style="text-decoration: none" href="ListStudySubject">
-                  <fmt:message
-                     key="go_back_to_study_subject_list" bundle="${resword}" />
+                  <fmt:message key="go_back_to_study_subject_list" bundle="${resword}"/>
                </a>
             </span>
          </c:when>
@@ -140,6 +139,12 @@
       </c:choose>
    </c:otherwise>
 </c:choose>
+
+<select style="margin-left: 40px;">
+    <option>Active Events</option>
+    <option>Removed Events</option>
+    <option>All Events</option>
+</select>
 
 <br>
 <br>
