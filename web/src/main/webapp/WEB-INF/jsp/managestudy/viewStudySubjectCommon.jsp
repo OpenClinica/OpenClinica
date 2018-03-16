@@ -62,6 +62,9 @@
     .actions .icon.icon-reassign:before {
         content: "\e92f";
     }
+    .actions .icon.icon-restore:before {
+        content: "\e817";
+    }
 }
 </style>
 
@@ -142,7 +145,7 @@
                             {{/each}}
                             <td align="center" class="table_cell">{{submission.status}}</td>
                             <td align="center" class="table_cell"></td>
-                            <td align="center" class="table_cell actions">
+                            <td class="table_cell actions">
                                 <table border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
                                         <tr valign="top">
