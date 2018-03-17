@@ -50,6 +50,7 @@ import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.dto.Bucket;
 import org.akaza.openclinica.service.dto.Form;
 import org.apache.commons.io.FileUtils;
+import org.cdisc.ns.odm.v130.EventType;
 import org.cdisc.ns.odm.v130.ODM;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormDef;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormRef;
@@ -101,6 +102,8 @@ public class OdmImportServiceImpl implements OdmImportService {
     private CoreResources coreResources;
     private EventService eventService;
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private final String COMMON = "common";
+    private final String UNSCHEDULED = "unscheduled";
 
     public OdmImportServiceImpl(DataSource dataSource) {
         this.dataSource = dataSource;
@@ -426,6 +429,19 @@ public class OdmImportServiceImpl implements OdmImportService {
             logger.info(studyEventDefinition.getName() + " cannot change to non-repeating; event has been published to Production - FAILED");
 
         }
+        if (study.getEnvType().equals(StudyEnvEnum.PROD) && odmStudyEventDef.getType().equals(EventType.COMMON)
+                && !studyEventDefinition.getType().equals(COMMON)) {
+            errors.rejectValue("name", "event_error", " Cannot change Event \"" + studyEventDefinition.getName()
+                    + "\" to Common since it was previously published to Production as Visit-Based - FAILED");
+            logger.info(studyEventDefinition.getName() + " cannot change to Common; event has been published to Production as Visit-Based - FAILED");
+        }
+        if (study.getEnvType().equals(StudyEnvEnum.PROD) && odmStudyEventDef.getType().equals(EventType.UNSCHEDULED)
+                && !studyEventDefinition.getType().equals(UNSCHEDULED)) {
+            errors.rejectValue("name", "event_error", " Cannot change Event \"" + studyEventDefinition.getName()
+                    + "\" to Visit-Based since it was previously published to Production as Common - FAILED");
+            logger.info(studyEventDefinition.getName() + " cannot change to Visit-Based; event has been published to Production as Common - FAILED");
+        }
+
         studyEventDefinition = populateEvent(odmStudyEventDef, userAccount, studyEventDefinition, study);
         studyEventDefinition.setUpdateId(userAccount.getUserId());
         studyEventDefinition.setDateUpdated(new Date());
