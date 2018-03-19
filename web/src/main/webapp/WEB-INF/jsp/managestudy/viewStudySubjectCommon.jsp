@@ -80,7 +80,7 @@
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <tr class="section-header collapsed">
+    <tr class="section-header collapsed section-{{sectionStatus}}" style="display:{{sectionDisplay}};">
         <td class="section">
             <span class="icon icon-caret-down gray"></span>
             <span class="icon icon-caret-right gray"></span>
@@ -190,7 +190,7 @@ $(function() {
             return x.length ? x : [x];
         return [];
     }
-    $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*', function(data) {
+    $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y', function(data) {
         var numCommons = 0;
         var numVisitBaseds = 0;
 
@@ -277,13 +277,28 @@ $(function() {
             form.submissions.push(submission);
         });
 
+        var eventTypeFilter = $('#event-status-filter').val();
+        $('#event-status-filter').on('change', function() {
+            var sections = $('tr.section-header');
+            var visibles = $();
+            $(this).val().split(',').forEach(function(status) {
+                visibles = visibles.add(sections.filter('.section-' + status));
+            });
+            visibles.show();
+            sections.not(visibles).hide();
+        });
+
         var sectionTable = $('#sections');
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
             if (studyEvent['@OpenClinica:EventType'] === 'Common') {
+                var status = studyEvent['@OpenClinica:Status'];
+                var display = eventTypeFilter.indexOf(status) >= 0 ? 'table-row' : 'none';
                 sectionTable.append(sectionTmpl({
                     sectionName: studyEvent['@Name'],
+                    sectionStatus: status,
+                    sectionDisplay: display,
                     studyEventOid: studyEventId,
                     forms: studyEvent.forms
                 }));
