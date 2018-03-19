@@ -80,14 +80,14 @@
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <tr class="section-header collapsed">
+    <tr class="section-header collapsed {{sectionStatus}}" style="{{sectionDisplay}};">
         <td class="section">
             <span class="icon icon-caret-down gray"></span>
             <span class="icon icon-caret-right gray"></span>
             <span>{{sectionName}}</span>
         </td>
     </tr>
-    <tr class="section-body collapsed" data-study-event-oid="{{studyEventOid}}">
+    <tr class="section-body collapsed {{sectionStatus}}" data-study-event-oid="{{studyEventOid}}">
     <td>
     <div class="box_T">
     <div class="box_L">
@@ -139,11 +139,11 @@
                 </thead>
                 <tbody>
                     {{#each form.submissions as |submission|}}
-                        <tr>
+                        <tr class="submission {{submission.hideStatus}}" style="{{submission.display}}">
                             {{#each submission.data as |item|}}
                                 <td class="table_cell">{{item}}</td>
                             {{/each}}
-                            <td align="center" class="table_cell">{{submission.status}}</td>
+                            <td align="center" class="table_cell">{{submission.studyStatus}}</td>
                             <td align="center" class="table_cell"></td>
                             <td class="table_cell actions">
                                 <table border="0" cellpadding="0" cellspacing="0">
@@ -190,7 +190,7 @@ $(function() {
             return x.length ? x : [x];
         return [];
     }
-    $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*', function(data) {
+    $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y', function(data) {
         var numCommons = 0;
         var numVisitBaseds = 0;
 
@@ -264,8 +264,11 @@ $(function() {
                 return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
             });
 
+            var hideStatus = formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active';
             var submission = {
-                status: studyEvent['@OpenClinica:Status'],
+                studyStatus: studyEvent['@OpenClinica:Status'],
+                hideStatus: hideStatus,
+                display: hideStatus === 'oc-status-removed' ? 'display:none;' : '',
                 data: $.extend(true, {}, form.submissionObj),
                 links: links
             };
@@ -277,13 +280,26 @@ $(function() {
             form.submissions.push(submission);
         });
 
+        $('#oc-status-hide').on('change', function() {
+            $('tr.section-header, tr.section-body').removeClass('expanded').addClass('collapsed');
+            var targets = $('tr.section-header, tr.submission');
+            var hides = targets.filter('.' + $(this).val());
+            hides.hide();
+            targets.not(hides).show();
+        });
+
+        var hideStatus = $('#oc-status-hide').val();
         var sectionTable = $('#sections');
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
             if (studyEvent['@OpenClinica:EventType'] === 'Common') {
+                var status = studyEvent['@OpenClinica:Status'] === 'AVAILABLE' ? 'oc-status-active' : 'oc-status-removed';
+                var display = status === hideStatus ? 'display:none;' : '';
                 sectionTable.append(sectionTmpl({
                     sectionName: studyEvent['@Name'],
+                    sectionStatus: status,
+                    sectionDisplay: display,
                     studyEventOid: studyEventId,
                     forms: studyEvent.forms
                 }));

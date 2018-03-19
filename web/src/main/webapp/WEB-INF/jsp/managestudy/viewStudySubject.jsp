@@ -140,10 +140,11 @@
    </c:otherwise>
 </c:choose>
 
-<select style="margin-left: 40px;">
-    <option>Active Events</option>
-    <option>Removed Events</option>
-    <option>All Events</option>
+<label for="oc-status-hide" style="margin-left: 40px;">Show:</label>
+<select id="oc-status-hide">
+    <option value="oc-status-removed">Active Events</option>
+    <option value="oc-status-active">Removed Events</option>
+    <option value="null">All Events</option>
 </select>
 
 <br>
