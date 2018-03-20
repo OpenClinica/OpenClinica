@@ -47,9 +47,13 @@ public abstract class AbstractItemProcessor {
         // parentDiscrepancyNoteList is the list of the parent DNs records only
         List<DiscrepancyNote> parentDiscrepancyNoteList = discrepancyNoteDao.findParentNotesByItemData(itemData.getItemDataId());
         for (DiscrepancyNote parentDiscrepancyNote : parentDiscrepancyNoteList) {
-            if (parentDiscrepancyNote.getResolutionStatus().getResolutionStatusId() != 4) { // if the DN's resolution
-                                                                                            // status is not set to
-                                                                                            // Closed
+            if (parentDiscrepancyNote.getResolutionStatus().getResolutionStatusId() != 4
+                    && parentDiscrepancyNote.getDiscrepancyNoteType().getDiscrepancyNoteTypeId() != 4) { // if
+                // the
+                // DN's
+                // resolution
+                // status is not set to
+                // Closed
                 String description = resword.getString("dn_auto-closed_description");
                 String detailedNotes = resword.getString("dn_auto_closed_item_detailed_notes");
                 // create new DN record , new DN Map record , also update the parent record
