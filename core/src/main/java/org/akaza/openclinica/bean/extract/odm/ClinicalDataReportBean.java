@@ -279,7 +279,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             xml.append(nls);
 
                             String formUrl = "/EnketoFormServlet?formLayoutId=" + formLayout.getFormLayoutId() + "&studyEventId=" + studyEvent.getStudyEventId()
-                                    + "&eventCrfId=" + eventCrf.getEventCrfId() + "&originatingPage=ViewStudySubject%3Fid%3D1";
+                                    + "&eventCrfId=" + eventCrf.getEventCrfId() + "&originatingPage=ViewStudySubject%3Fid%3D"
+                                    + studySubject.getStudySubjectId();
 
                             // ***************** OpenClinica:Link ENKETO EDIT MODE **************
 
