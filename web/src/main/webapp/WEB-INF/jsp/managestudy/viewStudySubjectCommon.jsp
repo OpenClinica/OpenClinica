@@ -65,6 +65,9 @@
     .actions .icon.icon-restore:before {
         content: "\e817";
     }
+    .actions .icon.icon-sign:before {
+        content: "\e91a";
+    }
 }
 </style>
 
@@ -259,7 +262,7 @@ $(function() {
             var links = [];
             $.merge(links, collection(studyEvent['OpenClinica:links']['OpenClinica:link']));
             $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
-            var order = ['edit', 'view', 'remove', 'restore', 'reassign'];
+            var order = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign'];
             links.sort(function(a, b) {
                 return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
             });
