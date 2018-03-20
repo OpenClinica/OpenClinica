@@ -126,19 +126,6 @@
                             <center>Actions</center>
                         </td>
                     </tr>
-                    <tr valign="top">
-                        {{#each form.itemGroups as |itemGroup|}}
-                            {{#each itemGroup.items as |item|}}
-                                <td class="table_cell"></td>
-                            {{/each}}
-                        {{/each}}
-                        <td class="table_cell">
-                        </td>
-                        <td class="table_cell">
-                        </td>
-                        <td class="table_cell">
-                        </td>
-                    </tr>
                 </thead>
                 <tbody>
                     {{#each form.submissions as |submission|}}
@@ -370,30 +357,9 @@ $(function() {
                     targets: '_all',
                     render: function(data, type, row) {
                         return data.length > 200 ?
-                            data.substr(0, 200) +'…' : data;
+                            data.substr(0, 200) + '...' : data;
                     }
-                }],
-                initComplete: function () {
-                    var columns = this.api().columns();
-                    columns.every(function() {
-                        var column = this;
-                        if (column.index() === columns.indexes().length - 1)
-                            return;
-                        var select = $('<select><option value=""></option></select>')
-                            .prependTo($(column.header()))
-                            .on('change', function () {
-                                var val = $.fn.dataTable.util.escapeRegex(
-                                    $(this).val()
-                                );
-                                column
-                                    .search( val ? '^' + val + '$' : '', true, false )
-                                    .draw();
-                            });
-                        column.data().unique().sort().each(function(val, index, api) {
-                            select.append('<option value="' + val + '">' + val + '</option>');
-                        });
-                    });
-                }
+                }]
             });
             $(this).children('tbody').on('mouseenter', 'td.table_cell', function () {
                 var colIdx = table.cell(this).index().column; 
