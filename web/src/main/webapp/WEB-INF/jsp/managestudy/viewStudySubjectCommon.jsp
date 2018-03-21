@@ -376,6 +376,7 @@ $(function() {
             paging.text(paging.text().replace(' to ', '-').replace('entries', 'rows'));
             pagesize[2].replaceWith(' rows per page');
             pagesize[0].remove();
+            theTable.css('width', '');
         });
         datatables.parent().css({
             'max-width': $(window).width() - 200 + 'px',
