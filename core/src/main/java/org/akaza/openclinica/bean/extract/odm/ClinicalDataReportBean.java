@@ -342,7 +342,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                 String reassignUrl = "/pages/managestudy/chooseCRFVersion?crfId=" + formLayout.getCrf().getCrfId() + "&crfName="
                                         + formLayout.getCrf().getName() + "&formLayoutId=" + formLayout.getFormLayoutId() + "&formLayoutName="
                                         + form.getFormLayoutName() + "&studySubjectLabel=" + studySubject.getLabel() + "&studySubjectId="
-                                        + studySubject.getLabel() + "&eventCRFId=" + eventCrf.getEventCrfId() + "&eventDefinitionCRFId="
+                                        + studySubject.getStudySubjectId() + "&eventCRFId=" + eventCrf.getEventCrfId() + "&eventDefinitionCRFId="
                                         + eventDefinitionCrf.getEventDefinitionCrfId();
 
                                 xml.append(indent + indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"reassign\" href=\""

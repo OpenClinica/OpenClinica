@@ -732,7 +732,7 @@ public class OdmExtractDAO extends DatasetDAO {
         while (it.hasNext()) {
             HashMap row = (HashMap) it.next();
             Integer sedOrder = (Integer) row.get("definition_order");
-            Integer cvId = (Integer) row.get("form_layout_id");
+            Integer cvId = (Integer) row.get("crf_version_id");
             String sedOID = (String) row.get("definition_oid");
             String sedName = (String) row.get("definition_name");
             Boolean sedRepeat = (Boolean) row.get("definition_repeating");
@@ -996,7 +996,7 @@ public class OdmExtractDAO extends DatasetDAO {
         while (it.hasNext()) {
             HashMap row = (HashMap) it.next();
             Integer sedOrder = (Integer) row.get("definition_order");
-            Integer cvId = (Integer) row.get("form_layout_id");
+            Integer cvId = (Integer) row.get("crf_version_id");
             String sedOID = (String) row.get("definition_oid");
             String sedName = (String) row.get("definition_name");
             Boolean sedRepeat = (Boolean) row.get("definition_repeating");
@@ -1559,7 +1559,7 @@ public class OdmExtractDAO extends DatasetDAO {
         String sedOIDs = "";
         while (iter.hasNext()) {
             HashMap row = (HashMap) iter.next();
-            Integer cvId = (Integer) row.get("form_layout_id");
+            Integer cvId = (Integer) row.get("crf_version_id");
             String sedOID = (String) row.get("definition_oid");
             String cvOID = (String) row.get("cv_oid");
             String sedDesc = (String) row.get("description");
@@ -3345,17 +3345,17 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getStudyEventAndFormMetaSql(int parentStudyId, int studyId, boolean isIncludedSite, String[] showArchived) {
-        return "select sed.ordinal as definition_order, edc.ordinal as crf_order, edc.crf_id, fl.form_layout_id,"
+        return "select sed.ordinal as definition_order, edc.ordinal as crf_order, edc.crf_id, cv.crf_version_id,"
                 + " sed.oc_oid as definition_oid, sed.name as definition_name, sed.repeating as definition_repeating,"
-                + " sed.type as definition_type, fl.oc_oid as cv_oid,"
-                + " fl.name as cv_name, edc.required_crf as cv_required, edc.null_values, crf.name as crf_name,crf.oc_oid as crf_oid ,sed.status_id as sed_status_id,edc.status_id as edc_status_id"
+                + " sed.type as definition_type, cv.oc_oid as cv_oid,"
+                + " cv.name as cv_name, edc.required_crf as cv_required, edc.null_values, crf.name as crf_name,crf.oc_oid as crf_oid ,sed.status_id as sed_status_id,edc.status_id as edc_status_id"
                 + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite, showArchived);
     }
 
     protected String getStudyEventAndFormMetaOC1_3Sql(int parentStudyId, int studyId, boolean isIncludedSite, String[] showArchived) {
-        return "select sed.ordinal as definition_order, edc.ordinal as crf_order, edc.crf_id, fl.form_layout_id,"
-                + " sed.oc_oid as definition_oid, fl.oc_oid as cv_oid,"
-                + " sed.description, sed.category, fl.description as version_description, fl.revision_notes,"
+        return "select sed.ordinal as definition_order, edc.ordinal as crf_order, edc.crf_id, cv.crf_version_id,"
+                + " sed.oc_oid as definition_oid, cv.oc_oid as cv_oid,"
+                + " sed.description, sed.category, cv.description as version_description, cv.revision_notes,"
                 + " crf.oc_oid as crf_oid, crf.description as crf_description ,edc.null_values, edc.default_version_id, edc.electronic_signature,"
                 + " edc.double_entry, edc.hide_crf, edc.participant_form,edc.allow_anonymous_submission,edc.submission_url,case when edc_tag.active is null then false else edc_tag.active end, edc.source_data_verification_code,sed.status_id as sed_status_id,edc.status_id as edc_status_id"
                 + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite, showArchived);
@@ -3364,15 +3364,15 @@ public class OdmExtractDAO extends DatasetDAO {
     protected String studyEventAndFormMetaTables() {
         // return "study_event_definition sed, event_definition_crf edc, crf, crf_version cv ";
         return "event_definition_crf edc Join crf crf on crf.crf_id = edc.crf_id "
-                + " Join form_layout fl on fl.crf_id=crf.crf_id Join study_event_definition sed on sed.study_event_definition_id = edc.study_event_definition_id"
+                + " Join crf_version cv on cv.crf_id=crf.crf_id Join study_event_definition sed on sed.study_event_definition_id = edc.study_event_definition_id"
                 + "  left Join  event_definition_crf_tag edc_tag on edc_tag.path::text = ((sed.oc_oid::text || '.'::text) || crf.oc_oid::text)";
     }
 
     protected String studyEventAndFormMetaCondition(int parentStudyId, int studyId, boolean isIncludedSite, String[] showArchived) {
         return " where sed.study_id = " + parentStudyId + " " + showArchived[0] + " and "
                 + this.getEventDefinitionCrfCondition(studyId, parentStudyId, isIncludedSite) + " " + showArchived[1] + " and edc.crf_id = crf.crf_id "
-                + showArchived[2] + " and crf.crf_id = fl.crf_id  " + showArchived[3] + " "
-                + " order by sed.ordinal, edc.ordinal, edc.crf_id, fl.form_layout_id desc";
+                + showArchived[2] + " and crf.crf_id = cv.crf_id  " + showArchived[3] + " "
+                + " order by sed.ordinal, edc.ordinal, edc.crf_id, cv.crf_version_id desc";
     }
 
     protected String getItemDataMaxLengths(String crfVersionIds) {
@@ -3832,7 +3832,7 @@ public class OdmExtractDAO extends DatasetDAO {
             arr[0] = "and sed.status_id not in (5,7)";
             arr[1] = "and edc.status_id not in (5,7)";
             arr[2] = "and crf.status_id not in (5,7)";
-            arr[3] = "and fl.status_id not in (5,7)";
+            arr[3] = "and cv.status_id not in (5,7)";
         }
         return arr;
     }
