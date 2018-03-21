@@ -68,14 +68,14 @@
     .actions .icon.icon-sign:before {
         content: "\e91a";
     }
+    .hide {
+        display: none;
+    }
 }
 </style>
 
 <table cellspacing="0" width="100%">
 <tbody id="sections">
-    <tr id="loading">
-        <td>Loading...</td>
-    </tr>
 </tbody>
 </table>
 
@@ -326,14 +326,11 @@ $(function() {
             });
         });
 
-        if (!numCommons) {
-            $('#commonEvents').hide();
-            $('#commonEvents_collapser').hide();
+        if (numCommons) {
+            $('#commonEvents, #commonEvents_collapser').removeClass('hide');
         }
-        if (!numVisitBaseds) {
-            $('#subjectEvents').hide();
-            $('#excl_subjectEvents_open').hide();
-            $('#excl_subjectEvents_close').hide();
+        if (numVisitBaseds) {
+            $('#subjectEvents, #excl_subjectEvents_close').removeClass('hide');
         }
 
         var datatables = $('table.datatable');

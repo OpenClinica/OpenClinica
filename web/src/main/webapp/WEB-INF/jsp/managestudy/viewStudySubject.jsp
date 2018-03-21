@@ -477,6 +477,8 @@
 
 </div>
 
+<div id="loading">Loading...</div>
+
 <c:choose>
     <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
         <div class="table_title_Admin">
@@ -494,23 +496,22 @@
 
     </c:otherwise>
 </c:choose>
-        <a name="events">
-            <a id="excl_subjectEvents_close" href="javascript:leftnavExpand('subjectEvents'); leftnavExpand('excl_subjectEvents_open'); leftnavExpand('excl_subjectEvents_close');" style="text-decoration: none; display: all;">
-                <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="visit_based_events" bundle="${resword}"/>
-            </a>
-            <a id="excl_subjectEvents_open" href="javascript:leftnavExpand('subjectEvents'); leftnavExpand('excl_subjectEvents_open'); leftnavExpand('excl_subjectEvents_close');" style="text-decoration: none; display: none;">
-                <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="visit_based_events" bundle="${resword}"/>
-            </a>
+    <a name="events">
+        <a id="excl_subjectEvents_close" href="javascript:leftnavExpand('subjectEvents'); leftnavExpand('excl_subjectEvents_open'); leftnavExpand('excl_subjectEvents_close');" style="text-decoration: none; display: all;" class="hide">
+            <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="visit_based_events" bundle="${resword}"/>
         </a>
-    </div>
-<div id="subjectEvents">
+        <a id="excl_subjectEvents_open" href="javascript:leftnavExpand('subjectEvents'); leftnavExpand('excl_subjectEvents_open'); leftnavExpand('excl_subjectEvents_close');" style="text-decoration: none; display: none;">
+            <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="visit_based_events" bundle="${resword}"/>
+        </a>
+    </a>
+</div>
+
+<div id="subjectEvents" class="hide">
     <c:import url="../include/showTable.jsp"><c:param name="rowURL" value="showStudyEventRow.jsp" /></c:import>
-
-
     </br></br>
 </div>
 
-<div class="table_titla_manage" id="commonEvents_collapser">
+<div class="table_titla_manage hide" id="commonEvents_collapser">
   <a id="excl_commonEvents_open" href="javascript:leftnavExpand('commonEvents'); leftnavExpand('excl_commonEvents_open'); leftnavExpand('excl_commonEvents_closed');" style="text-decoration: none; display: none;">
   <img src="images/bt_Expand.gif" border="0" height="20px"> Common Events
   </a>
