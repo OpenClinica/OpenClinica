@@ -286,9 +286,9 @@ $(function() {
            }
         );
         $('#oc-status-hide').on('change', function() {
-            hideClass = '.' + $(this).val();
+            hideClass = $(this).val();
             var targets = $('tr.section-header');
-            var hides = targets.filter(hideClass);
+            var hides = targets.filter('.' + hideClass);
             hides.hide();
             targets.not(hides).show();
             $('table.datatable').DataTable().draw();
