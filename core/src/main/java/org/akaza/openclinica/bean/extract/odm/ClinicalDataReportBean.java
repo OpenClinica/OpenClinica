@@ -191,7 +191,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             // ***************** OpenClinica:Link RESTORE EVENT **************
                             // userRole.manageStudy &&
                             if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR)) && studySubject.getStatus().equals(Status.AVAILABLE)
-                                    && study.getStatus().equals(Status.AVAILABLE)) {
+                                    && study.getStatus().equals(Status.AVAILABLE)
+                                    && studyEvent.getStudyEventDefinition().getStatus().equals(Status.AVAILABLE)) {
                                 String restoreUrl = "/RestoreStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
                                         + studySubject.getStudySubjectId();
                                 xml.append(indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"restore\" href=\""
@@ -322,7 +323,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR))
                                             && studyEvent.getStatusId() != Status.AUTO_DELETED.getCode()
                                             && eventCrf.getStatusId() != Status.AUTO_DELETED.getCode() && studySubject.getStatus().equals(Status.AVAILABLE)
-                                            && study.getStatus().equals(Status.AVAILABLE)) {
+                                            && studyEvent.getStatusId() == Status.AVAILABLE.getCode() && study.getStatus().equals(Status.AVAILABLE)) {
                                         String restoreUrl = "/RestoreEventCRF?action=confirm&id=" + eventCrf.getEventCrfId() + "&studySubId="
                                                 + studySubject.getStudySubjectId();
                                         xml.append(indent + indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"restore\" href=\""
