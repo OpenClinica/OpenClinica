@@ -82,6 +82,12 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
+<script>
+    Handlebars.registerHelper('truncate', function(s, length) {
+        s = s.join(', ');
+        return s.length < length ? s : s.substring(0, length) + '...';
+    });
+</script>
 <script id="section-tmpl" type="text/x-handlebars-template">
     <tr class="section-header collapsed {{sectionStatus}}" style="{{sectionDisplay}};">
         <td class="section">
@@ -131,8 +137,8 @@
                 <tbody>
                     {{#each form.submissions as |submission|}}
                         <tr class="submission">
-                            {{#each submission.data as |item|}}
-                                <td class="table_cell">{{item}}</td>
+                            {{#each submission.data as |data|}}
+                                <td class="table_cell" data-search="{{data}}">{{truncate data 200}}</td>
                             {{/each}}
                             <td align="center" class="table_cell">{{submission.studyStatus}}</td>
                             <td align="center" class="table_cell"></td>
@@ -256,6 +262,7 @@ $(function() {
                 return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
             });
 
+
             var submission = {
                 studyStatus: studyEvent['@OpenClinica:Status'],
                 formStatus: formData['@OpenClinica:Status'],
@@ -357,17 +364,6 @@ $(function() {
                 columnDefs: [{
                     targets: -1,
                     visible: false
-                }, {
-                    targets: -2,
-                    render: function(data, type, row) {
-                        return data;
-                    }
-                }, {
-                    targets: '_all',
-                    render: function(data, type, row) {
-                        return data.length > 200 ?
-                            data.substr(0, 200) + '...' : data;
-                    }
                 }]
             });
             $(this).children('tbody').on('mouseenter', 'td.table_cell', function () {
