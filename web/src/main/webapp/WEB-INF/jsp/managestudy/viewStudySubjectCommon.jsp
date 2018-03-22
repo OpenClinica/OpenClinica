@@ -125,11 +125,12 @@
                         <td class="table_cell">
                             <center>Actions</center>
                         </td>
+                        <td></td>
                     </tr>
                 </thead>
                 <tbody>
                     {{#each form.submissions as |submission|}}
-                        <tr class="submission {{submission.hideStatus}}" style="{{submission.display}}">
+                        <tr class="submission">
                             {{#each submission.data as |item|}}
                                 <td class="table_cell">{{item}}</td>
                             {{/each}}
@@ -150,6 +151,7 @@
                                     </tbody>
                                 </table>
                             </td>
+                            <td>{{submission.hideStatus}}</td>
                         </tr>
                     {{/each}}
                 </tbody>
@@ -254,11 +256,10 @@ $(function() {
                 return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
             });
 
-            var hideStatus = formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active';
             var submission = {
                 studyStatus: studyEvent['@OpenClinica:Status'],
-                hideStatus: hideStatus,
-                display: hideStatus === 'oc-status-removed' ? 'display:none;' : '',
+                formStatus: formData['@OpenClinica:Status'],
+                hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
                 data: $.extend(true, {}, form.submissionObj),
                 links: links
             };
@@ -270,12 +271,20 @@ $(function() {
             form.submissions.push(submission);
         });
 
+        var hideClass = 'oc-status-removed';
+        $.fn.DataTable.ext.search.push(
+           function(settings, data, dataIndex) {
+              return data[data.length-1] !== hideClass;
+           }
+        );
         $('#oc-status-hide').on('change', function() {
-            $('tr.section-header, tr.section-body').removeClass('expanded').addClass('collapsed');
-            var targets = $('tr.section-header, tr.submission');
-            var hides = targets.filter('.' + $(this).val());
+            hideClass = '.' + $(this).val();
+            var targets = $('tr.section-header');
+            var hides = targets.filter(hideClass);
             hides.hide();
             targets.not(hides).show();
+            $('table.datatable').DataTable().draw();
+            $('tr.section-header, tr.section-body').removeClass('expanded').addClass('collapsed');
         });
 
         var hideStatus = $('#oc-status-hide').val();
@@ -347,6 +356,9 @@ $(function() {
                 },
                 columnDefs: [{
                     targets: -1,
+                    visible: false
+                }, {
+                    targets: -2,
                     render: function(data, type, row) {
                         return data;
                     }
@@ -359,21 +371,21 @@ $(function() {
                 }]
             });
             $(this).children('tbody').on('mouseenter', 'td.table_cell', function () {
-                var colIdx = table.cell(this).index().column; 
+                var colIdx = table.cell(this).index().column;
                 $(table.cells().nodes()).removeClass('highlight');
                 $(table.column(colIdx).nodes()).addClass('highlight');
             });
         });
         datatables.each(function() {
-            var theTable = $(this);
-            var header = theTable.parent();
-            var paging = theTable.next();
+            var table = $(this);
+            var header = table.parent();
+            var paging = table.next();
             var pagesize = paging.next().children().contents();
             header.prevUntil().prependTo(header);
             paging.text(paging.text().replace(' to ', '-').replace('entries', 'rows'));
             pagesize[2].replaceWith(' rows per page');
             pagesize[0].remove();
-            theTable.css('width', '');
+            table.css('width', '');
         });
         datatables.parent().css({
             'max-width': $(window).width() - 200 + 'px',

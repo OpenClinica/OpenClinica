@@ -142,9 +142,9 @@
 
 <label for="oc-status-hide" style="margin-left: 40px;">Show:</label>
 <select id="oc-status-hide">
-    <option value="oc-status-removed">Active Events</option>
-    <option value="oc-status-active">Removed Events</option>
-    <option value="null">All Events</option>
+    <option value="oc-status-removed">Active Records</option>
+    <option value="oc-status-active">Removed Records</option>
+    <option value="null">All Records</option>
 </select>
 
 <br>
