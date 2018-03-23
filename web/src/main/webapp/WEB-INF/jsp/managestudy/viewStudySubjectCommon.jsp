@@ -112,7 +112,7 @@
         {{#each forms as |form|}}
         <tr>
             <td colspan="3" valign="top">
-                <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{{form.disabled}}}>
+                <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
                 <h3 class="form-name">{{form.[@Name]}}</h3>
                 <table border="0" cellpadding="0" cellspacing="0" class="datatable">
                 <thead>
@@ -235,15 +235,14 @@ $(function() {
                 return ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'No';
             }).map(function(ref) {
                 var form = forms[ref['@FormOID']];
-                form.studyEvent = studyEvent;
-                form.disabled = '';
+                form.disableAddNew = false;
                 return form;
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
 
-        collection(data.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEvent) {
-            var formData = studyEvent.FormData;
+        collection(data.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
+            var formData = studyEventData.FormData;
             if (!formData)
                 return;
 
@@ -251,11 +250,15 @@ $(function() {
             if (!form)
                 return;
 
-            if (form.studyEvent['@Repeating'] === 'No')
-                form.disabled = 'disabled="disabled"';
+            var studyEvent = studyEvents[studyEventData['@StudyEventOID']];
+            if (studyEvent['@OpenClinica:EventType'] !== 'Common')
+                return;
+
+            if (studyEvent['@Repeating'] === 'No')
+                form.disableAddNew = true;
 
             var links = [];
-            $.merge(links, collection(studyEvent['OpenClinica:links']['OpenClinica:link']));
+            $.merge(links, collection(studyEventData['OpenClinica:links']['OpenClinica:link']));
             $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
             var order = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign'];
             links.sort(function(a, b) {
@@ -264,7 +267,7 @@ $(function() {
 
 
             var submission = {
-                studyStatus: studyEvent['@OpenClinica:Status'],
+                studyStatus: studyEventData['@OpenClinica:Status'],
                 formStatus: formData['@OpenClinica:Status'],
                 hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
                 updated: formData['@OpenClinica:UpdatedDate'],
@@ -287,10 +290,10 @@ $(function() {
         );
         $('#oc-status-hide').on('change', function() {
             hideClass = $(this).val();
-            var targets = $('tr.section-header');
-            var hides = targets.filter('.' + hideClass);
+            var sections = $('tr.section-header');
+            var hides = sections.filter('.' + hideClass);
             hides.hide();
-            targets.not(hides).show();
+            sections.not(hides).show();
             $('table.datatable').DataTable().draw();
             $('tr.section-header, tr.section-body').removeClass('expanded').addClass('collapsed');
         });
