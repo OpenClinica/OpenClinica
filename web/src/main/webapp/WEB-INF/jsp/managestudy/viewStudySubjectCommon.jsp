@@ -270,7 +270,7 @@ $(function() {
                 studyStatus: studyEventData['@OpenClinica:Status'],
                 formStatus: formData['@OpenClinica:Status'],
                 hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
-                updated: formData['@OpenClinica:UpdatedDate'],
+                updated: formData['@OpenClinica:UpdatedDate'].split(' ')[0] + ' (' + formData['@OpenClinica:UpdatedBy'] + ')',
                 data: $.extend(true, {}, form.submissionObj),
                 links: links
             };
