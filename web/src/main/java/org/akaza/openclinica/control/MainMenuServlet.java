@@ -171,7 +171,7 @@ public class MainMenuServlet extends SecureController {
         StudyUserRoleBean role = ub.getRoleByStudy(currentPublicStudy.getId());
 
         if (role.getStudyId() == 0) {
-            logger.error("You have no roles for this study." + studyEnvUuid);
+            logger.error("You have no roles for this study." + studyEnvUuid + " currentStudy is:" + currentStudy.getName() + " schema:" + currentPublicStudy.getSchemaName());
             logger.error("Creating an invalid role, ChangeStudy page will be shown");
             //throw new Exception("You have no roles for this study.");
             currentStudy = new StudyBean();
