@@ -162,13 +162,15 @@ public class RestoreEventCRFServlet extends SecureController {
                         iddao.update(item);
                     }
                 }
+                /* OC-8797
+                    Do not send email notification when data is removed
+                    String emailBody =
+                        respage.getString("the_event_CRF") + cb.getName() + " " + respage.getString("has_been_restored_to_the_event") + " "
+                            + event.getStudyEventDefinition().getName() + ".";
 
-                String emailBody =
-                    respage.getString("the_event_CRF") + cb.getName() + " " + respage.getString("has_been_restored_to_the_event") + " "
-                        + event.getStudyEventDefinition().getName() + ".";
-
-                addPageMessage(emailBody);
-                sendEmail(emailBody);
+                    addPageMessage(emailBody);
+                    sendEmail(emailBody);
+                */
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
@@ -177,9 +179,7 @@ public class RestoreEventCRFServlet extends SecureController {
 
     /**
      * Send email to director and administrator
-     * 
-     * @param request
-     * @param response
+     *
      */
     private void sendEmail(String emailBody) throws Exception {
 

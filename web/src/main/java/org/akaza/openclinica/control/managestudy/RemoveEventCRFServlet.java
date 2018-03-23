@@ -188,11 +188,14 @@ public class RemoveEventCRFServlet extends SecureController {
                     }
                 }
 
-                String emailBody = respage.getString("the_event_CRF") + " " + cb.getName() + " " + respage.getString("has_been_removed_from_the_event")
-                        + event.getStudyEventDefinition().getName() + ". " + respage.getString("has_been_removed_from_the_event_cont");
+                /* OC-8797
+                    Do not send email notification when data is removed
+                    String emailBody = respage.getString("the_event_CRF") + " " + cb.getName() + " " + respage.getString("has_been_removed_from_the_event")
+                            + event.getStudyEventDefinition().getName() + ". " + respage.getString("has_been_removed_from_the_event_cont");
 
-                addPageMessage(emailBody);
-                sendEmail(emailBody);
+                    addPageMessage(emailBody);
+                    sendEmail(emailBody);
+                */
                 request.setAttribute("id", new Integer(studySubId).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             }
