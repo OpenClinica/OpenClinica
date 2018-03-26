@@ -63,7 +63,7 @@
   }
 </script>
 <script>
-  $(document.body).on('click', '.section', function() {
+  $(document.body).on('click', '.section-header', function() {
     var section = $(this);
     var body = section.children('.section-body');
     var updown = section.hasClass('collapsed') ? 'slideDown' : 'slideUp';
@@ -79,8 +79,8 @@
   .section-header {
     color: white;
     background-color: #618ebb;
-    border-radius: 10px 10px 0 0;
-    font-size: 15px;
+    border-radius: 10px;
+    font-size: 20px;
     padding: 0.5em 1em;
   }
   .section-header::after {
@@ -474,13 +474,10 @@
                                             </td>
                                           </tr>
                                           <tr>
-                                            <td class="table_divider" colspan="4">&nbsp;</td>
-                                          </tr>
-                                          <tr>
                                             <td class="table_header_column_top">
                                               <fmt:message key="study_name" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top">
+                                            <td class="table_cell">
                                               <c:choose>
                                                 <c:when test="${subjectStudy.parentStudyId>0}">
                                                   <a style="text-decoration: none" href="ViewStudy?id=
@@ -501,7 +498,7 @@
                                             <td class="table_header_row">
                                               <fmt:message key="site_name" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top">
+                                            <td class="table_cell">
                                               <c:if test="${subjectStudy.parentStudyId>0}">
                                                 <a style="text-decoration: none" href="ViewStudy?id=
                                                 <c:out value="${subjectStudy.id}"/>

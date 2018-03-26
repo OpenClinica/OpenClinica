@@ -26,10 +26,8 @@
         display: inline;
         margin-right: 10px;
     }
-    input[type=button][disabled], input[type=button][disabled]:hover {
-        background-color: lightgray;
-        background-image: none;
-        color: gray;
+    input[type=button][disabled] {
+        display: none;
     }
     .actions .icon:before {
         content: "\f1234";
