@@ -9,6 +9,8 @@ package org.akaza.openclinica.control.admin;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
+import org.akaza.openclinica.bean.admin.QueryObject;
+import org.akaza.openclinica.bean.admin.SqlParameter;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
@@ -48,6 +50,7 @@ import org.slf4j.LoggerFactory;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -90,6 +93,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
     private String crfName = "";
 
     private String versionIdString = "";
+    private String versionIdStringWithParameter ="";
 
     private boolean isRepeating = false;
 
@@ -346,8 +350,19 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 }
                                 this.existingOIDs.add(oid);
                                 this.existingUnits.add(unit);
-                                muSql = this.getMUInsertSql(oid, unit, ub.getId(), dbName);
-                                queries.add(muSql);
+/*                                muSql = this.getMUInsertSql(oid, unit, ub.getId(), dbName);
+                                queries.add(muSql);*/
+                                muSql = this.getMUInsertSqlParameters();
+                                
+                                ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                                sqlParameters.add(new SqlParameter(oid));
+                                sqlParameters.add(new SqlParameter(stripQuotes(unit)));
+                                                             
+                                QueryObject qo = new QueryObject();
+                                qo.setSql(muSql);
+                                qo.setSqlParameters(sqlParameters);
+                                
+                                queries.add(qo);
                             }
                         }
 
@@ -1246,25 +1261,47 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             }
                         }
                         String sql = "";
+                        ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
                         if (dbName.equals("oracle")) {
-                            sql =
+                            /*sql =
                                 "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, " + "RESPONSE_TYPE_ID, VERSION_ID)" + " VALUES ('"
                                     + stripQuotes(responseLabel) + "', '" + stripQuotes(resOptions.replaceAll("\\\\,", "\\,")) + "','"
                                     + stripQuotes(resValues.replace("\\\\", "\\")) + "'," + "(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME='"
-                                    + stripQuotes(responseType.toLowerCase()) + "')," + versionIdString + ")";
+                                    + stripQuotes(responseType.toLowerCase()) + "')," + versionIdString + ")";*/
+                        	sql =
+                                    "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
+                                   		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"+ versionIdString + ")";
+                       	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
+                             sqlParameters.add(new SqlParameter(stripQuotes(resOptions.replaceAll("\\\\,", "\\,"))));
+                             sqlParameters.add(new SqlParameter(stripQuotes(resValues.replace("\\\\", "\\"))));
+                             sqlParameters.add(new SqlParameter(stripQuotes(responseType.toLowerCase())));
+                            
                         } else {
-                            sql =
+                            /*sql =
                                 "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, " + "RESPONSE_TYPE_ID, VERSION_ID)" + " VALUES ('"
                                     + stripQuotes(responseLabel) + "', E'" + stripQuotes(resOptions) + "', E'" + stripQuotes(resValues) + "',"
                                     + "(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME='" + stripQuotes(responseType.toLowerCase()) + "'),"
-                                    + versionIdString + ")";
+                                    + versionIdString + ")";*/
+                        	 sql =
+                                     "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
+                                    		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"+ versionIdString + ")";
+                        	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(resOptions)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(resValues)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(responseType.toLowerCase())));
+                             
                         }
                         // YW << a response Label can not be used for more than
                         // one response type
                         if (!resPairs.contains(responseLabel.toString().toLowerCase() + "_" + responseType.toString().toLowerCase())) {
                             // YW >>
                             if (!resNames.contains(responseLabel)) {
-                                queries.add(sql);
+                                //queries.add(sql);
+                            	QueryObject qo = new QueryObject();
+                                qo.setSql(sql);
+                                qo.setSqlParameters(sqlParameters);
+                                
+                                queries.add(qo);
                                 resNames.add(responseLabel);
                             }
                             // this will have to change since we have some data
@@ -1329,8 +1366,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                 + itemName + "'" + " AND I.owner_id = " + ownerId + " AND CV.CRF_VERSION_ID is not null AND CV.CRF_ID =" + crfId + " )) ";
 
                         String sql2 = "";
+                        sqlParameters = new ArrayList<>();
                         if (dbName.equals("oracle")) {
-                            sql2 =
+                            /*sql2 =
                                 "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
                                     + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
                                     + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)" + " VALUES ("
@@ -1381,11 +1419,54 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + widthDecimal
                                     + "', "
                                     + (isShowItem ? 1 : 0)
-                                    + ")";
-                            logger.debug(sql2);
+                                    + ")";*/
+                        	sql2 =
+                                    "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,header,LEFT_ITEM_TEXT,"
+                                        + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
+                                        + "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
+                                        + versionIdString                                          
+                                        + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
+                                        + stripQuotes(responseLabel)
+                                        + "'"
+                                        + " AND VERSION_ID="
+                                        + versionIdString
+                                        + "),"
+                                        + selectCorrectItemQueryOracle
+                                        + ",?, ?, ?, ?, ? "                                          
+                                        + ", (SELECT SECTION_ID FROM SECTION WHERE LABEL='"
+                                        + secName
+                                        + "' AND "
+                                        + "CRF_VERSION_ID IN "
+                                        + versionIdString
+                                        + "), "
+                                        + k
+                                        + ",'"
+                                        + parentItem
+                                        + "',"
+                                        + columnNum
+                                        + ",'"
+                                        + stripQuotes(page)
+                                        + "','"
+                                        + stripQuotes(questionNum)
+                                        + "','"
+                                        + stripQuotes(regexp1)
+                                        + "','"
+                                        + stripQuotes(regexpError)
+                                        + "', "
+                                        + (isRequired ? 1 : 0)
+                                        + ", '"
+                                        + stripQuotes(default_value)
+                                        + "','"
+                                        + stripQuotes(responseLayout)
+                                        + "','"
+                                        + widthDecimal
+                                        + "', "
+                                        + (isShowItem ? 1 : 0)
+                                        + ")";
+                       
 
                         } else {
-                            sql2 =
+                            /*sql2 =
                                 "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
                                     + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
                                     + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)" + " VALUES ("
@@ -1432,28 +1513,92 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     + stripQuotes(default_value)
                                     + "','"
                                     + stripQuotes(responseLayout) + "','" + widthDecimal + "'," + isShowItem
-                                    + ")";
+                                    + ")";*/
+                        	sql2 =
+                                    "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
+                                        + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
+                                        + "REGEXP,REGEXP_ERROR_MSG,REQUIRED,DEFAULT_VALUE,RESPONSE_LAYOUT,WIDTH_DECIMAL, show_item)" + " VALUES ("
+                                        + versionIdString                                        
+                                        + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
+                                        + stripQuotes(responseLabel)
+                                        + "'"
+                                        + " AND VERSION_ID="
+                                        + versionIdString
+                                        + "),"
+                                        + selectCorrectItemQueryPostgres                                       
+                                        + ",?, ?, ?, ?, ? "
+                                        + ", (SELECT SECTION_ID FROM SECTION WHERE LABEL='"
+                                        + secName
+                                        + "' AND "
+                                        + "CRF_VERSION_ID IN "
+                                        + versionIdString
+                                        + "), "
+                                        + k
+                                        + ",'"
+                                        + parentItem
+                                        + "',"
+                                        + columnNum
+                                        + ",'"
+                                        + stripQuotes(page)
+                                        + "','"
+                                        + stripQuotes(questionNum)
+                                        + "','"
+                                        + stripQuotes(regexp1)
+                                        + "','"
+                                        + stripQuotes(regexpError)
+                                        + "', "
+                                        + isRequired
+                                        + ", '"
+                                        + stripQuotes(default_value)
+                                        + "','"
+                                        + stripQuotes(responseLayout) + "','" + widthDecimal + "'," + isShowItem
+                                        + ")";
 
                         }
-                        queries.add(sql2);
+                        //queries.add(sql2);
+                       
+                        sqlParameters.add(new SqlParameter(stripQuotes(subHeader)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(header)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(leftItemText)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(rightItemText)));
+                        sqlParameters.add(new SqlParameter(parentItemString,JDBCType.INTEGER));
+                        
+                        QueryObject qo = new QueryObject();
+                        qo.setSql(sql2);
+                        qo.setSqlParameters(sqlParameters);
+                        
+                        queries.add(qo);
 
 
                         // link version with items now
                         String sql3 = "";
                         if (dbName.equals("oracle")) {
-                            sql3 =
-                                "INSERT INTO VERSIONING_MAP (CRF_VERSION_ID, ITEM_ID) VALUES ( " + versionIdString + "," + selectCorrectItemQueryOracle + ")";
+                            /*sql3 =
+                                "INSERT INTO VERSIONING_MAP (CRF_VERSION_ID, ITEM_ID) VALUES ( " + versionIdString + "," + selectCorrectItemQueryOracle + ")";*/
+                        	sql3 =
+                                    "INSERT INTO VERSIONING_MAP (CRF_VERSION_ID, ITEM_ID) VALUES ( " + versionIdStringWithParameter + "," + selectCorrectItemQueryOracle + ")";
                         } else {
-                            sql3 =
-                                "INSERT INTO VERSIONING_MAP (CRF_VERSION_ID, ITEM_ID) VALUES ( " + versionIdString + "," + selectCorrectItemQueryPostgres + ")";
+                            /*sql3 =
+                                "INSERT INTO VERSIONING_MAP (CRF_VERSION_ID, ITEM_ID) VALUES ( " + versionIdString + "," + selectCorrectItemQueryPostgres + ")";*/
+                        	sql3 =
+                                    "INSERT INTO VERSIONING_MAP (CRF_VERSION_ID, ITEM_ID) VALUES ( " + versionIdStringWithParameter + "," + selectCorrectItemQueryPostgres + ")";
                         }
-                        queries.add(sql3);
+                        //queries.add(sql3);
+                        sqlParameters = new ArrayList<>();
+                       //in versionIdStringWithParameter there is one parameter:crfId
+                        sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));                   
+                        
+                        qo = new QueryObject();
+                        qo.setSql(sql3);
+                        qo.setSqlParameters(sqlParameters);
+                        
+                        queries.add(qo);
 
                         String sql2_1 = "";
                         if(display.length() > 0) {
                             if(controlItemName.length()>0 && optionValue.length()>0 && message.length()>0) {
                                 //At this point, all errors for scd should be caught; and insert into item_form_metadata should be done
-                                if (dbName.equals("oracle")) {
+                               /* if (dbName.equals("oracle")) {
                                     sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name,"
                                         + "option_value,message) values("
                                         + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryOracle
@@ -1464,9 +1609,21 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         + " and vm.crf_version_id = " + versionIdString + " and vm.item_id = it.item_id)"
                                         + " and cifm.item_id = item.item_id), "
                                         + "'" + controlItemName + "', '" + stripQuotes(optionValue) + "', '" + stripQuotes(message) + "'"
-                                        + ")";
+                                        + ")";*/
+                            	 if (dbName.equals("oracle")) {
+                                     sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name,"
+                                         + "option_value,message) values("
+                                         + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryOracle
+                                         + "and ifm.show_item=0 ),"
+                                         + "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
+                                         + " where cifm.crf_version_id = " + versionIdString
+                                         + " and item.item_id = (select it.item_id from item it, versioning_map vm where it.name = '" + controlItemName +"'"
+                                         + " and vm.crf_version_id = " + versionIdString + " and vm.item_id = it.item_id)"
+                                         + " and cifm.item_id = item.item_id), "
+                                         + "?,?,?"
+                                         + ")";
                                 } else {
-                                    sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name,"
+                                  /*  sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name,"
                                         + "option_value,message) values("
                                         + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryPostgres
                                         + "and ifm.show_item=false ),"
@@ -1476,9 +1633,31 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                         + " and vm.crf_version_id = " + versionIdString + " and vm.item_id = it.item_id)"
                                         + " and cifm.item_id = item.item_id), "
                                         + "'" + controlItemName + "', '" + stripQuotes(optionValue) + "', '" + stripQuotes(message) + "'"
-                                        + ")";
+                                        + ")";*/
+                                	  sql2_1 = "insert into scd_item_metadata (scd_item_form_metadata_id,control_item_form_metadata_id,control_item_name,"
+                                              + "option_value,message) values("
+                                              + "(select max(ifm.item_form_metadata_id) from item_form_metadata ifm where ifm.item_id=" + selectCorrectItemQueryPostgres
+                                              + "and ifm.show_item=false ),"
+                                              + "(select cifm.item_form_metadata_id from item, item_form_metadata cifm"
+                                              + " where cifm.crf_version_id = " + versionIdString
+                                              + " and item.item_id = (select it.item_id from item it, versioning_map vm where it.name = '" + controlItemName +"'"
+                                              + " and vm.crf_version_id = " + versionIdString + " and vm.item_id = it.item_id)"
+                                              + " and cifm.item_id = item.item_id), "
+                                              + "?,?,?"
+                                              + ")";
                                 }
-                                queries.add(sql2_1);
+                                //queries.add(sql2_1);
+                            	 sqlParameters = new ArrayList<>();
+                                 sqlParameters.add(new SqlParameter(controlItemName));
+                                 sqlParameters.add(new SqlParameter(stripQuotes(optionValue)));
+                                 sqlParameters.add(new SqlParameter(stripQuotes(message)));                                
+                                 
+                                 qo = new QueryObject();
+                                 qo.setSql(sql2_1);
+                                 qo.setSqlParameters(sqlParameters);
+                                 
+                                 queries.add(qo);
+         						
                             } else {
                                 logger.debug("No insert into scd_item_metadata for item name = " + itemName +
                                         "with Simple_Conditional_Display = \"" + display + "\".");
@@ -1545,8 +1724,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             +
                                             // above removed?
                                             igMeta.getRowStartNumber()
-                                            + ","
-                                            + versionIdString
+                                            + ",?"                                            
                                             + ","
                                             + "(SELECT MAX(ITEM.ITEM_ID) FROM ITEM,ITEM_FORM_METADATA,CRF_VERSION WHERE ITEM.NAME='"
                                             + stripQuotes(itemName)
@@ -1585,7 +1763,7 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                             // above removed?
                                             igMeta.getRowStartNumber()
                                             + ","
-                                            + versionIdString
+                                            +versionIdStringWithParameter
                                             + ","
                                             // + "(SELECT ITEM_ID FROM ITEM
                                             // WHERE NAME='"
@@ -1602,7 +1780,17 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                                 }
 
-                                queries.add(sqlGroupLabel);
+                               // queries.add(sqlGroupLabel);
+                                sqlParameters = new ArrayList<>();
+                              //in versionIdStringWithParameter there is one parameter:crfId
+                                sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                               
+                                
+                                qo = new QueryObject();
+                                qo.setSql(sqlGroupLabel);
+                                qo.setSqlParameters(sqlParameters);
+                                
+                                queries.add(qo);
                             } catch (NullPointerException e) {
                                 // Auto-generated catch block, added tbh 102007
                                 logger.error( "Error  message", e);
@@ -1619,20 +1807,29 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                                     "INSERT INTO ITEM_GROUP_METADATA (item_group_id,HEADER,subheader, layout, repeat_number, repeat_max,"
                                         + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, repeating_group) VALUES ("
                                         + "(SELECT MAX(ITEM_GROUP_ID) FROM ITEM_GROUP WHERE NAME='Ungrouped' AND crf_id = " + crfId + " ),'" + "" + "', '" + ""
-                                        + "', '" + "" + "', " + 1 + ", " + 1 + ", '', 1," + versionIdString + "," + selectCorrectItemQueryOracle + "," + k
+                                        + "', '" + "" + "', " + 1 + ", " + 1 + ", '', 1,?," + selectCorrectItemQueryOracle + "," + k
                                         + ", 0)";
                             } else {
                                 sqlGroupLabel =
                                     "INSERT INTO ITEM_GROUP_METADATA (item_group_id,header,subheader, layout, repeat_number, repeat_max,"
                                         + " repeat_array,row_start_number, crf_version_id," + "item_id , ordinal, repeating_group) VALUES ("
-                                        + "(SELECT ITEM_GROUP_ID FROM ITEM_GROUP WHERE NAME='Ungrouped' AND crf_id = " + crfId
+                                        + "(SELECT ITEM_GROUP_ID FROM ITEM_GROUP WHERE NAME='Ungrouped' AND crf_id = ?" 
                                         + "  LIMIT 1),'" + "" + "', '" + "" + "', '" + "" + "', " + 1 + ", " + 1 + ", '', 1,"
-                                        + versionIdString + "," + selectCorrectItemQueryPostgres + "," + k + ", false)";
+                                        + versionIdString+"," + selectCorrectItemQueryPostgres + "," + k + ", false)";
 
                             }
                             // >>>>>>> .r10888
 
-                            queries.add(sqlGroupLabel);
+                            //queries.add(sqlGroupLabel);
+                            sqlParameters = new ArrayList<>();
+                            sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                           
+                            
+                            qo = new QueryObject();
+                            qo.setSql(sqlGroupLabel);
+                            qo.setSqlParameters(sqlParameters);
+                            
+                            queries.add(qo);
 
                         }
                     }
@@ -1690,19 +1887,37 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                     String defaultSql = "";
                     if (dbName.equals("oracle")) {
-                        defaultSql =
+                       /* defaultSql =
                             "INSERT INTO ITEM_GROUP ( name, crf_id, status_id, date_created ,owner_id,oc_oid) VALUES ('" + defaultGroup.getName()
                                 + "', " + defaultGroup.getCrfId() + "," + defaultGroup.getStatus().getId() + ",sysdate," + ub.getId() + ",'"
-                                + defaultGroupOid + "')";
+                                + defaultGroupOid + "')";*/
+                    	 defaultSql =
+                                 "INSERT INTO ITEM_GROUP ( name, crf_id, status_id, date_created ,owner_id,oc_oid)" + 
+                                		 " VALUES (?, ?, ?,sysdate, ?, ?)";
                     } else {
-                        defaultSql =
+                       /* defaultSql =
                             "INSERT INTO ITEM_GROUP (  name, crf_id, status_id, date_created ,owner_id,oc_oid) VALUES ('" + defaultGroup.getName()
                                 + "', " + defaultGroup.getCrfId() + "," + defaultGroup.getStatus().getId() + ",now()," + ub.getId() + ",'"
-                                + defaultGroupOid + "')";
+                                + defaultGroupOid + "')";*/
+                    	defaultSql =
+                                "INSERT INTO ITEM_GROUP ( name, crf_id, status_id, date_created ,owner_id,oc_oid)" + 
+                               		 " VALUES (?, ?, ?,now(), ?, ?)";
                     }
 
                     if (!GroupCheck.containsKey("Ungrouped")) {
-                        queries.add(defaultSql);
+                        //queries.add(defaultSql);
+                    	ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                        sqlParameters.add(new SqlParameter(defaultGroup.getName()));
+                        sqlParameters.add(new SqlParameter(defaultGroup.getCrfId().toString(),JDBCType.INTEGER));
+                        sqlParameters.add(new SqlParameter(defaultGroup.getStatus().getId()+"",JDBCType.INTEGER));                         
+                        sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
+                        sqlParameters.add(new SqlParameter(defaultGroupOid+""));
+                        
+                        QueryObject qo = new QueryObject();
+                        qo.setSql(defaultSql);
+                        qo.setSqlParameters(sqlParameters);
+                        
+                        queries.add(qo);
                     }
                     for (int gk = 1; gk < numRows; gk++) {
                        
@@ -1920,13 +2135,19 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                         String gsql = "";
                         if (dbName.equals("oracle")) {
-                            gsql =
+                           /* gsql =
                                 "INSERT INTO ITEM_GROUP ( " + "name, crf_id, status_id, date_created ,owner_id,oc_oid)" + "VALUES ('" + fgb.getName() + "', "
-                                    + fgb.getCrfId() + "," + fgb.getStatus().getId() + "," + "sysdate," + ub.getId() + ",'" + groupOid + "')";
+                                    + fgb.getCrfId() + "," + fgb.getStatus().getId() + "," + "sysdate," + ub.getId() + ",'" + groupOid + "')";*/
+                        	 gsql =
+                                     "INSERT INTO ITEM_GROUP ( name, crf_id, status_id, date_created ,owner_id,oc_oid)" + 
+                                    		 " VALUES (?, ?, ?,sysdate, ?, ?)";
                         } else {
-                            gsql =
+                           /* gsql =
                                 "INSERT INTO ITEM_GROUP ( " + "name, crf_id, status_id, date_created ,owner_id,oc_oid)" + "VALUES ('" + fgb.getName() + "', "
-                                    + fgb.getCrfId() + "," + fgb.getStatus().getId() + "," + "now()," + ub.getId() + ",'" + groupOid + "')";
+                                    + fgb.getCrfId() + "," + fgb.getStatus().getId() + "," + "now()," + ub.getId() + ",'" + groupOid + "')";*/
+                        	gsql =
+                                    "INSERT INTO ITEM_GROUP ( name, crf_id, status_id, date_created ,owner_id,oc_oid)" + 
+                                   		  " VALUES (?, ?, ?,now(), ?, ?)";
                         }
 
                         itemGroups.put(fgb.getName(), fgb);
@@ -1936,7 +2157,19 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             // otherwise, will use the existing group because
                             // group name is unique
                             // and shared within CRF
-                            queries.add(gsql);
+                            //queries.add(gsql);
+                        	 ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                             sqlParameters.add(new SqlParameter(fgb.getName()));
+                             sqlParameters.add(new SqlParameter(fgb.getCrfId().toString(),JDBCType.INTEGER));
+                             sqlParameters.add(new SqlParameter(fgb.getStatus().getId()+"",JDBCType.INTEGER));                         
+                             sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
+                             sqlParameters.add(new SqlParameter(groupOid+""));
+                             
+                             QueryObject qo = new QueryObject();
+                             qo.setSql(gsql);
+                             qo.setSqlParameters(sqlParameters);
+                             
+                             queries.add(qo);
 
                         }
                         // if (!StringUtil.isBlank(groupLabel)) {
@@ -2095,20 +2328,38 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                         String sql = "";
                         // BWP added borders column 4/24/2008
                         if (dbName.equals("oracle")) {
-                            sql =
+                           /* sql =
                                 "INSERT INTO SECTION (CRF_VERSION_ID," + "STATUS_ID,LABEL, TITLE, INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL,"
                                     + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED, BORDERS) " + "VALUES (" + versionIdString + ",1,'" + secLabel + "','"
                                     + stripQuotes(title) + "', '" + stripQuotes(instructions) + "', '" + stripQuotes(subtitle) + "','" + pageNumber + "'," + k
-                                    + "," + parentId + "," + ub.getId() + ",sysdate," + intBorder + ")";
+                                    + "," + parentId + "," + ub.getId() + ",sysdate," + intBorder + ")";*/
+                        	 sql =
+                                     "INSERT INTO SECTION (CRF_VERSION_ID," + "STATUS_ID,LABEL, TITLE, INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL,"
+                                         + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED, BORDERS) " + "VALUES ("  + versionIdString+",1,?,'"
+                                         + stripQuotes(title) + "', '" + stripQuotes(instructions) + "', '" + stripQuotes(subtitle) + "','" + pageNumber + "'," + k
+                                         + "," + parentId + "," + ub.getId() + ",sysdate," + intBorder + ")";
                         } else {
-                            sql =
+                            /*sql =
                                 "INSERT INTO SECTION (CRF_VERSION_ID," + "STATUS_ID,LABEL, TITLE, INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL,"
                                     + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED,BORDERS) " + "VALUES (" + versionIdString + ",1,'" + secLabel + "','"
                                     + stripQuotes(title) + "', '" + stripQuotes(instructions) + "', '" + stripQuotes(subtitle) + "','" + pageNumber + "'," + k
-                                    + "," + parentId + "," + ub.getId() + ",NOW()," + intBorder + ")";
+                                    + "," + parentId + "," + ub.getId() + ",NOW()," + intBorder + ")";*/
+                        	sql =
+                                    "INSERT INTO SECTION (CRF_VERSION_ID," + "STATUS_ID,LABEL, TITLE, INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL,"
+                                        + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED,BORDERS) " + "VALUES (" +versionIdString+ ",1,?,'"
+                                        + stripQuotes(title) + "', '" + stripQuotes(instructions) + "', '" + stripQuotes(subtitle) + "','" + pageNumber + "'," + k
+                                        + "," + parentId + "," + ub.getId() + ",NOW()," + intBorder + ")";
                         }
 
-                        queries.add(sql);
+                        //queries.add(sql);
+                        ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                        sqlParameters.add(new SqlParameter(secLabel));                        
+                        
+                        QueryObject qo = new QueryObject();
+                        qo.setSql(sql);
+                        qo.setSqlParameters(sqlParameters);
+                        
+                        queries.add(qo);
                     }// end for loop
                 } else if (sheetName.equalsIgnoreCase("CRF")) {
                     logger.debug("read crf");
@@ -2248,17 +2499,33 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
                             ncrf.setCrfId(crfId);
                             String createCRFSql;
                             if (dbName.equals("oracle")) {
-                                createCRFSql =
+                               /* createCRFSql =
                                     "INSERT INTO CRF (CRF_ID, STATUS_ID, NAME, DESCRIPTION, OWNER_ID, DATE_CREATED, OC_OID, SOURCE_STUDY_ID) VALUES (" + crfId
                                         + ", 1,'" + stripQuotes(crfName) + "','" + stripQuotes(versionDesc) + "'," + ub.getId() + ",sysdate" + ",'" + crfOid
-                                        + "'," + studyId + ")";
+                                        + "'," + studyId + ")";*/
+                            	 createCRFSql =
+                                         "INSERT INTO CRF (CRF_ID, STATUS_ID, NAME, DESCRIPTION, OWNER_ID, DATE_CREATED, OC_OID, SOURCE_STUDY_ID) VALUES (" + crfId
+                                             + ", 1, ? ,'" + stripQuotes(versionDesc) + "'," + ub.getId() + ",sysdate" + ",'" + crfOid
+                                             + "'," + studyId + ")";
                             } else {
-                                createCRFSql =
+                               /* createCRFSql =
                                     "INSERT INTO CRF (CRF_ID, STATUS_ID, NAME, DESCRIPTION, OWNER_ID, DATE_CREATED, OC_OID, SOURCE_STUDY_ID) VALUES (" + crfId
                                         + ", 1,'" + stripQuotes(crfName) + "','" + stripQuotes(versionDesc) + "'," + ub.getId() + ",NOW()" + ",'" + crfOid
-                                        + "'," + studyId + ")";
+                                        + "'," + studyId + ")";*/
+                            	 createCRFSql =
+                                         "INSERT INTO CRF (CRF_ID, STATUS_ID, NAME, DESCRIPTION, OWNER_ID, DATE_CREATED, OC_OID, SOURCE_STUDY_ID) VALUES (" + crfId
+                                             + ", 1, ? ,'" + stripQuotes(versionDesc) + "'," + ub.getId() + ",NOW()" + ",'" + crfOid
+                                             + "'," + studyId + ")";
                             }
-                            queries.add(createCRFSql);
+                            //queries.add(createCRFSql);
+                            ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                            sqlParameters.add(new SqlParameter(stripQuotes(crfName)));                           
+                            
+                            QueryObject qo = new QueryObject();
+                            qo.setSql(createCRFSql);
+                            qo.setSqlParameters(sqlParameters);
+                            
+                            queries.add(qo);
                         } catch (SQLException e) {
                             logger.warn("Exception encountered with query select nextval('crf_crf_id_seq'), Message-" + e.getMessage());
                         } finally {
@@ -2311,38 +2578,64 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
 
                     if (dbName.equals("oracle")) {
                         if (crfId == 0) {
-                            sql =
+                            /*sql =
                                 "INSERT INTO CRF_VERSION (NAME, DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) "
                                     + "VALUES ('" + stripQuotes(version) + "','" + stripQuotes(versionDesc) + "'," + "(SELECT CRF_ID FROM CRF C WHERE C.NAME='"
-                                    + crfName + "'),1,sysdate," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";
+                                    + crfName + "'),1,sysdate," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";*/
+                        	sql =
+                                    "INSERT INTO CRF_VERSION (NAME, DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) "
+                                        + "VALUES (?,'" + stripQuotes(versionDesc) + "'," + "(SELECT CRF_ID FROM CRF C WHERE C.NAME='"
+                                        + crfName + "'),1,sysdate," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";
 
                         } else {
-                            sql =
+                           /* sql =
                                 "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " + "VALUES ('"
                                     + version + "','" + stripQuotes(versionDesc) + "'," + crfId + ",1,sysdate," + ub.getId() + ",'"
-                                    + stripQuotes(revisionNotes) + "','" + oid + "')";
+                                    + stripQuotes(revisionNotes) + "','" + oid + "')";*/
+                        	 sql =
+                                     "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " 
+                        	 + "VALUES (?,'" + stripQuotes(versionDesc) + "'," + crfId + ",1,sysdate," + ub.getId() + ",'"
+                                         + stripQuotes(revisionNotes) + "','" + oid + "')";
 
                         }
                     } else {
                         if (crfId == 0) {
-                            sql =
+                            /*sql =
                                 "INSERT INTO CRF_VERSION (NAME, DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) "
                                     + "VALUES ('" + stripQuotes(version) + "','" + stripQuotes(versionDesc) + "'," + "(SELECT CRF_ID FROM CRF WHERE NAME='"
-                                    + crfName + "'),1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";
+                                    + crfName + "'),1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";*/
+                        	sql =
+                                    "INSERT INTO CRF_VERSION (NAME, DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) "
+                                        + "VALUES (?,'" + stripQuotes(versionDesc) + "'," + "(SELECT CRF_ID FROM CRF WHERE NAME='"
+                                        + crfName + "'),1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";
                         } else {
-                            sql =
+                           /* sql =
                                 "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " + "VALUES ('"
                                     + version + "','" + stripQuotes(versionDesc) + "'," + crfId + ",1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes)
-                                    + "','" + oid + "')";
+                                    + "','" + oid + "')";*/
+                        	 sql =
+                                     "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " 
+                        	     + "VALUES (?,'" + stripQuotes(versionDesc) + "'," + crfId + ",1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes)
+                                         + "','" + oid + "')";
                         }
                     }
 
-                    queries.add(sql);
+                    //queries.add(sql);
+                    ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                    sqlParameters.add(new SqlParameter(stripQuotes(version)));
+                    
+                    QueryObject qo = new QueryObject();
+                    qo.setSql(sql);
+                    qo.setSqlParameters(sqlParameters);
+                    
+                    queries.add(qo);
+					
                     pVersion = version;
                     pVerDesc = versionDesc;
                 }
 
                 versionIdString = "(SELECT CRF_VERSION_ID FROM CRF_VERSION WHERE NAME ='" + pVersion + "' AND CRF_ID=" + crfId + ")";
+                versionIdStringWithParameter = "(SELECT CRF_VERSION_ID FROM CRF_VERSION WHERE NAME ='" + pVersion + "' AND CRF_ID=?)";
 
                 // move html creation to here, include error creation as well,
                 // tbh 7/28
@@ -2562,7 +2855,9 @@ public class SpreadSheetTableRepeating implements SpreadSheetTable {
         return muSql;
     }
 
-
+    private String getMUInsertSqlParameters() {
+        return "insert into measurement_unit (oc_oid, name) values (?, ?)";
+    }
 
     /**
      * Checks whether the parent_item is valid a name

@@ -9,6 +9,7 @@
 package org.akaza.openclinica.bean.admin;
 
 import java.sql.Connection;
+import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -392,9 +393,18 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             // try a for loop instead
             int last = queries.size();
             for (int th = 0; th < last; th++) {
-                String query = (String) queries.get(th);// it.next();
+               /* String query = (String) queries.get(th);// it.next();
+                count = th;
+                s = con.prepareStatement(query);*/
+            	QueryObject qo =(QueryObject) queries.get(th);
+            	String query = qo.getSql();// it.next();
+            	int paraCnt =qo.getSqlParameters().size();
                 count = th;
                 s = con.prepareStatement(query);
+                for(int i=0;i < paraCnt;i++) {
+                	setPreparedStatementParameter(s,i+1,qo.getSqlParameters().get(i));                  
+                }
+                 
                 s.executeUpdate();
                 s.close();
                 error.add(query);
@@ -648,7 +658,23 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             }
 
             logger.debug("deleteInsertToDB function  ---pause in query generation, items---");
-            for (String crQuery : (ArrayList<String>) queries) {
+            QueryObject qo;
+            for (QueryObject queryObj : (ArrayList<QueryObject>) queries) {               
+                qo = queryObj;
+                cur_query = qo.getSql();
+                if (cur_query == null || cur_query.trim().length() < 1) {
+                    continue;
+                }
+                int parCnt = qo.getSqlParameters().size();
+                
+                statement = con.prepareStatement(cur_query);
+                for(int i=0;i<parCnt;i++) {
+                	setPreparedStatementParameter(statement,i+1,qo.getSqlParameters().get(i));                	
+                }
+                statement.executeUpdate();
+                statement.close();
+            }
+            /*for (String crQuery : (ArrayList<String>) queries) {
                 logger.debug(crQuery);
                 cur_query = crQuery;
                 if (cur_query == null || cur_query.trim().length() < 1) {
@@ -658,7 +684,7 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 statement = con.prepareStatement(crQuery);
                 statement.executeUpdate();
                 statement.close();
-            }
+            }*/
             // the below lines are temporarily commented out for instrument
             // upload, tbh 8-13
             con.commit();
@@ -744,5 +770,24 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             }
             this.setErrors(error);
         }
+    }
+    
+    public void setPreparedStatementParameter(PreparedStatement s, int parameterIndex, SqlParameter sp) {
+    	JDBCType type = sp.getType();
+    	try {	
+	    	if(type == null) {	    	
+					s.setString(parameterIndex, sp.getValue());				
+	    	}
+	    	else if(type.equals(JDBCType.INTEGER)) {
+	    		s.setInt(parameterIndex, Integer.parseInt(sp.getValue()));
+	    	}
+	    	else {
+	    		s.setString(parameterIndex, sp.getValue());	
+	    	}
+    	} catch (SQLException e) {
+				// TODO Auto-generated catch block
+    		    System.out.println("setPreparedStatementParameter ERROR:" + s);
+				e.printStackTrace();
+			}
     }
 }

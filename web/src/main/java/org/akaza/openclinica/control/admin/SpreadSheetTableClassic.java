@@ -10,6 +10,7 @@ package org.akaza.openclinica.control.admin;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
+import java.sql.JDBCType;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -18,6 +19,8 @@ import java.util.regex.PatternSyntaxException;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
+import org.akaza.openclinica.bean.admin.QueryObject;
+import org.akaza.openclinica.bean.admin.SqlParameter;
 import org.akaza.openclinica.bean.core.ItemDataType;
 import org.akaza.openclinica.bean.core.ResponseType;
 import org.akaza.openclinica.bean.core.Status;
@@ -213,19 +216,36 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
 
                     String defaultSql = "";
                     if (dbName.equals("oracle")) {
-                        defaultSql =
+                        /*defaultSql =
                             "INSERT INTO ITEM_GROUP ( " + "name, crf_id, status_id, date_created ,owner_id,oc_oid)" + "VALUES ('" + defaultGroup.getName()
                                 + "', " + defaultGroup.getCrfId() + "," + defaultGroup.getStatus().getId() + "," + "sysdate," + ub.getId() + ",'"
-                                + defaultGroupOid + "')";
+                                + defaultGroupOid + "')";*/
+                    	 defaultSql =
+                                 "INSERT INTO ITEM_GROUP ( name, crf_id, status_id, date_created ,owner_id,oc_oid)" + 
+                                		 " VALUES (?, ?, ?,sysdate, ?, ?)";
                     } else {
-                        defaultSql =
+                       /* defaultSql =
                             "INSERT INTO ITEM_GROUP ( " + "name, crf_id, status_id, date_created ,owner_id,oc_oid)" + "VALUES ('" + defaultGroup.getName()
                                 + "', " + defaultGroup.getCrfId() + "," + defaultGroup.getStatus().getId() + "," + "now()," + ub.getId() + ",'"
-                                + defaultGroupOid + "')";
+                                + defaultGroupOid + "')";*/
+                    	 defaultSql =
+                                 "INSERT INTO ITEM_GROUP ( name, crf_id, status_id, date_created ,owner_id,oc_oid)" + 
+                                		 " VALUES (?, ?, ?,now(), ?, ?)";
                     }
 
                     if (!GroupCheck.containsKey("Ungrouped")) {
-                        queries.add(defaultSql);
+                    	 ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                         sqlParameters.add(new SqlParameter(defaultGroup.getName()));
+                         sqlParameters.add(new SqlParameter(defaultGroup.getCrfId().toString(),JDBCType.INTEGER));
+                         sqlParameters.add(new SqlParameter(defaultGroup.getStatus().getId()+"",JDBCType.INTEGER));                         
+                         sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
+                         sqlParameters.add(new SqlParameter(defaultGroupOid+"",JDBCType.INTEGER));
+                         
+                         QueryObject qo = new QueryObject();
+                         qo.setSql(defaultSql);
+                         qo.setSqlParameters(sqlParameters);
+                         
+                         queries.add(qo);
                     }
                     //Adding itemnames for further use
                     HashMap itemNames = new HashMap();
@@ -351,8 +371,17 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                 }
                                 this.existingOIDs.add(oid);
                                 this.existingUnits.add(unit.toUpperCase());
-                                muSql = this.getMUInsertSql(oid, unit, ub.getId(), dbName);
-                                queries.add(muSql);
+                                muSql = this.getMUInsertSqlParameters();
+                                
+                                ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                                sqlParameters.add(new SqlParameter(oid));
+                                sqlParameters.add(new SqlParameter(stripQuotes(unit)));
+                                                             
+                                QueryObject qo = new QueryObject();
+                                qo.setSql(muSql);
+                                qo.setSqlParameters(sqlParameters);
+                                
+                                queries.add(qo);
                             }
                         }
 
@@ -880,23 +909,49 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                             }
                         }
                         String sql = "";
+                        ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
                         if (dbName.equals("oracle")) {
                             // resOptions = resOptions.replaceAll("\\\\,",
                             // "\\,");
-                            sql =
+                           /* sql =
                                 "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, " + "RESPONSE_TYPE_ID, VERSION_ID)" + " VALUES ('"
                                     + stripQuotes(responseLabel) + "', '" + stripQuotes(resOptions.replaceAll("\\\\,", "\\,")) + "','"
                                     + stripQuotes(resValues.replace("\\\\", "\\")) + "'," + "(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME='"
-                                    + stripQuotes(responseType.toLowerCase()) + "')," + versionIdString + ")";
+                                    + stripQuotes(responseType.toLowerCase()) + "')," + versionIdString + ")";*/
+                       	 sql =
+                                 "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
+                                		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"
+                                		 +  versionIdString + ")";
+                    	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
+                          sqlParameters.add(new SqlParameter(stripQuotes(resOptions.replaceAll("\\\\,", "\\,"))));
+                          sqlParameters.add(new SqlParameter(stripQuotes(resValues.replace("\\\\", "\\"))));
+                          sqlParameters.add(new SqlParameter(stripQuotes(stripQuotes(responseType.toLowerCase()))));
+                         //in versionIdString there is one parameter:crfId
+                          sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         } else {
-                            sql =
+                           /* sql =
                                 "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, " + "RESPONSE_TYPE_ID, VERSION_ID)" + " VALUES ('"
                                     + stripQuotes(responseLabel) + "', E'" + stripQuotes(resOptions) + "', E'" + stripQuotes(resValues) + "',"
                                     + "(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME='" + stripQuotes(responseType.toLowerCase()) + "'),"
-                                    + versionIdString + ")";
+                                    + versionIdString + ")";*/
+                        	 sql =
+                                     "INSERT INTO RESPONSE_SET (LABEL, OPTIONS_TEXT, OPTIONS_VALUES, RESPONSE_TYPE_ID, VERSION_ID)" 
+                                    		 + " VALUES (?, ?, ?,(SELECT RESPONSE_TYPE_ID From RESPONSE_TYPE Where NAME=?),"
+                                    		 +  versionIdString + ")";
+                        	  sqlParameters.add(new SqlParameter(stripQuotes(responseLabel)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(resOptions)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(resValues)));
+                              sqlParameters.add(new SqlParameter(stripQuotes(stripQuotes(responseType.toLowerCase()))));
+                             //in versionIdString there is one parameter:crfId
+                              sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         }
-                        if (!resNames.contains(responseLabel)) {
-                            queries.add(sql);
+                        if (!resNames.contains(responseLabel)) {                        	                           
+                                                      
+                             QueryObject qo = new QueryObject();
+                             qo.setSql(sql);
+                             qo.setSqlParameters(sqlParameters);
+                             
+                             queries.add(qo);
                             resNames.add(responseLabel);
                             // this will have to change since we have some data
                             // in the actual
@@ -950,8 +1005,9 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                 + itemName + "'" + " AND I.owner_id = " + ownerId + " AND CV.CRF_VERSION_ID is not null AND CV.CRF_ID =" + crfId + " )) ";
 
                         String sql2 = "";
+                        sqlParameters = new ArrayList<>();
                         if (dbName.equals("oracle")) {
-                            sql2 =
+                          /*  sql2 =
                                 "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,header,LEFT_ITEM_TEXT,"
                                     + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
                                     + "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
@@ -990,11 +1046,40 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                     + stripQuotes(questionNum)
                                     + "','"
                                     + stripQuotes(regexp1) + "','" + stripQuotes(regexpError) + "', " + (isRequired ? 1 : 0) + ")";
-
-                            logger.warn(sql2);
-
+*/
+                        	  sql2 =
+                                      "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,header,LEFT_ITEM_TEXT,"
+                                          + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
+                                          + "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
+                                          +  versionIdString                                                                  
+                                          + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
+                                          + stripQuotes(responseLabel)
+                                          + "'"
+                                          + " AND VERSION_ID="
+                                          + versionIdString
+                                          + "),"
+                                          + selectCorrectItemQueryPostgres
+                                          + ",?, ?, ?, ?, ? "                                         
+                                          + ", (SELECT SECTION_ID FROM SECTION WHERE LABEL='"
+                                          + secName
+                                          + "' AND "
+                                          + "CRF_VERSION_ID IN "
+                                          + versionIdString
+                                          + "), "
+                                          + k
+                                          + ",'"
+                                          + parentItem
+                                          + "',"
+                                          + columnNum
+                                          + ",'"
+                                          + stripQuotes(page)
+                                          + "','"
+                                          + stripQuotes(questionNum)
+                                          + "','"
+                                          + stripQuotes(regexp1) + "','" + stripQuotes(regexpError) + "', " + (isRequired ? 1 : 0) + ")";
+                         
                         } else {
-                            sql2 =
+                           /* sql2 =
                                 "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
                                     + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
                                     + "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
@@ -1032,20 +1117,78 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                     + "','"
                                     + stripQuotes(questionNum)
                                     + "','"
-                                    + stripQuotes(regexp1) + "','" + stripQuotes(regexpError) + "', " + isRequired + ")";
+                                    + stripQuotes(regexp1) + "','" + stripQuotes(regexpError) + "', " + isRequired + ")";*/
+                        	 sql2 =
+                                     "INSERT INTO ITEM_FORM_METADATA (CRF_VERSION_ID, RESPONSE_SET_ID," + "ITEM_ID,SUBHEADER,HEADER,LEFT_ITEM_TEXT,"
+                                         + "RIGHT_ITEM_TEXT,PARENT_ID,SECTION_ID,ORDINAL,PARENT_LABEL,COLUMN_NUMBER,PAGE_NUMBER_LABEL,question_number_label,"
+                                         + "REGEXP,REGEXP_ERROR_MSG,REQUIRED)" + " VALUES ("
+                                         + versionIdString                                         
+                                         + ",(SELECT RESPONSE_SET_ID FROM RESPONSE_SET WHERE LABEL='"
+                                         + stripQuotes(responseLabel)
+                                         + "'"
+                                         + " AND VERSION_ID="
+                                         + versionIdString
+                                         + "),"
+                                         + selectCorrectItemQueryPostgres
+                                         + ",?, ?, ?, ?, ? "
+                                         + ", (SELECT SECTION_ID FROM SECTION WHERE LABEL='"
+                                         + secName
+                                         + "' AND "
+                                         + "CRF_VERSION_ID IN "
+                                         + versionIdString
+                                         + "), "
+                                         + k
+                                         + ",'"
+                                         + parentItem
+                                         + "',"
+                                         + columnNum
+                                         + ",'"
+                                         + stripQuotes(page)
+                                         + "','"
+                                         + stripQuotes(questionNum)
+                                         + "','"
+                                         + stripQuotes(regexp1) + "','" + stripQuotes(regexpError) + "', " + isRequired + ")";
+                                                                                
                         }
-
-                        queries.add(sql2);
+                     
+                       //in versionIdString there is one parameter:crfId
+                        sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                        sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                        sqlParameters.add(new SqlParameter(stripQuotes(subHeader)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(header)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(leftItemText)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(rightItemText)));
+                        sqlParameters.add(new SqlParameter(parentItemString,JDBCType.INTEGER));
+                        sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                        
+                        QueryObject qo = new QueryObject();
+                        qo.setSql(sql2);
+                        qo.setSqlParameters(sqlParameters);
+                        
+                        queries.add(qo);
+						
+						
                         // link version with items now
                         String sql3 = "";
                         if (dbName.equals("oracle")) {
                             sql3 =
                                 "INSERT INTO VERSIONING_MAP (CRF_VERSION_ID, ITEM_ID) VALUES ( " + versionIdString + "," + selectCorrectItemQueryOracle + ")";
+                        	
                         } else {
                             sql3 =
                                 "INSERT INTO VERSIONING_MAP (CRF_VERSION_ID, ITEM_ID) VALUES ( " + versionIdString + "," + selectCorrectItemQueryPostgres + ")";
+                       
                         }
-                        queries.add(sql3);
+                        sqlParameters = new ArrayList<>();
+                       
+                       //in versionIdString there is one parameter:crfId
+                        sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                        
+                        qo = new QueryObject();
+                        qo.setSql(sql3);
+                        qo.setSqlParameters(sqlParameters);
+                        
+                        queries.add(qo);
 
                         // this item doesn't have group, so put it into
                         // 'Ungrouped' group
@@ -1068,7 +1211,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                     + 1
                                     + ", '', 1,"
                                     + versionIdString
-                                    + ","
+                                    + ","                                   
                                     // + "(SELECT MAX(ITEM_ID) FROM ITEM WHERE
                                     // NAME='"
                                     // + itemName + "' ),"
@@ -1107,7 +1250,17 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                     + "AND CRF_VERSION.CRF_ID= " + crfId + " ORDER BY ITEM.OC_OID DESC LIMIT 1)," + k + ",0)";
                         }
 
-                        queries.add(sqlGroupLabel);
+                        sqlParameters = new ArrayList<>();
+                       //in versionIdString there is one parameter:crfId
+                        sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                       
+                        
+                        qo = new QueryObject();
+                        qo.setSql(sqlGroupLabel);
+                        qo.setSqlParameters(sqlParameters);
+                        
+                        queries.add(qo);
+                       
                     }
                 } else if (sheetName.equalsIgnoreCase("Sections")) {
                     logger.info("read sections");
@@ -1184,20 +1337,49 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                             }
                         }
                         String sql = "";
+                       
                         if (dbName.equals("oracle")) {
-                            sql =
+                          /*  sql =
                                 "INSERT INTO SECTION (CRF_VERSION_ID," + "STATUS_ID,LABEL, TITLE, INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL,"
                                     + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED) " + "VALUES (" + versionIdString + ",1,'" + secLabel + "','"
                                     + stripQuotes(title) + "', '" + stripQuotes(instructions) + "', '" + stripQuotes(subtitle) + "','" + pageNumber + "'," + k
-                                    + "," + parentId + "," + ub.getId() + ",sysdate)";
+                                    + "," + parentId + "," + ub.getId() + ",sysdate)";*/
+                        	 sql =
+                                     "INSERT INTO SECTION (CRF_VERSION_ID," + "STATUS_ID,LABEL, TITLE, INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL,"
+                                         + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED) " 
+                                    	 + "VALUES ("+ versionIdString + ", 1, ? ,?, ?, ?, ?, ?, ?, ?,sysdate)";
+                     
+                           
                         } else {
-                            sql =
+                           /* sql =
                                 "INSERT INTO SECTION (CRF_VERSION_ID," + "STATUS_ID,LABEL, TITLE, INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL,"
                                     + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED) " + "VALUES (" + versionIdString + ",1,'" + secLabel + "','"
                                     + stripQuotes(title) + "', '" + stripQuotes(instructions) + "', '" + stripQuotes(subtitle) + "','" + pageNumber + "'," + k
-                                    + "," + parentId + "," + ub.getId() + ",NOW())";
+                                    + "," + parentId + "," + ub.getId() + ",NOW())";*/
+                        	 sql =
+                                     "INSERT INTO SECTION (CRF_VERSION_ID," + "STATUS_ID,LABEL, TITLE, INSTRUCTIONS, SUBTITLE, PAGE_NUMBER_LABEL,"
+                                         + "ORDINAL, PARENT_ID, OWNER_ID, DATE_CREATED) " 
+                                    	 + "VALUES (" + versionIdString + ", 1, ? ,?, ?, ?, ?, ?, ?, ?,NOW())";
                         }
-                        queries.add(sql);
+                        
+                        ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                        //in versionIdString there is one parameter:crfId
+                        sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                        
+                        sqlParameters.add(new SqlParameter(secLabel));
+                        sqlParameters.add(new SqlParameter(stripQuotes(title)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(instructions)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(subtitle)));
+                        sqlParameters.add(new SqlParameter(pageNumber));
+                        sqlParameters.add(new SqlParameter(k+"",JDBCType.INTEGER));
+                        sqlParameters.add(new SqlParameter(parentId +"",JDBCType.INTEGER));
+                        sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
+                        
+                        QueryObject qo = new QueryObject();
+                        qo.setSql(sql);
+                        qo.setSqlParameters(sqlParameters);
+                        
+                        queries.add(qo);
                     }// end for loop
                 } else if (sheetName.equalsIgnoreCase("CRF")) {
                     logger.info("read crf");
@@ -1324,17 +1506,36 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                             ncrf.setCrfId(crfId);
                             String createCRFSql = "";
                             if (dbName.equals("oracle")) {
-                                createCRFSql =
+                                /*createCRFSql =
                                     "INSERT INTO CRF (CRF_ID, STATUS_ID, NAME, DESCRIPTION, OWNER_ID, DATE_CREATED, OC_OID, SOURCE_STUDY_ID) VALUES (" + crfId
                                         + ", 1,'" + stripQuotes(crfName) + "','" + stripQuotes(versionDesc) + "'," + ub.getId() + ",sysdate" + ",'" + crfOid
-                                        + "'," + studyId + ")";
+                                        + "'," + studyId + ")";*/
+                            	 createCRFSql =
+                                         "INSERT INTO CRF (CRF_ID, STATUS_ID, NAME, DESCRIPTION, OWNER_ID, DATE_CREATED, OC_OID, SOURCE_STUDY_ID) VALUES " 
+                                             + "(?, 1, ?, ?, ?, sysdate,? ,?)";
                             } else {
-                                createCRFSql =
+                               /* createCRFSql =
                                     "INSERT INTO CRF (CRF_ID, STATUS_ID, NAME, DESCRIPTION, OWNER_ID, DATE_CREATED, OC_OID, SOURCE_STUDY_ID) VALUES (" + crfId
                                         + ", 1,'" + stripQuotes(crfName) + "','" + stripQuotes(versionDesc) + "'," + ub.getId() + ",NOW()" + ",'" + crfOid
-                                        + "'," + studyId + ")";
+                                        + "'," + studyId + ")";*/
+                            	 createCRFSql =
+                                         "INSERT INTO CRF (CRF_ID, STATUS_ID, NAME, DESCRIPTION, OWNER_ID, DATE_CREATED, OC_OID, SOURCE_STUDY_ID) VALUES " 
+                                             + "(?, 1, ?, ?, ?, NOW(),? ,?)";
                             }
-                            queries.add(createCRFSql);
+                            
+                            ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                            sqlParameters.add(new SqlParameter(crfId +"",JDBCType.INTEGER));
+                            sqlParameters.add(new SqlParameter(stripQuotes(crfName)));
+                            sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));                          
+                            sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
+                            sqlParameters.add(new SqlParameter(crfOid));                          
+                            sqlParameters.add(new SqlParameter(studyId+"",JDBCType.INTEGER));                          
+                            
+                            QueryObject qo = new QueryObject();
+                            qo.setSql(createCRFSql);
+                            qo.setSqlParameters(sqlParameters);                            
+                            queries.add(qo);
+                            
                         } catch (SQLException e) {
                             logger.warn("Exception encountered with query select nextval('crf_crf_id_seq'), Message-" + e.getMessage());
                         } finally {
@@ -1376,34 +1577,80 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         oid = cvdao.getValidOid(new CRFVersionBean(), crfBean.getOid(), version);
                     }
                     String sql = "";
+                    ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
                     if (dbName.equals("oracle")) {
                         logger.warn("TEST 2");
                         if (crfId == 0) {
-                            sql =
+                            /*sql =
                                 "INSERT INTO CRF_VERSION (NAME, DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) "
                                     + "VALUES ('" + stripQuotes(version) + "','" + stripQuotes(versionDesc) + "'," + "(SELECT CRF_ID FROM CRF WHERE NAME='"
-                                    + crfName + "'),1,sysdate," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";
+                                    + crfName + "'),1,sysdate," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";*/
+                        	 sql =
+                                     "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " + 
+                        	        "VALUES (?, ?, (SELECT CRF_ID FROM CRF WHERE NAME=?), 1, sysdate, ?, ?, ?)";
+                        	 
+                             sqlParameters.add(new SqlParameter(version +""));                    
+                             sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));
+                             sqlParameters.add(new SqlParameter(crfName));
+                             sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
+                             sqlParameters.add(new SqlParameter(stripQuotes(revisionNotes)));                          
+                             sqlParameters.add(new SqlParameter(oid+""));
                         } else {
-                            sql =
+                           /* sql =
                                 "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " + "VALUES ('"
                                     + version + "','" + stripQuotes(versionDesc) + "'," + crfId + ",1,sysdate," + ub.getId() + ",'"
-                                    + stripQuotes(revisionNotes) + "','" + oid + "')";
+                                    + stripQuotes(revisionNotes) + "','" + oid + "')";*/
+                        	 sql =
+                                     "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " + 
+                        	        "VALUES (?, ?, ?, 1, sysdate, ?, ?, ?)";
+                        	 
+                             sqlParameters.add(new SqlParameter(version +""));                    
+                             sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));
+                             sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                             sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
+                             sqlParameters.add(new SqlParameter(stripQuotes(revisionNotes)));                          
+                             sqlParameters.add(new SqlParameter(oid+"")); 
                         }
                     } else {
                         if (crfId == 0) {
-                            sql =
+                            /*sql =
                                 "INSERT INTO CRF_VERSION (NAME, DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) "
                                     + "VALUES ('" + stripQuotes(version) + "','" + stripQuotes(versionDesc) + "'," + "(SELECT CRF_ID FROM CRF WHERE NAME='"
-                                    + crfName + "'),1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";
+                                    + crfName + "'),1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes) + "','" + oid + "')";*/
+                        	 sql =
+                                     "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " + 
+                        	        " VALUES (?, ?, (SELECT CRF_ID FROM CRF WHERE NAME=?), 1, NOW(), ?, ?, ?)";
+                        	 
+                             sqlParameters.add(new SqlParameter(version +""));                    
+                             sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));
+                             sqlParameters.add(new SqlParameter(crfName));
+                             sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
+                             sqlParameters.add(new SqlParameter(stripQuotes(revisionNotes)));                          
+                             sqlParameters.add(new SqlParameter(oid+""));            
                         } else {
-                            sql =
+                           /* sql =
                                 "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " + "VALUES ('"
                                     + version + "','" + stripQuotes(versionDesc) + "'," + crfId + ",1,NOW()," + ub.getId() + ",'" + stripQuotes(revisionNotes)
-                                    + "','" + oid + "')";
+                                    + "','" + oid + "')";*/
+                        	 sql =
+                                     "INSERT INTO CRF_VERSION (NAME,DESCRIPTION, CRF_ID, STATUS_ID,DATE_CREATED," + "OWNER_ID,REVISION_NOTES,OC_OID) " + 
+                        	        " VALUES (?, ?, ?, 1, NOW(), ?, ?, ?)";
+                        	 
+                             sqlParameters.add(new SqlParameter(version +""));                    
+                             sqlParameters.add(new SqlParameter(stripQuotes(versionDesc)));
+                             sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
+                             sqlParameters.add(new SqlParameter(ub.getId()+"",JDBCType.INTEGER));
+                             sqlParameters.add(new SqlParameter(stripQuotes(revisionNotes)));                          
+                             sqlParameters.add(new SqlParameter(oid+""));            
                         }
                     }
 
-                    queries.add(sql);
+                                
+                    
+                    QueryObject qo = new QueryObject();
+                    qo.setSql(sql);
+                    qo.setSqlParameters(sqlParameters);                            
+                    queries.add(qo);
                     for (int i = 0; i < queries.size(); i++) {
                         String s = (String) queries.get(i);
                         logger.info("====================" + s);
@@ -1412,7 +1659,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                     pVerDesc = versionDesc;
                 }
 
-                versionIdString = "(SELECT CRF_VERSION_ID FROM CRF_VERSION WHERE NAME ='" + pVersion + "' AND CRF_ID=" + crfId + ")";
+                /*versionIdString = "(SELECT CRF_VERSION_ID FROM CRF_VERSION WHERE NAME ='" + pVersion + "' AND CRF_ID=" + crfId + ")";*/
+                versionIdString = "(SELECT CRF_VERSION_ID FROM CRF_VERSION WHERE NAME ='" + pVersion + "' AND CRF_ID=?)";
 
                 // move html creation to here, include error creation as well,
                 // tbh 7/28
@@ -1615,6 +1863,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
    
     private String getMUInsertSql(String oid, String measurementUnitName, int ownerId, String dbName) {
         return "insert into measurement_unit (oc_oid, name) values ('" + oid + "', '" + stripQuotes(measurementUnitName) + "')";
+    }
+    
+    private String getMUInsertSqlParameters() {
+        return "insert into measurement_unit (oc_oid, name) values (?, ?)";
     }
 
     public void setLocale(Locale locale) {
