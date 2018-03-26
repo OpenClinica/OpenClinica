@@ -73,6 +73,15 @@
   });
 </script>
 <style>
+  #header {
+    display: inline-block;
+    margin-bottom: 15px;
+  }
+  #header-links {
+    float: right;
+    margin-top: 6px;
+    font-size: .85rem;
+  }
   .section {
     margin-bottom: 5px;
   }
@@ -119,53 +128,64 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
-<h1 style="display:inline-block; margin-right:40px;">
+<h1 id="header">
   <span class="title_manage">
     <fmt:message key="view_subject2" bundle="${resword}"/>
     <c:out value="${studySub.label}"/>
   </span>
 </h1>
-<c:choose>
-  <c:when
-    test="${from =='listSubject' && userBean.sysAdmin && module=='admin'}">
-    <span>
-      <a style="text-decoration: none"
-      href="ViewSubject?id=
-      <c:out value="${subject.id}"/>
-      ">
-      <fmt:message
-        key="go_back_to_view_subject" bundle="${resword}" />
-      </a>
-    </span>
-  </c:when>
-  <c:otherwise>
+<div id="header-links">
+  <span>
     <c:choose>
-      <c:when test="${(userRole.manageStudy)&& module=='manage'}">
+      <c:when
+        test="${from =='listSubject' && userBean.sysAdmin && module=='admin'}">
         <span>
-          <a style="text-decoration: none" href="ListStudySubject">
-            <fmt:message key="go_back_to_study_subject_list" bundle="${resword}"/>
+          <a style="text-decoration: none"
+          href="ViewSubject?id=
+          <c:out value="${subject.id}"/>
+          ">
+          <fmt:message
+            key="go_back_to_view_subject" bundle="${resword}" />
           </a>
         </span>
       </c:when>
       <c:otherwise>
-        <span>
-          <a href="ListStudySubjects" style="text-decoration: none">
-            <fmt:message
-              key="back_to_subject_matrix" bundle="${resword}" />
-          </a>
-        </span>
+        <c:choose>
+          <c:when test="${(userRole.manageStudy)&& module=='manage'}">
+            <span>
+              <a style="text-decoration: none" href="ListStudySubject">
+                <fmt:message key="go_back_to_study_subject_list" bundle="${resword}"/>
+              </a>
+            </span>
+          </c:when>
+          <c:otherwise>
+            <span>
+              <a href="ListStudySubjects" style="text-decoration: none">
+                <fmt:message
+                  key="back_to_subject_matrix" bundle="${resword}" />
+              </a>
+            </span>
+          </c:otherwise>
+        </c:choose>
       </c:otherwise>
     </c:choose>
-  </c:otherwise>
-</c:choose>
-<label for="oc-status-hide" style="margin-left: 40px;">Show:</label>
-<select id="oc-status-hide">
-  <option value="oc-status-removed">Active Records</option>
-  <option value="oc-status-active">Removed Records</option>
-  <option value="null">All Records</option>
-</select>
-<br>
-<br>
+  </span>
+  <span> | </span>
+  <span>
+    <a style="text-decoration: none" href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
+      <fmt:message key="audit_logs" bundle="${resword}"/>
+    </a>
+  </span>
+  <span> | </span>
+  <span>
+    <label for="oc-status-hide">Showing</label>
+    <select id="oc-status-hide">
+      <option value="oc-status-removed">Active Records</option>
+      <option value="oc-status-active">Removed Records</option>
+      <option value="null">All Records</option>
+    </select>
+  </div>
+</span>
 <c:choose>
   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
     <div class="table_title_Admin">
@@ -211,11 +231,6 @@
                                         <tbody>
                                           <tr>
                                             <td class="table_tools">
-                                              <a style="text-decoration: none" href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=
-                                              <c:out value="${studySub.id}"/>
-                                              ')">
-                                              <fmt:message key="audit_logs" bundle="${resword}"/>
-                                              </a>
                                               <c:if test="${study.status.available}">
                                                 <c:if test="${!userRole.monitor}">
                                                   |
