@@ -1,22 +1,13 @@
 <style>
-    .section {
-        background-color: #f1f1f1;
-        background-image: none;
-        border-top: 1px solid #999;
-        font-size: .8em;
-        padding: 1em;
-    }
-    .section-body.collapsed {
-        display: none;
-    }
-    .collapsed .icon-caret-down {
-        display: none;
-    }
-    .expanded .icon-caret-right {
-        display: none;
-    }
     .datatable {
         padding-top: 5px;
+    }
+    .dataTables_info {
+        padding-top: 0.5em !important;
+    }
+    .dataTables_length {
+        padding-top: 0.5em;
+        padding-left: 1.5em;
     }
     thead .table_cell {
         background-color: #ccc !important;
@@ -28,24 +19,15 @@
     td.actions td {
         padding: 3.4px !important;
     }
+    tr.submission:hover, td.highlight {
+        background-color: whitesmoke !important;
+    }
     .form-name {
         display: inline;
         margin-right: 10px;
     }
-    .dataTables_info {
-        padding-top: 0.5em !important;
-    }
-    .dataTables_length {
-        padding-top: 0.5em;
-        padding-left: 1.5em;
-    }
-    tr:hover, td.highlight {
-        background-color: whitesmoke !important;
-    }
-    input[type=button][disabled], input[type=button][disabled]:hover {
-        background-color: lightgray;
-        background-image: none;
-        color: gray;
+    input[type=button][disabled] {
+        display: none;
     }
     .actions .icon:before {
         content: "\f1234";
@@ -65,122 +47,95 @@
     .actions .icon.icon-restore:before {
         content: "\e817";
     }
+    .actions .icon.icon-sign:before {
+        content: "\e91a";
+    }
 }
 </style>
 
-<table cellspacing="0" width="100%">
-<tbody id="sections">
-    <tr id="loading">
-        <td>Loading...</td>
-    </tr>
-</tbody>
-</table>
+<div id="commonEvents"></div>
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
+<script>
+    Handlebars.registerHelper('truncate', function(s, length) {
+        s = s.join(', ');
+        return s.length < length ? s : s.substring(0, length) + '...';
+    });
+</script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <tr class="section-header collapsed {{sectionStatus}}" style="{{sectionDisplay}};">
-        <td class="section">
-            <span class="icon icon-caret-down gray"></span>
-            <span class="icon icon-caret-right gray"></span>
-            <span>{{sectionName}}</span>
-        </td>
-    </tr>
-    <tr class="section-body collapsed {{sectionStatus}}" data-study-event-oid="{{studyEventOid}}">
-    <td>
-    <div class="box_T">
-    <div class="box_L">
-    <div class="box_R">
-    <div class="box_B">
-    <div class="box_TL">
-    <div class="box_TR">
-    <div class="box_BL">
-    <div class="box_BR">
-    <div class="tablebox_center">
-        <table border="0" cellpadding="0" cellspacing="0">
-        <tbody>
-        {{#each forms as |form|}}
-        <tr>
-            <td colspan="3" valign="top">
-                <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{{form.disabled}}}>
-                <h3 class="form-name">{{form.[@Name]}}</h3>
-                <table border="0" cellpadding="0" cellspacing="0" class="datatable">
-                <thead>
-                    <tr valign="top">
-                        {{#each form.itemGroups as |itemGroup|}}
-                            {{#each itemGroup.items as |item|}}
-                                <td class="table_cell">{{item.Question.TranslatedText}}</td>
+    <div class="section expanded">
+        <div class="section-header">
+            {{sectionName}}
+        </div>
+        <div class="section-body">
+            <table border="0" cellpadding="0" cellspacing="0">
+            <tbody>
+            {{#each forms as |form|}}
+            <tr>
+                <td colspan="3" valign="top" style="padding-top: 30px;">
+                    <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
+                    <h3 class="form-name">{{form.[@Name]}}</h3>
+                    <table border="0" cellpadding="0" cellspacing="0" class="datatable">
+                    <thead>
+                        <tr valign="top">
+                            {{#each form.itemGroups as |itemGroup|}}
+                                {{#each itemGroup.items as |item|}}
+                                    <td class="table_cell">{{item.Question.TranslatedText}}</td>
+                                {{/each}}
                             {{/each}}
-                        {{/each}}
-                        <td class="table_cell">
-                            <center>Status</center>
-                        </td>
-                        <td class="table_cell">
-                            <center>Updated</center>
-                        </td>
-                        <td class="table_cell">
-                            <center>Actions</center>
-                        </td>
-                    </tr>
-                    <tr valign="top">
-                        {{#each form.itemGroups as |itemGroup|}}
-                            {{#each itemGroup.items as |item|}}
-                                <td class="table_cell"></td>
-                            {{/each}}
-                        {{/each}}
-                        <td class="table_cell">
-                        </td>
-                        <td class="table_cell">
-                        </td>
-                        <td class="table_cell">
-                        </td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each form.submissions as |submission|}}
-                        <tr class="submission {{submission.hideStatus}}" style="{{submission.display}}">
-                            {{#each submission.data as |item|}}
-                                <td class="table_cell">{{item}}</td>
-                            {{/each}}
-                            <td align="center" class="table_cell">{{submission.studyStatus}}</td>
-                            <td align="center" class="table_cell"></td>
-                            <td class="table_cell actions">
-                                <table border="0" cellpadding="0" cellspacing="0">
-                                    <tbody>
-                                        <tr valign="top">
-                                            {{#each submission.links as |link|}}
-                                            <td>
-                                                <a href="${pageContext.request.contextPath}{{link.[@href]}}">
-                                                <span class="icon icon-{{link.[@rel]}}" border="0" alt="{{link.[@rel]}}" title="{{link.[@rel]}}" align="left" hspace="6">
-                                                </span></a>
-                                            </td>
-                                            {{/each}}
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <td class="table_cell">
+                                <center>Status</center>
                             </td>
+                            <td class="table_cell">
+                                <center>Last Update</center>
+                            </td>
+                            <td class="table_cell">
+                                <center>Updated By</center>
+                            </td>
+                            <td class="table_cell">
+                                <center>Actions</center>
+                            </td>
+                            <td></td>
                         </tr>
-                    {{/each}}
-                </tbody>
-                </table>
-            {{/each}}
-            </td>
-        </tr>
-        </tbody>
-        </table>
-        <br>
+                    </thead>
+                    <tbody>
+                        {{#each form.submissions as |submission|}}
+                            <tr class="submission">
+                                {{#each submission.data as |data|}}
+                                    <td class="table_cell" data-search="{{data}}">{{truncate data 200}}</td>
+                                {{/each}}
+                                <td align="center" class="table_cell">{{submission.studyStatus}}</td>
+                                <td align="center" class="table_cell">{{submission.updatedDate}}</td>
+                                <td align="center" class="table_cell">{{submission.updatedBy}}</td>
+                                <td class="table_cell actions">
+                                    <table border="0" cellpadding="0" cellspacing="0">
+                                        <tbody>
+                                            <tr valign="top">
+                                                {{#each submission.links as |link|}}
+                                                <td>
+                                                    <a href="${pageContext.request.contextPath}{{link.[@href]}}">
+                                                    <span class="icon icon-{{link.[@rel]}}" border="0" alt="{{link.[@rel]}}" title="{{link.[@rel]}}" align="left" hspace="6">
+                                                    </span></a>
+                                                </td>
+                                                {{/each}}
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td>{{submission.hideStatus}}</td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                    </table>
+                {{/each}}
+                </td>
+            </tr>
+            </tbody>
+            </table>
+        </div>
     </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </td>
-    </tr>
 </script>
 
 <script>
@@ -237,15 +192,14 @@ $(function() {
                 return ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'No';
             }).map(function(ref) {
                 var form = forms[ref['@FormOID']];
-                form.studyEvent = studyEvent;
-                form.disabled = '';
+                form.disableAddNew = false;
                 return form;
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
 
-        collection(data.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEvent) {
-            var formData = studyEvent.FormData;
+        collection(data.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
+            var formData = studyEventData.FormData;
             if (!formData)
                 return;
 
@@ -253,22 +207,28 @@ $(function() {
             if (!form)
                 return;
 
-            if (form.studyEvent['@Repeating'] === 'No')
-                form.disabled = 'disabled="disabled"';
+            var studyEvent = studyEvents[studyEventData['@StudyEventOID']];
+            if (studyEvent['@OpenClinica:EventType'] !== 'Common')
+                return;
+
+            if (studyEvent['@Repeating'] === 'No')
+                form.disableAddNew = true;
 
             var links = [];
-            $.merge(links, collection(studyEvent['OpenClinica:links']['OpenClinica:link']));
+            $.merge(links, collection(studyEventData['OpenClinica:links']['OpenClinica:link']));
             $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
-            var order = ['edit', 'view', 'remove', 'restore', 'reassign'];
+            var order = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign'];
             links.sort(function(a, b) {
                 return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
             });
 
-            var hideStatus = formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active';
+
             var submission = {
-                studyStatus: studyEvent['@OpenClinica:Status'],
-                hideStatus: hideStatus,
-                display: hideStatus === 'oc-status-removed' ? 'display:none;' : '',
+                studyStatus: studyEventData['@OpenClinica:Status'],
+                formStatus: formData['@OpenClinica:Status'],
+                hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
+                updatedDate: formData['@OpenClinica:UpdatedDate'].split(' ')[0],
+                updatedBy: formData['@OpenClinica:UpdatedBy'],
                 data: $.extend(true, {}, form.submissionObj),
                 links: links
             };
@@ -280,16 +240,24 @@ $(function() {
             form.submissions.push(submission);
         });
 
+        var hideClass = 'oc-status-removed';
+        $.fn.DataTable.ext.search.push(
+           function(settings, data, dataIndex) {
+              return data[data.length-1] !== hideClass;
+           }
+        );
         $('#oc-status-hide').on('change', function() {
-            $('tr.section-header, tr.section-body').removeClass('expanded').addClass('collapsed');
-            var targets = $('tr.section-header, tr.submission');
-            var hides = targets.filter('.' + $(this).val());
+            hideClass = $(this).val();
+            var sections = $('tr.section-header');
+            var hides = sections.filter('.' + hideClass);
             hides.hide();
-            targets.not(hides).show();
+            sections.not(hides).show();
+            $('table.datatable').DataTable().draw();
+            $('tr.section-header, tr.section-body').removeClass('expanded').addClass('collapsed');
         });
 
         var hideStatus = $('#oc-status-hide').val();
-        var sectionTable = $('#sections');
+        var sectionTable = $('#commonEvents');
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
@@ -336,14 +304,11 @@ $(function() {
             });
         });
 
-        if (!numCommons) {
-            $('#commonEvents').hide();
-            $('#commonEvents_collapser').hide();
+        if (numCommons) {
+            $('#commonEvents, #commonEvents_collapser').removeClass('hide');
         }
-        if (!numVisitBaseds) {
-            $('#subjectEvents').hide();
-            $('#excl_subjectEvents_open').hide();
-            $('#excl_subjectEvents_close').hide();
+        if (numVisitBaseds) {
+            $('#subjectEvents, #excl_subjectEvents_close').removeClass('hide');
         }
 
         var datatables = $('table.datatable');
@@ -360,53 +325,25 @@ $(function() {
                 },
                 columnDefs: [{
                     targets: -1,
-                    render: function(data, type, row) {
-                        return data;
-                    }
-                }, {
-                    targets: '_all',
-                    render: function(data, type, row) {
-                        return data.length > 200 ?
-                            data.substr(0, 200) +'…' : data;
-                    }
-                }],
-                initComplete: function () {
-                    var columns = this.api().columns();
-                    columns.every(function() {
-                        var column = this;
-                        if (column.index() === columns.indexes().length - 1)
-                            return;
-                        var select = $('<select><option value=""></option></select>')
-                            .prependTo($(column.header()))
-                            .on('change', function () {
-                                var val = $.fn.dataTable.util.escapeRegex(
-                                    $(this).val()
-                                );
-                                column
-                                    .search( val ? '^' + val + '$' : '', true, false )
-                                    .draw();
-                            });
-                        column.data().unique().sort().each(function(val, index, api) {
-                            select.append('<option value="' + val + '">' + val + '</option>');
-                        });
-                    });
-                }
+                    visible: false
+                }]
             });
             $(this).children('tbody').on('mouseenter', 'td.table_cell', function () {
-                var colIdx = table.cell(this).index().column; 
+                var colIdx = table.cell(this).index().column;
                 $(table.cells().nodes()).removeClass('highlight');
                 $(table.column(colIdx).nodes()).addClass('highlight');
             });
         });
         datatables.each(function() {
-            var theTable = $(this);
-            var header = theTable.parent();
-            var paging = theTable.next();
+            var table = $(this);
+            var header = table.parent();
+            var paging = table.next();
             var pagesize = paging.next().children().contents();
             header.prevUntil().prependTo(header);
             paging.text(paging.text().replace(' to ', '-').replace('entries', 'rows'));
             pagesize[2].replaceWith(' rows per page');
             pagesize[0].remove();
+            table.css('width', '');
         });
         datatables.parent().css({
             'max-width': $(window).width() - 200 + 'px',
