@@ -1,20 +1,4 @@
 <style>
-    .section {
-        background-color: #f1f1f1;
-        background-image: none;
-        border-top: 1px solid #999;
-        font-size: .8em;
-        padding: 1em;
-    }
-    .section-body.collapsed {
-        display: none;
-    }
-    .collapsed .icon-caret-down {
-        display: none;
-    }
-    .expanded .icon-caret-right {
-        display: none;
-    }
     .datatable {
         padding-top: 5px;
     }
@@ -28,6 +12,9 @@
     td.actions td {
         padding: 3.4px !important;
     }
+    tr.submission:hover, td.highlight {
+        background-color: whitesmoke !important;
+    }
     .form-name {
         display: inline;
         margin-right: 10px;
@@ -38,9 +25,6 @@
     .dataTables_length {
         padding-top: 0.5em;
         padding-left: 1.5em;
-    }
-    tr:hover, td.highlight {
-        background-color: whitesmoke !important;
     }
     input[type=button][disabled], input[type=button][disabled]:hover {
         background-color: lightgray;

@@ -62,6 +62,39 @@
       });
   }
 </script>
+<script>
+  $(document.body).on('click', '.section', function() {
+    var section = $(this);
+    var body = section.children('.section-body');
+    var updown = section.hasClass('collapsed') ? 'slideDown' : 'slideUp';
+    body[updown]('fast', function() {
+      section.toggleClass('collapsed expanded');
+    });
+  });
+</script>
+<style>
+  .section-header {
+    color: white;
+    background-color: #618ebb;
+    border-radius: 10px 10px 0 0;
+    font-size: 1em;
+    padding: 0.5em 1em;
+  }
+  .section-header::after {
+    float: right;
+    margin: 3px;
+    font-family: 'icomoon' !important;
+  }
+  .section-body {
+    overflow: hidden;
+  }
+  .expanded > .section-header::after {
+    content: "\e92a";
+  }
+  .collapsed > .section-header::after {
+    content: "\e92b";
+  }
+</style>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
   <td class="sidebar_tab">
@@ -127,12 +160,6 @@
 </select>
 <br>
 <br>
-<%-- <p>
-  <a href="#events"><fmt:message key="events" bundle="${resword}"/></a> &nbsp; &nbsp; &nbsp;
-  <a href="#group"><fmt:message key="group" bundle="${resword}"/></a> &nbsp;&nbsp;&nbsp;
-  <a href="#global"><fmt:message key="global_subject_record" bundle="${resword}"/></a> &nbsp;&nbsp;&nbsp;
-  <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')"><fmt:message key="audit_logs" bundle="${resword}"/></a>
-  </p> --%>
 <c:choose>
   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
     <div class="table_title_Admin">
@@ -148,358 +175,346 @@
     </c:choose>
   </c:otherwise>
 </c:choose>
-<a id="excl_studySubjectRecord_open" href="javascript:leftnavExpand('studySubjectRecord'); leftnavExpand('excl_studySubjectRecord_open'); leftnavExpand('excl_studySubjectRecord_closed');" style="text-decoration: none; display: all;">
-<img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/>
-</a>
-<a id="excl_studySubjectRecord_closed" href="javascript:leftnavExpand('studySubjectRecord'); leftnavExpand('excl_studySubjectRecord_open'); leftnavExpand('excl_studySubjectRecord_closed');" style="text-decoration: none; display: none;">
-<img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="study_subject_record" bundle="${resword}"/>
-</a>
 </div>
-<div id="studySubjectRecord">
-  <script type="text/javascript" language="javascript">
-    var oldURL = document.referrer;
-    var parts = oldURL.split('/');
-    var lastSegment = parts.pop() || parts.pop();//get last segmen of url
-    var beforePage = lastSegment.substring(0,lastSegment.indexOf("?")); 
-    
-    if(beforePage=='ViewNotes'){
-        document.getElementById('studySubjectRecord').style.display = "block";
-    }else{
-        document.getElementById('studySubjectRecord').style.display = "none";
-    }
-  </script>
-  <table border="0" cellpadding="0" cellspacing="0">
-    <tbody>
-      <tr>
-        <td style="padding-right: 20px;" valign="top" width="800">
-          <!-- These DIVs define shaded box borders -->
-          <div class="box_T">
-            <div class="box_L">
-              <div class="box_R">
-                <div class="box_B">
-                  <div class="box_TL">
-                    <div class="box_TR">
-                      <div class="box_BL">
-                        <div class="box_BR">
-                          <div class="tablebox_center">
-                            <table width="800" border="0" cellpadding="0" cellspacing="0">
-                              <!-- Table Actions row (pagination, search, tools) -->
-                              <tbody>
-                                <tr>
-                                  <!-- Table Tools/Actions cell -->
-                                  <td class="table_actions" valign="top" align="right">
-                                    <table border="0" cellpadding="0" cellspacing="0">
-                                      <tbody>
-                                        <tr>
-                                          <td class="table_tools">
-                                            <a style="text-decoration: none" href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=
-                                            <c:out value="${studySub.id}"/>
-                                            ')">
-                                            <fmt:message key="audit_logs" bundle="${resword}"/>
-                                            </a>
-                                            <c:if test="${study.status.available}">
-                                              <c:if test="${!userRole.monitor}">
-                                                |
-                                                <a style="text-decoration: none" href="UpdateStudySubject?id=
-                                                <c:out value="${studySub.id}"/>
-                                                &amp;action=show">
-                                                <fmt:message key="edit_record" bundle="${resword}"/>
-                                                </a>
+<div class="section expanded" id="studySubjectRecord">
+  <div class="section-header">
+    <span class="icon-caret"></span>
+    <fmt:message key="study_subject_record" bundle="${resword}"/>
+  </div>
+  <div class="section-body">
+    <table border="0" cellpadding="0" cellspacing="0">
+      <tbody>
+        <tr>
+          <td style="padding-right: 20px;" valign="top" width="800">
+            <!-- These DIVs define shaded box borders -->
+            <div class="box_T">
+              <div class="box_L">
+                <div class="box_R">
+                  <div class="box_B">
+                    <div class="box_TL">
+                      <div class="box_TR">
+                        <div class="box_BL">
+                          <div class="box_BR">
+                            <div class="tablebox_center">
+                              <table width="800" border="0" cellpadding="0" cellspacing="0">
+                                <!-- Table Actions row (pagination, search, tools) -->
+                                <tbody>
+                                  <tr>
+                                    <!-- Table Tools/Actions cell -->
+                                    <td class="table_actions" valign="top" align="right">
+                                      <table border="0" cellpadding="0" cellspacing="0">
+                                        <tbody>
+                                          <tr>
+                                            <td class="table_tools">
+                                              <a style="text-decoration: none" href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=
+                                              <c:out value="${studySub.id}"/>
+                                              ')">
+                                              <fmt:message key="audit_logs" bundle="${resword}"/>
+                                              </a>
+                                              <c:if test="${study.status.available}">
+                                                <c:if test="${!userRole.monitor}">
+                                                  |
+                                                  <a style="text-decoration: none" href="UpdateStudySubject?id=
+                                                  <c:out value="${studySub.id}"/>
+                                                  &amp;action=show">
+                                                  <fmt:message key="edit_record" bundle="${resword}"/>
+                                                  </a>
+                                                </c:if>
                                               </c:if>
-                                            </c:if>
-                                          </td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                  </td>
-                                  <!-- End Table Tools/Actions cell -->
-                                </tr>
-                                <!-- end Table Actions row (pagination, search, tools) -->
-                                <tr>
-                                  <td valign="top">
-                                    <!-- Table Contents -->
-                                    <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                                      <tbody>
-                                        <tr>
-                                          <td class="table_header_column_top">
-                                            <fmt:message key="study_subject_ID" bundle="${resword}"/>
-                                          </td>
-                                          <td class="table_cell_top">
-                                            <c:out value="${studySub.label}"/>
-                                          </td>
-                                          <td class="table_header_row">
-                                            <fmt:message key="person_ID" bundle="${resword}"/>
-                                            <%-- DN for person ID goes here --%>
-                                            <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                                              <c:set var="isNew" value="${hasUniqueIDNote eq 'yes' ? 0 : 1}"/>
-                                              <c:choose>
-                                                <c:when test="${hasUniqueIDNote eq 'yes'}">
-                                                  <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
-                                                    <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="${uniqueIDNote.resStatus.iconFilePath}" border="0" alt="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " title="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " >
-                                                  </a>
-                                                </c:when>
-                                                <c:otherwise>
-                                                  <a href="#" style="text-decoration: none"  style="text-decoration: none" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
-                                                    <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="fa fa-bubble-white" border="0" alt="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " title="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " >
-                                                  </a>
-                                                </c:otherwise>
-                                              </c:choose>
-                                            </c:if>
-                                          </td>
-                                          <td class="table_cell_top">
-                                            <c:out value="${subject.uniqueIdentifier}"/>
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td class="table_header_column">
-                                            <fmt:message key="secondary_ID" bundle="${resword}"/>
-                                          </td>
-                                          <td class="table_cell">
-                                            <c:out value="${studySub.secondaryLabel}"/>
-                                          </td>
-                                          <c:choose>
-                                            <c:when test="${subjectStudy.studyParameterConfig.collectDob == '1'}">
-                                              <td class="table_header_row">
-                                                <fmt:message key="date_of_birth" bundle="${resword}"/>
-                                                <%-- DN for DOB goes here --%>
-                                                <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                                                  <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
-                                                  <c:choose>
-                                                    <c:when test="${hasDOBNote eq 'yes'}">
-                                                      <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " title="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " >
-                                                      </a>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                      <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " title="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " >
-                                                      </a>
-                                                    </c:otherwise>
-                                                  </c:choose>
-                                                </c:if>
-                                              </td>
-                                              <td class="table_cell">
-                                                <c:out value="${subject.dateOfBirth}" />
-                                              </td>
-                                            </c:when>
-                                            <c:when test="${subjectStudy.studyParameterConfig.collectDob == '3'}">
-                                              <td class="table_header_row">
-                                                <fmt:message key="date_of_birth" bundle="${resword}"/>
-                                                <%-- DN for DOB goes here --%>
-                                                <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                                                  <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
-                                                  <c:choose>
-                                                    <c:when test="${hasDOBNote eq 'yes'}">
-                                                      <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " title="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " >
-                                                      </a>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                      <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " title="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " >
-                                                      </a>
-                                                    </c:otherwise>
-                                                  </c:choose>
-                                                </c:if>
-                                              </td>
-                                              <td class="table_cell">
-                                                <fmt:message key="not_used" bundle="${resword}"/>
-                                              </td>
-                                            </c:when>
-                                            <c:otherwise>
-                                              <td class="table_header_row">
-                                                <fmt:message key="year_of_birth" bundle="${resword}"/>
-                                                <%-- DN for DOB goes here --%>
-                                                <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                                                  <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
-                                                  <c:choose>
-                                                    <c:when test="${hasDOBNote eq 'yes'}">
-                                                      <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " title="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " >
-                                                      </a>
-                                                    </c:when>
-                                                    <c:otherwise>
-                                                      <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
-                                                        <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " title="
-                                                        <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                        " >
-                                                      </a>
-                                                    </c:otherwise>
-                                                  </c:choose>
-                                                </c:if>
-                                              </td>
-                                              <td class="table_cell">
-                                                <c:out value="${yearOfBirth}"/>
-                                              </td>
-                                            </c:otherwise>
-                                          </c:choose>
-                                        </tr>
-                                        <tr>
-                                          <td class="table_header_column">
-                                            <fmt:message key="OID" bundle="${resword}"/>
-                                          </td>
-                                          <td class="table_cell">
-                                            <c:out value="${studySub.oid}"/>
-                                          </td>
-                                          <td class="table_header_row">
-                                            <fmt:message key="gender" bundle="${resword}"/>
-                                            <%-- DN for Gender goes here --%>
-                                            <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                                              <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
-                                              <c:set var="isUpdated" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
-                                              <c:set var="isClosed" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
-                                              <c:set var="isClosedModified" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
-                                              <c:choose>
-                                                <c:when test="${hasGenderNote eq 'yes'}">
-                                                  <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
-                                                    <span id="flag_gender" name="flag_gender" class="${genderNote.resStatus.iconFilePath}" border="0" alt="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " title="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " >
-                                                  </a>
-                                                </c:when>
-                                                <c:otherwise>
-                                                  <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${subject.id}&writeToDB=1&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
-                                                    <span id="flag_gender" name="flag_gender" class="fa fa-bubble-white" border="0" alt="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " title="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " >
-                                                  </a>
-                                                </c:otherwise>
-                                              </c:choose>
-                                            </c:if>
-                                          </td>
-                                          <td class="table_cell">
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                    </td>
+                                    <!-- End Table Tools/Actions cell -->
+                                  </tr>
+                                  <!-- end Table Actions row (pagination, search, tools) -->
+                                  <tr>
+                                    <td valign="top">
+                                      <!-- Table Contents -->
+                                      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                        <tbody>
+                                          <tr>
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="study_subject_ID" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell_top">
+                                              <c:out value="${studySub.label}"/>
+                                            </td>
+                                            <td class="table_header_row">
+                                              <fmt:message key="person_ID" bundle="${resword}"/>
+                                              <%-- DN for person ID goes here --%>
+                                              <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                                <c:set var="isNew" value="${hasUniqueIDNote eq 'yes' ? 0 : 1}"/>
+                                                <c:choose>
+                                                  <c:when test="${hasUniqueIDNote eq 'yes'}">
+                                                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+                                                      <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="${uniqueIDNote.resStatus.iconFilePath}" border="0" alt="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " title="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " >
+                                                    </a>
+                                                  </c:when>
+                                                  <c:otherwise>
+                                                    <a href="#" style="text-decoration: none"  style="text-decoration: none" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+                                                      <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="fa fa-bubble-white" border="0" alt="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " title="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " >
+                                                    </a>
+                                                  </c:otherwise>
+                                                </c:choose>
+                                              </c:if>
+                                            </td>
+                                            <td class="table_cell_top">
+                                              <c:out value="${subject.uniqueIdentifier}"/>
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td class="table_header_column">
+                                              <fmt:message key="secondary_ID" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell">
+                                              <c:out value="${studySub.secondaryLabel}"/>
+                                            </td>
                                             <c:choose>
-                                              <c:when test="${subject.gender==32}">
-                                                &nbsp;
+                                              <c:when test="${subjectStudy.studyParameterConfig.collectDob == '1'}">
+                                                <td class="table_header_row">
+                                                  <fmt:message key="date_of_birth" bundle="${resword}"/>
+                                                  <%-- DN for DOB goes here --%>
+                                                  <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                                    <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
+                                                    <c:choose>
+                                                      <c:when test="${hasDOBNote eq 'yes'}">
+                                                        <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                                                          <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " title="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " >
+                                                        </a>
+                                                      </c:when>
+                                                      <c:otherwise>
+                                                        <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                                                          <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " title="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " >
+                                                        </a>
+                                                      </c:otherwise>
+                                                    </c:choose>
+                                                  </c:if>
+                                                </td>
+                                                <td class="table_cell">
+                                                  <c:out value="${subject.dateOfBirth}" />
+                                                </td>
                                               </c:when>
-                                              <c:when test="${subject.gender==109 ||subject.gender==77}">
-                                                <fmt:message key="male" bundle="${resword}"/>
+                                              <c:when test="${subjectStudy.studyParameterConfig.collectDob == '3'}">
+                                                <td class="table_header_row">
+                                                  <fmt:message key="date_of_birth" bundle="${resword}"/>
+                                                  <%-- DN for DOB goes here --%>
+                                                  <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                                    <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
+                                                    <c:choose>
+                                                      <c:when test="${hasDOBNote eq 'yes'}">
+                                                        <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                                                          <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " title="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " >
+                                                        </a>
+                                                      </c:when>
+                                                      <c:otherwise>
+                                                        <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                                                          <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " title="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " >
+                                                        </a>
+                                                      </c:otherwise>
+                                                    </c:choose>
+                                                  </c:if>
+                                                </td>
+                                                <td class="table_cell">
+                                                  <fmt:message key="not_used" bundle="${resword}"/>
+                                                </td>
                                               </c:when>
                                               <c:otherwise>
-                                                <fmt:message key="female" bundle="${resword}"/>
+                                                <td class="table_header_row">
+                                                  <fmt:message key="year_of_birth" bundle="${resword}"/>
+                                                  <%-- DN for DOB goes here --%>
+                                                  <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                                    <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
+                                                    <c:choose>
+                                                      <c:when test="${hasDOBNote eq 'yes'}">
+                                                        <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                                                          <span id="flag_dob" name="flag_dob" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " title="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " >
+                                                        </a>
+                                                      </c:when>
+                                                      <c:otherwise>
+                                                        <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                                                          <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " title="
+                                                          <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                          " >
+                                                        </a>
+                                                      </c:otherwise>
+                                                    </c:choose>
+                                                  </c:if>
+                                                </td>
+                                                <td class="table_cell">
+                                                  <c:out value="${yearOfBirth}"/>
+                                                </td>
                                               </c:otherwise>
                                             </c:choose>
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td class="table_header_column">
-                                            <fmt:message key="status" bundle="${resword}"/>
-                                          </td>
-                                          <td class="table_cell">
-                                            <c:out value="${studySub.status.name}"/>
-                                          </td>
-                                          <td class="table_header_row">
-                                            <fmt:message key="enrollment_date" bundle="${resword}"/>
-                                            &nbsp;
-                                            <%-- DN for enrollment date goes here --%>
-                                            <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                                              <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
+                                          </tr>
+                                          <tr>
+                                            <td class="table_header_column">
+                                              <fmt:message key="OID" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell">
+                                              <c:out value="${studySub.oid}"/>
+                                            </td>
+                                            <td class="table_header_row">
+                                              <fmt:message key="gender" bundle="${resword}"/>
+                                              <%-- DN for Gender goes here --%>
+                                              <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                                <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
+                                                <c:set var="isUpdated" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
+                                                <c:set var="isClosed" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
+                                                <c:set var="isClosedModified" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
+                                                <c:choose>
+                                                  <c:when test="${hasGenderNote eq 'yes'}">
+                                                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
+                                                      <span id="flag_gender" name="flag_gender" class="${genderNote.resStatus.iconFilePath}" border="0" alt="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " title="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " >
+                                                    </a>
+                                                  </c:when>
+                                                  <c:otherwise>
+                                                    <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${subject.id}&writeToDB=1&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
+                                                      <span id="flag_gender" name="flag_gender" class="fa fa-bubble-white" border="0" alt="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " title="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " >
+                                                    </a>
+                                                  </c:otherwise>
+                                                </c:choose>
+                                              </c:if>
+                                            </td>
+                                            <td class="table_cell">
                                               <c:choose>
-                                                <c:when test="${hasEnrollmentNote eq 'yes'}">
-                                                  <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
-                                                    <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="${enrollmentNote.resStatus.iconFilePath}" border="0" alt="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " title="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " >
+                                                <c:when test="${subject.gender==32}">
+                                                  &nbsp;
+                                                </c:when>
+                                                <c:when test="${subject.gender==109 ||subject.gender==77}">
+                                                  <fmt:message key="male" bundle="${resword}"/>
+                                                </c:when>
+                                                <c:otherwise>
+                                                  <fmt:message key="female" bundle="${resword}"/>
+                                                </c:otherwise>
+                                              </c:choose>
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td class="table_header_column">
+                                              <fmt:message key="status" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell">
+                                              <c:out value="${studySub.status.name}"/>
+                                            </td>
+                                            <td class="table_header_row">
+                                              <fmt:message key="enrollment_date" bundle="${resword}"/>
+                                              &nbsp;
+                                              <%-- DN for enrollment date goes here --%>
+                                              <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
+                                                <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
+                                                <c:choose>
+                                                  <c:when test="${hasEnrollmentNote eq 'yes'}">
+                                                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
+                                                      <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="${enrollmentNote.resStatus.iconFilePath}" border="0" alt="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " title="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " >
+                                                    </a>
+                                                  </c:when>
+                                                  <c:otherwise>
+                                                    <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${studySub.id}&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
+                                                      <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="fa fa-bubble-white" border="0" alt="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " title="
+                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
+                                                      " >
+                                                    </a>
+                                                  </c:otherwise>
+                                                </c:choose>
+                                              </c:if>
+                                            </td>
+                                            <td class="table_cell">
+                                              <c:out value="${studySub.enrollmentDate}"/>
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <td class="table_divider" colspan="4">&nbsp;</td>
+                                          </tr>
+                                          <tr>
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="study_name" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell_top">
+                                              <c:choose>
+                                                <c:when test="${subjectStudy.parentStudyId>0}">
+                                                  <a style="text-decoration: none" href="ViewStudy?id=
+                                                  <c:out value="${parentStudy.id}"/>
+                                                  &amp;viewFull=yes">
+                                                  <c:out value="${parentStudy.name}"/>
                                                   </a>
                                                 </c:when>
                                                 <c:otherwise>
-                                                  <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${studySub.id}&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
-                                                    <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="fa fa-bubble-white" border="0" alt="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " title="
-                                                    <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                    " >
+                                                  <a href="ViewStudy?id=
+                                                  <c:out value="${subjectStudy.id}"/>
+                                                  &amp;viewFull=yes">
+                                                  <c:out value="${subjectStudy.name}"/>
                                                   </a>
                                                 </c:otherwise>
                                               </c:choose>
-                                            </c:if>
-                                          </td>
-                                          <td class="table_cell">
-                                            <c:out value="${studySub.enrollmentDate}"/>
-                                          </td>
-                                        </tr>
-                                        <tr>
-                                          <td class="table_divider" colspan="4">&nbsp;</td>
-                                        </tr>
-                                        <tr>
-                                          <td class="table_header_column_top">
-                                            <fmt:message key="study_name" bundle="${resword}"/>
-                                          </td>
-                                          <td class="table_cell_top">
-                                            <c:choose>
-                                              <c:when test="${subjectStudy.parentStudyId>0}">
+                                            </td>
+                                            <td class="table_header_row">
+                                              <fmt:message key="site_name" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell_top">
+                                              <c:if test="${subjectStudy.parentStudyId>0}">
                                                 <a style="text-decoration: none" href="ViewStudy?id=
-                                                <c:out value="${parentStudy.id}"/>
-                                                &amp;viewFull=yes">
-                                                <c:out value="${parentStudy.name}"/>
-                                                </a>
-                                              </c:when>
-                                              <c:otherwise>
-                                                <a href="ViewStudy?id=
                                                 <c:out value="${subjectStudy.id}"/>
-                                                &amp;viewFull=yes">
+                                                ">
                                                 <c:out value="${subjectStudy.name}"/>
                                                 </a>
-                                              </c:otherwise>
-                                            </c:choose>
-                                          </td>
-                                          <td class="table_header_row">
-                                            <fmt:message key="site_name" bundle="${resword}"/>
-                                          </td>
-                                          <td class="table_cell_top">
-                                            <c:if test="${subjectStudy.parentStudyId>0}">
-                                              <a style="text-decoration: none" href="ViewStudy?id=
-                                              <c:out value="${subjectStudy.id}"/>
-                                              ">
-                                              <c:out value="${subjectStudy.name}"/>
-                                              </a>
-                                            </c:if>
-                                            &nbsp;
-                                          </td>
-                                        </tr>
-                                      </tbody>
-                                    </table>
-                                    <!-- End Table Contents -->
-                                  </td>
-                                </tr>
-                              </tbody>
-                            </table>
+                                              </c:if>
+                                              &nbsp;
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                      <!-- End Table Contents -->
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                            </div>
                           </div>
                         </div>
                       </div>
@@ -508,12 +523,12 @@
                 </div>
               </div>
             </div>
-          </div>
-        </td>
-      </tr>
-    </tbody>
-  </table>
-  <br>
+          </td>
+        </tr>
+      </tbody>
+    </table>
+    <br>
+  </div>
 </div>
 <div id="loading">Loading...</div>
 <c:choose>
