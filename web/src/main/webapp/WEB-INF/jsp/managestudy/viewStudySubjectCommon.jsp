@@ -5,9 +5,9 @@
         font-size: .85rem;
     }
     table.datatable {
-        padding-top: 5px;
         border-bottom: none !important;
         border-collapse: collapse !important;
+        margin-top: 2px !important;
     }
     .dataTables_info {
         padding-top: 0.5em !important;
@@ -49,6 +49,9 @@
     }
     input[type=button][disabled] {
         display: none;
+    }
+    .add-new {
+        height: 25px;
     }
     .actions .icon:before {
         content: "\f1234";
@@ -355,9 +358,8 @@ $(function() {
             var paging = table.next();
             var pagesize = paging.next().children().contents();
             header.prevUntil().prependTo(header);
-            paging.text(paging.text().replace(' to ', '-').replace('entries', 'rows'));
-            pagesize[2].replaceWith(' rows per page');
-            pagesize[0].remove();
+            paging.text(paging.text().replace('Showing', 'Results').replace(' to ', '-').replace('entries', ''));
+            pagesize[2].replaceWith(' per page');
             table.css('width', '');
         });
         datatables.parent().css({
