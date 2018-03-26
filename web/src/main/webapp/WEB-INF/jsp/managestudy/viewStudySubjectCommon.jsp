@@ -126,7 +126,10 @@
                             <center>Status</center>
                         </td>
                         <td class="table_cell">
-                            <center>Updated</center>
+                            <center>Last Update</center>
+                        </td>
+                        <td class="table_cell">
+                            <center>Updated By</center>
                         </td>
                         <td class="table_cell">
                             <center>Actions</center>
@@ -141,7 +144,8 @@
                                 <td class="table_cell" data-search="{{data}}">{{truncate data 200}}</td>
                             {{/each}}
                             <td align="center" class="table_cell">{{submission.studyStatus}}</td>
-                            <td align="center" class="table_cell">{{submission.updated}}</td>
+                            <td align="center" class="table_cell">{{submission.updatedDate}}</td>
+                            <td align="center" class="table_cell">{{submission.updatedBy}}</td>
                             <td class="table_cell actions">
                                 <table border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
@@ -270,7 +274,8 @@ $(function() {
                 studyStatus: studyEventData['@OpenClinica:Status'],
                 formStatus: formData['@OpenClinica:Status'],
                 hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
-                updated: formData['@OpenClinica:UpdatedDate'].split(' ')[0] + ' (' + formData['@OpenClinica:UpdatedBy'] + ')',
+                updatedDate: formData['@OpenClinica:UpdatedDate'].split(' ')[0],
+                updatedBy: formData['@OpenClinica:UpdatedBy'],
                 data: $.extend(true, {}, form.submissionObj),
                 links: links
             };
