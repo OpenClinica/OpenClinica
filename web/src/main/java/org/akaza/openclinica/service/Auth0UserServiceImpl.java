@@ -53,7 +53,7 @@ public class Auth0UserServiceImpl implements Auth0UserService {
         try {
             TokenHolder tokenHolder = authRequest.execute();
         } catch (Auth0Exception e) {
-            logger.error("Error authenticating auth0 user:" + e.getMessage());
+            logger.error("Error authenticating auth0 user:" + e);
             return authenticated;
         }
         return true;

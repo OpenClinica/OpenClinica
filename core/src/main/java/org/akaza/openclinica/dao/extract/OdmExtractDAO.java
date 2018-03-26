@@ -3356,7 +3356,7 @@ public class OdmExtractDAO extends DatasetDAO {
         return "select sed.ordinal as definition_order, edc.ordinal as crf_order, edc.crf_id, cv.crf_version_id,"
                 + " sed.oc_oid as definition_oid, cv.oc_oid as cv_oid,"
                 + " sed.description, sed.category, cv.description as version_description, cv.revision_notes,"
-                + " crf.oc_oid as crf_oid, crf.description as crf_description ,edc.null_values, edc.default_version_id, edc.electronic_signature,"
+                + " crf.oc_oid as crf_oid, crf.description as crf_description, edc.null_values, edc.default_version_id, edc.electronic_signature,"
                 + " edc.double_entry, edc.hide_crf, edc.participant_form,edc.allow_anonymous_submission,edc.submission_url,case when edc_tag.active is null then false else edc_tag.active end, edc.source_data_verification_code,sed.status_id as sed_status_id,edc.status_id as edc_status_id"
                 + " from " + this.studyEventAndFormMetaTables() + this.studyEventAndFormMetaCondition(parentStudyId, studyId, isIncludedSite, showArchived);
     }
@@ -3371,7 +3371,9 @@ public class OdmExtractDAO extends DatasetDAO {
     protected String studyEventAndFormMetaCondition(int parentStudyId, int studyId, boolean isIncludedSite, String[] showArchived) {
         return " where sed.study_id = " + parentStudyId + " " + showArchived[0] + " and "
                 + this.getEventDefinitionCrfCondition(studyId, parentStudyId, isIncludedSite) + " " + showArchived[1] + " and edc.crf_id = crf.crf_id "
-                + showArchived[2] + " and crf.crf_id = cv.crf_id  " + showArchived[3] + " "
+                + showArchived[2] + " and crf.crf_id = cv.crf_id  " + showArchived[3]
+                + " and exists (select ifm.crf_version_id from item_form_metadata ifm, item_group_metadata igm"
+                + " where cv.crf_version_id = ifm.crf_version_id and cv.crf_version_id = igm.crf_version_id and ifm.item_id = igm.item_id)"
                 + " order by sed.ordinal, edc.ordinal, edc.crf_id, cv.crf_version_id desc";
     }
 
