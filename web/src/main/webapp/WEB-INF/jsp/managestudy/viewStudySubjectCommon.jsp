@@ -1,4 +1,8 @@
 <style>
+    .subsection {
+        margin-top: 35px;
+        margin-bottom: 65px;
+    }
     .datatable {
         padding-top: 5px;
     }
@@ -70,11 +74,8 @@
             {{sectionName}}
         </div>
         <div class="section-body">
-            <table border="0" cellpadding="0" cellspacing="0">
-            <tbody>
             {{#each forms as |form|}}
-            <tr>
-                <td colspan="3" valign="top" style="padding-top: 30px;">
+                <div class="subsection">
                     <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
                     <h3 class="form-name">{{form.[@Name]}}</h3>
                     <table border="0" cellpadding="0" cellspacing="0" class="datatable">
@@ -129,11 +130,8 @@
                         {{/each}}
                     </tbody>
                     </table>
-                {{/each}}
-                </td>
-            </tr>
-            </tbody>
-            </table>
+                </div>
+            {{/each}}
         </div>
     </div>
 </script>
