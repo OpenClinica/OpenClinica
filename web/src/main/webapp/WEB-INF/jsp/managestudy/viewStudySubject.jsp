@@ -64,21 +64,27 @@
 </script>
 <script>
   $(document.body).on('click', '.section-header', function() {
-    var section = $(this);
-    var body = section.children('.section-body');
+    var header = $(this);
+    var body = header.next();
+    var section = header.parent();
     var updown = section.hasClass('collapsed') ? 'slideDown' : 'slideUp';
     body[updown]('fast', function() {
       section.toggleClass('collapsed expanded');
     });
   });
+
+  function clickAllSections(state) {
+    $('.section.' + state).children('.section-header').click();
+  };
 </script>
 <style>
   #header {
     display: inline-block;
-    margin-bottom: 15px;
+    margin-bottom: 25px;
   }
-  #header-links {
+  .header-links {
     float: right;
+    clear: right;
     margin-top: 6px;
     font-size: .85rem;
   }
@@ -89,7 +95,7 @@
     color: white;
     background-color: #618ebb;
     border-radius: 10px;
-    font-size: 20px;
+    font-size: 17px;
     padding: 0.5em 1em;
   }
   .section-header::after {
@@ -134,7 +140,7 @@
     <c:out value="${studySub.label}"/>
   </span>
 </h1>
-<div id="header-links">
+<div class="header-links">
   <span>
     <c:choose>
       <c:when
@@ -181,10 +187,11 @@
       <option value="null">All Records</option>
     </select>
   </span>
-  <br>
-  <span>Expand All</span>
+</div>
+<div class="header-links">
+  <a href="javascript:clickAllSections('collapsed');">Expand All</a>
   <span> | </span>
-  <span>Collapse All</span>  
+  <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
 </div>
 <c:choose>
   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
