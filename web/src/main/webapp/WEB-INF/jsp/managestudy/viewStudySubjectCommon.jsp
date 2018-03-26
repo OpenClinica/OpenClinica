@@ -55,10 +55,7 @@
 }
 </style>
 
-<table cellspacing="0" width="100%">
-<tbody id="sections">
-</tbody>
-</table>
+<div id="commonEvents"></div>
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
@@ -70,100 +67,77 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <tr class="section-header collapsed {{sectionStatus}}" style="{{sectionDisplay}};">
-        <td class="section">
-            <span class="icon icon-caret-down gray"></span>
-            <span class="icon icon-caret-right gray"></span>
-            <span>{{sectionName}}</span>
-        </td>
-    </tr>
-    <tr class="section-body collapsed {{sectionStatus}}" data-study-event-oid="{{studyEventOid}}">
-    <td>
-    <div class="box_T">
-    <div class="box_L">
-    <div class="box_R">
-    <div class="box_B">
-    <div class="box_TL">
-    <div class="box_TR">
-    <div class="box_BL">
-    <div class="box_BR">
-    <div class="tablebox_center">
-        <table border="0" cellpadding="0" cellspacing="0">
-        <tbody>
-        {{#each forms as |form|}}
-        <tr>
-            <td colspan="3" valign="top">
-                <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
-                <h3 class="form-name">{{form.[@Name]}}</h3>
-                <table border="0" cellpadding="0" cellspacing="0" class="datatable">
-                <thead>
-                    <tr valign="top">
-                        {{#each form.itemGroups as |itemGroup|}}
-                            {{#each itemGroup.items as |item|}}
-                                <td class="table_cell">{{item.Question.TranslatedText}}</td>
+    <div class="section expanded">
+        <div class="section-header">
+            {{sectionName}}
+        </div>
+        <div class="section-body">
+            <table border="0" cellpadding="0" cellspacing="0">
+            <tbody>
+            {{#each forms as |form|}}
+            <tr>
+                <td colspan="3" valign="top" style="padding-top: 30px;">
+                    <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
+                    <h3 class="form-name">{{form.[@Name]}}</h3>
+                    <table border="0" cellpadding="0" cellspacing="0" class="datatable">
+                    <thead>
+                        <tr valign="top">
+                            {{#each form.itemGroups as |itemGroup|}}
+                                {{#each itemGroup.items as |item|}}
+                                    <td class="table_cell">{{item.Question.TranslatedText}}</td>
+                                {{/each}}
                             {{/each}}
-                        {{/each}}
-                        <td class="table_cell">
-                            <center>Status</center>
-                        </td>
-                        <td class="table_cell">
-                            <center>Last Update</center>
-                        </td>
-                        <td class="table_cell">
-                            <center>Updated By</center>
-                        </td>
-                        <td class="table_cell">
-                            <center>Actions</center>
-                        </td>
-                        <td></td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each form.submissions as |submission|}}
-                        <tr class="submission">
-                            {{#each submission.data as |data|}}
-                                <td class="table_cell" data-search="{{data}}">{{truncate data 200}}</td>
-                            {{/each}}
-                            <td align="center" class="table_cell">{{submission.studyStatus}}</td>
-                            <td align="center" class="table_cell">{{submission.updatedDate}}</td>
-                            <td align="center" class="table_cell">{{submission.updatedBy}}</td>
-                            <td class="table_cell actions">
-                                <table border="0" cellpadding="0" cellspacing="0">
-                                    <tbody>
-                                        <tr valign="top">
-                                            {{#each submission.links as |link|}}
-                                            <td>
-                                                <a href="${pageContext.request.contextPath}{{link.[@href]}}">
-                                                <span class="icon icon-{{link.[@rel]}}" border="0" alt="{{link.[@rel]}}" title="{{link.[@rel]}}" align="left" hspace="6">
-                                                </span></a>
-                                            </td>
-                                            {{/each}}
-                                        </tr>
-                                    </tbody>
-                                </table>
+                            <td class="table_cell">
+                                <center>Status</center>
                             </td>
-                            <td>{{submission.hideStatus}}</td>
+                            <td class="table_cell">
+                                <center>Last Update</center>
+                            </td>
+                            <td class="table_cell">
+                                <center>Updated By</center>
+                            </td>
+                            <td class="table_cell">
+                                <center>Actions</center>
+                            </td>
+                            <td></td>
                         </tr>
-                    {{/each}}
-                </tbody>
-                </table>
-            {{/each}}
-            </td>
-        </tr>
-        </tbody>
-        </table>
-        <br>
+                    </thead>
+                    <tbody>
+                        {{#each form.submissions as |submission|}}
+                            <tr class="submission">
+                                {{#each submission.data as |data|}}
+                                    <td class="table_cell" data-search="{{data}}">{{truncate data 200}}</td>
+                                {{/each}}
+                                <td align="center" class="table_cell">{{submission.studyStatus}}</td>
+                                <td align="center" class="table_cell">{{submission.updatedDate}}</td>
+                                <td align="center" class="table_cell">{{submission.updatedBy}}</td>
+                                <td class="table_cell actions">
+                                    <table border="0" cellpadding="0" cellspacing="0">
+                                        <tbody>
+                                            <tr valign="top">
+                                                {{#each submission.links as |link|}}
+                                                <td>
+                                                    <a href="${pageContext.request.contextPath}{{link.[@href]}}">
+                                                    <span class="icon icon-{{link.[@rel]}}" border="0" alt="{{link.[@rel]}}" title="{{link.[@rel]}}" align="left" hspace="6">
+                                                    </span></a>
+                                                </td>
+                                                {{/each}}
+                                            </tr>
+                                        </tbody>
+                                    </table>
+                                </td>
+                                <td>{{submission.hideStatus}}</td>
+                            </tr>
+                        {{/each}}
+                    </tbody>
+                    </table>
+                {{/each}}
+                </td>
+            </tr>
+            </tbody>
+            </table>
+        </div>
     </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </div>
-    </td>
-    </tr>
 </script>
 
 <script>
@@ -285,7 +259,7 @@ $(function() {
         });
 
         var hideStatus = $('#oc-status-hide').val();
-        var sectionTable = $('#sections');
+        var sectionTable = $('#commonEvents');
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
