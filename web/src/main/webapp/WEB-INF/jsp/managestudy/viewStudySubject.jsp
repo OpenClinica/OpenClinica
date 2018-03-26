@@ -73,11 +73,14 @@
   });
 </script>
 <style>
+  .section {
+    margin-bottom: 5px;
+  }
   .section-header {
     color: white;
     background-color: #618ebb;
     border-radius: 10px 10px 0 0;
-    font-size: 1em;
+    font-size: 15px;
     padding: 0.5em 1em;
   }
   .section-header::after {
@@ -93,6 +96,9 @@
   }
   .collapsed > .section-header::after {
     content: "\e92b";
+  }
+  .hide {
+    display: none;
   }
 </style>
 <!-- then instructions-->
@@ -546,20 +552,18 @@
     </c:choose>
   </c:otherwise>
 </c:choose>
-<a name="events">
-<a id="excl_subjectEvents_close" href="javascript:leftnavExpand('subjectEvents'); leftnavExpand('excl_subjectEvents_open'); leftnavExpand('excl_subjectEvents_close');" style="text-decoration: none; display: all;" class="hide">
-<img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="visit_based_events" bundle="${resword}"/>
-</a>
-<a id="excl_subjectEvents_open" href="javascript:leftnavExpand('subjectEvents'); leftnavExpand('excl_subjectEvents_open'); leftnavExpand('excl_subjectEvents_close');" style="text-decoration: none; display: none;">
-<img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="visit_based_events" bundle="${resword}"/>
-</a>
-</a>
+<a name="events"></a>
 </div>
-<div id="subjectEvents" class="hide">
-  <c:import url="../include/showTable.jsp">
-    <c:param name="rowURL" value="showStudyEventRow.jsp" />
-  </c:import>
-  </br></br>
+<div class="section expanded hide" id="subjectEvents">
+  <div class="section-header">
+    <span class="icon-caret"></span>
+    Visits
+  </div>
+  <div class="section-body">
+    <c:import url="../include/showTable.jsp">
+      <c:param name="rowURL" value="showStudyEventRow.jsp" />
+    </c:import>
+  </div>
 </div>
 <div class="table_titla_manage hide" id="commonEvents_collapser">
   <a id="excl_commonEvents_open" href="javascript:leftnavExpand('commonEvents'); leftnavExpand('excl_commonEvents_open'); leftnavExpand('excl_commonEvents_closed');" style="text-decoration: none; display: none;">

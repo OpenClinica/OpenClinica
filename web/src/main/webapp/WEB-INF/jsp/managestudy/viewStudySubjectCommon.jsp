@@ -2,6 +2,13 @@
     .datatable {
         padding-top: 5px;
     }
+    .dataTables_info {
+        padding-top: 0.5em !important;
+    }
+    .dataTables_length {
+        padding-top: 0.5em;
+        padding-left: 1.5em;
+    }
     thead .table_cell {
         background-color: #ccc !important;
     }
@@ -18,13 +25,6 @@
     .form-name {
         display: inline;
         margin-right: 10px;
-    }
-    .dataTables_info {
-        padding-top: 0.5em !important;
-    }
-    .dataTables_length {
-        padding-top: 0.5em;
-        padding-left: 1.5em;
     }
     input[type=button][disabled], input[type=button][disabled]:hover {
         background-color: lightgray;
@@ -51,9 +51,6 @@
     }
     .actions .icon.icon-sign:before {
         content: "\e91a";
-    }
-    .hide {
-        display: none;
     }
 }
 </style>
