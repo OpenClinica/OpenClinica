@@ -2,9 +2,12 @@
     .subsection {
         margin-top: 35px;
         margin-bottom: 65px;
+        font-size: .85rem;
     }
-    .datatable {
+    table.datatable {
         padding-top: 5px;
+        border-bottom: none !important;
+        border-collapse: collapse !important;
     }
     .dataTables_info {
         padding-top: 0.5em !important;
@@ -12,6 +15,19 @@
     .dataTables_length {
         padding-top: 0.5em;
         padding-left: 1.5em;
+    }
+    .datatable td {
+        border: 1px solid #ccc;
+        border-bottom-color: #ccc !important;
+    }
+    .datatable thead td {
+        border-color: white !important;
+    }
+    .datatable thead td:first-child {
+        border-left-color: #ccc !important;
+    }
+    .datatable thead td:last-child {
+        border-right-color: #ccc !important;
     }
     thead .table_cell {
         background-color: #ccc !important;
@@ -22,6 +38,7 @@
     }
     td.actions td {
         padding: 3.4px !important;
+        border: none;
     }
     tr.submission:hover, td.highlight {
         background-color: whitesmoke !important;
@@ -78,7 +95,7 @@
                 <div class="subsection">
                     <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
                     <h3 class="form-name">{{form.[@Name]}}</h3>
-                    <table border="0" cellpadding="0" cellspacing="0" class="datatable">
+                    <table class="datatable">
                     <thead>
                         <tr valign="top">
                             {{#each form.itemGroups as |itemGroup|}}
@@ -111,7 +128,7 @@
                                 <td align="center" class="table_cell">{{submission.updatedDate}}</td>
                                 <td align="center" class="table_cell">{{submission.updatedBy}}</td>
                                 <td class="table_cell actions">
-                                    <table border="0" cellpadding="0" cellspacing="0">
+                                    <table>
                                         <tbody>
                                             <tr valign="top">
                                                 {{#each submission.links as |link|}}
