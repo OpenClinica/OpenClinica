@@ -46,21 +46,31 @@ public class EnketoAPI {
      * 100% READONLY: applies for both field and query and dn close button should not appear
      */
 
-    public static final String SURVEY_PREVIEW_MODE = "/api/v2/survey/preview";
+    // public static final String SURVEY_PREVIEW_MODE = "/api/v2/survey/preview";
+    public static final String SURVEY_PREVIEW_MODE = "/oc/api/v1/survey/preview";
+
     public static final String SURVEY_OFFLINE_MODE = "/api/v2/survey/offline";
 
-    public static final String SURVEY_100_PERCENT_READONLY = "/api/v2/survey/view/iframe";
+    // public static final String SURVEY_100_PERCENT_READONLY = "/api/v2/survey/view/iframe";
+    public static final String SURVEY_100_PERCENT_READONLY = "/oc/api/v1/survey/view";
 
-    public static final String SURVEY_WRITABLE_DN = "/api/v2/survey/single/fieldsubmission/iframe";
-    public static final String SURVEY_WRITABLE_DN_CLOSE_BUTTON = "/api/v2/survey/single/fieldsubmission/c/iframe";
+    // public static final String SURVEY_WRITABLE_DN = "/api/v2/survey/single/fieldsubmission/iframe";
+    public static final String SURVEY_WRITABLE_DN = "/oc/api/v1/survey/collect";
+    // public static final String SURVEY_WRITABLE_DN_CLOSE_BUTTON = "/api/v2/survey/single/fieldsubmission/c/iframe";
+    public static final String SURVEY_WRITABLE_DN_CLOSE_BUTTON = "/oc/api/v1/survey/collect/c";
 
-    public static final String INSTANCE_100_PERCENT_READONLY = "/api/v2/instance/view/iframe";
+    // public static final String INSTANCE_100_PERCENT_READONLY = "/api/v2/instance/view/iframe";
+    public static final String INSTANCE_100_PERCENT_READONLY = "/oc/api/v1/instance/view";
 
-    public static final String INSTANCE_READONLY_DN = "/api/v2/instance/fieldsubmission/note/iframe";
-    public static final String INSTANCE_READONLY_DN_CLOSE_BUTTON = "/api/v2/instance/fieldsubmission/note/c/iframe";
+    // public static final String INSTANCE_READONLY_DN = "/api/v2/instance/fieldsubmission/note/iframe";
+    public static final String INSTANCE_READONLY_DN = "/oc/api/v1/instance/note";
+    // public static final String INSTANCE_READONLY_DN_CLOSE_BUTTON = "/api/v2/instance/fieldsubmission/note/c/iframe";
+    public static final String INSTANCE_READONLY_DN_CLOSE_BUTTON = "/oc/api/v1/instance/note/c";
 
-    public static final String INSTANCE_WRITABLE_DN = "/api/v2/instance/fieldsubmission/iframe";
-    public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/api/v2/instance/fieldsubmission/c/iframe";
+    // public static final String INSTANCE_WRITABLE_DN = "/api/v2/instance/fieldsubmission/iframe";
+    public static final String INSTANCE_WRITABLE_DN = "/oc/api/v1/instance/edit";
+    // public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/api/v2/instance/fieldsubmission/c/iframe";
+    public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/oc/api/v1/instance/edit/c";
     private String userPasswdCombo;
 
     public EnketoAPI(EnketoCredentials credentials) {
@@ -76,7 +86,7 @@ public class EnketoAPI {
         URL eURL = new URL(enketoURL + SURVEY_OFFLINE_MODE);
         EnketoURLResponse response = registerAndGetURL(eURL, crfOID);
         if (response != null) {
-            String myUrl = response.getOffline_url();
+            String myUrl = response.getUrl();
             if (enketoURL.toLowerCase().startsWith("https") && !myUrl.toLowerCase().startsWith("https")) {
                 myUrl = myUrl.replaceFirst("http", "https");
             }
@@ -124,12 +134,8 @@ public class EnketoAPI {
         String myUrl = null;
         EnketoURLResponse response = registerAndGetURL(eURL, crfOID);
         if (response != null) {
-            if (response.getSingle_fieldsubmission_iframe_url() != null) {
-                myUrl = response.getSingle_fieldsubmission_iframe_url();
-            } else if (response.getView_iframe_url() != null) {
-                myUrl = response.getView_iframe_url();
-            } else if (response.getPreview_url() != null) {
-                myUrl = response.getPreview_url();
+            if (response.getUrl() != null) {
+                myUrl = response.getUrl();
             }
 
             if (enketoURL.toLowerCase().startsWith("https") && !myUrl.toLowerCase().startsWith("https")) {
@@ -146,7 +152,7 @@ public class EnketoAPI {
         URL eURL = new URL(enketoURL + SURVEY_PREVIEW_MODE);
         EnketoURLResponse response = registerAndGetURL(eURL, crfOID);
         if (response != null)
-            return response.getPreview_url();
+            return response.getUrl();
         else
             return "";
     }
