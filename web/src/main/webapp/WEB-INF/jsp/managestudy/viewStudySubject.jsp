@@ -94,9 +94,9 @@
   .section-header {
     color: white;
     background-color: #618ebb;
-    border-radius: 10px;
+    border-radius: 6px;
     font-size: 17px;
-    padding: 0.5em 1em;
+    padding: .5em 1em .5em .6em;
   }
   .section-header::after {
     float: right;
@@ -104,7 +104,7 @@
     font-family: 'icomoon' !important;
   }
   .section-body {
-    overflow: hidden;
+    padding-left: 25px;
   }
   .expanded > .section-header::after {
     content: "\e92a";
@@ -211,7 +211,7 @@
 </div>
 <div class="section expanded" id="studySubjectRecord">
   <div class="section-header">
-    <fmt:message key="study_subject_record" bundle="${resword}"/>
+    General Information
   </div>
   <div class="section-body">
     <table border="0" cellpadding="0" cellspacing="0">
@@ -233,23 +233,14 @@
                                 <tbody>
                                   <tr>
                                     <!-- Table Tools/Actions cell -->
-                                    <td class="table_actions" valign="top" align="right">
-                                      <table border="0" cellpadding="0" cellspacing="0">
-                                        <tbody>
-                                          <tr>
-                                            <td class="table_tools">
-                                              <c:if test="${study.status.available}">
-                                                <c:if test="${!userRole.monitor}">
-                                                  |
-                                                  <a href="UpdateStudySubject?id=<c:out value="${studySub.id}"/>&amp;action=show">
-                                                  <fmt:message key="edit_record" bundle="${resword}"/>
-                                                  </a>
-                                                </c:if>
-                                              </c:if>
-                                            </td>
-                                          </tr>
-                                        </tbody>
-                                      </table>
+                                    <td class="table_actions" valign="top">
+                                      <c:if test="${study.status.available}">
+                                        <c:if test="${!userRole.monitor}">
+                                          <a href="UpdateStudySubject?id=<c:out value="${studySub.id}"/>&amp;action=show">
+                                            Edit
+                                          </a>
+                                        </c:if>
+                                      </c:if>
                                     </td>
                                     <!-- End Table Tools/Actions cell -->
                                   </tr>
