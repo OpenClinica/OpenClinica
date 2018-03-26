@@ -89,7 +89,7 @@
     font-size: .85rem;
   }
   .section {
-    margin-bottom: 5px;
+    margin-bottom: 3px;
   }
   .section-header {
     color: white;
@@ -1010,6 +1010,7 @@
     </div>
   </div>
 </div>
+<br>
 <c:choose>
   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
     <div class="table_title_Admin">
