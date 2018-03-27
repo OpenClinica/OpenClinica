@@ -218,6 +218,19 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             xml.append(nls);
                         }
 
+                        // ***************** OpenClinica:Link LOCK EVENT **************
+
+                        if (!role.equals(Role.MONITOR) && studyEvent.getStatusId() != Status.DELETED.getCode()
+                                && studyEvent.getStatusId() != Status.AUTO_DELETED.getCode() && studySubject.getStatus().equals(Status.AVAILABLE)
+                                && study.getStatus().equals(Status.AVAILABLE)) {
+                            String lockUrl = "/UpdateStudyEvent?event_id=" + studyEvent.getStudyEventId() + "&ss_id=" + studySubject.getStudySubjectId();
+
+                            xml.append(indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"lock\" href=\""
+                                    + StringEscapeUtils.escapeXml(lockUrl) + "\"");
+                            xml.append("/>");
+                            xml.append(nls);
+                        }
+
                         xml.append(indent + indent + indent + indent + "</OpenClinica:links>");
                         xml.append(nls);
                     }

@@ -68,9 +68,9 @@ public class EnketoAPI {
     public static final String INSTANCE_READONLY_DN_CLOSE_BUTTON = "/oc/api/v1/instance/note/c";
 
     // public static final String INSTANCE_WRITABLE_DN = "/api/v2/instance/fieldsubmission/iframe";
-    public static final String INSTANCE_WRITABLE_DN = "/oc/api/v1/instance/edit";
+    public static final String INSTANCE_WRITABLE_DN = "/oc/api/v1/instance/edit/rfc";
     // public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/api/v2/instance/fieldsubmission/c/iframe";
-    public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/oc/api/v1/instance/edit/c";
+    public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/oc/api/v1/instance/edit/rfc/c";
     private String userPasswdCombo;
 
     public EnketoAPI(EnketoCredentials credentials) {
