@@ -86,7 +86,11 @@
 <script type="text/JavaScript" language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
 <script>
     Handlebars.registerHelper('truncate', function(s, length) {
-        s = s.join(', ');
+        if (!s)
+            return '';
+        if (s.join)
+            s = s.join(', ');
+        s = s.trim();
         return s.length < length ? s : s.substring(0, length) + '...';
     });
 </script>
@@ -107,7 +111,7 @@
                         <tr valign="top">
                             {{#each form.itemGroups as |itemGroup|}}
                                 {{#each itemGroup.items as |item|}}
-                                    <td class="table_cell">{{item.Question.TranslatedText}}</td>
+                                    <td class="table_cell">{{truncate item.Question.TranslatedText 30}}</td>
                                 {{/each}}
                             {{/each}}
                             <td class="table_cell">
