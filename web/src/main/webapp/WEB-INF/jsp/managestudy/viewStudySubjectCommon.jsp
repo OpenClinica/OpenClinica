@@ -51,7 +51,9 @@
         display: none;
     }
     .add-new {
-        height: 25px;
+        height: 22px;
+        margin-top: 3px !important;
+        padding: 3px 9px !important;
     }
     .actions .icon:before {
         content: "\f1234";
