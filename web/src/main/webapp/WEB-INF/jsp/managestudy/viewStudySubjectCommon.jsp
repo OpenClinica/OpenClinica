@@ -42,6 +42,9 @@
     tr.submission:hover, td.highlight {
         background-color: whitesmoke !important;
     }
+    .submission.oc-status-removed {
+        color: red;
+    }
     .form-name {
         display: inline;
         margin-right: 10px;
@@ -130,7 +133,7 @@
                     </thead>
                     <tbody>
                         {{#each form.submissions as |submission|}}
-                            <tr class="submission">
+                            <tr class="submission {{submission.hideStatus}}">
                                 {{#each submission.data as |data|}}
                                     <td data-search="{{data}}">{{truncate data 200}}</td>
                                 {{/each}}
