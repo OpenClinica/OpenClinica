@@ -89,14 +89,16 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section expanded">
+    <div class="section expanded" data-study-event-oid="{{studyEventOid}}">
         <div class="section-header">
             {{sectionName}}
         </div>
         <div class="section-body">
             {{#each forms as |form|}}
                 <div class="subsection">
-                    <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
+                    <input type="button" class="add-new" value="Add New" 
+                        data-form-oid="{{form.[@OID]}}" 
+                        {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
                     <h3 class="form-name">{{form.[@Name]}}</h3>
                     <table class="datatable">
                     <thead>
@@ -164,9 +166,7 @@ $(function() {
         return [];
     }
     $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y', function(data) {
-        var numCommons = 0;
         var numVisitBaseds = 0;
-
         var studyOid = data.ClinicalData['@StudyOID'];
         var studySubjectOid = data.ClinicalData.SubjectData['@SubjectKey'];
 
@@ -289,7 +289,6 @@ $(function() {
                     studyEventOid: studyEventId,
                     forms: studyEvent.forms
                 }));
-                numCommons++;
             }
             else {
                 numVisitBaseds++;
@@ -301,7 +300,8 @@ $(function() {
         sectionTable.on('click', '.add-new', function() {
             var btn = $(this);
             var formOid = btn.data('form-oid');
-            var studyEventOid = btn.closest('.section-body').data('study-event-oid');
+            var studyEventOid = btn.closest('.section').data('study-event-oid');
+            console.log(studyOid, studyEventOid, studySubjectOid, formOid);
             $.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/api/addAnotherForm',
@@ -322,11 +322,8 @@ $(function() {
             });
         });
 
-        if (numCommons) {
-            $('#commonEvents, #commonEvents_collapser').removeClass('hide');
-        }
         if (numVisitBaseds) {
-            $('#subjectEvents, #excl_subjectEvents_close').removeClass('hide');
+            $('#subjectEvents').removeClass('hide');
         }
 
         var datatables = $('table.datatable');
