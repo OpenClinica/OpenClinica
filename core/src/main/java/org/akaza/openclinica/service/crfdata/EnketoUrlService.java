@@ -273,12 +273,8 @@ public class EnketoUrlService {
 
         EnketoURLResponse eur = enketo.registerAndGetEditURL(editUrlObject);
 
-        if (eur.getEdit_url() != null) {
-            editURL = eur.getEdit_url();
-        } else if (eur.getEdit_iframe_url() != null) {
-            editURL = eur.getEdit_iframe_url();
-        } else if (eur.getView_iframe_url() != null) {
-            editURL = eur.getView_iframe_url();
+        if (eur.getUrl() != null) {
+            editURL = eur.getUrl();
         }
 
         int hashIndex = editURL.lastIndexOf("#");

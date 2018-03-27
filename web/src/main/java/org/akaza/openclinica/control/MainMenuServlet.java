@@ -27,6 +27,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.service.StudyBuildServiceImpl;
@@ -148,16 +149,19 @@ public class MainMenuServlet extends SecureController {
         ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getName());
         ub.setRoles(userRoleBeans);
         StudyDAO sd = getStudyDAO();
-        StudyBean study = sd.findByStudyEnvUuid(studyEnvUuid);
+        StudyBean tmpPublicStudy = sd.findByStudyEnvUuid(studyEnvUuid);
 
-        if (study == null) {
+        if (tmpPublicStudy == null) {
             CoreResources.setRequestSchema(request,currentSchema);
             return isRenewAuth;
         }
-        currentPublicStudy = study;
-        CoreResources.setRequestSchema(request, study.getSchemaName());
+        currentPublicStudy = tmpPublicStudy;
+        CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
         currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
-        
+        if (currentStudy.getParentStudyId() > 0) {
+            currentStudy.setParentStudyName(sd.findByPK(currentStudy.getParentStudyId()).getName());
+            currentPublicStudy.setParentStudyName(currentStudy.getParentStudyName());
+        }
         StudyConfigService scs = new StudyConfigService(sm.getDataSource());
         scs.setParametersForStudy(currentStudy);
         
@@ -167,7 +171,8 @@ public class MainMenuServlet extends SecureController {
         StudyUserRoleBean role = ub.getRoleByStudy(currentPublicStudy.getId());
 
         if (role.getStudyId() == 0) {
-            logger.error("You have no roles for this study.");
+            logger.error("You have no roles for this study." + studyEnvUuid + " currentStudy is:" + currentStudy.getName() + " schema:" + currentPublicStudy.getSchemaName());
+            logger.error("Creating an invalid role, ChangeStudy page will be shown");
             //throw new Exception("You have no roles for this study.");
             currentStudy = new StudyBean();
             currentPublicStudy = new StudyBean();

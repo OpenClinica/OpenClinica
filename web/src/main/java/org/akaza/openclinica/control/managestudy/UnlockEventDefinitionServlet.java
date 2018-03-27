@@ -140,12 +140,15 @@ public class UnlockEventDefinitionServlet extends SecureController {
                     }
                 }
 
-                String emailBody =
-                    respage.getString("the_SED") + " " + sed.getName() + respage.getString("has_been_unlocked_for_the_study") + " " + currentStudy.getName()
-                        + ". " + respage.getString("subject_event_data_is_as_it_was_before");
+                 /* OC-8797
+                    Do not send email notification when data is removed
+                    String emailBody =
+                        respage.getString("the_SED") + " " + sed.getName() + respage.getString("has_been_unlocked_for_the_study") + " " + currentStudy.getName()
+                            + ". " + respage.getString("subject_event_data_is_as_it_was_before");
 
-                addPageMessage(emailBody);
-                sendEmail(emailBody);
+                    addPageMessage(emailBody);
+                    sendEmail(emailBody);
+                */
                 forwardPage(Page.LIST_DEFINITION_SERVLET);
             }
 
@@ -156,8 +159,6 @@ public class UnlockEventDefinitionServlet extends SecureController {
     /**
      * Send email to director and administrator
      *
-     * @param request
-     * @param response
      */
     private void sendEmail(String emailBody) throws Exception {
 

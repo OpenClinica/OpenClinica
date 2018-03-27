@@ -145,13 +145,15 @@ public class LockEventDefinitionServlet extends SecureController {
                         }
                     }
                 }
+                /* OC-8797
+                    Do not send email notification when data is removed
+                    String emailBody =
+                        respage.getString("the_SED") + sed.getName() + respage.getString("has_been_locked_for_the_study") + currentStudy.getName()
+                            + respage.getString("no_new_data_may_entered_for_this_SED");
 
-                String emailBody =
-                    respage.getString("the_SED") + sed.getName() + respage.getString("has_been_locked_for_the_study") + currentStudy.getName()
-                        + respage.getString("no_new_data_may_entered_for_this_SED");
-
-                addPageMessage(emailBody);
-                sendEmail(emailBody);
+                    addPageMessage(emailBody);
+                    sendEmail(emailBody);
+                */
                 forwardPage(Page.LIST_DEFINITION_SERVLET);
             }
 
@@ -162,8 +164,6 @@ public class LockEventDefinitionServlet extends SecureController {
     /**
      * Send email to director and administrator
      *
-     * @param request
-     * @param response
      */
     private void sendEmail(String emailBody) throws Exception {
 
