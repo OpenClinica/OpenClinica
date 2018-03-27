@@ -1,7 +1,7 @@
 <style>
     .subsection {
-        margin-top: 35px;
-        margin-bottom: 65px;
+        margin-top: 25px;
+        margin-bottom: 75px;
         font-size: .85rem;
     }
     table.datatable {
@@ -22,15 +22,14 @@
     }
     .datatable thead td {
         border-color: white !important;
+        border-top-color: #ccc !important;
+        background-color: #ccc !important;
     }
     .datatable thead td:first-child {
         border-left-color: #ccc !important;
     }
     .datatable thead td:last-child {
         border-right-color: #ccc !important;
-    }
-    thead .table_cell {
-        background-color: #ccc !important;
     }
     td.actions {
         padding: 3.4px !important;
@@ -108,22 +107,22 @@
                     <h3 class="form-name">{{form.[@Name]}}</h3>
                     <table class="datatable">
                     <thead>
-                        <tr valign="top">
+                        <tr>
                             {{#each form.itemGroups as |itemGroup|}}
                                 {{#each itemGroup.items as |item|}}
-                                    <td class="table_cell">{{truncate item.Question.TranslatedText 30}}</td>
+                                    <td>{{truncate item.Question.TranslatedText 30}}</td>
                                 {{/each}}
                             {{/each}}
-                            <td class="table_cell">
+                            <td>
                                 <center>Status</center>
                             </td>
-                            <td class="table_cell">
+                            <td>
                                 <center>Last Update</center>
                             </td>
-                            <td class="table_cell">
+                            <td>
                                 <center>Updated By</center>
                             </td>
-                            <td class="table_cell">
+                            <td>
                                 <center>Actions</center>
                             </td>
                             <td></td>
@@ -133,20 +132,20 @@
                         {{#each form.submissions as |submission|}}
                             <tr class="submission">
                                 {{#each submission.data as |data|}}
-                                    <td class="table_cell" data-search="{{data}}">{{truncate data 200}}</td>
+                                    <td data-search="{{data}}">{{truncate data 200}}</td>
                                 {{/each}}
-                                <td align="center" class="table_cell">{{submission.studyStatus}}</td>
-                                <td align="center" class="table_cell">{{submission.updatedDate}}</td>
-                                <td align="center" class="table_cell">{{submission.updatedBy}}</td>
-                                <td class="table_cell actions">
+                                <td>{{submission.studyStatus}}</td>
+                                <td>{{submission.updatedDate}}</td>
+                                <td>{{submission.updatedBy}}</td>
+                                <td class="actions">
                                     <table>
                                         <tbody>
-                                            <tr valign="top">
+                                            <tr>
                                                 {{#each submission.links as |link|}}
                                                 <td>
                                                     <a href="${pageContext.request.contextPath}{{link.[@href]}}">
-                                                    <span class="icon icon-{{link.[@rel]}}" border="0" alt="{{link.[@rel]}}" title="{{link.[@rel]}}" align="left" hspace="6">
-                                                    </span></a>
+                                                        <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title="{{link.[@rel]}}"></span>
+                                                    </a>
                                                 </td>
                                                 {{/each}}
                                             </tr>
@@ -349,7 +348,7 @@ $(function() {
                     visible: false
                 }]
             });
-            $(this).children('tbody').on('mouseenter', 'td.table_cell', function () {
+            $(this).children('tbody').on('mouseenter', 'td', function () {
                 var colIdx = table.cell(this).index().column;
                 $(table.cells().nodes()).removeClass('highlight');
                 $(table.column(colIdx).nodes()).addClass('highlight');
