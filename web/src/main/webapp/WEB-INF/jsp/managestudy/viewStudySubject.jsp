@@ -64,24 +64,39 @@
 </script>
 <script>
   $(document.body).on('click', '.section-header', function() {
-    var section = $(this);
-    var body = section.children('.section-body');
+    var header = $(this);
+    var body = header.next();
+    var section = header.parent();
     var updown = section.hasClass('collapsed') ? 'slideDown' : 'slideUp';
     body[updown]('fast', function() {
       section.toggleClass('collapsed expanded');
     });
   });
+
+  function clickAllSections(state) {
+    $('.section.' + state).children('.section-header').click();
+  };
 </script>
 <style>
+  #header {
+    display: inline-block;
+    margin-bottom: 25px;
+  }
+  .header-links {
+    float: right;
+    clear: right;
+    margin-top: 6px;
+    font-size: .85rem;
+  }
   .section {
-    margin-bottom: 5px;
+    margin-bottom: 3px;
   }
   .section-header {
     color: white;
     background-color: #618ebb;
-    border-radius: 10px;
-    font-size: 20px;
-    padding: 0.5em 1em;
+    border-radius: 6px;
+    font-size: 17px;
+    padding: .5em 1em .5em .6em;
   }
   .section-header::after {
     float: right;
@@ -89,7 +104,7 @@
     font-family: 'icomoon' !important;
   }
   .section-body {
-    overflow: hidden;
+    padding-left: 25px;
   }
   .expanded > .section-header::after {
     content: "\e92a";
@@ -119,53 +134,65 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
-<h1 style="display:inline-block; margin-right:40px;">
+<h1 id="header">
   <span class="title_manage">
     <fmt:message key="view_subject2" bundle="${resword}"/>
     <c:out value="${studySub.label}"/>
   </span>
 </h1>
-<c:choose>
-  <c:when
-    test="${from =='listSubject' && userBean.sysAdmin && module=='admin'}">
-    <span>
-      <a style="text-decoration: none"
-      href="ViewSubject?id=
-      <c:out value="${subject.id}"/>
-      ">
-      <fmt:message
-        key="go_back_to_view_subject" bundle="${resword}" />
-      </a>
-    </span>
-  </c:when>
-  <c:otherwise>
+<div class="header-links">
+  <span>
     <c:choose>
-      <c:when test="${(userRole.manageStudy)&& module=='manage'}">
+      <c:when
+        test="${from =='listSubject' && userBean.sysAdmin && module=='admin'}">
         <span>
-          <a style="text-decoration: none" href="ListStudySubject">
-            <fmt:message key="go_back_to_study_subject_list" bundle="${resword}"/>
+          <a href="ViewSubject?id=<c:out value="${subject.id}"/>">
+            <fmt:message key="go_back_to_view_subject" bundle="${resword}" />
           </a>
         </span>
       </c:when>
       <c:otherwise>
-        <span>
-          <a href="ListStudySubjects" style="text-decoration: none">
-            <fmt:message
-              key="back_to_subject_matrix" bundle="${resword}" />
-          </a>
-        </span>
+        <c:choose>
+          <c:when test="${(userRole.manageStudy) && module=='manage'}">
+            <span>
+              <a href="ListStudySubject">
+                <fmt:message key="go_back_to_study_subject_list" bundle="${resword}"/>
+              </a>
+            </span>
+          </c:when>
+          <c:otherwise>
+            <span>
+              <a href="ListStudySubjects">
+                <fmt:message
+                  key="back_to_subject_matrix" bundle="${resword}" />
+              </a>
+            </span>
+          </c:otherwise>
+        </c:choose>
       </c:otherwise>
     </c:choose>
-  </c:otherwise>
-</c:choose>
-<label for="oc-status-hide" style="margin-left: 40px;">Show:</label>
-<select id="oc-status-hide">
-  <option value="oc-status-removed">Active Records</option>
-  <option value="oc-status-active">Removed Records</option>
-  <option value="null">All Records</option>
-</select>
-<br>
-<br>
+  </span>
+  <span> | </span>
+  <span>
+    <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
+      <fmt:message key="audit_logs" bundle="${resword}"/>
+    </a>
+  </span>
+  <span> | </span>
+  <span>
+    <label for="oc-status-hide">Showing</label>
+    <select id="oc-status-hide">
+      <option value="oc-status-removed">Active Records</option>
+      <option value="oc-status-active">Removed Records</option>
+      <option value="null">All Records</option>
+    </select>
+  </span>
+</div>
+<div class="header-links">
+  <a href="javascript:clickAllSections('collapsed');">Expand All</a>
+  <span> | </span>
+  <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
+</div>
 <c:choose>
   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
     <div class="table_title_Admin">
@@ -184,7 +211,7 @@
 </div>
 <div class="section expanded" id="studySubjectRecord">
   <div class="section-header">
-    <fmt:message key="study_subject_record" bundle="${resword}"/>
+    General Information
   </div>
   <div class="section-body">
     <table border="0" cellpadding="0" cellspacing="0">
@@ -206,30 +233,14 @@
                                 <tbody>
                                   <tr>
                                     <!-- Table Tools/Actions cell -->
-                                    <td class="table_actions" valign="top" align="right">
-                                      <table border="0" cellpadding="0" cellspacing="0">
-                                        <tbody>
-                                          <tr>
-                                            <td class="table_tools">
-                                              <a style="text-decoration: none" href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=
-                                              <c:out value="${studySub.id}"/>
-                                              ')">
-                                              <fmt:message key="audit_logs" bundle="${resword}"/>
-                                              </a>
-                                              <c:if test="${study.status.available}">
-                                                <c:if test="${!userRole.monitor}">
-                                                  |
-                                                  <a style="text-decoration: none" href="UpdateStudySubject?id=
-                                                  <c:out value="${studySub.id}"/>
-                                                  &amp;action=show">
-                                                  <fmt:message key="edit_record" bundle="${resword}"/>
-                                                  </a>
-                                                </c:if>
-                                              </c:if>
-                                            </td>
-                                          </tr>
-                                        </tbody>
-                                      </table>
+                                    <td class="table_actions" valign="top">
+                                      <c:if test="${study.status.available}">
+                                        <c:if test="${!userRole.monitor}">
+                                          <a href="UpdateStudySubject?id=<c:out value="${studySub.id}"/>&amp;action=show">
+                                            Edit
+                                          </a>
+                                        </c:if>
+                                      </c:if>
                                     </td>
                                     <!-- End Table Tools/Actions cell -->
                                   </tr>
@@ -262,7 +273,7 @@
                                                     </a>
                                                   </c:when>
                                                   <c:otherwise>
-                                                    <a href="#" style="text-decoration: none"  style="text-decoration: none" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+                                                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
                                                       <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="fa fa-bubble-white" border="0" alt="
                                                       <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                       " title="
@@ -302,7 +313,7 @@
                                                         </a>
                                                       </c:when>
                                                       <c:otherwise>
-                                                        <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                                                        <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
                                                           <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
                                                           <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                           " title="
@@ -334,7 +345,7 @@
                                                         </a>
                                                       </c:when>
                                                       <c:otherwise>
-                                                        <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                                                        <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
                                                           <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
                                                           <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                           " title="
@@ -366,7 +377,7 @@
                                                         </a>
                                                       </c:when>
                                                       <c:otherwise>
-                                                        <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                                                        <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
                                                           <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
                                                           <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                           " title="
@@ -409,7 +420,7 @@
                                                     </a>
                                                   </c:when>
                                                   <c:otherwise>
-                                                    <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${subject.id}&writeToDB=1&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
+                                                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${subject.id}&writeToDB=1&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
                                                       <span id="flag_gender" name="flag_gender" class="fa fa-bubble-white" border="0" alt="
                                                       <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                       " title="
@@ -458,7 +469,7 @@
                                                     </a>
                                                   </c:when>
                                                   <c:otherwise>
-                                                    <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${studySub.id}&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
+                                                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${studySub.id}&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
                                                       <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="fa fa-bubble-white" border="0" alt="
                                                       <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                       " title="
@@ -480,17 +491,13 @@
                                             <td class="table_cell">
                                               <c:choose>
                                                 <c:when test="${subjectStudy.parentStudyId>0}">
-                                                  <a style="text-decoration: none" href="ViewStudy?id=
-                                                  <c:out value="${parentStudy.id}"/>
-                                                  &amp;viewFull=yes">
-                                                  <c:out value="${parentStudy.name}"/>
+                                                  <a href="ViewStudy?id=<c:out value="${parentStudy.id}"/>&amp;viewFull=yes">
+                                                    <c:out value="${parentStudy.name}"/>
                                                   </a>
                                                 </c:when>
                                                 <c:otherwise>
-                                                  <a href="ViewStudy?id=
-                                                  <c:out value="${subjectStudy.id}"/>
-                                                  &amp;viewFull=yes">
-                                                  <c:out value="${subjectStudy.name}"/>
+                                                  <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>&amp;viewFull=yes">
+                                                    <c:out value="${subjectStudy.name}"/>
                                                   </a>
                                                 </c:otherwise>
                                               </c:choose>
@@ -500,10 +507,8 @@
                                             </td>
                                             <td class="table_cell">
                                               <c:if test="${subjectStudy.parentStudyId>0}">
-                                                <a style="text-decoration: none" href="ViewStudy?id=
-                                                <c:out value="${subjectStudy.id}"/>
-                                                ">
-                                                <c:out value="${subjectStudy.name}"/>
+                                                <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>">
+                                                  <c:out value="${subjectStudy.name}"/>
                                                 </a>
                                               </c:if>
                                               &nbsp;
@@ -599,10 +604,8 @@
                               <tr>
                                 <td class="table_tools">
                                   <c:if test="${study.status.available && !(empty groups)}">
-                                    <a style="text-decoration: none" href="UpdateStudySubject?id=
-                                    <c:out value="${studySub.id}"/>
-                                    &action=show">
-                                    <fmt:message key="assign_subject_to_group" bundle="${resworkflow}"/>
+                                    <a href="UpdateStudySubject?id=<c:out value="${studySub.id}"/>&action=show">
+                                      <fmt:message key="assign_subject_to_group" bundle="${resworkflow}"/>
                                     </a>
                                   </c:if>
                                 </td>
@@ -739,7 +742,7 @@
                                       <c:set var="isNew" value="${hasUniqueIDNote eq 'yes' ? 0 : 1}"/>
                                       <c:choose>
                                         <c:when test="${hasUniqueIDNote eq 'yes'}">
-                                          <a href="#" style="text-decoration: none"  style="text-decoration: none" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+                                          <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
                                             <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="fa fa-bubble-red" border="0" alt="
                                             <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                             " title="
@@ -748,7 +751,7 @@
                                           </a>
                                         </c:when>
                                         <c:otherwise>
-                                          <a href="#" style="text-decoration: none"  style="text-decoration: none" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
+                                          <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
                                             <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="fa fa-bubble-white" border="0" alt="
                                             <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                             " title="
@@ -779,7 +782,7 @@
                                           <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
                                           <c:choose>
                                             <c:when test="${hasDOBNote eq 'yes'}">
-                                              <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                                              <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
                                                 <span id="flag_dob" name="flag_dob" class="fa fa-bubble-red" border="0" alt="
                                                 <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                 " title="
@@ -788,7 +791,7 @@
                                               </a>
                                             </c:when>
                                             <c:otherwise>
-                                              <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                                              <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
                                                 <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
                                                 <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                 " title="
@@ -811,7 +814,7 @@
                                           <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
                                           <c:choose>
                                             <c:when test="${hasDOBNote eq 'yes'}">
-                                              <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                                              <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
                                                 <span id="flag_dob" name="flag_dob" class="fa fa-bubble-red" border="0" alt="
                                                 <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                 " title="
@@ -820,7 +823,7 @@
                                               </a>
                                             </c:when>
                                             <c:otherwise>
-                                              <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                                              <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
                                                 <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
                                                 <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                 " title="
@@ -843,7 +846,7 @@
                                           <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
                                           <c:choose>
                                             <c:when test="${hasDOBNote eq 'yes'}">
-                                              <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
+                                              <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth','spanAlert-dob'); return false;">
                                                 <span id="flag_dob" name="flag_dob" class="fa fa-bubble-red" border="0" alt="
                                                 <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                 " title="
@@ -852,7 +855,7 @@
                                               </a>
                                             </c:when>
                                             <c:otherwise>
-                                              <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
+                                              <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dob&column=date_of_birth&new=1','spanAlert-dob'); return false;">
                                                 <span id="flag_dob" name="flag_dob" class="fa fa-bubble-white" border="0" alt="
                                                 <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                                 " title="
@@ -883,7 +886,7 @@
                                       <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
                                       <c:choose>
                                         <c:when test="${hasGenderNote eq 'yes'}">
-                                          <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
+                                          <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
                                             <span id="flag_gender" name="flag_gender" class="fa fa-bubble-red" border="0" alt="
                                             <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                             " title="
@@ -892,7 +895,7 @@
                                           </a>
                                         </c:when>
                                         <c:otherwise>
-                                          <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${subject.id}&writeToDB=1&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
+                                          <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${subject.id}&writeToDB=1&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
                                             <span id="flag_gender" name="flag_gender" class="fa fa-bubble-white" border="0" alt="
                                             <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                             " title="
@@ -932,7 +935,7 @@
                                       <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
                                       <c:choose>
                                         <c:when test="${hasEnrollmentNote eq 'yes'}">
-                                          <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
+                                          <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
                                             <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="fa fa-bubble-red" border="0" alt="
                                             <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                             " title="
@@ -941,7 +944,7 @@
                                           </a>
                                         </c:when>
                                         <c:otherwise>
-                                          <a href="#" style="text-decoration: none"  onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${studySub.id}&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
+                                          <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${studySub.id}&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
                                             <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="fa fa-bubble-white" border="0" alt="
                                             <fmt:message key="discrepancy_note" bundle="${resword}"/>
                                             " title="
@@ -967,17 +970,13 @@
                                   <td class="table_cell_top">
                                     <c:choose>
                                       <c:when test="${subjectStudy.parentStudyId>0}">
-                                        <a style="text-decoration: none" href="ViewStudy?id=
-                                        <c:out value="${parentStudy.id}"/>
-                                        &amp;viewFull=yes">
-                                        <c:out value="${parentStudy.name}"/>
+                                        <a href="ViewStudy?id=<c:out value="${parentStudy.id}"/>&amp;viewFull=yes">
+                                          <c:out value="${parentStudy.name}"/>
                                         </a>
                                       </c:when>
                                       <c:otherwise>
-                                        <a href="ViewStudy?id=
-                                        <c:out value="${subjectStudy.id}"/>
-                                        &amp;viewFull=yes">
-                                        <c:out value="${subjectStudy.name}"/>
+                                        <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>&amp;viewFull=yes">
+                                          <c:out value="${subjectStudy.name}"/>
                                         </a>
                                       </c:otherwise>
                                     </c:choose>
@@ -987,10 +986,8 @@
                                   </td>
                                   <td class="table_cell_top">
                                     <c:if test="${subjectStudy.parentStudyId>0}">
-                                      <a style="text-decoration: none" href="ViewStudy?id=
-                                      <c:out value="${subjectStudy.id}"/>
-                                      ">
-                                      <c:out value="${subjectStudy.name}"/>
+                                      <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>">
+                                        <c:out value="${subjectStudy.name}"/>
                                       </a>
                                     </c:if>
                                     &nbsp;
@@ -1013,6 +1010,7 @@
     </div>
   </div>
 </div>
+<br>
 <c:choose>
   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
     <div class="table_title_Admin">
@@ -1029,10 +1027,10 @@
   </c:otherwise>
 </c:choose>
 <a name="global">
-<a id="excl_archivableCasebook_open" style="text-decoration: none; display: all;" href="javascript:leftnavExpand('archivableCasebook'); leftnavExpand('excl_archivableCasebook_open'); leftnavExpand('excl_archivableCasebook_close');">
+<a id="excl_archivableCasebook_open" style="display: all;" href="javascript:leftnavExpand('archivableCasebook'); leftnavExpand('excl_archivableCasebook_open'); leftnavExpand('excl_archivableCasebook_close');">
 <img src="images/bt_Expand.gif" border="0" height="20px"> <fmt:message key="viewStudySubject.casebookGenerationForm.title" bundle="${resword}"/>
 </a>
-<a id="excl_archivableCasebook_close" style="text-decoration: none; display: none;" href="javascript:leftnavExpand('archivableCasebook'); leftnavExpand('excl_archivableCasebook_open'); leftnavExpand('excl_archivableCasebook_close');">
+<a id="excl_archivableCasebook_close" style="display: none;" href="javascript:leftnavExpand('archivableCasebook'); leftnavExpand('excl_archivableCasebook_open'); leftnavExpand('excl_archivableCasebook_close');">
 <img src="images/bt_Collapse.gif" border="0" height="20px"> <fmt:message key="viewStudySubject.casebookGenerationForm.title" bundle="${resword}"/>
 </a>
 </a>

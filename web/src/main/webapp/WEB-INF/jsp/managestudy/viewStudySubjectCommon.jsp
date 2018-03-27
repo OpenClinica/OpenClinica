@@ -1,6 +1,13 @@
 <style>
-    .datatable {
-        padding-top: 5px;
+    .subsection {
+        margin-top: 25px;
+        margin-bottom: 75px;
+        font-size: .85rem;
+    }
+    table.datatable {
+        border-bottom: none !important;
+        border-collapse: collapse !important;
+        margin-top: 2px !important;
     }
     .dataTables_info {
         padding-top: 0.5em !important;
@@ -9,8 +16,20 @@
         padding-top: 0.5em;
         padding-left: 1.5em;
     }
-    thead .table_cell {
+    .datatable td {
+        border: 1px solid #ccc;
+        border-bottom-color: #ccc !important;
+    }
+    .datatable thead td {
+        border-color: white !important;
+        border-top-color: #ccc !important;
         background-color: #ccc !important;
+    }
+    .datatable thead td:first-child {
+        border-left-color: #ccc !important;
+    }
+    .datatable thead td:last-child {
+        border-right-color: #ccc !important;
     }
     td.actions {
         padding: 3.4px !important;
@@ -18,9 +37,13 @@
     }
     td.actions td {
         padding: 3.4px !important;
+        border: none;
     }
     tr.submission:hover, td.highlight {
         background-color: whitesmoke !important;
+    }
+    .submission.oc-status-removed {
+        color: red;
     }
     .form-name {
         display: inline;
@@ -28,6 +51,11 @@
     }
     input[type=button][disabled] {
         display: none;
+    }
+    .add-new {
+        height: 22px;
+        margin-top: 3px !important;
+        padding: 3px 9px !important;
     }
     .actions .icon:before {
         content: "\f1234";
@@ -60,41 +88,44 @@
 <script type="text/JavaScript" language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
 <script>
     Handlebars.registerHelper('truncate', function(s, length) {
-        s = s.join(', ');
+        if (!s)
+            return '';
+        if (s.join)
+            s = s.join(', ');
+        s = s.trim();
         return s.length < length ? s : s.substring(0, length) + '...';
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section expanded">
+    <div class="section expanded" data-study-event-oid="{{studyEventOid}}">
         <div class="section-header">
             {{sectionName}}
         </div>
         <div class="section-body">
-            <table border="0" cellpadding="0" cellspacing="0">
-            <tbody>
             {{#each forms as |form|}}
-            <tr>
-                <td colspan="3" valign="top" style="padding-top: 30px;">
-                    <input type="button" class="add-new" value="Add New" data-form-oid="{{form.[@OID]}}" {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
+                <div class="subsection">
+                    <input type="button" class="add-new" value="Add New" 
+                        data-form-oid="{{form.[@OID]}}" 
+                        {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
                     <h3 class="form-name">{{form.[@Name]}}</h3>
-                    <table border="0" cellpadding="0" cellspacing="0" class="datatable">
+                    <table class="datatable">
                     <thead>
-                        <tr valign="top">
+                        <tr>
                             {{#each form.itemGroups as |itemGroup|}}
                                 {{#each itemGroup.items as |item|}}
-                                    <td class="table_cell">{{item.Question.TranslatedText}}</td>
+                                    <td>{{truncate item.Question.TranslatedText 30}}</td>
                                 {{/each}}
                             {{/each}}
-                            <td class="table_cell">
+                            <td>
                                 <center>Status</center>
                             </td>
-                            <td class="table_cell">
+                            <td>
                                 <center>Last Update</center>
                             </td>
-                            <td class="table_cell">
+                            <td>
                                 <center>Updated By</center>
                             </td>
-                            <td class="table_cell">
+                            <td>
                                 <center>Actions</center>
                             </td>
                             <td></td>
@@ -102,22 +133,22 @@
                     </thead>
                     <tbody>
                         {{#each form.submissions as |submission|}}
-                            <tr class="submission">
+                            <tr class="submission {{submission.hideStatus}}">
                                 {{#each submission.data as |data|}}
-                                    <td class="table_cell" data-search="{{data}}">{{truncate data 200}}</td>
+                                    <td data-search="{{data}}">{{truncate data 200}}</td>
                                 {{/each}}
-                                <td align="center" class="table_cell">{{submission.studyStatus}}</td>
-                                <td align="center" class="table_cell">{{submission.updatedDate}}</td>
-                                <td align="center" class="table_cell">{{submission.updatedBy}}</td>
-                                <td class="table_cell actions">
-                                    <table border="0" cellpadding="0" cellspacing="0">
+                                <td>{{submission.studyStatus}}</td>
+                                <td>{{submission.updatedDate}}</td>
+                                <td>{{submission.updatedBy}}</td>
+                                <td class="actions">
+                                    <table>
                                         <tbody>
-                                            <tr valign="top">
+                                            <tr>
                                                 {{#each submission.links as |link|}}
                                                 <td>
                                                     <a href="${pageContext.request.contextPath}{{link.[@href]}}">
-                                                    <span class="icon icon-{{link.[@rel]}}" border="0" alt="{{link.[@rel]}}" title="{{link.[@rel]}}" align="left" hspace="6">
-                                                    </span></a>
+                                                        <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title="{{link.[@rel]}}"></span>
+                                                    </a>
                                                 </td>
                                                 {{/each}}
                                             </tr>
@@ -129,11 +160,8 @@
                         {{/each}}
                     </tbody>
                     </table>
-                {{/each}}
-                </td>
-            </tr>
-            </tbody>
-            </table>
+                </div>
+            {{/each}}
         </div>
     </div>
 </script>
@@ -146,9 +174,7 @@ $(function() {
         return [];
     }
     $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y', function(data) {
-        var numCommons = 0;
         var numVisitBaseds = 0;
-
         var studyOid = data.ClinicalData['@StudyOID'];
         var studySubjectOid = data.ClinicalData.SubjectData['@SubjectKey'];
 
@@ -271,7 +297,6 @@ $(function() {
                     studyEventOid: studyEventId,
                     forms: studyEvent.forms
                 }));
-                numCommons++;
             }
             else {
                 numVisitBaseds++;
@@ -283,7 +308,8 @@ $(function() {
         sectionTable.on('click', '.add-new', function() {
             var btn = $(this);
             var formOid = btn.data('form-oid');
-            var studyEventOid = btn.closest('.section-body').data('study-event-oid');
+            var studyEventOid = btn.closest('.section').data('study-event-oid');
+            console.log(studyOid, studyEventOid, studySubjectOid, formOid);
             $.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/api/addAnotherForm',
@@ -304,11 +330,8 @@ $(function() {
             });
         });
 
-        if (numCommons) {
-            $('#commonEvents, #commonEvents_collapser').removeClass('hide');
-        }
         if (numVisitBaseds) {
-            $('#subjectEvents, #excl_subjectEvents_close').removeClass('hide');
+            $('#subjectEvents').removeClass('hide');
         }
 
         var datatables = $('table.datatable');
@@ -328,7 +351,7 @@ $(function() {
                     visible: false
                 }]
             });
-            $(this).children('tbody').on('mouseenter', 'td.table_cell', function () {
+            $(this).children('tbody').on('mouseenter', 'td', function () {
                 var colIdx = table.cell(this).index().column;
                 $(table.cells().nodes()).removeClass('highlight');
                 $(table.column(colIdx).nodes()).addClass('highlight');
@@ -340,9 +363,8 @@ $(function() {
             var paging = table.next();
             var pagesize = paging.next().children().contents();
             header.prevUntil().prependTo(header);
-            paging.text(paging.text().replace(' to ', '-').replace('entries', 'rows'));
-            pagesize[2].replaceWith(' rows per page');
-            pagesize[0].remove();
+            paging.text(paging.text().replace('Showing', 'Results').replace(' to ', '-').replace('entries', ''));
+            pagesize[2].replaceWith(' per page');
             table.css('width', '');
         });
         datatables.parent().css({
