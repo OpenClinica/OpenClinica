@@ -51,7 +51,7 @@
            </c:if>
          </c:when>
          <c:otherwise>
-          <c:if test="${(userRole.manageStudy && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (study.status.available)}">
+          <c:if test="${(userRole.manageStudy && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (currRow.bean.studyEvent.studyEventDefinition.status.available) && (study.status.available)}">
            <a href="RestoreStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
 			onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
 			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><span
@@ -60,7 +60,7 @@
          </c:otherwise>
         </c:choose>
 
-        <c:if test="${userRole.manageStudy && study.status.available}">
+        <c:if test="${userRole.manageStudy && study.status.available  && currRow.bean.studyEvent.studyEventDefinition.status.available && (currRow.bean.studyEvent.studyEventDefinition.status.available)}">
             
             <td>
                 <a href="DeleteStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
