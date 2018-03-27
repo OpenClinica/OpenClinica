@@ -97,15 +97,16 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section expanded" data-study-event-oid="{{studyEventOid}}">
+    <div class="section expanded" id="common-event-{{studyEventOid}}">
         <div class="section-header">
             {{sectionName}}
         </div>
         <div class="section-body">
             {{#each forms as |form|}}
-                <div class="subsection">
+                <div class="subsection" id="common-{{../studyEventOid}}-{{form.[@OID]}}">
                     <input type="button" class="add-new" value="Add New" 
                         data-form-oid="{{form.[@OID]}}" 
+                        data-study-event-oid="{{../studyEventOid}}"
                         {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
                     <h3 class="form-name">{{form.[@Name]}}</h3>
                     <table class="datatable">
@@ -308,8 +309,7 @@ $(function() {
         sectionTable.on('click', '.add-new', function() {
             var btn = $(this);
             var formOid = btn.data('form-oid');
-            var studyEventOid = btn.closest('.section').data('study-event-oid');
-            console.log(studyOid, studyEventOid, studySubjectOid, formOid);
+            var studyEventOid = btn.data('study-event-oid');
             $.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/api/addAnotherForm',
