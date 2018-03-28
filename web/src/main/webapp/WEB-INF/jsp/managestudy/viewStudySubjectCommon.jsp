@@ -364,7 +364,7 @@ $(function() {
             pagesize[2].replaceWith(' per page');
             table.css('width', '');
         });
-        datatables.parent().css({
+        datatables.wrap('<div>').parent().css({
             'max-width': $(window).width() - 200 + 'px',
             'overflow': 'scroll'
         });        
