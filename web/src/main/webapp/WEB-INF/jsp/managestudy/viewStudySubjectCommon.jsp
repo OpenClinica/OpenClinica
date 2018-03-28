@@ -16,6 +16,9 @@
         padding-top: 0.5em;
         padding-left: 1.5em;
     }
+    .dataTables_length > label {
+        margin-left: 10px;
+    }
     .datatable td {
         border: 1px solid #ccc;
         border-bottom-color: #ccc !important;
@@ -360,7 +363,7 @@ $(function() {
             var paging = table.next();
             var pagesize = paging.next().children().contents();
             header.prevUntil().prependTo(header);
-            paging.text(paging.text().replace('Showing', 'Results').replace(' to ', '-').replace('entries', ''));
+            paging.text(paging.text().replace('Showing', 'Results').replace(' to ', '-').replace(' entries', '.'));
             pagesize[2].replaceWith(' per page');
             table.css('width', '');
         });
