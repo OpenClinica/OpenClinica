@@ -126,7 +126,7 @@
                                 {{/each}}
                             {{/each}}
                             <td>Status</td>
-                            <td>Last Update</td>
+                            <td>Last Updated</td>
                             <td>Updated By</td>
                             <td>Actions</td>
                             <td>oc-status-hide</td>
