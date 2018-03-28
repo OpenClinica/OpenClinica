@@ -95,13 +95,14 @@
     color: white;
     background-color: #618ebb;
     border-radius: 6px;
-    font-size: 17px;
+    font-size: 20px;
     padding: .5em 1em .5em .6em;
   }
   .section-header::after {
     float: right;
     margin: 3px;
     font-family: 'icomoon' !important;
+    font-size: 30px;
   }
   .section-body {
     padding-left: 25px;
@@ -136,8 +137,7 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 <h1 id="header">
   <span class="title_manage">
-    <fmt:message key="view_subject2" bundle="${resword}"/>
-    <c:out value="${studySub.label}"/>
+    Subject <c:out value="${studySub.label}"/>
   </span>
 </h1>
 <div class="header-links">
@@ -172,13 +172,13 @@
       </c:otherwise>
     </c:choose>
   </span>
-  <span> | </span>
+  <span>&nbsp; | &nbsp;</span>
   <span>
     <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
       <fmt:message key="audit_logs" bundle="${resword}"/>
     </a>
   </span>
-  <span> | </span>
+  <span>&nbsp; | &nbsp;</span>
   <span>
     <label for="oc-status-hide">Showing</label>
     <select id="oc-status-hide">
@@ -190,7 +190,7 @@
 </div>
 <div class="header-links">
   <a href="javascript:clickAllSections('collapsed');">Expand All</a>
-  <span> | </span>
+  <span>&nbsp; | &nbsp;</span>
   <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
 </div>
 <c:choose>

@@ -16,6 +16,9 @@
         padding-top: 0.5em;
         padding-left: 1.5em;
     }
+    .dataTables_length > label {
+        margin-left: 10px;
+    }
     .datatable td {
         border: 1px solid #ccc;
         border-bottom-color: #ccc !important;
@@ -24,6 +27,7 @@
         border-color: white !important;
         border-top-color: #ccc !important;
         background-color: #ccc !important;
+        text-align: center;
     }
     .datatable thead td:first-child {
         border-left-color: #ccc !important;
@@ -55,6 +59,7 @@
     .add-new {
         height: 22px;
         margin-top: 3px !important;
+        margin-bottom: 2px !important;
         padding: 3px 9px !important;
     }
     .actions .icon:before {
@@ -78,6 +83,9 @@
     .actions .icon.icon-sign:before {
         content: "\e91a";
     }
+    .actions .icon.icon-lock:before {
+        content: "\e811";
+    }
 }
 </style>
 
@@ -97,15 +105,16 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section expanded" data-study-event-oid="{{studyEventOid}}">
+    <div class="section expanded" id="common.{{studyEventOid}}">
         <div class="section-header">
             {{sectionName}}
         </div>
         <div class="section-body">
             {{#each forms as |form|}}
-                <div class="subsection">
+                <div class="subsection" id="common.{{../studyEventOid}}.{{form.[@OID]}}">
                     <input type="button" class="add-new" value="Add New" 
                         data-form-oid="{{form.[@OID]}}" 
+                        data-study-event-oid="{{../studyEventOid}}"
                         {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
                     <h3 class="form-name">{{form.[@Name]}}</h3>
                     <table class="datatable">
@@ -116,19 +125,11 @@
                                     <td>{{truncate item.Question.TranslatedText 30}}</td>
                                 {{/each}}
                             {{/each}}
-                            <td>
-                                <center>Status</center>
-                            </td>
-                            <td>
-                                <center>Last Update</center>
-                            </td>
-                            <td>
-                                <center>Updated By</center>
-                            </td>
-                            <td>
-                                <center>Actions</center>
-                            </td>
-                            <td></td>
+                            <td>Status</td>
+                            <td>Last Updated</td>
+                            <td>Updated By</td>
+                            <td>Actions</td>
+                            <td>oc-status-hide</td>
                         </tr>
                     </thead>
                     <tbody>
@@ -243,7 +244,7 @@ $(function() {
             var links = [];
             $.merge(links, collection(studyEventData['OpenClinica:links']['OpenClinica:link']));
             $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
-            var order = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign'];
+            var order = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign', 'lock'];
             links.sort(function(a, b) {
                 return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
             });
@@ -308,8 +309,7 @@ $(function() {
         sectionTable.on('click', '.add-new', function() {
             var btn = $(this);
             var formOid = btn.data('form-oid');
-            var studyEventOid = btn.closest('.section').data('study-event-oid');
-            console.log(studyOid, studyEventOid, studySubjectOid, formOid);
+            var studyEventOid = btn.data('study-event-oid');
             $.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/api/addAnotherForm',
@@ -363,11 +363,11 @@ $(function() {
             var paging = table.next();
             var pagesize = paging.next().children().contents();
             header.prevUntil().prependTo(header);
-            paging.text(paging.text().replace('Showing', 'Results').replace(' to ', '-').replace('entries', ''));
+            paging.text(paging.text().replace('Showing', 'Results').replace(' to ', '-').replace(' entries', '.'));
             pagesize[2].replaceWith(' per page');
             table.css('width', '');
         });
-        datatables.parent().css({
+        datatables.wrap('<div>').parent().css({
             'max-width': $(window).width() - 200 + 'px',
             'overflow': 'scroll'
         });        
