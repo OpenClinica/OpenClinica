@@ -70,7 +70,7 @@ public class InitUpdateSubStudyServlet extends SecureController {
         logger.info("study id:" + idString);
         if (StringUtil.isBlank(idString)) {
             addPageMessage(respage.getString("please_choose_a_study_to_edit"));
-            forwardPage(Page.STUDY_LIST_SERVLET);
+            forwardPage(Page.ERROR);
         } else {
             int studyId = Integer.valueOf(idString.trim()).intValue();
             StudyBean study = (StudyBean) sdao.findByPK(studyId);

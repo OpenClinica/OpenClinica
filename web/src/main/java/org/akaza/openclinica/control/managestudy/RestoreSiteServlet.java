@@ -110,7 +110,7 @@ public class RestoreSiteServlet extends SecureController {
                     mf.applyPattern(respage.getString("choosen_site_cannot_restored"));
                     Object[] arguments = { study.getName(), parentstudy.getName() };
                     addPageMessage(mf.format(arguments));
-                    forwardPage(Page.STUDY_LIST_SERVLET);
+                    forwardPage(Page.ERROR);
                 }
                 forwardPage(Page.RESTORE_SITE);
             } else {
@@ -246,7 +246,7 @@ public class RestoreSiteServlet extends SecureController {
                 } else {
                     session.removeAttribute("fromListSite");
                     if (currentRole.getRole().equals(Role.ADMIN)) {
-                        forwardPage(Page.STUDY_LIST_SERVLET);
+                        forwardPage(Page.ERROR);
                     } else {
                         forwardPage(Page.SITE_LIST_SERVLET);
                     }

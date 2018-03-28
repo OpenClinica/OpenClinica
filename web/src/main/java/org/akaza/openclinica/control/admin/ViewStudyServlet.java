@@ -62,7 +62,7 @@ public class ViewStudyServlet extends SecureController {
 
         if (studyId == 0) {
             addPageMessage(respage.getString("please_choose_a_study_to_view"));
-            forwardPage(Page.STUDY_LIST_SERVLET);
+            forwardPage(Page.ERROR);
         } else {
             if (currentStudy.getId() != studyId && currentStudy.getParentStudyId() != studyId) {
                 checkRoleByUserAndStudy(ub, study, sdao);

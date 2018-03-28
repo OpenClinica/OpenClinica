@@ -1,44 +1,18 @@
 package org.akaza.openclinica.control.submit;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.FindSubjectsFilter;
-import org.akaza.openclinica.dao.managestudy.FindSubjectsSort;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
@@ -50,16 +24,21 @@ import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
 import org.jmesa.facade.TableFacade;
-import org.jmesa.limit.Filter;
-import org.jmesa.limit.FilterSet;
-import org.jmesa.limit.Limit;
-import org.jmesa.limit.Sort;
-import org.jmesa.limit.SortSet;
+import org.jmesa.limit.*;
+import org.jmesa.util.ItemUtils;
 import org.jmesa.view.component.Row;
 import org.jmesa.view.editor.BasicCellEditor;
 import org.jmesa.view.editor.CellEditor;
 import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
@@ -87,6 +66,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private StudyParameterValueDAO studyParameterValueDAO;
     private ParticipantPortalRegistrar participantPortalRegistrar;
     private final String COMMON = "common";
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
@@ -139,7 +120,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties(columnNames);
         Row row = tableFacade.getTable().getRow();
         int index = 0;
-        configureColumn(row.getColumn(columnNames[index]), resword.getString("study_subject_ID"), null, null);
+        configureColumn(row.getColumn(columnNames[index]), resword.getString("study_subject_ID"), new SubjectIdCellEditor(), null);
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("subject_status"), new StatusCellEditor(), new StatusDroplistFilterEditor());
         ++index;
@@ -225,7 +206,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
             theItem.put("studySubject", studySubjectBean);
-            theItem.put("studySubject.label", studySubjectBean.getLabel());
+            HtmlBuilder subjectLink = new HtmlBuilder();
+
+            subjectLink
+                    .append("<a href=\"ViewStudySubject?id="
+                            + studySubjectBean.getSubjectId());
+            subjectLink.append("\">" + studySubjectBean.getLabel() + "</a>");
+            theItem.put("studySubject.label", subjectLink.toString());
             theItem.put("studySubject.status", studySubjectBean.getStatus());
             theItem.put("enrolledAt", study.getIdentifier());
             theItem.put("studySubject.oid", studySubjectBean.getOid());
@@ -605,6 +592,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         public Object getValue(Object item, String property, int rowcount) {
             StudySubjectBean studySubject = (StudySubjectBean) new BasicCellEditor().getValue(item, "studySubject", rowcount);
             return studySubject.getStatus().getName();
+        }
+    }
+
+
+    private class SubjectIdCellEditor implements CellEditor {
+        public Object getValue(Object item, String property, int rowcount) {
+            Object itemValue = ItemUtils.getItemValue(item, property);
+            return itemValue;
         }
     }
 
