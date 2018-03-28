@@ -122,7 +122,7 @@ public class UpdateStudyServletNew extends SecureController {
         }
         if (study == null) {
             addPageMessage(respage.getString("please_choose_a_study_to_edit"));
-            forwardPage(Page.STUDY_LIST_SERVLET);
+            forwardPage(Page.ERROR);
             return;
         }
         if (action.equals("submit")) {

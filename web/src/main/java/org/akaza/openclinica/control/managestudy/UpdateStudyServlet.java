@@ -71,7 +71,7 @@ public class UpdateStudyServlet extends SecureController {
 
         if (study == null) {
             addPageMessage(respage.getString("please_choose_a_study_to_edit"));
-            forwardPage(Page.STUDY_LIST_SERVLET);
+            forwardPage(Page.ERROR);
             return;
         }
 
@@ -93,7 +93,7 @@ public class UpdateStudyServlet extends SecureController {
             } else if ("submit".equalsIgnoreCase(action)) {
                 submitStudy();
                 addPageMessage(respage.getString("the_study_has_been_updated_succesfully"));
-                forwardPage(Page.STUDY_LIST_SERVLET);
+                forwardPage(Page.ERROR);
 
             } else if ("next".equalsIgnoreCase(action)) {
                 Integer pageNumber = Integer.valueOf(request.getParameter("pageNum"));

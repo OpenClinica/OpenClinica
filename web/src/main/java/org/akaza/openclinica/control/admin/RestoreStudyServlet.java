@@ -86,7 +86,7 @@ public class RestoreStudyServlet extends SecureController {
         String action = request.getParameter("action");
         if (studyId == 0) {
             addPageMessage(respage.getString("please_choose_a_study_to_restore"));
-            forwardPage(Page.STUDY_LIST_SERVLET);
+            forwardPage(Page.ERROR);
         } else {
             if ("confirm".equalsIgnoreCase(action)) {
                 request.setAttribute("studyToRestore", study);
@@ -262,7 +262,7 @@ public class RestoreStudyServlet extends SecureController {
                 }
 
                 addPageMessage(respage.getString("this_study_has_been_restored_succesfully"));
-                forwardPage(Page.STUDY_LIST_SERVLET);
+                forwardPage(Page.ERROR);
 
             }
         }

@@ -240,7 +240,7 @@ public class RemoveSiteServlet extends SecureController {
                 } else {
                     session.removeAttribute("fromListSite");
                     if (currentRole.getRole().equals(Role.ADMIN)) {
-                        forwardPage(Page.STUDY_LIST_SERVLET);
+                        forwardPage(Page.ERROR);
                     } else {
                         forwardPage(Page.SITE_LIST_SERVLET);
                     }
