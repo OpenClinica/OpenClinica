@@ -136,8 +136,7 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 <h1 id="header">
   <span class="title_manage">
-    <fmt:message key="view_subject2" bundle="${resword}"/>
-    <c:out value="${studySub.label}"/>
+    Subject <c:out value="${studySub.label}"/>
   </span>
 </h1>
 <div class="header-links">
