@@ -24,6 +24,7 @@
         border-color: white !important;
         border-top-color: #ccc !important;
         background-color: #ccc !important;
+        text-align: center;
     }
     .datatable thead td:first-child {
         border-left-color: #ccc !important;
@@ -118,19 +119,11 @@
                                     <td>{{truncate item.Question.TranslatedText 30}}</td>
                                 {{/each}}
                             {{/each}}
-                            <td>
-                                <center>Status</center>
-                            </td>
-                            <td>
-                                <center>Last Update</center>
-                            </td>
-                            <td>
-                                <center>Updated By</center>
-                            </td>
-                            <td>
-                                <center>Actions</center>
-                            </td>
-                            <td></td>
+                            <td>Status</td>
+                            <td>Last Update</td>
+                            <td>Updated By</td>
+                            <td>Actions</td>
+                            <td>oc-status-hide</td>
                         </tr>
                     </thead>
                     <tbody>
