@@ -80,6 +80,9 @@
     .actions .icon.icon-sign:before {
         content: "\e91a";
     }
+    .actions .icon.icon-lock:before {
+        content: "\e811";
+    }
 }
 </style>
 
@@ -238,7 +241,7 @@ $(function() {
             var links = [];
             $.merge(links, collection(studyEventData['OpenClinica:links']['OpenClinica:link']));
             $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
-            var order = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign'];
+            var order = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign', 'lock'];
             links.sort(function(a, b) {
                 return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
             });
