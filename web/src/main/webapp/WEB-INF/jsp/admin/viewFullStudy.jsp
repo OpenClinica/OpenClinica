@@ -455,8 +455,6 @@
    <td class="table_header_row"><fmt:message key="last_name" bundle="${resword}"/></td>
    <td class="table_header_row"><fmt:message key="role" bundle="${resword}"/></td>
    <td class="table_header_row"><fmt:message key="study_name" bundle="${resword}"/></td>
-   <td class="table_header_row"><fmt:message key="status" bundle="${resword}"/></td>
-   <td class="table_header_row">&nbsp;</td>
   </tr>
   <c:forEach var="user" items="${userRolesToView}">
   <tr valign="top">
@@ -467,18 +465,6 @@
       <td class="table_cell"><c:out value="${user.lastName}"/></td>
       <td class="table_cell"><c:out value="${user.role.description}"/></td>
       <td class="table_cell"><c:out value="${user.studyName}"/></td>
-      <td class="table_cell"><c:out value="${user.status.name}"/></td>
-      <td class="table_cell">
-        <c:if test="${userBean.techAdmin || userBean.sysAdmin || userRole.manageStudy}">
-         <a href="ViewStudyUser?name=<c:out value="${user.userName}"/>&studyId=<c:out value="${user.studyId}"/>"
-
-      onMouseDown="javascript:setImage('bt_View1','icon icon-search');"
-      onMouseUp="javascript:setImage('bt_View1','icon icon-search');"><center><span
-      name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="6"></a>
-
-
-    </c:if>
-      </td>
   </tr>
   </c:forEach>
   </table>
