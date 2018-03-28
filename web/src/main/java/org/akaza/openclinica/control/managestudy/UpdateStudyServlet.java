@@ -51,7 +51,7 @@ public class UpdateStudyServlet extends SecureController {
         }
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
+        throw new InsufficientPermissionException(Page.ERROR, resexception.getString("not_admin"), "1");
 
     }
 
