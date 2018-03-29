@@ -57,7 +57,7 @@ public class LogoutController {
         if (request.getParameter("studyEnvUuid") != null) {
             param = "?studyEnvUuid=" + request.getParameter("studyEnvUuid");
         }
-        logger.info("/logoutSuccess" + returnURL + param);
+        logger.info("/logoutSuccess:" + returnURL + param);
         return "redirect:" + returnURL + param;
     }
 

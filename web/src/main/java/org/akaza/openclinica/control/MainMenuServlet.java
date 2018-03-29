@@ -127,7 +127,7 @@ public class MainMenuServlet extends SecureController {
     }
 
     public boolean processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) throws Exception {
-        logger.debug("MainMenuServlet processSpecificStudyEnvUuid:%%%%%%%%" + session.getAttribute("firstLoginCheck"));
+        logger.info("MainMenuServlet processSpecificStudyEnvUuid:%%%%%%%%" + session.getAttribute("firstLoginCheck"));
         boolean isRenewAuth = false;
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
         if (StringUtils.isEmpty(studyEnvUuid)) {
@@ -184,6 +184,7 @@ public class MainMenuServlet extends SecureController {
         } else {
             currentRole = role;
             session.setAttribute("userRole", role);
+            logger.info("Found role for this study:" + role.getRoleName());
             if (ub.getActiveStudyId() == currentPublicStudy.getId())
                 return isRenewAuth;
             ub.setActiveStudyId(currentPublicStudy.getId());
@@ -194,6 +195,7 @@ public class MainMenuServlet extends SecureController {
 
     private boolean
     processForceRenewAuth() throws IOException {
+        logger.info("forceRenewAuth is true");
         boolean isRenewAuth = false;
         String renewAuth = (String) request.getParameter("forceRenewAuth");
         if (StringUtils.isNotEmpty(renewAuth)) {
@@ -230,6 +232,7 @@ public class MainMenuServlet extends SecureController {
             targetMap.remove("forceRenewAuth");
             String paramStr = Utils.getParamsString(targetMap);
             session.removeAttribute("userRole");
+            logger.info("Sending redirect to:" + request.getRequestURI() + "?" + paramStr);
             response.sendRedirect(request.getRequestURI() + "?" + paramStr);
             return;
         }
@@ -287,9 +290,11 @@ public class MainMenuServlet extends SecureController {
 
         if (currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentRole.isResearchAssistant2()) {
             forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+            return;
         }
         if (currentRole.isMonitor()) {
             response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId());
+            return;
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();
             setupSubjectEventStatusStatisticsTable();

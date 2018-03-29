@@ -130,6 +130,8 @@ public class CallbackController {
                 if (StringUtils.isEmpty(returnTo) || StringUtils.equals(returnTo, "/OpenClinica"))
                     returnTo = this.redirectOnSuccess;
                 logger.info("CallbackController returnTo URL:%%%%%%%%" + returnTo);
+                logger.info("param:" + param);
+
                 res.sendRedirect(returnTo + param);
             }
         } catch (InvalidRequestException e) {
