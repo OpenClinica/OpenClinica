@@ -81,7 +81,7 @@
         margin-top: 2px !important;
     }
     input[type=button][disabled] {
-        display: none;
+        visibility: hidden;
     }
     .actions .icon:before {
         content: "\f1234";
@@ -113,10 +113,10 @@
 <div id="commonEvents"></div>
 
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
-<script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
-<script type="text/JavaScript" language="JavaScript" src=""></script>
-<script type="text/JavaScript" language="JavaScript" src=""></script>
+<script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
 <script>
     Handlebars.registerHelper('truncate', function(s, length) {
         if (!s)
@@ -150,10 +150,8 @@
                     <table class="datatable">
                     <thead>
                         <tr>
-                            {{#each form.itemGroups as |itemGroup|}}
-                                {{#each itemGroup.items as |item|}}
-                                    <td>{{truncate item.Question.TranslatedText 30}}</td>
-                                {{/each}}
+                            {{#each form.columnTitles as |coltitle|}}
+                                <td>{{truncate coltitle 30}}</td>
                             {{/each}}
                             <td>Status</td>
                             <td>Last Updated</td>
@@ -204,10 +202,48 @@ $(function() {
             return x.length ? x : [x];
         return [];
     }
-    $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y', function(data) {
+
+    var odm;
+    var pageJson = {
+        name: "view subject",
+        components: [{ 
+            name: "SE_EVENT1.F_F1",
+            type: "table",
+            columns: [
+              "I_MED1",
+              "I_MED2"
+            ]
+        }, { 
+            name: "SE_EVENT1.F_MEDS",
+            type: "table",
+            columns: [
+              "I_CON1",
+              "I_CON2"
+            ]
+        }, { 
+            name: "SE_EVENT2.F_MEDICATIONS",
+            type: "table",
+            columns: [
+              "I_MEDIC_STARTDT",
+              "I_MEDIC_MEDOTHER",
+              "I_MEDIC_MEDNAME"
+            ]
+        }]
+    };
+    
+    $.when(
+        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y', function(data){odm = data;})
+        // ,
+        // $.get('that page.json', function(data){pageJson = data;})
+    ).then(function() {
+        var columns = {};
+        collection(pageJson.components).forEach(function(component) {
+            columns[component.name] = component.columns;
+        });
+
         var numVisitBaseds = 0;
-        var studyOid = data.ClinicalData['@StudyOID'];
-        var studySubjectOid = data.ClinicalData.SubjectData['@SubjectKey'];
+        var studyOid = odm.ClinicalData['@StudyOID'];
+        var studySubjectOid = odm.ClinicalData.SubjectData['@SubjectKey'];
 
         var studyEvents = {};
         var forms = {};
@@ -215,7 +251,7 @@ $(function() {
         var items = {};
 
         var metadata;
-        for (var i=0, studies=collection(data.Study); i<studies.length; i++) {
+        for (var i=0, studies=collection(odm.Study); i<studies.length; i++) {
             if (studies[i]['@OID'] === '${study.oid}') {
                 metadata = studies[i].MetaDataVersion;
                 break;
@@ -231,17 +267,12 @@ $(function() {
             itemGroups[itemGroup['@OID']] = itemGroup;
         });
         collection(metadata.FormDef).forEach(function(form) {
-            form.itemGroups = {};
-            form.submissionObj = {};
             collection(form.ItemGroupRef).forEach(function(ref) {
                 var id = ref['@ItemGroupOID'];
-                var itemGroup = itemGroups[id]
-                form.itemGroups[id] = itemGroup;
-                itemGroup.items.forEach(function(item) {
-                    form.submissionObj[item['@OID']] = [];
-                });
+                var itemGroup = itemGroups[id];
             });
             form.submissions = [];
+            form.columns = [];
             forms[form['@OID']] = form;
         });
         collection(metadata.StudyEventDef).forEach(function(studyEvent) {
@@ -255,16 +286,18 @@ $(function() {
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
 
-        collection(data.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
+        collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
             var formData = studyEventData.FormData;
             if (!formData)
                 return;
 
-            var form = forms[formData['@FormOID']];
+            var formOid = formData['@FormOID'];
+            var form = forms[formOid];
             if (!form)
                 return;
 
-            var studyEvent = studyEvents[studyEventData['@StudyEventOID']];
+            var studyEventOid = studyEventData['@StudyEventOID'];
+            var studyEvent = studyEvents[studyEventOid];
             if (studyEvent['@OpenClinica:EventType'] !== 'Common')
                 return;
 
@@ -279,6 +312,16 @@ $(function() {
                 return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
             });
 
+            var componentOid = studyEventOid + '.' + formOid;
+            var columnTitles = [];
+            var submissionObj = {};
+            collection(columns[componentOid]).forEach(function(col) {
+                var item = items[col];
+                if (item) {
+                    columnTitles.push(item.Question.TranslatedText);
+                    submissionObj[col] = [];
+                }
+            });
 
             var submission = {
                 studyStatus: studyEventData['@OpenClinica:Status'],
@@ -286,15 +329,18 @@ $(function() {
                 hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
                 updatedDate: formData['@OpenClinica:UpdatedDate'].split(' ')[0],
                 updatedBy: formData['@OpenClinica:UpdatedBy'],
-                data: $.extend(true, {}, form.submissionObj),
+                data: submissionObj,
                 links: links
             };
             collection(formData.ItemGroupData).forEach(function(igd) {
                 collection(igd.ItemData).forEach(function(item) {
-                    submission.data[item['@ItemOID']].push(item['@Value']);
+                    var data = submission.data[item['@ItemOID']];
+                    if (data)
+                        data.push(item['@Value']);
                 });
             });
             form.submissions.push(submission);
+            form.columnTitles = columnTitles;
         });
 
         var hideClass = 'oc-status-removed';
@@ -364,42 +410,45 @@ $(function() {
             $('#subjectEvents').removeClass('hide');
         }
 
-        var datatables = $('table.datatable');
-        datatables.each(function() {
-            var table = $(this).DataTable({
-                dom: "frtilp",
-                language: {
-                    paginate: {
-                        first: '<<',
-                        previous: '<',
-                        next: '>',
-                        last: '>>'
+        $.fn.dataTable.moment('DD-MMM-YYYY');
+        $('table.datatable')
+            .each(function() {
+                var table = $(this).DataTable({
+                    dom: "frtilp",
+                    language: {
+                        paginate: {
+                            first: '<<',
+                            previous: '<',
+                            next: '>',
+                            last: '>>'
+                        },
+                        info: 'Results _START_-_END_ of _TOTAL_.',
+                        infoEmpty: 'Results 0-0 of 0.',
+                        infoFiltered: '(filtered from _MAX_ total)',
+                        lengthMenu: 'Show _MENU_ per page'
                     },
-                    info: 'Results _START_-_END_ of _TOTAL_.',
-                    infoEmpty: 'Results 0-0 of 0.',
-                    lengthMenu: 'Show _MENU_ per page'
-                },
-                columnDefs: [{
-                    targets: -1,
-                    visible: false
-                }]
-            });
-            $(this).children('tbody').on('mouseenter', 'td', function () {
-                var colIdx = table.cell(this).index().column;
-                $(table.cells().nodes()).removeClass('highlight');
-                $(table.column(colIdx).nodes()).addClass('highlight');
-            });
-        });
-        datatables.prev('.dataTables_filter').each(function() {
-            console.log($(this));
-            $(this).appendTo($(this).closest('.subsection').find('.searchbox'));
-        });
-        datatables.wrap($('<div>', {
-            css: {
-                'max-width': $(window).width() - 200,
-                overflow: 'scroll'
-            }
-        }));        
+                    columnDefs: [{
+                        targets: -1,
+                        visible: false
+                    }]
+                });
+                $(this).children('tbody').on('mouseenter', 'td', function () {
+                    var colIdx = table.cell(this).index().column;
+                    $(table.cells().nodes()).removeClass('highlight');
+                    $(table.column(colIdx).nodes()).addClass('highlight');
+                });
+            })
+            .prev('.dataTables_filter').each(function() {
+                var searchbox = $(this);
+                searchbox.appendTo(searchbox.closest('.subsection').find('.searchbox'));
+            })
+            .end()
+            .wrap($('<div>', {
+                css: {
+                    'max-width': $(window).width() - 200,
+                    overflow: 'scroll'
+                }
+            }));
 
         $('#loading').remove();
     });
