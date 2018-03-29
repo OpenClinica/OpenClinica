@@ -4,20 +4,19 @@
         margin-bottom: 75px;
         font-size: .85rem;
     }
-    table.datatable {
+    .subsection-title {
+        width: 100%;
+    }
+    .subsection-title td {
+        vertical-align: middle;
+    }
+    .subsection-title td > * {
+        vertical-align: middle;
+    }
+    .datatable {
         border-bottom: none !important;
         border-collapse: collapse !important;
         margin-top: 2px !important;
-    }
-    .dataTables_info {
-        padding-top: 0.5em !important;
-    }
-    .dataTables_length {
-        padding-top: 0.5em;
-        padding-left: 1.5em;
-    }
-    .dataTables_length > label {
-        margin-left: 10px;
     }
     .datatable td {
         border: 1px solid #ccc;
@@ -35,6 +34,22 @@
     .datatable thead td:last-child {
         border-right-color: #ccc !important;
     }
+    .dataTables_info {
+        padding-top: 0.5em !important;
+    }
+    .dataTables_length {
+        padding-top: 0.5em;
+        padding-left: 1.5em;
+    }
+    .dataTables_length > label {
+        margin-left: 10px;
+    }
+    .table_tools, .table_actions {
+        vertical-align: middle !important;
+    }
+    .table_tools > a > input {
+        margin-top: 3px !important;
+    }
     td.actions {
         padding: 3.4px !important;
         vertical-align: middle;
@@ -43,7 +58,7 @@
         padding: 3.4px !important;
         border: none;
     }
-    tr.submission:hover, td.highlight {
+    td.highlight, .submission:hover {
         background-color: whitesmoke !important;
     }
     .submission.oc-status-removed {
@@ -53,14 +68,20 @@
         display: inline;
         margin-right: 10px;
     }
+    .add-new {
+        margin: 3px !important;
+    }
+    .searchbox {
+        text-align: right;
+    }
+    .searchbox input {
+        margin-left: 5px;
+    }
+    .button_search {
+        margin-top: 2px !important;
+    }
     input[type=button][disabled] {
         display: none;
-    }
-    .add-new {
-        height: 22px;
-        margin-top: 3px !important;
-        margin-bottom: 2px !important;
-        padding: 3px 9px !important;
     }
     .actions .icon:before {
         content: "\f1234";
@@ -94,6 +115,8 @@
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="https://cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="https://cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
+<script type="text/JavaScript" language="JavaScript" src=""></script>
+<script type="text/JavaScript" language="JavaScript" src=""></script>
 <script>
     Handlebars.registerHelper('truncate', function(s, length) {
         if (!s)
@@ -112,11 +135,18 @@
         <div class="section-body">
             {{#each forms as |form|}}
                 <div class="subsection" id="common.{{../studyEventOid}}.{{form.[@OID]}}">
-                    <input type="button" class="add-new" value="Add New" 
-                        data-form-oid="{{form.[@OID]}}" 
-                        data-study-event-oid="{{../studyEventOid}}"
-                        {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
-                    <h3 class="form-name">{{form.[@Name]}}</h3>
+                    <table class="subsection-title">
+                    <tr>
+                        <td>
+                            <h3 class="form-name">{{form.[@Name]}}</h3>
+                            <input type="button" class="add-new" value="Add New" 
+                                data-form-oid="{{form.[@OID]}}" 
+                                data-study-event-oid="{{../studyEventOid}}"
+                                {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
+                        </td>
+                        <td class="searchbox"></td>
+                    <tr>
+                    </table>
                     <table class="datatable">
                     <thead>
                         <tr>
@@ -344,7 +374,10 @@ $(function() {
                         previous: '<',
                         next: '>',
                         last: '>>'
-                    }
+                    },
+                    info: 'Results _START_-_END_ of _TOTAL_.',
+                    infoEmpty: 'Results 0-0 of 0.',
+                    lengthMenu: 'Show _MENU_ per page'
                 },
                 columnDefs: [{
                     targets: -1,
@@ -357,20 +390,16 @@ $(function() {
                 $(table.column(colIdx).nodes()).addClass('highlight');
             });
         });
-        datatables.each(function() {
-            var table = $(this);
-            var header = table.parent();
-            var paging = table.next();
-            var pagesize = paging.next().children().contents();
-            header.prevUntil().prependTo(header);
-            paging.text(paging.text().replace('Showing', 'Results').replace(' to ', '-').replace(' entries', '.'));
-            pagesize[2].replaceWith(' per page');
-            table.css('width', '');
+        datatables.prev('.dataTables_filter').each(function() {
+            console.log($(this));
+            $(this).appendTo($(this).closest('.subsection').find('.searchbox'));
         });
-        datatables.wrap('<div>').parent().css({
-            'max-width': $(window).width() - 200 + 'px',
-            'overflow': 'scroll'
-        });        
+        datatables.wrap($('<div>', {
+            css: {
+                'max-width': $(window).width() - 200,
+                overflow: 'scroll'
+            }
+        }));        
 
         $('#loading').remove();
     });
