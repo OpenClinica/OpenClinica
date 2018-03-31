@@ -15,6 +15,7 @@ import org.akaza.openclinica.controller.dto.SSOverhaulDTO;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
+import org.akaza.openclinica.dao.hibernate.PageLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
@@ -25,16 +26,20 @@ import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.PageLayout;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.service.Page;
+import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -66,6 +71,9 @@ public class StudySubjectOverhaulController {
 
     @Autowired
     private UserAccountDao userAccountDao;
+
+    @Autowired
+    private PageLayoutDao pageLayoutDao;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final String COMMON = "common";
@@ -219,4 +227,14 @@ public class StudySubjectOverhaulController {
 
     }
 
+    @Produces(MediaType.APPLICATION_JSON)
+    @RequestMapping(value = "/api/studies/{studyoid}/pages/{name}", method = RequestMethod.GET)
+    public ResponseEntity<Page> getPageLayout(HttpServletRequest request, @PathVariable("studyoid") String studyOid, @PathVariable("name") String name) {
+        Page page = null;
+        PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(name);
+        if (pageLayout != null) {
+            page = (Page) SerializationUtils.deserialize(pageLayout.getDefinition());
+        }
+        return new ResponseEntity<Page>(page, org.springframework.http.HttpStatus.OK);
+    }
 }

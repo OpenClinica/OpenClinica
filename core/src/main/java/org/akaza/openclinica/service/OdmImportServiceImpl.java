@@ -2,6 +2,7 @@ package org.akaza.openclinica.service;
 
 import java.io.File;
 import java.io.IOException;
+import java.io.Serializable;
 import java.text.MessageFormat;
 import java.time.Duration;
 import java.time.Instant;
@@ -28,6 +29,7 @@ import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
+import org.akaza.openclinica.dao.hibernate.PageLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
@@ -39,6 +41,7 @@ import org.akaza.openclinica.domain.datamap.CrfBean;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
 import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.PageLayout;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
@@ -50,6 +53,7 @@ import org.akaza.openclinica.service.crfdata.XformMetaDataService;
 import org.akaza.openclinica.service.dto.Bucket;
 import org.akaza.openclinica.service.dto.Form;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang.SerializationUtils;
 import org.cdisc.ns.odm.v130.EventType;
 import org.cdisc.ns.odm.v130.ODM;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormDef;
@@ -65,6 +69,7 @@ import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutD
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -109,6 +114,10 @@ public class OdmImportServiceImpl implements OdmImportService {
         this.dataSource = dataSource;
     }
 
+    @Autowired
+    private PageLayoutDao pageLayoutDao;
+    private Errors errors;
+
     private void printOdm(ODM odm) {
         JAXBContext jaxbContext = null;
         try {
@@ -124,19 +133,23 @@ public class OdmImportServiceImpl implements OdmImportService {
     }
 
     @Transactional
-    public Map<String, Object> importOdm(ODM odm, String boardId, HttpServletRequest request) {
-        Map<String, Object> map = importOdmToOC(odm, boardId, request);
+    public Map<String, Object> importOdm(PublishDTO publishDTO, String boardId, HttpServletRequest request) {
+        Map<String, Object> map = importOdmToOC(publishDTO, boardId, request);
         return map;
     }
 
     @Transactional
-    public Map<String, Object> importOdmToOC(ODM odm, String boardId, HttpServletRequest request) {
+    public Map<String, Object> importOdmToOC(PublishDTO publishDTO, String boardId, HttpServletRequest request) {
+        ODM odm = publishDTO.getOdm();
+        Page page = publishDTO.getPage();
         DataBinder dataBinder = new DataBinder(new Study());
         Errors errors = dataBinder.getBindingResult();
         printOdm(odm);
         CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(), dataSource);
 
         UserAccount userAccount = getCurrentUser();
+
+    //    saveOrUpdatePageLayout(page, userAccount);
         // TODO add validation to all entities
         ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
         Study study = retrieveStudy(odm, userAccount, odmStudy, errors);
@@ -729,5 +742,27 @@ public class OdmImportServiceImpl implements OdmImportService {
         ResponseEntity<Bucket[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Bucket[].class);
         return response.getBody();
     }
+
+    public void saveOrUpdatePageLayout(Page page, UserAccount userAccount) {
+        PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(page.getName());
+        if (pageLayout == null) {
+            pageLayout = new PageLayout();
+            pageLayout.setName(page.getName());
+            pageLayout.setDateCreated(new Date());
+            pageLayout.setUserAccount(userAccount);
+        } else {
+            pageLayout.setDateUpdated(new Date());
+            pageLayout.setUpdateId(userAccount.getUserId());
+        }
+        pageLayout.setDefinition(SerializationUtils.serialize((Serializable) page));
+        pageLayout = (PageLayout) pageLayoutDao.saveOrUpdate(pageLayout);
+        // if page object fails to save
+        /*
+         * if (true) {
+         * errors.rejectValue("name", "missing_default_version_error", "Page Layout Object fails to Save for " +
+         * page.getName() + "- FAILED");
+         * logger.info("Page Saving for " + page.getName() + "- FAILED");
+         * }
+         */ }
 
 }

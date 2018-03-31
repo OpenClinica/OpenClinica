@@ -10,6 +10,7 @@ import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.service.CustomRuntimeException;
 import org.akaza.openclinica.service.OdmImportServiceImpl;
+import org.akaza.openclinica.service.PublishDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -33,12 +34,12 @@ public class OdmImportController {
 
     @SuppressWarnings("unchecked")
     @RequestMapping(value = "/boardId/{boardId}", method = RequestMethod.POST)
-    public ResponseEntity<Object> importOdmToOC(@RequestBody org.cdisc.ns.odm.v130.ODM odm, @PathVariable("boardId") String boardId, HttpServletRequest request)
+    public ResponseEntity<Object> importOdmToOC(@RequestBody PublishDTO publishDTO, @PathVariable("boardId") String boardId, HttpServletRequest request)
             throws Exception {
         Instant start = Instant.now();
 
         try {
-            Map<String, Object> map = (Map<String, Object>) odmImportServiceImpl.importOdm(odm, boardId, request);
+            Map<String, Object> map = (Map<String, Object>) odmImportServiceImpl.importOdm(publishDTO, boardId, request);
             Study study = (Study) map.get("study");
             Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
             odmImportServiceImpl.updatePublicStudyPublishedFlag(publicStudy);
