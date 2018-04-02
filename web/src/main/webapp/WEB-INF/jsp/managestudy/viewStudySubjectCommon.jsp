@@ -210,15 +210,12 @@ $(function() {
             name: "SE_EVENT1.F_F1",
             type: "table",
             columns: [
-              "I_MED1",
-              "I_MED2"
-            ]
-        }, { 
-            name: "SE_EVENT1.F_MEDS",
-            type: "table",
-            columns: [
-              "I_CON1",
-              "I_CON2"
+                "I_F1_ML_DROPDOWN",
+                "I_F1_RADIO",
+                "I_F1_RADIO_HORIZ_COMP",
+                "I_F1_SM_COLUMNS",
+                "I_F1_MEALS",
+                "I_F1_SARAH"
             ]
         }, { 
             name: "SE_EVENT2.F_MEDICATIONS",
@@ -249,6 +246,7 @@ $(function() {
         var forms = {};
         var itemGroups = {};
         var items = {};
+        var codes = {};
 
         var metadata;
         for (var i=0, studies=collection(odm.Study); i<studies.length; i++) {
@@ -256,49 +254,68 @@ $(function() {
                 metadata = studies[i].MetaDataVersion;
                 break;
             }
-        }        
+        }
+        collection(metadata.CodeList).forEach(function(codelist) {
+            var code = {};
+            collection(codelist.CodeListItem).forEach(function(item) {
+                code[item['@CodedValue']] = item.Decode.TranslatedText;
+            });
+            codes[codelist['@OID']] = code;
+        });
+        collection(metadata['OpenClinica:MultiSelectList']).forEach(function(multiselect) {
+            var code = {};
+            collection(multiselect['OpenClinica:MultiSelectListItem']).forEach(function(item) {
+                code[item['@CodedOptionValue']] = item.Decode.TranslatedText;
+            });
+            codes[multiselect['@ID']] = code;
+        });
         collection(metadata.ItemDef).forEach(function(item) {
             items[item['@OID']] = item;
+            if (item.CodeListRef)
+                item.code = codes[item.CodeListRef['@CodeListOID']]
+            if (item['OpenClinica:MultiSelectListRef'])
+                item.code = codes[item['OpenClinica:MultiSelectListRef']['@MultiSelectListID']]
         });
         collection(metadata.ItemGroupDef).forEach(function(itemGroup) {
-            itemGroup.items = itemGroup.ItemRef.map(function(ref) {
+            itemGroup.items = collection(itemGroup.ItemRef).map(function(ref) {
                 return items[ref['@ItemOID']];
             });
             itemGroups[itemGroup['@OID']] = itemGroup;
         });
         collection(metadata.FormDef).forEach(function(form) {
-            collection(form.ItemGroupRef).forEach(function(ref) {
-                var id = ref['@ItemGroupOID'];
-                var itemGroup = itemGroups[id];
+            form.itemGroups = collection(form.ItemGroupRef).map(function(ref) {
+                return itemGroups[ref['@ItemGroupOID']];
             });
-            form.submissions = [];
-            form.columns = [];
             forms[form['@OID']] = form;
         });
         collection(metadata.StudyEventDef).forEach(function(studyEvent) {
-            studyEvent.forms = collection(studyEvent.FormRef).filter(function(ref) {
+            studyEvent.forms = {};
+            collection(studyEvent.FormRef).filter(function(ref) {
                 return ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'No';
-            }).map(function(ref) {
-                var form = forms[ref['@FormOID']];
-                form.disableAddNew = false;
-                return form;
+            }).forEach(function(ref) {
+                var formOid = ref['@FormOID'];
+                studyEvent.forms[formOid] = $.extend({
+                    columnTitles: [],
+                    submissions: [],
+                    disableAddNew: false
+                }, forms[formOid]);
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
 
         collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
+            var studyEventOid = studyEventData['@StudyEventOID'];
+            var studyEvent = studyEvents[studyEventOid];
+            if (studyEvent['@OpenClinica:EventType'] !== 'Common')
+                return;
+
             var formData = studyEventData.FormData;
             if (!formData)
                 return;
 
             var formOid = formData['@FormOID'];
-            var form = forms[formOid];
+            var form = studyEvent.forms[formOid];
             if (!form)
-                return;
-
-            var studyEventOid = studyEventData['@StudyEventOID'];
-            var studyEvent = studyEvents[studyEventOid];
-            if (studyEvent['@OpenClinica:EventType'] !== 'Common')
                 return;
 
             if (studyEvent['@Repeating'] === 'No')
@@ -333,10 +350,19 @@ $(function() {
                 links: links
             };
             collection(formData.ItemGroupData).forEach(function(igd) {
-                collection(igd.ItemData).forEach(function(item) {
-                    var data = submission.data[item['@ItemOID']];
-                    if (data)
-                        data.push(item['@Value']);
+                collection(igd.ItemData).forEach(function(itemData) {
+                    var itemOid = itemData['@ItemOID'];
+                    var data = submission.data[itemOid];
+                    if (data) {
+                        var item = items[itemOid];
+                        var value = itemData['@Value'];
+                        if (item.code) {
+                            value = value.split(',').map(function(code) {
+                                return item.code[code];
+                            }).join(', ');
+                        }
+                        data.push(value);
+                    }
                 });
             });
             form.submissions.push(submission);
@@ -433,9 +459,12 @@ $(function() {
                     }]
                 });
                 $(this).children('tbody').on('mouseenter', 'td', function () {
-                    var colIdx = table.cell(this).index().column;
-                    $(table.cells().nodes()).removeClass('highlight');
-                    $(table.column(colIdx).nodes()).addClass('highlight');
+                    var colIdx = table.cell(this).index();
+                    if (colIdx) {
+                        var col = colIdx.column;
+                        $(table.cells().nodes()).removeClass('highlight');
+                        $(table.column(col).nodes()).addClass('highlight');
+                    }
                 });
             })
             .prev('.dataTables_filter').each(function() {
