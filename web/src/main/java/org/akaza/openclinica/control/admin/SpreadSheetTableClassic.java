@@ -10,7 +10,7 @@ package org.akaza.openclinica.control.admin;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.sql.Connection;
-import java.sql.JDBCType;
+
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.*;
@@ -18,6 +18,7 @@ import java.util.regex.Pattern;
 import java.util.regex.PatternSyntaxException;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.admin.JDBCType;
 import org.akaza.openclinica.bean.admin.NewCRFBean;
 import org.akaza.openclinica.bean.admin.QueryObject;
 import org.akaza.openclinica.bean.admin.SqlParameter;
@@ -816,21 +817,45 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         // better spot for checking item might be right here,
                         // tbh 7-25
                         String vlSql = "";
+                        ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                        QueryObject qo = new QueryObject();
                         if (dbName.equals("oracle")) {
-                            vlSql =
+                           /* vlSql =
                                 "INSERT INTO ITEM (NAME,DESCRIPTION,UNITS,PHI_STATUS,"
                                     + "ITEM_DATA_TYPE_ID, ITEM_REFERENCE_TYPE_ID,STATUS_ID,OWNER_ID,DATE_CREATED,OC_OID) " + "VALUES ('"
                                     + stripQuotes(itemName) + "','" + stripQuotes(descLabel) + "','" + stripQuotes(unit) + "'," + (phiBoolean == true ? 1 : 0)
-                                    + "," + dataTypeIdString + ",1,1," + ub.getId() + ", sysdate" + ",'" + itemOid + "')";
+                                    + "," + dataTypeIdString + ",1,1," + ub.getId() + ", sysdate" + ",'" + itemOid + "')";*/
+                        	 vlSql =
+                                     "INSERT INTO ITEM (NAME,DESCRIPTION,UNITS,PHI_STATUS,"
+                                         + "ITEM_DATA_TYPE_ID, ITEM_REFERENCE_TYPE_ID,STATUS_ID,OWNER_ID,DATE_CREATED,OC_OID) " 
+                                    	 + "VALUES (?,?,?," + (phiBoolean == true ? 1 : 0)
+                                    	 + "," + dataTypeIdString + ",1,1,"  + ub.getId() + ", sysdate" + ",?)";
                         } else {
-                            vlSql =
+                            /*vlSql =
                                 "INSERT INTO ITEM (NAME,DESCRIPTION,UNITS,PHI_STATUS,"
                                     + "ITEM_DATA_TYPE_ID, ITEM_REFERENCE_TYPE_ID,STATUS_ID,OWNER_ID,DATE_CREATED,OC_OID) " + "VALUES ('"
                                     + stripQuotes(itemName) + "','" + stripQuotes(descLabel) + "','" + stripQuotes(unit) + "'," + phiBoolean + ","
-                                    + dataTypeIdString + ",1,1," + ub.getId() + ", NOW()" + ",'" + itemOid + "')";
+                                    + dataTypeIdString + ",1,1," + ub.getId() + ", NOW()" + ",'" + itemOid + "')";*/
+                        	vlSql =
+                                    "INSERT INTO ITEM (NAME,DESCRIPTION,UNITS,PHI_STATUS,"
+                                        + "ITEM_DATA_TYPE_ID, ITEM_REFERENCE_TYPE_ID,STATUS_ID,OWNER_ID,DATE_CREATED,OC_OID) " 
+                                    	+ "VALUES (?, ?, ?," + phiBoolean 
+                                    	+ "," + dataTypeIdString + ",1,1,"  + ub.getId() + ", NOW()" + ",?)";
                         }
 
-                        backupItemQueries.put(itemName, vlSql);
+                        //backupItemQueries.put(itemName, vlSql);
+                        sqlParameters = new ArrayList<>();
+                        
+                        sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));
+                        sqlParameters.add(new SqlParameter(stripQuotes(unit)));                                              
+                        sqlParameters.add(new SqlParameter(itemOid));
+                                                           
+                        qo = new QueryObject();
+                        qo.setSql(vlSql);
+                        qo.setSqlParameters(sqlParameters);
+                        backupItemQueries.put(itemName, qo);
+                        
                         // to compare items from DB later, if two items have the
                         // same name,
                         // but different units or phiStatus, they are different
@@ -857,7 +882,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
 
                         if (!itemCheck.containsKey(itemName)) {// item not in
                             // the DB
-                            openQueries.put(itemName, vlSql);
+                           // openQueries.put(itemName, vlSql);                        	                               
+                              openQueries.put(itemName, qo);
 
                         } else {// item in the DB
                             ItemBean oldItem = (ItemBean) idao.findByNameAndCRFId(itemName, crfId);
@@ -869,47 +895,83 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                     // data
                                     String upSql = "";
                                     if (dbName.equals("oracle")) {
-                                        upSql =
+                                       /* upSql =
                                             "UPDATE ITEM SET DESCRIPTION='" + stripQuotes(descLabel) + "'," + "UNITS='" + stripQuotes(unit) + "',"
                                                 + "PHI_STATUS=" + (phiBoolean ? 1 : 0) + "," + "ITEM_DATA_TYPE_ID=" + dataTypeIdString
                                                 + " WHERE exists (SELECT versioning_map.item_id from versioning_map, crf_version where"
                                                 + " versioning_map.crf_version_id = crf_version.crf_version_id" + " AND crf_version.crf_id= " + crfId
                                                 + " AND item.item_id = versioning_map.item_id)" + " AND item.name='" + stripQuotes(itemName)
-                                                + "' AND item.owner_id = " + ownerId;
+                                                + "' AND item.owner_id = " + ownerId;*/
+                                    	 upSql =
+                                                 "UPDATE ITEM SET DESCRIPTION= ?,UNITS= ?, "
+                                                     + "PHI_STATUS=" + (phiBoolean ? 1 : 0) + "," + "ITEM_DATA_TYPE_ID=" + dataTypeIdString
+                                                     + " WHERE exists (SELECT versioning_map.item_id from versioning_map, crf_version where"
+                                                     + " versioning_map.crf_version_id = crf_version.crf_version_id AND crf_version.crf_id= " + crfId
+                                                     + " AND item.item_id = versioning_map.item_id) AND item.name= ? "
+                                                     + "' AND item.owner_id = ?";
                                     } else {
-                                        upSql =
+                                       /* upSql =
                                             "UPDATE ITEM SET DESCRIPTION='" + stripQuotes(descLabel) + "'," + "UNITS='" + stripQuotes(unit) + "',"
                                                 + "PHI_STATUS=" + phiBoolean + "," + "ITEM_DATA_TYPE_ID=" + dataTypeIdString
                                                 + " FROM versioning_map, crf_version" + " WHERE item.name='" + stripQuotes(itemName) + "' AND item.owner_id = "
                                                 + ownerId + " AND item.item_id = versioning_map.item_id AND"
-                                                + " versioning_map.crf_version_id = crf_version.crf_version_id" + " AND crf_version.crf_id = " + crfId;
+                                                + " versioning_map.crf_version_id = crf_version.crf_version_id" + " AND crf_version.crf_id = " + crfId;*/
+                                    	 upSql =
+                                                 "UPDATE ITEM SET DESCRIPTION= ?, UNITS= ?,"
+                                                     + "PHI_STATUS=" + phiBoolean + "," + "ITEM_DATA_TYPE_ID=" + dataTypeIdString
+                                                     + " FROM versioning_map, crf_version" + " WHERE item.name= ? AND item.owner_id =? "
+                                                     + " AND item.item_id = versioning_map.item_id AND"
+                                                     + " versioning_map.crf_version_id = crf_version.crf_version_id" + " AND crf_version.crf_id = " + crfId;
                                     }// end of if dbname
-                                    openQueries.put(itemName, upSql);
+                                    //openQueries.put(itemName, upSql);
+                                    sqlParameters = new ArrayList<>();
+                                    
+                                    sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));
+                                    sqlParameters.add(new SqlParameter(stripQuotes(unit)));                                  
+                                    sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
+                                    sqlParameters.add(new SqlParameter(ownerId+"",JDBCType.INTEGER));
+                                                                       
+                                    qo = new QueryObject();
+                                    qo.setSql(upSql);
+                                    qo.setSqlParameters(sqlParameters);
+                                    
+                                    openQueries.put(itemName, qo);
                                 } else {
                                     String upSql = "";
                                     if (dbName.equals("oracle")) {
                                         upSql =
-                                            "UPDATE ITEM SET DESCRIPTION='" + stripQuotes(descLabel) + "'," + "PHI_STATUS=" + (phiBoolean ? 1 : 0)
+                                            "UPDATE ITEM SET DESCRIPTION= ?," + "PHI_STATUS=" + (phiBoolean ? 1 : 0)
                                                 + " WHERE exists (SELECT versioning_map.item_id from versioning_map, crf_version where"
                                                 + " versioning_map.crf_version_id = crf_version.crf_version_id" + " AND crf_version.crf_id= " + crfId
-                                                + " AND item.item_id = versioning_map.item_id)" + " AND item.name='" + stripQuotes(itemName)
-                                                + "' AND item.owner_id = " + ownerId;
+                                                + " AND item.item_id = versioning_map.item_id)" + " AND item.name= ? "
+                                                + " AND item.owner_id = ?";
 
                                     } else {
                                         upSql =
-                                            "UPDATE ITEM SET DESCRIPTION='" + stripQuotes(descLabel) + "'," + "PHI_STATUS=" + phiBoolean
-                                                + " FROM versioning_map, crf_version" + " WHERE item.name='" + stripQuotes(itemName) + "' AND item.owner_id = "
-                                                + ownerId + " AND item.item_id = versioning_map.item_id AND"
+                                            "UPDATE ITEM SET DESCRIPTION= ?," + "PHI_STATUS=" + phiBoolean
+                                                + " FROM versioning_map, crf_version" + " WHERE item.name= ? AND item.owner_id = ? "
+                                                + ownerId + " AND item.item_id = versioning_map.item_id AND "
                                                 + " versioning_map.crf_version_id = crf_version.crf_version_id" + " AND crf_version.crf_id = " + crfId;
                                     }// end of if dbName
-                                    openQueries.put(itemName, upSql);
+                                    //openQueries.put(itemName, upSql);
+                                    sqlParameters = new ArrayList<>();
+                                    
+                                    sqlParameters.add(new SqlParameter(stripQuotes(descLabel)));
+                                    sqlParameters.add(new SqlParameter(stripQuotes(itemName)));
+                                    sqlParameters.add(new SqlParameter(ownerId+"",JDBCType.INTEGER));
+                                    
+                                    qo = new QueryObject();
+                                    qo.setSql(upSql);
+                                    qo.setSqlParameters(sqlParameters);
+                                    
+                                    openQueries.put(itemName, qo);
                                 }
                             } else {
                                 ownerId = oldItem.getOwner().getId();
                             }
                         }
                         String sql = "";
-                        ArrayList<SqlParameter> sqlParameters = new ArrayList<>();
+                        sqlParameters = new ArrayList<>();
                         if (dbName.equals("oracle")) {
                             // resOptions = resOptions.replaceAll("\\\\,",
                             // "\\,");
@@ -947,7 +1009,7 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         }
                         if (!resNames.contains(responseLabel)) {                        	                           
                                                       
-                             QueryObject qo = new QueryObject();
+                             qo = new QueryObject();
                              qo.setSql(sql);
                              qo.setSqlParameters(sqlParameters);
                              
@@ -1059,7 +1121,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                           + versionIdString
                                           + "),"
                                           + selectCorrectItemQueryPostgres
-                                          + ",?, ?, ?, ?, ? "                                         
+                                          + ",?, ?, ?, ?, "
+                                          + parentItemString
                                           + ", (SELECT SECTION_ID FROM SECTION WHERE LABEL='"
                                           + secName
                                           + "' AND "
@@ -1130,7 +1193,8 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                                          + versionIdString
                                          + "),"
                                          + selectCorrectItemQueryPostgres
-                                         + ",?, ?, ?, ?, ? "
+                                         + ",?, ?, ?, ?, "
+                                         + parentItemString
                                          + ", (SELECT SECTION_ID FROM SECTION WHERE LABEL='"
                                          + secName
                                          + "' AND "
@@ -1157,11 +1221,10 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         sqlParameters.add(new SqlParameter(stripQuotes(subHeader)));
                         sqlParameters.add(new SqlParameter(stripQuotes(header)));
                         sqlParameters.add(new SqlParameter(stripQuotes(leftItemText)));
-                        sqlParameters.add(new SqlParameter(stripQuotes(rightItemText)));
-                        sqlParameters.add(new SqlParameter(parentItemString,JDBCType.INTEGER));
+                        sqlParameters.add(new SqlParameter(stripQuotes(rightItemText)));                        
                         sqlParameters.add(new SqlParameter(crfId+"",JDBCType.INTEGER));
                         
-                        QueryObject qo = new QueryObject();
+                        qo = new QueryObject();
                         qo.setSql(sql2);
                         qo.setSqlParameters(sqlParameters);
                         

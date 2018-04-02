@@ -1,6 +1,5 @@
 package org.akaza.openclinica.bean.admin;
 
-import java.sql.JDBCType;
 
 public class SqlParameter {
 	private String value;

@@ -344,8 +344,8 @@ public class ItemBean extends AuditableEntityBean implements Comparable {
             ItemFormMetadataBean m2 = (ItemFormMetadataBean) arg.getItemMetas().get(0);
             return m1.getOrdinal() - m2.getOrdinal();
         }
-        //fix here 
-        else if (!itemDataElements.isEmpty() && !arg.getItemDataElements().isEmpty()) {
+        //fix null pointer exception here 
+        else if (itemDataElements!=null && !itemDataElements.isEmpty() && arg.getItemDataElements()!=null && !arg.getItemDataElements().isEmpty()) {
             ItemDataBean m1 = (ItemDataBean) getItemDataElements().get(0);
             ItemDataBean m2 = (ItemDataBean) arg.getItemDataElements().get(0);
             return m1.getOrdinal() - m2.getOrdinal();

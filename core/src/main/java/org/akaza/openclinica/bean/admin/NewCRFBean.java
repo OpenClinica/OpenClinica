@@ -9,7 +9,6 @@
 package org.akaza.openclinica.bean.admin;
 
 import java.sql.Connection;
-import java.sql.JDBCType;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -377,9 +376,21 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             logger.debug("---start of item query generation here---");
             for (Iterator itvl = mySet.iterator(); itvl.hasNext();) {
                 Map.Entry ment = (Map.Entry) itvl.next();
-                String pQuery = (String) ment.getValue();
-                s = con.prepareStatement(pQuery);
-                logger.debug(pQuery);
+               /* String pQuery = (String) ment.getValue();
+                s = con.prepareStatement(pQuery);*/
+                QueryObject qo = (QueryObject) ment.getValue();
+                String cur_query = qo.getSql();
+                if (cur_query == null || cur_query.trim().length() < 1) {
+                    continue;
+                }
+                int parCnt = qo.getSqlParameters().size();
+                
+                s = con.prepareStatement(cur_query);
+                for(int i=0;i<parCnt;i++) {
+                	setPreparedStatementParameter(s,i+1,qo.getSqlParameters().get(i));                	
+                }
+                
+               // logger.debug(pQuery);
                 s.executeUpdate();
                 s.close();
                 // this might throw off the 'error' count, who can say?
@@ -646,7 +657,24 @@ public class NewCRFBean extends Object implements java.io.Serializable {
             logger.debug("deleteInsertToDB function ---end of delete query generation, all queries committed---");
             logger.debug("deleteInsertToDB function ---start of item query generation here---");
 
-            for (String pQuery : (Collection<String>) itemQueries.values()) {
+            QueryObject qo;
+            Collection<QueryObject> values = itemQueries.values();
+            for (QueryObject queryObj : (ArrayList<QueryObject>) values) {               
+                qo = queryObj;
+                cur_query = qo.getSql();
+                if (cur_query == null || cur_query.trim().length() < 1) {
+                    continue;
+                }
+                int parCnt = qo.getSqlParameters().size();
+                
+                statement = con.prepareStatement(cur_query);
+                for(int i=0;i<parCnt;i++) {
+                	setPreparedStatementParameter(statement,i+1,qo.getSqlParameters().get(i));                	
+                }
+                statement.executeUpdate();
+                statement.close();
+            }
+            /*for (String pQuery : (Collection<String>) itemQueries.values()) {
                 logger.debug(pQuery);
                 cur_query = pQuery;
                 if (cur_query == null || cur_query.trim().length() < 1) {
@@ -655,10 +683,9 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                 statement = con.prepareStatement(pQuery);
                 statement.executeUpdate();
                 statement.close();
-            }
+            }*/
 
-            logger.debug("deleteInsertToDB function  ---pause in query generation, items---");
-            QueryObject qo;
+            logger.debug("deleteInsertToDB function  ---pause in query generation, items---");           
             for (QueryObject queryObj : (ArrayList<QueryObject>) queries) {               
                 qo = queryObj;
                 cur_query = qo.getSql();
@@ -784,9 +811,10 @@ public class NewCRFBean extends Object implements java.io.Serializable {
 	    	else {
 	    		s.setString(parameterIndex, sp.getValue());	
 	    	}
-    	} catch (SQLException e) {
+    	} catch (Exception e) {
 				// TODO Auto-generated catch block
     		    System.out.println("setPreparedStatementParameter ERROR:" + s);
+    		    System.out.println("setPreparedStatementParameter ERROR:" +parameterIndex+ ":" + sp);
 				e.printStackTrace();
 			}
     }
