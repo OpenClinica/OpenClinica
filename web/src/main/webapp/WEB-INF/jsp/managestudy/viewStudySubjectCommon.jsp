@@ -221,9 +221,10 @@ $(function() {
             name: "SE_EVENT2.F_MEDICATIONS",
             type: "table",
             columns: [
-              "I_MEDIC_STARTDT",
-              "I_MEDIC_MEDOTHER",
-              "I_MEDIC_MEDNAME"
+                "I_MEDIC_STARTDT",
+                "I_MEDIC_MEDOTHER",
+                "DOES_NOT_EXIST",
+                "I_MEDIC_MEDNAME"
             ]
         }]
     };
@@ -334,10 +335,8 @@ $(function() {
             var submissionObj = {};
             collection(columns[componentOid]).forEach(function(col) {
                 var item = items[col];
-                if (item) {
-                    columnTitles.push(item.Question.TranslatedText);
-                    submissionObj[col] = [];
-                }
+                columnTitles.push(item ? item.Question.TranslatedText : col);
+                submissionObj[col] = [];
             });
 
             var submission = {
