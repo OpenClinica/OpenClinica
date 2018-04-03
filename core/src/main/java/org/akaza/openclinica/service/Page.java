@@ -7,35 +7,43 @@ import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+
 /**
  * @author joekeremian
  *
  */
+@XmlAccessorType(XmlAccessType.FIELD)
 
 public class Page implements Serializable {
-    private String name;
-    private List<Component> components;
 
-    public String getName() {
-        return name;
-    }
+	@XmlElement
+	private String name;
+	@XmlElement
+	private List<Component> components;
 
-    public void setName(String name) {
-        this.name = name;
-    }
+	public String getName() {
+		return name;
+	}
 
-    public List<Component> getComponents() {
-        return components;
-    }
+	public void setName(String name) {
+		this.name = name;
+	}
 
-    public void setComponents(List<Component> components) {
-        this.components = components;
-    }
+	public List<Component> getComponents() {
+		return components;
+	}
 
-    public void addComponent(Component component) {
-        if (getComponents() == null)
-            components = new ArrayList<>();
-        components.add(component);
-    }
+	public void setComponents(List<Component> components) {
+		this.components = components;
+	}
+
+	public void addComponent(Component component) {
+		if (getComponents() == null)
+			components = new ArrayList<>();
+		components.add(component);
+	}
 
 }

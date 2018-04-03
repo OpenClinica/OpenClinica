@@ -3,35 +3,40 @@
  */
 package org.akaza.openclinica.service;
 
-import org.cdisc.ns.odm.v130.ODM;
+import javax.xml.bind.annotation.XmlAccessType;
+import javax.xml.bind.annotation.XmlAccessorType;
+import javax.xml.bind.annotation.XmlElement;
+import javax.xml.bind.annotation.XmlRootElement;
 
-import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
-import com.fasterxml.jackson.annotation.JsonProperty;
+import org.cdisc.ns.odm.v130.ODM;
 
 /**
  * @author joekeremian
  *
  */
-@JsonIgnoreProperties
+@XmlAccessorType(XmlAccessType.FIELD)
+@XmlRootElement
 public class PublishDTO {
-    private Page page;
-    @JsonProperty("ODM")
-    private ODM odm;
 
-    public ODM getOdm() {
-        return odm;
-    }
+	@XmlElement
+	private Page page;
+	@XmlElement
+	private ODM odm;
 
-    public void setOdm(ODM odm) {
-        this.odm = odm;
-    }
+	public Page getPage() {
+		return page;
+	}
 
-    public Page getPage() {
-        return page;
-    }
+	public void setPage(Page page) {
+		this.page = page;
+	}
 
-    public void setPage(Page page) {
-        this.page = page;
-    }
+	public ODM getOdm() {
+		return odm;
+	}
+
+	public void setOdm(ODM odm) {
+		this.odm = odm;
+	}
 
 }
