@@ -100,6 +100,7 @@
 			<xs:attribute ref="OpenClinica:DateOfBirth" />
 			<xs:attribute ref="OpenClinica:YearOfBirth" />
 			<xs:attribute ref="OpenClinica:Sex" />
+			<xs:attribute ref="OpenClinica:EnrollmentDate" />
 		</xs:attributeGroup>		
 		<xs:attributeGroup name="StudyEventDataAttributeExtension">
 			<xs:attributeGroup ref="StudyEventDataAttributeExtension"/>
