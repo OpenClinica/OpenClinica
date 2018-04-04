@@ -57,10 +57,11 @@
                 <value>org.akaza.openclinica.domain.datamap.Study</value>
                 <value>org.akaza.openclinica.domain.user.UserAccount</value>
                 <value>org.akaza.openclinica.domain.user.UserType</value>
-                <value>org.akaza.openclinica.domain.datamap.CrfBean              </value>
+                <value>org.akaza.openclinica.domain.datamap.CrfBean</value>
                 <value>org.akaza.openclinica.domain.datamap.CompletionStatus</value>
                 <value>org.akaza.openclinica.domain.datamap.CrfVersion</value>
                 <value>org.akaza.openclinica.domain.datamap.FormLayout</value>
+                <value>org.akaza.openclinica.domain.datamap.PageLayout</value>
                 <value>org.akaza.openclinica.domain.datamap.FormLayoutMedia</value>
                 <value>org.akaza.openclinica.domain.datamap.DiscrepancyNote      </value>
                 <value>org.akaza.openclinica.domain.datamap.DiscrepancyNoteType  </value>
@@ -207,6 +208,7 @@
     <bean id="usageStatsServiceDAO" class="org.akaza.openclinica.dao.hibernate.UsageStatsServiceDAO" parent="abstractDomainDao" autowire="byName" />
     <bean id="openClinicaVersionDAO" class="org.akaza.openclinica.dao.hibernate.OpenClinicaVersionDAO" parent="abstractDomainDao" autowire="byName" />
     <bean id="crfVersionDao" class="org.akaza.openclinica.dao.hibernate.CrfVersionDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="pageLayoutDao" class="org.akaza.openclinica.dao.hibernate.PageLayoutDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="formLayoutDao" class="org.akaza.openclinica.dao.hibernate.FormLayoutDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="eventCrfDao" class="org.akaza.openclinica.dao.hibernate.EventCrfDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="eventDefinitionCrfDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao" parent="abstractDomainDao" autowire="byName" />
