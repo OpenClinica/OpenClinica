@@ -1,7 +1,9 @@
 <style>
+    .section {
+        margin-top: 25px;
+    }
     .subsection {
         margin-top: 25px;
-        margin-bottom: 75px;
         font-size: .85rem;
     }
     .subsection-title {
