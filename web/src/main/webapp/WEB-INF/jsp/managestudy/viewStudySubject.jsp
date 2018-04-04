@@ -143,7 +143,7 @@
 <div class="header-links">
   <span>
     <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
-      <fmt:message key="audit_logs" bundle="${resword}"/>
+      <c:out value="${studySub.label}"/> <fmt:message key="audit_log" bundle="${resword}"/>
     </a>
   </span>
   <span>&nbsp; | &nbsp;</span>
