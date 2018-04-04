@@ -6,9 +6,11 @@ import org.akaza.openclinica.domain.rule.RuleSetAuditBean;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
+import org.junit.Ignore;
 
 import java.util.List;
 
+@Ignore
 public class RuleSetAuditDaoTest extends HibernateOcDbTestCase {
     private static RuleSetAuditDao ruleSetAuditDao;
     private static RuleSetDao ruleSetDao;

@@ -3,7 +3,9 @@ package org.akaza.openclinica.dao;
 import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
 import org.akaza.openclinica.domain.technicaladmin.DatabaseChangeLogBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
+import org.junit.Ignore;
 
+@Ignore
 public class DatabaseChangeLogDaoTest extends HibernateOcDbTestCase {
 
     private final Integer POSTGRES_COUNT = 833;

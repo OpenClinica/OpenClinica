@@ -42,7 +42,7 @@ public class ExpressionTreeHelper {
 
 
     static Date getDate(String dateString) {
-        logger.info("DateString : " + dateString);
+        logger.debug("DateString : " + dateString);
         String[] componentsOfDate = dateString.split("[/|.|-]");
         if (componentsOfDate.length == 3) {
             dateString = componentsOfDate[0] + "-" + componentsOfDate[1] + "-" + componentsOfDate[2];
@@ -59,7 +59,7 @@ public class ExpressionTreeHelper {
     }
     
     static Date getDateFromddMMMyyyyDashes(String dateString) {
-        logger.info("DateString : " + dateString);
+        logger.debug("DateString : " + dateString);
         try {
             SimpleDateFormat sdf = new SimpleDateFormat("dd-MMM-yyyy");
             Date d = sdf.parse(dateString);
@@ -70,7 +70,7 @@ public class ExpressionTreeHelper {
     }
 
     static private boolean isDate(String dateString, String format, String dateRegexp) {
-        logger.info("DateString : " + dateString);
+        logger.debug("DateString : " + dateString);
 
         if (!dateString.matches(dateRegexp)) {
             return false;

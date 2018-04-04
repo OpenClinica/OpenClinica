@@ -68,9 +68,15 @@ public class EnketoAPI {
     public static final String INSTANCE_READONLY_DN_CLOSE_BUTTON = "/oc/api/v1/instance/note/c";
 
     // public static final String INSTANCE_WRITABLE_DN = "/api/v2/instance/fieldsubmission/iframe";
-    public static final String INSTANCE_WRITABLE_DN = "/oc/api/v1/instance/edit/rfc";
+    public static final String INSTANCE_WRITABLE_DN_RFC = "/oc/api/v1/instance/edit/rfc";
     // public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/api/v2/instance/fieldsubmission/c/iframe";
-    public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/oc/api/v1/instance/edit/rfc/c";
+    public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON_RFC = "/oc/api/v1/instance/edit/rfc/c";
+
+    // public static final String INSTANCE_WRITABLE_DN = "/api/v2/instance/fieldsubmission/iframe";
+    public static final String INSTANCE_WRITABLE_DN = "/oc/api/v1/instance/edit";
+    // public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/api/v2/instance/fieldsubmission/c/iframe";
+    public static final String INSTANCE_WRITABLE_DN_CLOSE_BUTTON = "/oc/api/v1/instance/edit/c";
+
     private String userPasswdCombo;
 
     public EnketoAPI(EnketoCredentials credentials) {
@@ -363,7 +369,10 @@ public class EnketoAPI {
             } else if (flavor.equals(QUERY_FLAVOR)
                     && ((!parentStudy.getStatus().equals(Status.FROZEN) || (site != null && !site.getStatus().equals(Status.FROZEN)))) && mode.equals(EDIT_MODE)
                     && (role == Role.RESEARCHASSISTANT || role == Role.RESEARCHASSISTANT2 || role == Role.INVESTIGATOR)) {
-                eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN);
+                if (markComplete)
+                    eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN);
+                else
+                    eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN_RFC);
 
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
                 // https://jira.openclinica.com/browse/OC-8279 Study Director edits XForms.
@@ -371,7 +380,10 @@ public class EnketoAPI {
             } else if (flavor.equals(QUERY_FLAVOR)
                     && ((!parentStudy.getStatus().equals(Status.FROZEN)) || (site != null && !site.getStatus().equals(Status.FROZEN))) && mode.equals(EDIT_MODE)
                     && (role == Role.STUDYDIRECTOR || role == Role.COORDINATOR)) {
-                eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN_CLOSE_BUTTON);
+                if (markComplete)
+                    eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN_CLOSE_BUTTON);
+                else
+                    eURL = new URL(enketoURL + INSTANCE_WRITABLE_DN_CLOSE_BUTTON_RFC);
 
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
             } else if (flavor.equals(QUERY_FLAVOR)

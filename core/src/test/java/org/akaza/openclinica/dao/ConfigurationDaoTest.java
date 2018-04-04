@@ -3,7 +3,9 @@ package org.akaza.openclinica.dao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.domain.technicaladmin.ConfigurationBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
+import org.junit.Ignore;
 
+@Ignore
 public class ConfigurationDaoTest extends HibernateOcDbTestCase {
 
     public ConfigurationDaoTest() {
