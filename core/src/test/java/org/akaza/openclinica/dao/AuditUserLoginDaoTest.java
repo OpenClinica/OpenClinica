@@ -4,9 +4,11 @@ import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.domain.technicaladmin.AuditUserLoginBean;
 import org.akaza.openclinica.domain.technicaladmin.LoginStatus;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
+import org.junit.Ignore;
 
 import java.util.Date;
 
+@Ignore
 public class AuditUserLoginDaoTest extends HibernateOcDbTestCase {
 
     public AuditUserLoginDaoTest() {

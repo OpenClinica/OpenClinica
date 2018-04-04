@@ -8,9 +8,11 @@ import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
+import org.junit.Ignore;
 
 import java.util.List;
 
+@Ignore
 public class RuleSetRuleDaoTest extends HibernateOcDbTestCase {
     private static RuleSetRuleDao ruleSetRuleDao;
     private static RuleDao ruleDao;
