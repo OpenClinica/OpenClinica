@@ -19,6 +19,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
+import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
@@ -35,7 +36,8 @@ public class OdmImportController {
 
 	@SuppressWarnings("unchecked")
 	@RequestMapping(value = "/auth/api/v1/studyversion/boardId/{boardId}", method = RequestMethod.POST)
-	public ResponseEntity<Object> importOdmToOC(@RequestBody PublishDTO publishDTO, String boardId, HttpServletRequest request) throws Exception {
+	public ResponseEntity<Object> importOdmToOC(@RequestBody PublishDTO publishDTO, @PathVariable("boardId") String boardId, HttpServletRequest request)
+			throws Exception {
 
 		ODM odm = publishDTO.getOdm();
 		Page page = publishDTO.getPage();

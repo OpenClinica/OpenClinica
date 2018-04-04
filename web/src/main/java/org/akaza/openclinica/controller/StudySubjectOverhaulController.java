@@ -232,6 +232,9 @@ public class StudySubjectOverhaulController {
 	public ResponseEntity<Page> getPageLayout(HttpServletRequest request, @PathVariable("studyoid") String studyOid, @PathVariable("name") String name) {
 		Page page = null;
 		PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(name);
+		Study publicstudy = studyDao.findByOcOID(studyOid);
+		request.setAttribute("requestSchema", publicstudy.getSchemaName());
+
 		if (pageLayout != null) {
 			page = (Page) SerializationUtils.deserialize(pageLayout.getDefinition());
 			logger.info("Page Object retrieved from database with page name: {}", pageLayout.getName());

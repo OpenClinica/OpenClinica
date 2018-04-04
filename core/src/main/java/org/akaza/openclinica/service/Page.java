@@ -3,7 +3,6 @@
  */
 package org.akaza.openclinica.service;
 
-import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -17,7 +16,7 @@ import javax.xml.bind.annotation.XmlElement;
  */
 @XmlAccessorType(XmlAccessType.FIELD)
 
-public class Page implements Serializable {
+public class Page {
 
 	@XmlElement
 	private String name;
