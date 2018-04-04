@@ -142,38 +142,6 @@
 </h1>
 <div class="header-links">
   <span>
-    <c:choose>
-      <c:when
-        test="${from =='listSubject' && userBean.sysAdmin && module=='admin'}">
-        <span>
-          <a href="ViewSubject?id=<c:out value="${subject.id}"/>">
-            <fmt:message key="go_back_to_view_subject" bundle="${resword}" />
-          </a>
-        </span>
-      </c:when>
-      <c:otherwise>
-        <c:choose>
-          <c:when test="${(userRole.manageStudy) && module=='manage'}">
-            <span>
-              <a href="ListStudySubject">
-                <fmt:message key="go_back_to_study_subject_list" bundle="${resword}"/>
-              </a>
-            </span>
-          </c:when>
-          <c:otherwise>
-            <span>
-              <a href="ListStudySubjects">
-                <fmt:message
-                  key="back_to_subject_matrix" bundle="${resword}" />
-              </a>
-            </span>
-          </c:otherwise>
-        </c:choose>
-      </c:otherwise>
-    </c:choose>
-  </span>
-  <span>&nbsp; | &nbsp;</span>
-  <span>
     <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
       <fmt:message key="audit_logs" bundle="${resword}"/>
     </a>
@@ -193,21 +161,6 @@
   <span>&nbsp; | &nbsp;</span>
   <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
 </div>
-<c:choose>
-  <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
-    <div class="table_title_Admin">
-  </c:when>
-  <c:otherwise>
-    <c:choose>
-      <c:when test="${userRole.manageStudy}">
-        <div class="table_titla_manage">
-      </c:when>
-      <c:otherwise>
-        <div class="table_title_submit">
-      </c:otherwise>
-    </c:choose>
-  </c:otherwise>
-</c:choose>
 </div>
 <div class="section expanded" id="studySubjectRecord">
   <div class="section-header">
