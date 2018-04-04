@@ -231,9 +231,9 @@ public class StudySubjectOverhaulController {
 	@RequestMapping(value = "/api/studies/{studyoid}/pages/{name}", method = RequestMethod.GET)
 	public ResponseEntity<Page> getPageLayout(HttpServletRequest request, @PathVariable("studyoid") String studyOid, @PathVariable("name") String name) {
 		Page page = null;
-		PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(name);
 		Study publicstudy = studyDao.findByOcOID(studyOid);
 		request.setAttribute("requestSchema", publicstudy.getSchemaName());
+		PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(name);
 
 		if (pageLayout != null) {
 			page = (Page) SerializationUtils.deserialize(pageLayout.getDefinition());
