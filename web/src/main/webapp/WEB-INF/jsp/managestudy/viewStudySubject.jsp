@@ -67,7 +67,15 @@
     var header = $(this);
     var body = header.next();
     var section = header.parent();
-    var updown = section.hasClass('collapsed') ? 'slideDown' : 'slideUp';
+    var updown;
+    if (section.hasClass('collapsed')) {
+      updown = 'slideDown';
+      header.attr('title', 'Collapse Section');
+    }
+    else {
+      updown = 'slideUp';
+      header.attr('title', 'Expand Section');
+    }
     body[updown]('fast', function() {
       section.toggleClass('collapsed expanded');
     });
@@ -163,7 +171,7 @@
 </div>
 </div>
 <div class="section expanded" id="studySubjectRecord">
-  <div class="section-header">
+  <div class="section-header" title="Collapse Section">
     General Information
   </div>
   <div class="section-body">
@@ -509,7 +517,7 @@
 <a name="events"></a>
 </div>
 <div class="section expanded hide" id="subjectEvents">
-  <div class="section-header">
+  <div class="section-header" title="Collapse Section">
     Visits
   </div>
   <div class="section-body">

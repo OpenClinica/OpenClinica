@@ -131,7 +131,7 @@
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
     <div class="section expanded" id="common.{{studyEventOid}}">
-        <div class="section-header">
+        <div class="section-header" title="Collapse Section">
             {{sectionName}}
         </div>
         <div class="section-body">
@@ -325,7 +325,7 @@ $(function() {
             var components = columns[componentOid];
             if (components === null) {
                 columnTitles = form.columnTitles;
-                submissionObj = form.submissionObj;
+                $.extend(true, submissionObj, form.submissionObj);
             }
             else {
                 collection(components).forEach(function(col) {
@@ -400,9 +400,6 @@ $(function() {
                 numVisitBaseds++;
             }
         }
-        sectionTable.on('click', '.section-header', function() {
-            $(this).next().addBack().toggleClass('collapsed expanded');
-        });
         sectionTable.on('click', '.add-new', function() {
             var btn = $(this);
             var formOid = btn.data('form-oid');
