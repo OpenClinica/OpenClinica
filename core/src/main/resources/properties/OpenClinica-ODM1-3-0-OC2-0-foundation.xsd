@@ -196,7 +196,7 @@
 	</xs:complexType>
 	<xs:complexType name="OCodmComplexTypeDefinition-FormDetails">
 		<xs:sequence>
-			<xs:element ref="SectionDetailsDefinition" minOccurs="1" maxOccurs="unbounded"/>
+			<xs:element ref="SectionDetails" minOccurs="1" maxOccurs="unbounded"/>
 			<xs:element name="VersionDescription" type="odm:text" minOccurs="0" maxOccurs="1"/>
 			<xs:element name="RevisionNotes" type="odm:text" minOccurs="0" maxOccurs="1"/>
 			<xs:element ref="PresentInEventDefinition" minOccurs="1" maxOccurs="unbounded"/>
@@ -411,7 +411,7 @@
 	<xs:element name="DiscrepancyNotes" type="OCodmComplexTypeDefinition-DiscrepancyNotes"/>
 	<xs:element name="DiscrepancyNote" type="OCodmComplexTypeDefinition-DiscrepancyNote"/>
 	<xs:element name="ChildNote" type="OCodmComplexTypeDefinition-ChildNote"/>
-	<xs:element name="SectionDetailsDefinition" type="OCodmComplexTypeDefinition-SectionDetailsDefinition"/>
+	<xs:element name="SectionDetails" type="OCodmComplexTypeDefinition-SectionDetailsDefinition"/>
 	<xs:element name="Section" type= "OCodmComplexTypeDefinition-Section" ></xs:element>
     
 <!-- FormDefAttributeExtension -->
@@ -429,6 +429,7 @@
 	<xs:attribute name="DateOfBirth" type="odm:date" />
 	<xs:attribute name="YearOfBirth" type="odm:integer" />
 	<xs:attribute name="Sex" type="odm:text" />
+	<xs:attribute name="EnrollmentDate" type="odm:date"/>
 <!-- StudyEventDataAttributeExtension -->
 	<xs:attribute name="StudyEventLocation" type="odm:text" />
 	<xs:attribute name="StartDate" type="dateOrDatetime" />
@@ -611,6 +612,8 @@
 		<xs:attribute name="DoubleDataEntry" type="odm:text"/>
 		<xs:attribute name="HideCRF" type="odm:text"/>
 		<xs:attribute name="SourceDataVerification" type="odm:text"/>
+		<xs:attribute name="AllowAnonymousSubmission" type="odm:text"/>
+		<xs:attribute name="Offline" type="odm:text"/>
 		<xs:attribute name="ParticipantForm" type="odm:text"/>
 			</xs:attributeGroup>
 	
