@@ -6,7 +6,9 @@ import org.akaza.openclinica.domain.rule.RuleBean;
 import org.akaza.openclinica.domain.rule.expression.Context;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
+import org.junit.Ignore;
 
+@Ignore
 public class RuleDaoTest extends HibernateOcDbTestCase {
     private static RuleDao ruleDao;
 

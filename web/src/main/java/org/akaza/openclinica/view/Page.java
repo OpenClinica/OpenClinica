@@ -223,11 +223,6 @@ public enum Page {
     STUDY_LIST ("/WEB-INF/jsp/managestudy/studyList.jsp", "View All Studies"),
 
     /**
-     * Page for view all studies.
-     */
-    STUDY_LIST_SERVLET ("/ListStudy", "View All Studies"),
-
-    /**
      * Page for view all sites.
      */
      SITE_LIST ("/WEB-INF/jsp/managestudy/siteList.jsp", "View All Sites"),

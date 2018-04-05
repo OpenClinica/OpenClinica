@@ -56,7 +56,7 @@ public class RemoveStudyServlet extends SecureController {
         }
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
+        throw new InsufficientPermissionException(Page.ERROR, resexception.getString("not_admin"), "1");
 
     }
 
@@ -86,7 +86,7 @@ public class RemoveStudyServlet extends SecureController {
         String action = request.getParameter("action");
         if (studyId == 0) {
             addPageMessage(respage.getString("please_choose_a_study_to_remove"));
-            forwardPage(Page.STUDY_LIST_SERVLET);
+            forwardPage(Page.ERROR);
         } else {
             if ("confirm".equalsIgnoreCase(action)) {
                 request.setAttribute("studyToRemove", study);
@@ -276,7 +276,7 @@ public class RemoveStudyServlet extends SecureController {
                 }
 
                 addPageMessage(resexception.getString("this_study_has_been_removed_succesfully"));
-                forwardPage(Page.STUDY_LIST_SERVLET);
+                forwardPage(Page.ERROR);
 
             }
         }

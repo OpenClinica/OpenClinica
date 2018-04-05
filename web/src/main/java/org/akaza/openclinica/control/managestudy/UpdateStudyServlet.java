@@ -51,7 +51,7 @@ public class UpdateStudyServlet extends SecureController {
         }
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
+        throw new InsufficientPermissionException(Page.ERROR, resexception.getString("not_admin"), "1");
 
     }
 
@@ -71,7 +71,7 @@ public class UpdateStudyServlet extends SecureController {
 
         if (study == null) {
             addPageMessage(respage.getString("please_choose_a_study_to_edit"));
-            forwardPage(Page.STUDY_LIST_SERVLET);
+            forwardPage(Page.ERROR);
             return;
         }
 
@@ -93,7 +93,7 @@ public class UpdateStudyServlet extends SecureController {
             } else if ("submit".equalsIgnoreCase(action)) {
                 submitStudy();
                 addPageMessage(respage.getString("the_study_has_been_updated_succesfully"));
-                forwardPage(Page.STUDY_LIST_SERVLET);
+                forwardPage(Page.ERROR);
 
             } else if ("next".equalsIgnoreCase(action)) {
                 Integer pageNumber = Integer.valueOf(request.getParameter("pageNum"));

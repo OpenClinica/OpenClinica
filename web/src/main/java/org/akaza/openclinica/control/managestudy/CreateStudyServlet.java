@@ -255,7 +255,7 @@ public class CreateStudyServlet extends SecureController {
         }
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.STUDY_LIST_SERVLET, resexception.getString("not_admin"), "1");
+        throw new InsufficientPermissionException(Page.ERROR, resexception.getString("not_admin"), "1");
 
     }
 
@@ -291,7 +291,7 @@ public class CreateStudyServlet extends SecureController {
 
             } else if ("cancel".equalsIgnoreCase(action)) {
                 addPageMessage(respage.getString("study_creation_cancelled"));
-                forwardPage(Page.STUDY_LIST_SERVLET);
+                forwardPage(Page.ERROR);
                 return;
             } else if ("submit".equalsIgnoreCase(action)) {
 
@@ -319,7 +319,7 @@ public class CreateStudyServlet extends SecureController {
                 session.setAttribute("userRole", sub);
 
                 addPageMessage(respage.getString("the_new_study_created_succesfully_current"));
-                // forwardPage(Page.STUDY_LIST_SERVLET);
+                // forwardPage(Page.ERROR);
 
                 ArrayList pageMessages = (ArrayList) request.getAttribute(PAGE_MESSAGE);
                 session.setAttribute("pageMessages", pageMessages);
@@ -460,7 +460,7 @@ public class CreateStudyServlet extends SecureController {
                 // response.sendRedirect(request.getContextPath() +
                 // Page.MANAGE_STUDY_MODULE);
                 addPageMessage(respage.getString("the_new_study_created_succesfully_current"));
-                forwardPage(Page.STUDY_LIST_SERVLET);
+                forwardPage(Page.ERROR);
             } else {
                 session.setAttribute("newStudy", studyBean);
                 forwardPage(Page.CREATE_STUDY2);

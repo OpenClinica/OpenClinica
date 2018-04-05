@@ -481,7 +481,7 @@ public class UpdateSubStudyServlet extends SecureController {
             forwardPage(Page.SITE_LIST_SERVLET);
         } else {
             // session.removeAttribute("fromListSite");
-            forwardPage(Page.STUDY_LIST_SERVLET);
+            forwardPage(Page.ERROR);
         }
 
     }

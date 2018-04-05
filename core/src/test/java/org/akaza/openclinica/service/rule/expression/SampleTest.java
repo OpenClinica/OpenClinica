@@ -4,7 +4,9 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
+import org.junit.Ignore;
 
+@Ignore
 public class SampleTest extends HibernateOcDbTestCase {
     private CoreResources coreResources;
 

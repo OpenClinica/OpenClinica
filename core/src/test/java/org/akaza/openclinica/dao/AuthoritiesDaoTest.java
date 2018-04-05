@@ -4,7 +4,9 @@ import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
 import org.akaza.openclinica.templates.HibernateOcDbTestCase;
 import org.hibernate.HibernateException;
+import org.junit.Ignore;
 
+@Ignore
 public class AuthoritiesDaoTest extends HibernateOcDbTestCase {
     private static AuthoritiesDao authoritiesDao;
    /* 
