@@ -287,7 +287,7 @@ $(function() {
                     columnTitles: columnTitles,
                     submissionObj: submissionObj,
                     submissions: [],
-                    disableAddNew: false
+                    disableAddNew: ref['@OpenClinica:Status'] === 'DELETED'
                 }, form);
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
