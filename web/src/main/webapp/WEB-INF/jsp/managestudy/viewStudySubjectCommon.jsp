@@ -206,35 +206,11 @@ $(function() {
     }
 
     var odm;
-    var pageJson = {
-        name: "view subject",
-        components: [{ 
-            name: "SE_EVENT1.F_F1",
-            type: "table",
-            columns: [
-                "I_F1_ML_DROPDOWN",
-                "I_F1_RADIO",
-                "I_F1_RADIO_HORIZ_COMP",
-                "I_F1_SM_COLUMNS",
-                "I_F1_MEALS",
-                "I_F1_SARAH"
-            ]
-        }, { 
-            name: "SE_EVENT2.F_MEDICATIONS",
-            type: "table",
-            columns: [
-                "I_MEDIC_STARTDT",
-                "I_MEDIC_MEDOTHER",
-                "DOES_NOT_EXIST",
-                "I_MEDIC_MEDNAME"
-            ]
-        }]
-    };
+    var pageJson;
     
     $.when(
-        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y', function(data){odm = data;})
-        // ,
-        // $.get('that page.json', function(data){pageJson = data;})
+        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y', function(data){odm = data;}),
+        $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(data){pageJson = data;})
     ).then(function() {
         var columns = {};
         collection(pageJson.components).forEach(function(component) {
@@ -297,11 +273,22 @@ $(function() {
                 return ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'No';
             }).forEach(function(ref) {
                 var formOid = ref['@FormOID'];
+                var form = forms[formOid];
+                var columnTitles = [];
+                var submissionObj = {};
+                collection(form.itemGroups).forEach(function(itemGroup) {
+                    collection(itemGroup.items).forEach(function(item) {
+                        var itemOid = item['@OID'];
+                        columnTitles.push(item.Question ? item.Question.TranslatedText : itemOid);
+                        submissionObj[itemOid] = [];
+                    });
+                });
                 studyEvent.forms[formOid] = $.extend({
-                    columnTitles: [],
+                    columnTitles: columnTitles,
+                    submissionObj: submissionObj,
                     submissions: [],
                     disableAddNew: false
-                }, forms[formOid]);
+                }, form);
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
@@ -335,11 +322,18 @@ $(function() {
             var componentOid = studyEventOid + '.' + formOid;
             var columnTitles = [];
             var submissionObj = {};
-            collection(columns[componentOid]).forEach(function(col) {
-                var item = items[col];
-                columnTitles.push(item ? item.Question.TranslatedText : col);
-                submissionObj[col] = [];
-            });
+            var components = columns[componentOid];
+            if (components === null) {
+                columnTitles = form.columnTitles;
+                submissionObj = form.submissionObj;
+            }
+            else {
+                collection(components).forEach(function(col) {
+                    var item = items[col];
+                    columnTitles.push(item ? item.Question.TranslatedText : col);
+                    submissionObj[col] = [];
+                });
+            }
 
             var submission = {
                 studyStatus: studyEventData['@OpenClinica:Status'],
@@ -481,6 +475,8 @@ $(function() {
             }));
 
         $('#loading').remove();
+    }, function() {
+        $('#loading').text('AJAX Failed');
     });
 });
 </script>
