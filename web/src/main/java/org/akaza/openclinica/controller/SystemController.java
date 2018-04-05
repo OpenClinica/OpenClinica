@@ -13,6 +13,7 @@ import java.nio.file.attribute.UserPrincipal;
 import java.sql.Connection;
 import java.sql.DatabaseMetaData;
 import java.sql.DriverManager;
+import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
@@ -1144,9 +1145,14 @@ public class SystemController {
     }
 
     public HashMap<String, String> getDbRoleProperties(Connection conn, HashMap<String, String> mapRole, String username) throws SQLException {
-        String query = "select * from pg_roles where rolname='" + username + "'";
+        /*String query = "select * from pg_roles where rolname='" + username + "'";
         ResultSet resultSet = conn.prepareStatement(query).executeQuery();
-
+*/
+    	String query = "select * from pg_roles where rolname= ? ";
+    	PreparedStatement ps =conn.prepareStatement(query);
+    	ps.setString(1, username);
+    	ResultSet resultSet = ps.executeQuery();
+    	
         while (resultSet.next()) {
             mapRole.put("RoleName", resultSet.getString("rolname"));
             mapRole.put("SuperUser", resultSet.getString("rolsuper").equals("t") ? "True" : "False");
