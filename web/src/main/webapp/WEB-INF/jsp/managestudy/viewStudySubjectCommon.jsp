@@ -19,6 +19,9 @@
         border-bottom: none !important;
         border-collapse: collapse !important;
         margin-top: 2px !important;
+        width: 0 !important;
+        min-width: 600px !important;
+        float: left;
     }
     .datatable td {
         border: 1px solid #ccc;
@@ -29,6 +32,7 @@
         border-top-color: #ccc !important;
         background-color: #ccc !important;
         text-align: center;
+        width: 0 !important;
     }
     .datatable thead td:first-child {
         border-left-color: #ccc !important;
@@ -422,7 +426,8 @@ $(function() {
         $.fn.dataTable.moment('DD-MMM-YYYY');
         $('table.datatable')
             .each(function() {
-                var table = $(this).DataTable({
+                var table = $(this);
+                var datatable = table.DataTable({
                     dom: "frtilp",
                     language: {
                         paginate: {
@@ -444,14 +449,16 @@ $(function() {
                         orderable: false
                     }]
                 });
-                $(this).children('tbody').on('mouseenter', 'td', function () {
-                    var colIdx = table.cell(this).index();
+                table.children('tbody').on('mouseenter', 'td', function () {
+                    var colIdx = datatable.cell(this).index();
                     if (colIdx) {
                         var col = colIdx.column;
-                        $(table.cells().nodes()).removeClass('highlight');
-                        $(table.column(col).nodes()).addClass('highlight');
+                        $(datatable.cells().nodes()).removeClass('highlight');
+                        $(datatable.column(col).nodes()).addClass('highlight');
                     }
                 });
+                var tableWidth = table.width();
+                table.closest('.subsection').css('max-width', tableWidth < 500 ? 500 : tableWidth);
             })
             .prev('.dataTables_filter').each(function() {
                 var searchbox = $(this);
