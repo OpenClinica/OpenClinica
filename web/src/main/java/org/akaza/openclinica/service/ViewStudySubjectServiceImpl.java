@@ -1,17 +1,16 @@
-package org.akaza.openclinica.controller;
+/**
+ * 
+ */
+package org.akaza.openclinica.service;
 
-import java.io.IOException;
-import java.net.URISyntaxException;
 import java.util.Date;
 import java.util.List;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.Produces;
-import javax.ws.rs.core.MediaType;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.controller.dto.SSOverhaulDTO;
+import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
@@ -33,83 +32,60 @@ import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.service.Page;
 import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
-import org.springframework.web.bind.annotation.RestController;
 
-@RestController
-public class StudySubjectOverhaulController {
+/**
+ * @author joekeremian
+ *
+ */
 
-	@Autowired
-	private StudyEventDao studyEventDao;
-
-	@Autowired
-	private StudySubjectDao studySubjectDao;
-
-	@Autowired
-	private StudyDao studyDao;
-
-	@Autowired
-	private StudyEventDefinitionDao studyEventDefintionDao;
-
-	@Autowired
-	private CrfDao crfDao;
-
-	@Autowired
-	private EventCrfDao eventCrfDao;
-
-	@Autowired
-	private EventDefinitionCrfDao eventDefinitionCrfDao;
-
-	@Autowired
-	private UserAccountDao userAccountDao;
-
-	@Autowired
-	private PageLayoutDao pageLayoutDao;
-
+public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private final String COMMON = "common";
 
-	/**
-	 * Schedule new event Overhaul and add a form to event
-	 * 
-	 * @param request
-	 * @param studyOid
-	 * @param studyEventDefinitionOid
-	 * @param crfOid
-	 * @param studySubjectOid
-	 * @return
-	 * @throws IOException
-	 * @throws URISyntaxException
-	 */
-	@SuppressWarnings("null")
-	@Produces(MediaType.APPLICATION_JSON)
-	@RequestMapping(value = "/api/addAnotherForm", method = RequestMethod.POST)
-	public ResponseEntity<SSOverhaulDTO> scheduleNewEvent(HttpServletRequest request, @RequestParam("studyoid") String studyOid,
-			@RequestParam("studyeventdefinitionoid") String studyEventDefinitionOid, @RequestParam("crfoid") String crfOid,
-			@RequestParam("studysubjectoid") String studySubjectOid) throws IOException, URISyntaxException {
+	private StudyDao studyDao;
+	private UserAccountDao userAccountDao;
+	private StudySubjectDao studySubjectDao;
+	private CrfDao crfDao;
+	private EventDefinitionCrfDao eventDefinitionCrfDao;
+	private StudyEventDao studyEventDao;
+	private EventCrfDao eventCrfDao;
+	private StudyEventDefinitionDao studyEventDefintionDao;
+	private PageLayoutDao pageLayoutDao;
 
-		SSOverhaulDTO obj = null;
+	public ViewStudySubjectServiceImpl(StudyDao studyDao, UserAccountDao userAccountDao, StudySubjectDao studySubjectDao, CrfDao crfDao,
+			EventDefinitionCrfDao eventDefinitionCrfDao, StudyEventDao studyEventDao, EventCrfDao eventCrfDao, StudyEventDefinitionDao studyEventDefintionDao,
+			PageLayoutDao pageLayoutDao) {
+		super();
+		this.studyDao = studyDao;
+		this.userAccountDao = userAccountDao;
+		this.studySubjectDao = studySubjectDao;
+		this.crfDao = crfDao;
+		this.eventDefinitionCrfDao = eventDefinitionCrfDao;
+		this.studyEventDao = studyEventDao;
+		this.eventCrfDao = eventCrfDao;
+		this.studyEventDefintionDao = studyEventDefintionDao;
+		this.pageLayoutDao = pageLayoutDao;
+	}
+
+	public ViewStudySubjectDTO addNewForm(HttpServletRequest request, String studyOid, String studyEventDefinitionOid, String crfOid, String studySubjectOid) {
+
+		ViewStudySubjectDTO viewStudySubjectDTO = null;
+
 		request.setAttribute("requestSchema", "public");
 		HttpSession session = request.getSession();
 		Study publicstudy = studyDao.findByOcOID(studyOid);
 		UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
 		if (ub == null) {
 			logger.error("userAccount with username {} is null", ub.getName());
-			return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+			return null;
 		}
 		UserAccount userAccount = userAccountDao.findById(ub.getId());
 		if (userAccount == null) {
 			logger.error("userAccount with username {} is null", userAccount.getUserName());
-			return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+			return null;
 		}
 
 		request.setAttribute("requestSchema", publicstudy.getSchemaName());
@@ -117,7 +93,7 @@ public class StudySubjectOverhaulController {
 
 		if (study == null) {
 			logger.error("Study with Oid {} is null", study.getOc_oid());
-			return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+			return null;
 		} else if (study.getStudy() == null) {
 			logger.info("the study with Oid {} is a Parent study", study.getOc_oid());
 		} else {
@@ -127,20 +103,20 @@ public class StudySubjectOverhaulController {
 		StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOid);
 		if (studySubject == null) {
 			logger.error("StudySubject with Oid {} is null", studySubject.getOcOid());
-			return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+			return null;
 		}
 		StudyEventDefinition studyEventDefinition = studyEventDefintionDao.findByOcOID(studyEventDefinitionOid);
 		if (studyEventDefinition == null) {
 			logger.error("StudyEventDefinition with Oid {} is null", studyEventDefinition.getOc_oid());
-			return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+			return null;
 		} else if (!studyEventDefinition.getType().equals(COMMON)) {
 			logger.error("StudyEventDefinition with Oid {} is not a Common Type Event", studyEventDefinition.getOc_oid());
-			return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+			return null;
 		}
 		CrfBean crf = crfDao.findByOcOID(crfOid);
 		if (crf == null) {
 			logger.error("Crf with Oid {} is null", crf.getOcOid());
-			return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+			return null;
 		}
 
 		EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(),
@@ -149,15 +125,15 @@ public class StudySubjectOverhaulController {
 			edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(),
 					study.getStudy().getStudyId());
 		}
-		if (edc == null) {
-			logger.error("EventDefinitionCrf for StudyEventDefinition Oid {},Crf Oid {} and Study Oid {}is null", studyEventDefinition.getOc_oid(),
-					crf.getOcOid(), study.getOc_oid());
-			return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+		if (edc == null || edc.getStatusId().equals(Status.DELETED.getCode()) || edc.getStatusId().equals(Status.AUTO_DELETED.getCode())) {
+			logger.error("EventDefinitionCrf for StudyEventDefinition Oid {},Crf Oid {} and Study Oid {}is null or has Removed Status",
+					studyEventDefinition.getOc_oid(), crf.getOcOid(), study.getOc_oid());
+			return null;
 		}
 		FormLayout formLayout = edc.getFormLayout();
 		if (formLayout == null) {
 			logger.error("FormLayout with Oid {} is null", formLayout.getOcOid());
-			return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+			return null;
 		}
 
 		List<StudyEvent> studyEvents = studyEventDao.fetchListByStudyEventDefOID(studyEventDefinitionOid, studySubject.getStudySubjectId());
@@ -176,7 +152,7 @@ public class StudySubjectOverhaulController {
 					if (eventCrfs.size() != 0) {
 						logger.error("EventCrf with StudyEventDefinition Oid {},Crf Oid {} and StudySubjectOid {} already exist in the System",
 								studyEventDefinition.getOc_oid(), crf.getOcOid(), studySubject.getOcOid());
-						return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+						return null;
 					}
 				}
 			}
@@ -185,19 +161,33 @@ public class StudySubjectOverhaulController {
 					studySubject.getOcOid());
 			maxOrdinal = new Integer(0);
 		}
+
 		studyEvent = scheduleNewStudyEvent(studySubject, studyEventDefinition, maxOrdinal, userAccount);
 
 		if (studyEvent == null) {
 			logger.error("StudyEvent with studyEventId {} is null", studyEvent.getStudyEventId());
-			return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+			return null;
 		}
 
 		String url = "/EnketoFormServlet?formLayoutId=" + formLayout.getFormLayoutId() + "&studyEventId=" + studyEvent.getStudyEventId()
 				+ "&eventCrfId=0&originatingPage=ViewStudySubject%3Fid%3D" + studySubject.getStudySubjectId() + "&mode=edit";
 
-		obj = new SSOverhaulDTO();
-		obj.setUrl(url);
-		return new ResponseEntity<SSOverhaulDTO>(obj, org.springframework.http.HttpStatus.OK);
+		viewStudySubjectDTO = new ViewStudySubjectDTO();
+		viewStudySubjectDTO.setUrl(url);
+		return viewStudySubjectDTO;
+	}
+
+	public Page getPage(HttpServletRequest request, String studyOid, String name) {
+		Page page = null;
+		Study publicstudy = studyDao.findByOcOID(studyOid);
+		request.setAttribute("requestSchema", publicstudy.getSchemaName());
+		PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(name);
+		if (pageLayout != null) {
+			page = (Page) SerializationUtils.deserialize(pageLayout.getDefinition());
+			logger.info("Page Object retrieved from database with page name: {}", pageLayout.getName());
+		}
+
+		return page;
 	}
 
 	/**
@@ -227,18 +217,76 @@ public class StudySubjectOverhaulController {
 
 	}
 
-	@Produces(MediaType.APPLICATION_JSON)
-	@RequestMapping(value = "/api/studies/{studyoid}/pages/{name}", method = RequestMethod.GET)
-	public ResponseEntity<Page> getPageLayout(HttpServletRequest request, @PathVariable("studyoid") String studyOid, @PathVariable("name") String name) {
-		Page page = null;
-		Study publicstudy = studyDao.findByOcOID(studyOid);
-		request.setAttribute("requestSchema", publicstudy.getSchemaName());
-		PageLayout pageLayout = pageLayoutDao.findByPageLayoutName(name);
-
-		if (pageLayout != null) {
-			page = (Page) SerializationUtils.deserialize(pageLayout.getDefinition());
-			logger.info("Page Object retrieved from database with page name: {}", pageLayout.getName());
-		}
-		return new ResponseEntity<Page>(page, org.springframework.http.HttpStatus.OK);
+	public StudyDao getStudyDao() {
+		return studyDao;
 	}
+
+	public void setStudyDao(StudyDao studyDao) {
+		this.studyDao = studyDao;
+	}
+
+	public UserAccountDao getUserAccountDao() {
+		return userAccountDao;
+	}
+
+	public void setUserAccountDao(UserAccountDao userAccountDao) {
+		this.userAccountDao = userAccountDao;
+	}
+
+	public StudySubjectDao getStudySubjectDao() {
+		return studySubjectDao;
+	}
+
+	public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
+		this.studySubjectDao = studySubjectDao;
+	}
+
+	public CrfDao getCrfDao() {
+		return crfDao;
+	}
+
+	public void setCrfDao(CrfDao crfDao) {
+		this.crfDao = crfDao;
+	}
+
+	public EventDefinitionCrfDao getEventDefinitionCrfDao() {
+		return eventDefinitionCrfDao;
+	}
+
+	public void setEventDefinitionCrfDao(EventDefinitionCrfDao eventDefinitionCrfDao) {
+		this.eventDefinitionCrfDao = eventDefinitionCrfDao;
+	}
+
+	public StudyEventDao getStudyEventDao() {
+		return studyEventDao;
+	}
+
+	public void setStudyEventDao(StudyEventDao studyEventDao) {
+		this.studyEventDao = studyEventDao;
+	}
+
+	public EventCrfDao getEventCrfDao() {
+		return eventCrfDao;
+	}
+
+	public void setEventCrfDao(EventCrfDao eventCrfDao) {
+		this.eventCrfDao = eventCrfDao;
+	}
+
+	public StudyEventDefinitionDao getStudyEventDefintionDao() {
+		return studyEventDefintionDao;
+	}
+
+	public void setStudyEventDefintionDao(StudyEventDefinitionDao studyEventDefintionDao) {
+		this.studyEventDefintionDao = studyEventDefintionDao;
+	}
+
+	public PageLayoutDao getPageLayoutDao() {
+		return pageLayoutDao;
+	}
+
+	public void setPageLayoutDao(PageLayoutDao pageLayoutDao) {
+		this.pageLayoutDao = pageLayoutDao;
+	}
+
 }
