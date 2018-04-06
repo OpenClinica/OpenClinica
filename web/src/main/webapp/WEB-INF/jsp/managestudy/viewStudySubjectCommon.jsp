@@ -439,6 +439,9 @@ $(function() {
                     columnDefs: [{
                         targets: -1,
                         visible: false
+                    }, {
+                        targets: -2,
+                        orderable: false
                     }]
                 });
                 $(this).children('tbody').on('mouseenter', 'td', function () {
