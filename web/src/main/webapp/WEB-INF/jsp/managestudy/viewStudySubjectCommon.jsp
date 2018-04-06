@@ -468,7 +468,7 @@ $(function() {
             .wrap($('<div>', {
                 css: {
                     'max-width': $(window).width() - 200,
-                    overflow: 'scroll'
+                    overflow: 'auto'
                 }
             }));
 
