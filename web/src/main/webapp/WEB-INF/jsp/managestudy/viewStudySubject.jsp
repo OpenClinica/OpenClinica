@@ -113,7 +113,15 @@
     font-size: 30px;
   }
   .section-body {
+    padding-top: 25px;
     padding-left: 25px;
+  }
+  #subjectEvents .section-body {
+    padding-top: 0;
+    padding-bottom: 25px;
+  }
+  #studySubjectRecord .section-body {
+    padding-top: 0;
   }
   .expanded > .section-header::after {
     content: "\e92a";
