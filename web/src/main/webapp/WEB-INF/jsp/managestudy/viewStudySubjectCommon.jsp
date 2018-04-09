@@ -1,9 +1,6 @@
 <style>
-    .section {
-        margin-top: 25px;
-    }
     .subsection {
-        margin-top: 25px;
+        margin-bottom: 25px;
         font-size: .85rem;
     }
     .subsection-title {
@@ -19,6 +16,9 @@
         border-bottom: none !important;
         border-collapse: collapse !important;
         margin-top: 2px !important;
+        width: 0 !important;
+        min-width: 600px !important;
+        float: left;
     }
     .datatable td {
         border: 1px solid #ccc;
@@ -29,6 +29,7 @@
         border-top-color: #ccc !important;
         background-color: #ccc !important;
         text-align: center;
+        width: 0 !important;
     }
     .datatable thead td:first-child {
         border-left-color: #ccc !important;
@@ -130,20 +131,21 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section expanded" id="common.{{studyEventOid}}">
+    <div class="section expanded" id="common.{{studyEvent.[@OID]}}">
         <div class="section-header" title="Collapse Section">
-            {{sectionName}}
+            {{studyEvent.[@Name]}}
         </div>
         <div class="section-body">
-            {{#each forms as |form|}}
-                <div class="subsection" id="common.{{../studyEventOid}}.{{form.[@OID]}}">
+            {{#each studyEvent.forms as |form|}}
+            {{#if form.showMe}}
+                <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
                     <table class="subsection-title">
                     <tr>
                         <td>
                             <h3 class="form-name">{{form.[@Name]}}</h3>
                             <input type="button" class="add-new" value="Add New" 
                                 data-form-oid="{{form.[@OID]}}" 
-                                data-study-event-oid="{{../studyEventOid}}"
+                                data-study-event-oid="{{../studyEvent.[@OID]}}"
                                 {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
                         </td>
                         <td class="searchbox"></td>
@@ -165,7 +167,7 @@
                     <tbody>
                         {{#each form.submissions as |submission|}}
                             <tr class="submission {{submission.hideStatus}}">
-                                {{#each submission.data as |data|}}
+                                {{#each submission.fields as |data|}}
                                     <td data-search="{{data}}">{{truncate data 200}}</td>
                                 {{/each}}
                                 <td>{{submission.studyStatus}}</td>
@@ -192,6 +194,7 @@
                     </tbody>
                     </table>
                 </div>
+            {{/if}}
             {{/each}}
         </div>
     </div>
@@ -199,103 +202,131 @@
 
 <script>
 $(function() {
+
     function collection(x) {
         if (x)
             return x.length ? x : [x];
         return [];
     }
 
+    var linksOrder = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign', 'lock'];
+    function collectLinks(studyEventData, formData) {
+        var links = [];
+        $.merge(links, collection(studyEventData['OpenClinica:links']['OpenClinica:link']));
+        $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
+        links.sort(function(a, b) {
+            return linksOrder.indexOf(a['@rel']) - linksOrder.indexOf(b['@rel']);
+        });
+        return links;
+    }
+
+    function copyObject(obj) {
+        var copy = {};
+        $.extend(true, copy, obj);
+        return copy;
+    }
+
     var odm;
-    var pageJson;
+    var metadata;
+    var studyEvents = {};
+    var forms = {};
+    var itemGroups = {};
+    var items = {};
+    var codes = {};
+    var columns = {};
     
     $.when(
-        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y', function(data){odm = data;}),
-        $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(data){pageJson = data;})
-    ).then(function() {
-        var columns = {};
-        collection(pageJson.components).forEach(function(component) {
-            columns[component.name] = component.columns;
-        });
-
-        var numVisitBaseds = 0;
-        var studyOid = odm.ClinicalData['@StudyOID'];
-        var studySubjectOid = odm.ClinicalData.SubjectData['@SubjectKey'];
-
-        var studyEvents = {};
-        var forms = {};
-        var itemGroups = {};
-        var items = {};
-        var codes = {};
-
-        var metadata;
-        for (var i=0, studies=collection(odm.Study); i<studies.length; i++) {
-            if (studies[i]['@OID'] === '${study.oid}') {
-                metadata = studies[i].MetaDataVersion;
-                break;
+        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y', function(data){
+            odm = data;
+            for (var i=0, studies=collection(odm.Study); i<studies.length; i++) {
+                if (studies[i]['@OID'] === '${study.oid}') {
+                    metadata = studies[i].MetaDataVersion;
+                    break;
+                }
             }
-        }
-        collection(metadata.CodeList).forEach(function(codelist) {
-            var code = {};
-            collection(codelist.CodeListItem).forEach(function(item) {
-                code[item['@CodedValue']] = item.Decode.TranslatedText;
+            collection(metadata.CodeList).forEach(function(codelist) {
+                var code = {};
+                collection(codelist.CodeListItem).forEach(function(item) {
+                    code[item['@CodedValue']] = item.Decode.TranslatedText;
+                });
+                codes[codelist['@OID']] = code;
             });
-            codes[codelist['@OID']] = code;
-        });
-        collection(metadata['OpenClinica:MultiSelectList']).forEach(function(multiselect) {
-            var code = {};
-            collection(multiselect['OpenClinica:MultiSelectListItem']).forEach(function(item) {
-                code[item['@CodedOptionValue']] = item.Decode.TranslatedText;
+            collection(metadata['OpenClinica:MultiSelectList']).forEach(function(multiselect) {
+                var code = {};
+                collection(multiselect['OpenClinica:MultiSelectListItem']).forEach(function(item) {
+                    code[item['@CodedOptionValue']] = item.Decode.TranslatedText;
+                });
+                codes[multiselect['@ID']] = code;
             });
-            codes[multiselect['@ID']] = code;
-        });
-        collection(metadata.ItemDef).forEach(function(item) {
-            items[item['@OID']] = item;
-            if (item.CodeListRef)
-                item.code = codes[item.CodeListRef['@CodeListOID']]
-            if (item['OpenClinica:MultiSelectListRef'])
-                item.code = codes[item['OpenClinica:MultiSelectListRef']['@MultiSelectListID']]
-        });
-        collection(metadata.ItemGroupDef).forEach(function(itemGroup) {
-            itemGroup.items = collection(itemGroup.ItemRef).map(function(ref) {
-                return items[ref['@ItemOID']];
+            collection(metadata.ItemDef).forEach(function(item) {
+                items[item['@OID']] = item;
+                if (item.CodeListRef)
+                    item.codes = codes[item.CodeListRef['@CodeListOID']]
+                if (item['OpenClinica:MultiSelectListRef'])
+                    item.codes = codes[item['OpenClinica:MultiSelectListRef']['@MultiSelectListID']]
             });
-            itemGroups[itemGroup['@OID']] = itemGroup;
-        });
-        collection(metadata.FormDef).forEach(function(form) {
-            form.itemGroups = collection(form.ItemGroupRef).map(function(ref) {
-                return itemGroups[ref['@ItemGroupOID']];
+            collection(metadata.ItemGroupDef).forEach(function(itemGroup) {
+                itemGroup.items = collection(itemGroup.ItemRef).map(function(ref) {
+                    return items[ref['@ItemOID']];
+                });
+                itemGroups[itemGroup['@OID']] = itemGroup;
             });
-            forms[form['@OID']] = form;
-        });
+            collection(metadata.FormDef).forEach(function(form) {
+                form.itemGroups = collection(form.ItemGroupRef).map(function(ref) {
+                    return itemGroups[ref['@ItemGroupOID']];
+                });
+                forms[form['@OID']] = form;
+            });        
+        }),
+
+        $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(pageJson){
+            collection(pageJson.components).forEach(function(component) {
+                columns[component.name] = component.columns;
+            });
+        })
+
+    ).then(function() {
         collection(metadata.StudyEventDef).forEach(function(studyEvent) {
             studyEvent.forms = {};
+            var numFormShowing = 0;
+
             collection(studyEvent.FormRef).filter(function(ref) {
                 return ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'No';
             }).forEach(function(ref) {
                 var formOid = ref['@FormOID'];
                 var form = forms[formOid];
+                var formStatus = ref['@OpenClinica:Status'];
+                var formIsArchived = formStatus === 'DELETED' || formStatus === 'AUTO_DELETED';
                 var columnTitles = [];
-                var submissionObj = {};
-                collection(form.itemGroups).forEach(function(itemGroup) {
-                    collection(itemGroup.items).forEach(function(item) {
-                        var itemOid = item['@OID'];
-                        columnTitles.push(item.Question ? item.Question.TranslatedText : itemOid);
-                        submissionObj[itemOid] = [];
-                    });
+                var submissionFields = {};
+                var componentOid = studyEvent['@OID'] + '.' + formOid;
+                var components = columns[componentOid];
+                collection(components).forEach(function(col) {
+                    var item = items[col];
+                    columnTitles.push(item ? item.Question.TranslatedText : col);
+                    submissionFields[col] = [];
                 });
+
                 studyEvent.forms[formOid] = $.extend({
                     columnTitles: columnTitles,
-                    submissionObj: submissionObj,
+                    submissionFields: submissionFields,
                     submissions: [],
-                    disableAddNew: ref['@OpenClinica:Status'] === 'DELETED'
+                    isArchived: formIsArchived,
+                    disableAddNew: formIsArchived,
+                    showMe: !formIsArchived
                 }, form);
+
+                if (!formIsArchived)
+                    numFormShowing++;
             });
+
+            studyEvent.isArchived = studyEvent['@OpenClinica:Status'] === 'DELETED';
+            studyEvent.showMe = numFormShowing > 0;
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
 
         collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
-            var studyEventOid = studyEventData['@StudyEventOID'];
-            var studyEvent = studyEvents[studyEventOid];
+            var studyEvent = studyEvents[studyEventData['@StudyEventOID']];
             if (studyEvent['@OpenClinica:EventType'] !== 'Common')
                 return;
 
@@ -303,65 +334,41 @@ $(function() {
             if (!formData)
                 return;
 
-            var formOid = formData['@FormOID'];
-            var form = studyEvent.forms[formOid];
+            var form = studyEvent.forms[formData['@FormOID']];
             if (!form)
                 return;
 
             if (studyEvent['@Repeating'] === 'No')
                 form.disableAddNew = true;
 
-            var links = [];
-            $.merge(links, collection(studyEventData['OpenClinica:links']['OpenClinica:link']));
-            $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
-            var order = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign', 'lock'];
-            links.sort(function(a, b) {
-                return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
-            });
-
-            var componentOid = studyEventOid + '.' + formOid;
-            var columnTitles = [];
-            var submissionObj = {};
-            var components = columns[componentOid];
-            if (components === null) {
-                columnTitles = form.columnTitles;
-                $.extend(true, submissionObj, form.submissionObj);
-            }
-            else {
-                collection(components).forEach(function(col) {
-                    var item = items[col];
-                    columnTitles.push(item ? item.Question.TranslatedText : col);
-                    submissionObj[col] = [];
-                });
-            }
-
             var submission = {
                 studyStatus: studyEventData['@OpenClinica:Status'],
-                formStatus: formData['@OpenClinica:Status'],
                 hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
                 updatedDate: formData['@OpenClinica:UpdatedDate'].split(' ')[0],
                 updatedBy: formData['@OpenClinica:UpdatedBy'],
-                data: submissionObj,
-                links: links
+                fields: copyObject(form.submissionFields),
+                links: collectLinks(studyEventData, formData)
             };
             collection(formData.ItemGroupData).forEach(function(igd) {
                 collection(igd.ItemData).forEach(function(itemData) {
                     var itemOid = itemData['@ItemOID'];
-                    var data = submission.data[itemOid];
+                    var data = submission.fields[itemOid];
                     if (data) {
-                        var item = items[itemOid];
                         var value = itemData['@Value'];
-                        if (item.code) {
+                        var item = items[itemOid];
+                        if (item.codes) {
                             value = value.split(',').map(function(code) {
-                                return item.code[code];
+                                return item.codes[code];
                             }).join(', ');
                         }
                         data.push(value);
                     }
                 });
             });
+
             form.submissions.push(submission);
-            form.columnTitles = columnTitles;
+            form.showMe = true;
+            studyEvent.showMe = true;
         });
 
         var hideClass = 'oc-status-removed';
@@ -380,27 +387,28 @@ $(function() {
             $('tr.section-header, tr.section-body').removeClass('expanded').addClass('collapsed');
         });
 
+        var numVisitBaseds = 0;
         var hideStatus = $('#oc-status-hide').val();
-        var sectionTable = $('#commonEvents');
+        var commonEventsDiv = $('#commonEvents');
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
-            if (studyEvent['@OpenClinica:EventType'] === 'Common') {
-                var status = studyEvent['@OpenClinica:Status'] === 'AVAILABLE' ? 'oc-status-active' : 'oc-status-removed';
-                var display = status === hideStatus ? 'display:none;' : '';
-                sectionTable.append(sectionTmpl({
-                    sectionName: studyEvent['@Name'],
-                    sectionStatus: status,
-                    sectionDisplay: display,
-                    studyEventOid: studyEventId,
-                    forms: studyEvent.forms
+            if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent.showMe) {
+                commonEventsDiv.append(sectionTmpl({
+                    studyEvent: studyEvent
                 }));
             }
             else {
                 numVisitBaseds++;
             }
         }
-        sectionTable.on('click', '.add-new', function() {
+        if (numVisitBaseds) {
+            $('#subjectEvents').removeClass('hide');
+        }
+
+        var studyOid = odm.ClinicalData['@StudyOID'];
+        var studySubjectOid = odm.ClinicalData.SubjectData['@SubjectKey'];
+        commonEventsDiv.on('click', '.add-new', function() {
             var btn = $(this);
             var formOid = btn.data('form-oid');
             var studyEventOid = btn.data('study-event-oid');
@@ -424,14 +432,11 @@ $(function() {
             });
         });
 
-        if (numVisitBaseds) {
-            $('#subjectEvents').removeClass('hide');
-        }
-
         $.fn.dataTable.moment('DD-MMM-YYYY');
         $('table.datatable')
             .each(function() {
-                var table = $(this).DataTable({
+                var table = $(this);
+                var datatable = table.DataTable({
                     dom: "frtilp",
                     language: {
                         paginate: {
@@ -448,16 +453,21 @@ $(function() {
                     columnDefs: [{
                         targets: -1,
                         visible: false
+                    }, {
+                        targets: -2,
+                        orderable: false
                     }]
                 });
-                $(this).children('tbody').on('mouseenter', 'td', function () {
-                    var colIdx = table.cell(this).index();
+                table.children('tbody').on('mouseenter', 'td', function () {
+                    var colIdx = datatable.cell(this).index();
                     if (colIdx) {
                         var col = colIdx.column;
-                        $(table.cells().nodes()).removeClass('highlight');
-                        $(table.column(col).nodes()).addClass('highlight');
+                        $(datatable.cells().nodes()).removeClass('highlight');
+                        $(datatable.column(col).nodes()).addClass('highlight');
                     }
                 });
+                var tableWidth = table.width();
+                table.closest('.subsection').css('max-width', tableWidth < 500 ? 500 : tableWidth);
             })
             .prev('.dataTables_filter').each(function() {
                 var searchbox = $(this);
@@ -467,13 +477,13 @@ $(function() {
             .wrap($('<div>', {
                 css: {
                     'max-width': $(window).width() - 200,
-                    overflow: 'scroll'
+                    overflow: 'auto'
                 }
             }));
 
         $('#loading').remove();
     }, function() {
-        $('#loading').text('AJAX Failed');
+        $('#loading').text("Can't connect to the Study Service");
     });
 });
 </script>

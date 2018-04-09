@@ -11,6 +11,11 @@
 <jsp:include page="../include/sideAlert.jsp"/>
 
 <link rel="stylesheet" href="includes/jmesa/jmesa.css" type="text/css">
+<style>
+    .icon > span {
+        font-family: 'Open Sans', arial, helvetica, sans-serif;
+    }
+</style>
 
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.jmesa.js"></script>

@@ -1,0 +1,38 @@
+/**
+ * 
+ */
+package org.akaza.openclinica.service;
+
+import javax.servlet.http.HttpServletRequest;
+
+import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
+
+/**
+ * @author joekeremian
+ *
+ */
+public interface ViewStudySubjectService {
+
+	/**
+	 * This method will add or schedule new event/form
+	 * 
+	 * @param request
+	 * @param studyOid
+	 * @param studyEventDefinitionOid
+	 * @param crfOid
+	 * @param studySubjectOid
+	 * @return
+	 */
+	ViewStudySubjectDTO addNewForm(HttpServletRequest request, String studyOid, String studyEventDefinitionOid, String crfOid, String studySubjectOid);
+
+	/**
+	 * This method will retrieve Page object for UI filtering.
+	 * 
+	 * @param request
+	 * @param studyOid
+	 * @param name
+	 * @return
+	 */
+	Page getPage(HttpServletRequest request, String studyOid, String name);
+
+}
