@@ -134,20 +134,20 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section expanded" id="common.{{studyEventOid}}">
+    <div class="section expanded" id="common.{{studyEvent.[@OID]}}">
         <div class="section-header" title="Collapse Section">
-            {{sectionName}}
+            {{studyEvent.[@Name]}}
         </div>
         <div class="section-body">
-            {{#each forms as |form|}}
-                <div class="subsection" id="common.{{../studyEventOid}}.{{form.[@OID]}}">
+            {{#each studyEvent.forms as |form|}}
+                <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
                     <table class="subsection-title">
                     <tr>
                         <td>
                             <h3 class="form-name">{{form.[@Name]}}</h3>
                             <input type="button" class="add-new" value="Add New" 
                                 data-form-oid="{{form.[@OID]}}" 
-                                data-study-event-oid="{{../studyEventOid}}"
+                                data-study-event-oid="{{../studyEvent.[@OID]}}"
                                 {{#if form.disableAddNew}}disabled="disabled"{{/if}}>
                         </td>
                         <td class="searchbox"></td>
@@ -169,7 +169,7 @@
                     <tbody>
                         {{#each form.submissions as |submission|}}
                             <tr class="submission {{submission.hideStatus}}">
-                                {{#each submission.data as |data|}}
+                                {{#each submission.fields as |data|}}
                                     <td data-search="{{data}}">{{truncate data 200}}</td>
                                 {{/each}}
                                 <td>{{submission.studyStatus}}</td>
@@ -203,10 +203,28 @@
 
 <script>
 $(function() {
+
     function collection(x) {
         if (x)
             return x.length ? x : [x];
         return [];
+    }
+
+    var linksOrder = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign', 'lock'];
+    function collectLinks(studyEventData, formData) {
+        var links = [];
+        $.merge(links, collection(studyEventData['OpenClinica:links']['OpenClinica:link']));
+        $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
+        links.sort(function(a, b) {
+            return linksOrder.indexOf(a['@rel']) - linksOrder.indexOf(b['@rel']);
+        });
+        return links;
+    }
+
+    function copyObject(obj) {
+        var copy = {};
+        $.extend(true, copy, obj);
+        return copy;
     }
 
     var odm;
@@ -244,9 +262,9 @@ $(function() {
             collection(metadata.ItemDef).forEach(function(item) {
                 items[item['@OID']] = item;
                 if (item.CodeListRef)
-                    item.code = codes[item.CodeListRef['@CodeListOID']]
+                    item.codes = codes[item.CodeListRef['@CodeListOID']]
                 if (item['OpenClinica:MultiSelectListRef'])
-                    item.code = codes[item['OpenClinica:MultiSelectListRef']['@MultiSelectListID']]
+                    item.codes = codes[item['OpenClinica:MultiSelectListRef']['@MultiSelectListID']]
             });
             collection(metadata.ItemGroupDef).forEach(function(itemGroup) {
                 itemGroup.items = collection(itemGroup.ItemRef).map(function(ref) {
@@ -277,14 +295,24 @@ $(function() {
                 var formOid = ref['@FormOID'];
                 var form = forms[formOid];
                 var columnTitles = [];
+                var submissionFields = {};
+                var componentOid = studyEvent['@OID'] + '.' + formOid;
+                var components = columns[componentOid];
+                collection(components).forEach(function(col) {
+                    var item = items[col];
+                    columnTitles.push(item ? item.Question.TranslatedText : col);
+                    submissionFields[col] = [];
+                });
+
                 studyEvent.forms[formOid] = $.extend({
                     columnTitles: columnTitles,
-                    submissionObj: {},
+                    submissionFields: submissionFields,
                     submissions: [],
                     disableAddNew: ref['@OpenClinica:Status'] === 'DELETED'
                 }, form);
             });
             studyEvents[studyEvent['@OID']] = studyEvent;
+
         });
 
         collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
@@ -303,49 +331,24 @@ $(function() {
             if (studyEvent['@Repeating'] === 'No')
                 form.disableAddNew = true;
 
-            var links = [];
-            $.merge(links, collection(studyEventData['OpenClinica:links']['OpenClinica:link']));
-            $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
-            var order = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign', 'lock'];
-            links.sort(function(a, b) {
-                return order.indexOf(a['@rel']) - order.indexOf(b['@rel']);
-            });
-
-            var componentOid = studyEventData['@StudyEventOID'] + '.' + formData['@FormOID'];
-            var columnTitles = [];
-            var submissionObj = {};
-            var components = columns[componentOid];
-            if (components === null) {
-                columnTitles = form.columnTitles;
-                $.extend(true, submissionObj, form.submissionObj);
-            }
-            else {
-                collection(components).forEach(function(col) {
-                    var item = items[col];
-                    columnTitles.push(item ? item.Question.TranslatedText : col);
-                    submissionObj[col] = [];
-                });
-            }
-
             var submission = {
                 studyStatus: studyEventData['@OpenClinica:Status'],
-                formStatus: formData['@OpenClinica:Status'],
                 hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
                 updatedDate: formData['@OpenClinica:UpdatedDate'].split(' ')[0],
                 updatedBy: formData['@OpenClinica:UpdatedBy'],
-                data: submissionObj,
-                links: links
+                fields: copyObject(form.submissionFields),
+                links: collectLinks(studyEventData, formData)
             };
             collection(formData.ItemGroupData).forEach(function(igd) {
                 collection(igd.ItemData).forEach(function(itemData) {
                     var itemOid = itemData['@ItemOID'];
-                    var data = submission.data[itemOid];
+                    var data = submission.fields[itemOid];
                     if (data) {
-                        var item = items[itemOid];
                         var value = itemData['@Value'];
-                        if (item.code) {
+                        var itemCodes = items[itemOid].codes;
+                        if (itemCodes) {
                             value = value.split(',').map(function(code) {
-                                return item.code[code];
+                                return itemCodes[code];
                             }).join(', ');
                         }
                         data.push(value);
@@ -353,7 +356,6 @@ $(function() {
                 });
             });
             form.submissions.push(submission);
-            form.columnTitles = columnTitles;
         });
 
         var hideClass = 'oc-status-removed';
@@ -374,19 +376,13 @@ $(function() {
 
         var numVisitBaseds = 0;
         var hideStatus = $('#oc-status-hide').val();
-        var sectionTable = $('#commonEvents');
+        var commonEventsDiv = $('#commonEvents');
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
             if (studyEvent['@OpenClinica:EventType'] === 'Common') {
-                var status = studyEvent['@OpenClinica:Status'] === 'AVAILABLE' ? 'oc-status-active' : 'oc-status-removed';
-                var display = status === hideStatus ? 'display:none;' : '';
-                sectionTable.append(sectionTmpl({
-                    sectionName: studyEvent['@Name'],
-                    sectionStatus: status,
-                    sectionDisplay: display,
-                    studyEventOid: studyEventId,
-                    forms: studyEvent.forms
+                commonEventsDiv.append(sectionTmpl({
+                    studyEvent: studyEvent
                 }));
             }
             else {
@@ -399,7 +395,7 @@ $(function() {
 
         var studyOid = odm.ClinicalData['@StudyOID'];
         var studySubjectOid = odm.ClinicalData.SubjectData['@SubjectKey'];
-        sectionTable.on('click', '.add-new', function() {
+        commonEventsDiv.on('click', '.add-new', function() {
             var btn = $(this);
             var formOid = btn.data('form-oid');
             var studyEventOid = btn.data('study-event-oid');
@@ -474,7 +470,7 @@ $(function() {
 
         $('#loading').remove();
     }, function() {
-        $('#loading').text('AJAX Failed');
+        $('#loading').text("Can't connect to the Study Service");
     });
 });
 </script>
