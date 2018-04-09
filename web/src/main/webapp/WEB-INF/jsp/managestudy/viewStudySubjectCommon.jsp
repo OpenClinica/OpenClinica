@@ -140,6 +140,7 @@
         </div>
         <div class="section-body">
             {{#each studyEvent.forms as |form|}}
+            {{#if form.showMe}}
                 <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
                     <table class="subsection-title">
                     <tr>
@@ -196,6 +197,7 @@
                     </tbody>
                     </table>
                 </div>
+            {{/if}}
             {{/each}}
         </div>
     </div>
@@ -289,11 +291,15 @@ $(function() {
     ).then(function() {
         collection(metadata.StudyEventDef).forEach(function(studyEvent) {
             studyEvent.forms = {};
+            var numFormShowing = 0;
+
             collection(studyEvent.FormRef).filter(function(ref) {
                 return ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'No';
             }).forEach(function(ref) {
                 var formOid = ref['@FormOID'];
                 var form = forms[formOid];
+                var formStatus = ref['@OpenClinica:Status'];
+                var formIsArchived = formStatus === 'DELETED' || formStatus === 'AUTO_DELETED';
                 var columnTitles = [];
                 var submissionFields = {};
                 var componentOid = studyEvent['@OID'] + '.' + formOid;
@@ -308,11 +314,18 @@ $(function() {
                     columnTitles: columnTitles,
                     submissionFields: submissionFields,
                     submissions: [],
-                    disableAddNew: ref['@OpenClinica:Status'] === 'DELETED'
+                    isArchived: formIsArchived,
+                    disableAddNew: formIsArchived,
+                    showMe: !formIsArchived
                 }, form);
-            });
-            studyEvents[studyEvent['@OID']] = studyEvent;
 
+                if (!formIsArchived)
+                    numFormShowing++;
+            });
+
+            studyEvent.isArchived = studyEvent['@OpenClinica:Status'] === 'DELETED';
+            studyEvent.showMe = numFormShowing > 0;
+            studyEvents[studyEvent['@OID']] = studyEvent;
         });
 
         collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
@@ -345,17 +358,20 @@ $(function() {
                     var data = submission.fields[itemOid];
                     if (data) {
                         var value = itemData['@Value'];
-                        var itemCodes = items[itemOid].codes;
-                        if (itemCodes) {
+                        var item = items[itemOid];
+                        if (item.codes) {
                             value = value.split(',').map(function(code) {
-                                return itemCodes[code];
+                                return item.codes[code];
                             }).join(', ');
                         }
                         data.push(value);
                     }
                 });
             });
+
             form.submissions.push(submission);
+            form.showMe = true;
+            studyEvent.showMe = true;
         });
 
         var hideClass = 'oc-status-removed';
@@ -380,7 +396,7 @@ $(function() {
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
-            if (studyEvent['@OpenClinica:EventType'] === 'Common') {
+            if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent.showMe) {
                 commonEventsDiv.append(sectionTmpl({
                     studyEvent: studyEvent
                 }));
