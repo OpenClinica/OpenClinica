@@ -34,6 +34,10 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
+    <bean id="viewStudySubjectServiceImpl" class="org.akaza.openclinica.service.ViewStudySubjectServiceImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
     <bean id="eventService" class="org.akaza.openclinica.service.EventService">
         <constructor-arg ref="dataSource"/>
     </bean>
