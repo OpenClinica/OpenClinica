@@ -872,9 +872,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		// subject assigned to site is pulled from study level this will get the site OID correctly displayed.
 		if (!studySubjectOID.equals(INDICATE_ALL)) {
 
-			StudySubjectDao ssdao = getStudySubjectDao();
-			StudySubject ss = (StudySubject) getStudySubjectDao().findByColumnName(studySubjectOID, "ocOid");
-			studyOID = ss.getStudy().getOc_oid();
+			// StudySubjectDao ssdao = getStudySubjectDao();
+			// StudySubject ss = (StudySubject) getStudySubjectDao().findByColumnName(studySubjectOID, "ocOid");
+			// studyOID = ss.getStudy().getOc_oid();
 		}
 		if (studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL) && !studySubjectOID.equals(INDICATE_ALL)
 				&& !studyOID.equals(INDICATE_ALL)) {
