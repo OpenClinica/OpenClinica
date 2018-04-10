@@ -47,7 +47,6 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
@@ -140,8 +139,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 			ArrayList<ExportStudyEventDataBean> ses = (ArrayList<ExportStudyEventDataBean>) sub.getExportStudyEventData();// *****************
 																															// OpenClinica:
 																															// Subject
-																															// Links**************
-
+			// ***************** OpenClinica: Subject Links Start**************
 			xml.append(indent + indent + indent + "<OpenClinica:links>");
 			xml.append(nls);
 
@@ -149,7 +147,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 			StudyEventDefinitionDAO<String, ArrayList> seddao = new StudyEventDefinitionDAO(dataSource);
 			CRFDAO crfdao = new CRFDAO(dataSource);
 			StudyBean parentStudyBean = getParentStudy(clinicalData.getStudyOID());
+			StudyBean studyBean = getStudy(clinicalData.getStudyOID());
 			List<EventDefinitionCRFBean> edcs = edcdao.findAllByStudy(parentStudyBean);
+
 			for (EventDefinitionCRFBean edc : edcs) {
 				if (!edc.getStatus().equals(Status.AUTO_DELETED) && !edc.getStatus().equals(Status.DELETED) && validateAddNew(sub, edc)
 						&& edc.getParentId() == 0) {
@@ -167,6 +167,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 			}
 			xml.append(indent + indent + indent + "</OpenClinica:links>");
 			xml.append(nls);
+			// ***************** OpenClinica: Subject Links End **************
+
 			//
 			for (ExportStudyEventDataBean se : ses) {
 
@@ -203,27 +205,29 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 					xml.append("\">");
 					xml.append(nls);
 
-					// ***************** OpenClinica: Event Links**************
 					StudySubject studySubject = sub.getStudySubject();
-					Study study = studySubject.getStudy();
 					StudyEvent studyEvent = se.getStudyEvent();
 
-					StudyBean studyBean = CoreResources.getPublicStudy(study.getOc_oid(), dataSource);
-					StudyUserRoleBean userRole = userBean.getRoleByStudy(studyBean.getId());
+					StudyBean publicBean = CoreResources.getPublicStudy(clinicalData.getStudyOID(), dataSource);
+					StudyUserRoleBean userRole = userBean.getRoleByStudy(publicBean.getId());
 					if (userRole == null || !userRole.isActive())
-						userRole = userBean.getRoleByStudy(studyBean.getParentStudyId());
+						userRole = userBean.getRoleByStudy(publicBean.getParentStudyId());
 					Role role = userRole.getRole();
+
+					// ***************** OpenClinica: Event Links Start **************
+
+					xml.append(indent + indent + indent + indent + "<OpenClinica:links>");
+					xml.append(nls);
+
 					if (se.getExportFormData().size() != 0) {
 						if (se.getStudyEventDefinition().getType().equals(COMMON)
 								&& se.getExportFormData().get(0).getEventDefinitionCrf().getStatusId() != Status.AUTO_DELETED.getCode()
 								&& se.getExportFormData().get(0).getEventDefinitionCrf().getStatusId() != Status.DELETED.getCode()) {
-							xml.append(indent + indent + indent + indent + "<OpenClinica:links>");
-							xml.append(nls);
 
 							// ***************** OpenClinica:Link REMOVE EVENT **************
 							if (studyEvent.getStatusId() != Status.DELETED.getCode() && studyEvent.getStatusId() != Status.AUTO_DELETED.getCode()) {
 								if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR)) && studySubject.getStatus().equals(Status.AVAILABLE)
-										&& study.getStatus().equals(Status.AVAILABLE)) {
+										&& studyBean.getStatus().equals(org.akaza.openclinica.bean.core.Status.AVAILABLE)) {
 									String removeUrl = "/RemoveStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
 											+ studySubject.getStudySubjectId();
 									xml.append(indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"remove\" href=\""
@@ -236,7 +240,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 								// ***************** OpenClinica:Link RESTORE EVENT **************
 								// userRole.manageStudy &&
 								if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR)) && studySubject.getStatus().equals(Status.AVAILABLE)
-										&& study.getStatus().equals(Status.AVAILABLE)
+										&& studyBean.getStatus().equals(org.akaza.openclinica.bean.core.Status.AVAILABLE)
 										&& studyEvent.getStudyEventDefinition().getStatus().equals(Status.AVAILABLE)) {
 									String restoreUrl = "/RestoreStudyEvent?action=confirm&id=" + studyEvent.getStudyEventId() + "&studySubId="
 											+ studySubject.getStudySubjectId();
@@ -253,7 +257,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 									&& (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.COMPLETED.getCode()
 											|| studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode()
 											|| studyEvent.getSubjectEventStatusId() == SubjectEventStatus.STOPPED.getCode())
-									&& studySubject.getStatus().equals(Status.AVAILABLE) && study.getStatus().equals(Status.AVAILABLE)) {
+									&& studySubject.getStatus().equals(Status.AVAILABLE)
+									&& studyBean.getStatus().equals(org.akaza.openclinica.bean.core.Status.AVAILABLE)) {
 								String signUrl = "/UpdateStudyEvent?action=submit&event_id=" + studyEvent.getStudyEventId() + "&ss_id="
 										+ studySubject.getStudySubjectId() + "&statusId=8";
 
@@ -266,7 +271,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 							// ***************** OpenClinica:Link LOCK EVENT **************
 
 							if (studyEvent.getStatusId() != Status.DELETED.getCode() && studyEvent.getStatusId() != Status.AUTO_DELETED.getCode()
-									&& studySubject.getStatus().equals(Status.AVAILABLE) && study.getStatus().equals(Status.AVAILABLE)) {
+									&& studySubject.getStatus().equals(Status.AVAILABLE)
+									&& studyBean.getStatus().equals(org.akaza.openclinica.bean.core.Status.AVAILABLE)) {
 								if ((!studyEvent.getStudyEventDefinition().getType().equals(COMMON) && !role.equals(Role.MONITOR))
 										|| (studyEvent.getStudyEventDefinition().getType().equals(COMMON)
 												&& (role.equals(Role.STUDY_STUDYDIRECTOR) || role.equals(Role.COORDINATOR)))) {
@@ -278,14 +284,13 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 									xml.append("/>");
 									xml.append(nls);
 
-									xml.append(indent + indent + indent + indent + "</OpenClinica:links>");
-									xml.append(nls);
 								}
 							}
 						}
 					}
-
-					// ***************** OpenClinica: Form Links**************
+					xml.append(indent + indent + indent + indent + "</OpenClinica:links>");
+					xml.append(nls);
+					// ***************** OpenClinica: Event Links End **************
 
 					//
 					ArrayList<ExportFormDataBean> forms = se.getExportFormData();
@@ -335,10 +340,11 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 							xml.append("\">");
 							xml.append(nls);
 
-							// ***************** OpenClinica:Links**************
 							EventCrf eventCrf = form.getEventCrf();
 							FormLayout formLayout = form.getFormLayout();
 							EventDefinitionCrf eventDefinitionCrf = form.getEventDefinitionCrf();
+
+							// ***************** OpenClinica: Form Links Start **************
 
 							xml.append(indent + indent + indent + indent + indent + "<OpenClinica:links>");
 							xml.append(nls);
@@ -364,7 +370,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 										&& studyEvent.getSubjectEventStatusId() != SubjectEventStatus.SKIPPED.getCode()
 										&& studyEvent.getSubjectEventStatusId() != SubjectEventStatus.STOPPED.getCode()
 										&& studyEvent.getStatusId() != Status.DELETED.getCode() && studyEvent.getStatusId() != Status.AUTO_DELETED.getCode()
-										&& study.getStatus().equals(Status.AVAILABLE)) {
+										&& studyBean.getStatus().equals(org.akaza.openclinica.bean.core.Status.AVAILABLE)) {
 									xml.append(indent + indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"edit\" href=\""
 											+ StringEscapeUtils.escapeXml(formUrl + "&mode=edit") + "\"");
 									xml.append("/>");
@@ -374,7 +380,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 								if (!studyEvent.getStudyEventDefinition().getType().equals(COMMON)) {
 									if (eventCrf.getStatusId() != Status.DELETED.getCode() && eventCrf.getStatusId() != Status.AUTO_DELETED.getCode()) {
 										if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR))
-												&& studySubject.getStatus().equals(Status.AVAILABLE) && study.getStatus().equals(Status.AVAILABLE)) {
+												&& studySubject.getStatus().equals(Status.AVAILABLE)
+												&& studyBean.getStatus().equals(org.akaza.openclinica.bean.core.Status.AVAILABLE)) {
 											String removeUrl = "/RemoveEventCRF?action=confirm&id=" + eventCrf.getEventCrfId() + "&studySubId="
 													+ studySubject.getStudySubjectId();
 											xml.append(indent + indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"remove\" href=\""
@@ -389,7 +396,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 										if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR))
 												&& studyEvent.getStatusId() != Status.AUTO_DELETED.getCode()
 												&& eventCrf.getStatusId() != Status.AUTO_DELETED.getCode() && studySubject.getStatus().equals(Status.AVAILABLE)
-												&& studyEvent.getStatusId() == Status.AVAILABLE.getCode() && study.getStatus().equals(Status.AVAILABLE)) {
+												&& studyEvent.getStatusId() == Status.AVAILABLE.getCode()
+												&& studyBean.getStatus().equals(org.akaza.openclinica.bean.core.Status.AVAILABLE)) {
 											String restoreUrl = "/RestoreEventCRF?action=confirm&id=" + eventCrf.getEventCrfId() + "&studySubId="
 													+ studySubject.getStudySubjectId();
 											xml.append(indent + indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"restore\" href=\""
@@ -402,7 +410,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 								// ***************** OpenClinica:Link REASSIGN EVENT CRF **************
 
 								// (userRole.director || userRole.coordinator) &&
-								if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR)) && study.getStatus().equals(Status.AVAILABLE)
+								if ((role.equals(Role.STUDYDIRECTOR) || role.equals(Role.COORDINATOR))
+										&& studyBean.getStatus().equals(org.akaza.openclinica.bean.core.Status.AVAILABLE)
 										&& !(studyEvent.getSubjectEventStatusId() == SubjectEventStatus.LOCKED.getCode()
 												|| studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode())) {
 
@@ -421,7 +430,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 							}
 							xml.append(indent + indent + indent + indent + indent + "</OpenClinica:links>");
 							xml.append(nls);
-							// *****************END of OpenClinica:Links**************
+							// ***************** OpenClinica: Form Links End **************
 
 							//
 							ArrayList<ImportItemGroupDataBean> igs = form.getItemGroupData();
