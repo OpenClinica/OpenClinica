@@ -23,6 +23,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
@@ -41,7 +42,9 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.EventCrf;
@@ -138,7 +141,12 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
 			ArrayList<ExportStudyEventDataBean> ses = (ArrayList<ExportStudyEventDataBean>) sub.getExportStudyEventData();// *****************
 																															// OpenClinica:
-																															// Subject
+			StudyBean publicBean = CoreResources.getPublicStudy(clinicalData.getStudyOID(), dataSource);
+			StudyUserRoleBean userRole = userBean.getRoleByStudy(publicBean.getId());
+			if (userRole == null || !userRole.isActive())
+				userRole = userBean.getRoleByStudy(publicBean.getParentStudyId());
+			Role role = userRole.getRole();
+			// Subject
 			// ***************** OpenClinica: Subject Links Start**************
 			xml.append(indent + indent + indent + "<OpenClinica:links>");
 			xml.append(nls);
@@ -152,22 +160,22 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 			List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean);
 
 			for (EventDefinitionCRFBean edc : edcs) {
-				if (!edc.getStatus().equals(org.akaza.openclinica.bean.core.Status.AUTO_DELETED)
-						&& !edc.getStatus().equals(org.akaza.openclinica.bean.core.Status.DELETED) && validateAddNew(sub, edc) && !edc.isHideCrf()) {
+				if (!role.equals(Role.MONITOR) && !edc.getStatus().equals(org.akaza.openclinica.bean.core.Status.AUTO_DELETED)
+						&& !edc.getStatus().equals(org.akaza.openclinica.bean.core.Status.DELETED) && !edc.isHideCrf()) {
 					StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(edc.getStudyEventDefinitionId());
 					CRFBean crf = (CRFBean) crfdao.findByPK(edc.getCrfId());
-					if (!sed.getType().equals(COMMON)) {
-						continue;
+					if (sed.getType().equals(COMMON)) {
+						if (sed.isRepeating() || (!sed.isRepeating() && validateAddNewForNonRepeating(sub, crf))) {
+							xml.append(indent + indent + indent + indent + "<OpenClinica:link rel=\"common-add-new\" tag=\""
+									+ StringEscapeUtils.escapeXml(sed.getOid() + "." + crf.getOid()) + "\"" + " href=\"/pages/api/addAnotherForm?studyoid="
+									+ StringEscapeUtils.escapeXml(clinicalData.getStudyOID()) + "&amp;studysubjectoid="
+									+ StringEscapeUtils.escapeXml(sub.getSubjectOID()) + "&amp;studyeventdefinitionoid="
+									+ StringEscapeUtils.escapeXml(sed.getOid()) + "&amp;crfoid=" + StringEscapeUtils.escapeXml(crf.getOid()) + "\"");
+							xml.append("/>");
+							xml.append(nls);
+						}
 					}
-					xml.append(indent + indent + indent + indent + "<OpenClinica:link rel=\"common-add-new\" tag=\""
-							+ StringEscapeUtils.escapeXml(sed.getOid() + "." + crf.getOid()) + "\"" + " href=\"/pages/api/addAnotherForm?studyoid="
-							+ StringEscapeUtils.escapeXml(clinicalData.getStudyOID()) + "&amp;studysubjectoid="
-							+ StringEscapeUtils.escapeXml(sub.getSubjectOID()) + "&amp;studyeventdefinitionoid=" + StringEscapeUtils.escapeXml(sed.getOid())
-							+ "&amp;crfoid=" + StringEscapeUtils.escapeXml(crf.getOid()) + "\"");
-					xml.append("/>");
-					xml.append(nls);
 				}
-
 			}
 			xml.append(indent + indent + indent + "</OpenClinica:links>");
 			xml.append(nls);
@@ -211,12 +219,6 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
 					StudySubject studySubject = sub.getStudySubject();
 					StudyEvent studyEvent = se.getStudyEvent();
-
-					StudyBean publicBean = CoreResources.getPublicStudy(clinicalData.getStudyOID(), dataSource);
-					StudyUserRoleBean userRole = userBean.getRoleByStudy(publicBean.getId());
-					if (userRole == null || !userRole.isActive())
-						userRole = userBean.getRoleByStudy(publicBean.getParentStudyId());
-					Role role = userRole.getRole();
 
 					// ***************** OpenClinica: Event Links Start **************
 
@@ -906,15 +908,19 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 		return studyBean;
 	}
 
-	private boolean validateAddNew(ExportSubjectDataBean sub, EventDefinitionCRFBean edc) {
-		List<ExportStudyEventDataBean> studyEvents = sub.getExportStudyEventData();
-		for (ExportStudyEventDataBean studyEvent : studyEvents) {
-			if (!studyEvent.getStudyEventDefinition().getRepeating()
-					&& studyEvent.getStudyEventDefinition().getStudyEventDefinitionId() == edc.getStudyEventDefinitionId()) {
-				List<ExportFormDataBean> formDatas = studyEvent.getExportFormData();
-				if (formDatas.size() != 0) {
-					return false;
-				}
+	private boolean validateAddNewForNonRepeating(ExportSubjectDataBean sub, CRFBean crf) {
+		List<ExportStudyEventDataBean> studyEventDataBeans = sub.getExportStudyEventData();
+		EventCRFDAO edao = new EventCRFDAO<>(dataSource);
+		StudyEventDAO sedao = new StudyEventDAO(dataSource);
+
+		for (ExportStudyEventDataBean studyEventDataBean : studyEventDataBeans) {
+			StudyEventBean studyEventBean = (StudyEventBean) sedao.findByPK(studyEventDataBean.getStudyEvent().getStudyEventId());
+			List<EventCrf> eventCrfs = (List<EventCrf>) edao.findAllByStudyEventAndCrfOrCrfVersionOid(studyEventBean, crf.getOid());
+			if (eventCrfs.size() != 0) {
+				logger.error(
+						"EventCrf with StudyEventDefinition Oid {},Crf Oid {} and StudySubjectOid {} already exist in the System and it is a repeating event.",
+						studyEventDataBean.getStudyEventDefinition().getOc_oid(), crf.getOid(), sub.getSubjectOID());
+				return false;
 			}
 		}
 		return true;
