@@ -68,6 +68,7 @@ import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutD
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -110,7 +111,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 	public OdmImportServiceImpl(UserAccountDao userDaoDomain, StudyUserRoleDao studyUserRoleDao, StudyEventDefinitionDao studyEventDefDao,
 			EventDefinitionCrfDao eventDefinitionCrfDao, CrfDao crfDao, CrfVersionDao crfVersionDao, FormLayoutDao formLayoutDao, StudyDao studyDao,
 			EventDefinitionCrfTagDao eventDefinitionCrfTagDao, StudyParameterValueDao studyParameterValueDao, DataSource dataSource, XformParser xformParser,
-			XformMetaDataService xformService, CoreResources coreResources, EventServiceInterface eventService, PageLayoutDao pageLayoutDao) {
+			XformMetaDataService xformService, CoreResources coreResources, @Lazy EventServiceInterface eventService, PageLayoutDao pageLayoutDao) {
 		super();
 		this.userDaoDomain = userDaoDomain;
 		this.studyUserRoleDao = studyUserRoleDao;
