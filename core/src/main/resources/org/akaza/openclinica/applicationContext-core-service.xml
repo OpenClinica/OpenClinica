@@ -38,10 +38,6 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
-    <bean id="eventService" class="org.akaza.openclinica.service.EventService">
-        <constructor-arg ref="dataSource"/>
-    </bean>
-
     <bean id="randomizeService" class="org.akaza.openclinica.service.RandomizeService">
         <constructor-arg ref="dataSource"/>
     </bean>
@@ -83,7 +79,7 @@
         <property name="dataSource" ref="dataSource"/>
     </bean>
 
-    <bean id="userAccountDao" class="org.akaza.openclinica.dao.login.UserAccountDAO">
+    <bean id="userAccountDAO" class="org.akaza.openclinica.dao.login.UserAccountDAO">
         <constructor-arg ref="dataSource"/>
     </bean>
 
@@ -143,20 +139,7 @@
         <property name="userAccountDao" ref="userDaoDomain"/>
     </bean>
 
-    <bean id="odmImportServiceImpl" class="org.akaza.openclinica.service.OdmImportServiceImpl" autowire="byName">
-        <constructor-arg ref="dataSource"/>
-        <property name="studyEventDefDao" ref="studyEventDefDaoDomain"/>
-        <property name="userAccountDao" ref="userDaoDomain"/>
-        <property name="studyUserRoleDao" ref="studyUserRoleDao"/>        
-        <property name="crfDao" ref="crfDao"/>        
-        <property name="crfVersionDao" ref="crfVersionDao"/>        
-        <property name="eventDefinitionCrfDao" ref="eventDefinitionCrfDao"/>        
-        <property name="eventDefinitionCrfTagDao" ref="eventDefinitionCrfTagDao"/>        
-        <property name="studyDao" ref="studyDaoDomain"/>
-        <property name="studyParameterValueDao" ref="studyParameterValueDao"/>
-        <property name="xformParser" ref="xformParser"/>
-        <property name="coreResources" ref="coreResources"/>
-    </bean>
+
     <bean id = "enketoCredentials" class="org.akaza.openclinica.service.crfdata.xform.EnketoCredentials">
         <property name="studyDao" ref="studyDaoDomain"/>
     </bean>

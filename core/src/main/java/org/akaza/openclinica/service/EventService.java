@@ -20,7 +20,6 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -36,407 +35,413 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
+@Service
 public class EventService implements EventServiceInterface {
 
-    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    SubjectDAO subjectDao;
-    StudySubjectDAO studySubjectDao;
-    UserAccountDAO userAccountDao;
-    StudyEventDefinitionDAO studyEventDefinitionDao;
-    StudyEventDAO studyEventDao;
-    StudyDAO studyDao;
-    EventDefinitionCRFDAO eventDefinitionCRFDao;
-    EventCRFDAO eventCrfDao;
-    ItemDataDAO itemDataDao;
-    DataSource dataSource;
-    FormLayoutDAO formLayoutDao;
-    CRFDAO crfDao;
-    DiscrepancyNoteDAO discrepancyNoteDao;
+	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	SubjectDAO subjectDao;
+	StudySubjectDAO studySubjectDao;
+	UserAccountDAO userAccountDao;
+	StudyEventDefinitionDAO studyEventDefinitionDao;
+	StudyEventDAO studyEventDao;
+	StudyDAO studyDao;
+	EventDefinitionCRFDAO eventDefinitionCRFDao;
+	EventCRFDAO eventCrfDao;
+	ItemDataDAO itemDataDao;
+	DataSource dataSource;
+	FormLayoutDAO formLayoutDao;
+	CRFDAO crfDao;
+	DiscrepancyNoteDAO discrepancyNoteDao;
+	@Autowired
+	OdmImportService odmImportService;
 
-    public EventService(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+	public EventService(DataSource dataSource) {
+		super();
+		this.dataSource = dataSource;
+	}
 
-    public EventService(SessionManager sessionManager) {
-        this.dataSource = sessionManager.getDataSource();
-    }
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void removeStudyEventDefn(int defId, int userId) {
+		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
+		UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
+		// find all event defn CRFs
+		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList) getEventDefinitionCRFDao().findAllByDefinition(defId);
+		// finds all study events
+		ArrayList<StudyEventBean> events = (ArrayList) getStudyEventDao().findAllByDefinition(sed.getId());
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void removeStudyEventDefn(int defId, int userId) {
-        StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
-        UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
-        // find all event defn CRFs
-        ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList) getEventDefinitionCRFDao().findAllByDefinition(defId);
-        // finds all study events
-        ArrayList<StudyEventBean> events = (ArrayList) getStudyEventDao().findAllByDefinition(sed.getId());
+		sed.setStatus(Status.DELETED);
+		sed.setUpdater(ub);
+		sed.setUpdatedDate(new Date());
+		getStudyEventDefinitionDao().update(sed);
 
-        sed.setStatus(Status.DELETED);
-        sed.setUpdater(ub);
-        sed.setUpdatedDate(new Date());
-        getStudyEventDefinitionDao().update(sed);
+		// remove all event defn crfs
+		for (int j = 0; j < eventDefinitionCRFs.size(); j++) {
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(j);
+			if (!edc.getStatus().equals(Status.DELETED) || !edc.getStatus().equals(Status.AUTO_DELETED)) {
+				edc.setStatus(Status.AUTO_DELETED);
+				edc.setUpdater(ub);
+				edc.setUpdatedDate(new Date());
+				edc = (EventDefinitionCRFBean) getEventDefinitionCRFDao().update(edc);
+				odmImportService.removeSiteDefinitions(edc.getId(), userId);
 
-        // remove all event defn crfs
-        for (int j = 0; j < eventDefinitionCRFs.size(); j++) {
-            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(j);
-            if (!edc.getStatus().equals(Status.DELETED) || !edc.getStatus().equals(Status.AUTO_DELETED)) {
-                edc.setStatus(Status.AUTO_DELETED);
-                edc.setUpdater(ub);
-                edc.setUpdatedDate(new Date());
-                getEventDefinitionCRFDao().update(edc);
-            }
-        }
+			}
+		}
 
-        // remove all study events
-        for (int j = 0; j < events.size(); j++) {
-            StudyEventBean event = (StudyEventBean) events.get(j);
-            if (!event.getStatus().equals(Status.DELETED) || !event.getStatus().equals(Status.AUTO_DELETED)) {
-                event.setStatus(Status.AUTO_DELETED);
-                event.setUpdater(ub);
-                event.setUpdatedDate(new Date());
-                getStudyEventDao().update(event);
+		// remove all study events
+		for (int j = 0; j < events.size(); j++) {
+			StudyEventBean event = (StudyEventBean) events.get(j);
+			if (!event.getStatus().equals(Status.DELETED) || !event.getStatus().equals(Status.AUTO_DELETED)) {
+				event.setStatus(Status.AUTO_DELETED);
+				event.setUpdater(ub);
+				event.setUpdatedDate(new Date());
+				getStudyEventDao().update(event);
 
-                // remove all event crfs
-                ArrayList eventCRFs = getEventCRFDao().findAllByStudyEvent(event);
-                for (int k = 0; k < eventCRFs.size(); k++) {
-                    EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                    if (!eventCRF.getStatus().equals(Status.DELETED) || !eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
-                        eventCRF.setStatus(Status.AUTO_DELETED);
-                        eventCRF.setUpdater(ub);
-                        eventCRF.setUpdatedDate(new Date());
-                        getEventCRFDao().update(eventCRF);
+				// remove all event crfs
+				ArrayList eventCRFs = getEventCRFDao().findAllByStudyEvent(event);
+				for (int k = 0; k < eventCRFs.size(); k++) {
+					EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
+					if (!eventCRF.getStatus().equals(Status.DELETED) || !eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
+						eventCRF.setStatus(Status.AUTO_DELETED);
+						eventCRF.setUpdater(ub);
+						eventCRF.setUpdatedDate(new Date());
+						getEventCRFDao().update(eventCRF);
 
-                        // remove all item data
-                        ArrayList itemDatas = getItemDataDao().findAllByEventCRFId(eventCRF.getId());
-                        for (int a = 0; a < itemDatas.size(); a++) {
-                            ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-                            if (!item.getStatus().equals(Status.DELETED) || !item.getStatus().equals(Status.AUTO_DELETED)) {
-                                item.setStatus(Status.AUTO_DELETED);
-                                item.setUpdater(ub);
-                                item.setUpdatedDate(new Date());
-                                getItemDataDao().update(item);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+						// remove all item data
+						ArrayList itemDatas = getItemDataDao().findAllByEventCRFId(eventCRF.getId());
+						for (int a = 0; a < itemDatas.size(); a++) {
+							ItemDataBean item = (ItemDataBean) itemDatas.get(a);
+							if (!item.getStatus().equals(Status.DELETED) || !item.getStatus().equals(Status.AUTO_DELETED)) {
+								item.setStatus(Status.AUTO_DELETED);
+								item.setUpdater(ub);
+								item.setUpdatedDate(new Date());
+								getItemDataDao().update(item);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
-    @SuppressWarnings({ "unchecked", "rawtypes" })
-    public void restoreStudyEventDefn(int defId, int userId) {
-        StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
-        UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
-        // find all Event Defn CRFs
-        ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList) getEventDefinitionCRFDao().findAllByDefinition(defId);
-        // finds all events
-        ArrayList<StudyEventBean> events = (ArrayList) getStudyEventDao().findAllByDefinition(sed.getId());
+	@SuppressWarnings({ "unchecked", "rawtypes" })
+	public void restoreStudyEventDefn(int defId, int userId) {
+		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
+		UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
+		// find all Event Defn CRFs
+		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList) getEventDefinitionCRFDao().findAllByDefinition(defId);
+		// finds all events
+		ArrayList<StudyEventBean> events = (ArrayList) getStudyEventDao().findAllByDefinition(sed.getId());
 
-        sed.setStatus(Status.AVAILABLE);
-        sed.setUpdater(ub);
-        sed.setUpdatedDate(new Date());
-        getStudyEventDefinitionDao().update(sed);
+		sed.setStatus(Status.AVAILABLE);
+		sed.setUpdater(ub);
+		sed.setUpdatedDate(new Date());
+		getStudyEventDefinitionDao().update(sed);
 
-        // restore all event defn crfs
-        for (int j = 0; j < eventDefinitionCRFs.size(); j++) {
-            EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(j);
-            CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
-            if (edc.getStatus().equals(Status.AUTO_DELETED) || edc.getStatus().equals(Status.DELETED)) {
-                edc.setStatus(Status.AVAILABLE);
-                edc.setUpdater(ub);
-                edc.setUpdatedDate(new Date());
-                getEventDefinitionCRFDao().update(edc);
-            }
-        }
+		// restore all event defn crfs
+		for (int j = 0; j < eventDefinitionCRFs.size(); j++) {
+			EventDefinitionCRFBean edc = (EventDefinitionCRFBean) eventDefinitionCRFs.get(j);
+			CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
+			if (edc.getStatus().equals(Status.AUTO_DELETED) || edc.getStatus().equals(Status.DELETED)) {
+				edc.setStatus(Status.AVAILABLE);
+				edc.setUpdater(ub);
+				edc.setUpdatedDate(new Date());
+				edc = (EventDefinitionCRFBean) getEventDefinitionCRFDao().update(edc);
+				odmImportService.restoreSiteDefinitions(edc.getId(), userId);
 
-        // restore all study events
-        for (int j = 0; j < events.size(); j++) {
-            StudyEventBean event = (StudyEventBean) events.get(j);
-            if (event.getStatus().equals(Status.AUTO_DELETED) || event.getStatus().equals(Status.DELETED)) {
-                event.setStatus(Status.AVAILABLE);
-                event.setUpdater(ub);
-                event.setUpdatedDate(new Date());
-                getStudyEventDao().update(event);
+			}
+		}
 
-                // restore all event crf
-                ArrayList eventCRFs = getEventCRFDao().findAllByStudyEvent(event);
-                for (int k = 0; k < eventCRFs.size(); k++) {
-                    EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
-                    if (eventCRF.getStatus().equals(Status.AUTO_DELETED) || eventCRF.getStatus().equals(Status.DELETED)) {
-                        eventCRF.setStatus(Status.AVAILABLE);
-                        eventCRF.setUpdater(ub);
-                        eventCRF.setUpdatedDate(new Date());
-                        getEventCRFDao().update(eventCRF);
+		// restore all study events
+		for (int j = 0; j < events.size(); j++) {
+			StudyEventBean event = (StudyEventBean) events.get(j);
+			if (event.getStatus().equals(Status.AUTO_DELETED) || event.getStatus().equals(Status.DELETED)) {
+				event.setStatus(Status.AVAILABLE);
+				event.setUpdater(ub);
+				event.setUpdatedDate(new Date());
+				getStudyEventDao().update(event);
 
-                        // restore all item data
-                        ArrayList itemDatas = getItemDataDao().findAllByEventCRFId(eventCRF.getId());
-                        for (int a = 0; a < itemDatas.size(); a++) {
-                            ItemDataBean item = (ItemDataBean) itemDatas.get(a);
-                            if (item.getStatus().equals(Status.AUTO_DELETED) || item.getStatus().equals(Status.DELETED)) {
-                                item.setStatus(Status.AVAILABLE);
-                                item.setUpdater(ub);
-                                item.setUpdatedDate(new Date());
-                                getItemDataDao().update(item);
-                            }
-                        }
-                    }
-                }
-            }
-        }
-    }
+				// restore all event crf
+				ArrayList eventCRFs = getEventCRFDao().findAllByStudyEvent(event);
+				for (int k = 0; k < eventCRFs.size(); k++) {
+					EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
+					if (eventCRF.getStatus().equals(Status.AUTO_DELETED) || eventCRF.getStatus().equals(Status.DELETED)) {
+						eventCRF.setStatus(Status.AVAILABLE);
+						eventCRF.setUpdater(ub);
+						eventCRF.setUpdatedDate(new Date());
+						getEventCRFDao().update(eventCRF);
 
-    public void removeCrfFromEventDefinition(int eventDefnCrfId, int defId, int userId, int studyId) {
-        StudyBean study = (StudyBean) getStudyDao().findByPK(studyId);
-        StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
-        EventDefinitionCRFBean edc = (EventDefinitionCRFBean) getEventDefinitionCRFDao().findByPK(eventDefnCrfId);
-        UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
-        removeAllEventsItems(edc, sed, ub, study);
-    }
+						// restore all item data
+						ArrayList itemDatas = getItemDataDao().findAllByEventCRFId(eventCRF.getId());
+						for (int a = 0; a < itemDatas.size(); a++) {
+							ItemDataBean item = (ItemDataBean) itemDatas.get(a);
+							if (item.getStatus().equals(Status.AUTO_DELETED) || item.getStatus().equals(Status.DELETED)) {
+								item.setStatus(Status.AVAILABLE);
+								item.setUpdater(ub);
+								item.setUpdatedDate(new Date());
+								getItemDataDao().update(item);
+							}
+						}
+					}
+				}
+			}
+		}
+	}
 
-    public void restoreCrfFromEventDefinition(int eventDefnCrfId, int defId, int userId) {
-        StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
-        EventDefinitionCRFBean edc = (EventDefinitionCRFBean) getEventDefinitionCRFDao().findByPK(eventDefnCrfId);
-        UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
-        restoreAllEventsItems(edc, sed, ub);
-    }
+	public void removeCrfFromEventDefinition(int eventDefnCrfId, int defId, int userId, int studyId) {
+		StudyBean study = (StudyBean) getStudyDao().findByPK(studyId);
+		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
+		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) getEventDefinitionCRFDao().findByPK(eventDefnCrfId);
+		UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
+		removeAllEventsItems(edc, sed, ub, study);
+	}
 
-    public void removeAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub, StudyBean study) {
-        CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
-        // Getting Study Events
-        ArrayList seList = getStudyEventDao().findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), crf.getOid());
-        for (int j = 0; j < seList.size(); j++) {
-            StudyEventBean seBean = (StudyEventBean) seList.get(j);
-            // Getting Event CRFs
-            ArrayList ecrfList = getEventCRFDao().findAllByStudyEventAndFormOrFormLayoutOid(seBean, crf.getOid());
-            for (int k = 0; k < ecrfList.size(); k++) {
-                EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
-                ecrfBean.setOldStatus(ecrfBean.getStatus());
-                ecrfBean.setStatus(Status.AUTO_DELETED);
-                ecrfBean.setUpdater(ub);
-                ecrfBean.setUpdatedDate(new Date());
-                getEventCRFDao().update(ecrfBean);
-                // Getting Item Data
-                ArrayList itemData = getItemDataDao().findAllByEventCRFId(ecrfBean.getId());
-                // remove all the item data
-                for (int a = 0; a < itemData.size(); a++) {
-                    ItemDataBean item = (ItemDataBean) itemData.get(a);
-                    if (!item.getStatus().equals(Status.DELETED)) {
-                        item.setOldStatus(item.getStatus());
-                        item.setStatus(Status.AUTO_DELETED);
-                        item.setUpdater(ub);
-                        item.setUpdatedDate(new Date());
-                        getItemDataDao().update(item);
-                        List dnNotesOfRemovedItem = getDiscrepancyNoteDao().findExistingNotesForItemData(item.getId());
-                        if (!dnNotesOfRemovedItem.isEmpty()) {
-                            DiscrepancyNoteBean itemParentNote = null;
-                            for (Object obj : dnNotesOfRemovedItem) {
-                                if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
-                                    itemParentNote = (DiscrepancyNoteBean) obj;
-                                }
-                            }
-                            DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
-                            if (itemParentNote != null) {
-                                dnb.setParentDnId(itemParentNote.getId());
-                                dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
-                            }
-                            dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-                            dnb.setStudyId(study.getId());
-                            dnb.setAssignedUserId(ub.getId());
-                            dnb.setOwner(ub);
-                            dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
-                            dnb.setEntityId(item.getId());
-                            dnb.setColumn("value");
-                            dnb.setCreatedDate(new Date());
-                            dnb.setDetailedNotes("The item has been removed, this Query has been Closed.");
-                            getDiscrepancyNoteDao().create(dnb);
-                            getDiscrepancyNoteDao().createMapping(dnb);
-                            itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
-                            getDiscrepancyNoteDao().update(itemParentNote);
-                        }
-                    }
-                }
-            }
-        }
-    }
+	public void restoreCrfFromEventDefinition(int eventDefnCrfId, int defId, int userId) {
+		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
+		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) getEventDefinitionCRFDao().findByPK(eventDefnCrfId);
+		UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
+		restoreAllEventsItems(edc, sed, ub);
+	}
 
-    public void restoreAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub) {
-        CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
-        // All Study Events
-        ArrayList seList = getStudyEventDao().findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), crf.getOid());
-        for (int j = 0; j < seList.size(); j++) {
-            StudyEventBean seBean = (StudyEventBean) seList.get(j);
-            // All Event CRFs
-            ArrayList ecrfList = getEventCRFDao().findAllByStudyEventAndFormOrFormLayoutOid(seBean, crf.getOid());
-            for (int k = 0; k < ecrfList.size(); k++) {
-                EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
-                ecrfBean.setStatus(ecrfBean.getOldStatus());
-                ecrfBean.setUpdater(ub);
-                ecrfBean.setUpdatedDate(new Date());
-                getEventCRFDao().update(ecrfBean);
-                // All Item Data
-                ArrayList itemData = getItemDataDao().findAllByEventCRFId(ecrfBean.getId());
-                // remove all the item data
-                for (int a = 0; a < itemData.size(); a++) {
-                    ItemDataBean item = (ItemDataBean) itemData.get(a);
-                    if (item.getStatus().equals(Status.DELETED) || item.getStatus().equals(Status.AUTO_DELETED)) {
-                        item.setStatus(item.getOldStatus());
-                        item.setUpdater(ub);
-                        item.setUpdatedDate(new Date());
-                        getItemDataDao().update(item);
-                    }
-                }
-            }
-        }
+	public void removeAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub, StudyBean study) {
+		CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
+		// Getting Study Events
+		ArrayList seList = getStudyEventDao().findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), crf.getOid());
+		for (int j = 0; j < seList.size(); j++) {
+			StudyEventBean seBean = (StudyEventBean) seList.get(j);
+			// Getting Event CRFs
+			ArrayList ecrfList = getEventCRFDao().findAllByStudyEventAndFormOrFormLayoutOid(seBean, crf.getOid());
+			for (int k = 0; k < ecrfList.size(); k++) {
+				EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
+				ecrfBean.setOldStatus(ecrfBean.getStatus());
+				ecrfBean.setStatus(Status.AUTO_DELETED);
+				ecrfBean.setUpdater(ub);
+				ecrfBean.setUpdatedDate(new Date());
+				getEventCRFDao().update(ecrfBean);
+				// Getting Item Data
+				ArrayList itemData = getItemDataDao().findAllByEventCRFId(ecrfBean.getId());
+				// remove all the item data
+				for (int a = 0; a < itemData.size(); a++) {
+					ItemDataBean item = (ItemDataBean) itemData.get(a);
+					if (!item.getStatus().equals(Status.DELETED)) {
+						item.setOldStatus(item.getStatus());
+						item.setStatus(Status.AUTO_DELETED);
+						item.setUpdater(ub);
+						item.setUpdatedDate(new Date());
+						getItemDataDao().update(item);
+						List dnNotesOfRemovedItem = getDiscrepancyNoteDao().findExistingNotesForItemData(item.getId());
+						if (!dnNotesOfRemovedItem.isEmpty()) {
+							DiscrepancyNoteBean itemParentNote = null;
+							for (Object obj : dnNotesOfRemovedItem) {
+								if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
+									itemParentNote = (DiscrepancyNoteBean) obj;
+								}
+							}
+							DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+							if (itemParentNote != null) {
+								dnb.setParentDnId(itemParentNote.getId());
+								dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+							}
+							dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+							dnb.setStudyId(study.getId());
+							dnb.setAssignedUserId(ub.getId());
+							dnb.setOwner(ub);
+							dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+							dnb.setEntityId(item.getId());
+							dnb.setColumn("value");
+							dnb.setCreatedDate(new Date());
+							dnb.setDetailedNotes("The item has been removed, this Query has been Closed.");
+							getDiscrepancyNoteDao().create(dnb);
+							getDiscrepancyNoteDao().createMapping(dnb);
+							itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+							getDiscrepancyNoteDao().update(itemParentNote);
+						}
+					}
+				}
+			}
+		}
+	}
 
-    }
+	public void restoreAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub) {
+		CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
+		// All Study Events
+		ArrayList seList = getStudyEventDao().findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), crf.getOid());
+		for (int j = 0; j < seList.size(); j++) {
+			StudyEventBean seBean = (StudyEventBean) seList.get(j);
+			// All Event CRFs
+			ArrayList ecrfList = getEventCRFDao().findAllByStudyEventAndFormOrFormLayoutOid(seBean, crf.getOid());
+			for (int k = 0; k < ecrfList.size(); k++) {
+				EventCRFBean ecrfBean = (EventCRFBean) ecrfList.get(k);
+				ecrfBean.setStatus(ecrfBean.getOldStatus());
+				ecrfBean.setUpdater(ub);
+				ecrfBean.setUpdatedDate(new Date());
+				getEventCRFDao().update(ecrfBean);
+				// All Item Data
+				ArrayList itemData = getItemDataDao().findAllByEventCRFId(ecrfBean.getId());
+				// remove all the item data
+				for (int a = 0; a < itemData.size(); a++) {
+					ItemDataBean item = (ItemDataBean) itemData.get(a);
+					if (item.getStatus().equals(Status.DELETED) || item.getStatus().equals(Status.AUTO_DELETED)) {
+						item.setStatus(item.getOldStatus());
+						item.setUpdater(ub);
+						item.setUpdatedDate(new Date());
+						getItemDataDao().update(item);
+					}
+				}
+			}
+		}
 
-    public HashMap<String, String> scheduleEvent(UserAccountBean user, Date startDateTime, Date endDateTime, String location, String studyUniqueId,
-            String siteUniqueId, String eventDefinitionOID, String studySubjectId) throws OpenClinicaSystemException {
+	}
 
-        // Business Validation
-        StudyBean study = getStudyDao().findByUniqueIdentifier(studyUniqueId);
-        int parentStudyId = study.getId();
-        if (siteUniqueId != null) {
-            study = getStudyDao().findSiteByUniqueIdentifier(studyUniqueId, siteUniqueId);
-        }
-        StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(eventDefinitionOID, study.getId(), parentStudyId);
-        StudySubjectBean studySubject = getStudySubjectDao().findByLabelAndStudy(studySubjectId, study);
+	public HashMap<String, String> scheduleEvent(UserAccountBean user, Date startDateTime, Date endDateTime, String location, String studyUniqueId,
+			String siteUniqueId, String eventDefinitionOID, String studySubjectId) throws OpenClinicaSystemException {
 
-        Integer studyEventOrdinal = null;
-        if (canSubjectScheduleAnEvent(studyEventDefinition, studySubject)) {
+		// Business Validation
+		StudyBean study = getStudyDao().findByUniqueIdentifier(studyUniqueId);
+		int parentStudyId = study.getId();
+		if (siteUniqueId != null) {
+			study = getStudyDao().findSiteByUniqueIdentifier(studyUniqueId, siteUniqueId);
+		}
+		StudyEventDefinitionBean studyEventDefinition = getStudyEventDefinitionDao().findByOidAndStudy(eventDefinitionOID, study.getId(), parentStudyId);
+		StudySubjectBean studySubject = getStudySubjectDao().findByLabelAndStudy(studySubjectId, study);
 
-            StudyEventBean studyEvent = new StudyEventBean();
-            studyEvent.setStudyEventDefinitionId(studyEventDefinition.getId());
-            studyEvent.setStudySubjectId(studySubject.getId());
-            studyEvent.setLocation(location);
-            studyEvent.setDateStarted(startDateTime);
-            studyEvent.setDateEnded(endDateTime);
-            studyEvent.setOwner(user);
-            studyEvent.setStatus(Status.AVAILABLE);
-            studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
-            studyEvent.setSampleOrdinal(getStudyEventDao().getMaxSampleOrdinal(studyEventDefinition, studySubject) + 1);
-            studyEvent = (StudyEventBean) getStudyEventDao().create(studyEvent, true);
-            studyEventOrdinal = studyEvent.getSampleOrdinal();
+		Integer studyEventOrdinal = null;
+		if (canSubjectScheduleAnEvent(studyEventDefinition, studySubject)) {
 
-        } else {
-            throw new OpenClinicaSystemException("Cannot schedule an event for this Subject");
-        }
+			StudyEventBean studyEvent = new StudyEventBean();
+			studyEvent.setStudyEventDefinitionId(studyEventDefinition.getId());
+			studyEvent.setStudySubjectId(studySubject.getId());
+			studyEvent.setLocation(location);
+			studyEvent.setDateStarted(startDateTime);
+			studyEvent.setDateEnded(endDateTime);
+			studyEvent.setOwner(user);
+			studyEvent.setStatus(Status.AVAILABLE);
+			studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+			studyEvent.setSampleOrdinal(getStudyEventDao().getMaxSampleOrdinal(studyEventDefinition, studySubject) + 1);
+			studyEvent = (StudyEventBean) getStudyEventDao().create(studyEvent, true);
+			studyEventOrdinal = studyEvent.getSampleOrdinal();
 
-        HashMap<String, String> h = new HashMap<String, String>();
-        h.put("eventDefinitionOID", eventDefinitionOID);
-        h.put("studyEventOrdinal", studyEventOrdinal.toString());
-        h.put("studySubjectOID", studySubject.getOid());
-        return h;
+		} else {
+			throw new OpenClinicaSystemException("Cannot schedule an event for this Subject");
+		}
 
-    }
+		HashMap<String, String> h = new HashMap<String, String>();
+		h.put("eventDefinitionOID", eventDefinitionOID);
+		h.put("studyEventOrdinal", studyEventOrdinal.toString());
+		h.put("studySubjectOID", studySubject.getOid());
+		return h;
 
-    public boolean canSubjectScheduleAnEvent(StudyEventDefinitionBean studyEventDefinition, StudySubjectBean studySubject) {
+	}
 
-        if (studyEventDefinition.isRepeating()) {
-            return true;
-        }
-        if (getStudyEventDao().findAllByDefinitionAndSubject(studyEventDefinition, studySubject).size() > 0) {
-            return false;
-        }
-        return true;
-    }
+	public boolean canSubjectScheduleAnEvent(StudyEventDefinitionBean studyEventDefinition, StudySubjectBean studySubject) {
 
-    /**
-     * @return the subjectDao
-     */
-    public SubjectDAO getSubjectDao() {
-        subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
-        return subjectDao;
-    }
+		if (studyEventDefinition.isRepeating()) {
+			return true;
+		}
+		if (getStudyEventDao().findAllByDefinitionAndSubject(studyEventDefinition, studySubject).size() > 0) {
+			return false;
+		}
+		return true;
+	}
 
-    /**
-     * @return the subjectDao
-     */
-    public StudyDAO getStudyDao() {
-        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
-        return studyDao;
-    }
+	/**
+	 * @return the subjectDao
+	 */
+	public SubjectDAO getSubjectDao() {
+		subjectDao = subjectDao != null ? subjectDao : new SubjectDAO(dataSource);
+		return subjectDao;
+	}
 
-    /**
-     * @return the subjectDao
-     */
-    public StudySubjectDAO getStudySubjectDao() {
-        studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
-        return studySubjectDao;
-    }
+	/**
+	 * @return the subjectDao
+	 */
+	public StudyDAO getStudyDao() {
+		studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
+		return studyDao;
+	}
 
-    /**
-     * @return the UserAccountDao
-     */
-    public UserAccountDAO getUserAccountDao() {
-        userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
-        return userAccountDao;
-    }
+	/**
+	 * @return the subjectDao
+	 */
+	public StudySubjectDAO getStudySubjectDao() {
+		studySubjectDao = studySubjectDao != null ? studySubjectDao : new StudySubjectDAO(dataSource);
+		return studySubjectDao;
+	}
 
-    /**
-     * @return the StudyEventDefinitionDao
-     */
-    public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
-        studyEventDefinitionDao = studyEventDefinitionDao != null ? studyEventDefinitionDao : new StudyEventDefinitionDAO(dataSource);
-        return studyEventDefinitionDao;
-    }
+	/**
+	 * @return the UserAccountDao
+	 */
+	public UserAccountDAO getUserAccountDao() {
+		userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
+		return userAccountDao;
+	}
 
-    /**
-     * @return the StudyEventDao
-     */
-    public StudyEventDAO getStudyEventDao() {
-        studyEventDao = studyEventDao != null ? studyEventDao : new StudyEventDAO(dataSource);
-        return studyEventDao;
-    }
+	/**
+	 * @return the StudyEventDefinitionDao
+	 */
+	public StudyEventDefinitionDAO getStudyEventDefinitionDao() {
+		studyEventDefinitionDao = studyEventDefinitionDao != null ? studyEventDefinitionDao : new StudyEventDefinitionDAO(dataSource);
+		return studyEventDefinitionDao;
+	}
 
-    /**
-     * @return the datasource
-     */
-    public DataSource getDataSource() {
-        return dataSource;
-    }
+	/**
+	 * @return the StudyEventDao
+	 */
+	public StudyEventDAO getStudyEventDao() {
+		studyEventDao = studyEventDao != null ? studyEventDao : new StudyEventDAO(dataSource);
+		return studyEventDao;
+	}
 
-    /**
-     * @param datasource
-     *            the datasource to set
-     */
-    public void setDatasource(DataSource dataSource) {
-        this.dataSource = dataSource;
-    }
+	/**
+	 * @return the datasource
+	 */
+	public DataSource getDataSource() {
+		return dataSource;
+	}
 
-    public Logger getLogger() {
-        return logger;
-    }
+	/**
+	 * @param datasource
+	 *            the datasource to set
+	 */
+	public void setDatasource(DataSource dataSource) {
+		this.dataSource = dataSource;
+	}
 
-    public EventDefinitionCRFDAO getEventDefinitionCRFDao() {
-        eventDefinitionCRFDao = eventDefinitionCRFDao != null ? eventDefinitionCRFDao : new EventDefinitionCRFDAO(dataSource);
-        return eventDefinitionCRFDao;
-    }
+	public Logger getLogger() {
+		return logger;
+	}
 
-    @SuppressWarnings("rawtypes")
-    public EventCRFDAO getEventCRFDao() {
-        eventCrfDao = eventCrfDao != null ? eventCrfDao : new EventCRFDAO(dataSource);
-        return eventCrfDao;
-    }
+	public EventDefinitionCRFDAO getEventDefinitionCRFDao() {
+		eventDefinitionCRFDao = eventDefinitionCRFDao != null ? eventDefinitionCRFDao : new EventDefinitionCRFDAO(dataSource);
+		return eventDefinitionCRFDao;
+	}
 
-    public ItemDataDAO getItemDataDao() {
-        itemDataDao = itemDataDao != null ? itemDataDao : new ItemDataDAO(dataSource);
-        return itemDataDao;
-    }
+	@SuppressWarnings("rawtypes")
+	public EventCRFDAO getEventCRFDao() {
+		eventCrfDao = eventCrfDao != null ? eventCrfDao : new EventCRFDAO(dataSource);
+		return eventCrfDao;
+	}
 
-    public FormLayoutDAO getFormLayoutDao() {
-        formLayoutDao = formLayoutDao != null ? formLayoutDao : new FormLayoutDAO(dataSource);
-        return formLayoutDao;
-    }
+	public ItemDataDAO getItemDataDao() {
+		itemDataDao = itemDataDao != null ? itemDataDao : new ItemDataDAO(dataSource);
+		return itemDataDao;
+	}
 
-    public CRFDAO getCrfDao() {
-        crfDao = crfDao != null ? crfDao : new CRFDAO(dataSource);
-        return crfDao;
-    }
+	public FormLayoutDAO getFormLayoutDao() {
+		formLayoutDao = formLayoutDao != null ? formLayoutDao : new FormLayoutDAO(dataSource);
+		return formLayoutDao;
+	}
 
-    public DiscrepancyNoteDAO getDiscrepancyNoteDao() {
-        discrepancyNoteDao = discrepancyNoteDao != null ? discrepancyNoteDao : new DiscrepancyNoteDAO(dataSource);
-        return discrepancyNoteDao;
-    }
+	public CRFDAO getCrfDao() {
+		crfDao = crfDao != null ? crfDao : new CRFDAO(dataSource);
+		return crfDao;
+	}
+
+	public DiscrepancyNoteDAO getDiscrepancyNoteDao() {
+		discrepancyNoteDao = discrepancyNoteDao != null ? discrepancyNoteDao : new DiscrepancyNoteDAO(dataSource);
+		return discrepancyNoteDao;
+	}
 
 }

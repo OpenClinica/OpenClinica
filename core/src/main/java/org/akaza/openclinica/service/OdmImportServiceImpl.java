@@ -68,7 +68,6 @@ import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutD
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutRef;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
@@ -76,6 +75,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
@@ -87,9 +87,10 @@ import org.springframework.web.client.RestTemplate;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 
+@Service
 public class OdmImportServiceImpl implements OdmImportService {
 
-	private UserAccountDao userAccountDao;
+	private UserAccountDao userDaoDomain;
 	private StudyUserRoleDao studyUserRoleDao;
 	private StudyEventDefinitionDao studyEventDefDao;
 	private EventDefinitionCrfDao eventDefinitionCrfDao;
@@ -103,18 +104,35 @@ public class OdmImportServiceImpl implements OdmImportService {
 	private XformParser xformParser;
 	private XformMetaDataService xformService;
 	private CoreResources coreResources;
-	private EventService eventService;
+	private EventServiceInterface eventService;
+	private PageLayoutDao pageLayoutDao;
+
+	public OdmImportServiceImpl(UserAccountDao userDaoDomain, StudyUserRoleDao studyUserRoleDao, StudyEventDefinitionDao studyEventDefDao,
+			EventDefinitionCrfDao eventDefinitionCrfDao, CrfDao crfDao, CrfVersionDao crfVersionDao, FormLayoutDao formLayoutDao, StudyDao studyDao,
+			EventDefinitionCrfTagDao eventDefinitionCrfTagDao, StudyParameterValueDao studyParameterValueDao, DataSource dataSource, XformParser xformParser,
+			XformMetaDataService xformService, CoreResources coreResources, EventServiceInterface eventService, PageLayoutDao pageLayoutDao) {
+		super();
+		this.userDaoDomain = userDaoDomain;
+		this.studyUserRoleDao = studyUserRoleDao;
+		this.studyEventDefDao = studyEventDefDao;
+		this.eventDefinitionCrfDao = eventDefinitionCrfDao;
+		this.crfDao = crfDao;
+		this.crfVersionDao = crfVersionDao;
+		this.formLayoutDao = formLayoutDao;
+		this.studyDao = studyDao;
+		this.eventDefinitionCrfTagDao = eventDefinitionCrfTagDao;
+		this.studyParameterValueDao = studyParameterValueDao;
+		this.dataSource = dataSource;
+		this.xformParser = xformParser;
+		this.xformService = xformService;
+		this.coreResources = coreResources;
+		this.eventService = eventService;
+		this.pageLayoutDao = pageLayoutDao;
+	}
+
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	private final String COMMON = "common";
 	private final String UNSCHEDULED = "unscheduled";
-
-	@Autowired
-	private PageLayoutDao pageLayoutDao;
-
-	public OdmImportServiceImpl(DataSource dataSource) {
-		this.dataSource = dataSource;
-	}
-
 	private Errors errors;
 
 	private void printOdm(ODM odm) {
@@ -191,6 +209,11 @@ public class OdmImportServiceImpl implements OdmImportService {
 							// Restore CRF From Event Definition
 							if (eventDefinitionCrf != null && !eventDefinitionCrf.getStatusId().equals(Status.AVAILABLE.getCode())) {
 								eventDefinitionCrf.setStatusId(Status.AVAILABLE.getCode());
+								eventDefinitionCrf.setUpdateId(userAccount.getUserId());
+								eventDefinitionCrf.setDateUpdated(new Date());
+								eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(eventDefinitionCrf);
+								restoreSiteDefinitions(eventDefinitionCrf.getEventDefinitionCrfId(), userAccount.getUserId());
+
 								eventService.restoreCrfFromEventDefinition(eventDefinitionCrf.getEventDefinitionCrfId(),
 										studyEventDefinition.getStudyEventDefinitionId(), userAccount.getUserId());
 							}
@@ -233,8 +256,6 @@ public class OdmImportServiceImpl implements OdmImportService {
 
 							EDCTagDTO populateEDCTagParameter = new EDCTagDTO();
 							populateEDCTagParameter.setConf(conf);
-
-							populateEDCTagParameter.setConf(conf);
 							populateEDCTagParameter.setEventDefinitionCrf(eventDefinitionCrf);
 							populateEDCTagParameter.setUserAccount(userAccount);
 
@@ -252,7 +273,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 							ocEventDefCrf.setStatusId(Status.DELETED.getCode());
 							ocEventDefCrf.setUpdateId(userAccount.getUserId());
 							ocEventDefCrf.setDateUpdated(new Date());
-							getEventDefinitionCrfDao().saveOrUpdate(ocEventDefCrf);
+							ocEventDefCrf = getEventDefinitionCrfDao().saveOrUpdate(ocEventDefCrf);
+							removeSiteDefinitions(ocEventDefCrf.getEventDefinitionCrfId(), userAccount.getUserId());
 							eventService.removeCrfFromEventDefinition(ocEventDefCrf.getEventDefinitionCrfId(), studyEventDefinition.getStudyEventDefinitionId(),
 									userAccount.getUserId(), study.getStudyId());
 						}
@@ -459,7 +481,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 	}
 
 	private UserAccount getCurrentUser() {
-		UserAccount ub = getUserAccountDao().findById(1);
+		UserAccount ub = getUserDaoDomain().findById(1);
 		return ub;
 	}
 
@@ -539,11 +561,11 @@ public class OdmImportServiceImpl implements OdmImportService {
 	}
 
 	public UserAccountDao getUserAccountDao() {
-		return userAccountDao;
+		return userDaoDomain;
 	}
 
 	public void setUserAccountDao(UserAccountDao userAccountDao) {
-		this.userAccountDao = userAccountDao;
+		this.userDaoDomain = userAccountDao;
 	}
 
 	public StudyUserRoleDao getStudyUserRoleDao() {
@@ -669,7 +691,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 		return forms.toArray(new Form[forms.size()]);
 	}
 
-	public void setEventService(EventService eventService) {
+	public void setEventService(EventServiceInterface eventService) {
 		this.eventService = eventService;
 	}
 
@@ -754,6 +776,34 @@ public class OdmImportServiceImpl implements OdmImportService {
 		pageLayout.setDefinition(SerializationUtils.serialize((Serializable) page));
 		pageLayout = (PageLayout) pageLayoutDao.saveOrUpdate(pageLayout);
 		logger.info("Page with pageName {} object is being persisted", page.getName());
+	}
+
+	public void removeSiteDefinitions(Integer edcId, Integer updateId) {
+		List<EventDefinitionCrf> siteDefns = eventDefinitionCrfDao.findAllSiteDefinitionsByParentDefinition(edcId);
+		for (EventDefinitionCrf siteDefn : siteDefns) {
+			siteDefn.setStatusId(Status.AUTO_DELETED.getCode());
+			siteDefn.setUpdateId(updateId);
+			siteDefn.setDateUpdated(new Date());
+			getEventDefinitionCrfDao().saveOrUpdate(siteDefn);
+		}
+	}
+
+	public void restoreSiteDefinitions(Integer edcId, Integer updateId) {
+		List<EventDefinitionCrf> siteDefns = eventDefinitionCrfDao.findAllSiteDefinitionsByParentDefinition(edcId);
+		for (EventDefinitionCrf siteDefn : siteDefns) {
+			siteDefn.setStatusId(Status.AVAILABLE.getCode());
+			siteDefn.setUpdateId(updateId);
+			siteDefn.setDateUpdated(new Date());
+			getEventDefinitionCrfDao().saveOrUpdate(siteDefn);
+		}
+	}
+
+	public UserAccountDao getUserDaoDomain() {
+		return userDaoDomain;
+	}
+
+	public void setUserDaoDomain(UserAccountDao userDaoDomain) {
+		this.userDaoDomain = userDaoDomain;
 	}
 
 }

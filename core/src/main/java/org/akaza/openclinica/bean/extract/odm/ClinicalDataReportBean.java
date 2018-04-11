@@ -148,13 +148,17 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 			CRFDAO crfdao = new CRFDAO(dataSource);
 			StudyBean parentStudyBean = getParentStudy(clinicalData.getStudyOID());
 			StudyBean studyBean = getStudy(clinicalData.getStudyOID());
-			List<EventDefinitionCRFBean> edcs = edcdao.findAllByStudy(parentStudyBean);
+			// List<EventDefinitionCRFBean> edcs = edcdao.findAllByStudy(parentStudyBean);
+			List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean);
 
 			for (EventDefinitionCRFBean edc : edcs) {
-				if (!edc.getStatus().equals(Status.AUTO_DELETED) && !edc.getStatus().equals(Status.DELETED) && validateAddNew(sub, edc)
-						&& edc.getParentId() == 0) {
+				if (!edc.getStatus().equals(org.akaza.openclinica.bean.core.Status.AUTO_DELETED)
+						&& !edc.getStatus().equals(org.akaza.openclinica.bean.core.Status.DELETED) && validateAddNew(sub, edc) && !edc.isHideCrf()) {
 					StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(edc.getStudyEventDefinitionId());
 					CRFBean crf = (CRFBean) crfdao.findByPK(edc.getCrfId());
+					if (!sed.getType().equals(COMMON)) {
+						continue;
+					}
 					xml.append(indent + indent + indent + indent + "<OpenClinica:link rel=\"common-add-new\" tag=\""
 							+ StringEscapeUtils.escapeXml(sed.getOid() + "." + crf.getOid()) + "\"" + " href=\"/pages/api/addAnotherForm?studyoid="
 							+ StringEscapeUtils.escapeXml(clinicalData.getStudyOID()) + "&amp;studysubjectoid="
