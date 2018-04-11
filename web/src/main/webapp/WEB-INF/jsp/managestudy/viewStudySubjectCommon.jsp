@@ -314,7 +314,7 @@ $(function() {
                     columnTitles: columnTitles,
                     submissionFields: submissionFields,
                     submissions: [],
-                    addNew: formNotArchived,
+                    addNew: false,
                     showMe: formNotArchived
                 }, form);
 
@@ -333,8 +333,7 @@ $(function() {
             var oids = link['@tag'].split('.');
             var studyEvent = studyEvents[oids[0]];
             var form = studyEvent.forms[oids[1]];
-            if (form.addNew)
-                form.addNew = link['@href'];
+            form.addNew = link['@href'];
         });
 
         collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
@@ -351,9 +350,6 @@ $(function() {
             var form = studyEvent.forms[formOid];
             if (!form)
                 return;
-
-            if (studyEvent['@Repeating'] === 'No')
-                form.addNew = false;
 
             var submission = {
                 studyStatus: studyEventData['@OpenClinica:Status'],
