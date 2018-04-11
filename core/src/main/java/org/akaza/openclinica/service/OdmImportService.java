@@ -27,4 +27,21 @@ public interface OdmImportService {
 	 * @return
 	 */
 	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, HttpServletRequest request);
+
+	/**
+	 * This method will be used to change the Status of Site Definition into DELETED
+	 * 
+	 * @param edcId
+	 * @param updateId
+	 */
+	public void removeSiteDefinitions(Integer edcId, Integer updateId);
+
+	/**
+	 * This method will be used to change the Status of Site Definition into AVAILABLE
+	 * 
+	 * @param edcId
+	 * @param updateId
+	 */
+	public void restoreSiteDefinitions(Integer edcId, Integer updateId);
+
 }
