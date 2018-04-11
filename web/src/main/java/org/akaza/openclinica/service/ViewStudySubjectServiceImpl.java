@@ -10,7 +10,6 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
 import org.akaza.openclinica.dao.hibernate.CrfDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
@@ -77,8 +76,8 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
 
 		request.setAttribute("requestSchema", "public");
 		HttpSession session = request.getSession();
-		StudyBean currentStudy = (StudyBean) session.getAttribute("study");
-		Study publicstudy = studyDao.findByOcOID(currentStudy.getOid());
+
+		Study publicstudy = studyDao.findByOcOID(studyOid);
 
 		UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
 		if (ub == null) {
@@ -92,7 +91,7 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
 		}
 
 		request.setAttribute("requestSchema", publicstudy.getSchemaName());
-		Study study = studyDao.findByOcOID(currentStudy.getOid());
+		Study study = studyDao.findByOcOID(studyOid);
 
 		if (study == null) {
 			logger.error("Study with Oid {} is null", study.getOc_oid());

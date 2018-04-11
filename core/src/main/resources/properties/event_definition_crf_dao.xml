@@ -47,6 +47,17 @@
         </sql>
     </query>
     
+    
+    <query>
+        <name>findAllStudySiteFiltered</name>
+        <sql>SELECT edc.* FROM event_definition_crf edc where study_id in (?,?) and event_definition_crf_id not in
+(SELECT parent_id FROM event_definition_crf where study_id in (?) and parent_id !=0 );
+        </sql>
+    </query>
+
+
+    
+    
 	<query>
 		<name>findAllParentsByDefinition</name>
 		<!-- find all which have unavailable parent_id.

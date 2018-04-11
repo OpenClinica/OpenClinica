@@ -9,22 +9,25 @@
 <jsp:useBean scope='session' id='userRole' class='org.akaza.openclinica.bean.login.StudyUserRoleBean' />
 <jsp:useBean scope="session" id="passwordExpired" class="java.lang.String"/>
 
-<c:choose>
-	<c:when test="${userBean != null && userRole != null && userRole.role.name != 'invalid' && passwordExpired == 'no'}">
-		<jsp:include page="include/home-header.jsp"/>
+<jsp:include page="include/submit-header.jsp"/>
+<jsp:include page="include/sideAlert.jsp"/>
+<jsp:include page="include/sideInfo.jsp"/>
 
+<%--<c:choose>--%>
+	<%--<c:when test="${userBean != null && userRole != null && userRole.role.name != 'invalid' && passwordExpired == 'no'}">--%>
+		<%--<jsp:include page="include/home-header.jsp"/>--%>
 
-		<jsp:include page="include/sidebar.jsp"/>
-	</c:when>
-	<c:otherwise>
-		<jsp:include page="login-include/login-header.jsp"/>
+		<%--<jsp:include page="include/sidebar.jsp"/>--%>
+	<%--</c:when>--%>
+	<%--<c:otherwise>--%>
+		<%--<jsp:include page="login-include/login-header.jsp"/>--%>
 
-		<jsp:include page="include/userbox-inactive.jsp"/>
-		<table border="0" cellpadding=0" cellspacing="0">
-			<tr><td class="sidebar" valign="top"><br><b><a href="${pageContext.request.contextPath}/pages/logout"><fmt:message key="logout" bundle="${restext}"/></a></b></br></td>
-				<td class="content" valign="top">
-	</c:otherwise>
-</c:choose>
+		<%--<jsp:include page="include/userbox-inactive.jsp"/>--%>
+		<%--<table border="0" cellpadding=0" cellspacing="0">--%>
+			<%--<tr><td class="sidebar" valign="top"><br><b><a href="${pageContext.request.contextPath}/pages/logout"><fmt:message key="logout" bundle="${restext}"/></a></b></br></td>--%>
+				<%--<td class="content" valign="top">--%>
+	<%--</c:otherwise>--%>
+<%--</c:choose>--%>
 
 <h1><span class="title_manage"><fmt:message key="an_error_has_ocurred" bundle="${resword}"/></span></h1>
 
@@ -36,13 +39,13 @@
 		<c:set var="referer" value="${header[refererValue]}"/>
 	</c:if>
 </c:forEach>
+
 <fmt:message key="error_page" bundle="${resword}">
 	<%--<fmt:param><%=request.getHeader("Referer")%></fmt:param>--%>
 	<%-- tbh 02/2010 remove HTML/XML from the referer name --%>
 	<fmt:param><c:out value="${referer}"/></fmt:param>
 	<fmt:param><%=SQLInitServlet.getField("mail.errormsg")%></fmt:param>
 </fmt:message>
-
 </font>
 </td></tr></table>
 

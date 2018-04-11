@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html; charset=utf-8" pageEncoding="UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
@@ -24,7 +25,7 @@
 <meta http-equiv="X-UA-Compatible" content="IE=11" />
 
 
-<link rel="stylesheet" href="includes/styles.css" type="text/css">
+<link rel="stylesheet" href="${pageContext.request.contextPath}/includes/styles.css" type="text/css">
 <%-- <link rel="stylesheet" href="includes/styles2.css" type="text/css">--%>
 <%-- <link rel="stylesheet" href="includes/NewNavStyles.css" type="text/css" />--%>
 <script type="text/JavaScript" language="JavaScript" src="includes/global_functions_javascript.js"></script>

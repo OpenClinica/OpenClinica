@@ -45,6 +45,15 @@ public class EventDefinitionCrfDao extends AbstractDomainDao<EventDefinitionCrf>
     }
 
     @SuppressWarnings("unchecked")
+    public List<EventDefinitionCrf> findAllSiteDefinitionsByParentDefinition(Integer eventDefinitionCrfId) {
+        String query = "from " + getDomainClassName() + " do where do.parentId = :eventDefinitionCrfId ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("eventDefinitionCrfId", eventDefinitionCrfId);
+        return (List<EventDefinitionCrf>) q.list();
+
+    }
+
+    @SuppressWarnings("unchecked")
     public EventDefinitionCrf findByStudyEventDefinitionIdAndCRFIdAndStudyId(Integer studyEventDefinitionId, Integer crfId, Integer studyId) {
         String query = "from " + getDomainClassName() + " do where do.studyEventDefinition.studyEventDefinitionId = :studyeventdefid "
                 + " and do.study.studyId = :studyid and do.crf.crfId = :crfid";

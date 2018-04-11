@@ -247,7 +247,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			if (isCollectDns())
 				exportSubjectDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(studySubj));
 
-			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(studySubj, studyEvents, formVersionOID));
+			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(study, studySubj, studyEvents, formVersionOID));
 
 			exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
 
@@ -272,7 +272,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return subjectBelongs;
 	}
 
-	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(StudySubject ss, List<StudyEvent> sEvents, String formVersionOID) {
+	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(Study study, StudySubject ss, List<StudyEvent> sEvents, String formVersionOID) {
 		ArrayList<ExportStudyEventDataBean> al = new ArrayList<ExportStudyEventDataBean>();
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -310,7 +310,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				if (collectDns)
 					expSEBean.setDiscrepancyNotes(fetchDiscrepancyNotes(se));
 
-				expSEBean.setExportFormData(getFormDataForClinicalStudy(ss, se, formVersionOID));
+				expSEBean.setExportFormData(getFormDataForClinicalStudy(study, ss, se, formVersionOID));
 				expSEBean.setStudyEventDefinition(se.getStudyEventDefinition());
 				al.add(expSEBean);
 			}
@@ -319,7 +319,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return al;
 	}
 
-	private ArrayList<ExportFormDataBean> getFormDataForClinicalStudy(StudySubject ss, StudyEvent se, String formVersionOID) {
+	private ArrayList<ExportFormDataBean> getFormDataForClinicalStudy(Study study, StudySubject ss, StudyEvent se, String formVersionOID) {
 		List<ExportFormDataBean> formDataBean = new ArrayList<ExportFormDataBean>();
 		boolean formCheck = true;
 		if (formVersionOID != null)
@@ -332,7 +332,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			hiddenCrfCheckPassed = true;
 			int siteId = 0;
 			int parentStudyId = 0;
-			Study study = ss.getStudy();
 			if (study.getStudy() != null) {
 				// it is site subject
 
@@ -873,9 +872,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		// subject assigned to site is pulled from study level this will get the site OID correctly displayed.
 		if (!studySubjectOID.equals(INDICATE_ALL)) {
 
-			StudySubjectDao ssdao = getStudySubjectDao();
-			StudySubject ss = (StudySubject) getStudySubjectDao().findByColumnName(studySubjectOID, "ocOid");
-			studyOID = ss.getStudy().getOc_oid();
+			// StudySubjectDao ssdao = getStudySubjectDao();
+			// StudySubject ss = (StudySubject) getStudySubjectDao().findByColumnName(studySubjectOID, "ocOid");
+			// studyOID = ss.getStudy().getOc_oid();
 		}
 		if (studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL) && !studySubjectOID.equals(INDICATE_ALL)
 				&& !studyOID.equals(INDICATE_ALL)) {
