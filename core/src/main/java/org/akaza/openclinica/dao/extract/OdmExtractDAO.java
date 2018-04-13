@@ -3148,7 +3148,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     se.setStatus(SubjectEventStatus.get((Integer) row.get("event_status_id")).getName());
                 }
                 // ----- finish adding study event attributes
-                se.setStudyEventRepeatKey(studyEventRepeating ? sampleOrdinal + "" : "-1");
+                se.setStudyEventRepeatKey(studyEventRepeating ? sampleOrdinal + "" : "1");
                 sub.getExportStudyEventData().add(se);
                 formprev = "";
                 igprev = "";
