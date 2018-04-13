@@ -47,6 +47,14 @@
     .dataTables_length > label {
         margin-left: 10px;
     }
+    .dataTables_filter {
+        display: inline-block;
+        float: right;
+        margin-top: 5px;
+    }
+    .dataTables_filter input {
+        margin-left: 5px;
+    }
     .table_tools, .table_actions {
         vertical-align: middle !important;
     }
@@ -73,12 +81,6 @@
     }
     .add-new {
         margin: 3px !important;
-    }
-    .searchbox {
-        text-align: right;
-    }
-    .searchbox input {
-        margin-left: 5px;
     }
     .button_search {
         margin-top: 2px !important;
@@ -139,20 +141,15 @@
             {{#each studyEvent.forms as |form|}}
             {{#if form.showMe}}
                 <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
-                    <table class="subsection-title">
-                    <tr>
-                        <td>
-                            <h3 class="form-name">{{form.[@Name]}}</h3>
-                            <input class="add-new" type="button" value="Add New"
-                                {{#if form.addNew}}
-                                    data-url="{{form.addNew}}"
-                                {{else}}
-                                    disabled="disabled"
-                                {{/if}}>
-                        </td>
-                        <td class="searchbox"></td>
-                    <tr>
-                    </table>
+                    <div class="subsection-header">
+                        <h3 class="form-name">{{form.[@Name]}}</h3>
+                        <input class="add-new" type="button" value="Add New"
+                            {{#if form.addNew}}
+                                data-url="{{form.addNew}}"
+                            {{else}}
+                                disabled="disabled"
+                            {{/if}}>
+                    </div>
                     <table class="datatable">
                     <thead>
                         <tr>
@@ -176,19 +173,11 @@
                                 <td>{{submission.updatedDate}}</td>
                                 <td>{{submission.updatedBy}}</td>
                                 <td class="actions">
-                                    <table>
-                                        <tbody>
-                                            <tr>
-                                                {{#each submission.links as |link|}}
-                                                <td>
-                                                    <a href="${pageContext.request.contextPath}{{link.[@href]}}">
-                                                        <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title="{{link.[@rel]}}"></span>
-                                                    </a>
-                                                </td>
-                                                {{/each}}
-                                            </tr>
-                                        </tbody>
-                                    </table>
+                                    {{#each submission.links as |link|}}
+                                        <a href="${pageContext.request.contextPath}{{link.[@href]}}">
+                                            <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title="{{link.[@rel]}}"></span>
+                                        </a>
+                                    {{/each}}
                                 </td>
                                 <td>{{submission.hideStatus}}</td>
                             </tr>
@@ -469,7 +458,7 @@ $(function() {
             })
             .prev('.dataTables_filter').each(function() {
                 var searchbox = $(this);
-                searchbox.appendTo(searchbox.closest('.subsection').find('.searchbox'));
+                searchbox.appendTo(searchbox.closest('.subsection').find('.subsection-header'));
             })
             .end()
             .wrap($('<div>', {

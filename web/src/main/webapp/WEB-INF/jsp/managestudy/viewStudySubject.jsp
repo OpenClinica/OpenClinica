@@ -132,6 +132,9 @@
   .hide {
     display: none;
   }
+  .clear {
+    clear: both;
+  }
 </style>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -178,7 +181,7 @@
   <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
 </div>
 </div>
-<div class="section expanded" id="studySubjectRecord">
+<div class="section expanded clear" id="studySubjectRecord">
   <div class="section-header" title="Collapse Section">
     General Information
   </div>
