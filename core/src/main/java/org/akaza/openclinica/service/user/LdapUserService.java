@@ -15,7 +15,7 @@ import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.dao.IncorrectResultSizeDataAccessException;
-import org.springframework.ldap.core.AttributesMapper;
+import org.springframework.ldap.core.ContextMapper;
 import org.springframework.ldap.core.ContextSource;
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.ldap.SpringSecurityLdapTemplate;
@@ -48,9 +48,6 @@ public class LdapUserService {
     @Value("s[ldap.userSearch.baseDn]")
     private String userSearchBase;
 
-    @Value("s[ldap.userData.distinguishedName]")
-    private String keyDistinguishedName;
-
     @Value("s[ldap.userData.username]")
     private String keyUsername;
 
@@ -74,11 +71,19 @@ public class LdapUserService {
         ldapTemplate.setIgnorePartialResultException(true);
     }
 
-    private final AttributesMapper ldapUserAttributesMapper = new AttributesMapper() {
+    private final ContextMapper ldapUserAttributesMapper = new ContextMapper() {
 
-        public Object mapFromAttributes(Attributes attributes) throws NamingException {
+        @Override
+        public Object mapFromContext(Object arg) {
+            if (!(arg instanceof DirContextOperations)) {
+                return null;
+            }
+
+            DirContextOperations context = (DirContextOperations) arg;
+            
+            Attributes attributes = context.getAttributes();
             LdapUser u = new LdapUser();
-            u.setDistinguishedName(attToString(attributes, keyDistinguishedName));
+            u.setDistinguishedName(context.getDn().toString());
             u.setUsername(attToString(attributes, keyUsername));
             u.setFirstName(attToString(attributes, keyFirstName));
             u.setLastName(attToString(attributes, keyLastname));
@@ -87,11 +92,15 @@ public class LdapUserService {
             return u;
         }
 
-        private String attToString(Attributes a, String key) throws NamingException {
+        private String attToString(Attributes a, String key) {
             if (!StringUtils.isEmpty(key)) { // Check if the key for this attribute was defined in the properties file
                 Attribute att = a.get(key);
                 if (att != null) {
-                    return a.get(key).get().toString();
+                    try {
+                        return a.get(key).get().toString();
+                    } catch (NamingException e) {
+                        return null;
+                    }
                 }
             }
             return null;
