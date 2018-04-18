@@ -63,6 +63,12 @@
   }
 </script>
 <script>
+  var storageKey = location.pathname + location.search;
+  var storage = JSON.parse(sessionStorage.getItem(storageKey)) || {collapseSections: {}};
+  function stor() {
+    sessionStorage.setItem(storageKey, JSON.stringify(storage));
+  }
+
   $(document.body).on('click', '.section-header', function() {
     var header = $(this);
     var body = header.next();
@@ -79,10 +85,27 @@
     body[updown]('fast', function() {
       section.toggleClass('collapsed expanded');
     });
+
+    var sections = $('div.section');
+    var pos = sections.index(section);
+    if (pos > 0) {
+      storage.collapseSections = {};
+      sections.each(function(index) {
+        var section = $(this);
+        if (section.hasClass('collapsed'))
+          storage.collapseSections[index] = true;
+      });
+    }
+    storage.collapseSections[pos] = section.hasClass('expanded');
+    stor();
   });
 
   function clickAllSections(state) {
     $('.section.' + state).children('.section-header').click();
+  };
+
+  function resetAllFilters() {
+    clickAllSections('collapsed');
   };
 </script>
 <style>
@@ -179,9 +202,11 @@
   <a href="javascript:clickAllSections('collapsed');">Expand All</a>
   <span>&nbsp; | &nbsp;</span>
   <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
+  <span>&nbsp; | &nbsp;</span>
+  <a href="javascript:resetAllFilters();">Reset All Filters</a>  
 </div>
 </div>
-<div class="section expanded clear" id="studySubjectRecord">
+<div class="section expanded clear hide" id="studySubjectRecord">
   <div class="section-header" title="Collapse Section">
     General Information
   </div>
@@ -509,7 +534,12 @@
     <br>
   </div>
 </div>
-<div id="loading">Loading...</div>
+<script>
+  if (storage.collapseSections[0])
+    $('#studySubjectRecord').toggleClass('expanded collapsed').children('.section-body').hide();
+  $('#studySubjectRecord').removeClass('hide');
+</script>
+<div id="loading"><br> &nbsp; Loading...</div>
 <c:choose>
   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
     <div class="table_title_Admin">

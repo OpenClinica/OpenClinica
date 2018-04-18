@@ -133,7 +133,7 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section expanded" id="common.{{studyEvent.[@OID]}}">
+    <div class="section {{studyEvent.collapseState}}">
         <div class="section-header" title="Collapse Section">
             {{studyEvent.[@Name]}}
         </div>
@@ -389,9 +389,12 @@ $(function() {
         var numVisitBaseds = 0;
         var hideStatus = $('#oc-status-hide').val();
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
+        var i = 1;
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
             if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent.showMe) {
+                i++;
+                studyEvent.collapseState = storage.collapseSections[i] ? 'collapsed' : 'expanded';
                 $('#commonEvents').append(sectionTmpl({
                     studyEvent: studyEvent
                 }));
@@ -401,6 +404,8 @@ $(function() {
             }
         }
         if (numVisitBaseds) {
+            if (storage.collapseSections[1])
+                $('#subjectEvents').toggleClass('expanded collapsed').children('.section-body').hide();
             $('#subjectEvents').removeClass('hide');
         }
 
@@ -424,6 +429,7 @@ $(function() {
             .each(function() {
                 var table = $(this);
                 var datatable = table.DataTable({
+                    stateSave: true,
                     dom: "frtilp",
                     language: {
                         paginate: {
@@ -468,6 +474,7 @@ $(function() {
                 }
             }));
 
+        $('div.section.collapsed').children('.section-body').hide();
         $('#loading').remove();
     }, function() {
         $('#loading').text("Can't connect to the Study Service");
