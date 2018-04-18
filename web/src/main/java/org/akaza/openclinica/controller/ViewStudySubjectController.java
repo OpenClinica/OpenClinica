@@ -62,7 +62,8 @@ public class ViewStudySubjectController {
 
 		Page page = viewStudySubjectService.getPage(request, studyOid, name);
 		if (page == null) {
-			return new ResponseEntity<Page>(page, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
+			page = new Page();
+			//return new ResponseEntity<Page>(page, org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR);
 		}
 
 		return new ResponseEntity<Page>(page, org.springframework.http.HttpStatus.OK);
