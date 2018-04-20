@@ -1,10 +1,10 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
-
 <c:set var="suppressAddSubject"  value="${param.suppressAddSubject}"/>
 <c:set var="discNoteType"  value="${param.discNoteType}"/>
 
@@ -190,7 +190,7 @@
                 </c:forEach>
                 <td valign="top" class="table_tools" nowrap>
                     <c:if test="${param.studyHasDiscNotes}"><a href=
-                      "javascript:openDocWindow('ChooseDownloadFormat?resolutionStatus=${param.resolutionStatus}&discNoteType=${param.type}&module=${module}')"><img
+                      "javascript:openDocWindow('ChooseDownloadFormat?resolutionStatus=${fn:escapeXml(param.resolutionStatus)}&discNoteType=${fn:escapeXml(param.type)}&module=${fn:escapeXml(module)}')"><img
                       class="downloadAllDNotes" width="24 " height="15" name="bt_View1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_all_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_all_discrepancy_notes" bundle="${resword}"/>"></a></c:if>
 
                 </td>

@@ -109,25 +109,25 @@ applied on resolution status or type--%>
 <div class="dnKey"><strong><fmt:message key="Filter_by_status" bundle="${resword}"/>
     :</strong>
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&type=${param.type}" <c:if test="${param.type == 50}">style="color:green"</c:if>><fmt:message key="all_notes" bundle="${resterm}"/></a>&nbsp;
+    <a href="ListDiscNotesSubjectServlet?module=${fn:escapeXml(moduleStr)}&type=${fn:escapeXml(param.type)}" <c:if test="${param.type == 50}">style="color:green"</c:if>><fmt:message key="all_notes" bundle="${resterm}"/></a>&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=1&type=${param.type}"><img
+    <a href="ListDiscNotesSubjectServlet?module=${fn:escapeXml(moduleStr)}&resolutionStatus=1&type=${fn:escapeXml(param.type)}"><img
       name="icon_Note" src="images/icon_Note.gif" border="0"
       alt="<fmt:message key="Open" bundle="${resterm}"/>" title="<fmt:message key="Open" bundle="${resterm}"/>"/></a> (<fmt:message key="Open" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=2&type=${param.type}"><img
+    <a href="ListDiscNotesSubjectServlet?module=${fn:escapeXml(moduleStr)}&resolutionStatus=2&type=${fn:escapeXml(param.type)}"><img
       name="icon_flagYellow" src="images/icon_flagYellow.gif" border="0"
       alt="<fmt:message key="Updated" bundle="${resterm}"/>" title="<fmt:message key="Updated" bundle="${resterm}"/>"/></a> (<fmt:message key="Updated" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=3&type=${param.type}"><img
+    <a href="ListDiscNotesSubjectServlet?module=${fn:escapeXml(moduleStr)}&resolutionStatus=3&type=${fn:escapeXml(param.type)}"><img
       name="icon_flagGreen" src="images/icon_flagGreen.gif" border="0"
       alt="<fmt:message key="Resolved" bundle="${resterm}"/>" title="<fmt:message key="Resolved" bundle="${resterm}"/>"/></a> (<fmt:message key="Resolved" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=4&type=${param.type}"><img
+    <a href="ListDiscNotesSubjectServlet?module=${fn:escapeXml(moduleStr)}&resolutionStatus=4&type=${fn:escapeXml(param.type)}"><img
       name="icon_flagBlack" src="images/icon_flagBlack.gif" border="0"
       alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>"/></a> (<fmt:message key="Closed" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=5&type=${param.type}"><img
+    <a href="ListDiscNotesSubjectServlet?module=${fn:escapeXml(moduleStr)}&resolutionStatus=5&type=${fn:escapeXml(param.type)}"><img
       name="icon_flagNA" src="images/icon_flagWhite.gif" border="0"
       alt="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" title="<fmt:message key="Not_Applicable" bundle="${resterm}"/>"/></a> (<fmt:message key="Not_Applicable" bundle="${resterm}"/>)&nbsp;
 
@@ -139,24 +139,24 @@ applied on resolution status or type--%>
         <c:forEach var="statusName" items="${filterSummary['status']}">
             <strong>${statusName}; </strong>
         </c:forEach>
-        <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&type=${param.type}"><fmt:message key="Clear_status_filter" bundle="${resword}"/></a>
+        <a href="ListDiscNotesSubjectServlet?module=${fn:escapeXml(moduleStr)}&type=${fn:escapeXml(param.type)}"><fmt:message key="Clear_status_filter" bundle="${resword}"/></a>
     </c:if>
 </div>
 
 <div class="dnKey"><strong><fmt:message key="Filter_by_note_type" bundle="${resword}"/>
     :</strong>
     <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&defId=${eventDefinitionId}&type=50" <c:if test="${param.type == 50}">style="color:green"</c:if>><fmt:message key="all_notes" bundle="${resterm}"/></a>&nbsp;|&nbsp;
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&defId=${eventDefinitionId}&type=2&resolutionStatus=${param.resolutionStatus}" <c:if test="${param.type == 2}">style="color:green"</c:if>><fmt:message key="Annotation" bundle="${resterm}"/></a>&nbsp;|&nbsp;
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&defId=${eventDefinitionId}&type=1&resolutionStatus=${param.resolutionStatus}" <c:if test="${param.type == 1}">style="color:green"</c:if>><fmt:message key="Failed_Validation_Check" bundle="${resterm}"/></a>&nbsp;|&nbsp;
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&defId=${eventDefinitionId}&type=3&resolutionStatus=${param.resolutionStatus}" <c:if test="${param.type == 3}">style="color:green"</c:if>><fmt:message key="query" bundle="${resterm}"/></a>&nbsp;|&nbsp;
-    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&defId=${eventDefinitionId}&type=4&resolutionStatus=${param.resolutionStatus}" <c:if test="${param.type == 4}">style="color:green"</c:if>><fmt:message key="reason_for_change" bundle="${resterm}"/></a>&nbsp;|&nbsp;
+    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&defId=${eventDefinitionId}&type=2&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}" <c:if test="${param.type == 2}">style="color:green"</c:if>><fmt:message key="Annotation" bundle="${resterm}"/></a>&nbsp;|&nbsp;
+    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&defId=${eventDefinitionId}&type=1&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}" <c:if test="${param.type == 1}">style="color:green"</c:if>><fmt:message key="Failed_Validation_Check" bundle="${resterm}"/></a>&nbsp;|&nbsp;
+    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&defId=${eventDefinitionId}&type=3&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}" <c:if test="${param.type == 3}">style="color:green"</c:if>><fmt:message key="query" bundle="${resterm}"/></a>&nbsp;|&nbsp;
+    <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&defId=${eventDefinitionId}&type=4&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}" <c:if test="${param.type == 4}">style="color:green"</c:if>><fmt:message key="reason_for_change" bundle="${resterm}"/></a>&nbsp;|&nbsp;
     <br />
     <c:if test="${filterSummary != null  && ! (empty filterSummary['type'])}">
         <fmt:message key="You_have_filtered_type" bundle="${resword}"/>
         <c:forEach var="typeName" items="${filterSummary['type']}">
             <strong>${typeName}; </strong>
         </c:forEach>
-        <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=${param.resolutionStatus}&defId=${eventDefinitionId}&type=50"><fmt:message key="Clear_type_filter" bundle="${resword}"/></a>
+        <a href="ListDiscNotesSubjectServlet?module=${moduleStr}&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}&defId=${eventDefinitionId}&type=50"><fmt:message key="Clear_type_filter" bundle="${resword}"/></a>
     </c:if>
 </div>
 <div><a id="sumBoxParent" href="javascript:void(0)" onclick="showSummaryBox('sumBox',document.getElementById('sumBoxParent'),'<fmt:message key="show_summary_statistics" bundle="${resword}"/>','<fmt:message key="hide_summary_statistics" bundle="${resword}"/>')"> <img name="ExpandGroup1" src="images/bt_Expand.gif" border="0"><fmt:message key="show_summary_statistics" bundle="${resword}"/></a> </div>

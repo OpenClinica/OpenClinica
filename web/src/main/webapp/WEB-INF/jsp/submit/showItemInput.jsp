@@ -638,7 +638,7 @@ include the default value first in the select list --%>
 
 	    <td valign="top"><a tabindex="<c:out value="${tabNum + 1000}"/>" href="#"   onmouseover="callTip(genToolTips_ItemInput(${itemId}));"
 	           onmouseout="UnTip()" onClick=
-	    "openDNWindow('CreateDiscrepancyNote?isGroup=-1&eventCRFId=${eventCRFId}&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${item_data_id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>&eventName=${eventName}&eventDate=${eventDate}&crfName=${crfName}','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
+	    "openDNWindow('CreateDiscrepancyNote?isGroup=-1&eventCRFId=${fn:escapeXml(eventCRFId)}&subjectId=<c:out value="${studySubject.id}" />&itemId=<c:out value="${itemId}" />&groupLabel=<c:out value="${displayItem.metadata.groupLabel}"/>&sectionId=<c:out value="${displayItem.metadata.sectionId}"/>&id=<c:out value="${item_data_id}"/>&name=itemData&field=input<c:out value="${itemId}" />&column=value&enterData=1&errorFlag=<c:out value="${errorFlag}"/>&eventName=${fn:escapeXml(eventName)}&eventDate=${fn:escapeXml(eventDate)}&crfName=${fn:escapeXml(crfName)}','spanAlert-input<c:out value="${itemId}"/>','<c:out value="${errorTxtMessage}"/>'); return false;"
 	    ><img id="flag_input<c:out value="${itemId}" />" name="flag_input<c:out value="${itemId}" />" src=
 	    "images/<c:out value="${imageFileName}"/>.gif" border="0" alt=
 	    "<fmt:message key="discrepancy_note" bundle="${resword}"/>"

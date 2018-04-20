@@ -64,17 +64,17 @@ $.noConflict();
 
 </script>
 <form action="${pageContext.request.contextPath}/pages/managestudy/confirmCRFVersionChange" method="POST">
-<input type="hidden" name="studySubjectId" value="${studySubjectId}">
-<input type="hidden" name="eventDefinitionCRFId" value="${eventDefinitionCRFId}">
-<input type="hidden" name="studySubjectLabel" value="${studySubjectLabel}">
-<input type="hidden" name="crfversionId" value="${crfversionId}">
-<input type="hidden" name="crfId" value="${crfBean.id}">
-<input type="hidden" name="crfName" value="${crfName}">
-<input type="hidden" name="crfVersionName" value="${crfVersionName}">
-<input type="hidden" name="eventCRFId" value="${eventCRFId}">
-<input type="hidden" name="eventName" value="${eventName}">
-<input type="hidden" name="eventCreateDate" value="${eventCreateDate}">
-<input type="hidden" name="eventOrdinal" value="${eventOrdinal}">
+<input type="hidden" name="studySubjectId" value="${fn:escapeXml(studySubjectId)}">
+<input type="hidden" name="eventDefinitionCRFId" value="${fn:escapeXml(eventDefinitionCRFId)}">
+<input type="hidden" name="studySubjectLabel" value="${fn:escapeXml(studySubjectLabel)}">
+<input type="hidden" name="crfversionId" value="${fn:escapeXml(crfversionId)}">
+<input type="hidden" name="crfId" value="${fn:escapeXml(crfBean.id)}">
+<input type="hidden" name="crfName" value="${fn:escapeXml(crfName)}">
+<input type="hidden" name="crfVersionName" value="${fn:escapeXml(crfVersionName)}">
+<input type="hidden" name="eventCRFId" value="${fn:escapeXml(eventCRFId)}">
+<input type="hidden" name="eventName" value="${fn:escapeXml(eventName)}">
+<input type="hidden" name="eventCreateDate" value="${fn:escapeXml(eventCreateDate)}">
+<input type="hidden" name="eventOrdinal" value="${fn:escapeXml(eventOrdinal)}">
         	
 
 

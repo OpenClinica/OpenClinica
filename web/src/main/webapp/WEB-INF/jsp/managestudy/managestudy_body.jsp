@@ -8,7 +8,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -57,7 +57,7 @@
     </ul>
 </noscript>
 <%-- 3057 removed this: <span style="font-size:12px"><fmt:message key="select_to_manage" bundle="${restext}"/></span>--%>
-<h2><fmt:message key="recent_activity" bundle="${restext}"/> ${studyIdentifier}</h2>
+<h2><fmt:message key="recent_activity" bundle="${restext}"/> ${fn:escapeXml(studyIdentifier)}</h2>
 
 
 <table border="0" cellpadding="0" cellspacing="0">

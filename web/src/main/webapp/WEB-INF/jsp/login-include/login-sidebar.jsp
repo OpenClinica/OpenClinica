@@ -2,7 +2,7 @@
 <%@ include file="/WEB-INF/jsp/taglibs.jsp" %>
 
 <%@page import="org.akaza.openclinica.web.SQLInitServlet"%>
-
+<%@page import="org.springframework.web.util.HtmlUtils" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
 
@@ -40,7 +40,7 @@ function reportBug(versionNumber) {
 						<c:out value="${sessionScope.supportURL}" />--%>
             <td style="white-space:nowrap">
               <!--<a href="javascript:reportBug()"><span class="aka_font_general" style="font-size: 0.9em">Report Issue</span> </a> | <br/>-->
-              <a href="javascript:openDocWindow('<%out.println(SQLInitServlet.getSupportURL());%>')"><span class="aka_font_general" style="font-size: 0.9em"><fmt:message key="openclinica_feedback" bundle="${resword}"/></span></a>
+              <a href="javascript:openDocWindow('<%out.println(HtmlUtils.htmlEscape(SQLInitServlet.getSupportURL()));%>')"><span class="aka_font_general" style="font-size: 0.9em"><fmt:message key="openclinica_feedback" bundle="${resword}"/></span></a>
 
 
 

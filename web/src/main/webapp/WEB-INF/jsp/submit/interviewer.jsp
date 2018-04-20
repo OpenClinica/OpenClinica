@@ -635,7 +635,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                 <c:choose>
                  <c:when test="${hasNameNote eq 'yes'}">
                 <a href="#" id="nameNote1"
-           onmouseout="UnTip();"onmouseover="callTip(genToolTipFromArray('interviewNotes'));" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerNameNote.eventCRFId}&name=${InterviewerNameNote.entityType}&field=interviewer&column=${InterviewerNameNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
+           onmouseout="UnTip();"onmouseover="callTip(genToolTipFromArray('interviewNotes'));" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${fn:escapeXml(studySubject.id)}&itemId=${fn:escapeXml(itemId)}&id=${fn:escapeXml(InterviewerNameNote.eventCRFId)}&name=${fn:escapeXml(InterviewerNameNote.entityType)}&field=interviewer&column=${fn:escapeXml(InterviewerNameNote.column)}&enterData=${fn:escapeXml(enterData)}&monitor=${fn:escapeXml(monitor)}&blank=${fn:escapeXml(blank)}','spanAlert-interviewDate'); return false;">
                     <img id="flag_interviewer" name="flag_interviewer" src="<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
                     </c:when>
                     <c:otherwise>
@@ -754,7 +754,7 @@ form element in red <c:out value="FORMMESSAGES: ${formMessages} "/><br/>--%>
                 <c:choose>
                 <c:when test="${hasDateNote eq 'yes'}">
                 <a href="#"  onmouseover="callTip(genToolTipFromArray('dateNotes') );"
-           onmouseout="UnTip();"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySubject.id}&itemId=${itemId}&id=${InterviewerDateNote.eventCRFId}&name=${InterviewerDateNote.entityType}&field=interviewDate&column=${InterviewerDateNote.column}&enterData=${enterData}&monitor=${monitor}&blank=${blank}','spanAlert-interviewDate'); return false;">
+           onmouseout="UnTip();"  onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${fn:escapeXml(studySubject.id)}&itemId=${fn:escapeXml(itemId)}&id=${fn:escapeXml(InterviewerDateNote.eventCRFId)}&name=${fn:escapeXml(InterviewerDateNote.entityType)}&field=interviewDate&column=${fn:escapeXml(InterviewerDateNote.column)}&enterData=${fn:escapeXml(enterData)}&monitor=${fn:escapeXml(monitor)}&blank=${fn:escapeXml(blank)}','spanAlert-interviewDate'); return false;">
                     <img id="flag_interviewDate" name="flag_interviewDate" src="<c:out value="${contextPath}" />/images/<c:out value="${imageFileName}"/>.gif" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>"  >
                     </c:when>
                     <c:otherwise>

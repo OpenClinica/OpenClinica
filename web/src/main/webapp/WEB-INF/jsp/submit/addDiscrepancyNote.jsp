@@ -238,7 +238,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 	<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG">
 		<c:choose>
 		<c:when test="${parentId > 0}">
-			<input type="hidden" name="typeId" value="${param.typeId}"/>
+			<input type="hidden" name="typeId" value="${fn:escapeXml(param.typeId)}"/>
 			<select name="pTypeId" id="pTypeId" class="formfieldL" disabled>
 				<option value="<c:out value="${param.typeId}"/>" selected><c:out value="${param.typeName}"/>
 			</select>
@@ -276,7 +276,7 @@ function setElements(typeId, user1, user2,filter1,nw,ud,rs,cl,na) {
 		</c:choose>
 	</div></div>
 		
-	<span id="res1${parentId}">
+	<span id="res1${fn:escapeXml(parentId)}">
 		<div class="dnBoxCol1 dnBoxText"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
 		<div class="dnBoxCol2 dnBoxText"><div class="formfieldL_BG">
 			<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>

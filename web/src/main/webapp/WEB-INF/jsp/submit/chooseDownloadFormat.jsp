@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <html>
@@ -21,12 +22,12 @@
         </select><br /><br />
 
         <input type="hidden" name="list" value="y"/>
-        <input type="hidden" name="subjectId" value="${subjectId}"/>
-        <input type="hidden" name="fileName" value="dnotes${subjectId}_${studyIdentifier}"/>
-        <input type="hidden" name="studyIdentifier" value="${studyIdentifier}"/>
-        <input type="hidden" name="eventId" value="${param.eventId}"/>
-        <input type="hidden" name="resolutionStatus" value="${param.resolutionStatus}"/>
-        <input type="hidden" name="discNoteType" value="${param.discNoteType}"/>
+        <input type="hidden" name="subjectId" value="${fn:escapeXml(subjectId)}"/>
+        <input type="hidden" name="fileName" value="dnotes${fn:escapeXml(subjectId)}_${fn:escapeXml(studyIdentifier)}"/>
+        <input type="hidden" name="studyIdentifier" value="${fn:escapeXml(studyIdentifier)}"/>
+        <input type="hidden" name="eventId" value="${fn:escapeXml(param.eventId)}"/>
+        <input type="hidden" name="resolutionStatus" value="${fn:escapeXml(param.resolutionStatus)}"/>
+        <input type="hidden" name="discNoteType" value="${fn:escapeXml(param.discNoteType)}"/>
 
 <%
         String[] filterParams = {
@@ -53,7 +54,7 @@
         for (String p: filterParams) {
             String value = request.getParameter(p);
             if (value != null) {
-%>              <input type="hidden" name="<%= p %>" value="<%= value %>" />
+%>              <input type="hidden" name="${fn:escapeXml(p)}" value="${fn:escapeXml(value)}" />
 <%
             }
         }
@@ -67,7 +68,7 @@
         for (String s: sortParams) {
             String value = request.getParameter(s);
             if (value != null) {
-%>              <input type="hidden" name="<%= s %>" value="<%= value %>" />
+%>              <input type="hidden" name="${fn:escapeXml(s)}" value="${fn:escapeXml(value)}" />
 <%            	
             }
         }

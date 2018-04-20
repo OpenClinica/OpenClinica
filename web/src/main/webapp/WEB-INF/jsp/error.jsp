@@ -1,5 +1,6 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ page import="org.akaza.openclinica.web.SQLInitServlet" %>
+<%@ page import="org.springframework.web.util.HtmlUtils" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -40,7 +41,7 @@
 	<%--<fmt:param><%=request.getHeader("Referer")%></fmt:param>--%>
 	<%-- tbh 02/2010 remove HTML/XML from the referer name --%>
 	<fmt:param><c:out value="${referer}"/></fmt:param>
-	<fmt:param><%=SQLInitServlet.getField("mail.errormsg")%></fmt:param>
+	<fmt:param><%=HtmlUtils.htmlEscape(SQLInitServlet.getField("mail.errormsg"))%></fmt:param>
 </fmt:message>
 
 </font>

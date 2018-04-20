@@ -358,7 +358,7 @@
                         key="test_rules_rule_validation" bundle="${resword}" /></td>
                     <td class="formValue"><fmt:message
                         key="test_rules_${ruleValidation}" bundle="${resword}" /> <c:if
-                        test="${ruleValidationFailMessage != null }"> - ${ruleValidationFailMessage}</c:if></td>
+                        test="${ruleValidationFailMessage != null }"> - ${fn:escapeXml(ruleValidationFailMessage)}</c:if></td>
                 </tr>
 
                 <tr valign="top">
@@ -385,7 +385,7 @@
                         key="test_rules_rule_validation" bundle="${resword}" /></td>
                     <td class="formValue"><fmt:message
                         key="test_rules_${ruleValidation}" bundle="${resword}" /> <c:if
-                        test="${ruleValidationFailMessage != null }"> - ${ruleValidationFailMessage}</c:if></td>
+                        test="${ruleValidationFailMessage != null }"> - ${fn:escapeXml(ruleValidationFailMessage)}</c:if></td>
                 </tr>
 
                 <tr valign="top">
@@ -395,7 +395,7 @@
                 <tr valign="top">
                     <td class="formlabel"><fmt:message
                         key="test_rules_expression_evaluates_to" bundle="${resword}" /></td>
-                    <td class="formValue">${ruleEvaluatesTo}</td>
+                    <td class="formValue">${fn:escapeXml(ruleEvaluatesTo)}</td>
                 </tr>
 
                 <tr valign="top">
@@ -488,7 +488,7 @@
                 key="test_rules_rule_validation" bundle="${resword}" /></td>
             <td class="formValue"><fmt:message
                 key="test_rules_${ruleValidation}" bundle="${resword}" /> <c:if
-                test="${ruleValidationFailMessage != null }"> - ${ruleValidationFailMessage}</c:if></td>
+                test="${ruleValidationFailMessage != null }"> - ${fn:escapeXml(ruleValidationFailMessage)}</c:if></td>
         </tr>
 
         <tr valign="top">
@@ -498,7 +498,7 @@
         <tr valign="top">
             <td class="formlabel"><fmt:message
                 key="test_rules_expression_evaluates_to" bundle="${resword}" /></td>
-            <td class="formValue">${ruleEvaluatesTo}</td>
+            <td class="formValue">${fn:escapeXml(ruleEvaluatesTo)}</td>
         </tr>
 
         <tr valign="top">

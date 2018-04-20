@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
@@ -37,7 +38,7 @@
 				<c:when test='${currRow.bean.status.deleted}'>
 					<c:set var="confirmQuestion">
 					  <fmt:message key="are_you_sure_you_want_to_restore" bundle="${resword}">
-					    <fmt:param value="${currRow.bean.name}"/>
+					    <fmt:param value="${fn:escapeXml(currRow.bean.name)}"/>
 					  </fmt:message>
 					</c:set> 
 					
@@ -64,7 +65,7 @@
 		
 				<c:set var="confirmQuestion">
 				 <fmt:message key="are_you_sure_you_want_to_remove" bundle="${resword}">
-				   <fmt:param value="${currRow.bean.name}"/>
+				   <fmt:param value="${fn:escapeXml(currRow.bean.name)}"/>
 				 </fmt:message>
 				</c:set> 
 				

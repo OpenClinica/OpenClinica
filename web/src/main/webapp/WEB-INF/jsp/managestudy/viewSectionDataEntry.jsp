@@ -258,7 +258,7 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
     </c:forEach>
     DisplaySectionTabs();
 
-    selectTabs(${tabId},${sectionNum},'crfHeaderTabs');
+    selectTabs(${fn:escapeXml(tabId)},${fn:escapeXml(sectionNum)},'crfHeaderTabs');
 
     function DisplaySectionTabs() {
         TabID = 1;
@@ -268,11 +268,11 @@ http://svn.akazaresearch.com:8080/OpenClinica-2.2/EnterDataForStudyEvent?eventId
             sectionId = TabSectionId[TabID - 1];
         <c:choose>
         <c:when test="${studySubject != null && studySubject.id>0}">
-            url = "ViewSectionDataEntry?ecId=" + <c:out value="${EventCRFBean.id}"/> + "&crfVersionId=${section.crfVersion.id}&sectionId=" + sectionId + "&tabId=" + TabID + "&studySubjectId=${studySubjectId}"+"&eventDefinitionCRFId=${eventDefinitionCRFId}&exitTo=${exitTo}";
+            url = "ViewSectionDataEntry?ecId=" + <c:out value="${EventCRFBean.id}"/> + "&crfVersionId=${section.crfVersion.id}&sectionId=" + sectionId + "&tabId=" + TabID + "&studySubjectId=${studySubjectId}"+"&eventDefinitionCRFId=${eventDefinitionCRFId}&exitTo=${fn:escapeXml(exitTo)}";
 
         </c:when>
         <c:otherwise>
-            url = "ViewSectionDataEntry?crfVersionId=" + <c:out value="${section.crfVersion.id}"/> + "&sectionId=" + sectionId + "&ecId=" + <c:out value="${EventCRFBean.id}"/> + "&tabId=" + TabID+"&eventDefinitionCRFId=${eventDefinitionCRFId}&exitTo=${exitTo}";
+            url = "ViewSectionDataEntry?crfVersionId=" + <c:out value="${section.crfVersion.id}"/> + "&sectionId=" + sectionId + "&ecId=" + <c:out value="${EventCRFBean.id}"/> + "&tabId=" + TabID+"&eventDefinitionCRFId=${eventDefinitionCRFId}&exitTo=${fn:escapeXml(exitTo)}";
 
         </c:otherwise>
         </c:choose>

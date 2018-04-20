@@ -1,6 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="../login-include/login-header.jsp"/>
 <jsp:include page="../login-include/resetpwd-sidebar.jsp"/>
@@ -66,7 +67,7 @@
             <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwdChallengeQ"/></jsp:include></td><td class="formlabel">*</td>
         </tr>
         <tr><td class="formlabel"><fmt:message key="password_challenge_answer" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG">
-        <input type="text" name="passwdChallengeA" value="${ userBean1.passwdChallengeAnswer}" class="formfieldXL"></div>
+        <input type="text" name="passwdChallengeA" value="${ fn:escapeXml(userBean1.passwdChallengeAnswer)}" class="formfieldXL"></div>
             <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="passwdChallengeA"/></jsp:include></td><td class="formlabel">*</td>
         </tr>
      </c:if>

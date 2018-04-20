@@ -18,7 +18,7 @@
 		<fmt:message key="${currRow.bean.actionMessage}" bundle="${resaudit}" />&nbsp;
 	  </c:when>
 	  <c:otherwise>
-		<c:out value="${currRow.bean.actionMessage}" escapeXml="false" />&nbsp;
+		<c:out value="${currRow.bean.actionMessage}"/>&nbsp;
 	  </c:otherwise>
 	  </c:choose>
 	  </td>

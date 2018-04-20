@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -166,7 +167,7 @@
       </td>
       <td class="table_cell" colspan="2">
         <span id="enabledIfAllowAnonymousSubmission<c:out value="${count}"/>" style="display : none">
-          <fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}<input type="text" name="submissionUrl<c:out value="${count}"/>" value="">
+          <fmt:message key="submission_url" bundle="${resword}"/>: ${fn:escapeXml(participantUrl)}<input type="text" name="submissionUrl<c:out value="${count}"/>" value="">
                 <c:choose>
                   <c:when test="${definition.repeating == true }">
                           <br />

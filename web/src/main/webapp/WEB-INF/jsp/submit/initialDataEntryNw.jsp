@@ -122,7 +122,7 @@
 <input type="hidden" name="tab" value="<c:out value="${tabId}"/>" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
-<input type="hidden" name="exitTo" value="${exitTo}" />
+<input type="hidden" name="exitTo" value="${fn:escapeXml(exitTo)}" />
 <input type="hidden" name="sectionId" value="<c:out value="${section.section.id}"/>" />
 <input type="hidden" name="isFirstTimeOnSection" value="<c:out value="${section.section.id}"/>" />
 
@@ -273,7 +273,7 @@ if (TabLabel[<c:out value="${count}"/>].length>8) {
 </c:forEach>
 DisplaySectionTabs()
 
-selectTabs(${tabId},${sectionNum},'crfHeaderTabs');
+selectTabs(${fn:escapeXml(tabId)},${fn:escapeXml(sectionNum)},'crfHeaderTabs');
 
 
 function DisplaySectionTabs()
@@ -284,7 +284,7 @@ function DisplaySectionTabs()
 
     {
         sectionId = TabSectionId[TabID-1];
-        url = "InitialDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=${exitTo}";
+        url = "InitialDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=${fn:escapeXml(exitTo)}";
         currTabID = <c:out value="${tabId}"/>;
 
         if (TabID<=TabsShown)

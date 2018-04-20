@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -75,7 +76,7 @@
     <form name='scheduledJobsForm' action="${pageContext.request.contextPath}/pages/listCurrentScheduledJobs">
         <%--<fmt:message key="select_all_on_page" bundle="${resword}"/> <input type=checkbox name='checkSDVAll' onclick='selectAllChecks(this.form)'/>
         <br />--%>
-        <input type="hidden" name="studyId" value="${param.studyId}">
+        <input type="hidden" name="studyId" value="${fn:escapeXml(param.studyId)}">
         
         <%--This value will be set by an onclick handler associated with an SDV button --%>
         <input type="hidden" name="theJobName" value="0">

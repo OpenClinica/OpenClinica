@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -607,7 +608,7 @@
 
                             <tr>
                                 <td class="table_cell_left">
-                                        ${studyEvent.studyEventDefinition.name}</td>
+                                        ${fn:escapeXml(studyEvent.studyEventDefinition.name)}</td>
                                 <td class="table_cell">${displayEventCRFBean.eventCRF.crf.name}</td>
                                 <td class="table_cell">
                                     <c:set var="discNoteCount" value="${discNoteMap['New']}"/>

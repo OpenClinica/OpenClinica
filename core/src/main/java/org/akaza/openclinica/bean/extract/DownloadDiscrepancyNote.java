@@ -16,6 +16,7 @@ import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.springframework.web.util.HtmlUtils;
 
 import com.lowagie.text.BadElementException;
 import com.lowagie.text.Cell;
@@ -544,7 +545,7 @@ public class DownloadDiscrepancyNote implements DownLoadBean{
         try{
             if(CSV.equalsIgnoreCase(format))  {
                 String result  = StringEscapeUtils.unescapeJava(allContent.toString());
-                response.getWriter().print(result);
+                response.getWriter().print(HtmlUtils.htmlEscape(result));
                 //servletStream.print(allContent.toString());
             } else {
 

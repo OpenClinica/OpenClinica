@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
@@ -102,10 +102,10 @@ You may also enroll a new subject and add a new study event:
 
                     <c:choose>
                         <c:when test="${userRole.manageStudy}">
-                            <a class="tabtext" href="ListStudySubject?${tmpExtendedQuery}&module=${module}" onclick="javascript:HighlightTab(0);"><fmt:message key="all_events" bundle="${restext}"/></a>
+                            <a class="tabtext" href="ListStudySubject?${tmpExtendedQuery}&module=${fn:escapeXml(module)}" onclick="javascript:HighlightTab(0);"><fmt:message key="all_events" bundle="${restext}"/></a>
                         </c:when>
                         <c:otherwise>
-                            <a class="tabtext" href="ListStudySubjects?${tmpExtendedQuery}&module=${module}" onclick="javascript:HighlightTab(0);"><fmt:message key="all_events" bundle="${restext}"/></a>
+                            <a class="tabtext" href="ListStudySubjects?${tmpExtendedQuery}&module=${fn:escapeXml(module)}" onclick="javascript:HighlightTab(0);"><fmt:message key="all_events" bundle="${restext}"/></a>
                         </c:otherwise>
                     </c:choose>
 

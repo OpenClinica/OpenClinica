@@ -5,7 +5,7 @@
 --%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/> 
 
@@ -85,7 +85,7 @@
 	<!-- Search cell (for multi-page tables) -->
 
 		<c:if test="${searchFormDisplayed != 0}">
-			<form action="<c:out value="${table.postAction}" />?module=${module}" method="POST">
+			<form action="<c:out value="${table.postAction}" />?module=${fn:escapeXml(module)}" method="POST">
 		</c:if>
 	
 		<td width="33%" valign="top" align="center" class="table_actions">

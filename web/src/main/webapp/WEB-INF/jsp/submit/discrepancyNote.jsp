@@ -173,16 +173,16 @@ function setYPos(id) {
 	<c:set var="displayAll" value="block"/>
 </c:if>
 <form name="oneDNForm" method="POST" action="CreateOneDiscrepancyNote"> 
-<table border="0" cellpadding="0" cellspacing="0" style="float:left;display:<c:out value="${displayAll}"/>" id="${boxId}">
-	<input type="hidden" name="parentId" value="${parentId}"/>
-	<input type="hidden" name="viewDNLink${parentId}" value="${viewDNLink}"/>
-	<input type="hidden" name="id" value="${param.entityId}"/>
-	<input type="hidden" name="name" value="${param.entityType}"/>
-	<input type="hidden" name="field" value="${param.field}"/>
-	<input type="hidden" name="column" value="${param.column}"/>
-	<input type="hidden" name="close${parentId}" value=""/>
-	<input type="hidden" name="ypos${parentId}" value="0"/>
-	<input type="hidden" name="eventCRFId" value="${eventCRFId}"/>
+<table border="0" cellpadding="0" cellspacing="0" style="float:left;display:<c:out value="${fn:escapeXml(displayAll)}"/>" id="${fn:escapeXml(boxId)}">
+	<input type="hidden" name="parentId" value="${fn:escapeXml(parentId)}"/>
+	<input type="hidden" name="viewDNLink${fn:escapeXml(parentId)}" value="${fn:escapeXml(viewDNLink)}"/>
+	<input type="hidden" name="id" value="${fn:escapeXml(param.entityId)}"/>
+	<input type="hidden" name="name" value="${fn:escapeXml(param.entityType)}"/>
+	<input type="hidden" name="field" value="${fn:escapeXml(param.field)}"/>
+	<input type="hidden" name="column" value="${fn:escapeXml(param.column)}"/>
+	<input type="hidden" name="close${fn:escapeXml(parentId)}" value=""/>
+	<input type="hidden" name="ypos${fn:escapeXml(parentId)}" value="0"/>
+	<input type="hidden" name="eventCRFId" value="${fn:escapeXml(eventCRFId)}"/>
 
 	<td valign="top">
 	<div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TR"><div class="box_BL"><div class="box_BR">
@@ -205,22 +205,22 @@ function setYPos(id) {
 		<div style="clear:both;"></div> 
 		<div class="dnBoxCol1-1"><fmt:message key="description" bundle="${resword}"/>:<span class="alert">*</span></div>
 		<div class="dnBoxCol2-1">
-			<span id="description${parentId}">
-				<div class="formfieldXL_BG"><input type="text" id="description${parentId}id" name="description${parentId}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
+			<span id="description${fn:escapeXml(parentId)}">
+				<div class="formfieldXL_BG"><input type="text" id="description${fn:escapeXml(parentId)}id" name="description${fn:escapeXml(parentId)}" value="<c:out value="${discrepancyNote.description}"/>" class="formfieldXL"></div>
 				<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="description${parentId}"/></jsp:include>
 			</span>
 		</div>
 		<div class="dnBoxCol1"><fmt:message key="detailed_note" bundle="${resword}"/>:</div>
 		<div class="dnBoxCol2">
 			<div class="formtextareaXL4_BG">
-		  		<textarea name="detailedDes${parentId}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${discrepancyNote.detailedNotes}"/></textarea>
+		  		<textarea name="detailedDes${fn:escapeXml(parentId)}" rows="4" cols="50" class="formtextareaXL4"><c:out value="${fn:escapeXml(discrepancyNote.detailedNotes)}"/></textarea>
 			</div>
 			<jsp:include page="../showMessage.jsp"><jsp:param name="key" value="detailedDes${parentId}"/></jsp:include>
 		</div>
 		
 		<c:choose>
 		<c:when test="${parentId > 0}">
-			<input type="hidden" name="typeId${parentId}" value="${param.typeId}"/>
+			<input type="hidden" name="typeId${fn:escapeXml(parentId)}" value="${fn:escapeXml(param.typeId)}"/>
 		</c:when>
 		<c:otherwise>
 			<div class="dnBoxCol1"><fmt:message key="type" bundle="${resword}"/>:<span class="alert">*</span></div>
@@ -228,7 +228,7 @@ function setYPos(id) {
 				<c:set var="typeIdl" value="${discrepancyNote.discrepancyNoteTypeId}"/>
 				<c:choose>
 				<c:when test="${whichResStatus == 22 || whichResStatus == 1}">
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
+					<select name="typeId${fn:escapeXml(parentId)}" id="typeId${fn:escapeXml(parentId)}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2','<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
 						<c:forEach var="type" items="${discrepancyTypes2}">
 						<c:choose>
 						<c:when test="${typeIdl == type.id}">
@@ -256,7 +256,7 @@ function setYPos(id) {
 					</select>
 				</c:when>
 				<c:otherwise>
-					<select name="typeId${parentId}" id="typeId${parentId}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
+					<select name="typeId${fn:escapeXml(parentId)}" id="typeId${fn:escapeXml(parentId)}" class="formfieldL" onchange ="javascript:setElements(this.options[selectedIndex].value, 'user1', 'user2', '<c:out value="${parentId}"/>','<c:out value="${whichResStatus}"/>','<fmt:message key="New" bundle="${resterm}"/>','<fmt:message key="Updated" bundle="${resterm}"/>','<fmt:message key="Resolution_Proposed" bundle="${resterm}"/>','<fmt:message key="Closed" bundle="${resterm}"/>','<fmt:message key="Not_Applicable" bundle="${resterm}"/>');">
 						<c:forEach var="type" items="${discrepancyTypes}">
 						<c:choose>
 						<c:when test="${typeIdl == type.id}">
@@ -289,12 +289,12 @@ function setYPos(id) {
 		</c:otherwise>
 		</c:choose>
 		
-		<span id="res1${parentId}">
+		<span id="res1${fn:escapeXml(parentId)}">
 			<div class="dnBoxCol1"><fmt:message key="Set_to_Status" bundle="${resword}"/>:<span class="alert">*</span></div>
 			<div class="dnBoxCol2">
 				<div class="formfieldL_BG">
 				<c:set var="resStatusIdl" value="${discrepancyNote.resolutionStatusId}"/>
-			    <select name="resStatusId${parentId}" id="resStatusId${parentId}" class="formfieldL">
+			    <select name="resStatusId${fn:escapeXml(parentId)}" id="resStatusId${fn:escapeXml(parentId)}" class="formfieldL">
 					<c:choose>
 					<c:when test="${(parentId>0 || whichResStatus==2 && discrepancyNote.discrepancyNoteTypeId==3) || whichResStatus==1}">
 						<c:set var="resStatuses" value="${resolutionStatuses}"/>
@@ -321,10 +321,10 @@ function setYPos(id) {
 		
 		<c:choose>
 		<c:when test="${autoView == 0}">
-        	<span id="user1${parentId}" style="display:none">
+        	<span id="user1${fn:escapeXml(parentId)}" style="display:none">
 		</c:when>
 		<c:otherwise>
-			<span id="user1${parentId}" style="display:block">
+			<span id="user1${fn:escapeXml(parentId)}" style="display:block">
       	</c:otherwise>
 		</c:choose>
 			<div class="dnBoxCol1"><fmt:message key="assign_to_user" bundle="${resword}"/>:</div>
@@ -338,7 +338,7 @@ function setYPos(id) {
 						<c:set var="userAccountId1" value="0"/>
 					</c:otherwise>
 					</c:choose>
-					<select name="userAccountId${parentId}" id="userAccountId${parentId}" class="formfieldL" >
+					<select name="userAccountId${fn:escapeXml(parentId)}" id="userAccountId${fn:escapeXml(parentId)}" class="formfieldL" >
 						<option value="0">
 				  		<c:forEach var="user" items="${userAccounts}">
 				   		<c:choose>
@@ -358,21 +358,21 @@ function setYPos(id) {
 		
 		<c:choose>
 		<c:when test="${autoView == 0}">
-			<span id="user2${parentId}" style="display:none">
+			<span id="user2${fn:escapeXml(parentId)}" style="display:none">
 		</c:when>
 		<c:otherwise>
-			<span id="user2${parentId}" style="display:block">
+			<span id="user2${fn:escapeXml(parentId)}" style="display:block">
 		</c:otherwise>
 		</c:choose>
 			<div class="dnBoxCol1"><fmt:message key="email_assigned_user" bundle="${resword}"/>:</div>
-			<div class="dnBoxCol2"><input name="sendEmail${parentId}" value="1" type="checkbox"/></div>
+			<div class="dnBoxCol2"><input name="sendEmail${fn:escapeXml(parentId)}" value="1" type="checkbox"/></div>
 		</span>
 		
 		<c:set var= "noteEntityType" value="${discrepancyNote.entityType}"/>
 		<c:if test="${enterData == '1' || canMonitor == '1' || noteEntityType != 'itemData' }">
 			<div class="dnBoxCol3">
-				<input type="submit" id="submitBtn${parentId}" name="Submit${parentId}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');">
-				<input type="submit" name="SubmitExit${parentId}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');javascript:setYPos('<c:out value="${parentId}"/>');">
+				<input type="submit" id="submitBtn${fn:escapeXml(parentId)}" name="Submit${fn:escapeXml(parentId)}" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setYPos('<c:out value="${parentId}"/>');">
+				<input type="submit" name="SubmitExit${fn:escapeXml(parentId)}" value="<fmt:message key="submit_exit" bundle="${resword}"/>" class="button_medium" onclick="javascript:setValue('close<c:out value="${parentId}"/>','true');javascript:setYPos('<c:out value="${parentId}"/>');">
 			</div>
 		</c:if>
 		<c:if test="${parentId==0}">

@@ -19,15 +19,15 @@
 
 <script>
   var app_contextPath = '${pageContext.request.contextPath}';
-  var app_studyOID = '${studyOID}';
-  var app_studySubjectOID = '${studySubjectOID}';
-  var app_siteOID = '${studyOID}';
+  var app_studyOID = '${fn:escapeXml(studyOID)}';
+  var app_studySubjectOID = '${fn:escapeXml(studySubjectOID)}';
+  var app_siteOID = '${fn:escapeXml(studyOID)}';
 
-  var app_eventOID = '${eventOID}';
+  var app_eventOID = '${fn:escapeXml(eventOID)}';
   var app_eventOrdinal = 1;
-  if ('${eventOID}'.indexOf('[') != -1) {
-    app_eventOID = '${eventOID}'.substring(0,'${eventOID}'.indexOf('['));
-    app_eventOrdinal = '${eventOID}'.substring('${eventOID}'.indexOf('[')+1, '${eventOID}'.indexOf(']'));
+  if ('${fn:escapeXml(eventOID)}'.indexOf('[') != -1) {
+    app_eventOID = '${fn:escapeXml(eventOID)}'.substring(0,'${fn:escapeXml(eventOID)}'.indexOf('['));
+    app_eventOrdinal = '${fn:escapeXml(eventOID)}'.substring('${fn:escapeXml(eventOID)}'.indexOf('[')+1, '${fn:escapeXml(eventOID)}'.indexOf(']'));
   }
 
   var app_eventCRFLabel = '<oc:jsEscape key="event_CRF" bundle="${resword}"/>';
@@ -92,7 +92,7 @@
 
 
 
-  var app_formVersionOID = '${formVersionOID}';
+  var app_formVersionOID = '${fn:escapeXml(formVersionOID)}';
   var app_protocolIDLabel = '<oc:jsEscape key="protocol_ID" bundle="${resword}"/>';
   var app_siteNameLabel = '<oc:jsEscape key="site" bundle="${resword}"/>';
   var app_studyNameLabel = '<oc:jsEscape key="study_name" bundle="${resword}"/>';
@@ -120,8 +120,8 @@
   var app_sectionSubtitle = '<oc:jsEscape key="subtitle" bundle="${resword}"/>'+":";
   var app_sectionInstructions = '<oc:jsEscape key="instructions" bundle="${resword}"/>'+":";
   var app_sectionPage = '<oc:jsEscape key="page" bundle="${resword}"/>'+":";
-  var app_displayAudits='${includeAudits}';
-  var app_displayDNs='${includeDNs}';
+  var app_displayAudits='${fn:escapeXml(includeAudits)}';
+  var app_displayDNs='${fn:escapeXml(includeDNs)}';
 var removed_crfVersionMessage='<oc:jsEscape key="removed_crf_version" bundle="${resword}"/>'+":";
 
 var app_subjectAgeAtEvent='<oc:jsEscape key="subject_age_at_event" bundle="${resword}"/>';

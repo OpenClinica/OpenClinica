@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt"%>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format"
 	var="resformat" />
@@ -138,8 +139,8 @@
 <form
 	action="${pageContext.request.contextPath}/pages/api/v1/forms/migrate/run"
 	method="post">
-	<input type="hidden" name="studyOid" id="studyOid" value="${study.oid}">
-	<input type="hidden" name="crfId" id="crfId" value="${crf.id}">
+	<input type="hidden" name="studyOid" id="studyOid" value="${fn:escapeXml(study.oid)}">
+	<input type="hidden" name="crfId" id="crfId" value="${fn:escapeXml(crf.id)}">
 
 
 	<table cellpadding="2" cellspacing="2" border="0" class="dataTable">

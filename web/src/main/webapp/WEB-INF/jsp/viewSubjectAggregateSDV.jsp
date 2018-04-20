@@ -1,7 +1,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -151,7 +151,7 @@
     {hideCols('s_sdv',[2]);}
     else {hideCols('s_sdv',[2],true);} toggleName(this);"><fmt:message key="show_more" bundle="${resword}"/></a>
     <form  action="${pageContext.request.contextPath}/pages/viewSubjectAggregateSDV">
-        <input type="hidden" name="studyId" value="${param.studyId}">
+        <input type="hidden" name="studyId" value="${fn:escapeXml(param.studyId)}">
 <!--        <input type="hidden" name="decorator" value="mydecorator"> -->
         ${sdvTableAttribute}
     </form>

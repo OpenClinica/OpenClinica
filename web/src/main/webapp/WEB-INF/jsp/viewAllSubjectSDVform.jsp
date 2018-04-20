@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -184,7 +184,7 @@
                             </td>
                             <td><div><b><fmt:message key="To" bundle="${resword}"/></b></div></td>
                             <td><div class="formfieldS_BG" style="width:157px">
-                                <input type="text" name="endDate" value="${endDate}" class="formfieldS" id="endDateField">
+                                <input type="text" name="endDate" value="${fn:escapeXml(endDate)}" class="formfieldS" id="endDateField">
                                 <A HREF="#">
                                     <img src="../images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="startDateTriggerB"/>
                                     <script type="text/javascript">
@@ -217,16 +217,16 @@
     <form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDVform">
          <fmt:message key="select_all_on_page" bundle="${resword}"/> <input type=checkbox name='checkSDVAll' onclick='selectAllChecks(this.form)'/>
         <br />
-        <input type="hidden" name="studyId" value="${param.studyId}">
-        <input type="hidden" name="study_subject_id" value="${param.study_subject_id}">
-        <input type="hidden" name="eventCRF" value="${param.eventCRF}">
-        <input type="hidden" name="studyEventDefinition" value="${param.studyEventDefinition}">
-        <input type="hidden" name="studyEventStatus" value="${param.studyEventStatus}">
-        <input type="hidden" name="eventCRFStatus" value="${param.eventCRFStatus}">
-        <input type="hidden" name="eventcrfSDVStatus" value="${param.eventcrfSDVStatus}">
-        <input type="hidden" name="sdvRequirement" value="${param.sdvRequirement}">
-        <input type="hidden" name="startUpdatedDate" value="${param.startUpdatedDate}">
-        <input type="hidden" name="endDate" value="${param.endDate}">
+        <input type="hidden" name="studyId" value="${fn:escapeXml(param.studyId)}">
+        <input type="hidden" name="study_subject_id" value="${fn:escapeXml(param.study_subject_id)}">
+        <input type="hidden" name="eventCRF" value="${fn:escapeXml(param.eventCRF)}">
+        <input type="hidden" name="studyEventDefinition" value="${fn:escapeXml(param.studyEventDefinition)}">
+        <input type="hidden" name="studyEventStatus" value="${fn:escapeXml(param.studyEventStatus)}">
+        <input type="hidden" name="eventCRFStatus" value="${fn:escapeXml(param.eventCRFStatus)}">
+        <input type="hidden" name="eventcrfSDVStatus" value="${fn:escapeXml(param.eventcrfSDVStatus)}">
+        <input type="hidden" name="sdvRequirement" value="${fn:escapeXml(param.sdvRequirement)}">
+        <input type="hidden" name="startUpdatedDate" value="${fn:escapeXml(param.startUpdatedDate)}">
+        <input type="hidden" name="endDate" value="${fn:escapeXml(param.endDate)}">
         <%-- studyId=49&study_subject_id=Subject+D&eventCRF=0&studyEventDefinition=0&
         studyEventStatus=-1&eventCRFStatus=-1&eventcrfSDVStatus=None&sdvRequirement=0&startUpdatedDate=&endDate=&submit=Apply+Filter--%>
        <%--This value will be set by an onclick handler associated with an SDV button --%>

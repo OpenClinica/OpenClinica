@@ -8,6 +8,8 @@ import javax.servlet.jsp.JspContext;
 import javax.servlet.jsp.JspException;
 import javax.servlet.jsp.JspWriter;
 import javax.servlet.jsp.tagext.SimpleTagSupport;
+
+import org.apache.commons.lang.StringEscapeUtils;
 /**
  * Created by IntelliJ IDEA.
  * User: bruceperry
@@ -26,7 +28,7 @@ public class AlertTag extends SimpleTagSupport {
         List<String> messages = (ArrayList) context.findAttribute("pageMessages");
         if(messages != null){
             for(String message : messages){
-                builder.append(message);
+                builder.append(StringEscapeUtils.escapeHtml(message));
                 builder.append("<br />");
             }
 

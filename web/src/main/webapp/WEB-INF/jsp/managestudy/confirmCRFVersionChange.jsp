@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -167,19 +168,19 @@
 
 <table border="0" colspan="2"><tr><td>
 <form method="POST" action="${pageContext.request.contextPath}/pages/managestudy/changeCRFVersion" >
-<input type="hidden" name="newCRFVersionId" value="${selectedVersionId}">
+<input type="hidden" name="newCRFVersionId" value="${fn:escapeXml(selectedVersionId})">
 
-<input type="hidden" name="studySubjectId" value="${studySubjectId}">
-<input type="hidden" name="eventDefinitionCRFId" value="${eventDefinitionCRFId}">
-<input type="hidden" name="studySubjectLabel" value="${studySubjectLabel}">
-<input type="hidden" name="crfversionId" value="${crfversionId}">
-<input type="hidden" name="crfId" value="${crfId}">
-<input type="hidden" name="crfName" value="${crfName}">
-<input type="hidden" name="crfVersionName" value="${crfVersionName}">
-<input type="hidden" name="eventCRFId" value="${eventCRFId}">
-<input type="hidden" name="eventName" value="${eventName}">
-<input type="hidden" name="eventCreateDate" value="${eventCreateDate}">
-<input type="hidden" name="eventOrdinal" value="${eventOrdinal}">
+<input type="hidden" name="studySubjectId" value="${fn:escapeXml(studySubjectId})">
+<input type="hidden" name="eventDefinitionCRFId" value="${fn:escapeXml(eventDefinitionCRFId})">
+<input type="hidden" name="studySubjectLabel" value="${fn:escapeXml(studySubjectLabel})">
+<input type="hidden" name="crfversionId" value="${fn:escapeXml(crfversionId})">
+<input type="hidden" name="crfId" value="${fn:escapeXml(crfId})">
+<input type="hidden" name="crfName" value="${fn:escapeXml(crfName)}">
+<input type="hidden" name="crfVersionName" value="${fn:escapeXml(crfVersionName)}">
+<input type="hidden" name="eventCRFId" value="${fn:escapeXml(eventCRFId)}">
+<input type="hidden" name="eventName" value="${fn:escapeXml(eventName)}">
+<input type="hidden" name="eventCreateDate" value="${fn:escapeXml(eventCreateDate)}">
+<input type="hidden" name="eventOrdinal" value="${fn:escapeXml(eventOrdinal)}">
 
 <input type="submit" name="Submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long">
 </form></td><td>

@@ -127,10 +127,10 @@
     <td  class="table_cell">${status1.current.key.itemGroupName}</td>
     <td class="table_cell">${status1.current.key.itemName}</td>
 
-    <td class="table_cell"><span id="a${count}" style="color: BLUE; text-decoration: underline;" onClick="showOrHideSubjects(${count},'<fmt:message key="rule_show_subjects" bundle="${resword}" />','<fmt:message key="rule_hide_subjects" bundle="${resword}" />')"><u><fmt:message key="rule_show_subjects" bundle="${resword}" /></u></span></td>
+    <td class="table_cell"><span id="a${fn:escapeXml(count)}" style="color: BLUE; text-decoration: underline;" onClick="showOrHideSubjects(${fn:escapeXml(count)},'<fmt:message key="rule_show_subjects" bundle="${resword}" />','<fmt:message key="rule_hide_subjects" bundle="${resword}" />')"><u><fmt:message key="rule_show_subjects" bundle="${resword}" /></u></span></td>
 
     </tr>
-    <tr id="tr${count}" style="display: none;">
+    <tr id="tr${fn:escapeXml(count)}" style="display: none;">
         <td class="table_cell" colspan="7">
         <span style="color:#D4A718;font-weight:bold;font-size:12px;"><fmt:message key="rule_subjects" bundle="${resword}" /></span><br/>
         <c:forEach var ="subject" items="${status1.current.value}">
@@ -151,7 +151,7 @@
 <table border="0" cellpadding="0" cellspacing="0">
 <tr>
 <td>
-<input type="button" name="Submit" id="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRule?${submitLinkParams}';"/></td>
+<input type="button" name="Submit" id="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onClick="window.location.href='RunRule?${fn:escapeXml(submitLinkParams)}';"/></td>
 </td>
 <td>
 <input type="button" name="Cancel" id="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_long" onClick="window.location.href='ViewRuleAssignment';"/></td>

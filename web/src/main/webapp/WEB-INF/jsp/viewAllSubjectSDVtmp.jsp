@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -229,7 +229,7 @@
 </script>
 <div id="subjectSDV">
     <form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDVtmp">
-        <input type="hidden" name="studyId" value="${param.studyId}">
+        <input type="hidden" name="studyId" value="${fn:escapeXml(param.studyId)}">
         <input type="hidden" name=imagePathPrefix value="../">
         <%--This value will be set by an onclick handler associated with an SDV button --%>
         <input type="hidden" name="crfId" value="0">

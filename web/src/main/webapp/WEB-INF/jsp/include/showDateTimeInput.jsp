@@ -5,6 +5,7 @@
 
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/> 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/> 
@@ -48,14 +49,14 @@
 
 <td valign="top">
 <div class="formfieldS_BG">
-    <input type="text" name="<c:out value="${dateFieldName}"/>" value="<c:out value="${date}" />" class="formfieldS" id="${prefix}dateField"/>
+    <input type="text" name="<c:out value="${dateFieldName}"/>" value="<c:out value="${date}" />" class="formfieldS" id="${fn:escapeXml(prefix)}dateField"/>
 </div>
 </td>
 <td valign="top">
     <a href="#" >
-        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="${prefix}dateTrigger" />
+        <img src="images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="${fn:escapeXml(prefix)}dateTrigger" />
         <script type="text/javascript">
-        Calendar.setup({inputField  : "${prefix}dateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "${prefix}dateTrigger" });
+        Calendar.setup({inputField  : "${fn:escapeXml(prefix)}dateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "${fn:escapeXml(prefix)}dateTrigger" });
         </script>
         
     </a>

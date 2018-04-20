@@ -12,6 +12,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.dao.hibernate.DatabaseChangeLogDao;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.web.util.HtmlUtils;
 
 import java.io.PrintWriter;
 import java.util.Locale;
@@ -45,7 +46,7 @@ public class SystemStatusServlet extends SecureController {
 
         PrintWriter out = response.getWriter();
         out.println(applicationStatus);
-        out.println(String.valueOf(databaseChangelLogCount));
+        out.println(HtmlUtils.htmlEscape(String.valueOf(databaseChangelLogCount)));
     }
 
     public DatabaseChangeLogDao getDatabaseChangeLogDao() {
