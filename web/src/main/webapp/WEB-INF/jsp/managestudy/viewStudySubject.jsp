@@ -106,6 +106,14 @@
 
   function resetAllFilters() {
     clickAllSections('collapsed');
+    $('input[type=search]').val('');
+    $('table.datatable').each(function() {
+      var table = $(this);
+      table.DataTable().order([]);
+      table.DataTable().search('');
+      table.dataTable().fnDraw();
+    });
+    $('#oc-status-hide').val('oc-status-removed').trigger('change');
   };
 </script>
 <style>
