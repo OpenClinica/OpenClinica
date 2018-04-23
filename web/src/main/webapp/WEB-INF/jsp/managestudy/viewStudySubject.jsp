@@ -113,7 +113,7 @@
       table.DataTable().search('');
       table.dataTable().fnDraw();
     });
-    $('#oc-status-hide').val('oc-status-removed').trigger('change');
+    $('#oc-status-hide').val('oc-status-removed').change();
   };
 </script>
 <style>
@@ -204,6 +204,9 @@
       <option value="oc-status-active">Removed Records</option>
       <option value="null">All Records</option>
     </select>
+    <script>
+      $('#oc-status-hide').val(storage.ocStatusHide).change();
+    </script>
   </span>
 </div>
 <div class="header-links">

@@ -384,7 +384,9 @@ $(function() {
             sections.not(hides).show();
             $('table.datatable').DataTable().draw();
             $('tr.section-header, tr.section-body').removeClass('expanded').addClass('collapsed');
-        });
+            storage.ocStatusHide = hideClass;
+            stor();
+        }).change();
 
         var numVisitBaseds = 0;
         var hideStatus = $('#oc-status-hide').val();
