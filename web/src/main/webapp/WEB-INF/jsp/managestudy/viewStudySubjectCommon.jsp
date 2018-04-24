@@ -428,10 +428,17 @@ $(function() {
 
         $.fn.dataTable.moment('DD-MMM-YYYY');
         $('table.datatable')
-            .each(function() {
+            .each(function(i) {
                 var table = $(this);
                 var datatable = table.DataTable({
                     stateSave: true,
+                    stateSaveCallback: function(settings, data) {
+                        storage.datatables[i] = data;
+                        stor();
+                    },
+                    stateLoadCallback: function(settings, callback) {
+                        callback(storage.datatables[i]);
+                    },
                     dom: "frtilp",
                     language: {
                         paginate: {

@@ -64,7 +64,11 @@
 </script>
 <script>
   var storageKey = location.pathname + location.search;
-  var storage = JSON.parse(sessionStorage.getItem(storageKey)) || {collapseSections: {}};
+  var storage = JSON.parse(sessionStorage.getItem(storageKey)) || {
+    collapseSections: {},
+    datatables: [],
+    ocStatusHide: 'oc-status-removed',
+  };
   function stor() {
     sessionStorage.setItem(storageKey, JSON.stringify(storage));
   }
