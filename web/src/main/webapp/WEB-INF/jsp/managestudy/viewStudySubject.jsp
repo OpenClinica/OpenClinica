@@ -118,6 +118,7 @@
       table.dataTable().fnDraw();
     });
     $('#oc-status-hide').val('oc-status-removed').change();
+    $('#resetAllLink').hide();
   };
 </script>
 <style>
@@ -217,8 +218,9 @@
   <a href="javascript:clickAllSections('collapsed');">Expand All</a>
   <span>&nbsp; | &nbsp;</span>
   <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
-  <span>&nbsp; | &nbsp;</span>
-  <a href="javascript:resetAllFilters();">Reset All Filters</a>  
+  <span id="resetAllLink" style="display:none">&nbsp; | &nbsp;
+    <a href="javascript:resetAllFilters();">Reset All Filters</a>  
+  </span>
 </div>
 </div>
 <div class="section expanded clear hide" id="studySubjectRecord">
