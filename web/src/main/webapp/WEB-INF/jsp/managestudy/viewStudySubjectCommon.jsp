@@ -125,6 +125,7 @@
 <script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/plug-ins/1.10.16/api/fnSortNeutral.js"></script>
 <script>
     Handlebars.registerHelper('truncate', function(s, length) {
         if (!s)
@@ -427,6 +428,10 @@ $(function() {
                     alert('Error. See console log.');
                 }
             });
+        }).on('click', '.reset-filter', function() {
+            var table = $(this).closest('.subsection').find('table.datatable');
+            table.DataTable().search('');
+            table.dataTable().fnSortNeutral();
         });
 
         $.fn.dataTable.moment('DD-MMM-YYYY');
@@ -477,6 +482,7 @@ $(function() {
             .prev('.dataTables_filter').each(function() {
                 var searchbox = $(this);
                 searchbox.appendTo(searchbox.closest('.subsection').find('.subsection-header'));
+                $('<span><a class="reset-filter" href="#" onclick="return false;">Reset Filters</a> | </span>').prependTo(searchbox);
             })
             .end()
             .wrap($('<div>', {

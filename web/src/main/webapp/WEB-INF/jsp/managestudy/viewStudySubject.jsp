@@ -73,6 +73,10 @@
     sessionStorage.setItem(storageKey, JSON.stringify(storage));
   }
 
+  function resetFilter(link) {
+      console.log(link);
+  }
+
   $(document.body).on('click', '.section-header', function() {
     var header = $(this);
     var body = header.next();
