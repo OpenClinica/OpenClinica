@@ -483,16 +483,6 @@ $(function() {
                 }
             }));
 
-        var searchboxes = $('input[type=search]');
-        function showHideResetLink() {
-            numFiltered = searchboxes.filter(function(){return $(this).val() !== ''}).length;
-            $('#resetAllLink')[numFiltered > 0 ? 'show' : 'hide']();
-        }
-        searchboxes.on('input', function() {
-            showHideResetLink();
-        });
-        showHideResetLink();
-
         $('div.section.collapsed').children('.section-body').hide();
         $('#loading').remove();
     }, function() {
