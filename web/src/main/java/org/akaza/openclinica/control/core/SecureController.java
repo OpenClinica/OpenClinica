@@ -62,6 +62,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.core.CRFLocker;
 import org.akaza.openclinica.core.EmailEngine;
+import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
@@ -81,6 +82,8 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
@@ -227,6 +230,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public static final String MODULE = "module";// to determine which module
 
     private CRFLocker crfLocker;
+    private EventCRFLocker eventCrfLocker;
+
     private final String COMMON = "common";
 
     // user is in
@@ -277,6 +282,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public void init() throws ServletException {
         context = getServletContext();
         crfLocker = SpringServletAccess.getApplicationContext(context).getBean(CRFLocker.class);
+        eventCrfLocker = SpringServletAccess.getApplicationContext(context).getBean(EventCRFLocker.class);
+
     }
 
     /**
@@ -1323,6 +1330,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public CRFLocker getCrfLocker() {
         return crfLocker;
+    }
+    public EventCRFLocker getEventCrfLocker() {
+        return eventCrfLocker;
     }
 
 }

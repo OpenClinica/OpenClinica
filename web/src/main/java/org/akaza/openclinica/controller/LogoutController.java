@@ -1,6 +1,9 @@
 package org.akaza.openclinica.controller;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.odmbeans.UserBean;
 import org.akaza.openclinica.config.AppConfig;
+import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.service.LogoutService;
 import org.akaza.openclinica.view.Page;
 import org.apache.commons.lang.StringUtils;
@@ -35,6 +38,9 @@ public class LogoutController {
     private Auth0Controller controller;
     @Autowired LogoutService logoutService;
     @Autowired AppConfig config;
+    @Autowired
+    EventCRFLocker eventCRFLocker;
+
     @RequestMapping(value="/logout", method = RequestMethod.GET)
     protected String home(final Map<String, Object> model, final HttpServletRequest req) {
         HttpSession session = req.getSession();
@@ -87,6 +93,10 @@ public class LogoutController {
     }
 
     private void resetSessionAttributes(HttpSession session) {
+        // first release all locks
+        UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
+        if (ub != null)
+            eventCRFLocker.unlockAllForUser(ub.getId());
         SecurityContextHolder.clearContext();
         session.removeAttribute("userBean");
         session.removeAttribute("study");

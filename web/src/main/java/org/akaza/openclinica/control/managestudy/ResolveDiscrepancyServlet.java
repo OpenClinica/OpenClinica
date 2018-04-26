@@ -409,6 +409,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         boolean toView = false;
         boolean isCompleted = false;
+        Page p = null;
         if ("itemdata".equalsIgnoreCase(entityType)) {
             ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
             ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
@@ -416,6 +417,16 @@ public class ResolveDiscrepancyServlet extends SecureController {
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
+            if (isCRFLocked(ecb)) {
+                addPageMessage(resword.getString("CRF_unavailable") +
+                        "\n" + ub.getName() + " " + resword.getString("Currently_entering_data")
+                        + "\n" + resword.getString("Leave_the_CRF"));
+                p = Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET;
+                forwardPage(p);
+                return;
+            } else {
+                lockCRF(ecb);
+            }
             StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(ecb.getStudySubjectId());
 
             discrepancyNoteBean.setSubjectId(studySubjectBean.getId());
@@ -432,7 +443,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // System.out.println("set up pop up url: " + createNoteURL);
         boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted, module, flavor);
 
-        Page p = getPageForForwarding(discrepancyNoteBean, isCompleted);
+        p = getPageForForwarding(discrepancyNoteBean, isCompleted);
 
         // logger.info("found page for forwarding: " + p.getFileName());
         if (p == null) {
@@ -458,6 +469,21 @@ public class ResolveDiscrepancyServlet extends SecureController {
         }
 
         forwardPage(p);
+    }
+
+    private boolean isCRFLocked(EventCRFBean ecb) {
+        if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId())) {
+            String errorData = resword.getString("CRF_unavailable") +
+                    "\\n" + ub.getName() + " " + resword.getString("Currently_entering_data")
+                    + "\\n" + resword.getString("Leave_the_CRF");
+            request.setAttribute("errorData", errorData);
+            return true;
+        }
+        return false;
+    }
+
+    private void lockCRF(EventCRFBean ecb) {
+        getEventCrfLocker().lock(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId());
     }
 
     /**

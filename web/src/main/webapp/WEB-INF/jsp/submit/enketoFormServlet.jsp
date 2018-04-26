@@ -49,9 +49,17 @@
     <script type="text/javascript" language="javascript">
 
         $(document).ready(function(){
-            var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
-            iframe = document.getElementById("enketo");
-            iframe.setAttribute('src', fullEnketoURL);
+            var errorData = "${errorData}";
+            if (errorData) {
+                alert(errorData);
+                if ("${originatingPage}") window.location.replace("${originatingPage}");
+            } else {
+                var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
+                iframe = document.getElementById("enketo");
+                iframe.setAttribute('src', fullEnketoURL);
+            }
+
+
         });
 
         window.addEventListener("message", receiveMessage, false);
