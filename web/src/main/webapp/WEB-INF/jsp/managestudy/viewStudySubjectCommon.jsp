@@ -55,6 +55,9 @@
     .dataTables_filter input {
         margin-left: 5px;
     }
+    .info-filtered {
+        color: red;
+    }
     .table_tools, .table_actions {
         vertical-align: middle !important;
     }
@@ -449,7 +452,7 @@ $(function() {
                         },
                         info: 'Results _START_-_END_ of _TOTAL_.',
                         infoEmpty: 'Results 0-0 of 0.',
-                        infoFiltered: '(filtered from _MAX_ total)',
+                        infoFiltered: '<span class="info-filtered">(filtered from _MAX_ total)</span>',
                         lengthMenu: 'Show _MENU_ per page'
                     },
                     columnDefs: [{
