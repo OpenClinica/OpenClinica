@@ -110,6 +110,7 @@
 
   function resetAllFilters() {
     clickAllSections('collapsed');
+<<<<<<< HEAD
     $('input[type=search]').val('');
     $('table.datatable').each(function() {
       var table = $(this);
@@ -118,6 +119,8 @@
       table.dataTable().fnDraw();
     });
     $('#oc-status-hide').val('oc-status-removed').change();
+=======
+>>>>>>> parent of 2d8d66ef1... OC-9032 View Subject page has link to clear all filters
   };
 </script>
 <style>
