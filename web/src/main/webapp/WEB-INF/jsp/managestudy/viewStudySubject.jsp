@@ -107,21 +107,6 @@
   function clickAllSections(state) {
     $('.section.' + state).children('.section-header').click();
   };
-
-  function resetAllFilters() {
-    clickAllSections('collapsed');
-<<<<<<< HEAD
-    $('input[type=search]').val('');
-    $('table.datatable').each(function() {
-      var table = $(this);
-      table.DataTable().order([]);
-      table.DataTable().search('');
-      table.dataTable().fnDraw();
-    });
-    $('#oc-status-hide').val('oc-status-removed').change();
-=======
->>>>>>> parent of 2d8d66ef1... OC-9032 View Subject page has link to clear all filters
-  };
 </script>
 <style>
   #header {
@@ -220,8 +205,6 @@
   <a href="javascript:clickAllSections('collapsed');">Expand All</a>
   <span>&nbsp; | &nbsp;</span>
   <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
-  <span>&nbsp; | &nbsp;</span>
-  <a href="javascript:resetAllFilters();">Reset All Filters</a>  
 </div>
 </div>
 <div class="section expanded clear hide" id="studySubjectRecord">
