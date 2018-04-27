@@ -65,7 +65,13 @@
 <script>
   function store(f) {
     f(store.data);
-    sessionStorage.setItem(store.key, JSON.stringify(store.data));
+    if (!store.dirty) {
+      store.dirty = true;
+      setTimeout(function() {
+        sessionStorage.setItem(store.key, JSON.stringify(store.data));
+        store.dirty = false;
+      }, 1);
+    }
   }
   store.key = location.pathname + location.search;
   store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
@@ -73,50 +79,50 @@
     datatables: [],
     ocStatusHide: 'oc-status-removed'
   };
+  store.dirty = false;
 
   function resetFilter(target) {
-    target.closest('.subsection').find('table').each(function() {
+    $(target).closest('.subsection').find('table').each(function() {
       var table = $(this);
       table.DataTable().search('');
       table.dataTable().fnSortNeutral();
     });
+    return false;
   }
 
-  $(document.body).on('click', '.section-header', function() {
+  function resetAllFilters() {
+    $('#oc-status-hide').val('oc-status-removed').change();
+    clickAllSections('collapsed');
+    resetFilter('a.reset-filter');
+  }
+
+  function showHide() {
     var header = $(this);
     var body = header.next();
     var section = header.parent();
-    var updown;
+    var n = section.data('section-number');
     if (section.hasClass('collapsed')) {
-      updown = 'slideDown';
+      body.slideDown('fast');
       header.attr('title', 'Collapse Section');
+      store(function(data) {
+        delete data.collapseSections[n];
+      });
     }
     else {
-      updown = 'slideUp';
+      body.slideUp('fast');
       header.attr('title', 'Expand Section');
+      store(function(data) {
+        data.collapseSections[n] = true;
+      });
     }
-    body[updown]('fast', function() {
-      section.toggleClass('collapsed expanded');
-    });
-
-    store(function(data) {
-      var sections = $('div.section');
-      var pos = sections.index(section);
-      if (pos > 0) {
-        data.collapseSections = {};
-        sections.each(function(index) {
-          var section = $(this);
-          if (section.hasClass('collapsed'))
-            data.collapseSections[index] = true;
-        });
-      }
-      data.collapseSections[pos] = section.hasClass('expanded');
-    });
-  });
+    section.toggleClass('collapsed expanded');
+  }
 
   function clickAllSections(state) {
-    $('.section.' + state).children('.section-header').click();
+    $('div.section.' + state + '>.section-header').each(showHide);
   };
+
+  $(document.body).on('click', '.section-header', showHide);
 </script>
 <style>
   #header {
@@ -215,9 +221,13 @@
   <a href="javascript:clickAllSections('collapsed');">Expand All</a>
   <span>&nbsp; | &nbsp;</span>
   <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
+  <span id="reset-all-filters">
+    &nbsp; | &nbsp;
+    <a href="javascript:resetAllFilters();">Reset All Filters</a>
+  </span>  
 </div>
 </div>
-<div class="section expanded clear hide" id="studySubjectRecord">
+<div class="section expanded clear hide" id="studySubjectRecord" data-section-number="0">
   <div class="section-header" title="Collapse Section">
     General Information
   </div>
@@ -568,7 +578,7 @@
 </c:choose>
 <a name="events"></a>
 </div>
-<div class="section expanded hide" id="subjectEvents">
+<div class="section expanded hide" id="subjectEvents" data-section-number="1">
   <div class="section-header" title="Collapse Section">
     Visits
   </div>

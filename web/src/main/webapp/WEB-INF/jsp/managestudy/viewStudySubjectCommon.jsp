@@ -137,7 +137,7 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section {{studyEvent.collapseState}}">
+    <div class="section {{collapseState}}" data-section-number="{{sectionNumber}}">
         <div class="section-header" title="Collapse Section">
             {{studyEvent.[@Name]}}
         </div>
@@ -396,15 +396,16 @@ $(function() {
         var numVisitBaseds = 0;
         var hideStatus = $('#oc-status-hide').val();
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
-        var i = 1;
+        var i = 2; // Section 0 = General Information, 1 = Visits
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
             if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent.showMe) {
-                i++;
-                studyEvent.collapseState = store.data.collapseSections[i] ? 'collapsed' : 'expanded';
                 $('#commonEvents').append(sectionTmpl({
+                    sectionNumber: i,
+                    collapseState: store.data.collapseSections[i] ? 'collapsed' : 'expanded',
                     studyEvent: studyEvent
                 }));
+                i++;
             }
             else {
                 numVisitBaseds++;
@@ -416,23 +417,20 @@ $(function() {
             $('#subjectEvents').removeClass('hide');
         }
 
-        $('#commonEvents')
-            .on('click', '.add-new', function() {
-                $.ajax({
-                    type: 'post',
-                    url: '${pageContext.request.contextPath}' + $(this).data('url'),
-                    cache: false,
-                    success: function(obj) {
-                        window.location.href = '${pageContext.request.contextPath}' + obj.url;
-                    },
-                    error: function(e) {
-                        console.log(e);
-                        alert('Error. See console log.');
-                    }
-                });
-            }).on('click', '.reset-filter', function() {
-                resetFilter($(this));
+        $('#commonEvents').on('click', '.add-new', function() {
+            $.ajax({
+                type: 'post',
+                url: '${pageContext.request.contextPath}' + $(this).data('url'),
+                cache: false,
+                success: function(obj) {
+                    window.location.href = '${pageContext.request.contextPath}' + obj.url;
+                },
+                error: function(e) {
+                    console.log(e);
+                    alert('Error. See console log.');
+                }
             });
+        });
 
         $.fn.dataTable.moment('DD-MMM-YYYY');
         $('table.datatable')
@@ -483,7 +481,7 @@ $(function() {
             .prev('.dataTables_filter').each(function() {
                 var searchbox = $(this);
                 searchbox.appendTo(searchbox.closest('.subsection').find('.subsection-header'));
-                $('<span><a class="reset-filter" href="#" onclick="return false;">Reset Filters</a> | </span>').prependTo(searchbox);
+                $('<span><a class="reset-filter" href="#" onclick="return resetFilter(this);">Reset Filters</a> | </span>').prependTo(searchbox);
             })
             .end()
             .wrap($('<div>', {
