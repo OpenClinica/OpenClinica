@@ -331,7 +331,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             String formUrl = null;
             if (ecb.getId() > 0) {
-                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role, EDIT_MODE);
+                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role, EDIT_MODE, false);
             } else {
                 String hash = formLayout.getXform();
                 formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash);
@@ -420,7 +420,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (isCRFLocked(ecb)) {
                 addPageMessage(resword.getString("CRF_unavailable") +
                         "\n" + ub.getName() + " " + resword.getString("Currently_entering_data")
-                        + "\n" + resword.getString("Leave_the_CRF"));
+                        + "\n" + resword.getString("Leave_the_CRF")
+                        + "\n" + resword.getString("Continue_in_read_mode_or_cancel"));
                 p = Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET;
                 forwardPage(p);
                 return;
@@ -475,7 +476,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
         if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId())) {
             String errorData = resword.getString("CRF_unavailable") +
                     "\\n" + ub.getName() + " " + resword.getString("Currently_entering_data")
-                    + "\\n" + resword.getString("Leave_the_CRF");
+                    + "\\n" + resword.getString("Leave_the_CRF")
+                    + "\\n" + resword.getString("Continue_in_read_mode_or_cancel");
             request.setAttribute("errorData", errorData);
             return true;
         }

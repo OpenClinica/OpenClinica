@@ -78,7 +78,7 @@ public class EnketoFormServlet extends SecureController {
         Role role = currentRole.getRole();
 
         if (Integer.valueOf(eventCrfId) > 0) {
-            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout, QUERY_FLAVOR, null, role, mode);
+            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout, QUERY_FLAVOR, null, role, mode, false);
         } else if (Integer.valueOf(eventCrfId) == 0) {
             String hash = formLayout.getXform();
             formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, parentStudy.getOc_oid(), QUERY_FLAVOR, role, mode, hash);
@@ -93,7 +93,10 @@ public class EnketoFormServlet extends SecureController {
         request.setAttribute(FORM_URL1, part1);
         request.setAttribute(FORM_URL2, part2);
 
-        determineCRFLock(studyEvent, formLayout, part1);
+        if (determineCRFLock(studyEvent, formLayout, part1)) {
+            String readOnlyUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout, QUERY_FLAVOR, null, role, mode, true);
+            request.setAttribute("readOnlyUrl", readOnlyUrl);
+        }
 
         // request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");
         if (studyEvent != null) {
@@ -110,14 +113,14 @@ public class EnketoFormServlet extends SecureController {
         return;
     }
 
-    private void determineCRFLock(StudyEvent studyEvent, FormLayout formLayout, String url) {
+    private boolean determineCRFLock(StudyEvent studyEvent, FormLayout formLayout, String url) {
         boolean checkLock = false;
         boolean isAlreadyLocked = false;
         if (StringUtils.contains(url, "/edit/")) {
             checkLock = true;
         }
         if (checkLock == false)
-            return;
+            return false;
 
         if (getEventCrfLocker().isLocked(studyEvent, formLayout, currentPublicStudy.getSchemaName())) {
             // Display error message
@@ -126,10 +129,13 @@ public class EnketoFormServlet extends SecureController {
             UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
             String errorData = resword.getString("CRF_unavailable") +
                     "\\n" + ubean.getName() + " " + resword.getString("Currently_entering_data")
-                    + "\\n" + resword.getString("Leave_the_CRF");
+                    + "\\n" + resword.getString("Leave_the_CRF")
+                    + "\\n" + resword.getString("Continue_in_read_mode_or_cancel");
             request.setAttribute("errorData", errorData);
+            return true;
         } else {
             getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId());
+            return false;
         }
     }
 }

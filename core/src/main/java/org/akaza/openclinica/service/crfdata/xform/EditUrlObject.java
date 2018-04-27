@@ -28,10 +28,11 @@ public class EditUrlObject {
     String mode;
     EventDefinitionCrf edc;
     EventCrf eventCrf;
+    boolean lockModeReadOnly = false;
 
     public EditUrlObject(FormLayout formLayout, String crfOid, String instance, String ecid, String redirect, boolean markComplete, String studyOid,
             List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, Study site, StudyEvent studyEvent, String mode,
-            EventDefinitionCrf edc, EventCrf eventCrf) {
+            EventDefinitionCrf edc, EventCrf eventCrf, boolean lockModeReadOnly) {
         super();
         this.formLayout = formLayout;
         this.crfOid = crfOid;
@@ -50,6 +51,7 @@ public class EditUrlObject {
         this.edc = edc;
         this.eventCrf = eventCrf;
         this.site = site;
+        this.lockModeReadOnly = lockModeReadOnly;
     }
 
     @Override
@@ -72,6 +74,7 @@ public class EditUrlObject {
         buffer.append("mode:" + mode);
         buffer.append("edc:" + edc);
         buffer.append("eventCrf:" + eventCrf);
+        buffer.append("lockModeReadOnly:" + lockModeReadOnly);
         return buffer.toString();
     }
 }
