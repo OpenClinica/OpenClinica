@@ -377,7 +377,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
                                 if (!(form.getEventDefinitionCrf().getStatusId() == Status.DELETED.getCode())
                                         && !(form.getEventDefinitionCrf().getStatusId() == Status.AUTO_DELETED.getCode())) {
-                                    if (!role.equals(Role.MONITOR) && eventCrf.getStatusId() != Status.DELETED.getCode()
+
+                                    if (!formLayout.getStatus().equals(Status.LOCKED)
+                                            && !role.equals(Role.MONITOR) && eventCrf.getStatusId() != Status.DELETED.getCode()
                                             && eventCrf.getStatusId() != Status.AUTO_DELETED.getCode() && eventCrf.getStatusId() != Status.LOCKED.getCode()
                                             && studyEvent.getSubjectEventStatusId() != SubjectEventStatus.LOCKED.getCode()
                                             && studyEvent.getSubjectEventStatusId() != SubjectEventStatus.SKIPPED.getCode()
