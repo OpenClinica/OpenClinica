@@ -63,18 +63,23 @@
   }
 </script>
 <script>
-  var storageKey = location.pathname + location.search;
-  var storage = JSON.parse(sessionStorage.getItem(storageKey)) || {
+  function store(f) {
+    f(store.data);
+    sessionStorage.setItem(store.key, JSON.stringify(store.data));
+  }
+  store.key = location.pathname + location.search;
+  store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
     collapseSections: {},
     datatables: [],
-    ocStatusHide: 'oc-status-removed',
+    ocStatusHide: 'oc-status-removed'
   };
-  function stor() {
-    sessionStorage.setItem(storageKey, JSON.stringify(storage));
-  }
 
-  function resetFilter(link) {
-      console.log(link);
+  function resetFilter(target) {
+    target.closest('.subsection').find('table').each(function() {
+      var table = $(this);
+      table.DataTable().search('');
+      table.dataTable().fnSortNeutral();
+    });
   }
 
   $(document.body).on('click', '.section-header', function() {
@@ -94,18 +99,19 @@
       section.toggleClass('collapsed expanded');
     });
 
-    var sections = $('div.section');
-    var pos = sections.index(section);
-    if (pos > 0) {
-      storage.collapseSections = {};
-      sections.each(function(index) {
-        var section = $(this);
-        if (section.hasClass('collapsed'))
-          storage.collapseSections[index] = true;
-      });
-    }
-    storage.collapseSections[pos] = section.hasClass('expanded');
-    stor();
+    store(function(data) {
+      var sections = $('div.section');
+      var pos = sections.index(section);
+      if (pos > 0) {
+        data.collapseSections = {};
+        sections.each(function(index) {
+          var section = $(this);
+          if (section.hasClass('collapsed'))
+            data.collapseSections[index] = true;
+        });
+      }
+      data.collapseSections[pos] = section.hasClass('expanded');
+    });
   });
 
   function clickAllSections(state) {
@@ -201,7 +207,7 @@
       <option value="null">All Records</option>
     </select>
     <script>
-      $('#oc-status-hide').val(storage.ocStatusHide).change();
+      $('#oc-status-hide').val(store.data.ocStatusHide).change();
     </script>
   </span>
 </div>
@@ -540,7 +546,7 @@
   </div>
 </div>
 <script>
-  if (storage.collapseSections[0])
+  if (store.data.collapseSections[0])
     $('#studySubjectRecord').toggleClass('expanded collapsed').children('.section-body').hide();
   $('#studySubjectRecord').removeClass('hide');
 </script>

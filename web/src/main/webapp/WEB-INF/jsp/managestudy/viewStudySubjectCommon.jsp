@@ -388,8 +388,9 @@ $(function() {
             sections.not(hides).show();
             $('table.datatable').DataTable().draw();
             $('tr.section-header, tr.section-body').removeClass('expanded').addClass('collapsed');
-            storage.ocStatusHide = hideClass;
-            stor();
+            store(function(data) {
+                data.ocStatusHide = hideClass;
+            });
         }).change();
 
         var numVisitBaseds = 0;
@@ -400,7 +401,7 @@ $(function() {
             var studyEvent = studyEvents[studyEventId];
             if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent.showMe) {
                 i++;
-                studyEvent.collapseState = storage.collapseSections[i] ? 'collapsed' : 'expanded';
+                studyEvent.collapseState = store.data.collapseSections[i] ? 'collapsed' : 'expanded';
                 $('#commonEvents').append(sectionTmpl({
                     studyEvent: studyEvent
                 }));
@@ -410,29 +411,28 @@ $(function() {
             }
         }
         if (numVisitBaseds) {
-            if (storage.collapseSections[1])
+            if (store.data.collapseSections[1])
                 $('#subjectEvents').toggleClass('expanded collapsed').children('.section-body').hide();
             $('#subjectEvents').removeClass('hide');
         }
 
-        $('#commonEvents').on('click', '.add-new', function() {
-            $.ajax({
-                type: 'post',
-                url: '${pageContext.request.contextPath}' + $(this).data('url'),
-                cache: false,
-                success: function(obj) {
-                    window.location.href = '${pageContext.request.contextPath}' + obj.url;
-                },
-                error: function(e) {
-                    console.log(e);
-                    alert('Error. See console log.');
-                }
+        $('#commonEvents')
+            .on('click', '.add-new', function() {
+                $.ajax({
+                    type: 'post',
+                    url: '${pageContext.request.contextPath}' + $(this).data('url'),
+                    cache: false,
+                    success: function(obj) {
+                        window.location.href = '${pageContext.request.contextPath}' + obj.url;
+                    },
+                    error: function(e) {
+                        console.log(e);
+                        alert('Error. See console log.');
+                    }
+                });
+            }).on('click', '.reset-filter', function() {
+                resetFilter($(this));
             });
-        }).on('click', '.reset-filter', function() {
-            var table = $(this).closest('.subsection').find('table.datatable');
-            table.DataTable().search('');
-            table.dataTable().fnSortNeutral();
-        });
 
         $.fn.dataTable.moment('DD-MMM-YYYY');
         $('table.datatable')
@@ -440,12 +440,13 @@ $(function() {
                 var table = $(this);
                 var datatable = table.DataTable({
                     stateSave: true,
-                    stateSaveCallback: function(settings, data) {
-                        storage.datatables[i] = data;
-                        stor();
+                    stateSaveCallback: function(settings, state) {
+                        store(function(data) {
+                            data.datatables[i] = state;
+                        });
                     },
                     stateLoadCallback: function(settings, callback) {
-                        callback(storage.datatables[i]);
+                        callback(store.data.datatables[i]);
                     },
                     dom: "frtilp",
                     language: {
