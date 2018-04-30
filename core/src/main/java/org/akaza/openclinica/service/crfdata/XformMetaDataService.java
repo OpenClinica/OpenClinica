@@ -3,6 +3,7 @@ package org.akaza.openclinica.service.crfdata;
 import java.io.File;
 import java.io.FileOutputStream;
 import java.io.IOException;
+import java.nio.charset.Charset;
 import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.time.Duration;
@@ -70,6 +71,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.http.converter.ByteArrayHttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.validation.Errors;
@@ -464,6 +466,8 @@ public class XformMetaDataService {
             List<String> fileLinks = null;
             String vForm = "";
             RestTemplate rest = new RestTemplate();
+            rest.getMessageConverters()
+                    .add(0, new StringHttpMessageConverter(Charset.forName("UTF-8")));
             if (eicObject.form != null) {
                 List<FormVersion> versions = eicObject.form.getVersions();
                 for (FormVersion version : versions) {
