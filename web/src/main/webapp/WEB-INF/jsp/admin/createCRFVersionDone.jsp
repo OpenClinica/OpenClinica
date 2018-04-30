@@ -56,12 +56,12 @@
 <p>
 <div class="homebox_bullets"><a href="ListCRF"><fmt:message key="go_back_to_the_CRF_list" bundle="${restext}"/></a></div>
 <p>
-<div class="homebox_bullets"><a href="ViewSectionDataEntry?crfVersionId=<%=HtmlUtils.htmlEscape(request.getAttribute("crfVersionId"))%>&tabId=1"><fmt:message key="view_CRF_version_data_entry" bundle="${resword}"/></a></div>
+<div class="homebox_bullets"><a href="ViewSectionDataEntry?crfVersionId=<%=HtmlUtils.htmlEscape(request.getAttribute("crfVersionId") + "")%>&tabId=1"><fmt:message key="view_CRF_version_data_entry" bundle="${resword}"/></a></div>
 <p>
 <div class="homebox_bullets"><a href="pages/studymodule"><fmt:message key="go_back_build_study_page" bundle="${resword}"/></a></div>
 <p>
 <div class="homebox_bullets">
-    <a href="ViewCRFVersion?id=<%=HtmlUtils.htmlEscape(request.getAttribute("crfVersionId"))%>"><fmt:message key="crf_version_metadata" bundle="${resword}"/></a>
+    <a href="ViewCRFVersion?id=<%=HtmlUtils.htmlEscape(request.getAttribute("crfVersionId") + "")%>"><fmt:message key="crf_version_metadata" bundle="${resword}"/></a>
 </div>
 <%--<c:forEach var="query" items="${queries}">
 <c:out value="${query}"/></br>
