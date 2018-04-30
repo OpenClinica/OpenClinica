@@ -82,15 +82,15 @@
   store.dirty = false;
 
   function resetFilter(target) {
-    $(target).closest('.subsection').find('table').each(function() {
+    $(target).addClass('invisible').closest('.subsection').find('table').each(function() {
       var table = $(this);
       table.DataTable().search('');
       table.dataTable().fnSortNeutral();
     });
-    return false;
   }
 
   function resetAllFilters() {
+    $('#reset-all-filters').addClass('invisible');
     $('#oc-status-hide').val('oc-status-removed').change();
     clickAllSections('collapsed');
     resetFilter('a.reset-filter');
@@ -168,8 +168,20 @@
   .collapsed > .section-header::after {
     content: "\e92b";
   }
+  .orange {
+    background: #cc6600 !important;
+  }
+  .reset-filter {
+    margin-right: 25px !important; 
+  }
+  #reset-all-filters {
+    margin-left: 30px;
+  }
   .hide {
     display: none;
+  }
+  .invisible {
+    visibility: hidden;
   }
   .clear {
     clear: both;
@@ -198,6 +210,7 @@
     Subject <c:out value="${studySub.label}"/>
   </span>
 </h1>
+<input type="button" class="invisible orange" id="reset-all-filters" value="Custom View On &nbsp; &times;" onclick="resetAllFilters();">
 <div class="header-links">
   <span>
     <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
@@ -221,10 +234,6 @@
   <a href="javascript:clickAllSections('collapsed');">Expand All</a>
   <span>&nbsp; | &nbsp;</span>
   <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
-  <span id="reset-all-filters">
-    &nbsp; | &nbsp;
-    <a href="javascript:resetAllFilters();">Reset All Filters</a>
-  </span>  
 </div>
 </div>
 <div class="section expanded clear hide" id="studySubjectRecord" data-section-number="0">

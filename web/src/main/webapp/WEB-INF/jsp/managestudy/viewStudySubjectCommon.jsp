@@ -441,6 +441,14 @@ $(function() {
                     stateSaveCallback: function(settings, state) {
                         store(function(data) {
                             data.datatables[i] = state;
+                            if (state.order.length > 0 || state.search.search !== '' || state.start > 0) {
+                                table.closest('.subsection').find('input.reset-filter').removeClass('invisible');
+                                $('#reset-all-filters').removeClass('invisible');
+                            }
+                            else {
+                                table.closest('.subsection').find('input.reset-filter').addClass('invisible');                      
+                            }
+                            console.log(state.order.length, state.search.search, state.start);
                         });
                     },
                     stateLoadCallback: function(settings, callback) {
@@ -481,7 +489,7 @@ $(function() {
             .prev('.dataTables_filter').each(function() {
                 var searchbox = $(this);
                 searchbox.appendTo(searchbox.closest('.subsection').find('.subsection-header'));
-                $('<span><a class="reset-filter" href="#" onclick="return resetFilter(this);">Reset Filters</a> | </span>').prependTo(searchbox);
+                $('<input type="button" class="invisible orange reset-filter" value="Reset" onclick="resetFilter(this);">').prependTo(searchbox);
             })
             .end()
             .wrap($('<div>', {
