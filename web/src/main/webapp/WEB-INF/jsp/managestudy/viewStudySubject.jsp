@@ -82,7 +82,7 @@
   store.dirty = false;
 
   function resetFilter(target) {
-    $(target).addClass('invisible').closest('.subsection').find('table').each(function() {
+    $(target).addClass('invisible').closest('.subsection').find('table.datatable').each(function() {
       var table = $(this);
       table.DataTable().search('');
       table.dataTable().fnSortNeutral();
@@ -90,10 +90,10 @@
   }
 
   function resetAllFilters() {
-    $('#reset-all-filters').addClass('invisible');
     $('#oc-status-hide').val('oc-status-removed').change();
     clickAllSections('collapsed');
-    resetFilter('a.reset-filter');
+    resetFilter('input.reset-filter');
+    $('#reset-all-filters').addClass('invisible');
   }
 
   function showHide() {

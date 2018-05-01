@@ -441,14 +441,15 @@ $(function() {
                     stateSaveCallback: function(settings, state) {
                         store(function(data) {
                             data.datatables[i] = state;
+                            console.log(state.order.length, state.search.search, state.start);
                             if (state.order.length > 0 || state.search.search !== '' || state.start > 0) {
                                 table.closest('.subsection').find('input.reset-filter').removeClass('invisible');
                                 $('#reset-all-filters').removeClass('invisible');
+                                console.log('reset all filters is visible');
                             }
                             else {
                                 table.closest('.subsection').find('input.reset-filter').addClass('invisible');                      
                             }
-                            console.log(state.order.length, state.search.search, state.start);
                         });
                     },
                     stateLoadCallback: function(settings, callback) {
