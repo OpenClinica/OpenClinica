@@ -441,11 +441,9 @@ $(function() {
                     stateSaveCallback: function(settings, state) {
                         store(function(data) {
                             data.datatables[i] = state;
-                            console.log(state.order.length, state.search.search, state.start);
-                            if (state.order.length > 0 || state.search.search !== '' || state.start > 0) {
+                            if (canReset(state)) {
                                 table.closest('.subsection').find('input.reset-filter').removeClass('invisible');
                                 $('#reset-all-filters').removeClass('invisible');
-                                console.log('reset all filters is visible');
                             }
                             else {
                                 table.closest('.subsection').find('input.reset-filter').addClass('invisible');                      
@@ -487,10 +485,15 @@ $(function() {
                 var tableWidth = table.width();
                 table.closest('.subsection').css('max-width', tableWidth < 500 ? 500 : tableWidth);
             })
-            .prev('.dataTables_filter').each(function() {
+            .prev('.dataTables_filter').each(function(i) {
                 var searchbox = $(this);
-                searchbox.appendTo(searchbox.closest('.subsection').find('.subsection-header'));
-                $('<input type="button" class="invisible orange reset-filter" value="Reset" onclick="resetFilter(this);">').prependTo(searchbox);
+                var subheader = searchbox.closest('.subsection').find('.subsection-header');
+                searchbox.appendTo(subheader);
+                
+                var resetButton = $('<input type="button" class="invisible orange reset-filter" value="Reset" onclick="resetFilter(this);">');
+                if (canReset(store.data.datatables[i]))
+                    resetButton.removeClass('invisible');
+                resetButton.prependTo(searchbox);
             })
             .end()
             .wrap($('<div>', {

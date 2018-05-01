@@ -81,8 +81,14 @@
   };
   store.dirty = false;
 
+  function canReset(state) {
+    return state.order.length > 0 
+        || state.search.search !== '' 
+        || state.start > 0;
+  }
+
   function resetFilter(target) {
-    $(target).addClass('invisible').closest('.subsection').find('table.datatable').each(function() {
+    $(target).closest('.subsection').find('table.datatable').each(function() {
       var table = $(this);
       table.DataTable().search('');
       table.dataTable().fnSortNeutral();
