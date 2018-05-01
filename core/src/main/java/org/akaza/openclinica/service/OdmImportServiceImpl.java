@@ -74,6 +74,8 @@ import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpMethod;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.ClientHttpRequestFactory;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.stereotype.Service;
@@ -675,7 +677,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 			buckets = getBucket(request, boardId);
 		} catch (Exception e) {
 			logger.info(e.getMessage());
-			errors.rejectValue("name", "fm_app_error", "Form Manager not responding");
+			errors.rejectValue("name", "fm_app_error", "Form Service not responding");
+			logger.error("Form Service not responding , Probably Read Timeout error");
 
 		}
 
@@ -742,8 +745,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 	}
 
 	private Bucket[] getBucket(HttpServletRequest request, String boardId) {
-
-		RestTemplate restTemplate = new RestTemplate();
+		RestTemplate restTemplate = new RestTemplate(getRequestFactory());
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		ObjectMapper objectMapper = new ObjectMapper();
@@ -761,6 +763,23 @@ public class OdmImportServiceImpl implements OdmImportService {
 
 		ResponseEntity<Bucket[]> response = restTemplate.exchange(url, HttpMethod.GET, entity, Bucket[].class);
 		return response.getBody();
+	}
+
+	private ClientHttpRequestFactory getRequestFactory() {
+		HttpComponentsClientHttpRequestFactory factory =
+				new HttpComponentsClientHttpRequestFactory();
+		String connectTimeout =CoreResources.getField("formServiceCallConnectTimeout");
+		String readTimeout =CoreResources.getField("formServiceCallReadTimeout");
+		connectTimeout=!connectTimeout.equals("") ? connectTimeout:"30000";  //  30 seconds default
+		readTimeout=!readTimeout.equals("") ? readTimeout:"60000"; //  60 seconds default
+
+		factory.setConnectTimeout(Integer.valueOf(connectTimeout));
+		factory.setReadTimeout(Integer.valueOf(readTimeout));
+
+		logger.info("Connect TimeOut: {}" ,connectTimeout);
+		logger.info("Read TimeOut: {}" ,  readTimeout);
+
+		return factory;
 	}
 
 	public void saveOrUpdatePageLayout(Page page, UserAccount userAccount) {
