@@ -69,6 +69,11 @@
       store.dirty = true;
       setTimeout(function() {
         sessionStorage.setItem(store.key, JSON.stringify(store.data));
+        $('#reset-all-filters')[
+          store.data.datatables.filter(function(state) {return canReset(state)}).length > 0 ?
+          'removeClass' : 'addClass'
+        ]('invisible');
+        console.log(store.data.datatables);
         store.dirty = false;
       }, 1);
     }
@@ -99,7 +104,6 @@
     $('#oc-status-hide').val('oc-status-removed').change();
     clickAllSections('collapsed');
     resetFilter('input.reset-filter');
-    $('#reset-all-filters').addClass('invisible');
   }
 
   function showHide() {
