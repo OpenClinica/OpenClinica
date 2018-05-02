@@ -69,11 +69,14 @@
       store.dirty = true;
       setTimeout(function() {
         sessionStorage.setItem(store.key, JSON.stringify(store.data));
-        $('#reset-all-filters')[
-          store.data.datatables.filter(function(state) {return canReset(state)}).length > 0 ?
-          'removeClass' : 'addClass'
-        ]('invisible');
-        console.log(store.data.datatables);
+        if (
+          store.data.ocStatusHide !== 'oc-status-removed' ||
+          store.data.datatables.some(function(state) {return canReset(state)}) ||
+          $('div.section.collapsed').length
+        )
+          $('#reset-all-filters').removeClass('invisible');
+        else
+          $('#reset-all-filters').addClass('invisible');
         store.dirty = false;
       }, 1);
     }
