@@ -52,4 +52,26 @@ public class EditUrlObject {
         this.site = site;
     }
 
+    @Override
+    public String toString() {
+        StringBuffer buffer = new StringBuffer();
+        buffer.append("FormLayout" + formLayout == null? null: formLayout.getName());
+        buffer.append("crfOid:" + crfOid);
+        buffer.append("instance:" + instance);
+        buffer.append("ecdd:" + ecid);
+        buffer.append("redirect:" + redirect);
+        buffer.append("markComplete:" + markComplete);
+        buffer.append("studyOid:" + studyOid);
+        buffer.append("List<FormLayoutMedia> mediaList:" + mediaList.size());
+        buffer.append("goTo:" + goTo);
+        buffer.append("flavor:" + flavor);
+        buffer.append("role:" + role);
+        buffer.append("parentStudy:" + parentStudy);
+        buffer.append("site:" + site);
+        buffer.append("studyEvent:" + studyEvent);
+        buffer.append("mode:" + mode);
+        buffer.append("edc:" + edc);
+        buffer.append("eventCrf:" + eventCrf);
+        return buffer.toString();
+    }
 }

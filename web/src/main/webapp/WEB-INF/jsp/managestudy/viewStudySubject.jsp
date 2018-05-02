@@ -63,27 +63,76 @@
   }
 </script>
 <script>
-  $(document.body).on('click', '.section-header', function() {
+  function store(f) {
+    f(store.data);
+    if (!store.dirty) {
+      store.dirty = true;
+      setTimeout(function() {
+        sessionStorage.setItem(store.key, JSON.stringify(store.data));
+        $('#reset-all-filters')[
+          store.data.datatables.filter(function(state) {return canReset(state)}).length > 0 ?
+          'removeClass' : 'addClass'
+        ]('invisible');
+        console.log(store.data.datatables);
+        store.dirty = false;
+      }, 1);
+    }
+  }
+  store.key = location.pathname + location.search;
+  store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
+    collapseSections: {},
+    datatables: [],
+    ocStatusHide: 'oc-status-removed'
+  };
+  store.dirty = false;
+
+  function canReset(state) {
+    return state.order.length > 0 
+        || state.search.search !== '' 
+        || state.start > 0;
+  }
+
+  function resetFilter(target) {
+    $(target).closest('.subsection').find('table.datatable').each(function() {
+      var table = $(this);
+      table.DataTable().search('');
+      table.dataTable().fnSortNeutral();
+    });
+  }
+
+  function resetAllFilters() {
+    $('#oc-status-hide').val('oc-status-removed').change();
+    clickAllSections('collapsed');
+    resetFilter('input.reset-filter');
+  }
+
+  function showHide() {
     var header = $(this);
     var body = header.next();
     var section = header.parent();
-    var updown;
+    var n = section.data('section-number');
     if (section.hasClass('collapsed')) {
-      updown = 'slideDown';
+      body.slideDown('fast');
       header.attr('title', 'Collapse Section');
+      store(function(data) {
+        delete data.collapseSections[n];
+      });
     }
     else {
-      updown = 'slideUp';
+      body.slideUp('fast');
       header.attr('title', 'Expand Section');
+      store(function(data) {
+        data.collapseSections[n] = true;
+      });
     }
-    body[updown]('fast', function() {
-      section.toggleClass('collapsed expanded');
-    });
-  });
+    section.toggleClass('collapsed expanded');
+  }
 
   function clickAllSections(state) {
-    $('.section.' + state).children('.section-header').click();
+    $('div.section.' + state + '>.section-header').each(showHide);
   };
+
+  $(document.body).on('click', '.section-header', showHide);
 </script>
 <style>
   #header {
@@ -129,8 +178,20 @@
   .collapsed > .section-header::after {
     content: "\e92b";
   }
+  .orange {
+    background: #cc6600 !important;
+  }
+  .reset-filter {
+    margin-right: 25px !important; 
+  }
+  #reset-all-filters {
+    margin-left: 30px;
+  }
   .hide {
     display: none;
+  }
+  .invisible {
+    visibility: hidden;
   }
   .clear {
     clear: both;
@@ -159,6 +220,7 @@
     Subject <c:out value="${studySub.label}"/>
   </span>
 </h1>
+<input type="button" class="invisible orange" id="reset-all-filters" value="Custom View On &nbsp; &times;" onclick="resetAllFilters();">
 <div class="header-links">
   <span>
     <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
@@ -173,6 +235,9 @@
       <option value="oc-status-active">Removed Records</option>
       <option value="null">All Records</option>
     </select>
+    <script>
+      $('#oc-status-hide').val(store.data.ocStatusHide).change();
+    </script>
   </span>
 </div>
 <div class="header-links">
@@ -181,7 +246,7 @@
   <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
 </div>
 </div>
-<div class="section expanded clear" id="studySubjectRecord">
+<div class="section expanded clear hide" id="studySubjectRecord" data-section-number="0">
   <div class="section-header" title="Collapse Section">
     General Information
   </div>
@@ -509,7 +574,12 @@
     <br>
   </div>
 </div>
-<div id="loading">Loading...</div>
+<script>
+  if (store.data.collapseSections[0])
+    $('#studySubjectRecord').toggleClass('expanded collapsed').children('.section-body').hide();
+  $('#studySubjectRecord').removeClass('hide');
+</script>
+<div id="loading"><br> &nbsp; Loading...</div>
 <c:choose>
   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
     <div class="table_title_Admin">
@@ -527,7 +597,7 @@
 </c:choose>
 <a name="events"></a>
 </div>
-<div class="section expanded hide" id="subjectEvents">
+<div class="section expanded hide" id="subjectEvents" data-section-number="1">
   <div class="section-header" title="Collapse Section">
     Visits
   </div>

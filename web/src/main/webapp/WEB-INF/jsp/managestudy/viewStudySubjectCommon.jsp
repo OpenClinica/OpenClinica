@@ -55,6 +55,9 @@
     .dataTables_filter input {
         margin-left: 5px;
     }
+    .info-filtered {
+        color: red;
+    }
     .table_tools, .table_actions {
         vertical-align: middle !important;
     }
@@ -122,6 +125,7 @@
 <script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/plug-ins/1.10.16/api/fnSortNeutral.js"></script>
 <script>
     Handlebars.registerHelper('truncate', function(s, length) {
         if (!s)
@@ -133,7 +137,7 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section expanded" id="common.{{studyEvent.[@OID]}}">
+    <div class="section {{collapseState}}" data-section-number="{{sectionNumber}}">
         <div class="section-header" title="Collapse Section">
             {{studyEvent.[@Name]}}
         </div>
@@ -384,23 +388,32 @@ $(function() {
             sections.not(hides).show();
             $('table.datatable').DataTable().draw();
             $('tr.section-header, tr.section-body').removeClass('expanded').addClass('collapsed');
-        });
+            store(function(data) {
+                data.ocStatusHide = hideClass;
+            });
+        }).change();
 
         var numVisitBaseds = 0;
         var hideStatus = $('#oc-status-hide').val();
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
+        var i = 2; // Section 0 = General Information, 1 = Visits
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
             if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent.showMe) {
                 $('#commonEvents').append(sectionTmpl({
+                    sectionNumber: i,
+                    collapseState: store.data.collapseSections[i] ? 'collapsed' : 'expanded',
                     studyEvent: studyEvent
                 }));
+                i++;
             }
             else {
                 numVisitBaseds++;
             }
         }
         if (numVisitBaseds) {
+            if (store.data.collapseSections[1])
+                $('#subjectEvents').toggleClass('expanded collapsed').children('.section-body').hide();
             $('#subjectEvents').removeClass('hide');
         }
 
@@ -421,9 +434,21 @@ $(function() {
 
         $.fn.dataTable.moment('DD-MMM-YYYY');
         $('table.datatable')
-            .each(function() {
+            .each(function(i) {
                 var table = $(this);
                 var datatable = table.DataTable({
+                    stateSave: true,
+                    stateSaveCallback: function(settings, state) {
+                        store(function(data) {
+                            data.datatables[i] = state;
+                            table.closest('.subsection').find('input.reset-filter')[
+                                canReset(state) ? 'removeClass' : 'addClass'
+                            ]('invisible');
+                        });
+                    },
+                    stateLoadCallback: function(settings, callback) {
+                        callback(store.data.datatables[i]);
+                    },
                     dom: "frtilp",
                     language: {
                         paginate: {
@@ -434,7 +459,7 @@ $(function() {
                         },
                         info: 'Results _START_-_END_ of _TOTAL_.',
                         infoEmpty: 'Results 0-0 of 0.',
-                        infoFiltered: '(filtered from _MAX_ total)',
+                        infoFiltered: '<span class="info-filtered">(filtered from _MAX_ total)</span>',
                         lengthMenu: 'Show _MENU_ per page'
                     },
                     columnDefs: [{
@@ -456,9 +481,15 @@ $(function() {
                 var tableWidth = table.width();
                 table.closest('.subsection').css('max-width', tableWidth < 500 ? 500 : tableWidth);
             })
-            .prev('.dataTables_filter').each(function() {
+            .prev('.dataTables_filter').each(function(i) {
                 var searchbox = $(this);
-                searchbox.appendTo(searchbox.closest('.subsection').find('.subsection-header'));
+                var subheader = searchbox.closest('.subsection').find('.subsection-header');
+                searchbox.appendTo(subheader);
+
+                var resetButton = $('<input type="button" class="invisible orange reset-filter" value="Reset" onclick="resetFilter(this);">');
+                if (canReset(store.data.datatables[i]))
+                    resetButton.removeClass('invisible');
+                resetButton.prependTo(searchbox);
             })
             .end()
             .wrap($('<div>', {
@@ -468,6 +499,7 @@ $(function() {
                 }
             }));
 
+        $('div.section.collapsed').children('.section-body').hide();
         $('#loading').remove();
     }, function() {
         $('#loading').text("Can't connect to the Study Service");
