@@ -4,12 +4,10 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
@@ -39,18 +37,22 @@ public class EnketoFormServlet extends SecureController {
     protected void processRequest() throws Exception {
         FormLayoutDao formLayoutDao = (FormLayoutDao) SpringServletAccess.getApplicationContext(context).getBean("formLayoutDao");
         StudyEventDao studyEventDao = (StudyEventDao) SpringServletAccess.getApplicationContext(context).getBean("studyEventDaoDomain");
+        EventCrfDao eventCrfDao = (EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
+
         EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
         EnketoCredentials enketoCredentials = (EnketoCredentials) SpringServletAccess.getApplicationContext(context).getBean("enketoCredentials");
         String mode = request.getParameter(MODE);
         String originatingPage = request.getParameter(ORIGINATING_PAGE);
-        String formLayoutId = request.getParameter(FORM_LAYOUT_ID);
+        int formLayoutId = Integer.valueOf(request.getParameter(FORM_LAYOUT_ID));
+        int studyEventId = Integer.valueOf(request.getParameter(STUDY_EVENT_ID));
+        int eventCrfId = Integer.valueOf(request.getParameter(EVENT_CRF_ID));
 
-        String studyEventId = request.getParameter(STUDY_EVENT_ID);
-        String eventCrfId = request.getParameter(EVENT_CRF_ID);
+
         String formUrl = null;
 
-        StudyEvent studyEvent = studyEventDao.findById(Integer.valueOf(studyEventId));
-        FormLayout formLayout = formLayoutDao.findById(Integer.valueOf(formLayoutId));
+        StudyEvent studyEvent = studyEventDao.findById(studyEventId);
+        FormLayout formLayout = formLayoutDao.findById(formLayoutId);
+
 
         // Cache the subject context for use during xform submission
         PFormCache cache = PFormCache.getInstance(context);
@@ -73,9 +75,17 @@ public class EnketoFormServlet extends SecureController {
         StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         Role role = currentRole.getRole();
 
-        if (Integer.valueOf(eventCrfId) > 0) {
+        if (eventCrfId == 0 && studyEvent != null && formLayout != null) {
+            EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
+            if (eventCrf != null) {
+                eventCrfId = eventCrf.getEventCrfId();
+                logger.debug("The event crf status changed from not-started to started");
+            }
+
+        }
+        if (eventCrfId > 0) {
             formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout, QUERY_FLAVOR, null, role, mode);
-        } else if (Integer.valueOf(eventCrfId) == 0) {
+        } else if (eventCrfId == 0) {
             String hash = formLayout.getXform();
             formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, parentStudy.getOc_oid(), QUERY_FLAVOR, role, mode, hash);
         }
