@@ -265,6 +265,12 @@ public class DisplayItemBean implements Comparable {
         String valueForDB = "";
         String glue = "";
 
+       // OC-8975 remove current/old value in ResponseSetBean, then update with form value
+        if(rsb.getResponseType().equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) ||
+        		rsb.getResponseType().equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
+        	rsb.removeSelection();	
+        }
+        
         for (int i = 0; i < values.size(); i++) {
             String value = (String) values.get(i);
 
