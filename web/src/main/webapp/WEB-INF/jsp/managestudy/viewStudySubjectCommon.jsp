@@ -67,10 +67,7 @@
     td.actions {
         padding: 3.4px !important;
         vertical-align: middle;
-    }
-    td.actions td {
-        padding: 3.4px !important;
-        border: none;
+        white-space: nowrap;
     }
     td.highlight, .submission:hover {
         background-color: whitesmoke !important;
