@@ -1,49 +1,12 @@
 package org.akaza.openclinica.service;
 
-import java.io.File;
-import java.io.IOException;
-import java.io.Serializable;
-import java.text.MessageFormat;
-import java.time.Duration;
-import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.JAXBException;
-import javax.xml.bind.Marshaller;
-
+import com.fasterxml.jackson.databind.ObjectMapper;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.CrfDao;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
-import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfTagDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
-import org.akaza.openclinica.dao.hibernate.PageLayoutDao;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
-import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.datamap.PageLayout;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
-import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
@@ -53,15 +16,7 @@ import org.akaza.openclinica.service.dto.Bucket;
 import org.akaza.openclinica.service.dto.Form;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.SerializationUtils;
-import org.cdisc.ns.odm.v130.EventType;
-import org.cdisc.ns.odm.v130.ODM;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormDef;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormRef;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionMetaDataVersion;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudy;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudyEventDef;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudyEventRef;
-import org.cdisc.ns.odm.v130.YesOrNo;
+import org.cdisc.ns.odm.v130.*;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionConfigurationParameters;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionEventDefinitionDetails;
 import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutDef;
@@ -69,11 +24,7 @@ import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutR
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -88,9 +39,19 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.client.RestTemplate;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import javax.xml.bind.JAXBContext;
+import javax.xml.bind.JAXBException;
+import javax.xml.bind.Marshaller;
+import java.io.File;
+import java.io.IOException;
+import java.io.Serializable;
+import java.text.MessageFormat;
+import java.util.*;
 
 @Service
+@Transactional
 public class OdmImportServiceImpl implements OdmImportService {
 
 	private UserAccountDao userDaoDomain;
@@ -152,13 +113,11 @@ public class OdmImportServiceImpl implements OdmImportService {
 		}
 	}
 
-	@Transactional
 	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, HttpServletRequest request) {
 		Map<String, Object> map = importOdmToOC(odm, page, boardId, request);
 		return map;
 	}
 
-	@Transactional
 	public Map<String, Object> importOdmToOC(ODM odm, Page page, String boardId, HttpServletRequest request) {
 		DataBinder dataBinder = new DataBinder(new Study());
 		errors = dataBinder.getBindingResult();
@@ -668,7 +627,6 @@ public class OdmImportServiceImpl implements OdmImportService {
 	}
 
 	public Form[] getAllCrfsByProtIdFromFormManager(String boardId, HttpServletRequest request) {
-		Instant start = Instant.now();
 
 		Bucket[] buckets = null;
 		ArrayList<Form> forms = null;
@@ -688,9 +646,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 			errors.rejectValue("name", "fm_app_error", "No forms found for this board");
 
 		}
-		Instant end = Instant.now();
-		logger.info("***** Time execustion for {} method : {}   *****", new Object() {
-		}.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
+
 
 		return forms.toArray(new Form[forms.size()]);
 	}
@@ -709,20 +665,16 @@ public class OdmImportServiceImpl implements OdmImportService {
 	}
 
 	public void setPublishedVersionsInFM(Map<String, Object> map, HttpServletRequest request) {
-		Instant start = Instant.now();
 		Study study = (Study) map.get("study");
 		PublishingDTO dto = (PublishingDTO) map.get("publishingDTO");
 		if (dto.getVersionIds().size() != 0) {
 			dto.setPublishedEnvType(study.getEnvType());
 			setPublishEnvironment(request, dto);
 		}
-		Instant end = Instant.now();
-		logger.info("***** Time execustion for {} method : {}  *****", new Object() {
-		}.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
+
 	}
 
 	private void setPublishEnvironment(HttpServletRequest request, PublishingDTO publishingDTO) {
-		Instant start = Instant.now();
 
 		RestTemplate restTemplate = new RestTemplate();
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
@@ -738,9 +690,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 		converters.add(jsonConverter);
 		restTemplate.setMessageConverters(converters);
 		restTemplate.postForObject(CoreResources.getSBSFieldFormservice() + "/xlsForm/setPublishedEnvironment", entity, PublishingDTO.class);
-		Instant end = Instant.now();
-		logger.info("***** Time execustion for {} method : {}   *****", new Object() {
-		}.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
+
 
 	}
 
