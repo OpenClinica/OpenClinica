@@ -1,8 +1,5 @@
 package org.akaza.openclinica.service.crfdata;
 
-import java.util.HashMap;
-import java.util.Map;
-
 import org.akaza.openclinica.dao.hibernate.ResponseSetDao;
 import org.akaza.openclinica.domain.datamap.CrfVersion;
 import org.akaza.openclinica.domain.datamap.ResponseSet;
@@ -14,6 +11,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
+
+import java.util.HashMap;
+import java.util.List;
+import java.util.Map;
+
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
 
 @Service
 public class ResponseSetService {
@@ -27,9 +30,17 @@ public class ResponseSetService {
     }
 
     public ResponseSet getResponseSet(XformItem xformItem, CrfVersion crfVersion, ResponseType responseType, org.akaza.openclinica.domain.datamap.Item item,
-            Errors errors) throws Exception {
+                                      Errors errors, List<ResponseSet> responseSets) throws Exception {
+        ResponseSet responseSet = null;
 
-        ResponseSet responseSet = responseSetDao.findByLabelVersion(xformItem.getItemName(), crfVersion.getCrfVersionId());
+
+        for (ResponseSet response : emptyIfNull(responseSets)) {
+            if (response.getLabel().equals(xformItem.getItemName())) {
+                responseSet = response;
+                break;
+            }
+        }
+
         String optionText = xformItem.getOptionsText();
         String optionValues = xformItem.getOptionsValues();
         if (optionText != null && optionValues != null) {

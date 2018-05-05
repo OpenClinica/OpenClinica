@@ -5,6 +5,7 @@ import org.akaza.openclinica.domain.datamap.ItemMetadata;
 import org.hibernate.query.Query;
 
 import java.util.ArrayList;
+import java.util.List;
 
 public class ItemGroupMetadataDao extends AbstractDomainDao<ItemGroupMetadata> {
 
@@ -37,10 +38,20 @@ public class ItemGroupMetadataDao extends AbstractDomainDao<ItemGroupMetadata> {
             + "join igm.item item on item.itemId = :itemid "
             + "join igm.crfVersion crfVersion on crfVersion.crfVersionId = :crfversionid";
 
+    static String findAllByCrfVersionQuery = "select igm from ItemGroupMetadata igm "
+            + "join igm.crfVersion crfVersion on crfVersion.crfVersionId = :crfversionid";
+
+
     public ItemGroupMetadata findByItemCrfVersion(int itemId, int crfVersionId) {
         Query q = getCurrentSession().createQuery(findByItemCrfVersionQuery);
         q.setParameter("itemid", itemId);
         q.setParameter("crfversionid", crfVersionId);
         return (ItemGroupMetadata) q.uniqueResult();
+    }
+
+    public List<ItemGroupMetadata> findAllByCrfVersion(int crfVersionId) {
+        Query q = getCurrentSession().createQuery(findAllByCrfVersionQuery);
+        q.setParameter("crfversionid", crfVersionId);
+        return (List<ItemGroupMetadata>) q.list();
     }
 }

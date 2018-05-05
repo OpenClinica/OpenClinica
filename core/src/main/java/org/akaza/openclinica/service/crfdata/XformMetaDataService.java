@@ -35,6 +35,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.util.*;
 
+import static org.apache.commons.collections4.ListUtils.emptyIfNull;
+
 @Service
 public class XformMetaDataService {
 
@@ -74,8 +76,10 @@ public class XformMetaDataService {
     private XformParserHelper xformParserHelper;
     private XformParser xformParser;
     private CoreResources coreResources;
+    private ResponseSetDao responseSetDao;
 
-    public XformMetaDataService(StudyDao studyDao, CrfDao crfDao, SectionDao sectionDao, UserAccountDao userDao, CrfVersionDao crfVersionDao, FormLayoutDao formLayoutDao, FormLayoutMediaDao formLayoutMediaDao, ItemGroupDao itemGroupDao, ItemGroupMetadataDao itemGroupMetadataDao, VersioningMapDao versioningMapDao, ItemFormMetadataDao itemFormMetadataDao, ItemDao itemDao, ItemDataTypeDao itemDataTypeDao, ItemReferenceTypeDao itemRefTypeDao, ResponseTypeDao responseTypeDao, ResponseSetService responseSetService, XformParserHelper xformParserHelper, XformParser xformParser, CoreResources coreResources) {
+
+    public XformMetaDataService(StudyDao studyDao, CrfDao crfDao, SectionDao sectionDao, UserAccountDao userDao, CrfVersionDao crfVersionDao, FormLayoutDao formLayoutDao, FormLayoutMediaDao formLayoutMediaDao, ItemGroupDao itemGroupDao, ItemGroupMetadataDao itemGroupMetadataDao, VersioningMapDao versioningMapDao, ItemFormMetadataDao itemFormMetadataDao, ItemDao itemDao, ItemDataTypeDao itemDataTypeDao, ItemReferenceTypeDao itemRefTypeDao, ResponseTypeDao responseTypeDao, ResponseSetService responseSetService, XformParserHelper xformParserHelper, XformParser xformParser, CoreResources coreResources, ResponseSetDao responseSetDao) {
         this.studyDao = studyDao;
         this.crfDao = crfDao;
         this.sectionDao = sectionDao;
@@ -95,6 +99,7 @@ public class XformMetaDataService {
         this.xformParserHelper = xformParserHelper;
         this.xformParser = xformParser;
         this.coreResources = coreResources;
+        this.responseSetDao = responseSetDao;
     }
 
     public FormLayout createCRFMetaData(CrfMetaDataObject cmdObject) throws Exception {
@@ -104,6 +109,13 @@ public class XformMetaDataService {
         CrfBean crfBean = null;
         Section section = null;
         boolean formExist = false;
+
+        List<Item> items = null;
+        List<ResponseSet> responseSets = null;
+        List<ItemFormMetadata> ifms = null;
+        List<ItemGroupMetadata> igms = null;
+        List<VersioningMap> vms = null;
+        List<ItemGroup> itemGroups = null;
 
         crfBean = (CrfBean) crfDao.findByOcOID(cmdObject.crf.getOcoid());
         if (crfBean != null) {
@@ -128,6 +140,12 @@ public class XformMetaDataService {
             crfVersion = crfVersionDao.findAllByCrfId(crfBean.getCrfId()).get(0);
             section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
 
+            items = itemDao.findAllByCrfVersion(crfVersion.getCrfVersionId());
+            responseSets = responseSetDao.findAllByVersion(crfVersion.getCrfVersionId());
+            ifms = itemFormMetadataDao.findAllByCrfVersion(crfVersion.getCrfVersionId());
+            igms = itemGroupMetadataDao.findAllByCrfVersion(crfVersion.getCrfVersionId());
+            vms = versioningMapDao.findAllByVersionId(crfVersion.getCrfVersionId());
+            itemGroups = itemGroupDao.findByCrfVersionId(crfVersion.getCrfVersionId());
         } else {
             crfBean = new CrfBean();
             crfBean = populateCrf(crfBean, cmdObject);
@@ -153,14 +171,13 @@ public class XformMetaDataService {
                 section = sectionDao.findByCrfVersionOrdinal(crfVersion.getCrfVersionId(), 1);
             }
         }
-        createGroups(cmdObject.container, crfBean, crfVersion, formLayout, section, cmdObject.ub, cmdObject.errors, formExist);
-
+        createGroups(cmdObject.container, crfBean, crfVersion, formLayout, section, cmdObject.ub, cmdObject.errors, formExist, items, responseSets, ifms, igms, vms, itemGroups);
 
         return formLayout;
     }
 
     private void createGroups(XformContainer container, CrfBean crf, CrfVersion crfVersion, FormLayout formLayout, Section section, UserAccount ub,
-                              Errors errors, boolean formExist) throws Exception {
+                              Errors errors, boolean formExist, List<Item> items, List<ResponseSet> responseSets, List<ItemFormMetadata> ifms, List<ItemGroupMetadata> igms, List<VersioningMap> vms, List<ItemGroup> itemGroups) throws Exception {
 
         Integer itemOrdinal = 1;
         ArrayList<String> usedGroupOids = new ArrayList<String>();
@@ -171,7 +188,12 @@ public class XformMetaDataService {
             ItemGroup itemGroup = null;
 
             if (formExist) {
-                itemGroup = findGroupByOCOID(xformGroup);
+                for (ItemGroup ig : emptyIfNull(itemGroups)) {
+                    if (ig.getOcOid().equals(xformGroup.getGroupOid())) {
+                        itemGroup = ig;
+                        break;
+                    }
+                }
             }
 
             if (itemGroup == null) {
@@ -194,30 +216,51 @@ public class XformMetaDataService {
 
             for (XformItem xformItem : xformGroup.getItems()) {
 
-                Item item = createItem(xformGroup, xformItem, crf, ub, usedItemOids, errors, formExist);
+                Item item = createItem(xformGroup, xformItem, crf, ub, usedItemOids, errors, formExist, items);
                 if (item != null) {
                     ResponseType responseType = getResponseType(xformItem);
-                    ResponseSet responseSet = responseSetService.getResponseSet(xformItem, crfVersion, responseType, item, errors);
+                    ResponseSet responseSet = responseSetService.getResponseSet(xformItem, crfVersion, responseType, item, errors, responseSets);
                     // add if statement
-                    ItemFormMetadata ifmd = itemFormMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+
+                    ItemFormMetadata ifmd = null;
+                    for (ItemFormMetadata ifm : emptyIfNull(ifms)) {
+                        if (ifm.getItem().getItemId() == item.getItemId()) {
+                            ifmd = ifm;
+                            break;
+                        }
+                    }
                     if (ifmd == null) {
-                        ifmd = createItemFormMetadata(xformItem, item, responseSet, section, crfVersion, itemOrdinal);
+                        createItemFormMetadata(xformItem, item, responseSet, section, crfVersion, itemOrdinal);
                     } else {
                         ifmd.setRequired(xformItem.isRequired());
                         ifmd.setLeftItemText(xformItem.getLeftItemText());
                         ifmd.setItem(item);
                         ifmd.setResponseSet(responseSet);
-                        ifmd = itemFormMetadataDao.saveOrUpdate(ifmd);
+                        itemFormMetadataDao.saveOrUpdate(ifmd);
                     }
-                    ArrayList<VersioningMap> vm = versioningMapDao.findByVersionIdFormLayoutIdAndItemId(crfVersion.getCrfVersionId(),
-                            formLayout.getFormLayoutId(), item.getItemId(), itemOrdinal);
-                    if (vm.size() == 0) {
+                    VersioningMap vm = null;
+
+                    for (VersioningMap v : emptyIfNull(vms)) {
+                        if (v.getVersionMapId().getFormLayoutId() == formLayout.getFormLayoutId() && v.getVersionMapId().getItemId() == item.getItemId()) {
+                            vm = v;
+                            break;
+                        }
+                    }
+
+                    if (vm == null) {
                         createVersioningMap(crfVersion, item, formLayout, xformItem.getItemOrderInForm());
                     }
                     //
-                    ItemGroupMetadata igmd = itemGroupMetadataDao.findByItemCrfVersion(item.getItemId(), crfVersion.getCrfVersionId());
+                    ItemGroupMetadata igmd = null;
+
+                    for (ItemGroupMetadata igm : emptyIfNull(igms)) {
+                        if (igm.getItem().getItemId() == item.getItemId()) {
+                            igmd = igm;
+                            break;
+                        }
+                    }
                     if (igmd == null) {
-                        igmd = createItemGroupMetadata(item, crfVersion, itemGroup, isRepeating, itemOrdinal);
+                        createItemGroupMetadata(item, crfVersion, itemGroup, isRepeating, itemOrdinal);
                     }
                     itemOrdinal++;
 
@@ -265,7 +308,7 @@ public class XformMetaDataService {
     }
 
     private ItemFormMetadata createItemFormMetadata(XformItem xformItem, Item item, ResponseSet responseSet, Section section, CrfVersion crfVersion,
-            Integer itemOrdinal) {
+                                                    Integer itemOrdinal) {
         ItemFormMetadata itemFormMetadata = new ItemFormMetadata();
         itemFormMetadata.setCrfVersionId(crfVersion.getCrfVersionId());
         itemFormMetadata.setResponseSet(responseSet);
@@ -292,13 +335,18 @@ public class XformMetaDataService {
         return itemFormMetadata;
     }
 
-    private Item createItem(XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccount ub, ArrayList<String> usedItemOids, Errors errors, boolean formExist)
+    private Item createItem(XformGroup xformGroup, XformItem xformItem, CrfBean crf, UserAccount ub, ArrayList<String> usedItemOids, Errors errors, boolean formExist, List<Item> items)
             throws Exception {
         Item item = null;
         ItemDataType newDataType = getItemDataType(xformItem);
 
         if (formExist) {
-            item = itemDao.findByOcOID(xformItem.getItemOid());
+            for (Item i : emptyIfNull(items)) {
+                if (i.getOcOid().equals(xformItem.getItemOid())) {
+                    item = i;
+                    break;
+                }
+            }
         }
         if (item == null) {
             item = new Item();
@@ -316,8 +364,6 @@ public class XformMetaDataService {
             item.setDescription(xformItem.getItemDescription());
         }
         item = itemDao.saveOrUpdate(item);
-
-
 
 
         return item;
@@ -622,8 +668,5 @@ public class XformMetaDataService {
 
     }
 
-    private ItemGroup findGroupByOCOID(XformGroup xformGroup) {
-        return itemGroupDao.findByOcOID(xformGroup.getGroupOid());
-    }
 
 }
