@@ -1,8 +1,8 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.List;
-
 import org.akaza.openclinica.domain.datamap.ResponseSet;
+
+import java.util.List;
 
 public class ResponseSetDao extends AbstractDomainDao<ResponseSet> {
 
@@ -10,6 +10,13 @@ public class ResponseSetDao extends AbstractDomainDao<ResponseSet> {
     Class<ResponseSet> domainClass() {
         // TODO Auto-generated method stub
         return ResponseSet.class;
+    }
+
+    public List<ResponseSet> findAllByVersion(Integer version) {
+        String query = "from " + getDomainClassName() + " response_set  where response_set.versionId = :version ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("version", version);
+        return ((List<ResponseSet>) q.list());
     }
 
     public ResponseSet findByLabelVersion(String label, Integer version) {

@@ -1,10 +1,10 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.util.ArrayList;
-import java.util.List;
-
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.hibernate.query.Query;
+
+import java.util.ArrayList;
+import java.util.List;
 
 public class VersioningMapDao extends AbstractDomainDao<VersioningMap> {
 
@@ -38,6 +38,14 @@ public class VersioningMapDao extends AbstractDomainDao<VersioningMap> {
         q.setParameter("itemId", itemId);
         q.setParameter("itemOrdinal", itemOrdinal);
         return (ArrayList<VersioningMap>) q.list();
+    }
+
+    public List<VersioningMap> findAllByVersionId(int versionId) {
+        String query = "from " + getDomainClassName()
+                + " vm  where vm.crfVersion.crfVersionId = :versionId ";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("versionId", versionId);
+        return (List<VersioningMap>) q.list();
     }
 
 }
