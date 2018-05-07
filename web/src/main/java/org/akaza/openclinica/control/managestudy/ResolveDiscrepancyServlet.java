@@ -31,6 +31,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -52,6 +53,7 @@ import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -151,8 +153,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
         return null;
     }
 
-    public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy, DiscrepancyNoteBean note, boolean isCompleted,
-            String module, String flavor) throws Exception {
+    public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy, DiscrepancyNoteBean note,
+                                               boolean isCompleted,
+                                               String module, String flavor, boolean isLocked) throws Exception {
         String entityType = note.getEntityType().toLowerCase();
         int id = note.getEntityId();
         if ("subject".equalsIgnoreCase(entityType)) {
@@ -331,7 +334,12 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             String formUrl = null;
             if (ecb.getId() > 0) {
-                formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role, EDIT_MODE, false);
+                if (isLocked) {
+                    formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role,
+                            EDIT_MODE, true);
+                } else
+                    formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb,
+                            role, EDIT_MODE, false);
             } else {
                 String hash = formLayout.getXform();
                 formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash);
@@ -345,6 +353,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
             }
             request.setAttribute(EnketoFormServlet.FORM_URL1, part1);
             request.setAttribute(EnketoFormServlet.FORM_URL2, part2);
+            if (isLocked) {
+                request.setAttribute("readOnlyUrl", part1);
+            }
             request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module);
             if (!flavor.equals(SINGLE_ITEM_FLAVOR)) {
                 request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
@@ -410,6 +421,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
         boolean toView = false;
         boolean isCompleted = false;
         Page p = null;
+        boolean isLocked = false;
         if ("itemdata".equalsIgnoreCase(entityType)) {
             ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
             ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
@@ -418,13 +430,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
             if (isCRFLocked(ecb)) {
-                addPageMessage(resword.getString("CRF_unavailable") +
-                        "\n" + ub.getName() + " " + resword.getString("Currently_entering_data")
-                        + "\n" + resword.getString("Leave_the_CRF")
-                        + "\n" + resword.getString("Continue_in_read_mode_or_cancel"));
-                p = Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_SERVLET;
-                forwardPage(p);
-                return;
+                isLocked = true;
             } else {
                 lockCRF(ecb);
             }
@@ -442,7 +448,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
         }
         // logger.info("set up pop up url: " + createNoteURL);
         // System.out.println("set up pop up url: " + createNoteURL);
-        boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted, module, flavor);
+        boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted,
+                module, flavor, isLocked);
 
         p = getPageForForwarding(discrepancyNoteBean, isCompleted);
 
@@ -474,8 +481,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
     private boolean isCRFLocked(EventCRFBean ecb) {
         if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId())) {
+            Integer userId = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId());
+            UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+            UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
             String errorData = resword.getString("CRF_unavailable") +
-                    "\\n" + ub.getName() + " " + resword.getString("Currently_entering_data")
+                    "\\n" + ubean.getName() + " " + resword.getString("Currently_entering_data")
                     + "\\n" + resword.getString("Leave_the_CRF")
                     + "\\n" + resword.getString("Continue_in_read_mode_or_cancel");
             request.setAttribute("errorData", errorData);
