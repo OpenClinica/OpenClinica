@@ -147,7 +147,8 @@
 	        <c:when test="${importCRF.preImportStage.doubleDE_Complete}"><fmt:message key="data_entry_complete" bundle="${resword}"/></c:when>
 	        <c:when test="${importCRF.preImportStage.admin_Editing}"><fmt:message key="administrative_editing" bundle="${resword}"/></c:when>
 	        <c:when test="${importCRF.preImportStage.locked}"><fmt:message key="locked" bundle="${resword}"/></c:when>
-	        <c:otherwise><div class="alert"><fmt:message key="invalid" bundle="${resword}"/></div></c:otherwise>
+			<c:when test="${importCRF.preImportStage.complete}"><fmt:message key="complete" bundle="${resword}"/></c:when>
+			<c:otherwise><div class="alert"><fmt:message key="invalid" bundle="${resword}"/></div></c:otherwise>
         </c:choose>
     </td>
     </tr>

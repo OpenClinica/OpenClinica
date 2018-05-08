@@ -38,6 +38,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
@@ -242,7 +243,7 @@ public class ImportCRFDataServlet extends SecureController {
             // 3.f. are those items in that item group?
 
             List<String> errors = getImportCRFDataService().validateStudyMetadata(odmContainer, ub.getActiveStudyId());
-            if (errors != null) {
+            if (CollectionUtils.isNotEmpty(errors)) {
                 // add to session
                 // forward to another page
                 logger.info(errors.toString());
@@ -252,11 +253,10 @@ public class ImportCRFDataServlet extends SecureController {
                 if (errors.size() > 0) {
                     // fail = true;
                     forwardPage(Page.IMPORT_CRF_DATA);
-                } else {
-                    addPageMessage(respage.getString("passed_study_check"));
-                    addPageMessage(respage.getString("passed_oid_metadata_check"));
                 }
-
+            } else {
+                addPageMessage(respage.getString("passed_study_check"));
+                addPageMessage(respage.getString("passed_oid_metadata_check"));
             }
             logger.debug("passed error check");
             // TODO ADD many validation steps before we get to the
