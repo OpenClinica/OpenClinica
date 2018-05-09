@@ -1331,7 +1331,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     public CRFLocker getCrfLocker() {
         return crfLocker;
     }
-    public EventCRFLocker getEventCrfLocker() {
+    public  EventCRFLocker getEventCrfLocker() {
         return eventCrfLocker;
     }
 

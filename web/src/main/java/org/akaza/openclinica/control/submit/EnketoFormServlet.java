@@ -132,7 +132,7 @@ public class EnketoFormServlet extends SecureController {
         if (checkLock == false)
             return false;
 
-        if (getEventCrfLocker().isLocked(studyEvent, formLayout, currentPublicStudy.getSchemaName())) {
+        if (getEventCrfLocker().isLocked(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId())) {
             // Display error message
             Integer userId = getEventCrfLocker().getLockOwner(studyEvent, formLayout, currentPublicStudy.getSchemaName());
             UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());

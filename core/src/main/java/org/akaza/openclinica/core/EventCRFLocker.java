@@ -69,19 +69,24 @@ public class EventCRFLocker implements Serializable {
         }
     }
 
+
     /**
      * If the CRF is locked by a user.
      *
      */
-    public boolean isLocked(StudyEvent se, FormLayout fl, String schemaName) {
-
-        return lockedCRFs.containsKey(createEventCrfLockKey(se, fl, schemaName));
+    public boolean isLocked(StudyEvent se, FormLayout fl, String schemaName, Integer requestUserId) {
+       return isLocked(createEventCrfLockKey(se, fl, schemaName), requestUserId);
     }
 
 
-    public boolean isLocked(String ecId) {
-
-        return lockedCRFs.containsKey(ecId);
+    public boolean isLocked(String ecId, Integer requestUserId) {
+        Integer userId = lockedCRFs.get(ecId);
+        if (userId != null) {
+            if (requestUserId != null && requestUserId == userId)
+                return false;
+            return true;
+        }
+        return false;
     }
 
     /**

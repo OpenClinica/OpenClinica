@@ -480,7 +480,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     }
 
     private boolean isCRFLocked(EventCRFBean ecb) {
-        if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId())) {
+        if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId())) {
             Integer userId = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId());
             UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
             UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);

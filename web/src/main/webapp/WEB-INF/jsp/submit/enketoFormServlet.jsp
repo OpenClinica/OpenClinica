@@ -52,7 +52,7 @@
             var errorData = "${errorData}";
 
             if (errorData) {
-                var response = confirm(errorData);
+                var response = true; //confirm(errorData);
                 if (response == true) {
                     var fullEnketoURL = "${readOnlyUrl}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
                     console.log('fullEnketoURL:' + fullEnketoURL);

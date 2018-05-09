@@ -17,8 +17,9 @@ public class CheckCRFLocked extends SecureController {
     protected void processRequest() throws Exception {
         int userId;
         String ecId = request.getParameter("ecId");
+        int requestUserId = ub.getId();
         if (StringUtils.isNotEmpty(ecId)) {
-            if (getEventCrfLocker().isLocked(ecId)) {
+            if (getEventCrfLocker().isLocked(ecId, requestUserId)) {
                 userId = getEventCrfLocker().getLockOwner(ecId);
                 UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
                 UserAccountBean ubean = (UserAccountBean)udao.findByPK(userId);
