@@ -1,0 +1,14 @@
+var myContextPath = "${pageContext.request.contextPath}";
+var sessionTimeoutVal = '<%= session.getMaxInactiveInterval() %>';
+console.log("***********************************sessionTimeoutVal:"+ sessionTimeoutVal);
+var userName = "<%= userBean.getName() %>";
+var currentURL = "<%= currentURL %>";
+var crossStorageURL = '<%= session.getAttribute("crossStorageURL")%>';
+console.log("***********************************Getting crossStorage:"+ crossStorageURL);
+var ocAppTimeoutKey = "OCAppTimeout";
+var firstLoginCheck = '<%= session.getAttribute("firstLoginCheck")%>';
+console.log("Firstr time first:" + firstLoginCheck);
+var currentUser = "currentUser";
+console.log("***********************************Getting crossStorage");
+var storage = new CrossStorageClient(crossStorageURL);
+var appName = "RT";
