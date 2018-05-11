@@ -139,8 +139,7 @@ public class EnketoFormServlet extends SecureController {
             UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
             String errorData = resword.getString("CRF_unavailable") +
                     "\\n" + ubean.getName() + " " + resword.getString("Currently_entering_data")
-                    + "\\n" + resword.getString("Leave_the_CRF")
-                    + "\\n" + resword.getString("Continue_in_read_mode_or_cancel");
+                    + "\\n" + resword.getString("CRF_reopen_enter_data");
             request.setAttribute("errorData", errorData);
             return true;
         } else {

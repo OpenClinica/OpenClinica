@@ -131,6 +131,14 @@
 </div>
 <br>
  </c:if>
+	<c:choose>
+		<c:when test="${!empty errorData}">
+			<script type="text/javascript" language="javascript">
+				var errorData = "${errorData}";
+				alert(errorData);
+			</script>
+		</c:when>
+	</c:choose>
    <c:choose>
     <c:when test="${!empty items && count>0}">
      <form action='RemoveEventCRF?action=submit&id=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
