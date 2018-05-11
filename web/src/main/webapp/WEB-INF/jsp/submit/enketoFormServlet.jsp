@@ -55,6 +55,7 @@
                 var response = true; //confirm(errorData);
                 if (response == true) {
                     var fullEnketoURL = "${readOnlyUrl}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
+                    fullEnketoURL += "&loadWarning=" + encodeURIComponent(errorData);
                     console.log('fullEnketoURL:' + fullEnketoURL);
                     iframe = document.getElementById("enketo");
                     iframe.setAttribute('src', fullEnketoURL);

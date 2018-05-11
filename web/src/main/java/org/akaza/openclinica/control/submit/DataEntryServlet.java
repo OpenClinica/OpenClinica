@@ -340,7 +340,8 @@ public abstract class DataEntryServlet extends CoreSecureController {
             UserAccountDAO udao = new UserAccountDAO(getDataSource());
             UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
             if (ubean.getId() != ub.getId()) {
-                addPageMessage(resword.getString("CRF_unavailable") + " " + ubean.getName() + " " + resword.getString("Currently_entering_data") + " "
+                addPageMessage(resword.getString("CRF_unavailable") + " " + ubean.getName()
+                        + " " + resword.getString("Currently_entering_data") + " "
                     + resword.getString("Leave_the_CRF"), request);
                 forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
             }
