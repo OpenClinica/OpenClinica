@@ -112,20 +112,28 @@
 <br>
  </c:if>
    <c:choose>
-    <c:when test="${!empty items && count>0}">
-     <form action='DeleteEventCRF?action=submit&ecId=<c:out value="${displayEventCRF.eventCRF.id}"/>&ssId=<c:out value="${studySub.id}"/>' method="POST">
-      <input type="submit" name="submit" value="<fmt:message key="delete_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="this_CRF_has_data_want_delete" bundle="${restext}"/>");'>
-         &nbsp;
-       <input type="button" onclick="confirmCancel('EnterDataForStudyEvent?eventId=<c:out value="${event.id}"/>');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
-     </form>
-    </c:when>
-    <c:otherwise>
-      <form action='DeleteEventCRF?action=submit&ecId=<c:out value="${displayEventCRF.eventCRF.id}"/>&ssId=<c:out value="${studySub.id}"/>' method="POST">
-      <input type="submit" name="submit" value="<fmt:message key="delete_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_delete_it" bundle="${restext}"/>");'>
-          &nbsp;
-        <input type="button" onclick="confirmCancel('EnterDataForStudyEvent?eventId=<c:out value="${event.id}"/>');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
-     </form>
-    </c:otherwise>
+       <c:when test="${!empty errorData}">
+           <script type="text/javascript" language="javascript">
+               var errorData = "${errorData}";
+               alert(errorData);
+           </script>
+       </c:when>
+   </c:choose>
+   <c:choose>
+       <c:when test="${!empty items && count>0}">
+         <form action='DeleteEventCRF?action=submit&ecId=<c:out value="${displayEventCRF.eventCRF.id}"/>&ssId=<c:out value="${studySub.id}"/>' method="POST">
+          <input type="submit" name="submit" value="<fmt:message key="delete_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="this_CRF_has_data_want_delete" bundle="${restext}"/>");'>
+             &nbsp;
+           <input type="button" onclick="confirmCancel('EnterDataForStudyEvent?eventId=<c:out value="${event.id}"/>');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
+         </form>
+        </c:when>
+        <c:otherwise>
+          <form action='DeleteEventCRF?action=submit&ecId=<c:out value="${displayEventCRF.eventCRF.id}"/>&ssId=<c:out value="${studySub.id}"/>' method="POST">
+          <input type="submit" name="submit" value="<fmt:message key="delete_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_delete_it" bundle="${restext}"/>");'>
+              &nbsp;
+            <input type="button" onclick="confirmCancel('EnterDataForStudyEvent?eventId=<c:out value="${event.id}"/>');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
+         </form>
+        </c:otherwise>
    </c:choose>
 
 <jsp:include page="../include/footer.jsp"/>

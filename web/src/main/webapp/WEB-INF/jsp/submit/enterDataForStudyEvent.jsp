@@ -16,7 +16,7 @@
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="javascript">
     function checkCRFLocked(ecId, url){
-        jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
+        jQuery.post(" return checkCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
             if(data == 'true'){
                 window.location = url;
             }else{
@@ -26,7 +26,7 @@
     }
     function checkCRFLockedInitial(ecId, formName){
         if(ecId==0) {formName.submit(); return;}
-        jQuery.post("CheckCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
+        jQuery.post(" return checkCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
             if(data == 'true'){
                 formName.submit();
             }else{
@@ -384,16 +384,18 @@
                         <c:when test="${dedc.eventCRF.status.id != 0}">
                             <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
-                               onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','icon icon-pencil-squared');">
-                               <span name="bt_EnterData<c:out value="${rowCount}"/>" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></span></a>&nbsp;
+                               onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','icon icon-pencil-squared');"
+                               onclick="return checkCRFLocked('<c:out value="${currentPublicStudy.schemaName}"/><c:out value="${studyEvent.id}"/><c:out value="${dedc.eventCRF.formLayout.id}"/>', '<c:out value="${actionQuery}"/>');">
+                            <span name="bt_EnterData<c:out value="${rowCount}"/>" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></span></a>&nbsp;
                             </a>
                         </c:when>
                         <c:otherwise>
                               <a id="ide1-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>"
                                href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
-                               onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','icon icon-pencil-squared');">
-                               <span name="bt_EnterData<c:out value="${rowCount}"/>" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></span></a>&nbsp;
+                               onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','icon icon-pencil-squared');"
+                               onclick="return checkCRFLocked('<c:out value="${publicStudy.schemaName}"/><c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.defaultVersionId}"/>', '<c:out value="${actionQuery}"/>');">
+                              <span name="bt_EnterData<c:out value="${rowCount}"/>" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="enter_data" bundle="${resword}"/>" title="<fmt:message key="enter_data" bundle="${resword}"/>" align="left" hspace="2"></span></a>&nbsp;
                             </a>
                         </c:otherwise>
                         </c:choose>
@@ -406,7 +408,9 @@
                        <a id="ide2-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>"
                    href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                    onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
-                   onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><span
+                   onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
+                   onclick="return checkCRFLocked('<c:out value="${publicStudy.schemaName}"/><c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.defaultVersionId}"/>', '<c:out value="${actionQuery}"/>');">
+<span
                   name="bt_View1" align="left" class="icon icon-search" border="0" alt="<fmt:message key="view_default" bundle="${resword}"/>" title="<fmt:message key="view_default" bundle="${resword}"/>" hspace="2"></span></a>&nbsp;
             </td>
         </tr>
@@ -484,7 +488,8 @@
            <td><a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-              ><span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="2"></span></a>
+               onclick="return checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
+           <span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="2"></span></a>
 </td>
 
             <c:if test="${(studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed') && (dec.eventCRF.studyEvent.status.available) && (study.status.available)}">
@@ -499,7 +504,8 @@
            <td><a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
-              ><span name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></span></a>
+               onclick="return checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
+               <span name="bt_View1" class="icon icon-search" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left" hspace="2"></span></a>
 </td>
 
         </c:when>
@@ -508,7 +514,8 @@
                 <c:if test="${dec.continueInitialDataEntryPermitted}">
                 <td><a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                    onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');">
+                    onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');"
+                    onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></span></a-->
                    </a>
                </td> </c:if>
@@ -516,20 +523,21 @@
                  <td><a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');"
-                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
+                    onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <span class="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" title="<fmt:message key="begin_double_data_entry" bundle="${resword}"/>" align="left" hspace="6"></span></a>
                 </td></c:if>
                 <c:if test="${dec.continueDoubleDataEntryPermitted}">
                   <td><a href="#"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');"
-                    onclick="checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
+                    onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <span class="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></span></a>
                </td> </c:if>
                 <c:if test="${dec.performAdministrativeEditingPermitted}">
                 <td><a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
-                    onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');">
+                    onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');"
+                    onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
                     <span name="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="administrative_editing" bundle="${resword}"/>" title="<fmt:message key="administrative_editing" bundle="${resword}"/>" align="left" hspace="6"></span>
                     </a></td>
                 </c:if>
@@ -539,7 +547,8 @@
                 <td><a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
-              ><span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="2"></span></a>
+               onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
+                    <span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>"  hspace="2"></span></a>
               </td>
 
             <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">

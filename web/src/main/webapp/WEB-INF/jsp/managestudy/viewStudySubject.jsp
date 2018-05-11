@@ -1084,3 +1084,12 @@
 <!-- End Main Content Area -->
 <jsp:include page="../include/footer.jsp"/>
 <script type="text/javascript" src="includes/studySubject/viewStudySubject.js"></script>
+<c:choose>
+<c:when test="${!empty errorData}">
+<script type="text/javascript" language="javascript">
+    var errorData = "${errorData}";
+    alert(errorData);
+</script>
+</c:when>
+</c:choose>
+

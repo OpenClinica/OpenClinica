@@ -49,10 +49,28 @@
     <script type="text/javascript" language="javascript">
 
         $(document).ready(function(){
-            var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
-            iframe = document.getElementById("enketo");
-            iframe.setAttribute('src', fullEnketoURL);
+            var errorData = "${errorData}";
+
+            if (errorData) {
+                var response = true; //confirm(errorData);
+                if (response == true) {
+                    var fullEnketoURL = "${readOnlyUrl}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
+                    fullEnketoURL += "&loadWarning=" + encodeURIComponent(errorData);
+                    console.log('fullEnketoURL:' + fullEnketoURL);
+                    iframe = document.getElementById("enketo");
+                    iframe.setAttribute('src', fullEnketoURL);
+                } else {
+                    if ("${originatingPage}") window.location.replace("${originatingPage}");
+                }
+            } else {
+                var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
+                iframe = document.getElementById("enketo");
+                iframe.setAttribute('src', fullEnketoURL);
+            }
+
+
         });
+
 
         window.addEventListener("message", receiveMessage, false);
         function receiveMessage(event) {
@@ -84,6 +102,7 @@
     <c:set var="urlPrefix" value="../"/>
 </c:if>
 <body style="width:1024px;" class="main_BG">
+
 <script type="application/javascript">
     var storage = new CrossStorageClient(crossStorageURL);
     updateOCAppTimeout();

@@ -7,17 +7,6 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.net.URLEncoder;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.AuditEventBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.StudyEventAuditBean;
@@ -27,47 +16,30 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.DisplayEventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.FormLayoutBean;
-import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.submit.*;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.FormLayoutDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.dao.submit.*;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.web.context.support.WebApplicationContextUtils;
+
+import javax.sql.DataSource;
+import java.net.URLEncoder;
+import java.util.*;
 
 /**
  * @author jxu
@@ -109,7 +81,7 @@ public class ViewStudySubjectServlet extends SecureController {
         // YW 10-18-2007, if a study subject with passing parameter does not
         // belong to user's studies, it can not be viewed
         // mayAccess();
-        getCrfLocker().unlockAllForUser(ub.getId());
+        getEventCrfLocker().unlockAllForUser(ub.getId());
         if (ub.isSysAdmin()) {
             return;
         }
@@ -187,7 +159,7 @@ public class ViewStudySubjectServlet extends SecureController {
             addPageMessage(respage.getString("please_choose_a_subject_to_view"));
             forwardPage(Page.LIST_STUDY_SUBJECTS);
         } else {
-            if (!StringUtil.isBlank(from)) {
+            if (!StringUtils.isBlank(from)) {
                 request.setAttribute("from", from); // form ListSubject or
                 // ListStudySubject
             } else {
@@ -363,12 +335,12 @@ public class ViewStudySubjectServlet extends SecureController {
                 sea.setDefinition(sed);
                 String old = avb.getOldValue().trim();
                 try {
-                    if (!StringUtil.isBlank(old)) {
+                    if (!StringUtils.isBlank(old)) {
                         SubjectEventStatus oldStatus = SubjectEventStatus.get(new Integer(old).intValue());
                         sea.setOldSubjectEventStatus(oldStatus);
                     }
                     String newValue = avb.getNewValue().trim();
-                    if (!StringUtil.isBlank(newValue)) {
+                    if (!StringUtils.isBlank(newValue)) {
                         SubjectEventStatus newStatus = SubjectEventStatus.get(new Integer(newValue).intValue());
                         sea.setNewSubjectEventStatus(newStatus);
                     }
@@ -380,6 +352,9 @@ public class ViewStudySubjectServlet extends SecureController {
                 eventLogs.add(sea);
             }
             request.setAttribute("eventLogs", eventLogs);
+            String errorData = request.getParameter("errorData");
+            if (StringUtils.isNotEmpty(errorData))
+                request.setAttribute("errorData", errorData);
             forwardPage(Page.VIEW_STUDY_SUBJECT);
         }
     }

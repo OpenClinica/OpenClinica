@@ -11,10 +11,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -34,6 +31,8 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -94,14 +93,14 @@ public class DeleteEventCRFServlet extends SecureController {
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
-
+        request.setAttribute("errorData", null);
         if (eventCRFId == 0) {
             addPageMessage(respage.getString("please_choose_an_event_CRF_to_delete"));
             request.setAttribute("id", new Integer(studySubId).toString());
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
-            EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
+            EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
             request.setAttribute("studySub", studySub);
 
@@ -142,7 +141,25 @@ public class DeleteEventCRFServlet extends SecureController {
             dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
             ArrayList<ItemDataBean> itemData = iddao.findAllByEventCRFId(eventCRF.getId());
             request.setAttribute("items", itemData);
-
+            if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName()
+                    + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId(), ub.getId())) {
+                Integer lockOwner = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName()
+                        + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId());
+                UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
+                UserAccountBean userAccountBean = (UserAccountBean) uDAO.findByPK(lockOwner);
+                request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
+                        "User " + userAccountBean.getName() +" is currently entering data.\\n " +
+                        "Once they leave the form, you will be allowed to perform this action.\\n");
+                if ("confirm".equalsIgnoreCase(action)) {
+                    request.setAttribute("id", new Integer(studySubId).toString());
+                    forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+                    return;
+                } else {
+                    request.setAttribute("displayEventCRF", dec);
+                    forwardPage(Page.DELETE_EVENT_CRF);
+                    return;
+                }
+            }
             if ("confirm".equalsIgnoreCase(action)) {
 
                 request.setAttribute("displayEventCRF", dec);

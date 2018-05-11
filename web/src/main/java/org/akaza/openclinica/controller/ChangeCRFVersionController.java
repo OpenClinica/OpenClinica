@@ -1,5 +1,7 @@
 package org.akaza.openclinica.controller;
 
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.sql.Connection;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,10 +32,13 @@ import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -43,7 +48,9 @@ import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,7 +87,10 @@ public class ChangeCRFVersionController {
     @Autowired
     @Qualifier("sidebarInit")
     private SidebarInit sidebarInit;
-
+    @Autowired
+    EventCRFLocker eventCRFLocker;
+    @Autowired
+    UserAccountDao userAccountDao;
     ResourceBundle resword, resformat, respage;
 
     public ChangeCRFVersionController() {
@@ -130,7 +140,6 @@ public class ChangeCRFVersionController {
         // set default CRF version label
         setupResource(request);
 
-        // from event_crf get
         StudyBean study = (StudyBean) request.getSession().getAttribute("study");
 
         CRFDAO cdao = new CRFDAO(dataSource);
@@ -150,6 +159,15 @@ public class ChangeCRFVersionController {
         request.setAttribute("eventCreateDate", formatDate(seb.getCreatedDate()));
         if (sedb.isRepeating()) {
             request.setAttribute("eventOrdinal", seb.getSampleOrdinal());
+        }
+        HttpSession session = request.getSession();
+        UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
+        StudyBean currentPublicStudy = (StudyBean) session.getAttribute("publicStudy");
+        if (eventCRFLocker.isLocked(currentPublicStudy.getSchemaName()
+                + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId())) {
+            String errorData = getErrorData(request, ecb, currentPublicStudy);
+            if (redirect(request, response, "/ViewStudySubject?id=" + seb.getStudySubjectId() + "&errorData=" + errorData) == null)
+                return null;
         }
         if (study.getParentStudyId() > 0) {
             EventDefinitionCRFDAO edfdao = new EventDefinitionCRFDAO(dataSource);
@@ -178,6 +196,24 @@ public class ChangeCRFVersionController {
         gridMap.addAttribute("crfBean", crfBean);
 
         return gridMap;
+    }
+
+    private String getErrorData(HttpServletRequest request, EventCRFBean ecb, StudyBean currentPublicStudy) {
+        Integer lockOwner = eventCRFLocker.getLockOwner(currentPublicStudy.getSchemaName()
+                + ecb.getStudyEventId() + ecb.getFormLayoutId());
+        UserAccount userAccount = userAccountDao.findByUserId(lockOwner);
+        request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
+                "User " + userAccount.getUserName() + " is currently entering data.\\n " +
+                "Once they leave the form, you will be allowed to perform this action.\\n");
+        String errorData = "";
+        try {
+            errorData = URLEncoder.encode("This form is currently unavailable for this action.\\n " +
+                    "User " + userAccount.getUserName() + " is currently entering data.\\n " +
+                    "Once they leave the form, you will be allowed to perform this action.\\n", "UTF-8");
+        } catch (UnsupportedEncodingException e) {
+            e.printStackTrace();
+        }
+        return errorData;
     }
 
     /*
@@ -489,18 +525,25 @@ public class ChangeCRFVersionController {
         ArrayList<String> pageMessages = initPageMessages(request);
 
         setupResource(request);
+        HttpSession session = request.getSession();
         // update event_crf_id table
         try {
-            EventCRFDAO event_crf_dao = new EventCRFDAO(dataSource);
-            StudyEventDAO sedao = new StudyEventDAO(dataSource);
-
-            EventCRFBean ev_bean = (EventCRFBean) event_crf_dao.findByPK(eventCRFId);
-            StudyEventBean st_event_bean = (StudyEventBean) sedao.findByPK(ev_bean.getStudyEventId());
-
+            EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
+            StudyEventDAO sed = new StudyEventDAO(dataSource);
+            UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
+            StudyBean currentPublicStudy = (StudyBean) session.getAttribute("publicStudy");
+            EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
+            StudyEventBean seb = (StudyEventBean) sed.findByPK(ecb.getStudyEventId());
+            if (eventCRFLocker.isLocked(currentPublicStudy.getSchemaName()
+                    + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId())) {
+                String errorData = getErrorData(request, ecb, currentPublicStudy);
+                if (redirect(request, response, "/ViewStudySubject?id=" + seb.getStudySubjectId() + "&errorData=" + errorData) == null)
+                    return null;
+            }
             Connection con = dataSource.getConnection();
             CoreResources.setSchema(con);
             con.setAutoCommit(false);
-            event_crf_dao.updateFormLayoutID(eventCRFId, newFormLayoutId, getCurrentUser(request).getId(), con);
+            eventCRFDAO.updateFormLayoutID(eventCRFId, newFormLayoutId, getCurrentUser(request).getId(), con);
 
             String status_before_update = null;
             SubjectEventStatus eventStatus = null;
@@ -509,7 +552,7 @@ public class ChangeCRFVersionController {
 
             // event signed, check if subject is signed as well
             StudySubjectDAO studySubDao = new StudySubjectDAO(dataSource);
-            StudySubjectBean studySubBean = (StudySubjectBean) studySubDao.findByPK(st_event_bean.getStudySubjectId());
+            StudySubjectBean studySubBean = (StudySubjectBean) studySubDao.findByPK(seb.getStudySubjectId());
             if (studySubBean.getStatus().isSigned()) {
                 status_before_update = auditDao.findLastStatus("study_subject", studySubBean.getId(), "8");
                 if (status_before_update != null && status_before_update.length() == 1) {
@@ -520,16 +563,16 @@ public class ChangeCRFVersionController {
                 studySubBean.setUpdater(getCurrentUser(request));
                 studySubDao.update(studySubBean, con);
             }
-            st_event_bean.setUpdater(getCurrentUser(request));
-            st_event_bean.setUpdatedDate(new Date());
+            seb.setUpdater(getCurrentUser(request));
+            seb.setUpdatedDate(new Date());
 
-            status_before_update = auditDao.findLastStatus("study_event", st_event_bean.getId(), "8");
+            status_before_update = auditDao.findLastStatus("study_event", seb.getId(), "8");
             if (status_before_update != null && status_before_update.length() == 1) {
                 int status = Integer.parseInt(status_before_update);
                 eventStatus = SubjectEventStatus.get(status);
-                st_event_bean.setSubjectEventStatus(eventStatus);
+                seb.setSubjectEventStatus(eventStatus);
             }
-            sedao.update(st_event_bean, con);
+            sed.update(seb, con);
 
             con.commit();
             con.setAutoCommit(true);
