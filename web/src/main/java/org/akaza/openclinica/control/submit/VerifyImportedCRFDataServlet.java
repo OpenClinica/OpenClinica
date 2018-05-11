@@ -184,6 +184,7 @@ public class VerifyImportedCRFDataServlet extends SecureController {
                         .get(eventCrfBean.getStudySubjectId() + "-" + eventCrfBean.getStudyEventId() + "-" + eventCrfBean.getFormLayoutId());
                 if (eventCRFStatus != null &&
                         !eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName()) &&
+                        !eventCRFStatus.equals(DataEntryStage.COMPLETE.getName()) &&
                         !eventCRFStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.getName())) {
                     continue;
                 }

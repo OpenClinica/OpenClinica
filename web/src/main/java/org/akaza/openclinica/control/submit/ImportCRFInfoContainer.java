@@ -157,7 +157,8 @@ public class ImportCRFInfoContainer {
     private boolean isCRFStatusValid(String crfStatus) {
 
         if (StringUtils.equals(crfStatus, INITIAL_DATA_ENTRY.getName()) ||
-                StringUtils.equals(crfStatus, DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.getName()))
+                StringUtils.equals(crfStatus, DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.getName()) ||
+                StringUtils.equals(crfStatus, DataEntryStage.COMPLETE.getName()))
             return true;
 
         return false;
