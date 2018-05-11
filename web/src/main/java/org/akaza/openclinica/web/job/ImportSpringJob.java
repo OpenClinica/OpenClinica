@@ -455,7 +455,9 @@ public class ImportSpringJob extends QuartzJobBean {
 
                     logger.debug("Event CRF Bean: id " + eventCRFBean.getId() + ", data entry stage " + dataEntryStage.getName() + ", status "
                             + eventCRFStatus.getName());
-                    if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
+                    if (eventCRFStatus.equals(Status.AVAILABLE)
+                            || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
+                            || dataEntryStage.equals(DataEntryStage.COMPLETE)
                             || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
                             || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
 
