@@ -15,6 +15,7 @@ import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -28,6 +29,7 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -127,8 +129,27 @@ public class RemoveEventCRFServlet extends SecureController {
             ArrayList itemData = iddao.findAllByEventCRFId(eventCRF.getId());
 
             request.setAttribute("items", itemData);
-
             String action = request.getParameter("action");
+
+            if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName()
+                    + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId(), ub.getId())) {
+                Integer lockOwner = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName()
+                        + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId());
+                UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
+                UserAccountBean userAccountBean = (UserAccountBean) uDAO.findByPK(lockOwner);
+                request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
+                        "User " + userAccountBean.getName() +" is currently entering data.\\n " +
+                        "Once they leave the form, you will be allowed to perform this action.\\n");
+                if ("confirm".equalsIgnoreCase(action)) {
+                    request.setAttribute("id", new Integer(studySubId).toString());
+                    forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+                    return;
+                } else {
+                    request.setAttribute("displayEventCRF", dec);
+                    forwardPage(Page.REMOVE_EVENT_CRF);
+                    return;
+                }
+            }
             if ("confirm".equalsIgnoreCase(action)) {
                 if (eventCRF.getStatus().equals(Status.DELETED) || eventCRF.getStatus().equals(Status.AUTO_DELETED)) {
                     addPageMessage(respage.getString("this_event_CRF_is_removed_for_this_study") + " "

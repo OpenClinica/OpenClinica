@@ -94,14 +94,14 @@ public class DeleteEventCRFServlet extends SecureController {
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
-
+        request.setAttribute("errorData", null);
         if (eventCRFId == 0) {
             addPageMessage(respage.getString("please_choose_an_event_CRF_to_delete"));
             request.setAttribute("id", new Integer(studySubId).toString());
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
-            EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
 
+            EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
             request.setAttribute("studySub", studySub);
 
@@ -142,7 +142,20 @@ public class DeleteEventCRFServlet extends SecureController {
             dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
             ArrayList<ItemDataBean> itemData = iddao.findAllByEventCRFId(eventCRF.getId());
             request.setAttribute("items", itemData);
-
+            if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName()
+                    + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId(), ub.getId())) {
+                if ("confirm".equalsIgnoreCase(action)) {
+                    request.setAttribute("id", new Integer(studySubId).toString());
+                    forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+                    return;
+                } else {
+                    request.setAttribute("displayEventCRF", dec);
+                    request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
+                            "User " + ub.getName() +" is currently entering data.\\n " +
+                            "Once they leave the form, you will be allowed to perform this action.\\n");
+                    forwardPage(Page.DELETE_EVENT_CRF);
+                }
+            }
             if ("confirm".equalsIgnoreCase(action)) {
 
                 request.setAttribute("displayEventCRF", dec);
