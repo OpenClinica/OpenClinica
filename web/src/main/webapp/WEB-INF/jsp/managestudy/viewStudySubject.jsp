@@ -181,14 +181,13 @@
   .collapsed > .section-header::after {
     content: "\e92b";
   }
-  .orange {
-    background: #cc6600 !important;
-  }
   .reset-filter {
     margin-right: 25px !important; 
+    background: #cc6600 !important;
   }
   #reset-all-filters {
     margin-left: 30px;
+    background: #cc6600 !important;
   }
   .hide {
     display: none;
@@ -223,7 +222,7 @@
     Subject <c:out value="${studySub.label}"/>
   </span>
 </h1>
-<input type="button" class="invisible orange" id="reset-all-filters" value="Custom View On &nbsp; &times;" onclick="resetAllFilters();">
+<input type="button" class="invisible" id="reset-all-filters" value="Custom View On &nbsp; &times;" onclick="resetAllFilters();">
 <div class="header-links">
   <span>
     <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">

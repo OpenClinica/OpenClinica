@@ -483,7 +483,7 @@ $(function() {
                 var subheader = searchbox.closest('.subsection').find('.subsection-header');
                 searchbox.appendTo(subheader);
 
-                var resetButton = $('<input type="button" class="invisible orange reset-filter" value="Reset" onclick="resetFilter(this);">');
+                var resetButton = $('<input type="button" class="invisible reset-filter" value="Reset" onclick="resetFilter(this);">');
                 if (canReset(store.data.datatables[i]))
                     resetButton.removeClass('invisible');
                 resetButton.prependTo(searchbox);
