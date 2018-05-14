@@ -134,17 +134,25 @@ public class EnketoFormServlet extends SecureController {
 
         if (getEventCrfLocker().isLocked(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId())) {
             // Display error message
-            Integer userId = getEventCrfLocker().getLockOwner(studyEvent, formLayout, currentPublicStudy.getSchemaName());
-            UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-            UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
-            String errorData = resword.getString("CRF_unavailable") +
-                    "\\n" + ubean.getName() + " " + resword.getString("Currently_entering_data")
-                    + "\\n" + resword.getString("CRF_reopen_enter_data");
-            request.setAttribute("errorData", errorData);
+            generateErrorMessage(studyEvent, formLayout);
             return true;
         } else {
-            getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId());
+            // failed to get a lock
+            if (!getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId())) {
+                generateErrorMessage(studyEvent, formLayout);
+                return true;
+            }
             return false;
         }
+    }
+
+    private void generateErrorMessage(StudyEvent studyEvent, FormLayout formLayout) {
+        Integer userId = getEventCrfLocker().getLockOwner(studyEvent, formLayout, currentPublicStudy.getSchemaName());
+        UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+        UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
+        String errorData = resword.getString("CRF_unavailable") +
+                "\\n" + ubean.getName() + " " + resword.getString("Currently_entering_data")
+                + "\\n" + resword.getString("CRF_reopen_enter_data");
+        request.setAttribute("errorData", errorData);
     }
 }

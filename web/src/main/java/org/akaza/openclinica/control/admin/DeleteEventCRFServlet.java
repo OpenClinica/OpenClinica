@@ -144,15 +144,15 @@ public class DeleteEventCRFServlet extends SecureController {
             request.setAttribute("items", itemData);
             if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName()
                     + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId(), ub.getId())) {
+                request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
+                        "User " + ub.getName() +" is currently entering data.\\n " +
+                        "Once they leave the form, you will be allowed to perform this action.\\n");
                 if ("confirm".equalsIgnoreCase(action)) {
                     request.setAttribute("id", new Integer(studySubId).toString());
                     forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
                     return;
                 } else {
                     request.setAttribute("displayEventCRF", dec);
-                    request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
-                            "User " + ub.getName() +" is currently entering data.\\n " +
-                            "Once they leave the form, you will be allowed to perform this action.\\n");
                     forwardPage(Page.DELETE_EVENT_CRF);
                 }
             }

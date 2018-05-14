@@ -432,7 +432,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (isCRFLocked(ecb)) {
                 isLocked = true;
             } else {
-                lockCRF(ecb);
+                // failed to get a lock
+                if (!lockCRF(ecb))
+                    isLocked = true;
             }
             StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(ecb.getStudySubjectId());
 
@@ -493,8 +495,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
         return false;
     }
 
-    private void lockCRF(EventCRFBean ecb) {
-        getEventCrfLocker().lock(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId());
+    private boolean lockCRF(EventCRFBean ecb) {
+        if (getEventCrfLocker().lock(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId()))
+            return true;
+        return false;
     }
 
     /**
