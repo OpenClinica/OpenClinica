@@ -89,16 +89,21 @@
   };
   store.dirty = false;
 
+  var defaultPageSize = 10;
+
   function canReset(state) {
     return state.order.length > 0 
         || state.search.search !== '' 
-        || state.start > 0;
+        || state.start > 0
+        || state.length > defaultPageSize;
   }
 
   function resetFilter(target) {
     $(target).closest('.subsection').find('table.datatable').each(function() {
       var table = $(this);
-      table.DataTable().search('');
+      var datatable = table.DataTable();
+      datatable.search('');
+      datatable.page.len(defaultPageSize);
       table.dataTable().fnSortNeutral();
     });
   }
