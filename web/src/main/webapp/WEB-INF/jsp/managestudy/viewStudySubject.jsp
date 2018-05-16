@@ -98,20 +98,16 @@
         || state.length > defaultPageSize;
   }
 
-  function resetFilter(target) {
-    $(target).closest('.subsection').find('table.datatable').each(function() {
+  function resetAllFilters() {
+    $('#oc-status-hide').val('oc-status-removed').change();
+    $('table.datatable').each(function() {
       var table = $(this);
       var datatable = table.DataTable();
       datatable.search('');
       datatable.page.len(defaultPageSize);
       table.dataTable().fnSortNeutral();
     });
-  }
-
-  function resetAllFilters() {
-    $('#oc-status-hide').val('oc-status-removed').change();
     clickAllSections('collapsed');
-    resetFilter('input.reset-filter');
   }
 
   function showHide() {
@@ -185,10 +181,6 @@
   }
   .collapsed > .section-header::after {
     content: "\e92b";
-  }
-  .reset-filter {
-    margin-right: 25px !important; 
-    background: #cc6600 !important;
   }
   #reset-all-filters {
     margin-left: 30px;
