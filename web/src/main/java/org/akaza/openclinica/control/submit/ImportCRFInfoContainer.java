@@ -104,7 +104,7 @@ public class ImportCRFInfoContainer {
                                     formDataBean.getFormOID());
                             importCrfInfo.setPreImportStage(DataEntryStage.UNCOMPLETED);
                             String crfStatus = formDataBean.getEventCRFStatus();
-                            if (!isCRFStatusValid(crfStatus)) {
+                            if (!isCRFStatusValid(crfStatus, upsert)) {
                                 importCrfInfo.setProcessImport(false);
                                 importCrfInfo.setEventCRFID(null);
                                 importCrfInfo.setPreImportStage(DataEntryStage.INVALID);
@@ -129,11 +129,11 @@ public class ImportCRFInfoContainer {
                                     formDataBean.getFormOID());
                             importCrfInfo.setPreImportStage(ecb.getStage());
                             String crfStatus = formDataBean.getEventCRFStatus();
-                            if (!isCRFStatusValid(crfStatus)) {
+                            if (!isCRFStatusValid(crfStatus, upsert)) {
                                 importCrfInfo.setProcessImport(false);
                                 importCrfInfo.setEventCRFID(null);
                                 importCrfInfo.setPreImportStage(DataEntryStage.INVALID);
-                            } else if (crfStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName()))
+                            } else if (crfStatus != null && crfStatus.equals(DataEntryStage.INITIAL_DATA_ENTRY.getName()))
                                 importCrfInfo.setPostImportStage(DataEntryStage.INITIAL_DATA_ENTRY);
                             importCrfInfo.setEventCRFID(new Integer(ecb.getId()));
                             if (!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
@@ -154,11 +154,14 @@ public class ImportCRFInfoContainer {
         importCRFMap = subjectMap;
     }
 
-    private boolean isCRFStatusValid(String crfStatus) {
+    private boolean isCRFStatusValid(String crfStatus, UpsertOnBean upsert) {
 
         if (StringUtils.equals(crfStatus, INITIAL_DATA_ENTRY.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.COMPLETE.getName()))
+            return true;
+
+        if (upsert.isDataEntryStarted() || upsert.isDataEntryComplete())
             return true;
 
         return false;
