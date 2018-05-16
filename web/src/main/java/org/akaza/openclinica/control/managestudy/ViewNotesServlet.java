@@ -222,6 +222,7 @@ public class ViewNotesServlet extends SecureController {
             request.setAttribute("allNotes", allNotes);
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY_PRINT);
         } else {
+            getEventCrfLocker().unlockAllForUser(ub.getId());
             forwardPage(Page.VIEW_DISCREPANCY_NOTES_IN_STUDY);
         }
     }

@@ -56,7 +56,8 @@
         margin-left: 5px;
     }
     .info-filtered {
-        color: red;
+        color: #cc6600;
+        font-weight: bold;
     }
     .table_tools, .table_actions {
         vertical-align: middle !important;
@@ -438,13 +439,13 @@ $(function() {
                     stateSaveCallback: function(settings, state) {
                         store(function(data) {
                             data.datatables[i] = state;
-                            table.closest('.subsection').find('input.reset-filter')[
-                                canReset(state) ? 'removeClass' : 'addClass'
-                            ]('invisible');
                         });
                     },
                     stateLoadCallback: function(settings, callback) {
-                        callback(store.data.datatables[i]);
+                        var data = store.data.datatables[i];
+                        callback(data);
+                        if (!data)
+                            this.fnSortNeutral();
                     },
                     dom: "frtilp",
                     language: {
@@ -454,8 +455,8 @@ $(function() {
                             next: '>',
                             last: '>>'
                         },
-                        info: 'Results _START_-_END_ of _TOTAL_.',
-                        infoEmpty: 'Results 0-0 of 0.',
+                        info: 'Results _START_-_END_ of _TOTAL_',
+                        infoEmpty: 'Results 0-0 of 0',
                         infoFiltered: '<span class="info-filtered">(filtered from _MAX_ total)</span>',
                         lengthMenu: 'Show _MENU_ per page'
                     },
@@ -482,11 +483,6 @@ $(function() {
                 var searchbox = $(this);
                 var subheader = searchbox.closest('.subsection').find('.subsection-header');
                 searchbox.appendTo(subheader);
-
-                var resetButton = $('<input type="button" class="invisible orange reset-filter" value="Reset" onclick="resetFilter(this);">');
-                if (canReset(store.data.datatables[i]))
-                    resetButton.removeClass('invisible');
-                resetButton.prependTo(searchbox);
             })
             .end()
             .wrap($('<div>', {

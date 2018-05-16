@@ -203,7 +203,7 @@ public class EnketoUrlService {
     }
 
     public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout, String flavor,
-            ItemDataBean idb, Role role, String mode) throws Exception {
+            ItemDataBean idb, Role role, String mode, boolean lockModeReadOnly) throws Exception {
         Study study = enketoCredentials.getParentStudy(studyOid);
         Study site = enketoCredentials.getSiteStudy(studyOid);
         studyOid = study.getOc_oid();
@@ -265,7 +265,7 @@ public class EnketoUrlService {
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
         EditUrlObject editUrlObject = new EditUrlObject(formLayout, crfOid, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
-                mediaList, goTo, flavor, role, study, site, studyEvent, mode, edc, eventCrf);
+                mediaList, goTo, flavor, role, study, site, studyEvent, mode, edc, eventCrf, lockModeReadOnly);
 
         // EnketoCredentials credentials = EnketoCredentials.getInstance(studyOid);
         // URL eURL = new URL(credentials.getServerUrl() + SURVEY_CACHE);

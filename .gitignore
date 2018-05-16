@@ -7,6 +7,7 @@ release.properties
 .classpath
 .project
 .settings/
+web/src/main/resources/sso.properties
 web/src/main/resources/datainfo.properties
 web/src/main/resources/sso.properties
 .DS_Store

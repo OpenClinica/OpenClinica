@@ -89,24 +89,25 @@
   };
   store.dirty = false;
 
+  var defaultPageSize = 10;
+
   function canReset(state) {
     return state.order.length > 0 
         || state.search.search !== '' 
-        || state.start > 0;
-  }
-
-  function resetFilter(target) {
-    $(target).closest('.subsection').find('table.datatable').each(function() {
-      var table = $(this);
-      table.DataTable().search('');
-      table.dataTable().fnSortNeutral();
-    });
+        || state.start > 0
+        || state.length > defaultPageSize;
   }
 
   function resetAllFilters() {
     $('#oc-status-hide').val('oc-status-removed').change();
+    $('table.datatable').each(function() {
+      var table = $(this);
+      var datatable = table.DataTable();
+      datatable.search('');
+      datatable.page.len(defaultPageSize);
+      table.dataTable().fnSortNeutral();
+    });
     clickAllSections('collapsed');
-    resetFilter('input.reset-filter');
   }
 
   function showHide() {
@@ -181,14 +182,9 @@
   .collapsed > .section-header::after {
     content: "\e92b";
   }
-  .orange {
-    background: #cc6600 !important;
-  }
-  .reset-filter {
-    margin-right: 25px !important; 
-  }
   #reset-all-filters {
     margin-left: 30px;
+    background: #cc6600 !important;
   }
   .hide {
     display: none;
@@ -223,7 +219,7 @@
     Subject <c:out value="${studySub.label}"/>
   </span>
 </h1>
-<input type="button" class="invisible orange" id="reset-all-filters" value="Custom View On &nbsp; &times;" onclick="resetAllFilters();">
+<input type="button" class="invisible" id="reset-all-filters" value="Custom View On &nbsp; &times;" onclick="resetAllFilters();">
 <div class="header-links">
   <span>
     <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
@@ -1084,3 +1080,11 @@
 <!-- End Main Content Area -->
 <jsp:include page="../include/footer.jsp"/>
 <script type="text/javascript" src="includes/studySubject/viewStudySubject.js"></script>
+<c:choose>
+  <c:when test="${!empty errorData}">
+    <script type="text/javascript" language="javascript">
+        var errorData = "${errorData}";
+        alert(errorData);
+    </script>
+  </c:when>
+</c:choose>

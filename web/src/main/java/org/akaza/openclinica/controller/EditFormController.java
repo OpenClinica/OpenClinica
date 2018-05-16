@@ -96,7 +96,7 @@ public class EditFormController {
         ItemDataBean idb = null;
         Role role = null;
         String mode = null;
-        editURL = urlService.getEditUrl(formContext, subjectContext, studyOID, formLayout, NO_FLAVOR, idb, role, mode);
+        editURL = urlService.getEditUrl(formContext, subjectContext, studyOID, formLayout, NO_FLAVOR, idb, role, mode, false);
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return new ResponseEntity<String>(editURL, org.springframework.http.HttpStatus.ACCEPTED);
