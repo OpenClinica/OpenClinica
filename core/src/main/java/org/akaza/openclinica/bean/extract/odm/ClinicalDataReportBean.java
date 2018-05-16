@@ -7,16 +7,6 @@
  */
 package org.akaza.openclinica.bean.extract.odm;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.Date;
-import java.util.List;
-import java.util.Locale;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -25,18 +15,8 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
-import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
-import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
-import org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
-import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
+import org.akaza.openclinica.bean.odmbeans.*;
+import org.akaza.openclinica.bean.submit.crfdata.*;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
@@ -47,15 +27,14 @@ import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudySubject;
-import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.util.StringUtils;
+
+import javax.sql.DataSource;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Create ODM XML ClinicalData Element for a study.
@@ -100,6 +79,19 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     + StringEscapeUtils.escapeXml(this.clinicalData.getMetaDataVersionOID()) + "\">");
             xml.append(nls);
         }
+        Role role = null; // OpenClinica:
+        StudyBean publicBean = CoreResources.getPublicStudy(clinicalData.getStudyOID(), dataSource);
+        if (publicBean != null) {
+            StudyUserRoleBean userRole = userBean.getRoleByStudy(publicBean.getId());
+            if (userRole == null || !userRole.isActive())
+                userRole = userBean.getRoleByStudy(publicBean.getParentStudyId());
+            role = userRole.getRole();
+        }
+
+        if (clinical) {
+            xml.append(indent + indent + "<UserInfo OpenClinica:UserName=\"" + StringEscapeUtils.escapeXml(userBean.getName()) + "\" OpenClinica:UserRole=\"" + StringEscapeUtils.escapeXml(role.getDescription()) + "\"/>");
+        }
+
         ArrayList<ExportSubjectDataBean> subs = (ArrayList<ExportSubjectDataBean>) this.clinicalData.getExportSubjectData();
         for (ExportSubjectDataBean sub : subs) {
             xml.append(indent + indent + "<SubjectData SubjectKey=\"" + StringEscapeUtils.escapeXml(sub.getSubjectOID()));
@@ -140,14 +132,6 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             xml.append(nls);
 
             ArrayList<ExportStudyEventDataBean> ses = (ArrayList<ExportStudyEventDataBean>) sub.getExportStudyEventData();// *****************
-            Role role = null; // OpenClinica:
-            StudyBean publicBean = CoreResources.getPublicStudy(clinicalData.getStudyOID(), dataSource);
-            if (publicBean != null) {
-                StudyUserRoleBean userRole = userBean.getRoleByStudy(publicBean.getId());
-                if (userRole == null || !userRole.isActive())
-                    userRole = userBean.getRoleByStudy(publicBean.getParentStudyId());
-                role = userRole.getRole();
-            }
 
             EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(dataSource);
             StudyEventDefinitionDAO<String, ArrayList> seddao = new StudyEventDefinitionDAO(dataSource);
