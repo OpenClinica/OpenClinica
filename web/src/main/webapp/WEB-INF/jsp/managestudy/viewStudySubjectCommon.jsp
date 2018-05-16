@@ -56,7 +56,8 @@
         margin-left: 5px;
     }
     .info-filtered {
-        color: red;
+        color: #cc6600;
+        font-weight: bold;
     }
     .table_tools, .table_actions {
         vertical-align: middle !important;
