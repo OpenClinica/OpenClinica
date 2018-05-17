@@ -117,14 +117,14 @@
     var n = section.data('section-number');
     if (section.hasClass('collapsed')) {
       body.slideDown('fast');
-      header.attr('title', 'Collapse Section');
+      header.attr('title', '<fmt:message key="collapse_section" bundle="${resword}"/>');
       store(function(data) {
         delete data.collapseSections[n];
       });
     }
     else {
       body.slideUp('fast');
-      header.attr('title', 'Expand Section');
+      header.attr('title', '<fmt:message key="expand_section" bundle="${resword}"/>');
       store(function(data) {
         data.collapseSections[n] = true;
       });
@@ -216,10 +216,10 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 <h1 id="header">
   <span class="title_manage">
-    Subject <c:out value="${studySub.label}"/>
+    <fmt:message key="study_subject" bundle="${resword}"/> <c:out value="${studySub.label}"/>
   </span>
 </h1>
-<input type="button" class="invisible" id="reset-all-filters" value="Custom View On &nbsp; &times;" onclick="resetAllFilters();">
+<input type="button" class="invisible" id="reset-all-filters" value='<fmt:message key="custom_view_on" bundle="${resword}"/> &nbsp; &times;' onclick="resetAllFilters();">
 <div class="header-links">
   <span>
     <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
@@ -228,11 +228,11 @@
   </span>
   <span>&nbsp; | &nbsp;</span>
   <span>
-    <label for="oc-status-hide">Showing</label>
+    <label for="oc-status-hide"><fmt:message key="showing" bundle="${resword}"/></label>
     <select id="oc-status-hide">
-      <option value="oc-status-removed">Active Records</option>
-      <option value="oc-status-active">Removed Records</option>
-      <option value="null">All Records</option>
+      <option value="oc-status-removed"><fmt:message key="records_active" bundle="${resword}"/></option>
+      <option value="oc-status-active"><fmt:message key="records_removed" bundle="${resword}"/></option>
+      <option value="null"><fmt:message key="records_all" bundle="${resword}"/></option>
     </select>
     <script>
       $('#oc-status-hide').val(store.data.ocStatusHide).change();
@@ -240,14 +240,14 @@
   </span>
 </div>
 <div class="header-links">
-  <a href="javascript:clickAllSections('collapsed');">Expand All</a>
+  <a href="javascript:clickAllSections('collapsed');"><fmt:message key="expand_all" bundle="${resword}"/></a>
   <span>&nbsp; | &nbsp;</span>
-  <a href="javascript:clickAllSections('expanded');">Collapse All</a>  
+  <a href="javascript:clickAllSections('expanded');"><fmt:message key="collapse_all" bundle="${resword}"/></a>  
 </div>
 </div>
 <div class="section expanded clear hide" id="studySubjectRecord" data-section-number="0">
-  <div class="section-header" title="Collapse Section">
-    General Information
+  <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
+    <fmt:message key="general_information" bundle="${resword}"/>
   </div>
   <div class="section-body">
     <table border="0" cellpadding="0" cellspacing="0">
@@ -597,8 +597,8 @@
 <a name="events"></a>
 </div>
 <div class="section expanded hide" id="subjectEvents" data-section-number="1">
-  <div class="section-header" title="Collapse Section">
-    Visits
+  <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
+    <fmt:message key="visits" bundle="${resword}"/>
   </div>
   <div class="section-body">
     <c:import url="../include/showTable.jsp">
