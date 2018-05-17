@@ -25,9 +25,11 @@ public class DataEntryStage extends Term {
     public static final DataEntryStage DOUBLE_DATA_ENTRY_COMPLETE = new DataEntryStage(5, "data_entry_complete", "validation_completed");
     public static final DataEntryStage ADMINISTRATIVE_EDITING = new DataEntryStage(6, "administrative_editing", "completed");
     public static final DataEntryStage LOCKED = new DataEntryStage(7, "locked", "locked");
+    public static final DataEntryStage COMPLETE = new DataEntryStage(7, "complete", "complete");
+
 
     private static final DataEntryStage[] members =
-        { UNCOMPLETED, INITIAL_DATA_ENTRY, INITIAL_DATA_ENTRY_COMPLETE, DOUBLE_DATA_ENTRY, DOUBLE_DATA_ENTRY_COMPLETE, ADMINISTRATIVE_EDITING, LOCKED  };
+        { UNCOMPLETED, INITIAL_DATA_ENTRY, INITIAL_DATA_ENTRY_COMPLETE, DOUBLE_DATA_ENTRY, DOUBLE_DATA_ENTRY_COMPLETE, ADMINISTRATIVE_EDITING, LOCKED, COMPLETE  };
 
     private static final DataEntryStage[] membersLayoutOfEvent =
         { UNCOMPLETED, INITIAL_DATA_ENTRY, DOUBLE_DATA_ENTRY_COMPLETE, LOCKED };
@@ -39,6 +41,11 @@ public class DataEntryStage extends Term {
     public boolean isUncompleted() {
         return this == DataEntryStage.UNCOMPLETED;
     }
+
+    public boolean isComplete() {
+        return this == DataEntryStage.COMPLETE;
+    }
+
 
     public boolean isInitialDE() {
         return this == DataEntryStage.INITIAL_DATA_ENTRY;

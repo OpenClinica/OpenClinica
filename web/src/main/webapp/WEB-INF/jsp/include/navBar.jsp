@@ -218,6 +218,7 @@
 
     function processLogoutClick(returnTo) {
         setCurrentUser("");
+        sessionStorage && sessionStorage.clear();
     }
 </script>
 

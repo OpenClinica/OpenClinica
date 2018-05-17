@@ -2,6 +2,7 @@ package org.akaza.openclinica.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import net.sf.json.util.JSONUtils;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -18,8 +19,10 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
+import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,7 +34,9 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -128,12 +133,33 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return null;
     }
 
+    private String processAuth0State(HttpServletRequest req) {
+        String state = req.getParameter("state");
+        String param = null;
+        JSONObject jsonObject;
+        if (JSONUtils.mayBeJSON(state)) {
+            jsonObject = new JSONObject(state);
+
+            Set<String> keySet = jsonObject.keySet();
+            Object newJSON;
+            for (String key : keySet) {
+                logger.debug(key);
+                newJSON = jsonObject.get(key);
+
+                if (StringUtils.equals(key, "studyEnvUuid"))
+                   return newJSON.toString();
+            }
+        }
+        return null;
+    }
     public boolean processSpecificStudyEnvUuid(HttpServletRequest request, int userActiveStudyId, UserAccount ub) {
         boolean studyEnvUuidProcessed =false;
         HttpSession session = request.getSession();
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
         if (StringUtils.isEmpty(studyEnvUuid)) {
-           return studyEnvUuidProcessed;
+            studyEnvUuid = processAuth0State(request);
+            if (StringUtils.isEmpty(studyEnvUuid))
+                return studyEnvUuidProcessed;
         }
         updateStudyUserRoles(request, ub, userActiveStudyId);
 
