@@ -1,3 +1,7 @@
+<%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
+
 <style>
     .subsection {
         margin-bottom: 25px;
@@ -136,7 +140,7 @@
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
     <div class="section {{collapseState}}" data-section-number="{{sectionNumber}}">
-        <div class="section-header" title="Collapse Section">
+        <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
             {{studyEvent.[@Name]}}
         </div>
         <div class="section-body">
@@ -145,7 +149,7 @@
                 <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
                     <div class="subsection-header">
                         <h3 class="form-name">{{form.[@Name]}}</h3>
-                        <input class="add-new" type="button" value="Add New"
+                        <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
                             {{#if form.addNew}}
                                 data-url="{{form.addNew}}"
                             {{else}}
@@ -455,10 +459,10 @@ $(function() {
                             next: '>',
                             last: '>>'
                         },
-                        info: 'Results _START_-_END_ of _TOTAL_',
-                        infoEmpty: 'Results 0-0 of 0',
-                        infoFiltered: '<span class="info-filtered">(filtered from _MAX_ total)</span>',
-                        lengthMenu: 'Show _MENU_ per page'
+                        info: '<fmt:message key="results_m_n_of_total" bundle="${resword}"/>',
+                        infoEmpty: '<fmt:message key="results_zero_of_zero" bundle="${resword}"/>',
+                        infoFiltered: '<span class="info-filtered"><fmt:message key="results_filtered" bundle="${resword}"/></span>',
+                        lengthMenu: '<fmt:message key="results_pagesize" bundle="${resword}"/>'
                     },
                     columnDefs: [{
                         targets: -1,
