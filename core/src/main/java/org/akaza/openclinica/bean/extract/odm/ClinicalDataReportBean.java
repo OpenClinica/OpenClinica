@@ -149,18 +149,21 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
                 for (EventDefinitionCRFBean edc : edcs) {
                     if (role != null && !role.equals(Role.MONITOR) && !edc.getStatus().equals(org.akaza.openclinica.bean.core.Status.AUTO_DELETED)
-                            && !edc.getStatus().equals(org.akaza.openclinica.bean.core.Status.DELETED) && !edc.isHideCrf()) {
+                            && !edc.getStatus().equals(org.akaza.openclinica.bean.core.Status.DELETED)) {
                         StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(edc.getStudyEventDefinitionId());
                         CRFBean crf = (CRFBean) crfdao.findByPK(edc.getCrfId());
-                        if (sed.getType().equals(COMMON)) {
-                            if (sed.isRepeating() || (!sed.isRepeating() && validateAddNewForNonRepeating(sub, crf, sed))) {
-                                xml.append(indent + indent + indent + indent + "<OpenClinica:link rel=\"common-add-new\" tag=\""
-                                        + StringEscapeUtils.escapeXml(sed.getOid() + "." + crf.getOid()) + "\"" + " href=\"/pages/api/addAnotherForm?studyoid="
-                                        + StringEscapeUtils.escapeXml(clinicalData.getStudyOID()) + "&amp;studysubjectoid="
-                                        + StringEscapeUtils.escapeXml(sub.getSubjectOID()) + "&amp;studyeventdefinitionoid="
-                                        + StringEscapeUtils.escapeXml(sed.getOid()) + "&amp;crfoid=" + StringEscapeUtils.escapeXml(crf.getOid()) + "\"");
-                                xml.append("/>");
-                                xml.append(nls);
+
+                        if (studyBean.getParentStudyId() == 0 || (studyBean.getParentStudyId() != 0 && !edc.isHideCrf())) {
+                            if (sed.getType().equals(COMMON)) {
+                                if (sed.isRepeating() || (!sed.isRepeating() && validateAddNewForNonRepeating(sub, crf, sed))) {
+                                    xml.append(indent + indent + indent + indent + "<OpenClinica:link rel=\"common-add-new\" tag=\""
+                                            + StringEscapeUtils.escapeXml(sed.getOid() + "." + crf.getOid()) + "\"" + " href=\"/pages/api/addAnotherForm?studyoid="
+                                            + StringEscapeUtils.escapeXml(clinicalData.getStudyOID()) + "&amp;studysubjectoid="
+                                            + StringEscapeUtils.escapeXml(sub.getSubjectOID()) + "&amp;studyeventdefinitionoid="
+                                            + StringEscapeUtils.escapeXml(sed.getOid()) + "&amp;crfoid=" + StringEscapeUtils.escapeXml(crf.getOid()) + "\"");
+                                    xml.append("/>");
+                                    xml.append(nls);
+                                }
                             }
                         }
                     }
