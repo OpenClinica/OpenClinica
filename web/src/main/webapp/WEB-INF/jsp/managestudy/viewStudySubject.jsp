@@ -81,7 +81,7 @@
       }, 1);
     }
   }
-  store.key = location.pathname + location.search;
+  store.key = location.pathname + location.search + '&study=${studySub.oid}';
   store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
     collapseSections: {},
     datatables: [],
