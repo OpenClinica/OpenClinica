@@ -64,11 +64,7 @@ import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
-import org.akaza.openclinica.service.crfdata.xform.EditUrlObject;
-import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
-import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
-import org.akaza.openclinica.service.crfdata.xform.EnketoURLResponse;
-import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
+import org.akaza.openclinica.service.crfdata.xform.*;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.joda.time.DateTime;
@@ -184,8 +180,8 @@ public class EnketoUrlService {
     UserAccountDAO udao;
     StudyDAO sdao;
 
-    public String getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String flavor, Role role,
-            String mode, String hash) throws Exception {
+    public FormUrlObject getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String flavor, Role role,
+            String mode, String hash, String loadWarning, boolean isFormLocked) throws Exception {
         // Call Enketo api to get edit url
         Study parentStudy = enketoCredentials.getParentStudy(studyOid);
         studyOid = parentStudy.getOc_oid();
@@ -196,14 +192,18 @@ public class EnketoUrlService {
             studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
         }
         String crfOID = subjectContext.getFormLayoutOid() + DASH + hash + flavor;
-        // URL eURL = new URL(credentials.getServerUrl() + SURVEY_CACHE);
-        // enketo.registerAndDeleteCache(eURL, crfOID);
-        return enketo.getFormURL(crfOID, studyOid, role, parentStudy, studyEvent, mode) + "?ecid=" + subjectContextKey;
+        FormUrlObject formUrlObject = enketo.getFormURL(crfOID, studyOid, role,
+                parentStudy, studyEvent, mode, loadWarning, isFormLocked);
+        if (formUrlObject.getFormUrl().contains("?"))
+            formUrlObject.setFormUrl(formUrlObject.getFormUrl() + "&ecid=" + subjectContextKey);
+        else
+            formUrlObject.setFormUrl(formUrlObject.getFormUrl() + "?ecid=" + subjectContextKey);
+        return formUrlObject;
 
     }
 
-    public String getEditUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout, String flavor,
-            ItemDataBean idb, Role role, String mode, boolean lockModeReadOnly) throws Exception {
+    public FormUrlObject getActionUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, FormLayout formLayout, String flavor,
+                               ItemDataBean idb, Role role, String mode, String loadWarning, boolean formLocked) throws Exception {
         Study study = enketoCredentials.getParentStudy(studyOid);
         Study site = enketoCredentials.getSiteStudy(studyOid);
         studyOid = study.getOc_oid();
@@ -264,17 +264,17 @@ public class EnketoUrlService {
 
         // Return Enketo URL
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByEventCrfId(eventCrf.getEventCrfId());
-        EditUrlObject editUrlObject = new EditUrlObject(formLayout, crfOid, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
-                mediaList, goTo, flavor, role, study, site, studyEvent, mode, edc, eventCrf, lockModeReadOnly);
+        ActionUrlObject actionUrlObject = new ActionUrlObject(formLayout, crfOid, populatedInstance, subjectContextKey, redirectUrl, markComplete, studyOid,
+                mediaList, goTo, flavor, role, study, site, studyEvent, mode, edc, eventCrf, loadWarning, formLocked);
 
         // EnketoCredentials credentials = EnketoCredentials.getInstance(studyOid);
         // URL eURL = new URL(credentials.getServerUrl() + SURVEY_CACHE);
         // enketo.registerAndDeleteCache(eURL, crfOid);
 
-        EnketoURLResponse eur = enketo.registerAndGetEditURL(editUrlObject);
+        EnketoFormResponse eur = enketo.registerAndGetActionURL(actionUrlObject);
 
-        if (eur.getUrl() != null) {
-            editURL = eur.getUrl();
+        if (eur.getEnketoUrlResponse().getUrl() != null) {
+            editURL = eur.getEnketoUrlResponse().getUrl();
         }
 
         int hashIndex = editURL.lastIndexOf("#");
@@ -290,7 +290,7 @@ public class EnketoUrlService {
 
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
-        return editURL;
+        return new FormUrlObject(editURL, eur.isLockOn());
 
     }
 

@@ -7,6 +7,7 @@ import javax.servlet.ServletContext;
 
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.service.crfdata.FormUrlObject;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
@@ -62,6 +63,8 @@ public class PFormCache {
     public String getPFormURL(String studyOID, String formLayoutOID, boolean isOffline, StudyEvent studyEvent) throws Exception {
         Study parentStudy = enketoCredentials.getParentStudy(studyOID);
         studyOID = parentStudy.getOc_oid();
+        FormUrlObject formUrlObject = null;
+
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOID));
         HashMap<String, String> studyURLs = null;
         if (isOffline)
@@ -70,29 +73,29 @@ public class PFormCache {
             studyURLs = urlCache.get(studyOID);
         if (studyURLs == null) {
             studyURLs = new HashMap<String, String>();
-            String url = null;
+            formUrlObject = null;
             if (isOffline)
-                url = enketo.getOfflineFormURL(formLayoutOID);
+                formUrlObject = enketo.getOfflineFormURL(formLayoutOID);
             else
-                url = enketo.getFormURL(formLayoutOID, studyOID, null, parentStudy, studyEvent, EDIT_MODE);
+                formUrlObject = enketo.getFormURL(formLayoutOID, studyOID, null, parentStudy, studyEvent, EDIT_MODE, null, false);
 
-            if (url.equals("")) {
+            if (formUrlObject.getFormUrl().equals("")) {
                 throw new Exception("Unable to get enketo form url.");
             }
-            studyURLs.put(formLayoutOID, url);
+            studyURLs.put(formLayoutOID, formUrlObject.getFormUrl());
             if (isOffline)
                 offlineUrlCache.put(studyOID, studyURLs);
             else
                 urlCache.put(studyOID, studyURLs);
-            return url;
+            return formUrlObject.getFormUrl();
         } else if (studyURLs.get(formLayoutOID) == null) {
-            String url = null;
             if (isOffline)
-                url = enketo.getOfflineFormURL(formLayoutOID);
+                formUrlObject = enketo.getOfflineFormURL(formLayoutOID);
             else
-                url = enketo.getFormURL(formLayoutOID, studyOID, null, parentStudy, studyEvent, EDIT_MODE);
-            studyURLs.put(formLayoutOID, url);
-            return url;
+                formUrlObject = enketo.getFormURL(formLayoutOID, studyOID,
+                        null, parentStudy, studyEvent, EDIT_MODE, null, false);
+            studyURLs.put(formLayoutOID, formUrlObject.getFormUrl());
+            return formUrlObject.getFormUrl();
         } else
             return studyURLs.get(formLayoutOID);
     }

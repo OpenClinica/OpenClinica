@@ -10,7 +10,7 @@ import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 
-public class EditUrlObject {
+public class ActionUrlObject {
     FormLayout formLayout;
     String crfOid;
     String instance;
@@ -28,11 +28,12 @@ public class EditUrlObject {
     String mode;
     EventDefinitionCrf edc;
     EventCrf eventCrf;
-    boolean lockModeReadOnly = false;
+    String loadWarning;
+    boolean formLocked;
 
-    public EditUrlObject(FormLayout formLayout, String crfOid, String instance, String ecid, String redirect, boolean markComplete, String studyOid,
-            List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, Study site, StudyEvent studyEvent, String mode,
-            EventDefinitionCrf edc, EventCrf eventCrf, boolean lockModeReadOnly) {
+    public ActionUrlObject(FormLayout formLayout, String crfOid, String instance, String ecid, String redirect, boolean markComplete, String studyOid,
+                           List<FormLayoutMedia> mediaList, String goTo, String flavor, Role role, Study parentStudy, Study site, StudyEvent studyEvent, String mode,
+                           EventDefinitionCrf edc, EventCrf eventCrf, String loadWarning, boolean formLocked) {
         super();
         this.formLayout = formLayout;
         this.crfOid = crfOid;
@@ -51,7 +52,8 @@ public class EditUrlObject {
         this.edc = edc;
         this.eventCrf = eventCrf;
         this.site = site;
-        this.lockModeReadOnly = lockModeReadOnly;
+        this.loadWarning = loadWarning;
+        this.formLocked = formLocked;
     }
 
     @Override
@@ -74,7 +76,8 @@ public class EditUrlObject {
         buffer.append("mode:" + mode);
         buffer.append("edc:" + edc);
         buffer.append("eventCrf:" + eventCrf);
-        buffer.append("lockModeReadOnly:" + lockModeReadOnly);
+        buffer.append("loadWarning:" + loadWarning);
+        buffer.append("formLocked:" + formLocked);
         return buffer.toString();
     }
 }
