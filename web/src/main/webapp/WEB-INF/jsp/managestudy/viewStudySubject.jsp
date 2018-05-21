@@ -63,9 +63,9 @@
   }
 </script>
 <script>
-  function store(f) {
-    if (f)
-      store.data = f(store.data) || store.data;
+  function store(callback) {
+    if (callback)
+      store.data = callback(store.data) || store.data;
     if (!store.dirty) {
       store.dirty = true;
       setTimeout(function() {
