@@ -64,7 +64,8 @@
 </script>
 <script>
   function store(f) {
-    f(store.data);
+    if (f)
+      store.data = f(store.data) || store.data;
     if (!store.dirty) {
       store.dirty = true;
       setTimeout(function() {
@@ -81,13 +82,18 @@
       }, 1);
     }
   }
-  store.key = location.pathname + location.search + '&study=${studySub.oid}';
-  store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
-    collapseSections: {},
-    datatables: [],
-    ocStatusHide: 'oc-status-removed'
-  };
   store.dirty = false;
+  store.key = location.pathname + location.search;
+  store.data = JSON.parse(sessionStorage.getItem(store.key));
+  if (!store.data || store.data.studyOid !== '${studySub.oid}')
+    store(function() {
+      return {
+        studyOid: '${studySub.oid}',
+        collapseSections: {},
+        datatables: [],
+        ocStatusHide: 'oc-status-removed'
+      };
+    });
 
   var defaultPageSize = 10;
 
