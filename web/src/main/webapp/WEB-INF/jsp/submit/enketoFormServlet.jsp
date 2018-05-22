@@ -35,6 +35,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=11"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><fmt:message key="openclinica" bundle="${resword}"/></title>
     <link rel="SHORTCUT ICON" href="images/favicon.png" type="image/x-icon" />
     <link rel="stylesheet" href="includes/styles.css" type="text/css"/>
