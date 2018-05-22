@@ -287,9 +287,7 @@ $(function() {
             studyEvent.forms = {};
             var numFormShowing = 0;
 
-            collection(studyEvent.FormRef).filter(function(ref) {
-                return ref['OpenClinica:ConfigurationParameters']['@HideCRF'] === 'No';
-            }).forEach(function(ref) {
+            collection(studyEvent.FormRef).forEach(function(ref) {
                 var studyEventOid = studyEvent['@OID'];
                 var formOid = ref['@FormOID'];
                 var form = forms[formOid];
