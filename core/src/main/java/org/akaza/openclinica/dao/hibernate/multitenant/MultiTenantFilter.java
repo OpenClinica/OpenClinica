@@ -4,6 +4,7 @@ package org.akaza.openclinica.dao.hibernate.multitenant;
  * Created by yogi on 2/1/17.
  */
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.core.ExtendedBasicDataSource;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -74,6 +75,7 @@ import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdent
         if (session != null) {
             session.setAttribute(tenantKey, tenant);
         }
+        System.out.println("Session Id: MultiTenantFilter" + req.getSession().getId());
         chain.doFilter(req, response);
     }
 

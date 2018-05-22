@@ -408,7 +408,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         // BWP >> 1/8/2008
         try {
             // YW 10-03-2007 <<
-            session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
+            //session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
+            session.setAttribute("maxInactiveInterval", Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
             String smURL = CoreResources.getField("smURL");
             if (StringUtils.isNotEmpty(smURL)) {
 
@@ -422,7 +423,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         } catch (NumberFormatException nfe) {
             // BWP>>3600 is the datainfo.properties maxInactiveInterval on
             // 1/8/2008
-            session.setMaxInactiveInterval(3600);
+            session.setAttribute("maxInactiveInterval", 3600);
+            //session.setMaxInactiveInterval(3600);
         }
 
         // If the session already has a value with key SUPPORT_URL don't reset
