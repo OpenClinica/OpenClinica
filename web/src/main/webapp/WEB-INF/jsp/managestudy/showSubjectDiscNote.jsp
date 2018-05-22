@@ -2,7 +2,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%--isELIgnored="false" --%>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
@@ -272,27 +272,27 @@
     <td>--%>
     <c:choose>
         <c:when test="${! boolResStatus}">
-            <a href="ViewNotes?viewForOne=y&id=<c:out value="${currRow.bean.studySubject.id}"/>&module=${module}"
+            <a href="ViewNotes?viewForOne=y&id=<c:out value="${currRow.bean.studySubject.id}"/>&module=${fn:escapeXml(module)}"
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
               hspace="2" style="float:left" name="bt_View1" src="images/bt_View.gif" width="24 " height="15" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left"></a>
 
             <!--align="left" -->
             <c:if test="${hasDiscNotes}"><a href=
-              "javascript:openDocWindow('ChooseDownloadFormat?subjectId=<c:out value="${currRow.bean.studySubject.id}"/>&discNoteType=${discNoteType}&module=${module}')"><img
+              "javascript:openDocWindow('ChooseDownloadFormat?subjectId=<c:out value="${currRow.bean.studySubject.id}"/>&discNoteType=${fn:escapeXml(discNoteType)}&module=${fn:escapeXml(module)}')"><img
               hspace="2" width="24 " height="15" name="bt_View1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
 
 
             </c:if>
         </c:when>
         <c:otherwise>
-            <a href="ViewNotes?viewForOne=y&id=<c:out value="${currRow.bean.studySubject.id}"/>&resolutionStatus=${param.resolutionStatus}&discNoteType=${discNoteType}&module=${module}"
+            <a href="ViewNotes?viewForOne=y&id=<c:out value="${currRow.bean.studySubject.id}"/>&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}&discNoteType=${fn:escapeXml(discNoteType)}&module=${fn:escapeXml(module)}"
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
               hspace="4" style="float:left" width="24 " height="15" name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left"></a>
 
             <c:if test="${hasDiscNotes}"><a href=
-              "javascript:openDocWindow('ChooseDownloadFormat?subjectId=<c:out value="${currRow.bean.studySubject.id}"/>&discNoteType=${discNoteType}&resolutionStatus=${param.resolutionStatus}')"><img
+              "javascript:openDocWindow('ChooseDownloadFormat?subjectId=<c:out value="${currRow.bean.studySubject.id}"/>&discNoteType=${fn:escapeXml(discNoteType)}&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}')"><img
               hspace="4" width="24 " height="15" name="bt_View1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
 
                 <%--<a href=

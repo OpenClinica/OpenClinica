@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <jsp:useBean scope='session' id='pageMessage' class='java.lang.String'/>
 <jsp:useBean scope='session' id='mayProcessUploading' class='java.lang.String'/>
 <jsp:useBean scope='request' id='fileItemId' class='java.lang.String'/>
@@ -53,8 +54,8 @@
 </div>
 <br><br><br>
 <form name="uploadForm" action="UploadFile" method="post" enctype="multipart/form-data" onsubmit="return checkForm(this)">
-	<input type="hidden" name="itemId" value="${fileItemId}">
-	<input type="hidden" name="inputName" value="${inputName}">
+	<input type="hidden" name="itemId" value="${fn:escapeXml(fileItemId)}">
+	<input type="hidden" name="inputName" value="${fn:escapeXml(inputName)}">
 		<div style="position:absolute;  left:20px; width: 600px;">
 	<c:choose>
 	<c:when test="${mayProcessUploading=='true'}">

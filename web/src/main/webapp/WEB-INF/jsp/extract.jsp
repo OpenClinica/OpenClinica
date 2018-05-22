@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -53,7 +53,7 @@
 
 <ul>
 	<li><a href="../ViewDatasets"><fmt:message key="back_to_datasets" bundle="${restext}"/></a></li>
-	<li><a href="../ExportDataset?datasetId=${param.datasetId}"><fmt:message key="back_to_dataset" bundle="${restext}"/></a></li>
+	<li><a href="../ExportDataset?datasetId=${fn:escapeXml(param.datasetId)}"><fmt:message key="back_to_dataset" bundle="${restext}"/></a></li>
 </ul>
 </div>
 </div>

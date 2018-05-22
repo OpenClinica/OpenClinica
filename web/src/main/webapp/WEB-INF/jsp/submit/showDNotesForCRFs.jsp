@@ -4,7 +4,7 @@
 <%@ page import="org.akaza.openclinica.bean.core.SubjectEventStatus"%>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.terms" var="resterm"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -365,13 +365,13 @@ if dnote.crfName == edc.crfName, then include dnote--%>
             <td>--%>
         <c:choose>
             <c:when test="${! boolResStatus}">
-                <a href="ViewNotes?viewForOne=y&id=<c:out value="${currRow.bean.studySubject.id}"/>&module=${module}"
+                <a href="ViewNotes?viewForOne=y&id=<c:out value="${currRow.bean.studySubject.id}"/>&module=${fn:escapeXml(module)}"
                    onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                   hspace="2" style="float:left" name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left"></a>
 
                 <c:if test="${hasDiscNotes}"><a href=
-                  "javascript:openDocWindow('ChooseDownloadFormat?discNoteType=${discNoteType}&module=${module}&subjectId=${currRow.bean.studySubject.id}')"><img
+                  "javascript:openDocWindow('ChooseDownloadFormat?discNoteType=${fn:escapeXml(discNoteType)}&module=${fn:escapeXml(module)}&subjectId=${currRow.bean.studySubject.id}')"><img
                   hspace="2" name="bt_View1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
 
                     <%--<a href=
@@ -380,13 +380,13 @@ if dnote.crfName == edc.crfName, then include dnote--%>
                 </c:if>
             </c:when>
             <c:otherwise>
-                <a href="ViewNotes?viewForOne=y&module=${module}&id=<c:out value="${currRow.bean.studySubject.id}"/>&resolutionStatus=<c:out value="${resolutionStatusFromServlet}"/>"
+                <a href="ViewNotes?viewForOne=y&module=${fn:escapeXml(module)}&id=<c:out value="${currRow.bean.studySubject.id}"/>&resolutionStatus=<c:out value="${resolutionStatusFromServlet}"/>"
                    onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"><img
                   hspace="2" style="float:left" name="bt_View1" src="images/bt_View.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>" align="left"></a>
 
                 <c:if test="${hasDiscNotes}"><a href=
-                  "javascript:openDocWindow('ChooseDownloadFormat?subjectId=${currRow.bean.studySubject.id}&discNoteType=${discNoteType}&module=${module}&resolutionStatus=${param.resolutionStatus}')"><img
+                  "javascript:openDocWindow('ChooseDownloadFormat?subjectId=${fn:escapeXml(currRow.bean.studySubject.id)}&discNoteType=${fn:escapeXml(discNoteType)}&module=${fn:escapeXml(module)}&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}')"><img
                   hspace="2" name="bt_View1" src="images/bt_Download.gif" border="0" alt="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>" title="<fmt:message key="download_discrepancy_notes" bundle="${resword}"/>"></a>
 
                     <%--  <a href=

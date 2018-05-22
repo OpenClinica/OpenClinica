@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <jsp:include page="../include/admin-header.jsp"/>
@@ -43,8 +44,8 @@
 
 <h1><span class="title_manage">
 <fmt:message key="modify_role_for" bundle="${restext}">
-	<fmt:param value="${userName}"/>
-	<fmt:param value="${studyUserRole.studyName}"/>
+	<fmt:param value="${fn:escapeXml(userName)}"/>
+	<fmt:param value="${fn:escapeXml(studyUserRole.studyName)}"/>
 </fmt:message>
 </span></h1>
 

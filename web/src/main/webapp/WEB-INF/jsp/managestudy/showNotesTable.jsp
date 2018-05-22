@@ -132,7 +132,7 @@
                     <input type="submit" class="button_search" value="<fmt:message key="find" bundle="${resword}"/>"
                       <c:choose>
                           <c:when test="${searchFormDisplayed == 0}">
-                              onClick="if (document.<c:out value="${outerFormName}"/>.ebl_filterKeyword.value == '') return false; document.<c:out value="${outerFormName}"/>.elements['submitted'].value=0;document.<c:out value="${outerFormName}"/>.elements['action'].value='';<c:out value="${searchFormOnClickJS}" escapeXml="false" />"
+                              onClick="if (document.<c:out value="${outerFormName}"/>.ebl_filterKeyword.value == '') return false; document.<c:out value="${outerFormName}"/>.elements['submitted'].value=0;document.<c:out value="${outerFormName}"/>.elements['action'].value='';<c:out value="${searchFormOnClickJS}" />"
                           </c:when>
                           <c:otherwise>
                               onClick="if (document.forms[0].ebl_filterKeyword.value == '') return false;"

@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
@@ -65,7 +65,7 @@
 	</c:otherwise>
 </c:choose>
 
-<fmt:message key="import_rule_data" bundle="${resworkflow}"/> ${study.name}
+<fmt:message key="import_rule_data" bundle="${resworkflow}"/> ${fn:escapeXml(study.name)}
 <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/rules')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${restext}"/>" title="<fmt:message key="help" bundle="${restext}"/>"></a>
 </h1>
 
@@ -114,7 +114,7 @@
 as the link is provided on Build Study page tasks -> Create Rules -> Actions  
 <span class="table_title_Admin">Build Rules</span>
 <div>&nbsp;</div>
-<div class="homebox_bullets"><a href="${designerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}">Designer</a></div><br/>
+<div class="homebox_bullets"><a href="${fn:escapeXml(designerURL)}access?host=${fn:escapeXml(hostPath)}&app=${fn:escapeXml(contextPath)}&study_oid=${fn:escapeXml(study.oid)}&provider_user=${fn:escapeXml(userBean.name)}">Designer</a></div><br/>
 -->
 <c:choose>
     <c:when test="${userBean.sysAdmin && module=='admin'}">

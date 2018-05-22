@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
@@ -229,7 +229,7 @@
                  </td>
 
 		         <td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${crfVersionOID}')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${fn:escapeXml(study.oid)}/${fn:escapeXml(studySub.oid)}/${fn:escapeXml(currRow.bean.studyEvent.studyEventDefinition.oid)}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${fn:escapeXml(currRow.bean.studyEvent.sampleOrdinal)}]</c:if>/${fn:escapeXml(crfVersionOID)}')"
 			     onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
 			     onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
 		         name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print_default" bundle="${resword}"/>" title="<fmt:message key="print_default" bundle="${resword}"/>" align="left" hspace="6"></a></td>
@@ -347,7 +347,7 @@
 
 		 </td>
 		 <td>
- <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${study.oid}/${studySub.oid}/${currRow.bean.studyEvent.studyEventDefinition.oid}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${currRow.bean.studyEvent.sampleOrdinal}]</c:if>/${dec.eventCRF.crfVersion.oid}')"
+ <a href="javascript:openPrintCRFWindow('rest/clinicaldata/html/print/${fn:escapeXml(study.oid)}/${fn:escapeXml(studySub.oid)}/${fn:escapeXml(currRow.bean.studyEvent.studyEventDefinition.oid)}<c:if test="${currRow.bean.studyEvent.studyEventDefinition.repeating}">[${fn:escapeXml(currRow.bean.studyEvent.sampleOrdinal)}]</c:if>/${fn:escapeXml(dec.eventCRF.crfVersion.oid)}')"
 			onMouseDown="javascript:setImage('bt_Print1','images/bt_Print_d.gif');"
 			onMouseUp="javascript:setImage('bt_Print1','images/bt_Print.gif');"><img
 		    name="bt_Print1" src="images/bt_Print.gif" border="0" alt="<fmt:message key="print" bundle="${resword}"/>" title="<fmt:message key="print" bundle="${resword}"/>" align="left" hspace="6"></a>

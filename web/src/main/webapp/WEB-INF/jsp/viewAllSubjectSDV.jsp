@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %> 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -217,8 +217,8 @@
     <form name='sdvForm' action="${pageContext.request.contextPath}/pages/viewAllSubjectSDV">
         <fmt:message key="select_all_on_page" bundle="${resword}"/> <input type=checkbox name='checkSDVAll' onclick='selectAllChecks(this.form)'/>
         <br />
-        <input type="hidden" name="studyId" value="${param.studyId}">
-        <input type="hidden" name="studySubjectId" value="${param.studySubjectId}">
+        <input type="hidden" name="studyId" value="${fn:escapeXml(param.studyId)}">
+        <input type="hidden" name="studySubjectId" value="${fn:escapeXml(param.studySubjectId)}">
         <%--This value will be set by an onclick handler associated with an SDV button --%>
         <input type="hidden" name="crfId" value="0">
         <%-- the destination JSP page after removal or adding SDV for an eventCRF --%>

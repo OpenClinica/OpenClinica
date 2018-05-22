@@ -238,7 +238,7 @@ var TabSectionId = new Array(TabsNumber)
      <c:set var="count" value="${count+1}"/>
 </c:forEach>
 DisplaySectionTabs();
-selectTabs(${tabId},${sectionNum},'crfHeaderTabs');
+selectTabs(${fn:escapeXml(tabId)},${fn:escapeXml(sectionNum)},'crfHeaderTabs');
 
 function DisplaySectionTabs()
 	{

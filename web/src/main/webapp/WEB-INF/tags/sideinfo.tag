@@ -1,7 +1,7 @@
 <%@tag body-content="scriptless" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <c:set var="dteFormat"><fmt:message key="date_format_string" bundle="${resformat}"/></c:set>
@@ -15,7 +15,7 @@
             <c:choose>
                 <c:when test="${study.parentStudyId>0}">
                     <b><fmt:message key="study" bundle="${resword}"/>:</b>&nbsp;
-                    <a href="ViewStudy?id=${study.parentStudyId}&viewFull=yes">${study.parentStudyName}</a>
+                    <a href="ViewStudy?id=${study.parentStudyId}&viewFull=yes">${fn:escapeXml(study.parentStudyName)}</a>
                     <br><br>
                     <b>Site:</b>&nbsp;
                     <a href="ViewSite?id=${study.id}">
@@ -29,7 +29,7 @@
 
             <br><br>
             <c:if test="${studySubject != null}">
-                <b><a href="ViewStudySubject?id=${studySubject.id}"><fmt:message key="study_subject_ID" bundle="${resword}"/></a>:</b>&nbsp; ${studySubject.label}
+                <b><a href="ViewStudySubject?id=${fn:escapeXml(studySubject.id)}"><fmt:message key="study_subject_ID" bundle="${resword}"/></a>:</b>&nbsp; ${fn:escapeXml(studySubject.label)}
 
                 <br><br>
             </c:if>
@@ -58,7 +58,7 @@
             </c:choose>
             <br><br>
 
-            <b><fmt:message key="pi" bundle="${resword}"/>:</b>&nbsp; ${study.principalInvestigator}
+            <b><fmt:message key="pi" bundle="${resword}"/>:</b>&nbsp; ${fn:escapeXml(study.principalInvestigator)}
 
             <br><br>
 
@@ -82,7 +82,7 @@
 
         </c:when>
         <c:otherwise>
-            Your last active study/site was ${study.name}, but it has been deleted.
+            Your last active study/site was ${fn:escapeXml(study.name)}, but it has been deleted.
         </c:otherwise>
     </c:choose>
     <br><br>

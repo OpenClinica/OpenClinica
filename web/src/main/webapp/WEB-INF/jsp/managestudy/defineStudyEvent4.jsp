@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 
@@ -247,7 +247,7 @@
           <c:choose>
             <c:when test="${edc.participantForm == true && edc.allowAnonymousSubmission == true}">
               <span id="enabledIfAllowAnonymousSubmission<c:out value="${count}"/>">
-                <fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}
+                <fmt:message key="submission_url" bundle="${resword}"/>: ${fn:escapeXml(participantUrl)}
                 <input type="text" name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}">
                 <c:set var="summary" value="submissionUrl${count}"/>
                 <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>
@@ -266,7 +266,7 @@
             </c:when>
             <c:otherwise>
               <span id="enabledIfAllowAnonymousSubmission<c:out value="${count}"/>" style="display : none">
-                <fmt:message key="submission_url" bundle="${resword}"/>: ${participantUrl}
+                <fmt:message key="submission_url" bundle="${resword}"/>: ${fn:escapeXml(participantUrl)}
                 <input type="text" name="submissionUrl<c:out value="${count}"/>" value="${edc.submissionUrl}">
                 <c:set var="summary" value="submissionUrl${count}"/>
                 <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="${summary}"/></jsp:include>

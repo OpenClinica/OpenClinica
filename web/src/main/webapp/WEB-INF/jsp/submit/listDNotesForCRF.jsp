@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib uri="http://java.sun.com/jsp/jstl/functions" prefix="fn" %>
 
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
@@ -97,25 +97,25 @@
 <div class="dnKey"><strong><fmt:message key="Filter_by_status" bundle="${resword}"/>
 :</strong>
 
-    <a href="ListDiscNotesForCRFServlet?type=${param.type}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>&tab=1" <c:if test="${param.type == 50}">style="color:green"</c:if>><fmt:message key="all_notes" bundle="${resterm}"/></a>&nbsp;
+    <a href="ListDiscNotesForCRFServlet?type=${fn:escapeXml(param.type)}&module=${fn:escapeXml(module)}&defId=<c:out value="${eventDefinitionId}"/>&tab=1" <c:if test="${param.type == 50}">style="color:green"</c:if>><fmt:message key="all_notes" bundle="${resterm}"/></a>&nbsp;
 
-    <a href="ListDiscNotesForCRFServlet?resolutionStatus=1&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><img
+    <a href="ListDiscNotesForCRFServlet?resolutionStatus=1&type=${fn:escapeXml(param.type)}&tab=${fn:escapeXml(param.tab)}&module=${fn:escapeXml(module)}&defId=<c:out value="${eventDefinitionId}"/>"><img
                       name="icon_Note" src="images/icon_Note.gif" border="0"
                       alt="<fmt:message key="Open" bundle="${resterm}"/>" title="<fmt:message key="Open" bundle="${resterm}"/>"/></a> (<fmt:message key="Open" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesForCRFServlet?resolutionStatus=2&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><img
+    <a href="ListDiscNotesForCRFServlet?resolutionStatus=2&type=${fn:escapeXml(param.type)}&tab=${fn:escapeXml(param.tab)}&module=${fn:escapeXml(module)}&defId=<c:out value="${eventDefinitionId}"/>"><img
                       name="icon_flagYellow" src="images/icon_flagYellow.gif" border="0"
                       alt="<fmt:message key="Updated" bundle="${resterm}"/>" title="<fmt:message key="Updated" bundle="${resterm}"/>"/></a> (<fmt:message key="Updated" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesForCRFServlet?resolutionStatus=3&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><img
+    <a href="ListDiscNotesForCRFServlet?resolutionStatus=3&type=${fn:escapeXml(param.type)}&tab=${fn:escapeXml(param.tab)}&module=${fn:escapeXml(module)}&defId=<c:out value="${eventDefinitionId}"/>"><img
                           name="icon_flagGreen" src="images/icon_flagGreen.gif" border="0"
                           alt="<fmt:message key="Resolved" bundle="${resterm}"/>" title="<fmt:message key="Resolved" bundle="${resterm}"/>"/></a> (<fmt:message key="Resolved" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesForCRFServlet?resolutionStatus=4&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><img
+    <a href="ListDiscNotesForCRFServlet?resolutionStatus=4&type=${fn:escapeXml(param.type)}&tab=${fn:escapeXml(param.tab)}&module=${fn:escapeXml(module)}&defId=<c:out value="${eventDefinitionId}"/>"><img
                              name="icon_flagBlack" src="images/icon_flagBlack.gif" border="0"
                              alt="<fmt:message key="Closed" bundle="${resterm}"/>" title="<fmt:message key="Closed" bundle="${resterm}"/>"/></a> (<fmt:message key="Closed" bundle="${resterm}"/>)&nbsp;
 
-    <a href="ListDiscNotesForCRFServlet?resolutionStatus=5&type=${param.type}&tab=${param.tab}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>"><img
+    <a href="ListDiscNotesForCRFServlet?resolutionStatus=5&type=${fn:escapeXml(param.type)}&tab=${fn:escapeXml(param.tab)}&module=${fn:escapeXml(module)}&defId=<c:out value="${eventDefinitionId}"/>"><img
                              name="icon_flagNA" src="images/icon_flagWhite.gif" border="0"
                              alt="<fmt:message key="Not_Applicable" bundle="${resterm}"/>" title="<fmt:message key="Not_Applicable" bundle="${resterm}"/>"/></a> (<fmt:message key="Not_Applicable" bundle="${resterm}"/>)&nbsp;
 
@@ -126,23 +126,23 @@
         <c:forEach var="statusName" items="${filterSummary['status']}">
             <strong>${statusName}; </strong>
         </c:forEach>
-        <a href="ListDiscNotesForCRFServlet?type=${param.type}&module=${module}&defId=<c:out value="${eventDefinitionId}"/>&tab=1"><fmt:message key="Clear_status_filter" bundle="${resword}"/></a>
+        <a href="ListDiscNotesForCRFServlet?type=${fn:escapeXml(param.type)}&module=${fn:escapeXml(module)}&defId=<c:out value="${eventDefinitionId}"/>&tab=1"><fmt:message key="Clear_status_filter" bundle="${resword}"/></a>
     </c:if>
 </div>
 <div class="dnKey"><strong><fmt:message key="Filter_by_note_type" bundle="${resword}"/>
 :</strong>
-    <a href="ListDiscNotesForCRFServlet?module=${module}&defId=${eventDefinitionId}&tab=${param.tab}&type=50" <c:if test="${param.type == 50}">style="color:green"</c:if>><fmt:message key="all_notes" bundle="${resterm}"/></a>&nbsp;|&nbsp;
-    <a href="ListDiscNotesForCRFServlet?module=${module}&resolutionStatus=${param.resolutionStatus}&defId=${eventDefinitionId}&tab=${param.tab}&type=2" <c:if test="${param.type == 2}">style="color:green"</c:if>><fmt:message key="Annotation" bundle="${resterm}"/></a>&nbsp;|&nbsp;
-    <a href="ListDiscNotesForCRFServlet?module=${module}&resolutionStatus=${param.resolutionStatus}&defId=${eventDefinitionId}&tab=${param.tab}&type=1" <c:if test="${param.type == 1}">style="color:green"</c:if>><fmt:message key="Failed_Validation_Check" bundle="${resterm}"/></a>&nbsp;|&nbsp;
-    <a href="ListDiscNotesForCRFServlet?module=${module}&resolutionStatus=${param.resolutionStatus}&defId=${eventDefinitionId}&tab=${param.tab}&type=3" <c:if test="${param.type == 3}">style="color:green"</c:if>><fmt:message key="query" bundle="${resterm}"/></a>&nbsp;|&nbsp;
-    <a href="ListDiscNotesForCRFServlet?module=${module}&resolutionStatus=${param.resolutionStatus}&defId=${eventDefinitionId}&tab=${param.tab}&type=4" <c:if test="${param.type == 4}">style="color:green"</c:if>><fmt:message key="reason_for_change" bundle="${resterm}"/></a>
+    <a href="ListDiscNotesForCRFServlet?module=${fn:escapeXml(module)}&defId=${fn:escapeXml(eventDefinitionId)}&tab=${fn:escapeXml(param.tab)}&type=50" <c:if test="${param.type == 50}">style="color:green"</c:if>><fmt:message key="all_notes" bundle="${resterm}"/></a>&nbsp;|&nbsp;
+    <a href="ListDiscNotesForCRFServlet?module=${fn:escapeXml(module)}&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}&defId=${fn:escapeXml(eventDefinitionId)}&tab=${fn:escapeXml(param.tab)}&type=2" <c:if test="${param.type == 2}">style="color:green"</c:if>><fmt:message key="Annotation" bundle="${resterm}"/></a>&nbsp;|&nbsp;
+    <a href="ListDiscNotesForCRFServlet?module=${fn:escapeXml(module)}&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}&defId=${fn:escapeXml(eventDefinitionId)}&tab=${fn:escapeXml(param.tab)}&type=1" <c:if test="${param.type == 1}">style="color:green"</c:if>><fmt:message key="Failed_Validation_Check" bundle="${resterm}"/></a>&nbsp;|&nbsp;
+    <a href="ListDiscNotesForCRFServlet?module=${fn:escapeXml(module)}&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}&defId=${fn:escapeXml(eventDefinitionId)}&tab=${fn:escapeXml(param.tab)}&type=3" <c:if test="${param.type == 3}">style="color:green"</c:if>><fmt:message key="query" bundle="${resterm}"/></a>&nbsp;|&nbsp;
+    <a href="ListDiscNotesForCRFServlet?module=${fn:escapeXml(module)}&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}&defId=${fn:escapeXml(eventDefinitionId)}&tab=${fn:escapeXml(param.tab)}&type=4" <c:if test="${param.type == 4}">style="color:green"</c:if>><fmt:message key="reason_for_change" bundle="${resterm}"/></a>
      <br />
     <c:if test="${filterSummary != null  && ! (empty filterSummary['type'])}">
         <fmt:message key="You_have_filtered_type" bundle="${resword}"/>
         <c:forEach var="typeName" items="${filterSummary['type']}">
             <strong>${typeName}; </strong>
         </c:forEach>
-        <a href="ListDiscNotesForCRFServlet?module=${module}&resolutionStatus=${param.resolutionStatus}&defId=${eventDefinitionId}&tab=${param.tab}&type=50"><fmt:message key="Clear_type_filter" bundle="${resword}"/></a>
+        <a href="ListDiscNotesForCRFServlet?module=${fn:escapeXml(module)}&resolutionStatus=${fn:escapeXml(param.resolutionStatus)}&defId=${fn:escapeXml(eventDefinitionId)}&tab=${fn:escapeXml(param.tab)}&type=50"><fmt:message key="Clear_type_filter" bundle="${resword}"/></a>
     </c:if>
 </div>
 

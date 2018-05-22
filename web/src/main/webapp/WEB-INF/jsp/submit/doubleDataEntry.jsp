@@ -114,7 +114,7 @@
 <input type="hidden" name="tab" value="<c:out value="${tabId}"/>" />
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
-<input type="hidden" name="exitTo" value="${exitTo}" />
+<input type="hidden" name="exitTo" value="${fn:escapeXml(exitTo)}" />
 
 <script type="text/javascript" language="JavaScript">
     // <![CDATA[
@@ -232,7 +232,7 @@ if (TabLabel[<c:out value="${count}"/>].length>8) {
 <c:set var="count" value="${count+1}"/>
 </c:forEach>
 DisplaySectionTabs();
-selectTabs(${tabId},${sectionNum},'crfHeaderTabs');
+selectTabs(${fn:escapeXml(tabId)},${fn:escapeXml(sectionNum)},'crfHeaderTabs');
 
 function DisplaySectionTabs()
 {
@@ -242,7 +242,7 @@ function DisplaySectionTabs()
 
     {
         sectionId = TabSectionId[TabID-1];
-        url = "DoubleDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=${exitTo}";
+        url = "DoubleDataEntry?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=" +${fn:escapeXml(exitTo)};
         currTabID = <c:out value="${tabId}"/>;
         if (TabID<=TabsShown)
         {

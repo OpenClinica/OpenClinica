@@ -116,7 +116,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 <%-- We have to feed this value to the method giveFirstElementFocus()--%>
 <input id="formFirstField" type="hidden" name="formFirstField" value="${requestScope['formFirstField']}" />
 <input id="hasPopUp" type="hidden" name="hasPopUp" value="${requestScope['hasPopUp']}" />
-<input type="hidden" name="exitTo" value="${exitTo}" />
+<input type="hidden" name="exitTo" value="${fn:escapeXml(exitTo)}" />
 <script type="text/javascript" language="JavaScript">
     // <![CDATA[
     function getSib(theSibling){
@@ -214,7 +214,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
     </c:forEach>
 
     DisplaySectionTabs()
-    selectTabs(${tabId},${sectionNum},'crfHeaderTabs');
+    selectTabs(${fn:escapeXml(tabId)},${fn:escapeXml(sectionNum)},'crfHeaderTabs');
 
     function DisplaySectionTabs()
     {
@@ -224,7 +224,7 @@ margin-top:20px; updateTabs(<c:out value="${tabId}"/>);--%>
 
         {
             sectionId = TabSectionId[TabID-1];
-            url = "AdministrativeEditing?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=${exitTo}";
+            url = "AdministrativeEditing?eventCRFId=" + <c:out value="${section.eventCRF.id}"/> + "&sectionId=" + sectionId + "&tab=" + TabID + "&exitTo=" + ${fn:escapeXml(exitTo)};
             currTabID = <c:out value="${tabId}"/>;
             if (TabID<=TabsShown)
                 {
@@ -1118,7 +1118,7 @@ table-->
                     <td><input type="submit" id="srl" name="submittedResume" value="<fmt:message key="save" bundle="${resword}"/>" class=
                       "button_medium" onclick="disableSubmit(); this.form.submit();"/></td>
                     <td>
-                    <input type="hidden" name="fromResolvingNotes" value="${fromResolvingNotes}"/>
+                    <input type="hidden" name="fromResolvingNotes" value="${fn:escapeXml(fromResolvingNotes)}"/>
                     <input type="submit" id="sel" name="submittedExit" value="<fmt:message key="exit" bundle="${resword}"/>" class="button_medium" onClick="return checkEntryStatus('DataStatus_bottom');" /></td>
                     <c:choose>
                         <c:when test="${! empty formMessages}">

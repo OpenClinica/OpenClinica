@@ -2,7 +2,7 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.page_messages" var="pagemessage"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -450,19 +450,19 @@
                 <c:choose>
                     <c:when test="${studyModuleStatus.rule == 1}">
                         <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+						<a href="${fn:escapeXml(ruleDesignerURL)}access?host=${hostPath}&app=${fn:escapeXml(contextPath)}&study_oid=${fn:escapeXml(study.oid)}&provider_user=${fn:escapeXml(userBean.name)}&path=${fn:escapeXml(path)}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                     </c:when>
                     <c:when test="${studyModuleStatus.rule == 2}">
                         <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+						<a href="${fn:escapeXml(ruleDesignerURL)}access?host=${hostPath}&app=${fn:escapeXml(contextPath)}&study_oid=${fn:escapeXml(study.oid)}&provider_user=${fn:escapeXml(userBean.name)}&path=${fn:escapeXml(path)}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:when>
                     <c:otherwise>
                         <a href="${viewRule}"><img src="../images/bt_Details.gif" border="0" alt="<fmt:message key="view" bundle="${resword}"/>" title="<fmt:message key="view" bundle="${resword}"/>"/></a>
                         <a href="${createRule}"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="add2" bundle="${resword}"/>" title="<fmt:message key="add2" bundle="${resword}"/>"/></a>
-						<a href="${ruleDesignerURL}access?host=${hostPath}&app=${contextPath}&study_oid=${study.oid}&provider_user=${userBean.name}&path=${path}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
+						<a href="${fn:escapeXml(ruleDesignerURL)}access?host=${fn:escapeXml(hostPath)}&app=${fn:escapeXml(contextPath)}&study_oid=${fn:escapeXml(study.oid)}&provider_user=${fn:escapeXml(userBean.name)}&path=${fn:escapeXml(path)}"><img src="../images/bt_EnterData.gif" border="0" alt="<fmt:message key="rule_designer" bundle="${resword}"/>" title="<fmt:message key="rule_designer" bundle="${resword}"/>"/></a>
                         <%-- <a href="${viewRule}"><img src="../images/bt_Edit.gif" border="0"/></a> --%>
 
                     </c:otherwise>
@@ -617,7 +617,7 @@
                   <td>
                       <span id="participateURL">
                           <c:choose>
-                              <c:when test="${!empty participateURLDisplay}">${participateURLDisplay}</c:when>
+                              <c:when test="${!empty participateURLDisplay}">${fn:escapeXml(participateURLDisplay)}</c:when>
                               <c:otherwise>&nbsp;</c:otherwise>
                           </c:choose>
                       </span>
@@ -627,13 +627,13 @@
                       <c:url var="deactivateParticipate" value="studymodule/${currentStudy.oid}/deactivate"/>
                       <c:choose>
                           <c:when test="${participateOCStatus == 'disabled' && !empty participateStatus}">
-                              <a href="${reactivateParticipate}" id="reactivateParticipateAccess" name="reactivateParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                              <a href="${fn:escapeXml(reactivateParticipate)}" id="reactivateParticipateAccess" name="reactivateParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:when test="${participateOCStatus == 'disabled'}">
                               <a href="javascript:;" id="requestParticipateAccess" name="requestParticipateAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:otherwise>
-                              <a href="${deactivateParticipate}" id="removeParticipateAccess" name="removeParticipateAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
+                              <a href="${fn:escapeXml(deactivateParticipate)}" id="removeParticipateAccess" name="removeParticipateAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
                           </c:otherwise>
                       </c:choose>
                   </td>
@@ -666,7 +666,7 @@
                       <c:url var="deactivateRandomization" value="studymodule/${currentStudy.oid}/deactivaterandomization"/>
                       <c:choose>
                           <c:when test="${randomizationOCStatus == 'disabled' && !empty randomizationStatus}">
-                              <a href="${reactivateRandomization}" id="reactivateRandomizationAccess" name="reactivateRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
+                              <a href="${fn:escapeXml(reactivateRandomization)}" id="reactivateRandomizationAccess" name="reactivateRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:when test="${randomizationOCStatus == 'disabled'}">
                               <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
@@ -675,7 +675,7 @@
                               <a href="javascript:;" id="requestRandomizationAccess" name="requestRandomizationAccess"><img src="../images/create_new.gif" border="0" alt="<fmt:message key="enable" bundle="${resword}"/>" title="<fmt:message key="enable" bundle="${resword}"/>"/></a>
                           </c:when>
                           <c:otherwise>
-                              <a href="${deactivateRandomization}" id="removeRandomizeAccess" name="removeRandomizeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
+                              <a href="${fn:escapeXml(deactivateRandomization)}" id="removeRandomizeAccess" name="removeRandomizeAccess"><img src="../images/bt_Remove.gif" border="0" alt="<fmt:message key="disable" bundle="${resword}"/>" title="<fmt:message key="disable" bundle="${resword}"/>"/></a>
                           </c:otherwise>
                       </c:choose>
                   </td>
@@ -718,7 +718,7 @@
 
 <c:if test="${portalURL!= '' && portalURL!= null}">
     <div align="left" id="requestParticipateForm" class="participate-registration-div">
-        <form action="studymodule/${currentStudy.oid}/register" method="post">
+        <form action="studymodule/${fn:escapeXml(currentStudy.oid)}/register" method="post">
             <h1>
                 <fmt:message key="participate_reg_title" bundle="${resword}"/>
                 <a href="javascript:openDocWindow('https://docs.openclinica.com/participate/activate-openclinica-participate-your-study')">
@@ -747,7 +747,7 @@
 
  <c:if test="${moduleManager!= '' && moduleManager!= null}">
     <div align="left" id="requestRandomizationForm" class="randomization-registration-div">
-        <form action="studymodule/${currentStudy.oid}/randomize" method="post">
+        <form action="studymodule/${fn:escapeXml(currentStudy.oid)}/randomize" method="post">
             <h1>
                 <fmt:message key="randomization_reg_title" bundle="${resword}"/>
                 <a href="javascript:openDocWindow('https://docs.openclinica.com/randomization/activate-openclinica-randomize-your-study')">

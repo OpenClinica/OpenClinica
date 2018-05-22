@@ -1,7 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
-
+<%@ taglib prefix="fn" uri="http://java.sun.com/jsp/jstl/functions" %>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
@@ -101,7 +101,7 @@
            }
        
            function registerPManage(event){
-               var regURL = 'pages/pmanage/regSubmit?studyoid=' + "${studyToView.oid}";
+               var regURL = 'pages/pmanage/regSubmit?studyoid=' + "${fn:escapeXml(studyToView.oid)}";
                jQuery.ajax({
         	       type:'GET',
         	       url: regURL,
@@ -192,7 +192,7 @@
              </c:choose>
            </c:forEach>
            </select>
-           <input type=hidden name="status" value="${status1}">
+           <input type=hidden name="status" value="${fn:escapeXml(status1)}">
 
                   <%--<select name="statusId" class="formfieldXL" disabled="true">--%>
               <%--<c:forEach var="status" items="${statuses}">--%>
