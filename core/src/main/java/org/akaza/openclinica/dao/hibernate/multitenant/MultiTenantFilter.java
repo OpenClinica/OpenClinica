@@ -75,7 +75,6 @@ import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdent
         if (session != null) {
             session.setAttribute(tenantKey, tenant);
         }
-        System.out.println("Session Id: MultiTenantFilter" + req.getSession().getId());
         chain.doFilter(req, response);
     }
 
