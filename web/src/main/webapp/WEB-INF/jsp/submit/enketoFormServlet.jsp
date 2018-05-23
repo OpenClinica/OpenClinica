@@ -19,7 +19,7 @@
 %>
 <script>
     var myContextPath = "${pageContext.request.contextPath}";
-    var sessionTimeoutVal = '<%= session.getMaxInactiveInterval() %>';
+    var sessionTimeoutVal = '<%= session.getAttribute("maxInactiveInterval") %>';
     console.log("***********************************sessionTimeoutVal:"+ sessionTimeoutVal);
     var userName = "<%= userBean.getName() %>";
     var currentURL = "<%= currentURL %>";
@@ -50,27 +50,9 @@
     <script type="text/javascript" language="javascript">
 
         $(document).ready(function(){
-            var errorData = "${errorData}";
-
-            if (errorData) {
-                var response = true; //confirm(errorData);
-                if (response == true) {
-                    var fullEnketoURL = "${readOnlyUrl}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}";
-                    fullEnketoURL += "&loadWarning=" + encodeURIComponent(errorData);
-                    fullEnketoURL += "${formURL2}";
-                    console.log('fullEnketoURL:' + fullEnketoURL);
-                    iframe = document.getElementById("enketo");
-                    iframe.setAttribute('src', fullEnketoURL);
-                } else {
-                    if ("${originatingPage}") window.location.replace("${originatingPage}");
-                }
-            } else {
-                var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
-                iframe = document.getElementById("enketo");
-                iframe.setAttribute('src', fullEnketoURL);
-            }
-
-
+            var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
+            iframe = document.getElementById("enketo");
+            iframe.setAttribute('src', fullEnketoURL);
         });
 
 
