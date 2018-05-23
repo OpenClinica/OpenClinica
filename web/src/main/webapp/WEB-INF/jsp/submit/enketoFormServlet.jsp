@@ -19,7 +19,7 @@
 %>
 <script>
     var myContextPath = "${pageContext.request.contextPath}";
-    var sessionTimeoutVal = '<%= session.getAttribute("maxInactiveInterval") %>';
+    var sessionTimeoutVal = '<%= session.getMaxInactiveInterval() %>';
     console.log("***********************************sessionTimeoutVal:"+ sessionTimeoutVal);
     var userName = "<%= userBean.getName() %>";
     var currentURL = "<%= currentURL %>";
@@ -35,6 +35,7 @@
 <head>
     <meta http-equiv="content-type" content="text/html; charset=utf-8"/>
     <meta http-equiv="X-UA-Compatible" content="IE=11"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title><fmt:message key="openclinica" bundle="${resword}"/></title>
     <link rel="SHORTCUT ICON" href="images/favicon.png" type="image/x-icon" />
     <link rel="stylesheet" href="includes/styles.css" type="text/css"/>
@@ -49,9 +50,27 @@
     <script type="text/javascript" language="javascript">
 
         $(document).ready(function(){
-            var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
-            iframe = document.getElementById("enketo");
-            iframe.setAttribute('src', fullEnketoURL);
+            var errorData = "${errorData}";
+
+            if (errorData) {
+                var response = true; //confirm(errorData);
+                if (response == true) {
+                    var fullEnketoURL = "${readOnlyUrl}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}";
+                    fullEnketoURL += "&loadWarning=" + encodeURIComponent(errorData);
+                    fullEnketoURL += "${formURL2}";
+                    console.log('fullEnketoURL:' + fullEnketoURL);
+                    iframe = document.getElementById("enketo");
+                    iframe.setAttribute('src', fullEnketoURL);
+                } else {
+                    if ("${originatingPage}") window.location.replace("${originatingPage}");
+                }
+            } else {
+                var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
+                iframe = document.getElementById("enketo");
+                iframe.setAttribute('src', fullEnketoURL);
+            }
+
+
         });
 
 
