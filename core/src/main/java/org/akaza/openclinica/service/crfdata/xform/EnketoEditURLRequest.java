@@ -18,6 +18,15 @@ public class EnketoEditURLRequest {
     private String complete_button = null;
     @JsonProperty("go_to")
     private String goTo = null;
+    private String load_warning = null;
+
+    public String getLoad_warning() {
+        return load_warning;
+    }
+
+    public void setLoad_warning(String load_warning) {
+        this.load_warning = load_warning;
+    }
 
     @JsonProperty("instance_attachments")
     private InstanceAttachment instanceAttachments;
@@ -45,7 +54,7 @@ public class EnketoEditURLRequest {
     }
 
     public EnketoEditURLRequest(String server_url, String form_id, String instance_id, String return_url, String instance, String complete_button,
-            InstanceAttachment instanceAttachments, String goTo) {
+            InstanceAttachment instanceAttachments, String goTo, String load_warning) {
         this.server_url = server_url;
         this.form_id = form_id;
         this.instance_id = instance_id;
@@ -54,6 +63,7 @@ public class EnketoEditURLRequest {
         this.complete_button = complete_button;
         this.instanceAttachments = instanceAttachments;
         this.goTo = goTo;
+        this.load_warning = load_warning;
     }
 
     public String getServer_url() {

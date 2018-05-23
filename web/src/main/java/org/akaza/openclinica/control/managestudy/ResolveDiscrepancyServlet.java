@@ -66,6 +66,8 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.domain.xform.dto.Bind;
@@ -90,6 +92,7 @@ import org.akaza.openclinica.domain.xform.dto.Translation;
 import org.akaza.openclinica.domain.xform.dto.UserControl;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
+import org.akaza.openclinica.service.crfdata.FormUrlObject;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
@@ -155,7 +158,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
     public boolean prepareRequestForResolution(HttpServletRequest request, DataSource ds, StudyBean currentStudy, DiscrepancyNoteBean note,
                                                boolean isCompleted,
-                                               String module, String flavor, boolean isLocked) throws Exception {
+                                               String module, String flavor, String loadWarning, boolean isLocked) throws Exception {
         String entityType = note.getEntityType().toLowerCase();
         int id = note.getEntityId();
         if ("subject".equalsIgnoreCase(entityType)) {
@@ -332,24 +335,24 @@ public class ResolveDiscrepancyServlet extends SecureController {
             StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
             Role role = currentRole.getRole();
 
-            String formUrl = null;
+            FormUrlObject formUrlObject = null;
             if (ecb.getId() > 0) {
                 if (isLocked) {
-                    formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role,
-                            EDIT_MODE, true);
+                    formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role,
+                            EDIT_MODE, loadWarning, true);
                 } else
-                    formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb,
-                            role, EDIT_MODE, false);
+                    formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb,
+                            role, EDIT_MODE,  loadWarning,false);
             } else {
                 String hash = formLayout.getXform();
-                formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash);
+                formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);
             }
-            int hashIndex = formUrl.lastIndexOf("#");
-            String part1 = formUrl;
+            int hashIndex = formUrlObject.getFormUrl().lastIndexOf("#");
+            String part1 = formUrlObject.getFormUrl();
             String part2 = "";
             if (hashIndex != -1) {
-                part1 = formUrl.substring(0, hashIndex);
-                part2 = formUrl.substring(hashIndex);
+                part1 = formUrlObject.getFormUrl().substring(0, hashIndex);
+                part2 = formUrlObject.getFormUrl().substring(hashIndex);
             }
             request.setAttribute(EnketoFormServlet.FORM_URL1, part1);
             request.setAttribute(EnketoFormServlet.FORM_URL2, part2);
@@ -422,6 +425,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
         boolean isCompleted = false;
         Page p = null;
         boolean isLocked = false;
+        String loadWarning = "";
+
         if ("itemdata".equalsIgnoreCase(entityType)) {
             ItemDataDAO iddao = new ItemDataDAO(sm.getDataSource());
             ItemDataBean idb = (ItemDataBean) iddao.findByPK(discrepancyNoteBean.getEntityId());
@@ -444,14 +449,14 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (ecb.getStatus().equals(Status.UNAVAILABLE)) {
                 isCompleted = true;
             }
-
+            loadWarning = generateErrorMessage(ecb);
             toView = true;// we want to go to view note page if the note is
             // for item data
         }
         // logger.info("set up pop up url: " + createNoteURL);
         // System.out.println("set up pop up url: " + createNoteURL);
         boolean goNext = prepareRequestForResolution(request, sm.getDataSource(), currentStudy, discrepancyNoteBean, isCompleted,
-                module, flavor, isLocked);
+                module, flavor, loadWarning,isLocked);
 
         p = getPageForForwarding(discrepancyNoteBean, isCompleted);
 
@@ -482,19 +487,20 @@ public class ResolveDiscrepancyServlet extends SecureController {
     }
 
     private boolean isCRFLocked(EventCRFBean ecb) {
-        if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId())) {
-            Integer userId = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId());
-            UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-            UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
-            String errorData = resword.getString("CRF_unavailable") +
-                    "\\n" + ubean.getName() + " " + resword.getString("Currently_entering_data")
-                    + "\\n" + resword.getString("CRF_reopen_enter_data");
-            request.setAttribute("errorData", errorData);
+        if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId()))
             return true;
-        }
         return false;
     }
 
+    private String generateErrorMessage(EventCRFBean ecb) {
+        Integer userId = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId());
+        UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+        UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
+        String errorData = resword.getString("CRF_unavailable")
+                + ubean.getName() + " " + resword.getString("Currently_entering_data")
+                + resword.getString("CRF_reopen_enter_data");
+        return errorData;
+    }
     private boolean lockCRF(EventCRFBean ecb) {
         if (getEventCrfLocker().lock(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId()))
             return true;

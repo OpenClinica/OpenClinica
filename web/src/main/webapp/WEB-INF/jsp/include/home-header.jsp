@@ -15,7 +15,7 @@
 <html xmlns="http://www.w3.org/1999/xhtml">
 <script>
     var myContextPath = "${pageContext.request.contextPath}";
-    var sessionTimeoutVal = '<%= session.getMaxInactiveInterval() %>';
+    var sessionTimeoutVal = '<%= session.getAttribute("maxInactiveInterval") %>';
     console.log("***********************************sessionTimeoutVal:"+ sessionTimeoutVal);
     var userName = "<%= userBean.getName() %>";
     var crossStorageURL = '<%= session.getAttribute("crossStorageURL")%>';

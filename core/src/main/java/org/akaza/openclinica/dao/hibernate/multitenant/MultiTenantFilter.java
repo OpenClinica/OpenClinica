@@ -4,6 +4,7 @@ package org.akaza.openclinica.dao.hibernate.multitenant;
  * Created by yogi on 2/1/17.
  */
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.core.ExtendedBasicDataSource;
 import org.akaza.openclinica.dao.core.CoreResources;

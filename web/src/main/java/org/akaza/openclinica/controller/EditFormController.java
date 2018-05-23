@@ -13,6 +13,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
+import org.akaza.openclinica.service.crfdata.FormUrlObject;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.PFormCache;
@@ -53,7 +54,7 @@ public class EditFormController {
 
     /**
      * @api {get} /pages/api/v1/editform/:studyOid/url Get Form Edit URL
-     * @apiName getEditUrl
+     * @apiName getActionUrl
      * @apiPermission admin
      * @apiVersion 3.8.0
      * @apiParam {String} studyOid Study Oid.
@@ -78,9 +79,9 @@ public class EditFormController {
     @RequestMapping(value = "/{studyOid}/url", method = RequestMethod.GET)
     public ResponseEntity<String> getEditUrl(@RequestParam(FORM_CONTEXT) String formContext, @PathVariable("studyOid") String studyOID) throws Exception {
 
-        String editURL = null;
+        FormUrlObject editURL = null;
         if (!mayProceed(studyOID))
-            return new ResponseEntity<String>(editURL, org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
+            return new ResponseEntity<String>(editURL.getFormUrl(), org.springframework.http.HttpStatus.NOT_ACCEPTABLE);
 
         // Load context
         PFormCache cache = PFormCache.getInstance(context);
@@ -96,10 +97,10 @@ public class EditFormController {
         ItemDataBean idb = null;
         Role role = null;
         String mode = null;
-        editURL = urlService.getEditUrl(formContext, subjectContext, studyOID, formLayout, NO_FLAVOR, idb, role, mode, false);
+        editURL = urlService.getActionUrl(formContext, subjectContext, studyOID, formLayout, NO_FLAVOR, idb, role, mode, null, false);
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
-        return new ResponseEntity<String>(editURL, org.springframework.http.HttpStatus.ACCEPTED);
+        return new ResponseEntity<String>(editURL.getFormUrl(), org.springframework.http.HttpStatus.ACCEPTED);
 
     }
 

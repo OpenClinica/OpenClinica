@@ -11,6 +11,7 @@ import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
+import org.akaza.openclinica.service.crfdata.FormUrlObject;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
 import org.akaza.openclinica.view.Page;
@@ -52,7 +53,7 @@ public class EnketoFormServlet extends SecureController {
         int eventCrfId = Integer.valueOf(request.getParameter(EVENT_CRF_ID));
 
 
-        String formUrl = null;
+        FormUrlObject formUrlObject = null;
 
         StudyEvent studyEvent = studyEventDao.findById(Integer.valueOf(studyEventId));
         FormLayout formLayout = formLayoutDao.findById(Integer.valueOf(formLayoutId));
@@ -86,26 +87,28 @@ public class EnketoFormServlet extends SecureController {
 
         }
 
+        String loadWarning = generateErrorMessage(studyEvent, formLayout);
+        boolean isFormLocked = determineCRFLock(studyEvent, formLayout);
         if (Integer.valueOf(eventCrfId) > 0) {
-            formUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout, QUERY_FLAVOR, null, role, mode, false);
+            formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout,
+                    QUERY_FLAVOR, null, role, mode, loadWarning, isFormLocked);
         } else if (Integer.valueOf(eventCrfId) == 0) {
             String hash = formLayout.getXform();
-            formUrl = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, parentStudy.getOc_oid(), QUERY_FLAVOR, role, mode, hash);
+            formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, parentStudy.getOc_oid(),
+                    QUERY_FLAVOR, role, mode, hash, loadWarning, isFormLocked);
         }
-        int hashIndex = formUrl.lastIndexOf("#");
-        String part1 = formUrl;
+        if (!isFormLocked && formUrlObject.isLockOn()) {
+            getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId());
+        }
+        int hashIndex = formUrlObject.getFormUrl().lastIndexOf("#");
+        String part1 = formUrlObject.getFormUrl();
         String part2 = "";
         if (hashIndex != -1) {
-            part1 = formUrl.substring(0, hashIndex);
-            part2 = formUrl.substring(hashIndex);
+            part1 = formUrlObject.getFormUrl().substring(0, hashIndex);
+            part2 = formUrlObject.getFormUrl().substring(hashIndex);
         }
         request.setAttribute(FORM_URL1, part1);
         request.setAttribute(FORM_URL2, part2);
-
-        if (determineCRFLock(studyEvent, formLayout, part1)) {
-            String readOnlyUrl = enketoUrlService.getEditUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout, QUERY_FLAVOR, null, role, mode, true);
-            request.setAttribute("readOnlyUrl", readOnlyUrl);
-        }
 
         // request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
@@ -123,36 +126,24 @@ public class EnketoFormServlet extends SecureController {
         return;
     }
 
-    private boolean determineCRFLock(StudyEvent studyEvent, FormLayout formLayout, String url) {
-        boolean checkLock = false;
-        boolean isAlreadyLocked = false;
-        if (StringUtils.contains(url, "/edit/")) {
-            checkLock = true;
-        }
-        if (checkLock == false)
-            return false;
-
+    private boolean determineCRFLock(StudyEvent studyEvent, FormLayout formLayout) {
         if (getEventCrfLocker().isLocked(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId())) {
-            // Display error message
-            generateErrorMessage(studyEvent, formLayout);
             return true;
-        } else {
-            // failed to get a lock
-            if (!getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId())) {
-                generateErrorMessage(studyEvent, formLayout);
-                return true;
-            }
-            return false;
         }
+        return false;
+
     }
 
-    private void generateErrorMessage(StudyEvent studyEvent, FormLayout formLayout) {
+    private String generateErrorMessage(StudyEvent studyEvent, FormLayout formLayout) {
         Integer userId = getEventCrfLocker().getLockOwner(studyEvent, formLayout, currentPublicStudy.getSchemaName());
+        if (userId == null)
+            return null;
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
-        String errorData = resword.getString("CRF_unavailable") +
-                "\\n" + ubean.getName() + " " + resword.getString("Currently_entering_data")
-                + "\\n" + resword.getString("CRF_reopen_enter_data");
+        String errorData = resword.getString("CRF_unavailable")
+                 + ubean.getName() + " " + resword.getString("Currently_entering_data")
+                + resword.getString("CRF_reopen_enter_data");
         request.setAttribute("errorData", errorData);
+        return errorData;
     }
 }
