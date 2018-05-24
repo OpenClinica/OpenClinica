@@ -235,7 +235,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             return studyUserRoleUpdated;
         Collection<StudyUserRole> existingStudyUserRoles = studyUserRoleDao.findAllUserRolesByUserAccount(ub);
         ArrayList<StudyUserRole> modifiedSURArray = new ArrayList<>();
-
+        boolean currentActiveStudyValid = false;
+        Study placeHolderStudy = null;
         for (StudyEnvironmentRoleDTO role: userRoles.getBody()) {
             String uuidToFind = null;
             if (StringUtils.isNotEmpty(role.getSiteUuid()))
@@ -246,13 +247,18 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             if (study == null)
                 continue;
 
+            if (study.getStudyId() == userActiveStudyId)
+                currentActiveStudyValid = true;
+
             Study parentStudy = study.getStudy();
             Study toUpdate = parentStudy == null ? study : study.getStudy();
             // set this as the active study
             if (ub.getActiveStudy() == null) {
                 ub.setActiveStudy(toUpdate);
                 userAccountDao.saveOrUpdate(ub);
+                currentActiveStudyValid = true;
             }
+            placeHolderStudy = study;
             UserAccount userAccount = new UserAccount();
             userAccount.setUserName(ub.getUserName());
             ArrayList<StudyUserRole> byUserAccount = studyUserRoleDao.findAllUserRolesByUserAccountAndStudy(userAccount, study.getStudyId());
@@ -292,6 +298,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         }
         // remove all the roles that are not there for this user
         removeDeletedUserRoles(modifiedSURArray, existingStudyUserRoles);
+        if (currentActiveStudyValid == false) {
+            ub.setActiveStudy(placeHolderStudy);
+            userAccountDao.saveOrUpdate(ub);
+        }
         return studyUserRoleUpdated;
     }
 
