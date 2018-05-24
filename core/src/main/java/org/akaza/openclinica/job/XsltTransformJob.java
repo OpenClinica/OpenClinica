@@ -466,7 +466,7 @@ public class XsltTransformJob extends QuartzJobBean {
                             + " dataset on the View Datasets page.";
                     auditEventDAO.createRowForExtractDataJobSuccess(triggerBean, actionMsg);
                 }
-               // mailSender.sendEmail(alertEmail, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
+                mailSender.sendEmail(alertEmail, EmailEngine.getAdminEmail(), subject, emailBuffer.toString(), true);
 
             } catch (OpenClinicaSystemException ose) {
                 // Do Nothing, In the future we might want to have an email
