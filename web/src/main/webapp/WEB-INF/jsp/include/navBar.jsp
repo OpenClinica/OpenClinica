@@ -191,7 +191,7 @@
 
     function lockedCRFAlert(userName) {
         alert('<fmt:message key="CRF_unavailable" bundle="${resword}"/>' + '\n'
-            + '          ' + userName + ' ' + '<fmt:message key="Currently_entering_data" bundle="${resword}"/>' + '\n'
+            + ' User ' + userName + ' ' + '<fmt:message key="Currently_entering_data" bundle="${resword}"/>' + '\n'
             + '<fmt:message key="Leave_the_CRF" bundle="${resword}"/>');
         return false;
     }

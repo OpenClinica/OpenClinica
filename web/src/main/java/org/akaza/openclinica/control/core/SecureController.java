@@ -623,6 +623,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
             // YW << For the case that current role is not "invalid" but current
             // active study has been removed.
+            else if (currentPublicStudy.getId() == 0)
+                throw new Exception("No study assigned to this user");
             else if (currentRole.getId() > 0
                     && (currentPublicStudy.getStatus().equals(Status.DELETED) || currentPublicStudy.getStatus().equals(Status.AUTO_DELETED))) {
                 currentRole.setRole(Role.INVALID);
