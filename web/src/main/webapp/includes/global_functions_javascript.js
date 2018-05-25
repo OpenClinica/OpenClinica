@@ -1,3 +1,21 @@
+  function checkDataStatus() {
+
+        objImage=document.getElementById('status_top');
+        if (objImage != null && objImage.src.indexOf('images/icon_UnsavedData.gif')>0) {
+            return confirm('<fmt:message key="you_have_unsaved_data" bundle="${resword}"/>');
+        }
+
+        return true;
+    }
+    function gotoLink() {
+
+        var OptionIndex=document.crfForm.sectionName.selectedIndex;
+        if (checkDataStatus()) {
+            window.location = document.crfForm.sectionName.options[OptionIndex].value;
+        }
+    }
+
+    
 function selectAllChecks(formObj,value){
     if(formObj) {
         var allChecks = formObj.getElementsByTagName("input");
