@@ -63,6 +63,20 @@
   }
 </script>
 <script>
+  if (sessionStorage.getItem(location.pathname) !== '${study.oid}') {
+    function startsWith(prefix, str) {
+        return str.lastIndexOf(prefix, 0) === 0;
+    }
+    var keys = [];
+    for (var i = 0, len = sessionStorage.length; i < len; i++) {
+      keys.push(sessionStorage.key(i));
+    }
+    keys.forEach(function(key) {
+      if (startsWith(location.pathname, key))
+        sessionStorage.removeItem(key);
+    });
+    sessionStorage.setItem(location.pathname, '${study.oid}');
+  }
   function store(callback) {
     if (callback)
       store.data = callback(store.data) || store.data;
@@ -82,18 +96,13 @@
       }, 1);
     }
   }
-  store.dirty = false;
   store.key = location.pathname + location.search;
-  store.data = JSON.parse(sessionStorage.getItem(store.key));
-  if (!store.data || store.data.studyOid !== '${studySub.oid}')
-    store(function() {
-      return {
-        studyOid: '${studySub.oid}',
-        collapseSections: {},
-        datatables: [],
-        ocStatusHide: 'oc-status-removed'
-      };
-    });
+  store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
+    collapseSections: {},
+    datatables: [],
+    ocStatusHide: 'oc-status-removed'
+  };
+  store.dirty = false;
 
   var defaultPageSize = 10;
 
