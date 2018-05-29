@@ -378,7 +378,7 @@
                     &nbsp;
                 </c:when>
 
-                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && !userRole.monitor}">
+                <c:when test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && study.status.available && !studyEvent.status.deleted && !studyEvent.subjectEventStatus.locked &&!userRole.monitor}">
                     <td >
                         <c:choose>
                         <c:when test="${dedc.eventCRF.status.id != 0}">
