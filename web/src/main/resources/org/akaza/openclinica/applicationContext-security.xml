@@ -67,7 +67,6 @@
         <property name="dataSource" ref="dataSource"/>
         <property name="allowSessionCreation" value="true" />
         <property name="sessionAuthenticationStrategy" ref="sas"/>
-        <property name="crfLocker" ref="crfLocker"/>
     </bean>
 
     <bean id="successHandler" class="org.springframework.security.web.authentication.SavedRequestAwareAuthenticationSuccessHandler" >
@@ -96,7 +95,6 @@
     <bean id="sessionRegistry" class="org.akaza.openclinica.web.filter.OpenClinicaSessionRegistryImpl">
         <property name="auditUserLoginDao" ref="auditUserLoginDao"/>
         <property name="dataSource" ref="dataSource"/>
-        <property name="crfLocker" ref="crfLocker" />
     </bean>
 
 

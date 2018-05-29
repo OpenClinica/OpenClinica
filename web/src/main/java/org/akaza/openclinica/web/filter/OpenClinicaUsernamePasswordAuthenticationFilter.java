@@ -26,7 +26,6 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.core.CRFLocker;
 import org.akaza.openclinica.dao.hibernate.AuditUserLoginDao;
 import org.akaza.openclinica.dao.hibernate.ConfigurationDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -75,7 +74,6 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
     private ConfigurationDao configurationDao;
     private UserAccountDAO userAccountDao;
     private DataSource dataSource;
-    private org.akaza.openclinica.core.CRFLocker crfLocker; 
 
     //~ Constructors ===================================================================================================
 
@@ -135,8 +133,6 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
             auditUserLogin(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
             resetLockCounter(username, LoginStatus.SUCCESSFUL_LOGIN, userAccountBean);
             request.getSession().setAttribute(SecureController.USER_BEAN_NAME, userAccountBean);
-            //To remove the locking of Event CRFs previusly locked by this user.
-            crfLocker.unlockAllForUser(userAccountBean.getId());
         } catch (LockedException le) {
             auditUserLogin(username, LoginStatus.FAILED_LOGIN_LOCKED, userAccountBean);
             throw le;
@@ -288,13 +284,4 @@ public class OpenClinicaUsernamePasswordAuthenticationFilter extends AbstractAut
     public UserAccountDAO getUserAccountDao() {
         return userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
     }
-
-    public CRFLocker getCrfLocker() {
-        return crfLocker;
-    }
-
-    public void setCrfLocker(CRFLocker crfLocker) {
-        this.crfLocker = crfLocker;
-    }
-
 }
