@@ -285,7 +285,6 @@ $(function() {
     ).then(function() {
         collection(metadata.StudyEventDef).forEach(function(studyEvent) {
             studyEvent.forms = {};
-            var numFormShowing = 0;
 
             collection(studyEvent.FormRef).forEach(function(ref) {
                 var studyEventOid = studyEvent['@OID'];
@@ -308,14 +307,11 @@ $(function() {
                     submissionFields: submissionFields,
                     submissions: [],
                     addNew: false,
-                    showMe: formNotArchived
+                    showMe: false
                 }, form);
-
-                if (formNotArchived)
-                    numFormShowing++;
             });
 
-            studyEvent.showMe = numFormShowing > 0;
+            studyEvent.showMe = false;
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
 
@@ -327,6 +323,7 @@ $(function() {
             var studyEvent = studyEvents[oids[0]];
             var form = studyEvent.forms[oids[1]];
             form.addNew = link['@href'];
+            form.showMe = studyEvent.showMe = true;
         });
 
         collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {

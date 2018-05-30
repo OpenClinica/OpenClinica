@@ -8,40 +8,6 @@
 
 package org.akaza.openclinica.control.core;
 
-import java.io.DataInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.PrintWriter;
-import java.io.StringWriter;
-import java.io.UnsupportedEncodingException;
-import java.net.MalformedURLException;
-import java.net.URL;
-import java.net.URLEncoder;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-import java.util.Properties;
-import java.util.ResourceBundle;
-import java.util.StringTokenizer;
-
-import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletContext;
-import javax.servlet.ServletException;
-import javax.servlet.ServletOutputStream;
-import javax.servlet.SingleThreadModel;
-import javax.servlet.http.HttpServlet;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.Role;
@@ -50,17 +16,11 @@ import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.core.CRFLocker;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.core.SessionManager;
@@ -71,19 +31,12 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
@@ -111,6 +64,25 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+
+import javax.mail.MessagingException;
+import javax.mail.internet.InternetAddress;
+import javax.mail.internet.MimeMessage;
+import javax.servlet.ServletContext;
+import javax.servlet.ServletException;
+import javax.servlet.ServletOutputStream;
+import javax.servlet.SingleThreadModel;
+import javax.servlet.http.HttpServlet;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+import java.io.*;
+import java.net.MalformedURLException;
+import java.net.URL;
+import java.net.URLEncoder;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * This class enhances the Controller in several ways.
@@ -229,7 +201,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public static final String MODULE = "module";// to determine which module
 
-    private CRFLocker crfLocker;
     private EventCRFLocker eventCrfLocker;
 
     private final String COMMON = "common";
@@ -281,7 +252,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     @Override
     public void init() throws ServletException {
         context = getServletContext();
-        crfLocker = SpringServletAccess.getApplicationContext(context).getBean(CRFLocker.class);
         eventCrfLocker = SpringServletAccess.getApplicationContext(context).getBean(EventCRFLocker.class);
 
     }
@@ -409,8 +379,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         try {
             // YW 10-03-2007 <<
             // Since we are managing the session on our own, disable Tomcat session timeout
-            session.setMaxInactiveInterval(-1);
-            session.setAttribute("maxInactiveInterval", Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
+            session.setMaxInactiveInterval(Integer.parseInt(SQLInitServlet.getField("max_inactive_interval")));
             String smURL = CoreResources.getField("smURL");
             if (StringUtils.isNotEmpty(smURL)) {
 
@@ -424,8 +393,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         } catch (NumberFormatException nfe) {
             // BWP>>3600 is the datainfo.properties maxInactiveInterval on
             // 1/8/2008
-            session.setAttribute("maxInactiveInterval", 3600);
-            session.setMaxInactiveInterval(-1);
+            session.setMaxInactiveInterval(3600);
         }
 
         // If the session already has a value with key SUPPORT_URL don't reset
@@ -1333,9 +1301,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
     }
 
-    public CRFLocker getCrfLocker() {
-        return crfLocker;
-    }
     public  EventCRFLocker getEventCrfLocker() {
         return eventCrfLocker;
     }

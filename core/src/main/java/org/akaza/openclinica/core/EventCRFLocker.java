@@ -9,6 +9,8 @@ package org.akaza.openclinica.core;
 
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
 import java.util.Iterator;
@@ -27,6 +29,7 @@ import java.util.concurrent.ConcurrentMap;
 public class EventCRFLocker implements Serializable {
 
     private static final long serialVersionUID = -541015729642748245L;
+    private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
     private final ConcurrentMap<String, Integer> lockedCRFs = new ConcurrentHashMap<>();
 
@@ -71,6 +74,7 @@ public class EventCRFLocker implements Serializable {
             while (it.hasNext()) {
                 Entry<String, Integer> entry = it.next();
                 if (entry.getValue().equals(userId)) {
+                    logger.debug("Removed lock:" + entry.getKey() + " for user:" + entry.getValue() );
                     it.remove();
                 }
             }
