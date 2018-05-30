@@ -159,6 +159,10 @@ function processTimedOuts(checkCurrentUser, storageFlag) {
                         console.log("setting newExpiration:" + newExpiration);
                         return storage.set(ocAppTimeoutKey, newExpiration);
                     }
+                    jQuery.get(myContextPath + '/pages/keepAlive')
+                        .error(function (jqXHR, textStatus, errorThrown) {
+                            "Error calling :" + myContextPath + '/pages/keepAlive' + " " + textStatus + " " + errorThrown
+                        });
                 }
             }
     }).then(function(res) {
