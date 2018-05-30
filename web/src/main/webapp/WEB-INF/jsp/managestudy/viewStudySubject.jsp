@@ -63,19 +63,22 @@
   }
 </script>
 <script>
-  if (sessionStorage.getItem(location.pathname) !== '${study.oid}') {
-    function startsWith(prefix, str) {
-        return str.lastIndexOf(prefix, 0) === 0;
+  var studyKey = '/study.oid';
+  var participantKey = '/views/participants/';
+
+  if (sessionStorage.getItem(studyKey) !== '${study.oid}') {
+    function isParticipantData(key) {
+        return key.lastIndexOf(participantKey, 0) === 0;
     }
     var keys = [];
     for (var i = 0, len = sessionStorage.length; i < len; i++) {
       keys.push(sessionStorage.key(i));
     }
     keys.forEach(function(key) {
-      if (startsWith(location.pathname, key))
+      if (isParticipantData(key))
         sessionStorage.removeItem(key);
     });
-    sessionStorage.setItem(location.pathname, '${study.oid}');
+    sessionStorage.setItem(studyKey, '${study.oid}');
   }
   function store(callback) {
     if (callback)
@@ -96,7 +99,7 @@
       }, 1);
     }
   }
-  store.key = location.pathname + location.search;
+  store.key = participantKey + '${studySub.oid}';
   store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
     collapseSections: {},
     datatables: [],
