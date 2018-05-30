@@ -220,7 +220,7 @@
 
 				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">
 					 <td>
-                <c:if test="${study.status.available && !currRow.bean.studyEvent.status.deleted && !userRole.monitor}">
+                <c:if test="${study.status.available && !currRow.bean.studyEvent.status.deleted && !currRow.bean.studyEvent.subjectEventStatus.locked && !userRole.monitor}">
                     <c:choose>
                     <c:when test="${dedc.eventCRF.status.id != 0}">
                     <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
@@ -383,7 +383,7 @@
 		 </c:if>
 		</c:otherwise>
 		</c:choose>
-		<c:if test="${(study.status.available) && (!userRole.monitor) && (dec.eventCRF.status.name != 'completed') }">
+		<c:if test="${(study.status.available) && (!userRole.monitor) && (!currRow.bean.studyEvent.subjectEventStatus.locked) &&(dec.eventCRF.status.name != 'completed') }">
 		<td>
 		 <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
 			onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
