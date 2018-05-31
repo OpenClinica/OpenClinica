@@ -370,7 +370,6 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                             && eventCrf.getStatusId() != Status.AUTO_DELETED.getCode() && eventCrf.getStatusId() != Status.LOCKED.getCode()
                                             && studyEvent.getSubjectEventStatusId() != SubjectEventStatus.LOCKED.getCode()
                                             && studyEvent.getSubjectEventStatusId() != SubjectEventStatus.SKIPPED.getCode()
-                                            && studyEvent.getSubjectEventStatusId() != SubjectEventStatus.STOPPED.getCode()
                                             && studyEvent.getStatusId() != Status.DELETED.getCode() && studyEvent.getStatusId() != Status.AUTO_DELETED.getCode()
                                             && studyBean.getStatus().equals(org.akaza.openclinica.bean.core.Status.AVAILABLE)) {
                                         xml.append(indent + indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"edit\" href=\""

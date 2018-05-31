@@ -24,8 +24,8 @@ public class CheckCRFLocked extends SecureController {
                 UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
                 UserAccountBean ubean = (UserAccountBean)udao.findByPK(userId);
                 response.getWriter().print(resword.getString("CRF_unavailable") +
-                        "\n"+ubean.getName() + " "+ resword.getString("Currently_entering_data")
-                        + "\n" + resword.getString("CRF_reopen_enter_data"));
+                        "\n User "+ubean.getName() + " "+ resword.getString("Currently_entering_data")
+                        + "\n " + resword.getString("CRF_reopen_enter_data"));
             } else {
                 response.getWriter().print("true");
             }

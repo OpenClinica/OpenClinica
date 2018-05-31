@@ -19,7 +19,7 @@
 %>
 <script>
     var myContextPath = "${pageContext.request.contextPath}";
-    var sessionTimeoutVal = '<%= session.getAttribute("maxInactiveInterval") %>';
+    var sessionTimeoutVal = '<%= session.getMaxInactiveInterval()%>';
     console.log("***********************************sessionTimeoutVal:"+ sessionTimeoutVal);
     var userName = "<%= userBean.getName() %>";
     var currentURL = "<%= currentURL %>";
