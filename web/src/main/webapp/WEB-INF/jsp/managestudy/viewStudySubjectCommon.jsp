@@ -156,7 +156,7 @@
                                 disabled="disabled"
                             {{/if}}>
                     </div>
-                    <table class="datatable">
+                    <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
                     <thead>
                         <tr>
                             {{#each form.columnTitles as |coltitle|}}
@@ -446,7 +446,7 @@ $(function() {
                         if (!data)
                             this.fnSortNeutral();
                     },
-                    dom: "frtilp",
+                    dom: table.data('repeating') == 'Yes' ? 'frtilp' : 'frti',
                     language: {
                         paginate: {
                             first: '<<',
