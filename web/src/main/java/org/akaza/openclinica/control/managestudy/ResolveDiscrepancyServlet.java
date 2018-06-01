@@ -497,8 +497,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
         String errorData = resword.getString("CRF_unavailable")
-                + ubean.getName() + " " + resword.getString("Currently_entering_data")
-                + resword.getString("CRF_reopen_enter_data");
+                + " User " + ubean.getName() + " " + resword.getString("Currently_entering_data")
+                + " " + resword.getString("CRF_reopen_enter_data");
         return errorData;
     }
     private boolean lockCRF(EventCRFBean ecb) {

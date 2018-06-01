@@ -63,6 +63,23 @@
   }
 </script>
 <script>
+  var studyKey = '/study.oid';
+  var participantKey = '/views/participants/';
+
+  if (sessionStorage.getItem(studyKey) !== '${study.oid}') {
+    function isParticipantData(key) {
+        return key.lastIndexOf(participantKey, 0) === 0;
+    }
+    var keys = [];
+    for (var i = 0, len = sessionStorage.length; i < len; i++) {
+      keys.push(sessionStorage.key(i));
+    }
+    keys.forEach(function(key) {
+      if (isParticipantData(key))
+        sessionStorage.removeItem(key);
+    });
+    sessionStorage.setItem(studyKey, '${study.oid}');
+  }
   function store(callback) {
     if (callback)
       store.data = callback(store.data) || store.data;
@@ -82,18 +99,13 @@
       }, 1);
     }
   }
+  store.key = participantKey + '${studySub.oid}';
+  store.data = JSON.parse(sessionStorage.getItem(store.key)) || {
+    collapseSections: {},
+    datatables: [],
+    ocStatusHide: 'oc-status-removed'
+  };
   store.dirty = false;
-  store.key = location.pathname + location.search;
-  store.data = JSON.parse(sessionStorage.getItem(store.key));
-  if (!store.data || store.data.studyOid !== '${studySub.oid}')
-    store(function() {
-      return {
-        studyOid: '${studySub.oid}',
-        collapseSections: {},
-        datatables: [],
-        ocStatusHide: 'oc-status-removed'
-      };
-    });
 
   var defaultPageSize = 10;
 

@@ -117,7 +117,6 @@
         <property name="viewNotesDao" ref="viewNotesDao"/>
     </bean>
 
-    <bean id="crfLocker" class="org.akaza.openclinica.core.CRFLocker"/>
     <bean id="eventCrfLocker" class="org.akaza.openclinica.core.EventCRFLocker"/>
 
 

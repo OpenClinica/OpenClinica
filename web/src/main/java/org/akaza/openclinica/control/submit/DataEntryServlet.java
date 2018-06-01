@@ -335,20 +335,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
         int isFirstTimeOnSection =fp.getInt("isFirstTimeOnSection");
         request.setAttribute( "isFirstTimeOnSection",isFirstTimeOnSection+"");
 
-        if (getCrfLocker().isLocked(ecb.getId())) {
-            int userId = getCrfLocker().getLockOwner(ecb.getId());
-            UserAccountDAO udao = new UserAccountDAO(getDataSource());
-            UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
-            if (ubean.getId() != ub.getId()) {
-                addPageMessage(resword.getString("CRF_unavailable") + " " + ubean.getName()
-                        + " " + resword.getString("Currently_entering_data") + " "
-                    + resword.getString("Leave_the_CRF"), request);
-                forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET, request, response);
-            }
-        } else {
-            getCrfLocker().lock(ecb.getId(), ub.getId());
-        }
-
         if (!ecb.isActive()) {
             throw new InconsistentStateException(Page.LIST_STUDY_SUBJECTS_SERVLET, resexception.getString("event_not_exists"));
         }
@@ -447,9 +433,6 @@ public abstract class DataEntryServlet extends CoreSecureController {
             session.removeAttribute(GROUP_HAS_DATA);
             session.removeAttribute("to_create_crf");
             session.removeAttribute("mayProcessUploading");
-            //Removing the user and EventCRF from the locked CRF List
-            if (getCrfLocker().isLocked(ecb.getId()) && getCrfLocker().getLockOwner(ecb.getId()) == ub.getId())
-                getCrfLocker().unlock(ecb.getId());
 
             if (newUploadedFiles.size() > 0) {
                 if (this.unloadFiles(newUploadedFiles)) {
