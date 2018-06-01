@@ -186,7 +186,11 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             } 
                             if(printValue) {
                                 Boolean hasElm = false;
-                                xml.append("Value=\"" + StringEscapeUtils.escapeXml(item.getValue()) + "\"");
+                                String value = StringEscapeUtils.escapeXml(item.getValue());
+                                if(value != null && value.indexOf("&#") >-1) {
+                                	value = item.getValue();
+                                }
+                                xml.append("Value=\"" + value + "\"");
 
                                 String muRefOid = item.getMeasurementUnitRef().getElementDefOID();
                                 if (muRefOid != null && muRefOid.length() > 0) {
