@@ -43,7 +43,7 @@
 		<td>
 		<c:choose>
          <c:when test="${!currRow.bean.studyEvent.status.deleted}">
-           <c:if test="${userRole.manageStudy && study.status.available}">
+           <c:if test="${!userRole.monitor && study.status.available}">
            <a href="RemoveStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
 			onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
 			onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
@@ -51,7 +51,7 @@
            </c:if>
          </c:when>
          <c:otherwise>
-          <c:if test="${(userRole.manageStudy && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (currRow.bean.studyEvent.studyEventDefinition.status.available) && (study.status.available)}">
+          <c:if test="${(!userRole.monitor && studySub.status.name != 'removed' && studySub.status.name != 'auto-removed') && (currRow.bean.studyEvent.studyEventDefinition.status.available) && (study.status.available)}">
            <a href="RestoreStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
 			onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
 			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><span
@@ -365,7 +365,7 @@
 		 </td>
 		<c:choose>
 		<c:when test="${!dec.eventCRF.status.deleted}">
-			<c:if test="${userRole.manageStudy && study.status.available}">
+			<c:if test="${!userRole.monitor && study.status.available}">
 		  <td><a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
 			onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
 			onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
@@ -374,7 +374,7 @@
 		 </c:if>
 		</c:when>
 		<c:otherwise>
-			<c:if test="${(userRole.manageStudy && currRow.bean.studyEvent.status.name!='auto-removed' && dec.eventCRF.status.name != 'auto-removed') && (study.status.available) && (studySub.status.available)}">
+			<c:if test="${(!userRole.monitor && currRow.bean.studyEvent.status.name!='auto-removed' && dec.eventCRF.status.name != 'auto-removed') && (study.status.available) && (studySub.status.available)}">
 		  <td><a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
 			onMouseDown="javascript:setImage('bt_Restor3','images/bt_Restore_d.gif');"
 			onMouseUp="javascript:setImage('bt_Restore3','images/bt_Restore.gif');"><span
