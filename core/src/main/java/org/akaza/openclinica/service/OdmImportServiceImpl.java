@@ -113,15 +113,19 @@ public class OdmImportServiceImpl implements OdmImportService {
 		}
 	}
 
-	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, HttpServletRequest request) {
-		Map<String, Object> map = importOdmToOC(odm, page, boardId, request);
+	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, String accessToken) throws Exception {
+		Thread.sleep(120000);
+
+		Map<String, Object> map = importOdmToOC(odm, page, boardId, accessToken);
 		return map;
 	}
 
-	public Map<String, Object> importOdmToOC(ODM odm, Page page, String boardId, HttpServletRequest request) {
+	public Map<String, Object> importOdmToOC(ODM odm, Page page, String boardId, String accessToken) {
 		DataBinder dataBinder = new DataBinder(new Study());
 		errors = dataBinder.getBindingResult();
-		printOdm(odm);
+		if (logger.isDebugEnabled()) {
+			printOdm(odm);
+		}
 		CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(), dataSource);
 
 		UserAccount userAccount = getCurrentUser();
@@ -142,7 +146,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 			}
 		}
 
-		Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(boardId, request);
+		Form[] fmCrfs = getAllCrfsByProtIdFromFormManager(boardId, accessToken);
 
 		StudyEventDefinition studyEventDefinition = null;
 		List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions = odmStudy.getMetaDataVersion();
@@ -151,7 +155,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 		CrfBean crf = null;
 		FormLayout formLayout = null;
 
-		Set<Long> publishedVersions = saveOrUpdateCrf(userAccount, study, odmMetadataVersions, fmCrfs, errors, request);
+		Set<Long> publishedVersions = saveOrUpdateCrf(userAccount, study, odmMetadataVersions, fmCrfs, errors);
 
 		List<ODMcomplexTypeDefinitionStudyEventRef> odmStudyEventRefs = odmMetadataVersions.get(0).getProtocol().getStudyEventRef();
 		for (ODMcomplexTypeDefinitionStudyEventRef odmStudyEventRef : odmStudyEventRefs) {
@@ -297,7 +301,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 	}
 
 	private Set<Long> saveOrUpdateCrf(UserAccount userAccount, Study study, List<ODMcomplexTypeDefinitionMetaDataVersion> odmMetadataVersions, Form[] fmCrfs,
-			Errors errors, HttpServletRequest request) {
+			Errors errors) {
 		Set<Long> publishedVersions = new HashSet<>();
 		for (ODMcomplexTypeDefinitionFormDef odmFormDef : odmMetadataVersions.get(0).getFormDef()) {
 			String crfOid = odmFormDef.getOID();
@@ -626,13 +630,13 @@ public class OdmImportServiceImpl implements OdmImportService {
 		this.coreResources = coreResources;
 	}
 
-	public Form[] getAllCrfsByProtIdFromFormManager(String boardId, HttpServletRequest request) {
+	public Form[] getAllCrfsByProtIdFromFormManager(String boardId, String accessToken) {
 
 		Bucket[] buckets = null;
 		ArrayList<Form> forms = null;
 
 		try {
-			buckets = getBucket(request, boardId);
+			buckets = getBucket(accessToken, boardId);
 		} catch (Exception e) {
 			logger.info(e.getMessage());
 			errors.rejectValue("name", "fm_app_error", "Form Service not responding");
@@ -644,7 +648,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 			forms = buckets[0].getForms();
 		} else {
 			errors.rejectValue("name", "fm_app_error", "No forms found for this board");
-
+			return null;
 		}
 
 
@@ -664,22 +668,21 @@ public class OdmImportServiceImpl implements OdmImportService {
 		return err;
 	}
 
-	public void setPublishedVersionsInFM(Map<String, Object> map, HttpServletRequest request) {
+	public void setPublishedVersionsInFM(Map<String, Object> map, String accessToken) {
 		Study study = (Study) map.get("study");
 		PublishingDTO dto = (PublishingDTO) map.get("publishingDTO");
 		if (dto.getVersionIds().size() != 0) {
 			dto.setPublishedEnvType(study.getEnvType());
-			setPublishEnvironment(request, dto);
+			setPublishEnvironment(accessToken, dto);
 		}
 
 	}
 
-	private void setPublishEnvironment(HttpServletRequest request, PublishingDTO publishingDTO) {
+	private void setPublishEnvironment(String accessToken, PublishingDTO publishingDTO) {
 
 		RestTemplate restTemplate = new RestTemplate();
 		MultiValueMap<String, String> headers = new LinkedMultiValueMap<>();
 		ObjectMapper objectMapper = new ObjectMapper();
-		String accessToken = (String) request.getSession().getAttribute("accessToken");
 		headers.add("Authorization", "Bearer " + accessToken);
 		headers.add("Accept-Charset", "UTF-8");
 		HttpEntity<PublishingDTO> entity = new HttpEntity<>(publishingDTO, headers);
@@ -694,12 +697,11 @@ public class OdmImportServiceImpl implements OdmImportService {
 
 	}
 
-	private Bucket[] getBucket(HttpServletRequest request, String boardId) {
+	private Bucket[] getBucket(String accessToken, String boardId) {
 		RestTemplate restTemplate = new RestTemplate(getRequestFactory());
 		HttpHeaders headers = new HttpHeaders();
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
 		ObjectMapper objectMapper = new ObjectMapper();
-		String accessToken = (String) request.getSession().getAttribute("accessToken");
 		headers.add("Authorization", "Bearer " + accessToken);
 		headers.add("Accept-Charset", "UTF-8");
 		HttpEntity<String> entity = new HttpEntity<>(headers);
