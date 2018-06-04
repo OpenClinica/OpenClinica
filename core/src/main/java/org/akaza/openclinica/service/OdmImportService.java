@@ -16,14 +16,15 @@ public interface OdmImportService {
 
 	/**
 	 * @param map
-	 * @param request
+	 * @param accessToken
 	 */
 	public void setPublishedVersionsInFM(Map<String, Object> map, String accessToken);
 
 	/**
-	 * @param publishDTO
+	 * @param odm
+	 * @param page
 	 * @param boardId
-	 * @param request
+	 * @param accessToken
 	 * @return
 	 */
 	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, String accessToken) throws Exception;
