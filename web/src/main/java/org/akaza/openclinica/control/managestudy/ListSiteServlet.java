@@ -79,7 +79,7 @@ public class ListSiteServlet extends SecureController {
             ArrayList allStudyRows = StudyRow.generateRowsFromBeans(studies);
 
             String[] columns =
-                { resword.getString("name"), resword.getString("unique_identifier"), resword.getString("OID"), resword.getString("principal_investigator"),
+                { resword.getString("name"), resword.getString("site_id"), resword.getString("OID"), resword.getString("principal_investigator"),
                     resword.getString("location"), resword.getString("date_created"), resword.getString("status"), resword.getString("actions") };
             table.setColumns(new ArrayList(Arrays.asList(columns)));
             table.hideColumnLink(2);
