@@ -52,7 +52,7 @@ public class RestoreEventCRFServlet extends SecureController {
             return;
         }
 
-        if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
+        if (!currentRole.getRole().equals(Role.MONITOR) ){
             return;
         }
 
