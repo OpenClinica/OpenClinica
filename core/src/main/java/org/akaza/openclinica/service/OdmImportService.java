@@ -18,7 +18,7 @@ public interface OdmImportService {
 	 * @param map
 	 * @param request
 	 */
-	public void setPublishedVersionsInFM(Map<String, Object> map, HttpServletRequest request);
+	public void setPublishedVersionsInFM(Map<String, Object> map, String accessToken);
 
 	/**
 	 * @param publishDTO
@@ -26,7 +26,7 @@ public interface OdmImportService {
 	 * @param request
 	 * @return
 	 */
-	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, HttpServletRequest request);
+	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, String accessToken) throws Exception;
 
 	/**
 	 * This method will be used to change the Status of Site Definition into DELETED

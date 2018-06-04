@@ -480,7 +480,13 @@ public class CoreResources implements ResourceLoaderAware {
                 return (String) request.getAttribute("requestSchema");
             }
         }
-        return null;
+        String schema = null;
+        if (tenantSchema.get() != null) {
+            schema = tenantSchema.get();
+        } else
+            schema = DATAINFO.getProperty("schema");
+        return schema;
+
     }
 
     public static String getRequestSchema(HttpServletRequest request) {

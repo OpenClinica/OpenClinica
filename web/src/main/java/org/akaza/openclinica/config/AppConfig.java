@@ -82,7 +82,7 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
                         "/pages/openrosa/**",
                         "/pages/accounts/**",
                         "/pages/itemdata/**",
-                        "/pages/auth/api/v1/studies/**",
+
                         "/pages/odmss/**",
                         "/pages/v2/api-docs",
                         "/pages/swagger-resources/**"

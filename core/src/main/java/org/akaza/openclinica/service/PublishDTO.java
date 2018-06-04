@@ -23,6 +23,17 @@ public class PublishDTO {
 	@XmlElement
 	private ODM odm;
 
+	public String getBoardId() {
+		return boardId;
+	}
+
+	public void setBoardId(String boardId) {
+		this.boardId = boardId;
+	}
+
+	@XmlElement
+	private String boardId;
+
 	public Page getPage() {
 		return page;
 	}
@@ -38,5 +49,7 @@ public class PublishDTO {
 	public void setOdm(ODM odm) {
 		this.odm = odm;
 	}
+
+
 
 }
