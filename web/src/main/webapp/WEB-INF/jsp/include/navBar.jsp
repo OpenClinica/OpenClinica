@@ -311,6 +311,9 @@
                                 <a href="javascript:openDocWindow('<c:out value="${sessionScope.supportURL}" />')"><fmt:message key="openclinica_feedback" bundle="${resword}"/></a>
                             </li>
                             <li>
+                                <a href="//openclinica.com/openclinica-privacy-policy/" target="_blank"/><fmt:message key="privacy_policy" bundle="${resword}"/></a>
+                            </li>
+                            <li>
                                 <a onClick="javascript:processLogoutClick('<%=currentURL%>');" href="${urlPrefix}pages/logout"><fmt:message key="sign_out" bundle="${resworkflow}"/></a>
                             </li>
                         </ul>
