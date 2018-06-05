@@ -4,6 +4,7 @@ import java.util.Locale;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.Api;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.restful.ODMClinicaDataResource;
 import org.slf4j.Logger;
@@ -22,7 +23,11 @@ import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
+
+
+
 @RequestMapping(value = "/auth/api/v1/clinicaldata")
+@Api(value = "Study", tags = { "Study" })
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
 public class ODMClinicalDataController {
 
