@@ -115,7 +115,7 @@ public class OdmImportController {
         } else if (future.isDone()) {
             try {
                 ResponseEntity<Object> objectResponseEntity = future.get();
-                return objectResponseEntity;
+                return new ResponseEntity<>("Completed", HttpStatus.OK);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
