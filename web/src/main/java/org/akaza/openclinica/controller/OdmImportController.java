@@ -33,7 +33,7 @@ public class OdmImportController {
 	OdmImportService odmImportService;
 	private StudyDao studyDao;
 	PassiveExpiringMap<String, Future<ResponseEntity<Object>>> expiringMap =
-            new PassiveExpiringMap<>(20, TimeUnit.MINUTES);
+            new PassiveExpiringMap<>(24, TimeUnit.HOURS);
 
 
     public OdmImportController(OdmImportService odmImportService, StudyDao studyDao) {
@@ -115,7 +115,7 @@ public class OdmImportController {
         } else if (future.isDone()) {
             try {
                 ResponseEntity<Object> objectResponseEntity = future.get();
-                return objectResponseEntity;
+                return new ResponseEntity<>("Completed", HttpStatus.OK);
             } catch (InterruptedException e) {
                 e.printStackTrace();
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
