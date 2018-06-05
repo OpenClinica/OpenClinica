@@ -33,7 +33,7 @@ public class OdmImportController {
 	OdmImportService odmImportService;
 	private StudyDao studyDao;
 	PassiveExpiringMap<String, Future<ResponseEntity<Object>>> expiringMap =
-            new PassiveExpiringMap<>(20, TimeUnit.MINUTES);
+            new PassiveExpiringMap<>(24, TimeUnit.HOURS);
 
 
     public OdmImportController(OdmImportService odmImportService, StudyDao studyDao) {
