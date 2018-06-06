@@ -37,7 +37,7 @@ public class UserAccountDao extends AbstractDomainDao<UserAccount> {
     }
     public List<UserAccount> findNonRootNonParticipateUsersByStudyId(Integer studyId, Integer parentStudyId) {
         getSessionFactory().getStatistics().logSummary();
-        String query = "select distinct ua.* from user_account ua join study_user_role sur on ua.user_name = sur.user_name where ua.enabled = true and ua.institutional_affiliation != 'PFORM' and ua.user_name != 'root'"
+        String query = "select distinct ua.* from user_account ua join study_user_role sur on ua.user_name = sur.user_name where ua.enabled = true and ua.institutional_affiliation != 'PFORM' and ua.user_name != 'root' and sur.status_id!=5 and sur.status_id!=7  "
                 + " and (sur.study_id = " + studyId + " or  sur.study_id = " + parentStudyId + " ) order by ua.last_name";
         Query q = getCurrentSession().createNativeQuery(query).addEntity(UserAccount.class);
         return (List<UserAccount>) q.list();

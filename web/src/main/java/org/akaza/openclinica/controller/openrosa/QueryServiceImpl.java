@@ -290,7 +290,7 @@ public class QueryServiceImpl implements QueryService {
         message.append(respage.getString("disc_note_info"));
         message.append(respage.getString("email_body_separator"));
         message.append(
-                MessageFormat.format(respage.getString("mailDNParameters1"), helperBean.getDn().getDetailedNotes(), helperBean.getUserAccount().getUserName()));
+                MessageFormat.format(respage.getString("mailDNParameters1"), helperBean.getDn().getDetailedNotes(), helperBean.getContainer().getUser().getUserName()));
         message.append(respage.getString("email_body_separator"));
         message.append(respage.getString("entity_information"));
         message.append(respage.getString("email_body_separator"));
