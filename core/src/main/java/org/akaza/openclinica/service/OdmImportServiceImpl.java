@@ -114,7 +114,6 @@ public class OdmImportServiceImpl implements OdmImportService {
 	}
 
 	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, String accessToken) throws Exception {
-		Thread.sleep(120000);
 
 		Map<String, Object> map = importOdmToOC(odm, page, boardId, accessToken);
 		return map;
