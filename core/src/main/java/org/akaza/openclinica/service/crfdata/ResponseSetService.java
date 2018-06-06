@@ -106,10 +106,22 @@ public class ResponseSetService {
                         optValues = optValues.substring(0, optValues.length() - 1);
 
                     if (!optText.equals(responseSet.getOptionsText()) || !optValues.equals(responseSet.getOptionsValues())) {
-                        responseSet.setOptionsText(optText);
-                        responseSet.setOptionsValues(optValues);
-                        responseSet.setResponseType(responseType);
-                        responseSet = responseSetDao.saveOrUpdate(responseSet);
+                         if(optValues.length()<=4000 && optText.length()<=4000) {
+                             responseSet.setOptionsText(optText);
+                             responseSet.setOptionsValues(optValues);
+                             responseSet.setResponseType(responseType);
+                             responseSet = responseSetDao.saveOrUpdate(responseSet);
+                         }else{
+                             if(optValues.length()>4000){
+                                 errors.rejectValue("name", "xform_validation_error", "Form \'"+crfVersion.getCrf().getName()+ "\' Element \'" +xformItem.getItemName()+ "\' must not have total choice names longer than 4,000 characters across all versions of the form - FAILED");
+                                 logger.info("Form \""+crfVersion.getCrf().getName()+ "\" Element \"" +xformItem.getItemName()+ "\" must not have total choice names longer than 4,000 characters across all versions of the form - FAILED");
+                             }
+                             if(optText.length()>4000){
+                                 errors.rejectValue("name", "xform_validation_error", "Form \'"+crfVersion.getCrf().getName()+ "\' Element \'" +xformItem.getItemName()+ "\' must not have total choice labels longer than 4,000 characters across all versions of the form - FAILED");
+                                 logger.info("Form \""+crfVersion.getCrf().getName()+ "\" Element \"" +xformItem.getItemName()+ "\" must not have total choice labels longer than 4,000 characters across all versions of the form - FAILED");
+                             }
+                         }
+
                     }
                 }
             }
