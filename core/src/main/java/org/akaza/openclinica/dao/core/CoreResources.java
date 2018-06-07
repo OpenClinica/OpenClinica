@@ -499,7 +499,10 @@ public class CoreResources implements ResourceLoaderAware {
             HttpServletRequest request = requestAttributes.getRequest();
             request.setAttribute("requestSchema", schema);
             return true;
+        } else {
+            CoreResources.tenantSchema.set(schema);
         }
+
         return false;
     }
 
@@ -524,12 +527,19 @@ public class CoreResources implements ResourceLoaderAware {
     public static StudyBean getPublicStudy(String ocId, DataSource ds) {
         StudyDAO studyDAO = new StudyDAO(ds);
         HttpServletRequest request = getRequest();
-        if (request == null)
-            return null;
-        String schema = (String) request.getAttribute("requestSchema");
-        request.setAttribute("requestSchema", "public");
+        String schema = null;
+        if (request == null) {
+            schema = CoreResources.getRequestSchema();
+        } else {
+            if (request != null)
+                schema = (String) request.getAttribute("requestSchema");
+        }
+        if (request != null)
+            request.setAttribute("requestSchema", "public");
+
         StudyBean study = studyDAO.findByOid(ocId);
-        request.setAttribute("requestSchema", schema);
+        if (StringUtils.isNotEmpty(schema) && request != null)
+            request.setAttribute("requestSchema", schema);
         return study;
     }
 

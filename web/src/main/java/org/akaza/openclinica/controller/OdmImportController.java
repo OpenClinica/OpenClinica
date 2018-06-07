@@ -82,12 +82,12 @@ public class OdmImportController {
             Page page = publishDTO.getPage();
             Map<String, Object> map = null;
             try {
+                CoreResources.tenantSchema.set("public");
                 map = (Map<String, Object>) odmImportService.importOdm(odm, page, publishDTO.getBoardId(), accessToken);
             } catch (Exception e) {
                 throw new CompletionException(e);
             }
             Study study = (Study) map.get("study");
-            CoreResources.tenantSchema.set("public");
             Study publicStudy = studyDao.findPublicStudy(study.getOc_oid());
             odmImportService.updatePublicStudyPublishedFlag(publicStudy);
             odmImportService.setPublishedVersionsInFM(map, accessToken);
@@ -122,10 +122,15 @@ public class OdmImportController {
             } catch (CustomRuntimeException e) {
                 return new ResponseEntity<>(e.getErrList(), HttpStatus.BAD_REQUEST);
             } catch (ExecutionException e) {
-                List<ErrorObj> err = new ArrayList<>();
-                ErrorObj errorObj = new ErrorObj(e.getMessage(), e.getMessage());
-                err.add(errorObj);
-                return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
+                Throwable cause = e.getCause();
+                if (cause != null && cause instanceof CustomRuntimeException) {
+                    return new ResponseEntity<>(((CustomRuntimeException) cause).getErrList(), HttpStatus.BAD_REQUEST);
+                } else {
+                    List<ErrorObj> err = new ArrayList<>();
+                    ErrorObj errorObj = new ErrorObj(e.getMessage(), e.getMessage());
+                    err.add(errorObj);
+                    return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
+                }
             }
         } else {
             return new ResponseEntity<>(HttpStatus.PROCESSING.getReasonPhrase(), HttpStatus.OK);
