@@ -86,6 +86,8 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
         if (requestAttributes != null && requestAttributes.getRequest() != null) {
             HttpServletRequest request = requestAttributes.getRequest();
             tenant = (String) request.getAttribute("requestSchema");
+        } else {
+            tenant = CoreResources.tenantSchema.get();
         }
         session = getSessionFactory().getCurrentSession();
         SessionImpl sessionImpl = (SessionImpl) session;
