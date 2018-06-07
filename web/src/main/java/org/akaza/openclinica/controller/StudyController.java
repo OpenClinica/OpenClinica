@@ -115,7 +115,6 @@ public class StudyController {
     private static final String validation_failed_message = "VALIDATION FAILED";
     private static final String validation_passed_message = "SUCCESS";
 
-
     /**
      * @api {post} /pages/auth/api/v1/studies/ Create a study
      * @apiName createNewStudy
