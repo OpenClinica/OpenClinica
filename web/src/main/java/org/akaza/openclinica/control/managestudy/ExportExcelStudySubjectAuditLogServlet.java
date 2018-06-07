@@ -263,10 +263,11 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
 
             for (int j = 0; j < studySubjectAudits.size(); j++) {
                 AuditBean audit = (AuditBean) studySubjectAudits.get(j);
+
                 excelRow = new String[] { audit.getAuditEventTypeName(), dateTimeFormat(audit.getAuditDate()), audit.getUserName(), audit.getEntityName(),
                         audit.getOldValue(), audit.getNewValue() };
                 for (int i = 0; i < excelRow.length; i++) {
-                    Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
+                    Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i].replace(" ", "_").toLowerCase()), cellFormat);
                     excelSheet.addCell(label);
                 }
                 row++;
