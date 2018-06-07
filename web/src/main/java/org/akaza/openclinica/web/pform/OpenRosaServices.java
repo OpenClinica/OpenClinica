@@ -1130,7 +1130,7 @@ public class OpenRosaServices {
         String externalInstance = getFormLayout(formLayoutOID).getExternalInstance();
         String flavor = getQuerySet(formID);
 
-        if (studySubjectOID == null || externalInstance.equals("FALSE") || flavor.equals(SINGLE_ITEM_FLAVOR)) {
+        if (studySubjectOID == null || externalInstance.equals("FALSE") || formLoadMode.equals("view") || flavor.equals(SINGLE_ITEM_FLAVOR)) {
             Document doc = buildDocument();
             appendRootElement(doc);
             String writer = getWriter(doc);
