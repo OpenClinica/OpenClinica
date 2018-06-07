@@ -1,33 +1,16 @@
 package org.akaza.openclinica.service;
 
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -37,6 +20,12 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+
+import javax.sql.DataSource;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.HashMap;
+import java.util.List;
 
 @Service
 public class EventService implements EventServiceInterface {
@@ -66,7 +55,8 @@ public class EventService implements EventServiceInterface {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void removeStudyEventDefn(int defId, int userId) {
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
-		UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
+		UserAccountBean ub =  getUserAccount();
+
 		// find all event defn CRFs
 		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList) getEventDefinitionCRFDao().findAllByDefinition(defId);
 		// finds all study events
@@ -129,7 +119,7 @@ public class EventService implements EventServiceInterface {
 	@SuppressWarnings({ "unchecked", "rawtypes" })
 	public void restoreStudyEventDefn(int defId, int userId) {
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
-		UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
+		UserAccountBean ub = getUserAccount();
 		// find all Event Defn CRFs
 		ArrayList<EventDefinitionCRFBean> eventDefinitionCRFs = (ArrayList) getEventDefinitionCRFDao().findAllByDefinition(defId);
 		// finds all events
@@ -194,14 +184,14 @@ public class EventService implements EventServiceInterface {
 		StudyBean study = (StudyBean) getStudyDao().findByPK(studyId);
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
 		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) getEventDefinitionCRFDao().findByPK(eventDefnCrfId);
-		UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
+		UserAccountBean ub = getUserAccount();
 		removeAllEventsItems(edc, sed, ub, study);
 	}
 
 	public void restoreCrfFromEventDefinition(int eventDefnCrfId, int defId, int userId) {
 		StudyEventDefinitionBean sed = (StudyEventDefinitionBean) getStudyEventDefinitionDao().findByPK(defId);
 		EventDefinitionCRFBean edc = (EventDefinitionCRFBean) getEventDefinitionCRFDao().findByPK(eventDefnCrfId);
-		UserAccountBean ub = (UserAccountBean) getUserAccountDao().findByPK(userId);
+		UserAccountBean ub = getUserAccount();
 		restoreAllEventsItems(edc, sed, ub);
 	}
 
@@ -373,9 +363,11 @@ public class EventService implements EventServiceInterface {
 	/**
 	 * @return the UserAccountDao
 	 */
-	public UserAccountDAO getUserAccountDao() {
-		userAccountDao = userAccountDao != null ? userAccountDao : new UserAccountDAO(dataSource);
-		return userAccountDao;
+	public UserAccountBean getUserAccount() {
+		UserAccountBean ub = new UserAccountBean();
+		ub.setId(1);
+		ub.setName("root");
+		return ub;
 	}
 
 	/**
@@ -402,7 +394,7 @@ public class EventService implements EventServiceInterface {
 	}
 
 	/**
-	 * @param datasource
+	 * @param dataSource
 	 *            the datasource to set
 	 */
 	public void setDatasource(DataSource dataSource) {
