@@ -2,12 +2,12 @@ package org.akaza.openclinica.service;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.Instant;
 import java.util.Objects;
 
 /**
  * A DTO for the OCUser entity.
  */
+@com.fasterxml.jackson.annotation.JsonIgnoreProperties (ignoreUnknown = true)
 public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
 
     private String uuid;
@@ -32,10 +32,6 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
     private String externalUserId;
 
     private String organization;
-
-    private UserStatus status;
-
-    private Instant lastSuccessfulLogin;
 
     public String getUuid() {
         return uuid;
@@ -106,22 +102,6 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
         this.organization = organization;
     }
 
-    public UserStatus getStatus() {
-        return status;
-    }
-
-    public void setStatus(UserStatus status) {
-        this.status = status;
-    }
-
-    public Instant getLastSuccessfulLogin() {
-        return lastSuccessfulLogin;
-    }
-
-    public void setLastSuccessfulLogin(Instant lastSuccessfulLogin) {
-        this.lastSuccessfulLogin = lastSuccessfulLogin;
-    }
-
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -154,8 +134,6 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
                 ", phoneNumber='" + getPhoneNumber() + "'" +
                 ", externalUserId='" + getExternalUserId() + "'" +
                 ", organization='" + getOrganization() + "'" +
-                ", status='" + getStatus() + "'" +
-                ", lastSuccessfulLogin='" + getLastSuccessfulLogin() + "'" +
                 "}";
     }
 }
