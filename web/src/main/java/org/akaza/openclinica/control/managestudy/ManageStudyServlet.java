@@ -109,7 +109,7 @@ public class ManageStudyServlet extends SecureController {
         resetPanel();
 
         if (allSubjects.size() > 0) {
-            setToPanel("Subjects", new Integer(allSubjects.size()).toString());
+            setToPanel("Participants", new Integer(allSubjects.size()).toString());
         }
         if (allUsers.size() > 0) {
             setToPanel("Users", new Integer(allUsers.size()).toString());

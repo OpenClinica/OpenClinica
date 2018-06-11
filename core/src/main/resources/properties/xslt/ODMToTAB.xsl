@@ -141,7 +141,7 @@
 			<xsl:with-param name="DateTime" select="/odm:ODM/@CreationDateTime" />
 		</xsl:call-template>
 		<xsl:text>&#xa;</xsl:text>
-		<xsl:text>Subjects: </xsl:text>
+		<xsl:text>Participants: </xsl:text>
 		<xsl:value-of select="$delimiter" />
 		<xsl:value-of select="$subject_count" />
 		<xsl:text>&#xa;</xsl:text>
