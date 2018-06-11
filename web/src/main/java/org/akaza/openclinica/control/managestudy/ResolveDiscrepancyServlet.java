@@ -52,6 +52,7 @@ import org.akaza.openclinica.control.submit.EnketoFormServlet;
 import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -123,6 +124,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
     public static final String VIEW_MODE = "view";
     public static final String EDIT_MODE = "edit";
+    public static final String JINI = "jini";
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -193,6 +195,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         // this is for item data
         else if ("itemdata".equalsIgnoreCase(entityType)) {
+            String jini ="false";
+            String jiniEnabled =CoreResources.getField("jini.enabled");
+            if (!jiniEnabled.equals("") && jiniEnabled.equalsIgnoreCase("true")) {
+                jini = "true";
+            }
             ItemDataDAO iddao = new ItemDataDAO(ds);
             ItemDAO idao = new ItemDAO(ds);
             ItemDataBean idb = (ItemDataBean) iddao.findByPK(id);
@@ -360,6 +367,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 request.setAttribute("readOnlyUrl", part1);
             }
             request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module);
+            request.setAttribute(JINI, jini);
+
             if (!flavor.equals(SINGLE_ITEM_FLAVOR)) {
                 request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
             } else {
