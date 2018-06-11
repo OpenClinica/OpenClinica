@@ -143,7 +143,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
             // Subject
             // ***************** OpenClinica: Subject Links Start**************
-            if (role != null) {
+            if (role != null && !role.getName().equals("invalid")) {
                 xml.append(indent + indent + indent + "<OpenClinica:links>");
                 xml.append(nls);
 
@@ -213,7 +213,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     StudyEvent studyEvent = se.getStudyEvent();
 
                     // ***************** OpenClinica: Event Links Start **************
-                    if (role != null) {
+                    if (role != null && !role.getName().equals("invalid")) {
                         xml.append(indent + indent + indent + indent + "<OpenClinica:links>");
                         xml.append(nls);
 
@@ -344,7 +344,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             EventDefinitionCrf eventDefinitionCrf = form.getEventDefinitionCrf();
 
                             // ***************** OpenClinica: Form Links Start **************
-                            if (role != null) {
+                            if (role != null && !role.getName().equals("invalid")) {
 
                                 xml.append(indent + indent + indent + indent + indent + "<OpenClinica:links>");
                                 xml.append(nls);
