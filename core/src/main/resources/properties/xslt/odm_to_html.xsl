@@ -157,7 +157,7 @@
 							</td>
 						</tr>
 						<tr>
-							<td class="table_header_column">Subjects:</td>
+							<td class="table_header_column">Participants:</td>
 							<td class="table_cell">
 								<xsl:value-of select="$subject_count"/>
 							</td>

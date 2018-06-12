@@ -37,7 +37,7 @@ public class TriggerService {
         StringBuffer sb = new StringBuffer();
         sb.append("");
         sb.append("Summary Statistics: ");
-        sb.append("Subjects Affected: " + ssBean.getStudySubjectCount() + ", ");
+        sb.append("Participants Affected: " + ssBean.getStudySubjectCount() + ", ");
         sb.append("Event CRFs Affected: " + ssBean.getEventCrfCount() + ", ");
         sb.append("# of Warnings: " + validationMsgs.size() + ", ");
         sb.append("# of Discrepancy Notes: " + ssBean.getDiscNoteCount() + ". ");

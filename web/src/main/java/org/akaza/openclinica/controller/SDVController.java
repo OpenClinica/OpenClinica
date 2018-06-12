@@ -492,7 +492,7 @@ public class SDVController {
 
         //In this case, no checked event CRFs were submitted
         if (parameterMap.isEmpty()) {
-            pageMessages.add("None of the Study Subjects were selected for SDV.");
+            pageMessages.add("None of the Participants were selected for SDV.");
             request.setAttribute("pageMessages", pageMessages);
             sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
 

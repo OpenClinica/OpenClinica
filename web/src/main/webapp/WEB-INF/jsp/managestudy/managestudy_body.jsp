@@ -44,7 +44,7 @@
 <h1><span class="title_manage"><fmt:message key="manage_study" bundle="${resworkflow}"/> <a href="javascript:openDocWindow('https://docs.openclinica.com/3.1/study-setup')"><img src="images/bt_Help_Manage.gif" border="0" alt="<fmt:message key="help" bundle="${resword}"/>" title="<fmt:message key="help" bundle="${resword}"/>"></a></span></h1>
 <noscript class="noscript">
     <ul>
-        <li><a href="ListStudySubjects">Subjects</a></li>
+        <li><a href="ListStudySubjects">Participants</a></li>
         <li><a href="ListSubjectGroupClass">Groups</a></li>
         <li><a href="ViewStudyEvents?module=manage">Events</a></li>
         <li><a href="ListDiscNotesSubjectServlet?module=manage">Notes & Discrepancies</a></li>

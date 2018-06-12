@@ -297,7 +297,7 @@ public class ExtractBean {
             answer.nextRow();
         }
 
-        answer.nextCell("Subjects");
+        answer.nextCell("Participants");
         answer.nextCell(Integer.toString(getNumSubjects()));
         answer.nextRow();
 
