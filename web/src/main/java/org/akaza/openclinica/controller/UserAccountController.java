@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import io.swagger.annotations.Api;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -25,6 +26,7 @@ import java.util.HashMap;
 @Controller
 @RequestMapping(value = "/auth/api/v1")
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+@Api(value = "User Account", tags = { "User Account" }, hidden = true)
 public class UserAccountController {
 
 	@Autowired
