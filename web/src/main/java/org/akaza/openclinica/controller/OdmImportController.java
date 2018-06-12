@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import io.swagger.annotations.Api;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.domain.datamap.Study;
@@ -29,6 +30,7 @@ import java.util.concurrent.*;
 
 @RestController
 @RequestMapping(value = "/auth/api")
+@Api(value = "Study", tags = { "Study" })
 public class OdmImportController {
 	OdmImportService odmImportService;
 	private StudyDao studyDao;

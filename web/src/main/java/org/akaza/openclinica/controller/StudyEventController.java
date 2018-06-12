@@ -6,6 +6,7 @@ import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
 
+import io.swagger.annotations.Api;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
@@ -39,6 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studyevent")
+@Api(value = "Study Event", tags = { "Study Event" })
 public class StudyEventController {
 
 	@Autowired
