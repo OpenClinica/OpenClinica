@@ -494,7 +494,7 @@ $(function() {
         $('div.section.collapsed').children('.section-body').hide();
         $('#loading').remove();
     }, function() {
-        $('#loading').text("Can't connect to the Study Service");
+        $('#loading').text("Can't Load View Participant Page");
     });
 });
 </script>

@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import io.swagger.annotations.Api;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -23,6 +24,7 @@ import java.util.*;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studies/archive")
+@Api(value = "Study", tags = { "Study" })
 public class ArchiveStudyController {
 
 	@Autowired

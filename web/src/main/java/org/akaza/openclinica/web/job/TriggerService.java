@@ -213,7 +213,7 @@ public class TriggerService {
         StringBuffer sb = new StringBuffer();
         sb.append("<table border=\'0\' cellpadding=\'0\' cellspacing=\'0\' width=\'100%\'>");
         sb.append("<tr valign=\'top\'> <td class=\'table_header_row\'>Summary Statistics:</td> </tr> <tr valign=\'top\'>");
-        sb.append("<td class=\'table_cell_left\'>Subjects Affected: " + ssBean.getStudySubjectCount() + "</td> </tr>");
+        sb.append("<td class=\'table_cell_left\'>Participants Affected: " + ssBean.getStudySubjectCount() + "</td> </tr>");
         sb.append("<tr valign=\'top\'> <td class=\'table_cell_left\'>Total Event CRFs: " + ssBean.getEventCrfCount() + "</td> </tr> ");
         sb.append("<tr valign=\'top\'> <td class=\'table_cell_left\'>Event CRFs Available for Import: "
                 + (ssBean.getEventCrfCount() - ssBean.getSkippedCrfCount()) + "</td> </tr> ");

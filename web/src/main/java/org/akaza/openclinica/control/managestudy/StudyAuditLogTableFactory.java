@@ -62,7 +62,7 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
                  "studySubject.owner", "studySubject.status", "actions");
         Row row = tableFacade.getTable().getRow();
         configureColumn(row.getColumn("studySubject.label"), resword.getString("study_subject_ID"), null, null);
-        configureColumn(row.getColumn("studySubject.secondaryLabel"), resword.getString("secondary_subject_ID"), null, null);
+        configureColumn(row.getColumn("studySubject.secondaryLabel"), resword.getString("secondary_ID"), null, null);
         configureColumn(row.getColumn("studySubject.oid"), resword.getString("study_subject_oid"), null, null);
         configureColumn(row.getColumn("subject.dateOfBirth"), resword.getString("date_of_birth"), new DateCellEditor(getDateFormat()), null);
         configureColumn(row.getColumn("studySubject.owner"), resword.getString("created_by"), new OwnerCellEditor(), null, true, false);

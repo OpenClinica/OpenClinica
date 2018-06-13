@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import io.swagger.annotations.Api;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
@@ -68,6 +69,7 @@ import java.util.UUID;
 @Controller
 @RequestMapping(value = "auth/api/itemdata")
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
+@Api(value = "Item Data", tags = { "Item Data" })
 public class IdtViewController {
     @Autowired
     @Qualifier("dataSource")

@@ -143,7 +143,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
             // Subject
             // ***************** OpenClinica: Subject Links Start**************
-            if (role != null) {
+            if (role != null && !role.getName().equals("invalid")) {
                 xml.append(indent + indent + indent + "<OpenClinica:links>");
                 xml.append(nls);
 
@@ -154,7 +154,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                         CRFBean crf = (CRFBean) crfdao.findByPK(edc.getCrfId());
 
                         if (studyBean.getParentStudyId() == 0 || (studyBean.getParentStudyId() != 0 && !edc.isHideCrf())) {
-                            if (sed.getType().equals(COMMON)) {
+                            if (sed.getType().equals(COMMON) && !sub.getStatus().equals("removed")) {
                                 if (sed.isRepeating() || (!sed.isRepeating() && validateAddNewForNonRepeating(sub, crf, sed))) {
                                     xml.append(indent + indent + indent + indent + "<OpenClinica:link rel=\"common-add-new\" tag=\""
                                             + StringEscapeUtils.escapeXml(sed.getOid() + "." + crf.getOid()) + "\"" + " href=\"/pages/api/addAnotherForm?studyoid="
@@ -213,7 +213,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     StudyEvent studyEvent = se.getStudyEvent();
 
                     // ***************** OpenClinica: Event Links Start **************
-                    if (role != null) {
+                    if (role != null && !role.getName().equals("invalid")) {
                         xml.append(indent + indent + indent + indent + "<OpenClinica:links>");
                         xml.append(nls);
 
@@ -344,7 +344,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                             EventDefinitionCrf eventDefinitionCrf = form.getEventDefinitionCrf();
 
                             // ***************** OpenClinica: Form Links Start **************
-                            if (role != null) {
+                            if (role != null && !role.getName().equals("invalid")) {
 
                                 xml.append(indent + indent + indent + indent + indent + "<OpenClinica:links>");
                                 xml.append(nls);

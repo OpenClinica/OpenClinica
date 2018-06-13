@@ -50,7 +50,7 @@
     <script type="text/javascript" language="javascript">
 
         $(document).ready(function(){
-            var fullEnketoURL = "${formURL1}" + '&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
+            var fullEnketoURL = "${formURL1}" +'&jini='+"${jini}" +'&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
             iframe = document.getElementById("enketo");
             iframe.setAttribute('src', fullEnketoURL);
         });

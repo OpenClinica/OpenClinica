@@ -5,6 +5,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
@@ -36,6 +37,7 @@ public class EnketoFormServlet extends SecureController {
     public static final String NO_FLAVOR = "";
     public static final String VIEW_MODE = "view";
     public static final String EDIT_MODE = "edit";
+    public static final String JINI = "jini";
 
     @Override
     protected void processRequest() throws Exception {
@@ -52,7 +54,11 @@ public class EnketoFormServlet extends SecureController {
         int studyEventId = Integer.valueOf(request.getParameter(STUDY_EVENT_ID));
         int eventCrfId = Integer.valueOf(request.getParameter(EVENT_CRF_ID));
 
-
+        String jini ="false";
+        String jiniEnabled =CoreResources.getField("jini.enabled");
+        if (!jiniEnabled.equals("") && jiniEnabled.equalsIgnoreCase("true")) {
+            jini = "true";
+        }
         FormUrlObject formUrlObject = null;
 
         StudyEvent studyEvent = studyEventDao.findById(Integer.valueOf(studyEventId));
@@ -112,6 +118,7 @@ public class EnketoFormServlet extends SecureController {
 
         // request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
+        request.setAttribute(JINI, jini);
         if (studyEvent != null) {
             request.setAttribute(STUDYSUBJECTID, studyEvent.getStudySubject().getLabel());
         }

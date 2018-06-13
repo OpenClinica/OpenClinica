@@ -101,7 +101,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         imageIconPaths.put(5, "icon icon-stop-circle red");
         imageIconPaths.put(6, "icon icon-redo");
         imageIconPaths.put(7, "icon icon-lock");
-        imageIconPaths.put(8, "icon icon-icon-sign");
+        imageIconPaths.put(8, "icon icon-icon-sign green");
     }
 
     @Override
