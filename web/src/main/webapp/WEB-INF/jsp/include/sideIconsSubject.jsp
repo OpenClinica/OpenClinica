@@ -83,11 +83,11 @@ View
                 <td><fmt:message key="reassign" bundle="${reswords}"/></td>
             </tr>
             <tr>
-                <td>&nbsp;<span class="icon icon-icon-sign green"></span></td>
+                <td>&nbsp;<span class="icon icon-icon-sign"></span></td>
                 <td><fmt:message key="sign" bundle="${reswords}"/></td>
             </tr>
         </table>
-        
+
     </td>
 </tr>
 
