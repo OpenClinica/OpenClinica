@@ -28,6 +28,10 @@ View
                 <td><fmt:message key="not_started" bundle="${reswords}"/></td>
             </tr>
             <tr>
+                <td>&nbsp;<span class="icon icon-clock"></span></td>
+                <td><fmt:message key="not_scheduled" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
                 <td>&nbsp;<span class="icon icon-clock2"></span></td>
                 <td><fmt:message key="scheduled" bundle="${reswords}"/></td>
             </tr>
