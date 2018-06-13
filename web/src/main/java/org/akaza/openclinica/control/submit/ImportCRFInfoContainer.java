@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -119,7 +120,7 @@ public class ImportCRFInfoContainer {
                                     formDataBean.getFormOID());
                             importCrfInfo.setPreImportStage(DataEntryStage.UNCOMPLETED);
                             String crfStatus = formDataBean.getEventCRFStatus();
-                            if (!isCRFStatusValid(crfStatus, upsert)) {
+                            if (!isCRFStatusValid(crfStatus, upsert, null)) {
                                 importCrfInfo.setProcessImport(false);
                                 importCrfInfo.setEventCRFID(null);
                                 importCrfInfo.setPreImportStage(DataEntryStage.INVALID);
@@ -144,7 +145,7 @@ public class ImportCRFInfoContainer {
                                     formDataBean.getFormOID());
                             importCrfInfo.setPreImportStage(ecb.getStage());
                             String crfStatus = formDataBean.getEventCRFStatus();
-                            if (!isCRFStatusValid(crfStatus, upsert)) {
+                            if (!isCRFStatusValid(crfStatus, upsert, ecb)) {
                                 importCrfInfo.setProcessImport(false);
                                 importCrfInfo.setEventCRFID(null);
                                 importCrfInfo.setPreImportStage(DataEntryStage.INVALID);
@@ -169,8 +170,10 @@ public class ImportCRFInfoContainer {
         importCRFMap = subjectMap;
     }
 
-    private boolean isCRFStatusValid(String crfStatus, UpsertOnBean upsert) {
+    private boolean isCRFStatusValid(String crfStatus, UpsertOnBean upsert, EventCRFBean ecb) {
 
+        if (ecb != null && ecb.getStatus() == Status.UNAVAILABLE)
+            return false;
         if (StringUtils.equals(crfStatus, INITIAL_DATA_ENTRY.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.COMPLETE.getName()))
