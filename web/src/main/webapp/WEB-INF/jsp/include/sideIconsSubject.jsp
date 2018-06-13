@@ -70,26 +70,24 @@ View
                 <td>&nbsp;<span class="icon icon-pencil"></span></td>
                 <td><fmt:message key="edit" bundle="${reswords}"/></td>
             </tr>
-            <c:if test="${userRole.manageStudy}">
-                <tr>
-                    <td>&nbsp;<span class="icon icon-cancel"></span></td>
-                    <td><fmt:message key="remove" bundle="${reswords}"/></td>
-                </tr>
-                <tr>
-                    <td>&nbsp;<span class="icon icon-ccw"></span></td>
-                    <td><fmt:message key="restore" bundle="${reswords}"/></td>
-                </tr>
-                <tr>
-                    <td>&nbsp;<span class="icon icon-icon-reassign3"></span></td>
-                    <td><fmt:message key="reassign" bundle="${reswords}"/></td>
-                </tr>
-                <tr>
-                    <td>&nbsp;<span class="icon icon-icon-sign green"></span></td>
-                    <td><fmt:message key="sign" bundle="${reswords}"/></td>
-                </tr>
-            </c:if>
+            <tr>
+                <td>&nbsp;<span class="icon icon-cancel"></span></td>
+                <td><fmt:message key="remove" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-ccw"></span></td>
+                <td><fmt:message key="restore" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-icon-reassign3"></span></td>
+                <td><fmt:message key="reassign" bundle="${reswords}"/></td>
+            </tr>
+            <tr>
+                <td>&nbsp;<span class="icon icon-icon-sign green"></span></td>
+                <td><fmt:message key="sign" bundle="${reswords}"/></td>
+            </tr>
         </table>
-
+        
     </td>
 </tr>
 
