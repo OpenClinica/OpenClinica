@@ -1,53 +1,7 @@
 package org.akaza.openclinica.web.pform;
 
-import java.io.ByteArrayInputStream;
-import java.io.File;
-import java.io.FileInputStream;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.OutputStream;
-import java.io.StringWriter;
-import java.net.FileNameMap;
-import java.net.URLConnection;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.TimeZone;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import javax.ws.rs.Consumes;
-import javax.ws.rs.DELETE;
-import javax.ws.rs.GET;
-import javax.ws.rs.HEAD;
-import javax.ws.rs.POST;
-import javax.ws.rs.PUT;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.WebApplicationException;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-import javax.ws.rs.core.Response;
-import javax.ws.rs.core.Response.ResponseBuilder;
-import javax.ws.rs.core.StreamingOutput;
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
-
+import ch.qos.logback.classic.LoggerContext;
+import ch.qos.logback.core.util.StatusPrinter;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -57,28 +11,13 @@ import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.CrfDao;
-import org.akaza.openclinica.dao.hibernate.CrfVersionDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao;
-import org.akaza.openclinica.dao.hibernate.RuleActionPropertyDao;
-import org.akaza.openclinica.dao.hibernate.SCDItemMetadataDao;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -105,8 +44,34 @@ import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
 
-import ch.qos.logback.classic.LoggerContext;
-import ch.qos.logback.core.util.StatusPrinter;
+import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
+import javax.ws.rs.core.Response;
+import javax.ws.rs.core.Response.ResponseBuilder;
+import javax.ws.rs.core.StreamingOutput;
+import javax.xml.parsers.DocumentBuilder;
+import javax.xml.parsers.DocumentBuilderFactory;
+import javax.xml.parsers.ParserConfigurationException;
+import javax.xml.transform.Transformer;
+import javax.xml.transform.TransformerException;
+import javax.xml.transform.TransformerFactory;
+import javax.xml.transform.dom.DOMSource;
+import javax.xml.transform.stream.StreamResult;
+import java.io.*;
+import java.net.FileNameMap;
+import java.net.URLConnection;
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.text.SimpleDateFormat;
+import java.util.*;
+import java.util.concurrent.ConcurrentHashMap;
+import java.util.concurrent.ConcurrentMap;
+import java.util.function.Function;
 
 @Path("/openrosa")
 @Component
@@ -148,17 +113,12 @@ public class OpenRosaServices {
     @Autowired
     StudySubjectDao studySubjectDao;
 
-    public static final String INPUT_USER_SOURCE = "userSource";
-    public static final String INPUT_FIRST_NAME = "Participant";
-    public static final String INPUT_LAST_NAME = "User";
-    public static final String INPUT_EMAIL = "email";
-    public static final String INPUT_INSTITUTION = "PFORM";
-    public static final String INPUT_STUDY = "activeStudy";
-    public static final String INPUT_ROLE = "role";
-    public static final String INPUT_TYPE = "type";
-    public static final String INPUT_DISPLAY_PWD = "displayPwd";
-    public static final String INPUT_RUN_WEBSERVICES = "runWebServices";
-    public static final String USER_ACCOUNT_NOTIFICATION = "notifyPassword";
+    @Autowired
+    OpenRosaService openRosaService;
+
+    @Autowired
+    OpenRosaXMLUtil openRosaXMLUtil;
+
     public static final String QUERY_SUFFIX = "form-queries.xml";
     public static final String NO_SUFFIX = "form.xml";
     public static final String QUERY_FLAVOR = "-query";
@@ -178,6 +138,7 @@ public class OpenRosaServices {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     StudyDAO sdao;
 
+    static ConcurrentMap<String, String> studyUserMap = new ConcurrentHashMap<>();
     /**
      * @api {get} /rest2/openrosa/:studyOID/formList Get Form List
      * @apiName getFormList
@@ -434,6 +395,7 @@ public class OpenRosaServices {
     @GET
     @Path("/{studyOID}/manifest")
     @Produces(MediaType.TEXT_XML)
+    
     public String getManifest(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formID") String formID, @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
             @Context ServletContext context) throws Exception {
@@ -462,8 +424,12 @@ public class OpenRosaServices {
 
         // Add user list
         MediaFile userList = new MediaFile();
-        String userXml = getUserXml(context, studyOID, ecid);
-        userList.setHash((DigestUtils.md5Hex(userXml)));
+        // String userXml = getUserXml(context, studyOID, ecid);
+        StudyAndSiteEnvUuid studyAndSiteUuids = getStudyAndSiteUuids(context, studyOID, ecid);
+        String userXml = openRosaService.getUserListFromUserService(studyAndSiteUuids);
+        if (userXml != null)
+            studyUserMap.put(studyAndSiteUuids.studyEnvUuid + studyAndSiteUuids.siteEnvUuid, userXml);
+        userList.setHash((DigestUtils.md5Hex(userXml == null ? "" : userXml)));
         userList.setFilename("users.xml");
         userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers?ecid=" + ecid);
         manifest.add(userList);
@@ -657,18 +623,6 @@ public class OpenRosaServices {
      * @apiDescription Downloads list of users for use with queries.
      */
 
-    @GET
-    @Path("/{studyOID}/downloadUsers")
-    public Response getUserList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
-        if (!mayProceedPreview(request, studyOID))
-            return null;
-        String userXml = getUserXml(context, studyOID, ecid);
-
-        ResponseBuilder builder = Response.ok(userXml);
-        builder = builder.header("Content-Type", "text/xml");
-        return builder.build();
-    }
 
     /**
      * @api {post} /rest2/openrosa/:studyOid/submission Submit form data
@@ -969,14 +923,40 @@ public class OpenRosaServices {
         return attribs;
     }
 
+    private StudyAndSiteEnvUuid getStudyAndSiteUuids(ServletContext context, String studyOID, String ecid) throws Exception {
+        String studyEnvUuid = null;
+        HashMap<String, String> subjectContext = null;
+        PFormCache cache = PFormCache.getInstance(context);
+        subjectContext = cache.getSubjectContext(ecid);
+        int userAccountID = Integer.valueOf(subjectContext.get("userAccountID"));
+        String studySubjectOID = subjectContext.get("studySubjectOID");
+        Document doc = openRosaXMLUtil.buildDocument();
+        Element root = openRosaXMLUtil.appendRootElement(doc);
+
+        List<UserAccount> users = null;
+        StudySubject ssBean = ssDao.findByOcOID(studySubjectOID);
+        StudyAndSiteEnvUuid studyAndSiteEnvUuid = new StudyAndSiteEnvUuid();
+        if (ssBean != null) {
+            StudyBean publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
+            StudyBean parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
+            studyAndSiteEnvUuid.currentUser = userAccountDao.findByUserId(userAccountID);
+            if (publicStudy.getParentStudyId() == 0) {
+                studyAndSiteEnvUuid.studyEnvUuid = publicStudy.getStudyEnvUuid();
+            } else {
+                studyAndSiteEnvUuid.studyEnvUuid = parentPublicStudy.getStudyEnvUuid();
+                studyAndSiteEnvUuid.siteEnvUuid = publicStudy.getStudyEnvSiteUuid();
+            }
+        }
+        return studyAndSiteEnvUuid;
+    }
     private String getUserXml(ServletContext context, String studyOID, String ecid) throws Exception {
         HashMap<String, String> subjectContext = null;
         PFormCache cache = PFormCache.getInstance(context);
         subjectContext = cache.getSubjectContext(ecid);
         int userAccountID = Integer.valueOf(subjectContext.get("userAccountID"));
         String studySubjectOID = subjectContext.get("studySubjectOID");
-        Document doc = buildDocument();
-        Element root = appendRootElement(doc);
+        Document doc = openRosaXMLUtil.buildDocument();
+        Element root = openRosaXMLUtil.appendRootElement(doc);
 
         List<UserAccount> users = null;
         StudySubject ssBean = ssDao.findByOcOID(studySubjectOID);
@@ -1005,7 +985,7 @@ public class OpenRosaServices {
                 root.appendChild(item);
             }
         }
-        String writer = getWriter(doc);
+        String writer = openRosaXMLUtil.getWriter(doc);
         return writer;
     }
 
@@ -1131,9 +1111,9 @@ public class OpenRosaServices {
         String flavor = getQuerySet(formID);
 
         if (studySubjectOID == null || externalInstance.equals("FALSE") || flavor.equals(SINGLE_ITEM_FLAVOR)) {
-            Document doc = buildDocument();
-            appendRootElement(doc);
-            String writer = getWriter(doc);
+            Document doc = openRosaXMLUtil.buildDocument();
+            openRosaXMLUtil.appendRootElement(doc);
+            String writer = openRosaXMLUtil.getWriter(doc);
             return writer;
         }
         StudySubject studySubject = studySubjectDao.findByOcOID(studySubjectOID);
@@ -1159,29 +1139,6 @@ public class OpenRosaServices {
         String output = part1 + " OpenClinica:Current=\"Yes\" " + part2;
 
         return output;
-    }
-
-    private Document buildDocument() throws ParserConfigurationException {
-        DocumentBuilderFactory docFactory = DocumentBuilderFactory.newInstance();
-        DocumentBuilder docBuilder = docFactory.newDocumentBuilder();
-        Document doc = docBuilder.newDocument();
-        return doc;
-    }
-
-    private Element appendRootElement(Document doc) {
-        Element root = doc.createElement("root");
-        doc.appendChild(root);
-        return root;
-    }
-
-    private String getWriter(Document doc) throws TransformerException {
-        DOMSource dom = new DOMSource(doc);
-        StringWriter writer = new StringWriter();
-        StreamResult result = new StreamResult(writer);
-        TransformerFactory tf = TransformerFactory.newInstance();
-        Transformer transformer = tf.newTransformer();
-        transformer.transform(dom, result);
-        return writer.toString();
     }
 
     private FormLayout getFormLayout(String formLayoutOID) {
@@ -1214,4 +1171,29 @@ public class OpenRosaServices {
         }
         return xformOutput;
     }
+
+
+    @GET
+    @Path("/{studyOID}/downloadUsers")
+    
+    public Response getUserList(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
+                                @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
+        if (!mayProceedPreview(request, studyOID))
+            return null;
+        StudyAndSiteEnvUuid studyAndSiteEnvUuids = getStudyAndSiteUuids(context, studyOID, ecid);
+
+        // if there is no entry in the hashmap due to User service not available or any other reasons, get the list from RT database
+        String userXml = studyUserMap.computeIfAbsent(studyAndSiteEnvUuids.studyEnvUuid + studyAndSiteEnvUuids.siteEnvUuid, key -> {
+            try {
+                return getUserXml(context, studyOID, ecid);
+            } catch (Exception e) {
+                logger.error("Fetching user list failed from Runtime query", e);
+            }
+            return "";
+        });
+        ResponseBuilder builder = Response.ok(userXml);
+        builder = builder.header("Content-Type", "text/xml");
+        return builder.build();
+    }
+
 }

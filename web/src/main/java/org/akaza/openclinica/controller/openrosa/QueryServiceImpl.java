@@ -15,12 +15,15 @@ import javax.mail.MessagingException;
 import javax.mail.internet.AddressException;
 import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 
 import org.akaza.openclinica.controller.openrosa.processor.QueryServiceHelperBean;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.xform.QueriesBean;
 import org.akaza.openclinica.core.form.xform.QueryBean;
 import org.akaza.openclinica.core.form.xform.QueryType;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.DiscrepancyNoteDao;
 import org.akaza.openclinica.dao.hibernate.DnItemDataMapDao;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
@@ -30,17 +33,15 @@ import org.akaza.openclinica.dao.hibernate.ResolutionStatusDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
-import org.akaza.openclinica.domain.datamap.DiscrepancyNoteType;
-import org.akaza.openclinica.domain.datamap.DnItemDataMap;
-import org.akaza.openclinica.domain.datamap.DnItemDataMapId;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.Item;
-import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.service.OCUserDTO;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.akaza.openclinica.web.pform.OpenRosaService;
+import org.akaza.openclinica.web.pform.StudyAndSiteEnvUuid;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
@@ -71,6 +72,10 @@ public class QueryServiceImpl implements QueryService {
     private EventCrfDao eventCrfDao;
     @Autowired
     private StudyDao studyDao;
+    @Autowired
+    private OpenRosaService openRosaService;
+    @Autowired
+    private BeanFactory beanFactory;
 
     @Autowired
     private ApplicationContext appContext;
@@ -176,6 +181,9 @@ public class QueryServiceImpl implements QueryService {
         }
         if (!StringUtils.isEmpty(assignedTo)) {
             UserAccount userAccount = userAccountDao.findByUserName(assignedTo);
+            if (userAccount == null) {
+                createUserAccount(assignedTo, helperBean.getContainer().getStudy());
+            }
             helperBean.setUserAccount(userAccount);
             dn.setUserAccount(userAccount);
         }
@@ -185,6 +193,23 @@ public class QueryServiceImpl implements QueryService {
         }
         dn.setDateCreated(new Date());
         return dn;
+    }
+
+    private void createUserAccount(String assignedTo, Study study) {
+        StudyAndSiteEnvUuid studyAndSiteEnvUuid = new StudyAndSiteEnvUuid();
+        if (study.getStudy() == null)
+            studyAndSiteEnvUuid.setStudyEnvUuid(study.getStudyEnvUuid());
+        else {
+            studyAndSiteEnvUuid.setStudyEnvUuid(study.getStudy().getStudyEnvUuid());
+            studyAndSiteEnvUuid.setSiteEnvUuid(study.getStudyEnvSiteUuid());
+        }
+        try {
+            OCUserDTO ocUserDTO = openRosaService.fetchUserInfoFromUserService(studyAndSiteEnvUuid, assignedTo);
+            UserAccount userAccount = beanFactory.getBean(UserAccount.class, ocUserDTO);
+
+        } catch (Exception e) {
+            logger.error("Cannot get user info for user:" + assignedTo, e);
+        }
     }
 
     private void handleEmailNotification(QueryServiceHelperBean helperBean, QueryBean queryBean) throws Exception {
