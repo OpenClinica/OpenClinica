@@ -41,6 +41,20 @@ public class ImportCRFInfoContainer {
     private Map<String, Map<String, Map<String, String>>> importCRFMap;
     private List<ImportCRFInfo> importCRFList;
 
+
+    String stripNonAlphaNumeric(String input) {
+        // Add capitalization too
+        return input.trim().replaceAll("\\s+|\\W+", "");
+    }
+
+    String capitalize(String input) {
+        return input.toUpperCase();
+    }
+
+    String truncateToXChars(String input, int x) {
+        return input.length() > x ? input.substring(0, x) : input;
+    }
+
     /*
      * Purpose: Iterates over ODM to populate 2 objects: 1. importCRFList: A List of EventCRFs and information on how to
      * process them. 2. importCRFMap: A Map multi-layer map of Subject/Event/Form only populated when the subsequent
@@ -87,7 +101,8 @@ public class ImportCRFInfoContainer {
                 for (FormDataBean formDataBean : formDataBeans) {
 
                     FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
-                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID() + "_" + formDataBean.getFormLayoutName());
+                    String crfVersion = truncateToXChars(capitalize(stripNonAlphaNumeric(formDataBean.getFormLayoutName())), 10);
+                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID() + "_" + crfVersion);
                     for (FormLayoutBean formLayoutBean : formLayoutBeans) {
 
                         CRFDAO crfDAO = new CRFDAO(ds);
