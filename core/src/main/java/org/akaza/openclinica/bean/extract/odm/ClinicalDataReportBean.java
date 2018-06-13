@@ -377,12 +377,20 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     xml.append(currentIndent + "                      ReasonForChange=\"" + StringEscapeUtils.escapeXml(r) + "\" ");
                 }
                 if (o.length() > 0) {
+                	 String oldValue = StringEscapeUtils.escapeXml(o);
+                     if(oldValue != null && oldValue.indexOf("&#") >-1) {
+                    	 oldValue = o;
+                     }                  
                     xml.append(nls);
-                    xml.append(currentIndent + "                      OldValue=\"" + StringEscapeUtils.escapeXml(o) + "\" ");
+                    xml.append(currentIndent + "                      OldValue=\"" + oldValue + "\" ");
                 }
                 if (n.length() > 0) {
+                	String newValue = StringEscapeUtils.escapeXml(n);
+                    if(newValue != null && newValue.indexOf("&#") >-1) {
+                   	 	newValue = o;
+                    } 
                     xml.append(nls);
-                    xml.append(currentIndent + "                      NewValue=\"" + StringEscapeUtils.escapeXml(n) + "\"");
+                    xml.append(currentIndent + "                      NewValue=\"" + newValue + "\"");
                 }
                 if (vt.length() > 0) {
                     xml.append(nls);
