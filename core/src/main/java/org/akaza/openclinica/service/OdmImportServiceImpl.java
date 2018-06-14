@@ -121,9 +121,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 	public Map<String, Object> importOdmToOC(ODM odm, Page page, String boardId, String accessToken) {
 		DataBinder dataBinder = new DataBinder(new Study());
 		errors = dataBinder.getBindingResult();
-		if (logger.isInfoEnabled()) {
-			printOdm(odm);
-		}
+		printOdm(odm);
 		CoreResources.setRequestSchemaByStudy(odm.getStudy().get(0).getOID(), dataSource);
 
 		UserAccount userAccount = getCurrentUser();
