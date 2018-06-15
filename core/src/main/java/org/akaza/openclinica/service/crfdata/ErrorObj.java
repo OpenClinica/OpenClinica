@@ -30,4 +30,11 @@ public class ErrorObj {
         this.message = message;
     }
 
+    @Override
+    public String toString() {
+        return "ErrorObj{" +
+                "code='" + code + '\'' +
+                ", message='" + message + '\'' +
+                '}';
+    }
 }
