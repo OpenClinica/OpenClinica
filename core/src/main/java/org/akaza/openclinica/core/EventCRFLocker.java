@@ -18,7 +18,6 @@ import java.util.Map.Entry;
 import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
-import java.util.function.BiConsumer;
 
 /**
  * Data strucutre used to keep track of CRFs locked by users. The synchronization of access to the locks is implemented
@@ -41,20 +40,16 @@ public class EventCRFLocker implements Serializable {
     public synchronized boolean lock(StudyEvent se, FormLayout fl, String schemaName, int userId) {
         if (!isLocked(se, fl, schemaName, userId)) {
             lockedCRFs.put(createEventCrfLockKey(se, fl, schemaName), userId);
-            logger.info("Successfully locked for user:" + userId);
             return true;
         }
-        logger.info("Could not lock for user:" + userId);
         return false;
     }
 
     public synchronized boolean lock(String ecId, Integer userId) {
         if (!isLocked(ecId, userId)) {
             lockedCRFs.put(ecId, userId);
-            logger.info("Successfully locked ecId: " + ecId + " for user:" + userId);
             return true;
         }
-        logger.info("Could not lock ecId: " + ecId + " for user:" + userId);
         return false;
     }
 
@@ -97,20 +92,12 @@ public class EventCRFLocker implements Serializable {
 
 
     public boolean isLocked(String ecId, Integer requestUserId) {
-        logger.info("Check lock for ecId:" + ecId + " and requestUserId:" + requestUserId);
-        lockedCRFs.forEach((k,v) -> logger.info("key: "+k+" value:"+v));
-
         Integer userId = lockedCRFs.get(ecId);
-
         if (userId != null) {
-            if (requestUserId != null && requestUserId == userId) {
-                logger.info("Not locked");
+            if (requestUserId != null && requestUserId == userId)
                 return false;
-            }
-            logger.info("Locked by:" + userId);
             return true;
         }
-        logger.info("Not locked");
         return false;
     }
 
