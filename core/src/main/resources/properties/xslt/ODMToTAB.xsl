@@ -168,7 +168,7 @@
 		<!--<xsl:value-of select="$eol"/>--><!-- Subject Data, item 
 			data etc -->
 		<!--<xsl:text>SubjectId</xsl:text>-->
-		<xsl:text>Study Subject ID</xsl:text>
+		<xsl:text>Participant ID</xsl:text>
 		<xsl:value-of select="$sep"/>
 		<xsl:text>Protocol ID</xsl:text>
 		<xsl:value-of select="$sep"/>
@@ -181,7 +181,7 @@
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>		
 		<xsl:if test="$subjectStatusExist">
-			<xsl:text>Subject Status</xsl:text>
+			<xsl:text>Participant Status</xsl:text>
 			<xsl:value-of select="$delimiter" />
 		</xsl:if>
 		<xsl:if test="$sexExist">

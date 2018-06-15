@@ -122,7 +122,7 @@
 
 		<c:forEach var="subjectDataBean" items="${subjectData}" >
 			<tr valign="top">
-				<td class="table_header_row" colspan="4">Study Subject: <c:out value="${subjectDataBean.subjectOID}"/></td>
+				<td class="table_header_row" colspan="4">Participant: <c:out value="${subjectDataBean.subjectOID}"/></td>
 			</tr>
 			<c:forEach var="studyEventData" items="${subjectDataBean.studyEventData}">
 				<tr valign="top">
@@ -243,7 +243,7 @@
 
 			<c:forEach var="subjectDataBean" items="${subjectData}" >
 				<tr valign="top">
-					<td class="table_header_row" colspan="4">Study Subject: <c:out value="${subjectDataBean.subjectOID}"/></td>
+					<td class="table_header_row" colspan="4">Participant: <c:out value="${subjectDataBean.subjectOID}"/></td>
 				</tr>
 				<c:forEach var="studyEventData" items="${subjectDataBean.studyEventData}">
 					<tr valign="top">
@@ -334,7 +334,7 @@
 
 			<c:forEach var="subjectDataBean" items="${subjectData}" >
 				<tr valign="top">
-					<td class="table_header_row" colspan="4">Study Subject: <c:out value="${subjectDataBean.subjectOID}"/></td>
+					<td class="table_header_row" colspan="4">Participant: <c:out value="${subjectDataBean.subjectOID}"/></td>
 				</tr>
 				<c:forEach var="studyEventData" items="${subjectDataBean.studyEventData}">
 					<tr valign="top">

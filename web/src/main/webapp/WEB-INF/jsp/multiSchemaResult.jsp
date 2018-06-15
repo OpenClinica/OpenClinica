@@ -8,7 +8,7 @@
 <%@taglib uri="http://www.springframework.org/tags/form" prefix="form"%>
 <html>
 <head>
-    <title>Study Subject Information</title>
+    <title>Participant Information</title>
 </head>
 <body>
 
@@ -16,7 +16,7 @@
 <br>
 <table>
     <tr>
-        <td>Study Subject</td>
+        <td>Participant</td>
         <td>${studySubject}</td>
     </tr>
 </table>
