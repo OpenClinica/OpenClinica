@@ -96,13 +96,16 @@ public class EnketoFormServlet extends SecureController {
         String loadWarning = generateErrorMessage(studyEvent, formLayout);
         boolean isFormLocked = determineCRFLock(studyEvent, formLayout);
         if (Integer.valueOf(eventCrfId) > 0) {
+            logger.info("eventCrfId:" + eventCrfId + " user:" + ub.getName());
             formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout,
                     QUERY_FLAVOR, null, role, mode, loadWarning, isFormLocked);
         } else if (Integer.valueOf(eventCrfId) == 0) {
+            logger.info("eventCrfId is zero user:" + ub.getName());
             String hash = formLayout.getXform();
             formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, parentStudy.getOc_oid(),
                     QUERY_FLAVOR, role, mode, hash, loadWarning, isFormLocked);
         }
+        logger.info("!isFormLocked && formUrlObject.isLockOn(): " + isFormLocked + ":" + formUrlObject.isLockOn() + " for user:" + ub.getName());
         if (!isFormLocked && formUrlObject.isLockOn()) {
             getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId());
         }
