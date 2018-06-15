@@ -2110,7 +2110,7 @@
 
 		<xsl:if test="$subjectStatusExist">
 			<xsl:text>SubjectStatus</xsl:text>
-			<xsl:text> "Subject Status"</xsl:text><xsl:text> /</xsl:text>
+			<xsl:text> "Participant Status"</xsl:text><xsl:text> /</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 
