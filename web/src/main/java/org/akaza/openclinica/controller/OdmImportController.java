@@ -137,7 +137,8 @@ public class OdmImportController {
                     List<ErrorObj> err = new ArrayList<>();
                     ErrorObj errorObj = new ErrorObj(e.getMessage(), e.getMessage());
                     err.add(errorObj);
-                    logger.info("ExecutionException but not CustomRuntimeException for :" + publishUuid + e.getMessage());
+                    e.printStackTrace();
+                    logger.info("ExecutionException but not CustomRuntimeException for :" + publishUuid, e);
                     return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
                 }
             }
