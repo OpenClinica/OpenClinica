@@ -24,7 +24,7 @@ import java.util.*;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studies/archive")
-@Api(value = "Study", tags = { "Study" })
+@Api(value = "Study", tags = { "Study" }, description = "REST API for Study")
 public class ArchiveStudyController {
 
 	@Autowired

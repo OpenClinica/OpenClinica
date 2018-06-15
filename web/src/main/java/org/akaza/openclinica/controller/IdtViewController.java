@@ -69,7 +69,7 @@ import java.util.UUID;
 @Controller
 @RequestMapping(value = "auth/api/itemdata")
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
-@Api(value = "Item Data", tags = { "Item Data" })
+@Api(value = "Item Data", tags = { "Item Data" }, description = "REST API for Item Data")
 public class IdtViewController {
     @Autowired
     @Qualifier("dataSource")
