@@ -29,7 +29,7 @@ import java.util.concurrent.*;
 
 @RestController
 @RequestMapping(value = "/auth/api")
-@Api(value = "Study", tags = { "Study" })
+@Api(value = "Study", tags = { "Study" }, description = "REST API for Study")
 public class OdmImportController {
 	OdmImportService odmImportService;
 	private StudyDao studyDao;

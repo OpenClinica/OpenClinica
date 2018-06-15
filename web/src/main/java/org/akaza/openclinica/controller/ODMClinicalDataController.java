@@ -27,7 +27,7 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 
 
 @RequestMapping(value = "/auth/api/v1/clinicaldata")
-@Api(value = "Study", tags = { "Study" })
+@Api(value = "Study", tags = { "Study" }, description = "REST API for Study")
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
 public class ODMClinicalDataController {
 

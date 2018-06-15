@@ -66,7 +66,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 @Controller
 @RequestMapping(value = "/auth/api/v1/system")
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
-@Api(value = "System", tags = { "System" })
+@Api(value = "System", tags = { "System" }, description = "REST API for System")
 public class SystemController {
 
 	// Add in Spring Cor files /healthcheck path to avoid firewall
