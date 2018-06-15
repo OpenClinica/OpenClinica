@@ -115,7 +115,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 	}
 
 	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, String accessToken) throws Exception {
-		ResourceBundleProvider.updateLocale(new Locale("en"));
+		// since this is a new thread, add it to the ResourceBundle
+        ResourceBundleProvider.updateLocale(Locale.US);
 		logger.info("Thread name in importOdm:" + Thread.currentThread());
 		Map<String, Object> map = importOdmToOC(odm, page, boardId, accessToken);
 		return map;
