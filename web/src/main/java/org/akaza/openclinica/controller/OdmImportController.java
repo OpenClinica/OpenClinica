@@ -15,6 +15,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
 import javax.servlet.http.HttpServletRequest;
@@ -76,6 +77,7 @@ public class OdmImportController {
 			throws Exception {
 
         String accessToken = (String) request.getSession().getAttribute("accessToken");
+
         CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
 
             ODM odm = publishDTO.getOdm();
@@ -107,7 +109,6 @@ public class OdmImportController {
     public ResponseEntity<Object>  checkPublishStatus(@PathVariable("uuid") String publishUuid,
                                                            HttpServletRequest request) {
 	    Future<ResponseEntity<Object>> future = null;
-
         synchronized (expiringMap) {
             future = expiringMap.get(publishUuid);
         }
