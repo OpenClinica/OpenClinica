@@ -1,5 +1,8 @@
 package org.akaza.openclinica.i18n.util;
 
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.MissingResourceException;
@@ -12,6 +15,7 @@ public class ResourceBundleProvider {
      * @author Nacho M. Castejon and Jose Martinez Garcia, BAP Health
      */
     public static HashMap<Thread, Locale> localeMap = new HashMap<Thread, Locale>();
+    protected static final Logger logger = LoggerFactory.getLogger(ResourceBundleProvider.class);
     /**
      * Contains the set of ResourceBundles associated to each locale.
      */
@@ -126,8 +130,15 @@ public class ResourceBundleProvider {
      * @return
      */
     private static ResourceBundle getResBundle(String name) {
+        HashMap<String, ResourceBundle> stringResourceBundleHashMap = resBundleSetMap.get(localeMap.get(Thread.currentThread()));
+        if (stringResourceBundleHashMap == null) {
+            localeMap.forEach((k, v) -> logger.error("Key:" + k + " value:" + v));
+            logger.error("Thread:" + Thread.currentThread());
+            logger.error("name = :" + name);
+        }
+        ResourceBundle resourceBundle = stringResourceBundleHashMap.get(name);
 
-        return resBundleSetMap.get(localeMap.get(Thread.currentThread())).get(name);
+        return resourceBundle;
     }
 
     /**

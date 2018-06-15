@@ -9,6 +9,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.xform.XformParser;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.crfdata.ExecuteIndividualCrfObject;
 import org.akaza.openclinica.service.crfdata.XformMetaDataService;
@@ -114,6 +115,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 	}
 
 	public Map<String, Object> importOdm(ODM odm, Page page, String boardId, String accessToken) throws Exception {
+		ResourceBundleProvider.updateLocale(new Locale("en"));
+		logger.info("Thread name in importOdm:" + Thread.currentThread());
 		Map<String, Object> map = importOdmToOC(odm, page, boardId, accessToken);
 		return map;
 	}
