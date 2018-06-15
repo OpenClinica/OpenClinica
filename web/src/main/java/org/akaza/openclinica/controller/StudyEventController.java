@@ -40,7 +40,7 @@ import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/studyevent")
-@Api(value = "Study Event", tags = { "Study Event" })
+@Api(value = "Study Event", tags = { "Study Event" }, description="REST API for Study Event")
 public class StudyEventController {
 
 	@Autowired

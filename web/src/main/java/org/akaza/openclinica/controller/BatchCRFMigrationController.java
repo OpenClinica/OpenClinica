@@ -76,7 +76,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 
 @Controller
-@Api(value = "Form", tags = { "Form" })
+@Api(value = "Form", tags = { "Form" }, description = "REST API for Form")
 public class BatchCRFMigrationController implements Runnable {
 
     @Autowired
