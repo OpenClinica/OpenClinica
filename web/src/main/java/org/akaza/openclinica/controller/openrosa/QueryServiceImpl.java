@@ -182,7 +182,7 @@ public class QueryServiceImpl implements QueryService {
         if (!StringUtils.isEmpty(assignedTo)) {
             UserAccount userAccount = userAccountDao.findByUserName(assignedTo);
             if (userAccount == null) {
-                createUserAccount(assignedTo, helperBean.getContainer().getStudy());
+                userAccount = createUserAccount(assignedTo, helperBean.getContainer().getStudy());
             }
             helperBean.setUserAccount(userAccount);
             dn.setUserAccount(userAccount);
@@ -195,7 +195,8 @@ public class QueryServiceImpl implements QueryService {
         return dn;
     }
 
-    private void createUserAccount(String assignedTo, Study study) {
+    private UserAccount createUserAccount(String assignedTo, Study study) {
+        UserAccount userAccount = null;
         StudyAndSiteEnvUuid studyAndSiteEnvUuid = new StudyAndSiteEnvUuid();
         if (study.getStudy() == null)
             studyAndSiteEnvUuid.setStudyEnvUuid(study.getStudyEnvUuid());
@@ -205,11 +206,12 @@ public class QueryServiceImpl implements QueryService {
         }
         try {
             OCUserDTO ocUserDTO = openRosaService.fetchUserInfoFromUserService(studyAndSiteEnvUuid, assignedTo);
-            UserAccount userAccount = beanFactory.getBean(UserAccount.class, ocUserDTO);
+            userAccount = beanFactory.getBean(UserAccount.class, ocUserDTO);
 
         } catch (Exception e) {
             logger.error("Cannot get user info for user:" + assignedTo, e);
         }
+        return userAccount;
     }
 
     private void handleEmailNotification(QueryServiceHelperBean helperBean, QueryBean queryBean) throws Exception {
