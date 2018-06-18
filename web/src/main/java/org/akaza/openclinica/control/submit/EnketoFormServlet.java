@@ -105,7 +105,7 @@ public class EnketoFormServlet extends SecureController {
             formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, parentStudy.getOc_oid(),
                     QUERY_FLAVOR, role, mode, hash, loadWarning, isFormLocked);
         }
-        logger.info("!isFormLocked && formUrlObject.isLockOn(): " + isFormLocked + ":" + formUrlObject.isLockOn() + " for user:" + ub.getName());
+        logger.info("isFormLocked: " + isFormLocked + ": formUrlObject.isLockOn()" + formUrlObject.isLockOn() + " for user:" + ub.getName());
         if (!isFormLocked && formUrlObject.isLockOn()) {
             getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId());
         }
