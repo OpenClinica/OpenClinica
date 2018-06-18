@@ -196,7 +196,7 @@
 					<table border="1" cellpadding="0" cellspacing="0">
 						<tr valign="top">
 							<td class="table_header_row">
-								<xsl:text>Study Subject ID</xsl:text>
+								<xsl:text>Participant ID</xsl:text>
 							</td>							
 							<td class="table_header_row">
 								<xsl:text>Protocol ID</xsl:text>
@@ -213,7 +213,7 @@
 							</xsl:if>
 							<xsl:if test="$subjectStatusExist">
 								<td class="table_header_row">
-									<xsl:text>Subject Status</xsl:text>
+									<xsl:text>Participant Status</xsl:text>
 								</td>
 							</xsl:if>
 							<xsl:if test="$sexExist">

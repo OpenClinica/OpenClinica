@@ -1262,7 +1262,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
         xml.append(currentIndent + "</OpenClinica:StudyParameterList>" + nls);
         //
-        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_subjectIdGeneration" + "\" Name=\"" + "How To Generate Study SubjectID"
+        xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_subjectIdGeneration" + "\" Name=\"" + "How To Generate ParticipantID"
                 + "\">" + nls);
         xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "manual" + "\">" + nls);
         xml.append(currentIndent + indent + indent + "<Decode>" + nls);
