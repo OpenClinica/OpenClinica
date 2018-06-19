@@ -42,7 +42,7 @@ import org.springframework.web.bind.annotation.ResponseStatus;
 
 @Controller
 @RequestMapping(value = "/auth/api/v1/discrepancynote")
-@Api(value = "Query", tags = { "Query" })
+@Api(value = "Query", tags = { "Query" }, description = "REST API for Query")
 @ResponseStatus(value = org.springframework.http.HttpStatus.INTERNAL_SERVER_ERROR)
 public class DiscrepancyNoteController {
 

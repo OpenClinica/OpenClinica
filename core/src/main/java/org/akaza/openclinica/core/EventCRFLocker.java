@@ -13,9 +13,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
 import java.io.Serializable;
-import java.util.Iterator;
+import java.util.*;
 import java.util.Map.Entry;
-import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 
@@ -31,25 +30,30 @@ public class EventCRFLocker implements Serializable {
     private static final long serialVersionUID = -541015729642748245L;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-    private final ConcurrentMap<String, Integer> lockedCRFs = new ConcurrentHashMap<>();
+
+    private final Map<String, Integer> lockedCRFs = Collections.synchronizedMap(new HashMap<>());
 
     /**
      * Locks a CRF for an user.
      *
      */
-    public synchronized boolean lock(StudyEvent se, FormLayout fl, String schemaName, int userId) {
+    public boolean lock(StudyEvent se, FormLayout fl, String schemaName, int userId) {
         if (!isLocked(se, fl, schemaName, userId)) {
             lockedCRFs.put(createEventCrfLockKey(se, fl, schemaName), userId);
+            logger.info("::::::::::::::::::::::Successfully locked for user:" + userId);
             return true;
         }
+        logger.info("::::::::::::::::::::::Could not lock for user:" + userId);
         return false;
     }
 
-    public synchronized boolean lock(String ecId, Integer userId) {
+    public boolean lock(String ecId, Integer userId) {
         if (!isLocked(ecId, userId)) {
             lockedCRFs.put(ecId, userId);
+            logger.info("::::::::::::::::::::::Successfully locked ecId: " + ecId + " for user:" + userId);
             return true;
         }
+        logger.info("::::::::::::::::::::::Could not lock ecId: " + ecId + " for user:" + userId);
         return false;
     }
 
@@ -68,17 +72,19 @@ public class EventCRFLocker implements Serializable {
      * @param userId ID of the user.
      */
     public void unlockAllForUser(int userId) {
-        synchronized (lockedCRFs) {
-            Set<Entry<String, Integer>> entries = lockedCRFs.entrySet();
-            Iterator<Entry<String, Integer>> it = entries.iterator();
-            while (it.hasNext()) {
-                Entry<String, Integer> entry = it.next();
-                if (entry.getValue().equals(userId)) {
-                    logger.debug("Removed lock:" + entry.getKey() + " for user:" + entry.getValue() );
-                    it.remove();
-                }
+        logger.info("::::::::::::::::::::::Unlock for user:" + userId);
+        lockedCRFs.forEach((k,v) -> logger.info("::::::::::::::::::::::unlockAllForUser key: "+k+" value:"+v));
+
+        Set<Entry<String, Integer>> entries = lockedCRFs.entrySet();
+        Iterator<Entry<String, Integer>> it = entries.iterator();
+        while (it.hasNext()) {
+            Entry<String, Integer> entry = it.next();
+            if (entry.getValue().equals(userId)) {
+                logger.debug("Removed lock:" + entry.getKey() + " for user:" + entry.getValue() );
+                it.remove();
             }
         }
+
     }
 
 
@@ -92,12 +98,20 @@ public class EventCRFLocker implements Serializable {
 
 
     public boolean isLocked(String ecId, Integer requestUserId) {
+        logger.info("::::::::::::::::::::::Check lock for ecId:" + ecId + " and requestUserId:" + requestUserId);
+        lockedCRFs.forEach((k,v) -> logger.info("::::::::::::::::::::::key: "+k+" value:"+v));
+
         Integer userId = lockedCRFs.get(ecId);
+
         if (userId != null) {
-            if (requestUserId != null && requestUserId == userId)
+            if (requestUserId != null && requestUserId == userId) {
+                logger.info("::::::::::::::::::::::Not locked");
                 return false;
+            }
+            logger.info("::::::::::::::::::::::Locked by:" + userId);
             return true;
         }
+        logger.info("::::::::::::::::::::::Not locked");
         return false;
     }
 

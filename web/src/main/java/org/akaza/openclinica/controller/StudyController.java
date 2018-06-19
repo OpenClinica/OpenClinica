@@ -76,7 +76,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 
 @Controller
-@Api(value = "Study", tags = { "Study" })
+@Api(value = "Study", tags = { "Study" }, description = "REST API for Study")
 @RequestMapping(value = "/auth/api/v1/studies")
 public class StudyController {
 
@@ -882,7 +882,7 @@ public class StudyController {
         responseSuccess.setStudyOid(existingStudy.getOc_oid());
         responseSuccess.setUniqueStudyID(existingStudy.getUniqueIdentifier());
         responseSuccess.setSchemaName(existingStudy.getSchemaName());
-        ResponseEntity<Object> response = new ResponseEntity(responseSuccess, HttpStatus.SEE_OTHER);
+        ResponseEntity<Object> response = new ResponseEntity(responseSuccess, HttpStatus.BAD_REQUEST);
         return response;
     }
 

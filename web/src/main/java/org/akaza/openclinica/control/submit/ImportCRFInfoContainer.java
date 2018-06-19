@@ -9,6 +9,7 @@ import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -40,6 +41,20 @@ public class ImportCRFInfoContainer {
     // (Subject) (Event) (Form)
     private Map<String, Map<String, Map<String, String>>> importCRFMap;
     private List<ImportCRFInfo> importCRFList;
+
+
+    String stripNonAlphaNumeric(String input) {
+        // Add capitalization too
+        return input.trim().replaceAll("\\s+|\\W+", "");
+    }
+
+    String capitalize(String input) {
+        return input.toUpperCase();
+    }
+
+    String truncateToXChars(String input, int x) {
+        return input.length() > x ? input.substring(0, x) : input;
+    }
 
     /*
      * Purpose: Iterates over ODM to populate 2 objects: 1. importCRFList: A List of EventCRFs and information on how to
@@ -87,7 +102,8 @@ public class ImportCRFInfoContainer {
                 for (FormDataBean formDataBean : formDataBeans) {
 
                     FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
-                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID() + "_" + formDataBean.getFormLayoutName());
+                    String crfVersion = truncateToXChars(capitalize(stripNonAlphaNumeric(formDataBean.getFormLayoutName())), 10);
+                    ArrayList<FormLayoutBean> formLayoutBeans = formLayoutDAO.findAllByOid(formDataBean.getFormOID() + "_" + crfVersion);
                     for (FormLayoutBean formLayoutBean : formLayoutBeans) {
 
                         CRFDAO crfDAO = new CRFDAO(ds);
@@ -104,7 +120,7 @@ public class ImportCRFInfoContainer {
                                     formDataBean.getFormOID());
                             importCrfInfo.setPreImportStage(DataEntryStage.UNCOMPLETED);
                             String crfStatus = formDataBean.getEventCRFStatus();
-                            if (!isCRFStatusValid(crfStatus, upsert)) {
+                            if (!isCRFStatusValid(crfStatus, upsert, null)) {
                                 importCrfInfo.setProcessImport(false);
                                 importCrfInfo.setEventCRFID(null);
                                 importCrfInfo.setPreImportStage(DataEntryStage.INVALID);
@@ -129,7 +145,7 @@ public class ImportCRFInfoContainer {
                                     formDataBean.getFormOID());
                             importCrfInfo.setPreImportStage(ecb.getStage());
                             String crfStatus = formDataBean.getEventCRFStatus();
-                            if (!isCRFStatusValid(crfStatus, upsert)) {
+                            if (!isCRFStatusValid(crfStatus, upsert, ecb)) {
                                 importCrfInfo.setProcessImport(false);
                                 importCrfInfo.setEventCRFID(null);
                                 importCrfInfo.setPreImportStage(DataEntryStage.INVALID);
@@ -154,8 +170,10 @@ public class ImportCRFInfoContainer {
         importCRFMap = subjectMap;
     }
 
-    private boolean isCRFStatusValid(String crfStatus, UpsertOnBean upsert) {
+    private boolean isCRFStatusValid(String crfStatus, UpsertOnBean upsert, EventCRFBean ecb) {
 
+        if (ecb != null && ecb.getStatus() == Status.UNAVAILABLE)
+            return false;
         if (StringUtils.equals(crfStatus, INITIAL_DATA_ENTRY.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.COMPLETE.getName()))
