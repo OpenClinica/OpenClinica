@@ -882,7 +882,7 @@ public class StudyController {
         responseSuccess.setStudyOid(existingStudy.getOc_oid());
         responseSuccess.setUniqueStudyID(existingStudy.getUniqueIdentifier());
         responseSuccess.setSchemaName(existingStudy.getSchemaName());
-        ResponseEntity<Object> response = new ResponseEntity(responseSuccess, HttpStatus.SEE_OTHER);
+        ResponseEntity<Object> response = new ResponseEntity(responseSuccess, HttpStatus.BAD_REQUEST);
         return response;
     }
 

@@ -443,11 +443,15 @@ public class ResolveDiscrepancyServlet extends SecureController {
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
 
             EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(idb.getEventCRFId());
+            StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
+            StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+
             if (isCRFLocked(ecb)) {
                 isLocked = true;
             } else {
                 // failed to get a lock
-                if (!lockCRF(ecb))
+                if ((seb.getSubjectEventStatus().isLocked() != true)
+                        && !lockCRF(ecb))
                     isLocked = true;
             }
             StudySubjectBean studySubjectBean = (StudySubjectBean) studySubjectDAO.findByPK(ecb.getStudySubjectId());
@@ -503,6 +507,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
     private String generateErrorMessage(EventCRFBean ecb) {
         Integer userId = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId());
+        if (userId == null)
+            return "";
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
         String errorData = resword.getString("CRF_unavailable")
