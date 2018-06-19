@@ -138,7 +138,7 @@
 </c:choose>
 
 <a href="javascript:leftnavExpand('studySubjectRecord');">
-    <img id="excl_studySubjectRecord" src="images/bt_Expand.gif" border="0"> Study Subject Record</a></div>
+    <img id="excl_studySubjectRecord" src="images/bt_Expand.gif" border="0"> Participant Record</a></div>
 <div id="studySubjectRecord" style="display: none">
 
 <table border="0" cellpadding="0" cellspacing="0">

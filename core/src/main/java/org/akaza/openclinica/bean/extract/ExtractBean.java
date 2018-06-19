@@ -350,7 +350,7 @@ public class ExtractBean {
         // TODO add additional labels here
         if (dataset.isShowSubjectStatus()) {
             answer.nextCell("SubjectStatus");
-            eventDescriptions.put("SubjectStatus", "Subject Status");
+            eventDescriptions.put("SubjectStatus", "Participant Status");
         }
 
         // TODO set datainfo-settable code here, tbh

@@ -2086,7 +2086,7 @@
 	<xsl:template name="subjectDataColumnSPSS">
 		
 		<xsl:text>StudySubjectID</xsl:text>
-		<xsl:text> "Study Subject ID"</xsl:text><xsl:text> /</xsl:text>
+		<xsl:text> "Participant ID"</xsl:text><xsl:text> /</xsl:text>
 		<xsl:text>&#xa;</xsl:text>
 		
 		<xsl:text>ProtocolID</xsl:text>
@@ -2110,7 +2110,7 @@
 
 		<xsl:if test="$subjectStatusExist">
 			<xsl:text>SubjectStatus</xsl:text>
-			<xsl:text> "Subject Status"</xsl:text><xsl:text> /</xsl:text>
+			<xsl:text> "Participant Status"</xsl:text><xsl:text> /</xsl:text>
 			<xsl:text>&#xa;</xsl:text>
 		</xsl:if>
 

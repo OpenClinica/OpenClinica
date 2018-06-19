@@ -64,8 +64,8 @@
 
             <td valign="bottom" id="Tab2'">
                 <div id="Tab2NotSelected"><div class="tab_BG"><div class="tab_L"><div class="tab_R">
-					<a class="tabtext" title="View By Study Subject ID" href='viewSubjectSDV?studyId=${studyId}&studySubjectId=${studySubjectId}&decorator=mydecorator' onclick="javascript:HighlightTab(2);">View By Study Subject ID</a></div></div></div></div>
-                <div id="Tab2Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">View By Study Subject ID</span></div></div></div></div></td>
+					<a class="tabtext" title="View By Participant ID" href='viewSubjectSDV?studyId=${studyId}&studySubjectId=${studySubjectId}&decorator=mydecorator' onclick="javascript:HighlightTab(2);">View By Participant ID</a></div></div></div></div>
+                <div id="Tab2Selected" style="display:none"><div class="tab_BG_h"><div class="tab_L_h"><div class="tab_R_h"><span class="tabtext">View By Participant ID</span></div></div></div></div></td>
                     
         </tr>
     </table>

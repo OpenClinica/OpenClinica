@@ -239,7 +239,7 @@ public class TriggerService {
         StringBuffer sb = new StringBuffer();
         sb.append("Skipped CRFs (due to import rules):<br/>");
         sb.append("<table border=\'0\' cellpadding=\'0\' cellspacing=\'0\' width=\'100%\'>");
-        sb.append("<tr valign=\'top\'> <td>Study OID :</td> <td>Study Subject OID :</td> <td>Event CRF OID:</td> <td>CRF Version OID:</td> <td>Event CRF Status:</td> </tr>");
+        sb.append("<tr valign=\'top\'> <td>Study OID :</td> <td>Participant OID :</td> <td>Event CRF OID:</td> <td>CRF Version OID:</td> <td>Event CRF Status:</td> </tr>");
 
         for (ImportCRFInfo importCrfInfo : importCRFList.getImportCRFList()) {
             String preImportStatus = "";
@@ -273,7 +273,7 @@ public class TriggerService {
         String groupRepeatKey = "1";
         sb.append("<table border=\'0\' cellpadding=\'0\' cellspacing=\'0\' width=\'100%\'>");
         for (SubjectDataBean subjectDataBean : subjectData) {
-            sb.append("<tr valign=\'top\'> <td class=\'table_header_row\' colspan=\'4\'>Study Subject: " + subjectDataBean.getSubjectOID() + "</td> </tr>");
+            sb.append("<tr valign=\'top\'> <td class=\'table_header_row\' colspan=\'4\'>Participant: " + subjectDataBean.getSubjectOID() + "</td> </tr>");
             // next step here
             ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
