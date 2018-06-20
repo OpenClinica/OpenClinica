@@ -198,10 +198,10 @@ public class OpenRosaServiceImpl implements OpenRosaService {
         accessToken = tokenResponse.getBody().getAccessToken();
     }
     /**
-     * This method calls the given callable and if the API call returns a 401 error (because of expired token), it will
+     * This method calls the given supplier and if the API call returns a 401 (because of expired token), it will
      * re-initialize the token and call the API again with the new token.
      * @param supplier the response type
-     * @return the response entity if successful, otherwise throws an exception.
+     * @return the response entity list if successful, otherwise logs an exception and returns null.
      */
     public  <T> List<T>  callManagementApi(Supplier<ResponseEntity<List<T>>> supplier) {
         ResponseEntity<List<T>> response;
