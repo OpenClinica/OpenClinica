@@ -212,6 +212,7 @@ public class OpenRosaServiceImpl implements OpenRosaService {
         try {
             response = future.get(1, TimeUnit.SECONDS);
         }  catch(TimeoutException e) {
+            logger.error("User Service Timeout", "User service did not respond within allocated time");
             return null;
         } catch (Exception e) {
             Throwable t = e.getCause();
@@ -225,13 +226,13 @@ public class OpenRosaServiceImpl implements OpenRosaService {
                 } else {
                     // for all other 4xx errors, extract the error message from Auth0 and throw a 400 error
                     String errorResponse = ex.getResponseBodyAsString();
-                    String errorMessage = getErrorMessage(errorResponse);
-                    throw new CustomParameterizedException(AUTH0_CALL_FAILED, errorMessage);
+                    logger.error(AUTH0_CALL_FAILED, errorResponse);
+                    return null;
                 }
             } else {
                 String errorResponse = e.getMessage();
-                String errorMessage = getErrorMessage(errorResponse);
-                throw new CustomParameterizedException(AUTH0_CALL_FAILED, errorMessage);
+                logger.error(AUTH0_CALL_FAILED, errorResponse);
+                return null;
             }
 
         }

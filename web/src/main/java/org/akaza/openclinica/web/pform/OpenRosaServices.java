@@ -1191,6 +1191,7 @@ public class OpenRosaServices {
             }
             return "";
         });
+        studyUserMap.remove(studyAndSiteEnvUuids.studyEnvUuid + studyAndSiteEnvUuids.siteEnvUuid);
         ResponseBuilder builder = Response.ok(userXml);
         builder = builder.header("Content-Type", "text/xml");
         return builder.build();
