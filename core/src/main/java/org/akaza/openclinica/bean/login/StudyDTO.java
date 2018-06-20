@@ -15,6 +15,7 @@ public class StudyDTO {
 	private String protocolType;
 	private String startDate;
 	private String expectedTotalEnrollment;
+	private Boolean enforceEnrollmentCap;
 	private String status;
 	private String studyOid;
     private ArrayList<ErrorObject> errors;
@@ -98,6 +99,13 @@ public class StudyDTO {
 		this.expectedTotalEnrollment = expectedTotalEnrollment;
 	}
 
+	public Boolean isEnforceEnrollmentCap() {
+		return enforceEnrollmentCap;
+	}
+
+	public void setEnforceEnrollmentCap(Boolean enforceEnrollmentCap) {
+		this.enforceEnrollmentCap = enforceEnrollmentCap;
+	}
 
 	public String getStatus() {
 		return status;

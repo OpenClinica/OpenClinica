@@ -380,6 +380,7 @@ public class StudyController {
         String startDateStr;
         String endDateStr;
         Integer expectedTotalEnrollment;
+        boolean enforceEnrollmentCap;
         Date startDate;
         Date endDate;
         StudyParameterConfig studyParameterConfig;
@@ -401,6 +402,7 @@ public class StudyController {
             startDateStr = (String) map.get("expectedStartDate");
             endDateStr = (String) map.get("expectedEndDate");
             expectedTotalEnrollment = (Integer) map.get("expectedTotalEnrollment");
+            enforceEnrollmentCap = (Boolean) map.get("enforceEnrollmentCap");
             status = setStatus((String) map.get("status"));
         }
 
@@ -623,6 +625,7 @@ public class StudyController {
         study.setDatePlannedStart(parameters.startDate);
         study.setDatePlannedEnd(parameters.endDate);
         study.setExpectedTotalEnrollment(parameters.expectedTotalEnrollment);
+        study.setEnforceEnrollmentCap(parameters.enforceEnrollmentCap);
         study.setProtocolType(parameters.studyType.toLowerCase());
         study.setProtocolDescription(parameters.description);
         if(study.getStatus() != null){
