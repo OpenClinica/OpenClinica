@@ -462,11 +462,20 @@ function StudyRenderer(json) {
 		this.studyDataLoader = new StudyDataLoader(this.study, this.json);
 		this.studyDataLoader.loadStudyLists();
 		if (app_thisClinicalData) {
-			var studyOid = app_thisClinicalData["@StudyOID"];
-			app_siteName = app_globalStudy[studyOid]["GlobalVariables"]["StudyName"] ? app_globalStudy[studyOid]["GlobalVariables"]["StudyName"]
-					: app_siteName;
-			app_siteProtocolName = app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"] ? app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"]
-					: app_siteProtocolName;
+			if(app_thisClinicalData.constructor === Array){
+				var studyOid = app_thisClinicalData[0]["@StudyOID"];
+				app_siteName = app_globalStudy[studyOid]["GlobalVariables"]["StudyName"] ? app_globalStudy[studyOid]["GlobalVariables"]["StudyName"]
+						: app_siteName;
+				app_siteProtocolName = app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"] ? app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"]
+						: app_siteProtocolName;
+			}else{
+				var studyOid = app_thisClinicalData["@StudyOID"];
+				app_siteName = app_globalStudy[studyOid]["GlobalVariables"]["StudyName"] ? app_globalStudy[studyOid]["GlobalVariables"]["StudyName"]
+						: app_siteName;
+				app_siteProtocolName = app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"] ? app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"]
+						: app_siteProtocolName;
+			}
+			
 
 		}
 		var formDef = undefined;
@@ -474,27 +483,38 @@ function StudyRenderer(json) {
 		if (renderMode == "UNPOPULATED_FORM_CRF"
 				|| renderMode == "UNPOPULATED_GLOBAL_CRF" ||renderMode == "POPULATED_FORM_CRF") {
 			// select CRF by OID
-			for ( var i = 0; i < app_formDefs.length; i++) {
-				if (app_formDefs[i]["@OID"] == app_formVersionOID) {
-					formDef = app_formDefs[i];
-					break;
+			if(app_formVersionOID=='*'){
+				formDef = app_formDefs[0];
+			}else{
+				for ( var i = 0; i < app_formDefs.length; i++) {
+					if (app_formDefs[i]["@OID"] == app_formVersionOID) {
+						formDef = app_formDefs[i];
+						break;
+					}
 				}
 			}
+			
 			if (formDef == undefined) {
 				alert("This Case Report Form has been removed, please restore it to continue with Print functionaility");
 				window.history.back();
 				window.close();
 				return;
 			}
-			if (renderMode == 'UNPOPULATED_FORM_CRF' || renderMode == 'POPULATED_FORM_CRF' ) {
-				for ( var i = 0; i < app_studyEventDefs.length; i++) {
-					if (app_studyEventDefs[i]["@OID"] == app_eventOID) {
-						eventDef = app_studyEventDefs[i];
+			
+			if(app_eventOID=='*'){
+				eventDef = app_studyEventDefs[0];
+			}else{
+				if (renderMode == 'UNPOPULATED_FORM_CRF' || renderMode == 'POPULATED_FORM_CRF' ) {
+					for ( var i = 0; i < app_studyEventDefs.length; i++) {
+						if (app_studyEventDefs[i]["@OID"] == app_eventOID) {
+							eventDef = app_studyEventDefs[i];
 
-						break;
+							break;
+						}
 					}
 				}
 			}
+			
 			this.renderPrintableFormDef(formDef, this.NO_PAGE_BREAK, eventDef,
 					app_thisStudyEventRepeatKeyForSingleEvents);
 		} else if (renderMode == "UNPOPULATED_EVENT_CRFS") {

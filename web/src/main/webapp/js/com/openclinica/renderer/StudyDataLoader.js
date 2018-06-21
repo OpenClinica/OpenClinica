@@ -274,11 +274,23 @@ function StudyDataLoader(study, json) {
     var clinicalData = this.json["ClinicalData"];
     var subjectsData = util_ensureArray(clinicalData["SubjectData"]);
     
-    for (var i=0;i<subjectsData.length;i++) {
-      if(subjectsData[i]["@SubjectKey"] == app_studySubjectOID) { 
-        subjectData = subjectsData[i];
-        break;
-      }
+    if(app_studySubjectOID =='*'){
+    	if(!subjectsData){
+			var subjectsData = [];
+    		for (var i=0;i<clinicalData.length;i++) {
+				subjectsData.push(clinicalData[i]["SubjectData"]);
+			}	
+    	}
+    	
+    	subjectData = subjectsData;    	
+    	
+    }else{
+    	for (var i=0;i<subjectsData.length;i++) {
+		  if(subjectsData[i]["@SubjectKey"] == app_studySubjectOID) { 
+			subjectData = subjectsData[i];
+			break;
+		  }
+		}	
     }
     app_thisClinicalData = clinicalData;
     app_thisSubjectsData = subjectData;
