@@ -2,6 +2,7 @@ package org.akaza.openclinica.control.submit;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.core.LockInfo;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
@@ -19,10 +20,10 @@ public class CheckCRFLocked extends SecureController {
         String ecId = request.getParameter("ecId");
         int requestUserId = ub.getId();
         if (StringUtils.isNotEmpty(ecId)) {
-            if (getEventCrfLocker().isLocked(ecId, requestUserId)) {
-                userId = getEventCrfLocker().getLockOwner(ecId);
+            if (getEventCrfLocker().isLocked(ecId, requestUserId, request.getSession().getId())) {
+                LockInfo lockInfo = getEventCrfLocker().getLockOwner(ecId);
                 UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-                UserAccountBean ubean = (UserAccountBean)udao.findByPK(userId);
+                UserAccountBean ubean = (UserAccountBean)udao.findByPK(lockInfo.getUserId());
                 response.getWriter().print(resword.getString("CRF_unavailable") +
                         "\n User "+ubean.getName() + " "+ resword.getString("Currently_entering_data")
                         + "\n " + resword.getString("CRF_reopen_enter_data"));

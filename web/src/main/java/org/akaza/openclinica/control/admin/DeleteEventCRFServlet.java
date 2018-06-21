@@ -143,7 +143,7 @@ public class DeleteEventCRFServlet extends SecureController {
             ArrayList<ItemDataBean> itemData = iddao.findAllByEventCRFId(eventCRF.getId());
             request.setAttribute("items", itemData);
             if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName()
-                    + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId(), ub.getId())) {
+                    + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
                 request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
                         "User " + ub.getName() +" is currently entering data.\\n " +
                         "Once they leave the form, you will be allowed to perform this action.\\n");

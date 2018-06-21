@@ -51,6 +51,7 @@ import org.akaza.openclinica.control.submit.CreateDiscrepancyNoteServlet;
 import org.akaza.openclinica.control.submit.EnketoFormServlet;
 import org.akaza.openclinica.control.submit.EnterDataForStudyEventServlet;
 import org.akaza.openclinica.control.submit.TableOfContentsServlet;
+import org.akaza.openclinica.core.LockInfo;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
@@ -500,24 +501,24 @@ public class ResolveDiscrepancyServlet extends SecureController {
     }
 
     private boolean isCRFLocked(EventCRFBean ecb) {
-        if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId()))
+        if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId(), request.getSession().getId()))
             return true;
         return false;
     }
 
     private String generateErrorMessage(EventCRFBean ecb) {
-        Integer userId = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId());
-        if (userId == null)
+        LockInfo lockInfo = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId());
+        if (lockInfo.getUserId() == null)
             return "";
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-        UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
+        UserAccountBean ubean = (UserAccountBean) udao.findByPK(lockInfo.getUserId());
         String errorData = resword.getString("CRF_unavailable")
                 + " User " + ubean.getName() + " " + resword.getString("Currently_entering_data")
                 + " " + resword.getString("CRF_reopen_enter_data");
         return errorData;
     }
     private boolean lockCRF(EventCRFBean ecb) {
-        if (getEventCrfLocker().lock(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId()))
+        if (getEventCrfLocker().lock(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId(), request.getSession().getId()))
             return true;
         return false;
     }

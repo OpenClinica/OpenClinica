@@ -5,6 +5,8 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.core.EventCRFLocker;
+import org.akaza.openclinica.core.LockInfo;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
@@ -107,7 +109,7 @@ public class EnketoFormServlet extends SecureController {
         }
         logger.info("isFormLocked: " + isFormLocked + ": formUrlObject.isLockOn()" + formUrlObject.isLockOn() + " for user:" + ub.getName());
         if (!isFormLocked && formUrlObject.isLockOn()) {
-            getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId());
+            getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId(), request.getSession().getId());
         }
         int hashIndex = formUrlObject.getFormUrl().lastIndexOf("#");
         String part1 = formUrlObject.getFormUrl();
@@ -137,7 +139,7 @@ public class EnketoFormServlet extends SecureController {
     }
 
     private boolean determineCRFLock(StudyEvent studyEvent, FormLayout formLayout) {
-        if (getEventCrfLocker().isLocked(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId())) {
+        if (getEventCrfLocker().isLocked(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId(), request.getSession().getId())) {
             return true;
         }
         return false;
@@ -145,11 +147,11 @@ public class EnketoFormServlet extends SecureController {
     }
 
     private String generateErrorMessage(StudyEvent studyEvent, FormLayout formLayout) {
-        Integer userId = getEventCrfLocker().getLockOwner(studyEvent, formLayout, currentPublicStudy.getSchemaName());
-        if (userId == null)
+        LockInfo lockInfo = getEventCrfLocker().getLockOwner(studyEvent, formLayout, currentPublicStudy.getSchemaName());
+        if (lockInfo == null)
             return null;
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-        UserAccountBean ubean = (UserAccountBean) udao.findByPK(userId);
+        UserAccountBean ubean = (UserAccountBean) udao.findByPK(lockInfo.getUserId());
         String errorData = resword.getString("CRF_unavailable")
                  + " User " + ubean.getName() + " " + resword.getString("Currently_entering_data")
                 + " " + resword.getString("CRF_reopen_enter_data");
