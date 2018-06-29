@@ -9,6 +9,7 @@ package org.akaza.openclinica.core;
 
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -30,15 +31,14 @@ public class EventCRFLocker implements Serializable {
     private static final long serialVersionUID = -541015729642748245L;
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
 
-
-    private final ConcurrentHashMap<String, Integer> lockedCRFs = new ConcurrentHashMap<>();
+    private final ConcurrentHashMap<String, LockInfo> lockedCRFs = new ConcurrentHashMap<>();
     /**
      * Locks a CRF for an user.
      *
      */
-    public synchronized boolean lock(StudyEvent se, FormLayout fl, String schemaName, int userId) {
-        if (!isLocked(se, fl, schemaName, userId)) {
-            lockedCRFs.put(createEventCrfLockKey(se, fl, schemaName), userId);
+    public synchronized boolean lock(StudyEvent se, FormLayout fl, String schemaName, int userId, String sessionId) {
+        if (!isLocked(se, fl, schemaName, userId, sessionId)) {
+            lockedCRFs.put(createEventCrfLockKey(se, fl, schemaName), new LockInfo(userId, sessionId));
             logger.info("::::::::::::::::::::::Successfully locked for user:" + userId);
             return true;
         }
@@ -46,9 +46,9 @@ public class EventCRFLocker implements Serializable {
         return false;
     }
 
-    public synchronized boolean lock(String ecId, Integer userId) {
-        if (!isLocked(ecId, userId)) {
-            lockedCRFs.put(ecId, userId);
+    public synchronized boolean lock(String ecId, Integer userId, String sessionId) {
+        if (!isLocked(ecId, userId, sessionId)) {
+            lockedCRFs.put(ecId, new LockInfo(userId, sessionId));
             logger.debug("::::::::::::::::::::::Successfully locked ecId: " + ecId + " for user:" + userId);
             return true;
         }
@@ -66,11 +66,30 @@ public class EventCRFLocker implements Serializable {
             logger.debug("::::::::::::::::::::::Unlock for user:" + userId);
             lockedCRFs.forEach((k, v) -> logger.debug("::::::::::::::::::::::unlockAllForUser key: " + k + " value:" + v));
 
-            Set<Entry<String, Integer>> entries = lockedCRFs.entrySet();
-            Iterator<Entry<String, Integer>> it = entries.iterator();
+            Set<Entry<String, LockInfo>> entries = lockedCRFs.entrySet();
+            Iterator<Entry<String, LockInfo>> it = entries.iterator();
             while (it.hasNext()) {
-                Entry<String, Integer> entry = it.next();
-                if (entry.getValue().equals(userId)) {
+                Entry<String, LockInfo> entry = it.next();
+                if (entry.getValue().getUserId() == userId) {
+                    logger.info("Removed lock:" + entry.getKey() + " for user:" + entry.getValue());
+                    it.remove();
+                }
+            }
+        }
+
+    }
+
+    public void unlockAllForUserPerSession(int userId, String sessionId) {
+        synchronized (lockedCRFs) {
+            logger.debug("::::::::::::::::::::::Unlock for user:" + userId);
+            lockedCRFs.forEach((k, v) -> logger.debug("::::::::::::::::::::::unlockAllForUser key: " + k + " value:" + v));
+
+            Set<Entry<String, LockInfo>> entries = lockedCRFs.entrySet();
+            Iterator<Entry<String, LockInfo>> it = entries.iterator();
+            while (it.hasNext()) {
+                Entry<String, LockInfo> entry = it.next();
+                if ((entry.getValue().getUserId() == userId)
+                    && (entry.getValue().getSessionId().equals(sessionId))) {
                     logger.info("Removed lock:" + entry.getKey() + " for user:" + entry.getValue());
                     it.remove();
                 }
@@ -84,18 +103,19 @@ public class EventCRFLocker implements Serializable {
      * If the CRF is locked by a user.
      *
      */
-    public boolean isLocked(StudyEvent se, FormLayout fl, String schemaName, Integer requestUserId) {
-       return isLocked(createEventCrfLockKey(se, fl, schemaName), requestUserId);
+    public boolean isLocked(StudyEvent se, FormLayout fl, String schemaName, Integer requestUserId, String sessionId) {
+       return isLocked(createEventCrfLockKey(se, fl, schemaName), requestUserId, sessionId);
     }
 
 
-    public boolean isLocked(String ecId, Integer requestUserId) {
+    public boolean isLocked(String ecId, Integer requestUserId, String sessionId) {
         logger.debug("::::::::::::::::::::::Check lock for ecId:" + ecId + " and requestUserId:" + requestUserId);
         lockedCRFs.forEach((k,v) -> logger.debug("::::::::::::::::::::::key: "+k+" value:"+v));
 
-        Integer userId = lockedCRFs.get(ecId);
+        LockInfo lockInfo = lockedCRFs.get(ecId);
+        if (lockInfo != null) {
+            Integer userId = lockInfo.userId;
 
-        if (userId != null) {
             if (requestUserId != null && requestUserId == userId) {
                 logger.debug("::::::::::::::::::::::Not locked");
                 return false;
@@ -111,7 +131,7 @@ public class EventCRFLocker implements Serializable {
      * Identifies the owner of a CRF lock.
      *
      */
-    public Integer getLockOwner(StudyEvent se, FormLayout fl, String schemaName) {
+    public LockInfo getLockOwner(StudyEvent se, FormLayout fl, String schemaName) {
 
         return lockedCRFs.get(createEventCrfLockKey(se, fl, schemaName));
     }
@@ -124,7 +144,7 @@ public class EventCRFLocker implements Serializable {
         return key;
     }
 
-    public Integer getLockOwner(String ecId) {
+    public LockInfo getLockOwner(String ecId) {
         return lockedCRFs.get(ecId);
     }
 

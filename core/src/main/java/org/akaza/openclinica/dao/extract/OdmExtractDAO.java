@@ -757,7 +757,6 @@ public class OdmExtractDAO extends DatasetDAO {
      * which do not exist in the database.
      * 
      * @param metadata
-     * @param formVersionOID
      */
 
     // The method underneath tries to reuse the code based on getODMMetadata
@@ -997,7 +996,8 @@ public class OdmExtractDAO extends DatasetDAO {
                 }
             }
         }
-        cvIds = cvIds.substring(0, cvIds.length() - 1);
+        cvIds = cvIds.length() > 0 ? cvIds.substring(0, cvIds.length() - 1) : "";
+
         metadata.setCvIds(cvIds);
 
         HashMap<Integer, Integer> maxLengths = new HashMap<Integer, Integer>();
@@ -1295,7 +1295,7 @@ public class OdmExtractDAO extends DatasetDAO {
             String last = igMandatories.containsKey(igId + "") ? igMandatories.get(igId + "") : itMandatory;
             itemGroupRefs.get(itemGroupRefs.size() - 1).setMandatory(last);
         }
-        sectionIds = sectionIds.length() > 0 ? sectionIds.substring(1, sectionIds.length() - 1) : "";
+        sectionIds = sectionIds.length() > 1 ? sectionIds.substring(1, sectionIds.length() - 1) : "";
         metadata.setSectionIds(sectionIds);
     }
 
@@ -3323,12 +3323,14 @@ public class OdmExtractDAO extends DatasetDAO {
 
 
     protected String getItemDataMaxLengths(String crfVersionIds) {
+        crfVersionIds = crfVersionIds.length() > 0 ? crfVersionIds : "0";
         return "select item_id, max(length(value)) as max_length from item_data where item_id in ("
                 + " select distinct ifm.item_id from item_form_metadata ifm where ifm.crf_version_id in (" + crfVersionIds
                 + ")) and length(value) > 0 group by item_id";
     }
 
     protected String getItemGroupAndItemMetaSql(String crfVersionIds) {
+        crfVersionIds = crfVersionIds.length() > 0 ? crfVersionIds : "0";
         return "select cv.crf_id, cv.crf_version_id,"
                 + " ig.item_group_id, item.item_id, rs.response_set_id, cv.oc_oid as crf_version_oid, ig.oc_oid as item_group_oid, item.oc_oid as item_oid,"
                 + " ig.name as item_group_name, item.name as item_name, item.item_data_type_id, ifm.item_header, ifm.left_item_text,"
@@ -3343,6 +3345,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getItemGroupAndItemMetaOC1_3Sql(String crfVersionIds) {
+        crfVersionIds = crfVersionIds.length() > 0 ? crfVersionIds : "0";
         return "select cv.crf_id, cv.crf_version_id,"
                 + " ig.item_group_id, item.item_id, rs.response_set_id, cv.oc_oid as crf_version_oid, ig.oc_oid as item_group_oid, item.oc_oid as item_oid,"
                 + " ifm.item_header, ifm.subheader, ifm.section_id, ifm.left_item_text, ifm.right_item_text,"
@@ -3368,6 +3371,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getItemGroupAndItemMetaCondition(String crfVersionIds) {
+        crfVersionIds = crfVersionIds.length() > 0 ? crfVersionIds : "0";
         return " where cv.crf_version_id in (" + crfVersionIds + ") and cv.crf_version_id = ifm.crf_version_id"
                 + " and ifm.item_id = item.item_id and ifm.response_set_id = rs.response_set_id"
                 + " and ifm.item_id = igm.item_id and cv.crf_version_id = igm.crf_version_id and igm.item_group_id = ig.item_group_id"
@@ -3375,6 +3379,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getItemGroupAndItemMetaConditionalOrderItems(String crfVersionIds) {
+        crfVersionIds = crfVersionIds.length() > 0 ? crfVersionIds : "0";
         return " where cv.crf_version_id in (" + crfVersionIds + ") and cv.crf_version_id = ifm.crf_version_id"
                 + " and ifm.item_id = item.item_id and ifm.response_set_id = rs.response_set_id"
                 + " and ifm.item_id = igm.item_id and cv.crf_version_id = igm.crf_version_id and igm.item_group_id = ig.item_group_id"
@@ -3568,6 +3573,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getItemGroupAndItemMetaWithUnitSql(String crfVersionIds) {
+        crfVersionIds = crfVersionIds.length() > 0 ? crfVersionIds : "0";
         return "select cv.*, mu.oc_oid as mu_oid from (" + this.getItemGroupAndItemMetaSql(crfVersionIds) + ")cv left join"
                 + " (select item.item_id, mu.oc_oid from item, measurement_unit mu where item.item_id in (select vm.item_id from versioning_map vm"
                 + " where vm.crf_version_id in (" + crfVersionIds + "))" + " and item.units = mu.name )mu on cv.item_id = mu.item_id ";
@@ -3670,12 +3676,14 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getItemCVOIDsSql(String crfVersionIds) {
+        crfVersionIds = crfVersionIds.length() > 0 ? crfVersionIds : "0";
         return "select cv.crf_id, cv.crf_version_id, item.item_id, cv.oc_oid as cv_oid, item.oc_oid as item_oid"
                 + " from crf_version cv, versioning_map vm, item" + " where vm.crf_version_id in (" + crfVersionIds + ")"
                 + " and vm.crf_version_id = cv.crf_version_id and vm.item_id = item.item_id" + " order by cv.crf_id, cv.crf_version_id desc, item.item_id";
     }
 
     protected String getItemCVOIDsSqlUpdated(String crfVersionIds) {
+        crfVersionIds = crfVersionIds.length() > 0 ? crfVersionIds : "0";
         return "select cv.crf_id, cv.crf_version_id, item.item_id, cv.oc_oid as cv_oid, item.oc_oid as item_oid , c.oc_oid as crf_oid "
                 + " from crf_version cv, versioning_map vm, crf c , item" + " where vm.crf_version_id in (" + crfVersionIds + ")"
                 + " and vm.crf_version_id = cv.crf_version_id and c.crf_id = cv.crf_id and vm.item_id = item.item_id"
@@ -3683,15 +3691,18 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected String getSectionLabelsSql(String sectionIds) {
+        sectionIds = sectionIds.length() > 0 ? sectionIds : "0";
         return "select section_id, label from section where section_id in (" + sectionIds + ")";
     }
 
     protected String getParentItemOIDsSql(String crfVersionIds) {
+        crfVersionIds = crfVersionIds.length() > 0 ? crfVersionIds : "0";
         return "select item_id, oc_oid from item where item_id in (select distinct parent_id from item_form_metadata ifm" + " where crf_version_id in ("
                 + crfVersionIds + ") and ifm.parent_id > 0 )";
     }
 
     protected String getSCDsSql(String crfVersionIds) {
+        crfVersionIds = crfVersionIds.length() > 0 ? crfVersionIds : "0";
         return "select cv.crf_id, cv.crf_version_id, item.item_id, cv.oc_oid as crf_version_oid, item.oc_oid as item_oid,"
                 + " ifm.control_item_name, ifm.option_value, ifm.message from crf_version cv,"
                 + " (select im.crf_version_id, im.item_id, scd.control_item_name, scd.option_value, scd.message"

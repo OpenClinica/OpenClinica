@@ -33,6 +33,7 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.core.EventCRFLocker;
+import org.akaza.openclinica.core.LockInfo;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -164,7 +165,7 @@ public class ChangeCRFVersionController {
         UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
         StudyBean currentPublicStudy = (StudyBean) session.getAttribute("publicStudy");
         if (eventCRFLocker.isLocked(currentPublicStudy.getSchemaName()
-                + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId())) {
+                + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
             String errorData = getErrorData(request, ecb, currentPublicStudy);
             if (redirect(request, response, "/ViewStudySubject?id=" + seb.getStudySubjectId() + "&errorData=" + errorData) == null)
                 return null;
@@ -199,9 +200,9 @@ public class ChangeCRFVersionController {
     }
 
     private String getErrorData(HttpServletRequest request, EventCRFBean ecb, StudyBean currentPublicStudy) {
-        Integer lockOwner = eventCRFLocker.getLockOwner(currentPublicStudy.getSchemaName()
+        LockInfo lockInfo = eventCRFLocker.getLockOwner(currentPublicStudy.getSchemaName()
                 + ecb.getStudyEventId() + ecb.getFormLayoutId());
-        UserAccount userAccount = userAccountDao.findByUserId(lockOwner);
+        UserAccount userAccount = userAccountDao.findByUserId(lockInfo.getUserId());
         request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
                 "User " + userAccount.getUserName() + " is currently entering data.\\n " +
                 "Once they leave the form, you will be allowed to perform this action.\\n");
@@ -535,7 +536,7 @@ public class ChangeCRFVersionController {
             EventCRFBean ecb = (EventCRFBean) eventCRFDAO.findByPK(eventCRFId);
             StudyEventBean seb = (StudyEventBean) sed.findByPK(ecb.getStudyEventId());
             if (eventCRFLocker.isLocked(currentPublicStudy.getSchemaName()
-                    + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId())) {
+                    + ecb.getStudyEventId() + ecb.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
                 String errorData = getErrorData(request, ecb, currentPublicStudy);
                 if (redirect(request, response, "/ViewStudySubject?id=" + seb.getStudySubjectId() + "&errorData=" + errorData) == null)
                     return null;

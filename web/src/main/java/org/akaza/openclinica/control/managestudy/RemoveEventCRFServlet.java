@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.core.LockInfo;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -131,11 +132,12 @@ public class RemoveEventCRFServlet extends SecureController {
             String action = request.getParameter("action");
 
             if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName()
-                    + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId(), ub.getId())) {
-                Integer lockOwner = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName()
+                    + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
+
+                LockInfo lockInfo = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName()
                         + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId());
                 UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
-                UserAccountBean userAccountBean = (UserAccountBean) uDAO.findByPK(lockOwner);
+                UserAccountBean userAccountBean = (UserAccountBean) uDAO.findByPK(lockInfo.getUserId());
                 request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
                         "User " + userAccountBean.getName() +" is currently entering data.\\n " +
                         "Once they leave the form, you will be allowed to perform this action.\\n");
@@ -225,8 +227,7 @@ public class RemoveEventCRFServlet extends SecureController {
     /**
      * Send email to director and administrator
      * 
-     * @param request
-     * @param response
+     * @param emailBody
      */
     private void sendEmail(String emailBody) throws Exception {
 

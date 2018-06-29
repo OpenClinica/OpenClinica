@@ -36,7 +36,7 @@ public class CustomHttpSessionListener implements HttpSessionListener {
         }
         EventCRFLocker eventCRFLocker =
                 (EventCRFLocker) ctx.getBean("eventCrfLocker");
-        eventCRFLocker.unlockAllForUser(ub.getId());
+        eventCRFLocker.unlockAllForUserPerSession(ub.getId(), session.getId());
     }
 
     // ...
