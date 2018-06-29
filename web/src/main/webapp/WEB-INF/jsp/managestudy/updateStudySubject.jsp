@@ -50,7 +50,6 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope="session" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
-<jsp:useBean scope="session" id="enrollDateStr" class="java.lang.String"/>
 
 <body class="aka_bodywidth" onload=
   "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});};
@@ -121,18 +120,9 @@
       <input type="text" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" disabled="disabled" class="formfieldM">
       </td></tr>
 
-      <tr valign="top"><td class="table_header_column"><fmt:message key="enrollment_date" bundle="${resword}"/>:</td><td class="table_cell">
-      <input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" disabled="disabled" class="formfieldM" id="enrollmentDateField">
-      </td></tr>
 
-    <c:if test="${study.studyParameterConfig.subjectPersonIdRequired=='required' || study.studyParameterConfig.subjectPersonIdRequired=='optional'}">
-        <tr valign="top">
-            <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
-            <td class="table_cell">
-              <input type="text" name="uniqueIdentifier" disabled="disabled" value="<c:out value="${subject.uniqueIdentifier}"/>" class="formfieldXL">
-            </td>
-        </tr>
-    </c:if>
+
+
 
       <tr valign="top"><td class="table_header_column"><fmt:message key="gender" bundle="${resword}"/>:</td><td class="table_cell">
           <input type="radio" name="gender" disabled="disabled" <c:if test="${subject.gender == 109}">checked</c:if> value="m"><fmt:message key="male" bundle="${resword}"/>

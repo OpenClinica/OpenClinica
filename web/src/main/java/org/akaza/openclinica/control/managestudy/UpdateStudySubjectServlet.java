@@ -336,6 +336,7 @@ public class UpdateStudySubjectServlet extends SecureController {
 
             v.addValidation("label", Validator.NO_BLANKS);
             v.addValidation("label", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
+            v.addValidation("label", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
 
             if (!StringUtil.isBlank(fp.getString("label"))) {
                 StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());

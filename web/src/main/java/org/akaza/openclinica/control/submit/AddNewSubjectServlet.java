@@ -179,8 +179,6 @@ public class AddNewSubjectServlet extends SecureController {
 
                 setUpBeans(classes);
                 Date today = new Date(System.currentTimeMillis());
-                String todayFormatted = local_df.format(today);
-                fp.addPresetValue(INPUT_ENROLLMENT_DATE, todayFormatted);
 
                 // YW 10-07-2007 <<
                 String idSetting = "";
@@ -275,7 +273,6 @@ public class AddNewSubjectServlet extends SecureController {
                 studySubject.setStudyId(currentStudy.getId());
                 studySubject.setLabel(fp.getString(INPUT_LABEL));
                 studySubject.setStatus(Status.AVAILABLE);
-                studySubject.setEnrollmentDate(new Date());
                 studySubject.setOwner(ub);
                 studySubject = ssd.createWithoutGroup(studySubject);
                 if (!studySubject.isActive()) {

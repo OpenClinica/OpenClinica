@@ -312,48 +312,16 @@
                                               <c:out value="${studySub.label}"/>
                                             </td>
 
-                                          </tr>
 
 
-                   <tr>
                                             <td class="table_header_column">
                                               <fmt:message key="status" bundle="${resword}"/>
                                             </td>
                                             <td class="table_cell">
                                               <c:out value="${studySub.status.name}"/>
                                             </td>
-                                            <td class="table_header_row">
-                                              <fmt:message key="enrollment_date" bundle="${resword}"/>
-                                              &nbsp;
-                                              <%-- DN for enrollment date goes here --%>
-                                              <c:if test="${subjectStudy.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                                                <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
-                                                <c:choose>
-                                                  <c:when test="${hasEnrollmentNote eq 'yes'}">
-                                                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
-                                                      <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="${enrollmentNote.resStatus.iconFilePath}" border="0" alt="
-                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                      " title="
-                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                      " >
-                                                    </a>
-                                                  </c:when>
-                                                  <c:otherwise>
-                                                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${studySub.id}&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
-                                                      <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="fa fa-bubble-white" border="0" alt="
-                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                      " title="
-                                                      <fmt:message key="discrepancy_note" bundle="${resword}"/>
-                                                      " >
-                                                    </a>
-                                                  </c:otherwise>
-                                                </c:choose>
-                                              </c:if>
-                                            </td>
-                                            <td class="table_cell">
-                                              <c:out value="${studySub.enrollmentDate}"/>
-                                            </td>
                                           </tr>
+
                                           <tr>
                                             <td class="table_header_column_top">
                                               <fmt:message key="study_name" bundle="${resword}"/>
@@ -753,7 +721,7 @@
                                   </td>
                                   <td class="table_cell">
                                     <c:out value="${studySub.oid}"/>
-                                  </td>
+           ``                       </td>
                                   <td class="table_header_row">
                                     <fmt:message key="gender" bundle="${resword}"/>
                                     <%-- DN for Gender goes here --%>

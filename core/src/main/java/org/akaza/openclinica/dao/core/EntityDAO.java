@@ -2011,7 +2011,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "                                      AND  "
                     + "                                       study_event.study_subject_id = event_crf.study_subject_id  "
                     + "                                      AND " + "                                       (event_crf.status_id " + ecStatusConstraint + ") "
-                    + "                                      ) " + "                   WHERE " + dateConstraint + "                       AND "
+                    + "                                      ) " + "                   WHERE "
                     + "                       study_event_definition.study_event_definition_id IN " + sedin + "                  )  " + "           ) "
                     + "           AND study_subject_id IN ( " + "               SELECT DISTINCT study_subject.study_subject_id "
                     + "                FROM   study_subject   " + "                JOIN   study           ON ( "
@@ -2030,7 +2030,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "                                   study_event.study_event_id = event_crf.study_event_id  " + "                                  AND  "
                     + "                                   study_event.study_subject_id = event_crf.study_subject_id  "
                     + "                                  AND " + "                                   (event_crf.status_id " + ecStatusConstraint + ") "
-                    + "                                  ) " + "               WHERE " + dateConstraint + "                   AND "
+                    + "                                  ) " + "               WHERE  "
                     + "                   study_event_definition.study_event_definition_id IN " + sedin + "           ) " + "           AND "
                     + "           (event_crf.status_id " + ecStatusConstraint + ") " + "   )  " + "   AND  " + "   (item_data.status_id " + itStatusConstraint
                     + ")  " + " ) AS SBQONE, study_event, study_event_definition " + " WHERE  " + " (study_event.study_event_id = SBQONE.studyeventid) "
