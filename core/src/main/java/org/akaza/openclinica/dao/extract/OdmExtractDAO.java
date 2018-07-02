@@ -2259,7 +2259,7 @@ public class OdmExtractDAO extends DatasetDAO {
         this.setEventGroupItemDataWithUnitTypesExpected();
         logger.debug("Begin to GetEventGroupItemWithUnitSql");
         ArrayList viewRows = select(getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
-        logger.debug("getEventGroupItemWithUnitSql : "
+        logger.info("getEventGroupItemWithUnitSql : "
                 + getEventGroupItemWithUnitSql(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
         String idataIds = "";
         if (viewRows.size() > 0) {
@@ -3486,9 +3486,9 @@ public class OdmExtractDAO extends DatasetDAO {
                 + " idata.ordinal as item_data_ordinal, idata.value as value, item.item_data_type_id, idata.item_data_id as item_data_id, item.name as item_name from item,"
                 + " (select event_crf_id, item_id, ordinal, value, item_data_id from item_data where (status_id " + itStatusConstraint + ")"
                 + " and event_crf_id in (select distinct event_crf_id from event_crf where study_subject_id in (select distinct"
-                + " ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ") " + dateConstraint + ") and study_event_id"
+                + " ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ")) and study_event_id"
                 + " in (select distinct study_event_id from study_event" + " where study_event_definition_id in " + sedIds + " and study_subject_id in ("
-                + " select distinct ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ") " + dateConstraint
+                + " select distinct ss.study_subject_id from study_subject ss where ss.study_subject_id in (" + studySubjectIds + ")"
                 + "))))idata," + " (select event_crf_id, crf_version_id from event_crf where status_id " + ecStatusConstraint + ")ec"
                 + " where item.item_id in " + itemIds + " and length(idata.value) > 0 and item.item_id = idata.item_id and idata.event_crf_id = ec.event_crf_id"
                 + " order by ec.event_crf_id, ec.crf_version_id, item.item_id, idata.ordinal) cvidata, item_group_metadata igm,"
