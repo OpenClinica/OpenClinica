@@ -61,8 +61,6 @@
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <tr valign="bottom"><td class="table_header_column"><fmt:message key="study_subject_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.label}"/></td></tr>
-  <tr valign="bottom"><td class="table_header_column"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.secondaryLabel}"/>&nbsp;
-  </td></tr>
   <tr valign="bottom"><td class="table_header_column"><fmt:message key="enrollment_date" bundle="${resword}"/>:</td>
   <td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="created_by" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.owner.name}"/></td></tr>
@@ -72,43 +70,7 @@
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="date_updated" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${studySub.updatedDate}" pattern="${dteFormat}"/>&nbsp;
   </td></tr>
-    <c:if test="${study.studyParameterConfig.subjectPersonIdRequired=='required' || study.studyParameterConfig.subjectPersonIdRequired=='optional'}">
-    <tr valign="top">
-        <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
-        <td class="table_cell">
-          <c:out value="${subject.uniqueIdentifier}"/>
-        </td>
-    </tr>
-    </c:if>
-    <tr valign="top">
-        <td class="table_header_column"><fmt:message key="gender" bundle="${resword}"/>:</td>
-        <td class="table_cell">
-         <c:choose>
-         <c:when test="${subject.gender == 109}">
-          <fmt:message key="male" bundle="${resword}"/>
-         </c:when>
-         <c:when test="${subject.gender == 102}">
-          <fmt:message key="female" bundle="${resword}"/>
-         </c:when>
-         <c:otherwise>
-         <fmt:message key="not_specified" bundle="${resword}"/>
-        </c:otherwise>
-        </c:choose>
-        </td>
-    </tr>
-<c:if test="${study.studyParameterConfig.collectDob=='1' || study.studyParameterConfig.collectDob=='2' }">
-    <tr valign="top">
-        <td class="table_header_column">
-        <c:if test="${study.studyParameterConfig.collectDob=='1'}"><fmt:message key="date_of_birth" bundle="${resword}"/></c:if>
-        <c:if test="${study.studyParameterConfig.collectDob=='2'}"><fmt:message key="year_of_birth" bundle="${resword}"/></c:if>
-        :</td>
-    <td class="table_cell">
-    <c:if test="${study.studyParameterConfig.collectDob=='1'}"><fmt:formatDate value="${subject.dateOfBirth}" pattern="${dteFormat}"/></c:if>
-        <c:if test="${study.studyParameterConfig.collectDob=='2'}"><c:out value="${localBirthDate}"/></c:if>
-        </td>
-    
-    </tr>
-    </c:if>
+
 
 </table>
 </div>
