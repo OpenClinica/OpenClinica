@@ -171,7 +171,9 @@ public class UpdateStudySubjectServlet extends SecureController {
                 SubjectBean sub = (SubjectBean) session.getAttribute("subject");
 
                 studySubject.setUpdater(ub);
-                
+
+                // TODO remove these once we clear the study parameter config
+                /*
                 if (! currentStudy.getStudyParameterConfig().getCollectDob().equals("3")){
                     if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
                     {
@@ -183,10 +185,12 @@ public class UpdateStudySubjectServlet extends SecureController {
                     }
                     if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1"))
                     {
+
                         Date date_new = local_df.parse(fp.getString(UpdateSubjectServlet.DATE_DOB_TO_SAVE));
                         sub.setDateOfBirth(date_new);
                     }
                 }
+                */
                 sub.setUpdater(ub);
                 
                 updateClosedQueriesForUpdatedStudySubjectFields(study, sub, studySubject);
@@ -238,7 +242,8 @@ public class UpdateStudySubjectServlet extends SecureController {
                 session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 request.setAttribute("id", new Integer(studySubId).toString());
 
-                forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+                // forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+                response.sendRedirect(request.getContextPath() + "/ViewStudySubject?id=" +  new Integer(studySubId).toString());
             } else {
                 addPageMessage(respage.getString("no_action_specified"));
                 forwardPage(Page.LIST_STUDY_SUBJECTS);
