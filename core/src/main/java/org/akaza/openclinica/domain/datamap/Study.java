@@ -73,7 +73,6 @@ public class Study extends DataMapDomainObject {
     private Date protocolDateVerification;
     private String phase;
     private Integer expectedTotalEnrollment;
-    private Boolean enforceEnrollmentCap;
     private String sponsor;
     private String collaborators;
     private String medlineIdentifier;
@@ -178,7 +177,6 @@ public class Study extends DataMapDomainObject {
         this.protocolDateVerification = protocolDateVerification;
         this.phase = phase;
         this.expectedTotalEnrollment = expectedTotalEnrollment;
-        this.enforceEnrollmentCap = enforceEnrollmentCap;
         this.sponsor = sponsor;
         this.collaborators = collaborators;
         this.medlineIdentifier = medlineIdentifier;
@@ -604,15 +602,6 @@ public class Study extends DataMapDomainObject {
 
     public void setHealthyVolunteerAccepted(Boolean healthyVolunteerAccepted) {
         this.healthyVolunteerAccepted = healthyVolunteerAccepted;
-    }
-
-    @Column(name = "enforce_enrollment_cap")
-    public Boolean getEnforceEnrollmentCap() {
-        return enforceEnrollmentCap;
-    }
-
-    public void setEnforceEnrollmentCap(Boolean enforceEnrollmentCap) {
-        this.enforceEnrollmentCap = enforceEnrollmentCap;
     }
 
     @Column(name = "purpose", length = 64)

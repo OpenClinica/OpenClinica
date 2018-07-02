@@ -298,6 +298,7 @@ public class StudyController {
         Boolean collectSex = (Boolean) map.get("collectSex");
         String collectPersonId = (String) map.get("collectPersonId");
         Boolean showSecondaryId = (Boolean) map.get("showSecondaryId");
+        String enforceEnrollmentCap =  String.valueOf(map.get("enforceEnrollmentCap"));
         if (collectBirthDate == null) {
             ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
             errorObjects.add(errorObject);
@@ -322,6 +323,12 @@ public class StudyController {
             errorObjects.add(errorObject);
         }
         spc.setSecondaryLabelViewable(Boolean.toString(showSecondaryId));
+        if (enforceEnrollmentCap == null) {
+            ErrorObject errorObject = createErrorObject("Study Object", "Missing Field", "EnforceEnrollmentCap");
+            errorObjects.add(errorObject);
+        }
+        spc.setEnforceEnrollmentCap(enforceEnrollmentCap);
+
         return spc;
     }
 
@@ -380,7 +387,6 @@ public class StudyController {
         String startDateStr;
         String endDateStr;
         Integer expectedTotalEnrollment;
-        boolean enforceEnrollmentCap;
         Date startDate;
         Date endDate;
         StudyParameterConfig studyParameterConfig;
@@ -402,7 +408,6 @@ public class StudyController {
             startDateStr = (String) map.get("expectedStartDate");
             endDateStr = (String) map.get("expectedEndDate");
             expectedTotalEnrollment = (Integer) map.get("expectedTotalEnrollment");
-            enforceEnrollmentCap = (Boolean) map.get("enforceEnrollmentCap");
             status = setStatus((String) map.get("status"));
         }
 
@@ -625,7 +630,6 @@ public class StudyController {
         study.setDatePlannedStart(parameters.startDate);
         study.setDatePlannedEnd(parameters.endDate);
         study.setExpectedTotalEnrollment(parameters.expectedTotalEnrollment);
-        study.setEnforceEnrollmentCap(parameters.enforceEnrollmentCap);
         study.setProtocolType(parameters.studyType.toLowerCase());
         study.setProtocolDescription(parameters.description);
         if(study.getStatus() != null){
@@ -712,6 +716,9 @@ public class StudyController {
                     break;
                 case "secondaryLabelViewable":
                     spv.setValue(studyParameterConfig.getSecondaryLabelViewable());
+                    break;
+                case "enforceEnrollmentCap":
+                    spv.setValue(studyParameterConfig.getEnforceEnrollmentCap());
                     break;
 
             }
@@ -848,6 +855,12 @@ public class StudyController {
         secondaryLabelViewableValue.setValue(studyParameterConfig.getSecondaryLabelViewable());
         studyParameterValues.add(secondaryLabelViewableValue);
 
+        StudyParameterValue enforceEnrollmentCapValue = new StudyParameterValue();
+        enforceEnrollmentCapValue.setStudy(schemaStudy);
+        StudyParameter enforceEnrollmentCapViewable = studyParameterDao.findByHandle("enforceEnrollmentCap");
+        enforceEnrollmentCapValue.setStudyParameter(enforceEnrollmentCapViewable);
+        enforceEnrollmentCapValue.setValue(studyParameterConfig.getEnforceEnrollmentCap());
+        studyParameterValues.add(enforceEnrollmentCapValue);
 
         studyDao.saveOrUpdate(schemaStudy);
         if (StringUtils.isNotEmpty(schema))
