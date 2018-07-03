@@ -508,7 +508,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
     private String generateErrorMessage(EventCRFBean ecb) {
         LockInfo lockInfo = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName() + ecb.getStudyEventId() + ecb.getFormLayoutId());
-        if (lockInfo.getUserId() == null)
+        if (lockInfo == null)
             return "";
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         UserAccountBean ubean = (UserAccountBean) udao.findByPK(lockInfo.getUserId());
