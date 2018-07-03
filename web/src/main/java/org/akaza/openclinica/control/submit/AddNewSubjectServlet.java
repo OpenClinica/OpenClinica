@@ -286,7 +286,8 @@ public class AddNewSubjectServlet extends SecureController {
                 request.setAttribute(FormProcessor.FIELD_SUBMITTED, "0");
                 addPageMessage(respage.getString("subject_with_unique_identifier") + studySubject.getLabel() + respage.getString("X_was_created_succesfully"));
                 request.setAttribute("id", studySubject.getId() + "");
-                forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+                //forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+                response.sendRedirect(request.getContextPath() + "/ViewStudySubject?id=" +  new Integer(studySubject.getId()).toString());
                 return;
             }
         }// end of no error (errors.isEmpty())
