@@ -4,7 +4,7 @@
     <groupId>org.akaza.openclinica</groupId>
     <artifactId>OpenClinica</artifactId>
     <packaging>pom</packaging>
-    <version>4.4.0</version>
+    <version>4.4.1</version>
     <name>OpenClinica</name>
     <description>OpenClinica</description>
 
