@@ -99,7 +99,7 @@ function processUserData(inputPromise) {
                 params = "?" + prevPageParams;
             console.log("passing params:" + params);
             sessionStorage && sessionStorage.clear();
-            window.location.replace(myContextPath + '/pages/logout' + params);
+            //window.location.replace(myContextPath + '/pages/logout' + params);
         } else if (res === "-1") {
             firstLoginCheck = false;
             storage.set(currentUser, userName).then(function() {
@@ -148,7 +148,7 @@ function processTimedOuts(checkCurrentUser, storageFlag) {
                         if (dupeFirstUserCheck !== "true" || !checkCurrentUser) {
                             console.log("currentTime: " + currentTime + " > existingTimeout: " + existingTimeout + " returning to Login screen");
                             sessionStorage && sessionStorage.clear();
-                            window.location.replace(myContextPath + '/pages/logout');
+                            //window.location.replace(myContextPath + '/pages/logout');
                         }
 
                     }) ['catch'](function(err) {

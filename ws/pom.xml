@@ -247,10 +247,6 @@
             <groupId>oracle.ojdbc14</groupId>
             <artifactId>ojdbc14</artifactId>
         </dependency>
-		<dependency>
-			<groupId>com.auth0</groupId>
-			<artifactId>mvc-auth-commons</artifactId>
-		</dependency>
 	</dependencies>
     <build>
         <plugins>

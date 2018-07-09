@@ -5,6 +5,7 @@ import org.akaza.openclinica.config.AppConfig;
 import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.service.LogoutService;
 import org.akaza.openclinica.view.Page;
+import org.keycloak.authorization.client.AuthzClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -29,8 +30,6 @@ import java.util.Map;
 public class LogoutController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Autowired
-    private Auth0Controller controller;
     @Autowired LogoutService logoutService;
     @Autowired AppConfig config;
     @Autowired
@@ -38,15 +37,22 @@ public class LogoutController {
 
     @RequestMapping(value="/logout", method = RequestMethod.GET)
     protected String home(final Map<String, Object> model, final HttpServletRequest req) {
+        //https://keycloak.dev.openclinica.io/auth/realms/cust1/protocol/openid-connect/logout?redirect_uri=https%3A%2F%2Fcust1.build01.dev.openclinica.io%2F%23%2Faccount-study
+        AuthzClient authzClient = AuthzClient.create();
+        String coreAuthUrl = authzClient.getConfiguration().getAuthServerUrl();
+        int port = req.getServerPort();
+        String portStr ="";
+        if (port != 80 && port != 443) {
+            portStr = ":" + port;
+        }
+        String redirectUri = "https://cust1.build01.dev.openclinica.io//#/account-study";
+        String authUrl = coreAuthUrl + "/realms/" + authzClient.getConfiguration().getRealm()
+                + "/protocol/openid-connect/logout?&redirect_uri=" + redirectUri;
         HttpSession session = req.getSession();
         logger.debug("Logout page");
         resetSession(session);
         session.invalidate();
-        String urlPrefix = req.getRequestURL().substring(0, req.getRequestURL().lastIndexOf("/"));
-        int index = urlPrefix.indexOf(req.getContextPath());
-        String returnURL = urlPrefix.substring(0, index).concat(req.getContextPath()).concat("/pages/logoutSuccess");
-        String logoutURL = controller.buildLogoutURL(req, returnURL);
-        return String.format("redirect:%s", logoutURL);
+        return String.format("redirect:%s", authUrl);
     }
 
     @RequestMapping(value="/logoutSuccess", method = RequestMethod.GET)
@@ -72,7 +78,7 @@ public class LogoutController {
             auth.setAuthenticated(false);
             final HttpSession session = request.getSession();
             resetSession(session);
-            response.sendRedirect(controller.buildAuthorizeUrl(request, true));
+            response.sendRedirect("https://oc4.auth0.com/v2/logout");
         }
     }
 

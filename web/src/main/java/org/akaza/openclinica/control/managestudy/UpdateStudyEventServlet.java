@@ -60,7 +60,6 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.Auth0UserService;
-import org.akaza.openclinica.service.Auth0UserServiceImpl;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
@@ -548,8 +547,7 @@ public class UpdateStudyEventServlet extends SecureController {
             // org.akaza.openclinica.core.SecurityManager.getInstance().encrytPassword(password);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             StudyEventBean seb = (StudyEventBean) session.getAttribute("eventSigned");
-            Auth0UserService auth0UserService = ctx.getBean("auth0UserService", Auth0UserServiceImpl.class);
-            boolean isAuthenticated = auth0UserService.authenticateAuth0User(username, password);
+            boolean isAuthenticated = true;
             if (isAuthenticated && ub.getName().equals(username)) {
                 Date date = new Date();
                 seb.setUpdater(ub);
