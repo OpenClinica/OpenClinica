@@ -210,7 +210,12 @@ public class OpenRosaServiceImpl implements OpenRosaService {
                 = CompletableFuture.supplyAsync(supplier);
 
         try {
-            response = future.get(1, TimeUnit.SECONDS);
+            String timeoutStr = CoreResources.getField("queryUserListServiceTimeout");
+            int timeout = 1000;
+            if (StringUtils.isNotEmpty(timeoutStr)) {
+                timeout = new Integer(timeoutStr);
+            }
+            response = future.get(timeout, TimeUnit.MILLISECONDS);
         }  catch(TimeoutException e) {
             logger.error("User Service Timeout", "User service did not respond within allocated time");
             return null;
