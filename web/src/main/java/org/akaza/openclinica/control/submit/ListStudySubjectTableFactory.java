@@ -177,9 +177,24 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         Role r = currentRole.getRole();
-        boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
+        boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR) && !isEnrollmentCapped();
 
         tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink));
+    }
+
+    private boolean isEnrollmentCapped(){
+
+        boolean capIsOn = isEnrollmentCapEnforced();
+
+        int numberOfSubjects = getStudySubjectDAO().getCountofActiveStudySubjects(studyBean);
+
+        StudyBean sb = (StudyBean) getStudyDAO().findByName(studyBean.getName());
+        int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
+
+        if (numberOfSubjects >= expectedTotalEnrollment && capIsOn)
+            return true;
+        else
+            return false;
     }
 
     @Override
@@ -795,6 +810,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         StudyBean pStudy = getParentStudy(study.getOid());
         String participateFormStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getId(), "participantPortal").getValue();
         return participateFormStatus;
+    }
+
+    private boolean isEnrollmentCapEnforced(){
+        String enrollmentCapStatus = getStudyParameterValueDAO().findByHandleAndStudy(studyBean.getId(), "enforceEnrollmentCap").getValue();
+        boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
+        return capEnforced;
     }
 
     private String pManageStatus(StudySubjectBean studySubjectBean) throws Exception {
