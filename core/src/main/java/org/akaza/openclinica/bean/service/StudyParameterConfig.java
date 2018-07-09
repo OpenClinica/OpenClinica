@@ -95,6 +95,7 @@ public class StudyParameterConfig implements Serializable{
         eventLocationRequired = "not_used";
         participantPortal="disabled";
         randomization="disabled";
+        enforceEnrollmentCap = "false";
     }
 
 	

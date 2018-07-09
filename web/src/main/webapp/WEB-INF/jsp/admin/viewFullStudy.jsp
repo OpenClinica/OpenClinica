@@ -230,6 +230,19 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="expected_total_enrollment" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.expectedTotalEnrollment}"/>&nbsp;
   </td></tr>
+    <tr valign="top"><td class="table_header_column"><fmt:message key="enrollment_cap_enforced" bundle="${resword}"/>:</td><td class="table_cell">
+
+       <c:choose>
+       <c:when test="${studyToView.studyParameterConfig.enforceEnrollmentCap == 'false'}">
+       <fmt:message key="no" bundle="${resword}"/>
+       </c:when>
+       <c:otherwise>
+      <fmt:message key="yes" bundle="${resword}"/>
+       </c:otherwise>
+       </c:choose>
+
+
+    </td></tr>
   </table>
 </div>
 </div></div></div></div></div></div></div></div>
