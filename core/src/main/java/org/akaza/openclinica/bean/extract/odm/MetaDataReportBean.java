@@ -920,7 +920,7 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                     + spc.getSubjectIdGeneration() + "\"/>" + nls);
           if(!StringUtils.isEmpty(spc.getParticipantIdTemplate())) {
               xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_participantIdTemplate\"" + " Value=\""
-                      + spc.getParticipantIdTemplate() + "\"/>" + nls);
+                      +  StringEscapeUtils.escapeXml(spc.getParticipantIdTemplate())  + "\"/>" + nls);
           }
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameRequired\"" + " Value=\""
                     + spc.getInterviewerNameRequired() + "\"/>" + nls);

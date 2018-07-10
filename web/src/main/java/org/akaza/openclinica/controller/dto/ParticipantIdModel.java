@@ -1,15 +1,34 @@
 package org.akaza.openclinica.controller.dto;
 
+import java.util.HashMap;
+import java.util.Map;
+import java.util.Set;
+
+
 public class ParticipantIdModel {
-    private static final String[] participantIdVariables= {"siteId", "siteParticipantCount"};
-    private static final String[] participantIdExamples={"Example1", "Example2", "Example3"};
+    private static final String[] examples={"Example1", "Example2", "Example3"};
 
 
-    public static String[] getParticipantIdVariables() {
-        return participantIdVariables;
+   private static Map<String, Object> data = new HashMap<String, Object>();
+    static {
+        data.put("siteId", "HELLO THERE");
+        data.put("siteParticipantCount", 25);
     }
 
-    public static String[] getParticipantIdExamples() {
-        return participantIdExamples;
+
+    public  Set<String> getVariables() {
+        return data.keySet();
+    }
+
+    public  String[] getExamples() {
+        return examples;
+    }
+
+    public static Map<String, Object> getData() {
+        return data;
+    }
+
+    public static void setData(Map<String, Object> data) {
+        ParticipantIdModel.data = data;
     }
 }

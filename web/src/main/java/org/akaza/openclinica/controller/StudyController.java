@@ -5,14 +5,7 @@ import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.time.LocalTime;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 import java.io.StringReader;
@@ -84,6 +77,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
+
+
 @Controller
 @Api(value = "Study", tags = { "Study" }, description = "REST API for Study")
 @RequestMapping(value = "/auth/api/v1/studies")
@@ -2094,10 +2089,8 @@ public class StudyController {
     }
 
     public void verifyTemplateID(String templateID ,ArrayList<ErrorObj> errorObjects) {
-        Map<String, Object> data = new HashMap<String, Object>();
-        // Adding Sample data to validate templateID
-        data.put("siteId", "HELLO THERE");
-        data.put("siteParticipantCount", 25);
+        Map<String, Object> data =ParticipantIdModel.getData();
+
         StringWriter wtr = new StringWriter();
         Template template = null;
         try {
@@ -2116,9 +2109,8 @@ public class StudyController {
 
         }
 
-
-
     }
+
     @RequestMapping( value = "/participantIdTemplate/model", method = RequestMethod.GET )
     public ResponseEntity<Object> getParticipantIdModel()
 
@@ -2131,6 +2123,7 @@ public class StudyController {
         response = new ResponseEntity(participantIdModel, org.springframework.http.HttpStatus.OK);
         return response;
     }
+
 
 }
 
