@@ -2106,12 +2106,12 @@ public class StudyController {
             logger.info("Template ID Sample :"+ wtr.toString());
         } catch (TemplateException te) {
             te.printStackTrace();
-            ErrorObj errorObject = createErrorObject("Study Object", "Template ID is not Valid\" +te.getMessage()", "templateID");
+            ErrorObj errorObject = createErrorObject("Study Object", "Template ID is not Valid" , "templateID");
             errorObjects.add(errorObject);
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            ErrorObj errorObject = createErrorObject("Study Object", "Template ID is not Valid\" +te.getMessage()", "templateID");
+            ErrorObj errorObject = createErrorObject("Study Object", "Template ID is not Valid", "templateID");
             errorObjects.add(errorObject);
 
         }
