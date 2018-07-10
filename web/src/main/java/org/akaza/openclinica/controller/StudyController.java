@@ -300,6 +300,7 @@ public class StudyController {
         Boolean collectSex = (Boolean) map.get("collectSex");
         String collectPersonId = (String) map.get("collectPersonId");
         Boolean showSecondaryId = (Boolean) map.get("showSecondaryId");
+        String enforceEnrollmentCap =  String.valueOf(map.get("enforceEnrollmentCap"));
         if (collectBirthDate == null) {
             ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "CollectBirthDate");
             errorObjects.add(errorObject);
@@ -324,6 +325,12 @@ public class StudyController {
             errorObjects.add(errorObject);
         }
         spc.setSecondaryLabelViewable(Boolean.toString(showSecondaryId));
+        if (enforceEnrollmentCap == null) {
+            ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "EnforceEnrollmentCap");
+            errorObjects.add(errorObject);
+        }
+        spc.setEnforceEnrollmentCap(enforceEnrollmentCap);
+
         return spc;
     }
 
@@ -357,7 +364,7 @@ public class StudyController {
         CoreResources.setRequestSchema(request, schema);
         Study schemaStudy = studyDao.findByStudyEnvUuid(existingStudy.getStudyEnvUuid());
         setChangeableStudySettings(schemaStudy, parameters);
-        updateStudyConfigParameters(request, schemaStudy, parameters.studyParameterConfig,parameters.templateID);
+        updateStudyConfigParameters(request, schemaStudy, parameters.studyParameterConfig,parameters.templateID , parameters.enrollmentCap);
 
         ResponseSuccessStudyDTO responseSuccess = new ResponseSuccessStudyDTO();
         responseSuccess.setMessage(validation_passed_message);
@@ -386,6 +393,7 @@ public class StudyController {
         StudyParameterConfig studyParameterConfig;
         org.akaza.openclinica.domain.Status status;
         String templateID;
+        Boolean enrollmentCap;
 
 
         public StudyParameters(HashMap<String, Object> map) {
@@ -405,6 +413,7 @@ public class StudyController {
             expectedTotalEnrollment = (Integer) map.get("expectedTotalEnrollment");
             status = setStatus((String) map.get("status"));
             templateID = (String) map.get("participantIdTemplate");
+            enrollmentCap = (Boolean) map.get("enforceEnrollmentCap");
 
         }
 
@@ -657,7 +666,7 @@ public class StudyController {
         return schemaStudy;
     }
 
-    private void updateStudyConfigParameters(HttpServletRequest request, Study schemaStudy, StudyParameterConfig studyParameterConfig , String templateID) {
+    private void updateStudyConfigParameters(HttpServletRequest request, Study schemaStudy, StudyParameterConfig studyParameterConfig , String templateID ,Boolean enrollmentCap) {
         List<StudyParameterValue> studyParameterValues = schemaStudy.getStudyParameterValues();
 
 
@@ -679,6 +688,26 @@ public class StudyController {
             studyParameterValue.setValue(templateID);
             studyParameterValues.add(studyParameterValue);
         }
+
+        boolean enrollmentCapExist = false;
+        for (StudyParameterValue s : studyParameterValues) {
+            if (s.getStudyParameter().getHandle().equals("enforceEnrollmentCap")) {
+                s.setValue(enrollmentCap.toString());
+                enrollmentCapExist = true;
+                break;
+            }
+        }
+
+
+        if (!enrollmentCapExist) {
+            StudyParameterValue studyParameterValue = new StudyParameterValue();
+            studyParameterValue.setStudy(schemaStudy);
+            StudyParameter sp = studyParameterDao.findByHandle("enforceEnrollmentCap");
+            studyParameterValue.setStudyParameter(sp);
+            studyParameterValue.setValue(enrollmentCap.toString());
+            studyParameterValues.add(studyParameterValue);
+        }
+
 
 
 
@@ -877,6 +906,12 @@ public class StudyController {
         secondaryLabelViewableValue.setValue(studyParameterConfig.getSecondaryLabelViewable());
         studyParameterValues.add(secondaryLabelViewableValue);
 
+        StudyParameterValue enforceEnrollmentCapValue = new StudyParameterValue();
+        enforceEnrollmentCapValue.setStudy(schemaStudy);
+        StudyParameter enforceEnrollmentCapViewable = studyParameterDao.findByHandle("enforceEnrollmentCap");
+        enforceEnrollmentCapValue.setStudyParameter(enforceEnrollmentCapViewable);
+        enforceEnrollmentCapValue.setValue(studyParameterConfig.getEnforceEnrollmentCap());
+        studyParameterValues.add(enforceEnrollmentCapValue);
 
         studyDao.saveOrUpdate(schemaStudy);
         if (StringUtils.isNotEmpty(schema))
