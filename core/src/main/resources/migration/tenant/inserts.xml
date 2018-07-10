@@ -1106,4 +1106,17 @@
 		</insert>
 	</changeSet>
 
+	<changeSet author="jmcinerney" id="2018-06-29-OC-9208">
+		<comment>Insert a new record in the studyParameter table</comment>
+		<insert tableName="study_parameter">
+			<column name="study_parameter_id" valueNumeric="19"/>
+			<column name="handle" value="enforceEnrollmentCap"/>
+			<column name="name" value="enforceEnrollmentCap"/>
+			<column name="description" value="Enforce the expected enrollment number as a hard cap on the number of subjects."/>
+			<column name="default_value" value="false"/>
+			<column name="inheritable" valueBoolean="true"/>
+			<column name="overridable" valueBoolean="false"/>
+		</insert>
+	</changeSet>
+
 </databaseChangeLog>
