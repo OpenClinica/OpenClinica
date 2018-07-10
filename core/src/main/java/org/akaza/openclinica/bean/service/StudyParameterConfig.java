@@ -55,8 +55,10 @@ public class StudyParameterConfig implements Serializable{
 
     private String randomization;
 
+    private String participantIdTemplate;
+
     private String enforceEnrollmentCap;
-    
+
     public String getRandomization() {
         return randomization;
     }
@@ -96,6 +98,7 @@ public class StudyParameterConfig implements Serializable{
         participantPortal="disabled";
         randomization="disabled";
         enforceEnrollmentCap = "false";
+        participantIdTemplate="";
     }
 
 	
@@ -322,8 +325,14 @@ public class StudyParameterConfig implements Serializable{
     public String getEnforceEnrollmentCap() {
         return enforceEnrollmentCap;
     }
+    public String getParticipantIdTemplate() {
+        return participantIdTemplate;
+    }
 
     public void setEnforceEnrollmentCap(String enforceEnrollmentCap) {
         this.enforceEnrollmentCap = enforceEnrollmentCap;
+    }
+    public void setParticipantIdTemplate(String participantIdTemplate) {
+        this.participantIdTemplate = participantIdTemplate;
     }
 }
