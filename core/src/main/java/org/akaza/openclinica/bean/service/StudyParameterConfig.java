@@ -53,7 +53,9 @@ public class StudyParameterConfig implements Serializable{
     
     private String participantPortal;
 
-    private String randomization;                       
+    private String randomization;
+
+    private String participantIdTemplate;
     
     public String getRandomization() {
         return randomization;
@@ -93,6 +95,7 @@ public class StudyParameterConfig implements Serializable{
         eventLocationRequired = "not_used";
         participantPortal="disabled";
         randomization="disabled";
+        participantIdTemplate="";
     }
 
 	
@@ -316,5 +319,11 @@ public class StudyParameterConfig implements Serializable{
         this.eventLocationRequired = eventLocationRequired;
     }
 
+    public String getParticipantIdTemplate() {
+        return participantIdTemplate;
+    }
 
+    public void setParticipantIdTemplate(String participantIdTemplate) {
+        this.participantIdTemplate = participantIdTemplate;
+    }
 }
