@@ -52,6 +52,7 @@ import org.akaza.openclinica.domain.rule.RulesPostImportContainer;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
 import org.apache.commons.lang.StringEscapeUtils;
+import org.apache.commons.lang.StringUtils;
 import org.castor.xml.XMLConfiguration;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.mapping.MappingException;
@@ -917,6 +918,10 @@ public class MetaDataReportBean extends OdmXmlReportBean {
                     + spc.getGenderRequired() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_subjectIdGeneration\"" + " Value=\""
                     + spc.getSubjectIdGeneration() + "\"/>" + nls);
+          if(!StringUtils.isEmpty(spc.getParticipantIdTemplate())) {
+              xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_participantIdTemplate\"" + " Value=\""
+                      +  StringEscapeUtils.escapeXml(spc.getParticipantIdTemplate())  + "\"/>" + nls);
+          }
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameRequired\"" + " Value=\""
                     + spc.getInterviewerNameRequired() + "\"/>" + nls);
             xml.append(currentIndent + indent + indent + "<OpenClinica:StudyParameterListRef StudyParameterListID=\"SPL_interviewerNameDefault\"" + " Value=\""
@@ -1264,16 +1269,13 @@ public class MetaDataReportBean extends OdmXmlReportBean {
         //
         xml.append(currentIndent + "<OpenClinica:StudyParameterList ID=\"" + "SPL_subjectIdGeneration" + "\" Name=\"" + "How To Generate ParticipantID"
                 + "\">" + nls);
+
         xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "manual" + "\">" + nls);
         xml.append(currentIndent + indent + indent + "<Decode>" + nls);
         xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Manual Entry" + "</TranslatedText>" + nls);
         xml.append(currentIndent + indent + indent + "</Decode>" + nls);
         xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
-        xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "auto editable" + "\">" + nls);
-        xml.append(currentIndent + indent + indent + "<Decode>" + nls);
-        xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Auto-generated and Editable" + "</TranslatedText>" + nls);
-        xml.append(currentIndent + indent + indent + "</Decode>" + nls);
-        xml.append(currentIndent + indent + "</OpenClinica:StudyParameterListItem>" + nls);
+
         xml.append(currentIndent + indent + "<OpenClinica:StudyParameterListItem CodedParameterValue=\"" + "auto non-editable" + "\">" + nls);
         xml.append(currentIndent + indent + indent + "<Decode>" + nls);
         xml.append(currentIndent + indent + indent + indent + "<TranslatedText>" + "Auto-generated and Non-editable" + "</TranslatedText>" + nls);

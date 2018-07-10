@@ -144,6 +144,8 @@ public class StudyConfigService {
                     spc.setParticipantPortal(spv.getValue());
                 } else if (handle.equalsIgnoreCase("randomization")) {
                     spc.setRandomization(spv.getValue());
+                } else if (handle.equalsIgnoreCase("participantIdTemplate")) {
+                    spc.setParticipantIdTemplate(spv.getValue());
                 }
             }
         }
