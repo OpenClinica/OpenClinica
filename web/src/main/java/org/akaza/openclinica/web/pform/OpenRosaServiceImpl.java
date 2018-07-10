@@ -158,6 +158,11 @@ public class OpenRosaServiceImpl implements OpenRosaService {
                     include = false;
                     if (StringUtils.isEmpty(role.getSiteUuid()) || (StringUtils.equals(role.getSiteUuid(), studyAndSiteEnvUuid.siteEnvUuid)))
                         include = true;
+                } else {
+                    // site level users are anot be dded if the participant is not at the site level
+                    if (StringUtils.isNotEmpty(role.getSiteUuid())) {
+                        include = false;
+                    }
                 }
                 if (include) {
                     Element item = doc.createElement("item");
