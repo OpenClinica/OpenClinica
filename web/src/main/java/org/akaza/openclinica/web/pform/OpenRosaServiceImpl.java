@@ -1,5 +1,6 @@
 package org.akaza.openclinica.web.pform;
 
+import com.auth0.json.auth.UserInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
@@ -36,9 +37,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.time.Duration;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.TimeUnit;
 import java.util.concurrent.TimeoutException;
@@ -139,13 +138,14 @@ public class OpenRosaServiceImpl implements OpenRosaService {
         return callManagementApi(getUserList);
     }
 
-    private String getUsersAsXml(List<OCUserRoleDTO> userList, StudyAndSiteEnvUuid studyAndSiteEnvUuid) throws Exception {
+    private String getUsersAsXml(List<OCUserRoleDTO> userServiceList, StudyAndSiteEnvUuid studyAndSiteEnvUuid) throws Exception {
         Document doc = openRosaXMLUtil.buildDocument();
         Element root = openRosaXMLUtil.appendRootElement(doc);
+        List<OCUserDTO> userList = new ArrayList<>();
 
         if (userList == null)
             return null;
-        for (OCUserRoleDTO ocUser : userList) {
+        for (OCUserRoleDTO ocUser : userServiceList) {
             List<StudyEnvironmentRoleDTO> roles = ocUser.getRoles();
             OCUserDTO userInfo = ocUser.getUserInfo();
             if (userInfo.getStatus() != UserStatus.ACTIVE)
@@ -158,25 +158,34 @@ public class OpenRosaServiceImpl implements OpenRosaService {
                     include = false;
                     if (StringUtils.isEmpty(role.getSiteUuid()) || (StringUtils.equals(role.getSiteUuid(), studyAndSiteEnvUuid.siteEnvUuid)))
                         include = true;
+                } else {
+                    // site level users are anot be dded if the participant is not at the site level
+                    if (StringUtils.isNotEmpty(role.getSiteUuid())) {
+                        include = false;
+                    }
                 }
                 if (include) {
-                    Element item = doc.createElement("item");
-                    Element userName = doc.createElement("user_name");
-                    userName.appendChild(doc.createTextNode(userInfo.getUsername()));
-                    Element firstName = doc.createElement("first_name");
-                    firstName.appendChild(doc.createTextNode(userInfo.getFirstName()));
-                    Element lastName = doc.createElement("last_name");
-                    lastName.appendChild(doc.createTextNode(userInfo.getLastName()));
-                    item.appendChild(userName);
-                    item.appendChild(firstName);
-                    item.appendChild(lastName);
-                    if (userInfo.getUsername().equals(studyAndSiteEnvUuid.currentUser.getUserName())) {
-                        item.setAttribute("current", "true");
-                    }
-                    root.appendChild(item);
+                    userList.add(userInfo);
                 }
             }
         }
+        Collections.sort(userList, Comparator.comparing(OCUserDTO::getLastName));
+        userList.forEach(userInfo->{
+            Element item = doc.createElement("item");
+            Element userName = doc.createElement("user_name");
+            userName.appendChild(doc.createTextNode(userInfo.getUsername()));
+            Element firstName = doc.createElement("first_name");
+            firstName.appendChild(doc.createTextNode(userInfo.getFirstName()));
+            Element lastName = doc.createElement("last_name");
+            lastName.appendChild(doc.createTextNode(userInfo.getLastName()));
+            item.appendChild(userName);
+            item.appendChild(firstName);
+            item.appendChild(lastName);
+            if (userInfo.getUsername().equals(studyAndSiteEnvUuid.currentUser.getUserName())) {
+                item.setAttribute("current", "true");
+            }
+            root.appendChild(item);
+        });
         String writer = openRosaXMLUtil.getWriter(doc);
         return writer;
     }
