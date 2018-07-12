@@ -128,10 +128,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("rule_oid"), null, null);
         ++index;
-        configureColumn(row.getColumn(columnNames[index]), resword.getString("gender"), null, null, true, false);
-        ++index;
-        configureColumn(row.getColumn(columnNames[index]), resword.getString("secondary_ID"), null, null);
-        ++index;
         // group class columns
         for (int i = index; i < index + studyGroupClasses.size(); i++) {
             StudyGroupClassBean studyGroupClass = studyGroupClasses.get(i - index);
@@ -165,10 +161,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // tableFacade.addFilterMatcher(new MatcherKey(Integer.class), new
         // SubjectEventStatusFilterMatcher());
 
-        for (int i = 6; i < 6 + studyGroupClasses.size(); i++) {
+        for (int i = 4; i < 4 + studyGroupClasses.size(); i++) {
             tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectGroupFilterMatcher());
         }
-        for (int i = 6 + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
+        for (int i = 4 + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
             tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectEventStatusFilterMatcher());
         }
 
@@ -325,8 +321,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("status");
         columnNamesList.add("enrolledAt");
         columnNamesList.add("oid");
-        columnNamesList.add("subject.charGender");
-        columnNamesList.add("secondaryLabel");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
         }
@@ -343,8 +337,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("studySubject.status");
         columnNamesList.add("enrolledAt");
         columnNamesList.add("studySubject.oid");
-        columnNamesList.add("subject.charGender");
-        columnNamesList.add("studySubject.secondaryLabel");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
         }
