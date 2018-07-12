@@ -664,46 +664,8 @@ public class StudyController {
     private void updateStudyConfigParameters(HttpServletRequest request, Study schemaStudy, StudyParameterConfig studyParameterConfig , String templateID ,Boolean enrollmentCap) {
         List<StudyParameterValue> studyParameterValues = schemaStudy.getStudyParameterValues();
 
-
-        boolean templateValueExist = false;
-        for (StudyParameterValue s : studyParameterValues) {
-            if (s.getStudyParameter().getHandle().equals("participantIdTemplate")) {
-                s.setValue(templateID);
-                templateValueExist = true;
-                break;
-            }
-        }
-
-
-        if (!templateValueExist) {
-            StudyParameterValue studyParameterValue = new StudyParameterValue();
-            studyParameterValue.setStudy(schemaStudy);
-            StudyParameter sp = studyParameterDao.findByHandle("participantIdTemplate");
-            studyParameterValue.setStudyParameter(sp);
-            studyParameterValue.setValue(templateID);
-            studyParameterValues.add(studyParameterValue);
-        }
-
-        boolean enrollmentCapExist = false;
-        for (StudyParameterValue s : studyParameterValues) {
-            if (s.getStudyParameter().getHandle().equals("enforceEnrollmentCap")) {
-                s.setValue(enrollmentCap.toString());
-                enrollmentCapExist = true;
-                break;
-            }
-        }
-
-
-        if (!enrollmentCapExist) {
-            StudyParameterValue studyParameterValue = new StudyParameterValue();
-            studyParameterValue.setStudy(schemaStudy);
-            StudyParameter sp = studyParameterDao.findByHandle("enforceEnrollmentCap");
-            studyParameterValue.setStudyParameter(sp);
-            studyParameterValue.setValue(enrollmentCap.toString());
-            studyParameterValues.add(studyParameterValue);
-        }
-
-
+        addParameterValue(studyParameterValues, templateID, schemaStudy, "participantIdTemplate");
+        addParameterValue(studyParameterValues, enrollmentCap.toString(), schemaStudy, "enforceEnrollmentCap");
 
 
         for (StudyParameterValue spv : studyParameterValues) {
@@ -2097,14 +2059,20 @@ public class StudyController {
             template = new Template("template name", new StringReader(templateID), new Configuration());
             template.process(data, wtr);
             logger.info("Template ID Sample :"+ wtr.toString());
+
+            if(wtr.toString().length()>255){
+                ErrorObj errorObject = createErrorObject("Study Object", "ID Template length must not exceed 255 characters." , "templateID");
+                errorObjects.add(errorObject);
+            }
+
         } catch (TemplateException te) {
             te.printStackTrace();
-            ErrorObj errorObject = createErrorObject("Study Object", "Template ID is not Valid" , "templateID");
+            ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid" , "templateID");
             errorObjects.add(errorObject);
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            ErrorObj errorObject = createErrorObject("Study Object", "Template ID is not Valid", "templateID");
+            ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid", "templateID");
             errorObjects.add(errorObject);
 
         }
@@ -2124,6 +2092,28 @@ public class StudyController {
         return response;
     }
 
+
+    public void addParameterValue(List<StudyParameterValue> studyParameterValues , String parameter , Study schemaStudy , String handle){
+        boolean parameterValueExist = false;
+        for (StudyParameterValue s : studyParameterValues) {
+            if (s.getStudyParameter().getHandle().equals(handle)) {
+                s.setValue(parameter);
+                parameterValueExist = true;
+                break;
+            }
+        }
+
+
+        if (!parameterValueExist) {
+            StudyParameterValue studyParameterValue = new StudyParameterValue();
+            studyParameterValue.setStudy(schemaStudy);
+            StudyParameter sp = studyParameterDao.findByHandle(handle);
+            studyParameterValue.setStudyParameter(sp);
+            studyParameterValue.setValue(parameter);
+            studyParameterValues.add(studyParameterValue);
+        }
+
+    }
 
 }
 

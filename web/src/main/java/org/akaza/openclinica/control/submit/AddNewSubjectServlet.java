@@ -231,23 +231,20 @@ public class AddNewSubjectServlet extends SecureController {
             }
 
 
-            if (!label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
-                StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy);
-
-                StudySubjectBean subjectWithSameLabelInParent = new StudySubjectBean();
-                // tbh
-                if (currentStudy.getParentStudyId() > 0) {
-                    subjectWithSameLabelInParent = ssd.findSameByLabelAndStudy(label, currentStudy.getParentStudyId(), 0);// <
-
-                }
-                if (subjectWithSameLabel.isActive() || subjectWithSameLabelInParent.isActive()) {
-                    Validator.addError(errors, INPUT_LABEL, resexception.getString("another_assigned_this_ID_choose_unique"));
-                }
-            }else{
-
+            if (label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
                 label = generateParticipantIdUsingTemplate();
+            }
 
+            StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy);
 
+            StudySubjectBean subjectWithSameLabelInParent = new StudySubjectBean();
+            // tbh
+            if (currentStudy.getParentStudyId() > 0) {
+                subjectWithSameLabelInParent = ssd.findSameByLabelAndStudy(label, currentStudy.getParentStudyId(), 0);// <
+
+            }
+            if (subjectWithSameLabel.isActive() || subjectWithSameLabelInParent.isActive()) {
+                Validator.addError(errors, INPUT_LABEL, resexception.getString("another_assigned_this_ID_choose_unique"));
             }
 
             if (checkIfStudyEnrollmentCapped()){
@@ -551,16 +548,19 @@ public class AddNewSubjectServlet extends SecureController {
 
     public String generateParticipantIdUsingTemplate() {
         Map<String, Object> data = new HashMap<String, Object>();
-        String templateID="";
+        String templateID = "";
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        StudyParameterValueBean spv= spvdao.findByHandleAndStudy  (currentStudy.getId() ,"participantIdTemplate");
-        if(spv!=null)
-         templateID =spv.getValue();
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(currentStudy.getId(), "participantIdTemplate");
+        if (spv != null)
+            templateID = spv.getValue();
 
-        String siteId= currentStudy.getName();
-        int count = 35;
+        String siteId = currentStudy.getName();
+        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+        ArrayList ss = ssdao.findAllByStudy(currentStudy);
 
-
+        int count=0;
+        if (ss != null)
+             count = ss.size();
 
         // Adding Sample data to validate templateID
         data.put("siteId", siteId);

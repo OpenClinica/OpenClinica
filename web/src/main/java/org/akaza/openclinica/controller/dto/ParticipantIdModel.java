@@ -6,8 +6,7 @@ import java.util.Set;
 
 
 public class ParticipantIdModel {
-    private static final String[] examples={"Example1", "Example2", "Example3"};
-
+    private static final String[] examples={"${(siteParticipantCount+1)?string[\"0000\"]}", "${siteId}-${(siteParticipantCount+1)?string[\"0000\"]}"};
 
    private static Map<String, Object> data = new HashMap<String, Object>();
     static {
