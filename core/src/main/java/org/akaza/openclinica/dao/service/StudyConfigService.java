@@ -134,6 +134,8 @@ public class StudyConfigService {
                     spc.setPersonIdShownOnCRF(spv.getValue());
                 } else if (handle.equalsIgnoreCase("secondaryLabelViewable")) {
                     spc.setSecondaryLabelViewable(spv.getValue());
+                } else if (handle.equalsIgnoreCase("enforceEnrollmentCap")) {
+                    spc.setEnforceEnrollmentCap(spv.getValue());
                 } else if (handle.equalsIgnoreCase("adminForcedReasonForChange")) {
                     spc.setAdminForcedReasonForChange(spv.getValue());
                 } else if (handle.equalsIgnoreCase("eventLocationRequired")) {
@@ -142,6 +144,8 @@ public class StudyConfigService {
                     spc.setParticipantPortal(spv.getValue());
                 } else if (handle.equalsIgnoreCase("randomization")) {
                     spc.setRandomization(spv.getValue());
+                } else if (handle.equalsIgnoreCase("participantIdTemplate")) {
+                    spc.setParticipantIdTemplate(spv.getValue());
                 }
             }
         }

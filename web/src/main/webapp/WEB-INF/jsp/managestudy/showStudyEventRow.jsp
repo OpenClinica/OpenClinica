@@ -383,7 +383,7 @@
 		 </c:if>
 		</c:otherwise>
 		</c:choose>
-		<c:if test="${(study.status.available) && (!userRole.monitor) && (!currRow.bean.studyEvent.subjectEventStatus.locked) &&(dec.eventCRF.status.name != 'completed') }">
+		<c:if test="${(study.status.available) && (!userRole.monitor) && (!currRow.bean.studyEvent.subjectEventStatus.locked) &&(dec.eventCRF.status.name != 'completed') && dedc.edc.status.available }">
 		<td>
 		 <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
 			onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
@@ -391,10 +391,10 @@
 		    name="bt_Delete1" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"></a>
 		 </td>
 		 </c:if>
-		 
-		   
+
+
 		    <c:if test="${ (userRole.director || userRole.coordinator) &&
- (study.status.available ) && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped)
+ (study.status.available ) && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped)&& dedc.edc.status.available
  
  }">
    <td>

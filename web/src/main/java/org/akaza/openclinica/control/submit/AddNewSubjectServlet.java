@@ -8,14 +8,16 @@
 package org.akaza.openclinica.control.submit;
 
 // import org.akaza.openclinica.bean.core.Role;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
+import java.util.*;
 
+import freemarker.template.Configuration;
+import freemarker.template.Template;
+import freemarker.template.TemplateException;
 import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
@@ -49,8 +51,10 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -239,7 +243,17 @@ public class AddNewSubjectServlet extends SecureController {
                 if (subjectWithSameLabel.isActive() || subjectWithSameLabelInParent.isActive()) {
                     Validator.addError(errors, INPUT_LABEL, resexception.getString("another_assigned_this_ID_choose_unique"));
                 }
+            }else{
+
+                label = generateParticipantIdUsingTemplate();
+
+
             }
+
+            if (checkIfStudyEnrollmentCapped()){
+                Validator.addError(errors, INPUT_LABEL, resexception.getString("current_study_full"));
+            }
+            //checkIfStudyEnrollmentCapped(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_full"));
 
 
             if (!errors.isEmpty()) {
@@ -271,7 +285,7 @@ public class AddNewSubjectServlet extends SecureController {
                 StudySubjectBean studySubject = new StudySubjectBean();
                 studySubject.setSubjectId(subject.getId());
                 studySubject.setStudyId(currentStudy.getId());
-                studySubject.setLabel(fp.getString(INPUT_LABEL));
+                studySubject.setLabel(label);
                 studySubject.setStatus(Status.AVAILABLE);
                 studySubject.setOwner(ub);
                 studySubject = ssd.createWithoutGroup(studySubject);
@@ -293,7 +307,35 @@ public class AddNewSubjectServlet extends SecureController {
         }// end of no error (errors.isEmpty())
     }// end of fp.isSubmitted()
 
+    private boolean checkIfStudyEnrollmentCapped() {
+        boolean capIsOn = isEnrollmentCapEnforced();
 
+        // If cap reached.
+        StudySubjectDAO ssd = new StudySubjectDAO(sm.getDataSource());
+        int numberOfSubjects = ssd.getCountofActiveStudySubjects(currentStudy);
+
+
+        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+        StudyBean sb = (StudyBean) studyDAO.findByName(currentStudy.getName());
+        int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
+
+        if (numberOfSubjects >= expectedTotalEnrollment && capIsOn) {
+            return true;
+        }
+            else {
+            return false;
+        }
+        //    addPageMessage(message);
+        //    forwardPage(page);
+
+    }
+
+    private boolean isEnrollmentCapEnforced(){
+        StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(sm.getDataSource());
+        String enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getId(), "enforceEnrollmentCap").getValue();
+        boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
+        return capEnforced;
+    }
 
     private List<RuleSetBean> createRuleSet(StudySubjectBean ssub,
 			StudyEventDefinitionBean sed) {
@@ -506,4 +548,39 @@ public class AddNewSubjectServlet extends SecureController {
         }
 
     }
+
+    public String generateParticipantIdUsingTemplate() {
+        Map<String, Object> data = new HashMap<String, Object>();
+        String templateID="";
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+        StudyParameterValueBean spv= spvdao.findByHandleAndStudy  (currentStudy.getId() ,"participantIdTemplate");
+        if(spv!=null)
+         templateID =spv.getValue();
+
+        String siteId= currentStudy.getName();
+        int count = 35;
+
+
+
+        // Adding Sample data to validate templateID
+        data.put("siteId", siteId);
+        data.put("siteParticipantCount", count);
+        StringWriter wtr = new StringWriter();
+        Template template = null;
+        try {
+            template = new Template("template name", new StringReader(templateID), new Configuration());
+            template.process(data, wtr);
+            logger.info("Template ID Sample :"+ wtr.toString());
+        } catch (TemplateException te) {
+            te.printStackTrace();
+
+
+        } catch (IOException ioe) {
+            ioe.printStackTrace();
+
+
+        }
+return wtr.toString();
+    }
+
 }

@@ -1,0 +1,27 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.5.xsd">
+
+
+	<changeSet author="jkeremian" id="2018-07-09-0C-9318-01">
+		<comment>Updating study_parameter_value table value column size from 50 into 255 character</comment>
+		<modifyDataType
+				columnName="value"
+				newDataType="varchar(255)"
+				tableName="study_parameter_value"/>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2018-07-09-0C-9318-02">
+		<insert tableName="study_parameter">
+			<column name="study_parameter_id" valueNumeric="20"/>
+			<column name="handle" value="participantIdTemplate"/>
+			<column name="name" value=""/>
+			<column name="description" value="participant ID Template"/>
+			<column name="default_value" value=""/>
+			<column name="inheritable" valueBoolean="true"/>
+			<column name="overridable" valueBoolean="false"/>
+		</insert>
+	</changeSet>
+
+</databaseChangeLog>
