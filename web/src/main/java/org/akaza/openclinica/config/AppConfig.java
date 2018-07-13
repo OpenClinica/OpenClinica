@@ -18,15 +18,22 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.config.http.SessionCreationPolicy ;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
 
+import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 @SuppressWarnings("unused")
 @Configuration
 @EnableWebSecurity (debug = false)
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @PropertySources({
-        @PropertySource("classpath:auth0.properties")
+        @PropertySource("classpath:auth0.properties"),
+        @PropertySource("classpath:datainfo.properties")
 })
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 
@@ -51,6 +58,9 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
 
     @Value(value = "${auth0.securedRoute}")
     private String securedRoute;
+
+    @Value(value = "${SBSUrl}")
+    private String sbsUrl;
 
     @Bean
     public AuthenticationController authenticationController() throws UnsupportedEncodingException {
@@ -89,7 +99,10 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
                 ).permitAll()
                 .antMatchers("/partner/home").permitAll()
                 .antMatchers(securedRoute).hasAnyAuthority("ROLE_USER")
-                .antMatchers(securedRoute).authenticated();
+                .antMatchers(securedRoute).authenticated()
+            .and()
+            .cors()
+                .configurationSource(getCorsConfigurationSource());
         http.authorizeRequests().antMatchers("/includes/**").permitAll().anyRequest().permitAll();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER);
         http.csrf().disable();
@@ -110,5 +123,27 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    /**
+     * @return CORS configuration that allows requests from Study Manager application.
+     * @throws MalformedURLException if there is an error parsing study manager url.
+     */
+    private CorsConfigurationSource getCorsConfigurationSource() throws MalformedURLException {
+        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        corsConfigurationSource.setAlwaysUseFullPath(true);
+
+        URL studyManagerUrl = new URL(sbsUrl);
+        String studyManagerHost = studyManagerUrl.getProtocol() + "://" + studyManagerUrl.getAuthority();
+
+        // Set up CORS configuration for REST API endpoints
+        CorsConfiguration restApiCorsConfiguration = new CorsConfiguration();
+        // Allow requests originated from Study Manager
+        restApiCorsConfiguration.addAllowedOrigin(studyManagerHost);
+        restApiCorsConfiguration.setAllowCredentials(true);
+        restApiCorsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
+        restApiCorsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
+        corsConfigurationSource.registerCorsConfiguration("/pages/auth/api/**", restApiCorsConfiguration);
+        return corsConfigurationSource;
     }
 }
