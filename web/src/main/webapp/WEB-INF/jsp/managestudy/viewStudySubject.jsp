@@ -345,7 +345,7 @@
                                             </td>
                                             <td class="table_cell">
                                               <c:if test="${subjectStudy.parentStudyId>0}">
-                                                <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>">
+                                                <a href="ViewSite?id=<c:out value="${subjectStudy.id}"/>">
                                                   <c:out value="${subjectStudy.name}"/>
                                                 </a>
                                               </c:if>
