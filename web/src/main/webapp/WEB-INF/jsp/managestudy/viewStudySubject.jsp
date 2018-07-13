@@ -288,7 +288,7 @@
                                   <tr>
                                     <!-- Table Tools/Actions cell -->
                                     <td class="table_actions" valign="top">
-                                      <c:if test="${study.status.available}">
+                                     <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
                                         <c:if test="${!userRole.monitor}">
                                           <a href="UpdateStudySubject?id=<c:out value="${studySub.id}"/>&amp;action=show">
                                             Edit
