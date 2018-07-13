@@ -259,7 +259,14 @@ function StudyRenderer(json) {
 
 		app_renderMode = undefined;
 
-		if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {
+		if (renderMode == "STUDY_ALL_SUBJECT_CASE_BOOK" ) {
+			
+			this
+			.renderPrintableFormDef(formDef,
+					pageBreak, eventDef,
+					app_thisStudyEventRepeatKeyForSingleEvents);
+
+		}else if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {
 	//		this.renderPageHeader(pageBreak, app_printTime,
 	//				app_studyEventCoverPageType, app_eventName);
 
@@ -450,6 +457,278 @@ function StudyRenderer(json) {
 		;
 		return s;
 
+	}
+	
+
+	this.renderPrintableFormDefByRenderMode = function(formDef, eventDef,renderMode) {
+	if (renderMode == "UNPOPULATED_FORM_CRF"
+			|| renderMode == "UNPOPULATED_GLOBAL_CRF" ||renderMode == "POPULATED_FORM_CRF") {
+		
+		if (formDef == undefined) {
+			alert("This Case Report Form has been removed, please restore it to continue with Print functionaility");
+			window.history.back();
+			window.close();
+			return;
+		}
+		
+		this.renderPrintableFormDef(formDef, this.NO_PAGE_BREAK, eventDef,
+				app_thisStudyEventRepeatKeyForSingleEvents);
+	} else if (renderMode == "UNPOPULATED_EVENT_CRFS") {
+		
+		this.renderPrintableEventCRFs(renderMode, eventDef,
+				this.NO_PAGE_BREAK);
+	} else if (renderMode == "UNPOPULATED_STUDY_CRFS") {
+		this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime,
+				app_studyCoverPageType, app_eventName);
+		this.renderString += this.createStudyCoverPage();
+		// select all CRFs from study
+		for ( var i = 0; i < app_studyEventDefs.length; i++) {
+			eventDef = app_studyEventDefs[i];
+			this.renderPrintableEventCRFs(renderMode, eventDef,
+					this.PAGE_BREAK);
+		}
+	} else if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {		
+			app_renderMode = renderMode;
+			this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime,
+					app_studyCoverPageType, app_eventName);
+			this.renderString += this.renderSubjectTableOfContents();
+			this.renderPageHeader(this.PAGE_BREAK, app_printTime,
+					app_studyCoverPageType, app_eventName);
+
+			var studySubjectDefRenderer = new StudySubjectDefRenderer();
+			var subjectGroupData = util_ensureArray(app_thisSubjectsData["OpenClinica:SubjectGroupData"]);
+			var currentSubjectGroupData = [];
+			var thisSubjectGroupData = {};
+			if (subjectGroupData) {
+				for ( var k = 0; k < subjectGroupData.length; k++) {
+					thisSubjectGroupData.studyGroupClassName = subjectGroupData[k]["@OpenClinica:StudyGroupClassName"] ? subjectGroupData[k]["@OpenClinica:StudyGroupClassName"]
+							: "";
+					thisSubjectGroupData.studyGroupName = subjectGroupData[k]["@OpenClinica:StudyGroupName"] ? subjectGroupData[k]["@OpenClinica:StudyGroupName"]
+							: "";
+					currentSubjectGroupData.push(thisSubjectGroupData);
+					thisSubjectGroupData = {};
+
+				}
+			}
+			this.renderString += studySubjectDefRenderer
+					.renderStudySubjectData(app_thisSubjectsData,
+							currentSubjectGroupData);
+			studySubjectDefRenderer.studySubjectdns = app_thisSubjectsData["OpenClinica:DiscrepancyNotes"];
+			studySubjectDefRenderer.studySubjectaudits = app_thisSubjectsData["OpenClinica:AuditLogs"];
+			if (app_displayDNs == 'y') {
+	    	app_attributes = ['unique_identifier','gender' ,'date_of_birth','enrollment_date'];
+	          for (var i=0;i<app_attributes.length;i++) {
+
+				this.renderString += this
+						.print_EventCRF_StudyEvent_StudySubject_Discrepancies(
+								studySubjectDefRenderer,
+				//					studySubjectDefRenderer.studySubjectdns);
+				studySubjectDefRenderer.studySubjectdns,app_attributes[i]);
+	          }
+	            }
+			if (app_displayAudits == 'y') {
+				this.renderString += this
+						.print_EventCRF_StudyEvent_StudySubject_Audits(
+								studySubjectDefRenderer,
+								studySubjectDefRenderer.studySubjectaudits);
+			}
+			// select all CRFs from study
+			for ( var i = 0; i < app_studyEventDefs.length; i++) {
+				eventDef = app_studyEventDefs[i];
+				this.renderPrintableEventCRFs(renderMode, eventDef,
+						this.PAGE_BREAK);
+			}
+		} else if (renderMode == "STUDY_ALL_SUBJECT_CASE_BOOK") {
+			if(app_allSubjectsData.constructor === Array){
+				for ( var j = 0; j < app_allSubjectsData.length; j++) {
+					app_thisSubjectsData = app_allSubjectsData[j];
+					var app_thisSubjectData = app_allSubjectsData[j];
+					var studyEventsData = util_ensureArray(app_thisSubjectData["StudyEventData"]);					
+					app_renderMode = renderMode;
+					
+					if(studyEventsData){
+						 for (var i=0;i<studyEventsData.length;i++) {
+							 app_thisStudyEvent = studyEventsData[i];
+							
+							 this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime,
+									app_studyCoverPageType, app_eventName);
+								this.renderString += this.renderSubjectTableOfContents();
+							//	this.renderPageHeader(this.PAGE_BREAK, app_printTime,
+							//			app_studyCoverPageType, app_eventName);
+				
+								var studySubjectDefRenderer = new StudySubjectDefRenderer();
+								var subjectGroupData = util_ensureArray(app_thisSubjectData["OpenClinica:SubjectGroupData"]);
+								var currentSubjectGroupData = [];
+								var thisSubjectGroupData = {};
+								if (subjectGroupData) {
+									for ( var k = 0; k < subjectGroupData.length; k++) {
+										thisSubjectGroupData.studyGroupClassName = subjectGroupData[k]["@OpenClinica:StudyGroupClassName"] ? subjectGroupData[k]["@OpenClinica:StudyGroupClassName"]
+												: "";
+										thisSubjectGroupData.studyGroupName = subjectGroupData[k]["@OpenClinica:StudyGroupName"] ? subjectGroupData[k]["@OpenClinica:StudyGroupName"]
+												: "";
+										currentSubjectGroupData.push(thisSubjectGroupData);
+										thisSubjectGroupData = {};
+				
+									}
+								}
+								this.renderString += studySubjectDefRenderer
+										.renderStudySubjectData(app_thisSubjectData,
+												currentSubjectGroupData);
+								studySubjectDefRenderer.studySubjectdns = app_thisSubjectData["OpenClinica:DiscrepancyNotes"];
+								studySubjectDefRenderer.studySubjectaudits = app_thisSubjectData["OpenClinica:AuditLogs"];
+								if (app_displayDNs == 'y') {
+						    	app_attributes = ['unique_identifier','gender' ,'date_of_birth','enrollment_date'];
+						          for (var i=0;i<app_attributes.length;i++) {
+				
+									this.renderString += this
+											.print_EventCRF_StudyEvent_StudySubject_Discrepancies(
+													studySubjectDefRenderer,
+									//					studySubjectDefRenderer.studySubjectdns);
+									studySubjectDefRenderer.studySubjectdns,app_attributes[i]);
+						          }
+						            }
+								if (app_displayAudits == 'y') {
+									this.renderString += this
+											.print_EventCRF_StudyEvent_StudySubject_Audits(
+													studySubjectDefRenderer,
+													studySubjectDefRenderer.studySubjectaudits);
+								}
+							//event and CRF
+							for ( var m = 0; m < app_studyEventDefs.length; m++) {				
+								eventDef = app_studyEventDefs[m];
+								formRefs = eventDef.FormRef;
+								
+								if(app_thisStudyEvent["@StudyEventOID"] == eventDef["@OID"]){
+									for ( var l = 0; l < formRefs.length; l++) {
+										formOID = formRefs[l]["@FormOID"];
+																
+										for ( var n = 0; n < app_formDefs.length; n++) {
+											if (app_formDefs[i]["@OID"] == formOID) {
+												formDef = app_formDefs[n];
+
+												this.renderPrintableEventCRF(renderMode, eventDef,formDef,
+														this.PAGE_BREAK);
+											}																
+										}
+										
+									}
+								}																									
+							
+							 }//end of event and CRF	 
+						 }
+						 
+					}
+					
+					
+				
+													
+				
+				}
+				
+				}else{
+					app_renderMode = renderMode;
+					this.renderPageHeader(this.NO_PAGE_BREAK, app_printTime,
+							app_studyCoverPageType, app_eventName);
+					this.renderString += this.renderSubjectTableOfContents();
+					this.renderPageHeader(this.PAGE_BREAK, app_printTime,
+							app_studyCoverPageType, app_eventName);
+		
+					var studySubjectDefRenderer = new StudySubjectDefRenderer();
+					var subjectGroupData = util_ensureArray(app_thisSubjectsData["OpenClinica:SubjectGroupData"]);
+					var currentSubjectGroupData = [];
+					var thisSubjectGroupData = {};
+					if (subjectGroupData) {
+						for ( var k = 0; k < subjectGroupData.length; k++) {
+							thisSubjectGroupData.studyGroupClassName = subjectGroupData[k]["@OpenClinica:StudyGroupClassName"] ? subjectGroupData[k]["@OpenClinica:StudyGroupClassName"]
+									: "";
+							thisSubjectGroupData.studyGroupName = subjectGroupData[k]["@OpenClinica:StudyGroupName"] ? subjectGroupData[k]["@OpenClinica:StudyGroupName"]
+									: "";
+							currentSubjectGroupData.push(thisSubjectGroupData);
+							thisSubjectGroupData = {};
+		
+						}
+					}
+					this.renderString += studySubjectDefRenderer
+							.renderStudySubjectData(app_thisSubjectsData,
+									currentSubjectGroupData);
+					studySubjectDefRenderer.studySubjectdns = app_thisSubjectsData["OpenClinica:DiscrepancyNotes"];
+					studySubjectDefRenderer.studySubjectaudits = app_thisSubjectsData["OpenClinica:AuditLogs"];
+					if (app_displayDNs == 'y') {
+			    	app_attributes = ['unique_identifier','gender' ,'date_of_birth','enrollment_date'];
+			          for (var i=0;i<app_attributes.length;i++) {
+		
+						this.renderString += this
+								.print_EventCRF_StudyEvent_StudySubject_Discrepancies(
+										studySubjectDefRenderer,
+						//					studySubjectDefRenderer.studySubjectdns);
+						studySubjectDefRenderer.studySubjectdns,app_attributes[i]);
+			          }
+			            }
+					if (app_displayAudits == 'y') {
+						this.renderString += this
+								.print_EventCRF_StudyEvent_StudySubject_Audits(
+										studySubjectDefRenderer,
+										studySubjectDefRenderer.studySubjectaudits);
+					}
+					// select all CRFs from study
+					for ( var i = 0; i < app_studyEventDefs.length; i++) {
+						eventDef = app_studyEventDefs[i];
+						this.renderPrintableEventCRFs(renderMode, eventDef,
+								this.PAGE_BREAK);
+					}
+			}
+		
+	}
+	return this.renderString;
+
+	}
+	
+	this.renderPrintableStudyWrapper = function(renderMode) {	
+
+		pageHeaderRenderer = new PageHeaderRenderer();
+		this.setStudy(renderMode);
+		this.studyDataLoader = new StudyDataLoader(this.study, this.json);
+		this.studyDataLoader.loadStudyLists();
+		if (app_thisClinicalData) {
+			if(app_thisClinicalData.constructor === Array){
+				var studyOid = app_thisClinicalData[0]["@StudyOID"];
+				app_siteName = app_globalStudy[studyOid]["GlobalVariables"]["StudyName"] ? app_globalStudy[studyOid]["GlobalVariables"]["StudyName"]
+						: app_siteName;
+				app_siteProtocolName = app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"] ? app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"]
+						: app_siteProtocolName;
+			}else{
+				var studyOid = app_thisClinicalData["@StudyOID"];
+				app_siteName = app_globalStudy[studyOid]["GlobalVariables"]["StudyName"] ? app_globalStudy[studyOid]["GlobalVariables"]["StudyName"]
+						: app_siteName;
+				app_siteProtocolName = app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"] ? app_globalStudy[studyOid]["GlobalVariables"]["ProtocolName"]
+						: app_siteProtocolName;
+			}
+			
+
+		}
+		var formDef = undefined;
+		var formRefs = undefined;
+		var eventDef = undefined;
+		var formOID = undefined;
+		
+		if(app_eventOID=='*' && renderMode =='STUDY_ALL_SUBJECT_CASE_BOOK'){		
+						
+			this.renderString = this.renderPrintableFormDefByRenderMode(formDef, eventDef,renderMode);
+
+		}else{			
+			for ( var i = 0; i < app_studyEventDefs.length; i++) {
+				if (app_studyEventDefs[i]["@OID"] == app_eventOID) {
+					eventDef = app_studyEventDefs[i];
+
+					break;
+				}
+			}
+			
+			
+			this.renderString = this.renderPrintableFormDefByRenderMode(formDef, eventDef,renderMode);
+		}
+		
+		return this.renderString;
 	}
 	/*
 	 * renderPrintableStudy(renderMode) A kind of factory function for the
@@ -1330,6 +1609,64 @@ function StudyRenderer(json) {
 			this.renderString += pageHeaderRenderer.render(printTime,
 					currentPageType, "", app_thisStudyEvent)[0].outerHTML;
 
+	}
+	
+	/**
+	 *  for print specific form
+	 */
+	this.renderPrintableEventCRF = function(renderMode, eventDef, formDef,pageBreak) {
+		app_eventName = eventDef["@Name"];
+
+		app_renderMode = undefined;
+
+		if (renderMode == "STUDY_ALL_SUBJECT_CASE_BOOK" ) {
+			
+			this
+			.renderPrintableFormDef(formDef,
+					pageBreak, eventDef,
+					app_thisStudyEventRepeatKeyForSingleEvents);
+
+		}else if (renderMode == "STUDY_SUBJECT_CASE_BOOK") {
+	//		this.renderPageHeader(pageBreak, app_printTime,
+	//				app_studyEventCoverPageType, app_eventName);
+
+			this.renderStudyEventData(eventDef);
+
+		} else {
+			this.renderString += this.createStudyEventCoverPage(eventDef);
+
+			// select all CRFs from StudyEvent
+			var studyEventFormRefs = eventDef["FormRef"];
+			if (studyEventFormRefs[0] == undefined) {
+				studyEventFormRefs = new Array();
+				studyEventFormRefs.push(eventDef["FormRef"]);
+			}
+
+			for ( var i = 0; i < studyEventFormRefs.length; i++) {
+				pageBreak = this.PAGE_BREAK
+				var defaultDisplayed = false;
+				var formRef = studyEventFormRefs[i];
+				for ( var j = 0; j < app_formDefs.length && !defaultDisplayed; j++) {
+					if (app_formDefs[j]["@OID"] == formRef["@FormOID"]) {
+						var formDef = app_formDefs[j];
+						var presentInEventDef = util_ensureArray(formDef["OpenClinica:FormDetails"]["OpenClinica:PresentInEventDefinition"]);
+						for ( var l = 0; l < presentInEventDef.length; l++) {
+							var inEventDef = presentInEventDef[l];
+							if (inEventDef["@IsDefaultVersion"] == "Yes"
+									&& inEventDef["@HideCRF"] == "No"
+									&& inEventDef["@StudyEventOID"] == eventDef["@OID"]) {
+								this
+										.renderPrintableFormDef(formDef,
+												pageBreak, eventDef,
+												app_thisStudyEventRepeatKeyForSingleEvents);
+								defaultDisplayed = true;
+								break;
+							}
+						}
+					}
+				}
+			}
+		}
 	}
 
 	/*

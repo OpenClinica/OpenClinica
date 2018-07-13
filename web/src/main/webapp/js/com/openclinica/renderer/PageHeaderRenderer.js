@@ -62,12 +62,12 @@ else
 	  var interviewDate = app_thisFormData?(app_thisFormData["@OpenClinica:InterviewDate"]?app_thisFormData["@OpenClinica:InterviewDate"]:""):"";
 	  var gender = app_thisSubjectsData?(app_thisSubjectsData["@OpenClinica:Sex"]?app_thisSubjectsData["@OpenClinica:Sex"]:""):"";
 	  var ssID = app_thisSubjectsData?(app_thisSubjectsData["@OpenClinica:StudySubjectID"]?app_thisSubjectsData["@OpenClinica:StudySubjectID"]:""):"";
-
+      var studyName = app_studyName? app_studyName:app_studyOID;
 	  
 	  return RenderUtil.render(RenderUtil.get("print_page_header"), {
       printTime: printTime,
       pageType: pageType,
-      studyName: app_studyName, 
+      studyName: studyName, 
       siteName: app_siteName, 
       protocolName: app_protocolName,
       siteProtocolName: app_siteProtocolName,

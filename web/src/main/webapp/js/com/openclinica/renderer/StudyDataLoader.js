@@ -188,9 +188,12 @@ function StudyDataLoader(study, json) {
   this.loadStudyEventDefs = function() {
     debug("loading study events", util_logDebug );
     app_studyEventDefs = this.study["MetaDataVersion"]["StudyEventDef"];
-    if (app_studyEventDefs[0] == undefined) { 
+    if (app_studyEventDefs == undefined) { 
       app_studyEventDefs = new Array();
-      app_studyEventDefs.push(this.study["MetaDataVersion"]["StudyEventDef"]);
+      if(this.study["MetaDataVersion"]["StudyEventDef"]){
+    	  app_studyEventDefs.push(this.study["MetaDataVersion"]["StudyEventDef"]);
+      }
+      
      
     }
     for (var i=0;i< app_studyEventDefs.length;i++) {
@@ -207,7 +210,7 @@ function StudyDataLoader(study, json) {
   this.loadItemDefs = function() {
     debug("loading item items", util_logDebug );
     app_itemDefs = this.study["MetaDataVersion"]["ItemDef"];
-    if (app_itemDefs[0] == undefined) { 
+    if (app_itemDefs == undefined) { 
       app_itemDefs = new Array();
       app_itemDefs.push(this.study["MetaDataVersion"]["ItemDef"]);
     }
@@ -222,9 +225,12 @@ function StudyDataLoader(study, json) {
     // app_formDefs = this.study["MetaDataVersion"]["FormDef"];
 	  app_formDefs  = util_ensureArray(this.study["MetaDataVersion"]["FormDef"]);
 
-    if (app_formDefs[0] == undefined) { 
+    if (app_formDefs == undefined) { 
       app_formDefs = new Array();
-      app_formDefs.push(this.study["MetaDataVersion"]["FormDef"]);
+      if(this.study["MetaDataVersion"]["FormDef"]){
+    	  app_formDefs.push(this.study["MetaDataVersion"]["FormDef"]);
+      }
+     
     }
     for(var i=0;i<app_formDefs.length;i++){
     	var formDefOid = app_formDefs[i]["@OID"];
@@ -294,6 +300,7 @@ function StudyDataLoader(study, json) {
     }
     app_thisClinicalData = clinicalData;
     app_thisSubjectsData = subjectData;
+    app_allSubjectsData = subjectData;
     //app_studySubjectDOB = subjectData["@OpenClinica:DateOfBirth"];
     
     var studyEventsData = util_ensureArray(subjectData["StudyEventData"]);

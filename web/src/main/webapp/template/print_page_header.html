@@ -9,7 +9,7 @@
    
     
       </div>  
-{{if app_renderMode != "STUDY_SUBJECT_CASE_BOOK"}}  
+{{if app_renderMode != "STUDY_SUBJECT_CASE_BOOK" && app_renderMode != "STUDY_ALL_SUBJECT_CASE_BOOK"}}  
   
   {{if pageType != app_studyCoverPageType}}
       <div class='header-text text-left-aligned'>
@@ -35,7 +35,7 @@
     
     </div>  
     
-{{if app_renderMode != "STUDY_SUBJECT_CASE_BOOK"}}  
+{{if app_renderMode != "STUDY_SUBJECT_CASE_BOOK"  && app_renderMode != "STUDY_ALL_SUBJECT_CASE_BOOK"}}  
     
       <div class='header-text'>${app_crfLabel}: ${formStatus ? formStatus : '___________________'}</div>  
 
