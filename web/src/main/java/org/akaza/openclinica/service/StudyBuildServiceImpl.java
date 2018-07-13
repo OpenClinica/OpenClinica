@@ -3,10 +3,12 @@ package org.akaza.openclinica.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.sf.json.util.JSONUtils;
+import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -14,6 +16,7 @@ import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
@@ -182,6 +185,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             return studyEnvUuidProcessed;
         }
         StudyUserRoleBean studyUserRoleBean = new StudyUserRoleBean();
+        UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+        UserAccountBean jdbcUb = (UserAccountBean) userAccountDAO.findByUserName(ub.getUserName());
+        ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getUserName());
+        jdbcUb.setRoles(userRoleBeans);
+        session.setAttribute(SecureController.USER_BEAN_NAME, jdbcUb);
+
         ub.setActiveStudy(userStudy);
         userAccountDao.saveOrUpdate(ub);
 

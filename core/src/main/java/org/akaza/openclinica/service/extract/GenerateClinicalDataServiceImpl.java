@@ -560,7 +560,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		Set<String> keysGrpOIDs = oidMap.keySet();
 		ArrayList<ImportItemGroupDataBean> iigDataBean = new ArrayList<ImportItemGroupDataBean>();
 		ImportItemGroupDataBean importItemGrpDataBean = new ImportItemGroupDataBean();
+
 		for (String grpOID : keysGrpOIDs) {
+			LOGGER.info("*********************Processing grpOID:" + grpOID);
 			ArrayList<String> vals = oidMap.get(grpOID);
 			importItemGrpDataBean = new ImportItemGroupDataBean();
 			int firstIndexOf = StringUtils.ordinalIndexOf(grpOID, GROUPOID_ORDINAL_DELIM, 1);
@@ -581,10 +583,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 					int index = value.indexOf(DELIMITER);
 					if (!value.trim().equalsIgnoreCase(DELIMITER)) {
 						String itemOid = value.substring(0, index);
+						LOGGER.info("*******************itemOid:" + itemOid);
 						iiDataBean.setItemOID(itemOid);
 						iiDataBean.setValue(value.substring(index + 1, value.length()));
 						iiDataBean.setDeleted(isDeleted);
 						Item item = itemDao.findByOcOID(itemOid);
+						LOGGER.info("*****************item:" + item);
 						iiDataBean.setItemName(item.getName());
 						if (isCollectAudits() || isCollectDns()) {
 							iiDataBean = fetchItemDataAuditValue(oidDNAuditMap.get(grpOID), iiDataBean);
