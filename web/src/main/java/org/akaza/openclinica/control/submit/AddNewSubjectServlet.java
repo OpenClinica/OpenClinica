@@ -23,12 +23,7 @@ import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
-import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
@@ -252,6 +247,26 @@ public class AddNewSubjectServlet extends SecureController {
             }
             //checkIfStudyEnrollmentCapped(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_full"));
 
+            if(!errors.isEmpty() && subIdSetting.equalsIgnoreCase("auto non-editable")){
+                // generate default template
+
+                StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+
+                StudySubjectBean studySubjectBean = new StudySubjectBean();
+                while(studySubjectBean!=null) {
+                    Random rnd = new Random();
+                    int n = 100000 + rnd.nextInt(900000);
+                    label = currentStudy.getOid() + "-" + n;
+                    studySubjectBean= ssdao.findByLabel(label);
+                if(studySubjectBean!=null && !studySubjectBean.isActive())
+                    studySubjectBean=null;
+                }
+
+
+                errors.clear();
+
+            }
+
 
             if (!errors.isEmpty()) {
 
@@ -269,6 +284,21 @@ public class AddNewSubjectServlet extends SecureController {
                 }
 
             } else {
+
+
+                int subjectCount = currentStudy.getSubjectCount();
+                if(subjectCount==0) {
+                    StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+                    ArrayList ss = ssdao.findAllBySiteId(currentStudy.getId());
+                    if (ss != null) {
+                        subjectCount = ss.size();
+                    }
+                }
+                StudyDAO studydao = new StudyDAO(sm.getDataSource());
+                currentStudy.setSubjectCount(subjectCount+1);
+                currentStudy.setType(StudyType.GENETIC);
+                studydao.update(currentStudy);
+
                 // no errors
                 SubjectBean subject = new SubjectBean();
                 subject.setStatus(Status.AVAILABLE);
@@ -550,21 +580,23 @@ public class AddNewSubjectServlet extends SecureController {
         Map<String, Object> data = new HashMap<String, Object>();
         String templateID = "";
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(currentStudy.getId(), "participantIdTemplate");
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(currentStudy.getParentStudyId()==0 ?currentStudy.getId():currentStudy.getParentStudyId(), "participantIdTemplate");
         if (spv != null)
             templateID = spv.getValue();
 
+        int subjectCount = currentStudy.getSubjectCount();
+        if(subjectCount==0) {
+            StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+            ArrayList ss = ssdao.findAllBySiteId(currentStudy.getId());
+            if (ss != null) {
+                subjectCount = ss.size();
+            }
+        }
         String siteId = currentStudy.getName();
-        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-        ArrayList ss = ssdao.findAllByStudy(currentStudy);
-
-        int count=0;
-        if (ss != null)
-             count = ss.size();
 
         // Adding Sample data to validate templateID
         data.put("siteId", siteId);
-        data.put("siteParticipantCount", count);
+        data.put("siteParticipantCount", subjectCount);
         StringWriter wtr = new StringWriter();
         Template template = null;
 

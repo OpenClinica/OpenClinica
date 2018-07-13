@@ -36,6 +36,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.service.StudyParameterConfig;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.dto.ParticipantIdModel;
+import org.akaza.openclinica.controller.dto.ParticipantIdVariable;
 import org.akaza.openclinica.controller.dto.SiteStatusDTO;
 import org.akaza.openclinica.controller.dto.StudyEnvStatusDTO;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
@@ -2054,14 +2055,23 @@ public class StudyController {
         StringWriter wtr = new StringWriter();
         Template template = null;
         try {
+
+
+            if(templateID.length()>255){
+                ErrorObj errorObject = createErrorObject("Study Object", "ID Template length must not exceed 255 characters." , "templateID");
+                errorObjects.add(errorObject);
+            }
+
+            for( ParticipantIdVariable variable : ParticipantIdModel.getVariables()){
+                if(!templateID.contains(variable.getName())){
+                    ErrorObj errorObject = createErrorObject("Study Object", "ID Template must include " + variable.getName()  , "templateID");
+                    errorObjects.add(errorObject);
+                }
+            }
             template = new Template("template name", new StringReader(templateID), new Configuration());
             template.process(data, wtr);
             logger.info("Template ID Sample :"+ wtr.toString());
 
-            if(wtr.toString().length()>255){
-                ErrorObj errorObject = createErrorObject("Study Object", "ID Template length must not exceed 255 characters." , "templateID");
-                errorObjects.add(errorObject);
-            }
 
         } catch (TemplateException te) {
             te.printStackTrace();
