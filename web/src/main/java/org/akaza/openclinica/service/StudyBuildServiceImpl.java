@@ -8,6 +8,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -188,7 +189,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         UserAccountBean jdbcUb = (UserAccountBean) userAccountDAO.findByUserName(ub.getUserName());
         ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getUserName());
         jdbcUb.setRoles(userRoleBeans);
-        session.setAttribute("userBean", jdbcUb);
+        session.setAttribute(SecureController.USER_BEAN_NAME, jdbcUb);
 
         ub.setActiveStudy(userStudy);
         userAccountDao.saveOrUpdate(ub);
