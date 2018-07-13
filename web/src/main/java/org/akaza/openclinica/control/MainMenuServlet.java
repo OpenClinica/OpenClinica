@@ -148,6 +148,7 @@ public class MainMenuServlet extends SecureController {
 
         ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getName());
         ub.setRoles(userRoleBeans);
+        session.setAttribute("userBean", ub);
         StudyDAO sd = getStudyDAO();
         StudyBean tmpPublicStudy = sd.findByStudyEnvUuid(studyEnvUuid);
 
