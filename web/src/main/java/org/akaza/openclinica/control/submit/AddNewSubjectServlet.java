@@ -214,7 +214,13 @@ public class AddNewSubjectServlet extends SecureController {
             if (discNotes == null) {
                 discNotes = new FormDiscrepancyNotes();
             }
+
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
+            String label = fp.getString(INPUT_LABEL);
+
+            if (label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
+                label = generateParticipantIdUsingTemplate();
+            }
             v.addValidation(INPUT_LABEL, Validator.NO_BLANKS);
 
             String subIdSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
@@ -223,16 +229,10 @@ public class AddNewSubjectServlet extends SecureController {
             }
 
             HashMap errors = v.validate();
-            String label = fp.getString(INPUT_LABEL);
 
             if (label.contains("<") || label.contains(">")) {
                 Validator.addError(errors, INPUT_LABEL, resexception
                         .getString("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements"));
-            }
-
-
-            if (label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
-                label = generateParticipantIdUsingTemplate();
             }
 
             StudySubjectBean subjectWithSameLabel = ssd.findByLabelAndStudy(label, currentStudy);
@@ -567,10 +567,12 @@ public class AddNewSubjectServlet extends SecureController {
         data.put("siteParticipantCount", count);
         StringWriter wtr = new StringWriter();
         Template template = null;
+
         try {
             template = new Template("template name", new StringReader(templateID), new Configuration());
             template.process(data, wtr);
-            logger.info("Template ID Sample :"+ wtr.toString());
+            logger.info("Template ID  :"+ wtr.toString());
+
         } catch (TemplateException te) {
             te.printStackTrace();
 

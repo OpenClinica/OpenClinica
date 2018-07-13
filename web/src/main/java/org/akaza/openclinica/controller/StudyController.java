@@ -70,11 +70,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 
@@ -2051,7 +2047,9 @@ public class StudyController {
     }
 
     public void verifyTemplateID(String templateID ,ArrayList<ErrorObj> errorObjects) {
-        Map<String, Object> data =ParticipantIdModel.getData();
+
+
+        Map<String, Object> data =ParticipantIdModel.getDataModel();
 
         StringWriter wtr = new StringWriter();
         Template template = null;
@@ -2067,12 +2065,12 @@ public class StudyController {
 
         } catch (TemplateException te) {
             te.printStackTrace();
-            ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid" , "templateID");
+            ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid: "+ te.getMessage() , "templateID");
             errorObjects.add(errorObject);
 
         } catch (IOException ioe) {
             ioe.printStackTrace();
-            ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid", "templateID");
+            ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid: "+ ioe.getMessage(), "templateID");
             errorObjects.add(errorObject);
 
         }
