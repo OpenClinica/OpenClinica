@@ -159,6 +159,11 @@
 	</query>
 
     <query>
+        <name>findAllBySitetId</name>
+        <sql>SELECT * FROM study_subject where study_id=?</sql>
+    </query>
+
+    <query>
 		<name>findAnotherBySameLabel</name>
 		<sql>
 			SELECT ss.*
@@ -192,6 +197,14 @@
 			WHERE ss.label=?
 				AND ss.study_id=st.study_id
 				AND (st.study_id=? or st.parent_study_id=?)
+		</sql>
+	</query>
+	<query>
+		<name>findByLabel</name>
+		<sql>
+			SELECT ss.*
+			FROM study_subject ss
+			WHERE ss.label=?
 		</sql>
 	</query>
 	<query>

@@ -80,6 +80,7 @@ public class StudyBean extends AuditableEntityBean {
     private String studyEnvUuid;
     private boolean published;
     public int filePath;
+    private int subjectCount;
 
     public boolean isPublished() {
         return published;
@@ -1153,4 +1154,11 @@ public class StudyBean extends AuditableEntityBean {
         this.filePath = filePath;
     }
 
+    public int getSubjectCount() {
+        return subjectCount;
+    }
+
+    public void setSubjectCount(int subjectCount) {
+        this.subjectCount = subjectCount;
+    }
 }
