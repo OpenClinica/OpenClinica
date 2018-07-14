@@ -2062,7 +2062,8 @@ public class StudyController {
                 errorObjects.add(errorObject);
             }
 
-            for( ParticipantIdVariable variable : ParticipantIdModel.getVariables()){
+            ParticipantIdModel participantIdModel = new ParticipantIdModel();
+            for( ParticipantIdVariable variable : participantIdModel.getVariables()){
                 if(!templateID.contains(variable.getName())){
                     ErrorObj errorObject = createErrorObject("Study Object", "ID Template must include " + variable.getName()  , "templateID");
                     errorObjects.add(errorObject);

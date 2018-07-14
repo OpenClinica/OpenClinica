@@ -19,7 +19,7 @@ public class ParticipantIdModel {
         return data;
     }
 
-    public static List<ParticipantIdVariable> getVariables() {
+    public List<ParticipantIdVariable> getVariables() {
         return variables;
     }
 
