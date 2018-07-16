@@ -30,10 +30,12 @@ import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.core.LockInfo;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -144,9 +146,15 @@ public class DeleteEventCRFServlet extends SecureController {
             request.setAttribute("items", itemData);
             if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName()
                     + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
-                request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
-                        "User " + ub.getName() +" is currently entering data.\\n " +
-                        "Once they leave the form, you will be allowed to perform this action.\\n");
+                LockInfo lockInfo = getEventCrfLocker().getLockOwner(eventCRF.getStudyEvent(), eventCRF.getFormLayout(), currentPublicStudy.getSchemaName());
+                if (lockInfo != null) {
+                    UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+                    UserAccountBean ubean = (UserAccountBean) udao.findByPK(lockInfo.getUserId());
+                    String errorData = resword.getString("CRF_unavailable")
+                            + " User " + ubean.getName() + " " + resword.getString("Currently_entering_data")
+                            + " " + resword.getString("CRF_reopen_enter_data");
+                    request.setAttribute("errorData", errorData);
+                }
                 if ("confirm".equalsIgnoreCase(action)) {
                     request.setAttribute("id", new Integer(studySubId).toString());
                     forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
