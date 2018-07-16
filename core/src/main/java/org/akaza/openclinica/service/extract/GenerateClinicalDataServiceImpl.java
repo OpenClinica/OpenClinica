@@ -23,6 +23,7 @@ import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.ItemDao;
@@ -589,6 +590,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						iiDataBean.setDeleted(isDeleted);
 						Item item = itemDao.findByOcOID(itemOid);
 						LOGGER.info("*****************item:" + item);
+						LOGGER.info("schema:" + CoreResources.getRequestSchema());
 						iiDataBean.setItemName(item.getName());
 						if (isCollectAudits() || isCollectDns()) {
 							iiDataBean = fetchItemDataAuditValue(oidDNAuditMap.get(grpOID), iiDataBean);
