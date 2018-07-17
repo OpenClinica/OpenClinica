@@ -151,7 +151,7 @@ public enum Page {
     UPDATE_STUDY7("/WEB-INF/jsp/managestudy/updateStudy7.jsp", "Update a Study seventh section"),
     UPDATE_STUDY8 ("/WEB-INF/jsp/managestudy/updateStudy8.jsp", "Update a Study last section"),
 
-     LIST_STUDY_SUBJECTS ("/WEB-INF/jsp/managestudy/findSubjects.jsp", "List Study Subjects"),
+    LIST_STUDY_SUBJECTS ("/WEB-INF/jsp/managestudy/findSubjects.jsp", "List Study Subjects"),
     LIST_STUDY_SUBJECTS_SERVLET("/ListStudySubjects", "List Study Subjects"),
 
      UPDATE_STUDY_SERVLET_NEW ("/UpdateStudyNew", "Update a Study"),
