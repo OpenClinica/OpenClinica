@@ -592,7 +592,7 @@ public class AddNewSubjectServlet extends SecureController {
                 subjectCount = ss.size();
             }
         }
-        String siteId = currentStudy.getName();
+        String siteId = currentStudy.getIdentifier();
 
         // Adding Sample data to validate templateID
         data.put("siteId", siteId);
