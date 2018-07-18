@@ -29,8 +29,7 @@ public class EnketoFormServlet extends SecureController {
     public static final String ORIGINATING_PAGE = "originatingPage";
     public static final String STUDYSUBJECTID = "studySubjectId";
     public static final String MODE = "mode";
-    public static final String FORM_URL1 = "formURL1";
-    public static final String FORM_URL2 = "formURL2";
+    public static final String FORM_URL = "formURL";
     public static final String CRF_VERSION_ID = "crfVersionId";
     public static final String FORM_LAYOUT_ID = "formLayoutId";
     public static final String STUDY_EVENT_ID = "studyEventId";
@@ -56,11 +55,7 @@ public class EnketoFormServlet extends SecureController {
         int studyEventId = Integer.valueOf(request.getParameter(STUDY_EVENT_ID));
         int eventCrfId = Integer.valueOf(request.getParameter(EVENT_CRF_ID));
 
-        String jini ="false";
-        String jiniEnabled =CoreResources.getField("jini.enabled");
-        if (!jiniEnabled.equals("") && jiniEnabled.equalsIgnoreCase("true")) {
-            jini = "true";
-        }
+
         FormUrlObject formUrlObject = null;
 
         StudyEvent studyEvent = studyEventDao.findById(Integer.valueOf(studyEventId));
@@ -76,6 +71,7 @@ public class EnketoFormServlet extends SecureController {
             subjectContext.setStudyEventDefinitionId(String.valueOf(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId()));
             subjectContext.setOrdinal(String.valueOf(studyEvent.getSampleOrdinal()));
             subjectContext.setStudyEventId(String.valueOf(studyEvent.getStudyEventId()));
+            request.setAttribute(STUDYSUBJECTID, studyEvent.getStudySubject().getLabel());
         }
         subjectContext.setFormLayoutOid(formLayout.getOcOid());
         subjectContext.setUserAccountId(String.valueOf(ub.getId()));
@@ -111,22 +107,8 @@ public class EnketoFormServlet extends SecureController {
         if (!isFormLocked && formUrlObject.isLockOn()) {
             getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId(), request.getSession().getId());
         }
-        int hashIndex = formUrlObject.getFormUrl().lastIndexOf("#");
-        String part1 = formUrlObject.getFormUrl();
-        String part2 = "";
-        if (hashIndex != -1) {
-            part1 = formUrlObject.getFormUrl().substring(0, hashIndex);
-            part2 = formUrlObject.getFormUrl().substring(hashIndex);
-        }
-        request.setAttribute(FORM_URL1, part1);
-        request.setAttribute(FORM_URL2, part2);
-
-        // request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");
+        request.setAttribute(FORM_URL, formUrlObject.getFormUrl());
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
-        request.setAttribute(JINI, jini);
-        if (studyEvent != null) {
-            request.setAttribute(STUDYSUBJECTID, studyEvent.getStudySubject().getLabel());
-        }
         forwardPage(Page.ENKETO_FORM_SERVLET);
     }
 

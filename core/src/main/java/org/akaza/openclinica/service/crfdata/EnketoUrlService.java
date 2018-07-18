@@ -180,7 +180,8 @@ public class EnketoUrlService {
     UserAccountDAO udao;
     StudyDAO sdao;
 
-    public FormUrlObject getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid, String flavor, Role role,
+    public FormUrlObject getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid,
+                                                String flavor, Role role,
             String mode, String hash, String loadWarning, boolean isFormLocked) throws Exception {
         // Call Enketo api to get edit url
         Study parentStudy = enketoCredentials.getParentStudy(studyOid);
@@ -192,12 +193,8 @@ public class EnketoUrlService {
             studyEvent = studyEventDao.findById(Integer.valueOf(subjectContext.getStudyEventId()));
         }
         String crfOID = subjectContext.getFormLayoutOid() + DASH + hash + flavor;
-        FormUrlObject formUrlObject = enketo.getFormURL(crfOID, studyOid, role,
+        FormUrlObject formUrlObject = enketo.getFormURL(subjectContextKey, crfOID, studyOid, role,
                 parentStudy, studyEvent, mode, loadWarning, isFormLocked);
-        if (formUrlObject.getFormUrl().contains("?"))
-            formUrlObject.setFormUrl(formUrlObject.getFormUrl() + "&ecid=" + subjectContextKey);
-        else
-            formUrlObject.setFormUrl(formUrlObject.getFormUrl() + "?ecid=" + subjectContextKey);
         return formUrlObject;
 
     }
@@ -275,17 +272,6 @@ public class EnketoUrlService {
 
         if (eur.getEnketoUrlResponse().getUrl() != null) {
             editURL = eur.getEnketoUrlResponse().getUrl();
-        }
-
-        int hashIndex = editURL.lastIndexOf("#");
-        String part1 = "";
-        String part2 = "";
-        if (hashIndex != -1) {
-            part1 = editURL.substring(0, hashIndex);
-            part2 = editURL.substring(hashIndex);
-            editURL = part1 + "&ecid=" + subjectContextKey + part2;
-        } else {
-            editURL = editURL + "&ecid=" + subjectContextKey;
         }
 
         logger.debug("Generating Enketo edit url for form: " + editURL);
