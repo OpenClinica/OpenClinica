@@ -1740,6 +1740,7 @@ public class StudyController {
         study.setFacilityContactName(parameters.facilityInfo.getFacilityContact());
         study.setFacilityContactPhone(parameters.facilityInfo.getFacilityPhone());
         study.setFacilityContactEmail(parameters.facilityInfo.getFacilityEmail());
+        study.setIdentifier(parameters.uniqueIdentifier);
     }
 
     public StudyBean createStudy(StudyBean studyBean, UserAccountBean owner) {
