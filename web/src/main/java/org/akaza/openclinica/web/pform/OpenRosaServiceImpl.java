@@ -143,7 +143,7 @@ public class OpenRosaServiceImpl implements OpenRosaService {
         Element root = openRosaXMLUtil.appendRootElement(doc);
         List<OCUserDTO> userList = new ArrayList<>();
 
-        if (userList == null)
+        if (userServiceList == null)
             return null;
         for (OCUserRoleDTO ocUser : userServiceList) {
             List<StudyEnvironmentRoleDTO> roles = ocUser.getRoles();
