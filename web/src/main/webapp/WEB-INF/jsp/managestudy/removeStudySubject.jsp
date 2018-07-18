@@ -48,7 +48,7 @@
 
 <jsp:useBean scope="session" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
 <jsp:useBean scope="request" id="subject" class="org.akaza.openclinica.bean.submit.SubjectBean"/>
-<jsp:useBean scope="request" id="study" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
+<jsp:useBean scope="request" id="subjectStudy" class="org.akaza.openclinica.bean.managestudy.StudyBean"/>
 <jsp:useBean scope="request" id="events" class="java.util.ArrayList"/>
 <h1><span class="title_manage">
 <fmt:message key="remove_subject_from_Study"  bundle="${resword}"/>
@@ -67,6 +67,28 @@
     <%-- below line removed because it causes confusion with OpenClinica Study Subject ID line above, tbh --%>
   <%-- <tr valign="top"><td class="table_header_column"><fmt:message key="study_subject_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.id}"/></td></tr> --%>
   <%-- <tr valign="top"><td class="table_header_column"><fmt:message key="label" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.label}"/></td></tr> --%>
+  <c:choose>
+    <c:when test='${study.parentStudyId > 0}'>
+      <tr valign="top">
+        <td class="table_header_column"><fmt:message key="study_name" bundle="${resword}"/>:</td>
+        <td class="table_cell"><c:out value="${study.parentStudyName}"/></td>
+      </tr>
+      <tr valign="top">
+        <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/>:</td>
+        <td class="table_cell"><c:out value="${study.name}"/></td>
+      </tr>
+    </c:when>
+    <c:otherwise>
+      <tr valign="top">
+        <td class="table_header_column"><fmt:message key="study_name" bundle="${resword}"/>:</td>
+        <td class="table_cell"><c:out value="${study.name}"/></td>
+      </tr>
+      <tr valign="top">
+        <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/>:</td>
+        <td class="table_cell"></td>
+      </tr>
+    </c:otherwise>
+  </c:choose>
   <tr valign="top"><td class="table_header_column"><fmt:message key="created_by" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.owner.name}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${studySub.createdDate}" pattern="${dteFormat}"/>
   </td></tr>

@@ -98,7 +98,7 @@ public class RemoveStudySubjectServlet extends SecureController {
                 }
 
                 request.setAttribute("subject", subject);
-                request.setAttribute("study", study);
+                request.setAttribute("subjectStudy", study);
                 request.setAttribute("studySub", studySub);
                 request.setAttribute("events", displayEvents);
 
