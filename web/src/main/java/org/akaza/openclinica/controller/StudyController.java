@@ -105,6 +105,9 @@ public class StudyController {
     private SchemaCleanupService schemaCleanupService;
     @Autowired
     StudyParameterDao studyParameterDao;
+    @Autowired
+    private Configuration freemarkerConfiguration;
+
     private enum SiteSaveCheck {
         CHECK_UNIQUE_SAVE(0), CHECK_UNIQUE_UPDATE(1), NO_CHECK(2);
         private int code;
@@ -2070,7 +2073,7 @@ public class StudyController {
                     errorObjects.add(errorObject);
                 }
             }
-            template = new Template("template name", new StringReader(templateID), new Configuration());
+            template = new Template("template name", new StringReader(templateID), freemarkerConfiguration);
             template.process(data, wtr);
             logger.info("Template ID Sample :"+ wtr.toString());
 
