@@ -8,54 +8,43 @@
 package org.akaza.openclinica.control.submit;
 
 // import org.akaza.openclinica.bean.core.Role;
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.*;
 
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
-import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.core.NumericComparisonOperator;
-import org.akaza.openclinica.bean.core.ResolutionStatus;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.DisplaySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
-import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.context.annotation.ComponentScan;
+import org.springframework.web.context.support.SpringBeanAutowiringSupport;
+
+import javax.servlet.ServletException;
+import java.io.IOException;
+import java.io.StringReader;
+import java.io.StringWriter;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 // import javax.servlet.http.*;
 
@@ -66,6 +55,7 @@ import org.slf4j.LoggerFactory;
  * @version CVS: $Id: AddNewSubjectServlet.java,v 1.15 2005/07/05 17:20:43 jxu
  *          Exp $
  */
+@Configurable
 public class AddNewSubjectServlet extends SecureController {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -121,9 +111,16 @@ public class AddNewSubjectServlet extends SecureController {
     public static final String Y_WARNING = "yWarning";
     boolean needUpdate;
     SubjectBean updateSubject = new SubjectBean();
+    @Autowired
+    private Configuration freemarkerConfiguration;
 
     // YW >>
 
+    @Override
+    public void init() throws ServletException {
+        super.init();
+        SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
+    }
     /*
      * (non-Javadoc)
      *
@@ -601,7 +598,7 @@ public class AddNewSubjectServlet extends SecureController {
         Template template = null;
 
         try {
-            template = new Template("template name", new StringReader(templateID), new Configuration());
+            template = new Template("template name", new StringReader(templateID), freemarkerConfiguration);
             template.process(data, wtr);
             logger.info("Template ID  :"+ wtr.toString());
 
