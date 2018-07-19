@@ -47,7 +47,7 @@ public class CallbackController {
 
     public CallbackController() {
         this.redirectOnFail = "/error";
-        this.redirectOnSuccess = "/MainMenu";
+        this.redirectOnSuccess = "/ListStudySubjects";
     }
 
     @RequestMapping(value = "/callback", method = RequestMethod.GET)

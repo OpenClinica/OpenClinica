@@ -232,17 +232,17 @@
             <c:set var="isHref"/>
 
             <c:if test="${param.isSpringController}">
-                <c:set var="isHref" value="../MainMenu"/>
+                <c:set var="isHref" value="../ListStudySubjects"/>
                 <c:set var="isLogo" value="../images/logo-color-on-dark.svg"/>
             </c:if>
 
             <c:if test="${param.isSpringControllerCCV}">
-                <c:set var="isHref" value="../../MainMenu"/>
+                <c:set var="isHref" value="../../ListStudySubjects"/>
                 <c:set var="isLogo" value="../../images/logo-color-on-dark.svg"/>
             </c:if>
 
             <c:if test="${!param.isSpringController}">
-                <c:set var="isHref" value="MainMenu"/>
+                <c:set var="isHref" value="ListStudySubjects"/>
                 <c:set var="isLogo" value="images/logo-color-on-dark.svg"/>
             </c:if>
 
@@ -363,7 +363,7 @@
                                                                             <td align="right" style="font-weight: normal;">
                                                                                 <ul>
                                                                                     <c:if test="${userRole.coordinator || userRole.director}">
-                                                                                        <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home"
+                                                                                        <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_home"
                                                                                                                                         bundle="${resword}"/></a>
                                                                                         </li>
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
