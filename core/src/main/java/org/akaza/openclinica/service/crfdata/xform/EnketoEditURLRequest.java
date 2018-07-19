@@ -19,6 +19,12 @@ public class EnketoEditURLRequest {
     @JsonProperty("go_to")
     private String goTo = null;
     private String load_warning = null;
+    @JsonProperty("ecid")
+    private String ecId = null;
+    private String jini = null;
+    private String pid = null;
+    @JsonProperty("parent_window_origin")
+    private String parentWindowOrigin = null;
 
     public String getLoad_warning() {
         return load_warning;
@@ -53,8 +59,8 @@ public class EnketoEditURLRequest {
         this.additionalProperties.put(name, value);
     }
 
-    public EnketoEditURLRequest(String server_url, String form_id, String instance_id, String return_url, String instance, String complete_button,
-            InstanceAttachment instanceAttachments, String goTo, String load_warning) {
+    public EnketoEditURLRequest(String server_url, String ecId, String form_id, String instance_id, String return_url, String instance, String complete_button,
+            InstanceAttachment instanceAttachments, String goTo, String load_warning, String jini, String pid, String parentWindowOrigin) {
         this.server_url = server_url;
         this.form_id = form_id;
         this.instance_id = instance_id;
@@ -64,6 +70,10 @@ public class EnketoEditURLRequest {
         this.instanceAttachments = instanceAttachments;
         this.goTo = goTo;
         this.load_warning = load_warning;
+        this.ecId = ecId;
+        this.jini = jini;
+        this.pid = pid;
+        this.parentWindowOrigin = parentWindowOrigin;
     }
 
     public String getServer_url() {
@@ -114,4 +124,42 @@ public class EnketoEditURLRequest {
         this.complete_button = complete_button;
     }
 
+    public String getGoTo() {
+        return goTo;
+    }
+
+    public void setGoTo(String goTo) {
+        this.goTo = goTo;
+    }
+
+    public String getEcId() {
+        return ecId;
+    }
+
+    public void setEcId(String ecId) {
+        this.ecId = ecId;
+    }
+    public String getJini() {
+        return jini;
+    }
+
+    public void setJini(String jini) {
+        this.jini = jini;
+    }
+
+    public String getPid() {
+        return pid;
+    }
+
+    public void setPid(String pid) {
+        this.pid = pid;
+    }
+
+    public String getParentWindowOrigin() {
+        return parentWindowOrigin;
+    }
+
+    public void setParentWindowOrigin(String parentWindowOrigin) {
+        this.parentWindowOrigin = parentWindowOrigin;
+    }
 }

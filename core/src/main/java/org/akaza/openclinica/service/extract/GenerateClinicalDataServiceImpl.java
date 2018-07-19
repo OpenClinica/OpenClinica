@@ -10,6 +10,7 @@ import java.util.Locale;
 import java.util.Set;
 
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
@@ -61,6 +62,10 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 /**
  * Generate CDISC-ODM clinical data without data set.
@@ -590,6 +595,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						iiDataBean.setDeleted(isDeleted);
 						Item item = itemDao.findByOcOID(itemOid);
 						LOGGER.info("*****************item:" + item);
+						LOGGER.info("****************user:" + getCurrentUser());
 						LOGGER.info("schema:" + CoreResources.getRequestSchema());
 						iiDataBean.setItemName(item.getName());
 						if (isCollectAudits() || isCollectDns()) {
@@ -607,6 +613,18 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 
 		return iigDataBean;
+	}
+
+	private String getCurrentUser() {
+		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		if (requestAttributes != null && requestAttributes.getRequest() != null) {
+			HttpServletRequest request = requestAttributes.getRequest();
+			UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+			if (userAccountBean != null) {
+				return userAccountBean.getName();
+			}
+		}
+		return null;
 	}
 
 	private ImportItemDataBean fetchItemDataAuditValue(List<ItemData> list, ImportItemDataBean iiDataBean) {

@@ -273,6 +273,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
                 // This section is for version migration ,where item does not exist in the current formLayout
                 boolean itemExistInFormLayout = false;
+                request.setAttribute(STUDYSUBJECTID, "");
                 List<VersioningMap> vms = versioningMapDao.findByVersionIdAndItemId(ecb.getCRFVersionId(), item.getId());
                 for (VersioningMap vm : vms) {
                     if (vm.getFormLayout().getFormLayoutId() == formLayout.getId()) {
@@ -339,6 +340,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
                 String attribute = SINGLE_ITEM_FLAVOR + "[" + idb.getId() + "]";
                 context.setAttribute(attribute, xform);
+            } else {
+                request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
             }
             StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
             Role role = currentRole.getRole();
@@ -355,26 +358,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 String hash = formLayout.getXform();
                 formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);
             }
-            int hashIndex = formUrlObject.getFormUrl().lastIndexOf("#");
-            String part1 = formUrlObject.getFormUrl();
-            String part2 = "";
-            if (hashIndex != -1) {
-                part1 = formUrlObject.getFormUrl().substring(0, hashIndex);
-                part2 = formUrlObject.getFormUrl().substring(hashIndex);
-            }
-            request.setAttribute(EnketoFormServlet.FORM_URL1, part1);
-            request.setAttribute(EnketoFormServlet.FORM_URL2, part2);
-            if (isLocked) {
-                request.setAttribute("readOnlyUrl", part1);
-            }
+            request.setAttribute(EnketoFormServlet.FORM_URL, formUrlObject.getFormUrl());
             request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module);
             request.setAttribute(JINI, jini);
-
-            if (!flavor.equals(SINGLE_ITEM_FLAVOR)) {
-                request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
-            } else {
-                request.setAttribute(STUDYSUBJECTID, "");
-            }
         }
         return true;
     }

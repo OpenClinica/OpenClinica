@@ -30,7 +30,7 @@ public class ParticipantFormServlet extends SecureController {
         // Build Enketo URL for CRF version.
         EnketoCredentials credentials = getCredentials();
         EnketoAPI enketo = new EnketoAPI(credentials);
-        formURL = enketo.getFormPreviewURL(crf_oid + DASH + formLayout.getXform() + QUERY_FLAVOR);
+        formURL = enketo.getFormPreviewURL(null,crf_oid + DASH + formLayout.getXform() + QUERY_FLAVOR);
         if (!formURL.equals("")) {
             response.sendRedirect(formURL);
         } else {
