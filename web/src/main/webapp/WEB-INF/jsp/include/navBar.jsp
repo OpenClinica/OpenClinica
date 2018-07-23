@@ -5,6 +5,10 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
+<%-- Temporarily adding this alert message to catch any scenarios that does not calculate the enrollment cap --%>
+<c:if test="${empty enrollmentCapped}">
+    <script>alert("Enrollment Cap needs to be calculated!")</script>
+</c:if>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <%
     String currentURL = null;
@@ -379,7 +383,7 @@
                                                                                         </li>
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
-                                                                                        <c:if test="${study.status.available}">
+                                                                                        <c:if test="${study.status.available && !enrollmentCapped}">
                                                                                             <li><a href="javascript:;" id="navAddSubject"><fmt:message
                                                                                                     key="nav_add_subject" bundle="${resword}"/></a></li>
                                                                                         </c:if>
@@ -392,7 +396,7 @@
                                                                                         </li>
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
-                                                                                        <c:if test="${study.status.available}">
+                                                                                        <c:if test="${study.status.available && !enrollmentCapped}">
                                                                                             <li><a href="javascript:;" id="navAddSubject"><fmt:message
                                                                                                     key="nav_add_subject" bundle="${resword}"/></a></li>
                                                                                         </c:if>
@@ -499,7 +503,7 @@
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
-                <c:if test="${study.status.available}">
+                <c:if test="${study.status.available && !enrollmentCapped}">
                     <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
@@ -519,7 +523,7 @@
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
-                <c:if test="${study.status.available}">
+                <c:if test="${study.status.available && !enrollmentCapped}">
                     <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
@@ -547,7 +551,7 @@
             <div class="taskGroup"><fmt:message key="nav_submit_data" bundle="${resword}"/></div>
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
-                <c:if test="${study.status.available}">
+                <c:if test="${study.status.available && !enrollmentCapped}">
                     <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
