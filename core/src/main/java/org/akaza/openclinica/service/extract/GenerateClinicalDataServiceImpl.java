@@ -566,9 +566,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		Set<String> keysGrpOIDs = oidMap.keySet();
 		ArrayList<ImportItemGroupDataBean> iigDataBean = new ArrayList<ImportItemGroupDataBean>();
 		ImportItemGroupDataBean importItemGrpDataBean = new ImportItemGroupDataBean();
-
 		for (String grpOID : keysGrpOIDs) {
-			LOGGER.info("*********************Processing grpOID:" + grpOID);
+			LOGGER.debug("*********************Processing grpOID:" + grpOID);
 			ArrayList<String> vals = oidMap.get(grpOID);
 			importItemGrpDataBean = new ImportItemGroupDataBean();
 			int firstIndexOf = StringUtils.ordinalIndexOf(grpOID, GROUPOID_ORDINAL_DELIM, 1);
@@ -589,15 +588,22 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 					int index = value.indexOf(DELIMITER);
 					if (!value.trim().equalsIgnoreCase(DELIMITER)) {
 						String itemOid = value.substring(0, index);
-						LOGGER.info("*******************itemOid:" + itemOid);
+						LOGGER.debug("*******************itemOid:" + itemOid);
 						iiDataBean.setItemOID(itemOid);
 						iiDataBean.setValue(value.substring(index + 1, value.length()));
 						iiDataBean.setDeleted(isDeleted);
 						Item item = itemDao.findByOcOID(itemOid);
-						LOGGER.info("*****************item:" + item);
-						LOGGER.info("****************user:" + getCurrentUser());
-						LOGGER.info("schema:" + CoreResources.getRequestSchema());
-						iiDataBean.setItemName(item.getName());
+						LOGGER.debug("*****************item:" + item);
+						LOGGER.debug("****************user:" + getCurrentUser());
+						LOGGER.debug("schema:" + CoreResources.getRequestSchema());
+						try {
+                            iiDataBean.setItemName(item.getName());
+                        } catch (NullPointerException npe) {
+							CoreResources.getRequestSchema();
+							Item item1 = itemDao.findByOcOID(itemOid);
+							HttpServletRequest request = getRequest();
+                            throw npe;
+                        }
 						if (isCollectAudits() || isCollectDns()) {
 							iiDataBean = fetchItemDataAuditValue(oidDNAuditMap.get(grpOID), iiDataBean);
 						}
@@ -614,7 +620,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 		return iigDataBean;
 	}
-
+    private HttpServletRequest getRequest() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            return request;
+        }
+        return null;
+    }
 	private String getCurrentUser() {
 		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		if (requestAttributes != null && requestAttributes.getRequest() != null) {
@@ -662,7 +675,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	private DiscrepancyNotesBean fetchDiscrepancyNotes(EventCrf eventCrf) {
-		LOGGER.info("Fetching the discrepancy notes..");
+		LOGGER.debug("Fetching the discrepancy notes..");
 		List<DnEventCrfMap> dnEventCrfMaps = eventCrf.getDnEventCrfMaps();
 		DiscrepancyNotesBean dnNotesBean = new DiscrepancyNotesBean();
 		dnNotesBean.setEntityID(eventCrf.getCrfVersion().getCrf().getOcOid());
@@ -872,9 +885,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		setCollectAudits(collectAudit);
 		LinkedHashMap<String, OdmClinicalDataBean> clinicalDataHash = new LinkedHashMap<String, OdmClinicalDataBean>();
 		UserAccount userAccount = getUserAccountDao().findByColumnName(userId, "userId");
+		LOGGER.debug("*********userAccount:userId:" + userId + " name:" + userAccount.getUserName());
 		LOGGER.debug("Entering the URL with " + studyOID + ":" + studySubjectOID + ":" + studyEventOID + ":" + formVersionOID + ":DNS:" + collectDNs
 				+ ":Audits:" + collectAudit);
-		LOGGER.info("Determining the generic paramters...");
+		LOGGER.debug("Determining the generic paramters...");
 		int parentStudyId = 0;
 		Study publicStudy = getStudyDao().findPublicStudy(studyOID);
 
@@ -902,8 +916,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 		if (studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL) && !studySubjectOID.equals(INDICATE_ALL)
 				&& !studyOID.equals(INDICATE_ALL)) {
-			LOGGER.info("Adding all the study events,formevents as it is a *");
-			LOGGER.info("study subject is not all and so is study");
+			LOGGER.debug("Adding all the study events,formevents as it is a *");
+			LOGGER.debug("study subject is not all and so is study");
 
 			clinicalDataHash.put(studyOID, getClinicalData(studyOID, studySubjectOID));
 
