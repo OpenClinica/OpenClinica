@@ -1172,7 +1172,7 @@ break;
      * Instead of rewriting the whole Validation do this.
      */
     protected String getFieldValue(String fieldName) {
-        return request.getParameter(fieldName) == null ? request.getAttribute(fieldName) == null ? null : request.getAttribute(fieldName).toString() : request
+        return (request.getParameter(fieldName) == null || request.getParameter(fieldName).equals(resword.getString("id_generated_Save_Add"))) ? request.getAttribute(fieldName) == null ? null : request.getAttribute(fieldName).toString() : request
                 .getParameter(fieldName);
     }
 

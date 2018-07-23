@@ -2069,8 +2069,9 @@ public class StudyController {
             ParticipantIdModel participantIdModel = new ParticipantIdModel();
             for( ParticipantIdVariable variable : participantIdModel.getVariables()){
                 if(!templateID.contains(variable.getName())){
-                    ErrorObj errorObject = createErrorObject("Study Object", "ID Template must include " + variable.getName()  , "templateID");
+                    ErrorObj errorObject = createErrorObject("Study Object", "ID Template should include both variables", "templateID");
                     errorObjects.add(errorObject);
+                    break;
                 }
             }
             template = new Template("template name", new StringReader(templateID), freemarkerConfiguration);

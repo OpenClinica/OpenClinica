@@ -212,11 +212,12 @@ public class AddNewSubjectServlet extends SecureController {
 
             if (label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
                 label = generateParticipantIdUsingTemplate();
+                    request.setAttribute(INPUT_LABEL,label);
             }
             v.addValidation(INPUT_LABEL, Validator.NO_BLANKS);
 
             String subIdSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
-            if (!subIdSetting.equalsIgnoreCase("auto non-editable") && !subIdSetting.equalsIgnoreCase("auto editable")) {
+            if (!subIdSetting.equalsIgnoreCase("auto editable")) {
                 v.addValidation(INPUT_LABEL, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
             }
 
