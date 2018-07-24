@@ -1310,7 +1310,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     private boolean isEnrollmentCapEnforced(){
         StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(sm.getDataSource());
-        String enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getId(), "enforceEnrollmentCap").getValue();
+        String enrollmentCapStatus=null;
+        if(currentStudy.getParentStudyId()!=0){
+            enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getParentStudyId(), "enforceEnrollmentCap").getValue();
+        }else {
+            enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getId(), "enforceEnrollmentCap").getValue();
+        }
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
         return capEnforced;
     }
@@ -1320,11 +1325,16 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         boolean capIsOn = isEnrollmentCapEnforced();
 
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(sm.getDataSource());
-        int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects(currentStudy);
+        int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects();
 
         StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-        StudyBean sb = (StudyBean) studyDAO.findByName(currentStudy.getName());
-        int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
+        StudyBean sb = null;
+        if(currentStudy.getParentStudyId()!=0){
+            sb = (StudyBean) studyDAO.findByPK(currentStudy.getParentStudyId());
+        }else{
+             sb = (StudyBean) studyDAO.findByPK(currentStudy.getId());
+        }
+        int  expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
         if (numberOfSubjects >= expectedTotalEnrollment && capIsOn)
             return true;
