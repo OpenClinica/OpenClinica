@@ -629,6 +629,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             request.setAttribute("requestSchema", getRequestSchema(request));
             mayProceed();
             // pingJobServer(request);
+            // Set if enrollment is capped. Used by navBar.jsp to hide "Add Participant" link in the menu
+            request.setAttribute("enrollmentCapped", isEnrollmentCapped());
             processRequest();
         } catch (InconsistentStateException ise) {
             ise.printStackTrace();
@@ -1303,6 +1305,31 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     public  EventCRFLocker getEventCrfLocker() {
         return eventCrfLocker;
+    }
+
+
+    private boolean isEnrollmentCapEnforced(){
+        StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(sm.getDataSource());
+        String enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getId(), "enforceEnrollmentCap").getValue();
+        boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
+        return capEnforced;
+    }
+
+    protected boolean isEnrollmentCapped(){
+
+        boolean capIsOn = isEnrollmentCapEnforced();
+
+        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(sm.getDataSource());
+        int numberOfSubjects = studySubjectDAO.getCountofActiveStudySubjects(currentStudy);
+
+        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
+        StudyBean sb = (StudyBean) studyDAO.findByName(currentStudy.getName());
+        int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
+
+        if (numberOfSubjects >= expectedTotalEnrollment && capIsOn)
+            return true;
+        else
+            return false;
     }
 
 }

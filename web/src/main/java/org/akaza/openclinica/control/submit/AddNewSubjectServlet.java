@@ -239,7 +239,7 @@ public class AddNewSubjectServlet extends SecureController {
                 Validator.addError(errors, INPUT_LABEL, resexception.getString("another_assigned_this_ID_choose_unique"));
             }
 
-            if (checkIfStudyEnrollmentCapped()){
+            if (isEnrollmentCapped()){
                 Validator.addError(errors, INPUT_LABEL, resexception.getString("current_study_full"));
             }
             //checkIfStudyEnrollmentCapped(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_full"));
@@ -330,36 +330,6 @@ public class AddNewSubjectServlet extends SecureController {
             }
         }// end of no error (errors.isEmpty())
     }// end of fp.isSubmitted()
-
-    private boolean checkIfStudyEnrollmentCapped() {
-        boolean capIsOn = isEnrollmentCapEnforced();
-
-        // If cap reached.
-        StudySubjectDAO ssd = new StudySubjectDAO(sm.getDataSource());
-        int numberOfSubjects = ssd.getCountofActiveStudySubjects(currentStudy);
-
-
-        StudyDAO studyDAO = new StudyDAO(sm.getDataSource());
-        StudyBean sb = (StudyBean) studyDAO.findByName(currentStudy.getName());
-        int expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
-
-        if (numberOfSubjects >= expectedTotalEnrollment && capIsOn) {
-            return true;
-        }
-            else {
-            return false;
-        }
-        //    addPageMessage(message);
-        //    forwardPage(page);
-
-    }
-
-    private boolean isEnrollmentCapEnforced(){
-        StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(sm.getDataSource());
-        String enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getId(), "enforceEnrollmentCap").getValue();
-        boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
-        return capEnforced;
-    }
 
     private List<RuleSetBean> createRuleSet(StudySubjectBean ssub,
 			StudyEventDefinitionBean sed) {
