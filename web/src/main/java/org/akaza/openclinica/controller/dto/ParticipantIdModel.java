@@ -50,7 +50,7 @@ public class ParticipantIdModel {
         variables.add(variable2);
 
         ParticipantIdExample example1 = new ParticipantIdExample();
-        example1.setTemplate("${siteId}-${(siteParticipantCount+1)?string[\"00\"]}");
+        example1.setTemplate("${siteId}-${(siteParticipantCount+1)?string[\"000\"]}");
         example1.setDescription("Site ID followed by site participant count in a two digit number format");
         examples.add(example1);
 
