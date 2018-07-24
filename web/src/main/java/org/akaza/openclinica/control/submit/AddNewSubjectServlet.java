@@ -245,7 +245,7 @@ public class AddNewSubjectServlet extends SecureController {
             }
             //checkIfStudyEnrollmentCapped(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_full"));
 
-            if(!errors.isEmpty() && subIdSetting.equalsIgnoreCase("auto non-editable")){
+            if(!errors.isEmpty() && subIdSetting.equalsIgnoreCase("auto non-editable")&& !isEnrollmentCapped()){
                 // generate default template
 
                 StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
