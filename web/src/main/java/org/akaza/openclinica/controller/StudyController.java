@@ -2054,43 +2054,44 @@ public class StudyController {
     public void verifyTemplateID(String templateID ,ArrayList<ErrorObj> errorObjects) {
 
 
-        Map<String, Object> data =ParticipantIdModel.getDataModel();
+        Map<String, Object> data = ParticipantIdModel.getDataModel();
 
         StringWriter wtr = new StringWriter();
         Template template = null;
-        try {
-
-
-            if(templateID.length()>255){
-                ErrorObj errorObject = createErrorObject("Study Object", "ID Template length must not exceed 255 characters." , "templateID");
-                errorObjects.add(errorObject);
-            }
-
-            ParticipantIdModel participantIdModel = new ParticipantIdModel();
-            for( ParticipantIdVariable variable : participantIdModel.getVariables()){
-                if(!templateID.contains(variable.getName())){
-                    ErrorObj errorObject = createErrorObject("Study Object", "ID Template should include both variables", "templateID");
-                    errorObjects.add(errorObject);
-                    break;
-                }
-            }
-            template = new Template("template name", new StringReader(templateID), freemarkerConfiguration);
-            template.process(data, wtr);
-            logger.info("Template ID Sample :"+ wtr.toString());
-
-
-        } catch (TemplateException te) {
-            te.printStackTrace();
-            ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid: "+ te.getMessage() , "templateID");
+        if (templateID.length() > 255) {
+            ErrorObj errorObject = createErrorObject("Study Object", "ID Template length must not exceed 255 characters.", "templateID");
             errorObjects.add(errorObject);
-
-        } catch (IOException ioe) {
-            ioe.printStackTrace();
-            ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid: "+ ioe.getMessage(), "templateID");
-            errorObjects.add(errorObject);
-
         }
 
+        boolean templateIdMissingVariables = false;
+        ParticipantIdModel participantIdModel = new ParticipantIdModel();
+        for (ParticipantIdVariable variable : participantIdModel.getVariables()) {
+            if (!templateID.contains(variable.getName())) {
+                ErrorObj errorObject = createErrorObject("Study Object", "ID Template must include both variables.", "templateID");
+                errorObjects.add(errorObject);
+                templateIdMissingVariables = true;
+                break;
+            }
+        }
+        if (!templateIdMissingVariables){
+            try {
+                template = new Template("template name", new StringReader(templateID), freemarkerConfiguration);
+                template.process(data, wtr);
+                logger.info("Template ID Sample :" + wtr.toString());
+
+
+            } catch (TemplateException te) {
+                te.printStackTrace();
+                ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid.", "templateID");
+                errorObjects.add(errorObject);
+
+            } catch (IOException ioe) {
+                ioe.printStackTrace();
+                ErrorObj errorObject = createErrorObject("Study Object", "Syntax of the ID Template is invalid.", "templateID");
+                errorObjects.add(errorObject);
+
+            }
+    }
     }
 
     @RequestMapping( value = "/participantIdTemplate/model", method = RequestMethod.GET )
