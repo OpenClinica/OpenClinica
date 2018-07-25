@@ -70,9 +70,7 @@
     <query>
         <name>getCountOfActiveStudySubjects</name>
         <sql>
-			select count (*) from (select distinct ss.* from study_subject ss, study s where
-			ss.study_id = s.study_id AND
-			( s.study_id = ? or s.parent_study_id = ? ) AND ss.status_id in (1,8)) as ss
+            select count (*) from study_subject ss WHERE ss.status_id in (1,8)
         </sql>
     </query>
 

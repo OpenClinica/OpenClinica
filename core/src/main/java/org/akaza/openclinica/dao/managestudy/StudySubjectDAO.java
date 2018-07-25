@@ -874,13 +874,11 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         }
     }
 
-    public Integer getCountofActiveStudySubjects(StudyBean currentStudy) {
+    public Integer getCountofActiveStudySubjects() {
         StudySubjectBean studySubjectBean = new StudySubjectBean();
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), currentStudy.getId());
-        variables.put(new Integer(2), currentStudy.getId());
         String sql = digester.getQuery("getCountOfActiveStudySubjects");
 
         ArrayList rows = this.select(sql, variables);
