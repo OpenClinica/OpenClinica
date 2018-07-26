@@ -170,7 +170,7 @@ public class OpenRosaServiceImpl implements OpenRosaService {
             }
         }
         Collections.sort(userList, Comparator.comparing(OCUserDTO::getLastName));
-        userList.forEach(userInfo->{
+        userList.forEach(userInfo -> {
             Element item = doc.createElement("item");
             Element userName = doc.createElement("user_name");
             userName.appendChild(doc.createTextNode(userInfo.getUsername()));
@@ -181,7 +181,8 @@ public class OpenRosaServiceImpl implements OpenRosaService {
             item.appendChild(userName);
             item.appendChild(firstName);
             item.appendChild(lastName);
-            if (userInfo.getUsername().equals(studyAndSiteEnvUuid.currentUser.getUserName())) {
+            if (studyAndSiteEnvUuid.currentUser != null
+                    && userInfo.getUsername().equals(studyAndSiteEnvUuid.currentUser.getUserName())) {
                 item.setAttribute("current", "true");
             }
             root.appendChild(item);
