@@ -146,7 +146,8 @@ public class DeleteEventCRFServlet extends SecureController {
             request.setAttribute("items", itemData);
             if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName()
                     + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
-                LockInfo lockInfo = getEventCrfLocker().getLockOwner(eventCRF.getStudyEvent(), eventCRF.getFormLayout(), currentPublicStudy.getSchemaName());
+                LockInfo lockInfo = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName()
+                        + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId());
                 if (lockInfo != null) {
                     UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
                     UserAccountBean ubean = (UserAccountBean) udao.findByPK(lockInfo.getUserId());
