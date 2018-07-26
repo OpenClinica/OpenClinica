@@ -38,7 +38,6 @@
  <td class="table_header_column_top"><fmt:message key="start_date" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="end_date" bundle="${resword}"/></td>
  <td class="table_header_column_top"><fmt:message key="status" bundle="${resword}"/></td>
- <td class="table_header_column_top"><fmt:message key="subject_age_at_event" bundle="${resword}"/></td>
  </tr>
  <tr>
 
@@ -72,16 +71,6 @@
      </c:otherwise>
    </c:choose>
  </td>
-   <td class="table_cell">
-        <c:choose>
-            <c:when test="${newDataset.showSubjectAgeAtEvent}">
-                <input type="checkbox" checked name="age_at_event" value="yes">
-            </c:when>
-            <c:otherwise>
-                <input type="checkbox" name="age_at_event" value="yes">
-            </c:otherwise>
-        </c:choose>
-   </td>
 </tr>
 </table>
 </div>
