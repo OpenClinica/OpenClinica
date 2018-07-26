@@ -39,10 +39,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 import org.springframework.web.bind.annotation.RequestHeader;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 import org.w3c.dom.NamedNodeMap;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -397,8 +399,8 @@ public class OpenRosaServices {
     @Produces(MediaType.TEXT_XML)
     
     public String getManifest(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @QueryParam("formID") String formID, @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
-            @Context ServletContext context) throws Exception {
+                              @QueryParam("formID") String formID, @DefaultValue("") @QueryParam(FORM_CONTEXT) String ecid, @RequestHeader("Authorization") String authorization,
+                              @Context ServletContext context) throws Exception {
         if (!mayProceedPreview(request, studyOID))
             return null;
         String formLayoutOid = getFormLayoutOid(formID);
@@ -925,29 +927,34 @@ public class OpenRosaServices {
 
     private StudyAndSiteEnvUuid getStudyAndSiteUuids(ServletContext context, String studyOID, String ecid) throws Exception {
         String studyEnvUuid = null;
+        StudySubject ssBean = null;
+        StudyAndSiteEnvUuid studyAndSiteEnvUuid = new StudyAndSiteEnvUuid();
+
         HashMap<String, String> subjectContext = null;
         PFormCache cache = PFormCache.getInstance(context);
-        subjectContext = cache.getSubjectContext(ecid);
-        int userAccountID = Integer.valueOf(subjectContext.get("userAccountID"));
-        String studySubjectOID = subjectContext.get("studySubjectOID");
-        Document doc = openRosaXMLUtil.buildDocument();
-        Element root = openRosaXMLUtil.appendRootElement(doc);
-
-        List<UserAccount> users = null;
-        StudySubject ssBean = ssDao.findByOcOID(studySubjectOID);
-        StudyAndSiteEnvUuid studyAndSiteEnvUuid = new StudyAndSiteEnvUuid();
-        if (ssBean != null) {
-            StudyBean publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
-            StudyBean parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
+        if (StringUtils.isNotEmpty(ecid) && !ecid.equalsIgnoreCase("null")) {
+            subjectContext = cache.getSubjectContext(ecid);
+            int userAccountID = Integer.valueOf(subjectContext.get("userAccountID"));
+            String studySubjectOID = subjectContext.get("studySubjectOID");
+            ssBean = ssDao.findByOcOID(studySubjectOID);
             studyAndSiteEnvUuid.currentUser = userAccountDao.findByUserId(userAccountID);
-            if (publicStudy.getParentStudyId() == 0) {
-                studyAndSiteEnvUuid.studyEnvUuid = publicStudy.getStudyEnvUuid();
-            } else {
-                studyAndSiteEnvUuid.studyEnvUuid = parentPublicStudy.getStudyEnvUuid();
-                studyAndSiteEnvUuid.siteEnvUuid = publicStudy.getStudyEnvSiteUuid();
-            }
         }
-        return studyAndSiteEnvUuid;
+        StudyBean publicStudy = null;
+        StudyBean parentPublicStudy = null;
+        if (ssBean != null) {
+            publicStudy = getPublicStudy(ssBean.getStudy().getOc_oid());
+            parentPublicStudy = getParentPublicStudy(ssBean.getStudy().getOc_oid());
+        } else {
+            publicStudy = getPublicStudy(studyOID);
+            parentPublicStudy = getParentPublicStudy(studyOID);
+        }
+        if (publicStudy.getParentStudyId() == 0) {
+            studyAndSiteEnvUuid.studyEnvUuid = publicStudy.getStudyEnvUuid();
+        } else {
+            studyAndSiteEnvUuid.studyEnvUuid = parentPublicStudy.getStudyEnvUuid();
+            studyAndSiteEnvUuid.siteEnvUuid = publicStudy.getStudyEnvSiteUuid();
+        }
+         return studyAndSiteEnvUuid;
     }
     private String getUserXml(ServletContext context, String studyOID, String ecid) throws Exception {
         HashMap<String, String> subjectContext = null;
@@ -1104,6 +1111,12 @@ public class OpenRosaServices {
         HashMap<String, String> subjectContext = null;
         PFormCache cache = PFormCache.getInstance(context);
         subjectContext = cache.getSubjectContext(ecid);
+        if (subjectContext == null) {
+            Document doc = openRosaXMLUtil.buildDocument();
+            openRosaXMLUtil.appendRootElement(doc);
+            String writer = openRosaXMLUtil.getWriter(doc);
+            return writer;
+        }
         String studySubjectOID = subjectContext.get("studySubjectOID");
         String formLayoutOID = subjectContext.get("formLayoutOID");
         String formLoadMode = subjectContext.get("formLoadMode");
