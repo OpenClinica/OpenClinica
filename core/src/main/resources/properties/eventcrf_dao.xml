@@ -170,6 +170,12 @@
         <sql>select count(distinct ec.event_crf_id) from event_crf ec, study_event se, study_subject ss,study_event_definition sed,study s,
             event_definition_crf edc, crf crf,crf_version cv
             where ec.study_event_id = se.study_event_id AND
+
+            edc.event_definition_crf_id not in
+            (select event_definition_crf_id from event_definition_crf_permission_tag) AND
+            coalesce(edc.parent_id,0) not in
+            (select event_definition_crf_id from event_definition_crf_permission_tag) AND
+
             se.study_subject_id = ss.study_subject_id AND
             ss.study_id = s.study_id AND
             se.study_event_definition_id = sed.study_event_definition_id  AND
@@ -193,6 +199,12 @@
         <sql>select distinct ec.* from event_crf ec, study_event se, study_subject ss,study_event_definition sed,study s,
             event_definition_crf edc, crf crf,crf_version cv
             where ec.study_event_id = se.study_event_id AND
+
+             edc.event_definition_crf_id not in
+            (select event_definition_crf_id from event_definition_crf_permission_tag) AND
+            coalesce(edc.parent_id,0) not in
+            (select event_definition_crf_id from event_definition_crf_permission_tag) AND
+
             se.study_subject_id = ss.study_subject_id AND
             ss.study_id = s.study_id AND
             se.study_event_definition_id = sed.study_event_definition_id  AND
