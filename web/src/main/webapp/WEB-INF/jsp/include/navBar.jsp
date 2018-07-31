@@ -5,10 +5,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<%-- Temporarily adding this alert message to catch any scenarios that does not calculate the enrollment cap --%>
-<c:if test="${empty enrollmentCapped}">
-    <script>alert("Enrollment Cap needs to be calculated!")</script>
-</c:if>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <%
     String currentURL = null;
