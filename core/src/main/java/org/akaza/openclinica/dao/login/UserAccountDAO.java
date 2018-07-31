@@ -897,7 +897,34 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
         return answer;
     }
+    
+    public Collection findAllRolesByUserNameAndStudyOid(String userName,String studyOid) {
+        this.setRoleTypesExpected();
+        ArrayList answer = new ArrayList();
 
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), userName);
+        variables.put(new Integer(2), studyOid);
+        ArrayList alist = this.select(digester.getQuery("findAllRolesByUserNameAndStudyOid"), variables);
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            StudyUserRoleBean surb = this.getRoleFromHashMap((HashMap) it.next());
+            answer.add(surb);
+        }
+
+        return answer;
+    }
+
+    
+    public StudyUserRoleBean findTheRoleByUserNameAndStudyOid(String userName,String studyOid) {        
+        ArrayList roles = (ArrayList) this.findAllRolesByUserNameAndStudyOid(userName, studyOid);
+        if(roles.size() > 0) {
+        	return (StudyUserRoleBean) roles.get(0);
+        }else {
+        	return null;
+        }
+
+      }
     /**
      * Finds all user and roles in a study
      *

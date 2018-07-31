@@ -623,8 +623,15 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
             ind++;
         }
 
-        variables.put(new Integer(ind), sb.getSecondaryLabel());
-        ind++;
+        String secondLabel = sb.getSecondaryLabel();
+        if(secondLabel == null) {
+        	nullVars.put(new Integer(ind), new Integer(Types.VARCHAR));
+            variables.put(new Integer(ind), null);
+            ind++;
+        }else {
+        	 variables.put(new Integer(ind), sb.getSecondaryLabel());
+             ind++;
+        }
 
         variables.put(new Integer(ind), getValidOid(sb));
         ind++;
