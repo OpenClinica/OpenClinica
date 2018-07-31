@@ -237,15 +237,14 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
             workbook.createSheet("Subject Information", 0);
             WritableSheet excelSheet = workbook.getSheet(0);
             // Subject Summary
-            String[] excelRow = new String[] { "study_subject_ID", "secondary_ID", "date_of_birth", "person_ID", "created_by", "status" };
+            String[] excelRow = new String[] { "study_subject_ID", "created_by", "status" };
             for (int i = 0; i < excelRow.length; i++) {
                 Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
                 excelSheet.addCell(label);
             }
             row++;
 
-            excelRow = new String[] { studySubject.getLabel(), studySubject.getSecondaryLabel(), dateFormat(subject.getDateOfBirth()),
-                    subject.getUniqueIdentifier(), studySubject.getOwner().getName(), studySubject.getStatus().getName() };
+            excelRow = new String[] { studySubject.getLabel(), studySubject.getOwner().getName(), studySubject.getStatus().getName() };
             for (int i = 0; i < excelRow.length; i++) {
                 Label label = new Label(i, row, ResourceBundleProvider.getResWord(excelRow[i]), cellFormat);
                 excelSheet.addCell(label);
