@@ -82,6 +82,7 @@
 
                 <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrfItemTag </value>
                 <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrfTag</value>
+                <value>org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag</value>
 
                 <value>org.akaza.openclinica.domain.datamap.ItemDataFlag </value>
                 <value>org.akaza.openclinica.domain.datamap.EventCrfFlag   </value>
@@ -212,6 +213,7 @@
     <bean id="formLayoutDao" class="org.akaza.openclinica.dao.hibernate.FormLayoutDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="eventCrfDao" class="org.akaza.openclinica.dao.hibernate.EventCrfDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="eventDefinitionCrfDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao" parent="abstractDomainDao" autowire="byName" />
+    <bean id="eventDefinitionCrfPermissionTagDao" class="org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="formLayoutMediaDao" class="org.akaza.openclinica.dao.hibernate.FormLayoutMediaDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="crfDao" class="org.akaza.openclinica.dao.hibernate.CrfDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="sectionDao" class="org.akaza.openclinica.dao.hibernate.SectionDao" parent="abstractDomainDao" autowire="byName" />

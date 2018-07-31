@@ -176,7 +176,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             //
             for (ExportStudyEventDataBean se : ses) {
 
-                if (!clinical || (clinical && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) {
+                if ((!clinical || (clinical && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) && se.getExportFormData().size()!=0) {
                     // For developers, please do not change order of properties sorted, it will break OpenRosaService
                     // Manifest Call for odm file
                     xml.append(indent + indent + indent + "<StudyEventData StudyEventOID=\"" + StringEscapeUtils.escapeXml(se.getStudyEventOID()));
