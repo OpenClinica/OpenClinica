@@ -5,6 +5,7 @@ package org.akaza.openclinica.controller.helper;
  */
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
 import org.akaza.openclinica.service.AbstractAuditingDTO;
 
 import javax.validation.constraints.NotNull;
@@ -14,6 +15,7 @@ import java.util.Objects;
 /**
  * A DTO for the StudyEnvironmentRole entity.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Serializable {
 
     private String uuid;
