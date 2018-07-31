@@ -99,6 +99,14 @@
                 site.unique_identifier = ?
          </sql>
     </query>
+    <query>
+        <name>findSiteByOid</name>
+        <sql>select site.* from study site, study study where
+                site.parent_study_id = study.study_id and
+                study.oc_oid = ? and   
+                site.oc_oid = ?
+         </sql>
+    </query>
 	<query>
 		<name>updateStepOne</name>
 		<sql>UPDATE STUDY SET PARENT_STUDY_ID=?, NAME=?, official_title=?, UNIQUE_IDENTIFIER=?,

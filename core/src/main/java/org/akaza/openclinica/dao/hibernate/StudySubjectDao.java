@@ -18,6 +18,15 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         return StudySubject.class;
     }
 
+    @SuppressWarnings("unchecked")
+    public List<StudySubject> findAllByStudy(Integer studyId) {
+        String query = "from " + getDomainClassName() + " do where do.study.studyId = :studyid";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyid", studyId);
+        return (List<StudySubject>) q.list();
+      
+    }
+    
     public StudySubject findByOcOID(String OCOID) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.ocOid = :OCOID";
