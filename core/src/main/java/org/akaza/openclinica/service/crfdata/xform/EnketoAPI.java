@@ -589,8 +589,12 @@ public class EnketoAPI {
 
             if (!actionUrlObject.formLocked || !shouldLock)
                 loadWarning = "";
+            String subjectLabel = actionUrlObject.studyEvent.getStudySubject().getLabel();
+            if (flavor.equals(SINGLE_ITEM_FLAVOR) && mode.equals(EDIT_MODE))
+                subjectLabel = null;
+
             EnketoEditURLRequest body = new EnketoEditURLRequest(ocURL, actionUrlObject.ecid, crfOid, instanceId, redirect, instance, String.valueOf(markComplete),
-                    attachment, goTo, loadWarning, isJiniEnabled(), actionUrlObject.studyEvent.getStudySubject().getLabel(), getParentWindowOrigin());
+                    attachment, goTo, loadWarning, isJiniEnabled(), subjectLabel, getParentWindowOrigin());
             HttpEntity<EnketoEditURLRequest> request = new HttpEntity<EnketoEditURLRequest>(body, headers);
             RestTemplate rest = new RestTemplate();
             ResponseEntity<EnketoURLResponse> response = rest.postForEntity(eURL.toString(), request, EnketoURLResponse.class);

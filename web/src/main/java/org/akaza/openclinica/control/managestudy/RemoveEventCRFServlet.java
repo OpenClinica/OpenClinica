@@ -140,7 +140,7 @@ public class RemoveEventCRFServlet extends SecureController {
                 UserAccountBean userAccountBean = (UserAccountBean) uDAO.findByPK(lockInfo.getUserId());
                 request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
                         "User " + userAccountBean.getName() +" is currently entering data.\\n " +
-                        "Once they leave the form, you will be allowed to perform this action.\\n");
+                        resword.getString("CRF_perform_action") +"\\n");
                 if ("confirm".equalsIgnoreCase(action)) {
                     request.setAttribute("id", new Integer(studySubId).toString());
                     forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);

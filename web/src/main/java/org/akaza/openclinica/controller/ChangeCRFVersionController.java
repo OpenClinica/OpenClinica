@@ -205,12 +205,12 @@ public class ChangeCRFVersionController {
         UserAccount userAccount = userAccountDao.findByUserId(lockInfo.getUserId());
         request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
                 "User " + userAccount.getUserName() + " is currently entering data.\\n " +
-                "Once they leave the form, you will be allowed to perform this action.\\n");
+                resword.getString("CRF_perform_action") +"\\n");
         String errorData = "";
         try {
             errorData = URLEncoder.encode("This form is currently unavailable for this action.\\n " +
                     "User " + userAccount.getUserName() + " is currently entering data.\\n " +
-                    "Once they leave the form, you will be allowed to perform this action.\\n", "UTF-8");
+                    resword.getString("CRF_perform_action") + "\\n", "UTF-8");
         } catch (UnsupportedEncodingException e) {
             e.printStackTrace();
         }

@@ -153,7 +153,7 @@ public class DeleteEventCRFServlet extends SecureController {
                     UserAccountBean ubean = (UserAccountBean) udao.findByPK(lockInfo.getUserId());
                     String errorData = resword.getString("CRF_unavailable")
                             + " User " + ubean.getName() + " " + resword.getString("Currently_entering_data")
-                            + " " + resword.getString("CRF_reopen_enter_data");
+                            + resword.getString("CRF_perform_action") +"\\n";
                     request.setAttribute("errorData", errorData);
                 }
                 if ("confirm".equalsIgnoreCase(action)) {
