@@ -88,20 +88,6 @@
     </c:choose>
    Event Status
    </p>
-   <c:if test="${subjectAgeAtEvent == 1}">
-   <p>
-  
-   <c:choose>
-     <c:when test="${newDataset.showSubjectAgeAtEvent}">
-       <input type="checkbox" checked name="age_at_event" value="yes">
-     </c:when>
-     <c:otherwise>
-       <input type="checkbox" name="age_at_event" value="yes">
-     </c:otherwise>
-   </c:choose>
-   <fmt:message key="subject_age_at_event" bundle="${resword}"/>
-   </p>
-   </c:if>
 
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>
