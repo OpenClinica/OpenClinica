@@ -153,7 +153,10 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	        String userName = subjectTransferBean.getOwner().getName();
 	        String studyOid = currentStudy.getOid();
 	        StudyUserRoleBean role = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,studyOid);
-	        if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
+	        if(role == null) {
+	        	 e.reject("subjectTransferValidator.no_roles", "You do not have any role set up for user " + userName + " in study " + studyOid );
+		            return;
+	        }else if(role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
 	            e.reject("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
 	            return;
 	        }
