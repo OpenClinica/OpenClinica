@@ -22,8 +22,12 @@ public class EventDefinitionCrfPermissionTagDao extends AbstractDomainDao<EventD
         q.setInteger("eventDefinitionCrfParentId", edcParentId);
 
         return (List<EventDefinitionCrfPermissionTag>) q.list();
-
     }
-
+    public void delete(EventDefinitionCrfPermissionTag tag) {
+        String query = " delete from " + getDomainClassName() + "  where id =:id ";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("id", tag.getId());
+        q.executeUpdate();
+    }
 
 }
