@@ -134,7 +134,7 @@ public class ParticipantValidator extends SubjectTransferValidator {
 
 
         }
-return wtr.toString();
+        return wtr.toString();
     }
     
 	 public void validate(Object obj, Errors e) {

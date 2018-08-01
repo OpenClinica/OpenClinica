@@ -34,6 +34,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -105,6 +106,7 @@ public class StudyParticipantController {
 		@RequestMapping(value = "/{studyOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
 				@RequestParam("file") MultipartFile file,
+				//@RequestPart("json") Optional<JsonPojo> map,
 				//@RequestParam("size") Integer size,				
 				@PathVariable("studyOID") String studyOID) throws Exception {
 			
@@ -139,16 +141,9 @@ public class StudyParticipantController {
 			ResponseEntity response = null;
 			
 			if (!file.isEmpty()) {
-				BufferedReader br;
-				ArrayList<String> subjectKeyList = new ArrayList<>();
+				
 				try {
-				     String line;
-				     InputStream is = file.getInputStream();
-				     br = new BufferedReader(new InputStreamReader(is));
-				     while ((line = br.readLine()) != null && !(line.isEmpty())) {
-				    	 subjectKeyList.add(line);
-				    					     				         
-				     }
+					 ArrayList<String> subjectKeyList = RestfulServiceHelper.readCSVFile(file);
 				     
 				     return this.createNewStudySubjectsInBulk(request, null, studyOID, siteOID, subjectKeyList);
 
@@ -172,7 +167,8 @@ public class StudyParticipantController {
 			}
 			return response;
 		}
-		
+
+				
 		/**
 		 * 
 		 * @param request
@@ -333,9 +329,9 @@ public class StudyParticipantController {
 			responseStudyParticipantsBulkDTO.setCreatedAt(DateToStr);
 			
 			responseStudyParticipantsBulkDTO.setFailureCount(failureCount);
-			responseStudyParticipantsBulkDTO.setUploadCount(uploadCount);
+			responseStudyParticipantsBulkDTO.setUploadCount(uploadCount - failureCount);
 			
-		  if (errorMsgsAll != null && errorMsgsAll.size() != 0) {	
+		  if (errorMsgsAll != null && errorMsgsAll.size() != 0 && failureCount == uploadCount ) {	
 			  responseStudyParticipantsBulkDTO.setMessage(validation_failed_message);
 			  response = new ResponseEntity(responseStudyParticipantsBulkDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
 	      } else {
