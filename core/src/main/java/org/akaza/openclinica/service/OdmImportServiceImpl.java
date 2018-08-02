@@ -18,10 +18,7 @@ import org.akaza.openclinica.service.dto.Form;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang.SerializationUtils;
 import org.cdisc.ns.odm.v130.*;
-import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionConfigurationParameters;
-import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionEventDefinitionDetails;
-import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutDef;
-import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionFormLayoutRef;
+import org.openclinica.ns.odm_ext_v130.v31.*;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.context.annotation.Lazy;
@@ -71,11 +68,12 @@ public class OdmImportServiceImpl implements OdmImportService {
 	private CoreResources coreResources;
 	private EventServiceInterface eventService;
 	private PageLayoutDao pageLayoutDao;
+	private EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
 
 	public OdmImportServiceImpl(UserAccountDao userDaoDomain, StudyUserRoleDao studyUserRoleDao, StudyEventDefinitionDao studyEventDefDao,
 			EventDefinitionCrfDao eventDefinitionCrfDao, CrfDao crfDao, CrfVersionDao crfVersionDao, FormLayoutDao formLayoutDao, StudyDao studyDao,
 			EventDefinitionCrfTagDao eventDefinitionCrfTagDao, StudyParameterValueDao studyParameterValueDao, DataSource dataSource, XformParser xformParser,
-			XformMetaDataService xformService, CoreResources coreResources, @Lazy EventServiceInterface eventService, PageLayoutDao pageLayoutDao) {
+			XformMetaDataService xformService, CoreResources coreResources, @Lazy EventServiceInterface eventService, PageLayoutDao pageLayoutDao, EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao) {
 		super();
 		this.userDaoDomain = userDaoDomain;
 		this.studyUserRoleDao = studyUserRoleDao;
@@ -93,6 +91,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 		this.coreResources = coreResources;
 		this.eventService = eventService;
 		this.pageLayoutDao = pageLayoutDao;
+		this.eventDefinitionCrfPermissionTagDao = eventDefinitionCrfPermissionTagDao;
 	}
 
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -186,6 +185,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 							String defaultVersionName = null;
 							OCodmComplexTypeDefinitionConfigurationParameters conf = odmFormRef.getConfigurationParameters();
 							List<OCodmComplexTypeDefinitionFormLayoutRef> formLayoutRefs = odmFormRef.getFormLayoutRef();
+							OCodmComplexTypeDefinitionPermissionTags sbsPermissionTags = odmFormRef.getPermissionTags();
+
 							if (formLayoutRefs.size() == 1 && formLayoutRefs.get(0).getIsDefaultVersion() == null) {
 								defaultVersionName = formLayoutRefs.get(0).getOID();
 							} else {
@@ -228,6 +229,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 							eventDefinitionCrf = saveOrUpdateEventDefnCrf(new EventDefinitionCrfDTO(edcObj));
 							saveOrUpdateEDCTag(new EDCTagDTO(populateEDCTagParameter), studyEventDefinition, crf);
 							jsonEventDefCrfList.add(eventDefinitionCrf);
+							persistPermissionTag(sbsPermissionTags,eventDefinitionCrf);
+
 						}
 
 					}
@@ -776,6 +779,37 @@ public class OdmImportServiceImpl implements OdmImportService {
 
 	public void setUserDaoDomain(UserAccountDao userDaoDomain) {
 		this.userDaoDomain = userDaoDomain;
+	}
+
+	public void persistPermissionTag(OCodmComplexTypeDefinitionPermissionTags sbsPermissionTags, EventDefinitionCrf eventDefinitionCrf) {
+
+		List<EventDefinitionCrfPermissionTag> persistedPermissionTags = eventDefinitionCrfPermissionTagDao.findByEdcId(eventDefinitionCrf.getEventDefinitionCrfId(), eventDefinitionCrf.getParentId() != null ? eventDefinitionCrf.getParentId() : 0);
+		List<String> sbsTags = null;
+
+		if (StringUtils.isEmpty(sbsPermissionTags.getIds())) {
+			sbsTags = new ArrayList<>();
+		} else {
+			sbsTags = Arrays.asList(sbsPermissionTags.getIds().split("\\s*,\\s*"));
+		}
+
+
+		for (String sbsTag : sbsTags) {
+			if (!persistedPermissionTags
+					.stream()
+					.filter(o -> o.getPermissionTagId().equals(sbsTag))
+					.findFirst()
+					.isPresent()) {
+				eventDefinitionCrfPermissionTagDao.save(new EventDefinitionCrfPermissionTag(eventDefinitionCrf, sbsTag));
+			}
+		}
+
+		for (EventDefinitionCrfPermissionTag persistedPermissionTag : persistedPermissionTags) {
+			if (StringUtils.isEmpty(sbsPermissionTags.getIds()) || !sbsTags.contains(persistedPermissionTag.getPermissionTagId())) {
+				eventDefinitionCrfPermissionTagDao.delete(persistedPermissionTag);
+			}
+		}
+
+
 	}
 
 }

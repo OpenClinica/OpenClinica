@@ -26,8 +26,13 @@ public class EventDefinitionCrfPermissionTag extends DataMapDomainObject {
     private Date dateUpdated;
     private Integer updateId;
 
+    public EventDefinitionCrfPermissionTag() {
+    }
 
-
+    public EventDefinitionCrfPermissionTag(EventDefinitionCrf eventDefinitionCrf, String permissionTagId) {
+        this.eventDefinitionCrf = eventDefinitionCrf;
+        this.permissionTagId = permissionTagId;
+    }
 
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "owner_id")
