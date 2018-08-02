@@ -129,6 +129,7 @@
         <property name="studyUserRoleDao" ref="studyUserRoleDao"/>        
         <property name="itemGroupDao" ref="itemGroupDao"/>
         <property name="eventDefinitionCrfDao" ref="eventDefinitionCrfDao"/>
+        <property name="eventDefinitionCrfPermissionTagDao" ref="eventDefinitionCrfPermissionTagDao"/>
         <property name="itemDao" ref="itemDao"/>
     </bean>
 

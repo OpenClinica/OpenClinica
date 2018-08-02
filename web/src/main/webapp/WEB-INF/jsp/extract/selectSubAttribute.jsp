@@ -55,40 +55,6 @@
 <input type="hidden" name="crfId" value="0">
 <input type="hidden" name="subAttr" value="1">
 
-
-   <p>
-    <c:choose>
-      <c:when test="${newDataset.showSubjectDob}">
-        <input type="checkbox" checked name="dob" value="yes">
-      </c:when>
-      <c:otherwise>
-        <input type="checkbox" name="dob" value="yes">
-      </c:otherwise>
-    </c:choose>
-
-   <c:choose>
-    <c:when test="${study.studyParameterConfig.collectDob != '2'}">
-     <fmt:message key="date_of_birth" bundle="${resword}"/>
-    </c:when>
-    <c:otherwise>
-     <fmt:message key="year_of_birth" bundle="${resword}"/>
-    </c:otherwise>
-   </c:choose>
-   </p>
-  <%--</c:if>--%>
-
-   <p>
-   <c:choose>
-     <c:when test="${newDataset.showSubjectGender}">
-       <input type="checkbox" checked name="gender" value="yes">
-     </c:when>
-     <c:otherwise>
-       <input type="checkbox" name="gender" value="yes">
-     </c:otherwise>
-   </c:choose>   
-   <fmt:message key="gender" bundle="${resword}"/>
-   </p>
-   <!-- below added 07/09/2007, tbh -->
    <p>
    <c:choose>
      <c:when test="${newDataset.showSubjectStatus}">
@@ -101,27 +67,6 @@
    <fmt:message key="subject_status" bundle="${resword}"/>
    </p>
    <p>
-   <c:choose>
-     <c:when test="${newDataset.showSubjectUniqueIdentifier}">
-       <input type="checkbox" checked name="unique_identifier" value="yes">
-     </c:when>
-     <c:otherwise>
-       <input type="checkbox" name="unique_identifier" value="yes">
-     </c:otherwise>
-   </c:choose>   
-   <fmt:message key="subject_unique_ID" bundle="${resword}"/>
-   </p>
-   <p>
-   <c:choose>
-     <c:when test="${newDataset.showSubjectSecondaryId}">
-       <input type="checkbox" checked name="subj_secondary_id" value="yes">
-     </c:when>
-     <c:otherwise>
-       <input type="checkbox" name="subj_secondary_id" value="yes">
-     </c:otherwise>
-   </c:choose>
-   <fmt:message key="secondary_ID" bundle="${resword}"/>
-   </p>
   
 <table border="0" cellpadding="0" cellspacing="0" >
   <tr>

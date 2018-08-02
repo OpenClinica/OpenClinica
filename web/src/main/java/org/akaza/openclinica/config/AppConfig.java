@@ -21,6 +21,8 @@ import org.springframework.security.web.authentication.LoginUrlAuthenticationEnt
 import org.springframework.web.cors.CorsConfiguration;
 import org.springframework.web.cors.CorsConfigurationSource;
 import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.validation.Valid;
 import java.io.UnsupportedEncodingException;
@@ -70,6 +72,11 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
     }
 
 
+    @Bean
+    public MultipartResolver multipartResolver() {
+        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+        return multipartResolver;
+    }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         LoginUrlAuthenticationEntryPoint loginUrlAuthenticationEntryPoint = new OCLoginUrlAuthenticationEntryPoint("/pages/login");
