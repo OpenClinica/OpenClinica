@@ -295,7 +295,7 @@
 <a href="javascript:leftnavExpand('sectionf');" style="text-decoration:none;">
     <img id="excl_sectionf" src="images/bt_Expand.gif" border="0"> <span><fmt:message key="view_study_details" bundle="${resword}"/>: [<fmt:message key="section" bundle="${resword}"/> E: <fmt:message key="study_parameter_configuration" bundle="${resword}"/>]</span></a>
 <div id="sectionf" style="display:none ">
-<div style="width: 600px">
+<!-- <div style="width: 600px">
 <div class="box_T"><div class="box_L"><div class="box_R"><div class="box_B"><div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
@@ -343,7 +343,7 @@
         </c:otherwise>
   </c:choose>
   </td>
-  </tr>
+  </tr> -->
 
   <!--
    <tr valign="top"><td class="table_header_column"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/></td>
@@ -359,12 +359,12 @@
   </td>
   </tr>
   -->
-</table>
+<!-- </table> -->
 
-</div>
+<!-- </div>
 </div></div></div></div></div></div></div></div>
 
-</div>
+</div> -->
 </div>
 <br>
  <a href="javascript:leftnavExpand('sites');" style="text-decoration:none;">
