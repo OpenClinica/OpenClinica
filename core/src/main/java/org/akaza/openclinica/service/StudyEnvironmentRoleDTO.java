@@ -1,6 +1,15 @@
 package org.akaza.openclinica.service;
 
+/**
+ * Created by yogi on 6/22/17.
+ */
+
+
 import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.akaza.openclinica.service.AbstractAuditingDTO;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.akaza.openclinica.service.UserServiceRoleType;
 
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
@@ -20,12 +29,15 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
 
     private String studyEnvironmentUuid;
 
-    @NotNull
-    private String roleUuid;
+    @NotNull private String roleUuid;
 
     private String roleName;
 
-    private RoleType roleType;
+    @NotNull private UserServiceRoleType roleType;
+
+    private String ownerFirstName;
+
+    private String ownerLastName;
 
     public String getUuid() {
         return uuid;
@@ -42,6 +54,7 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
     public void setStudyUuid(String studyUuid) {
         this.studyUuid = studyUuid;
     }
+
     public String getStudyEnvironmentUuid() {
         return studyEnvironmentUuid;
     }
@@ -74,16 +87,31 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
         this.roleName = roleName;
     }
 
-    public RoleType getRoleType() {
+    public UserServiceRoleType getRoleType() {
         return roleType;
     }
 
-    public void setRoleType(RoleType roleType) {
+    public void setRoleType(UserServiceRoleType roleType) {
         this.roleType = roleType;
     }
 
-    @Override
-    public boolean equals(Object o) {
+    public String getOwnerFirstName() {
+        return ownerFirstName;
+    }
+
+    public void setOwnerFirstName(String ownerFirstName) {
+        this.ownerFirstName = ownerFirstName;
+    }
+
+    public String getOwnerLastName() {
+        return ownerLastName;
+    }
+
+    public void setOwnerLastName(String ownerLastName) {
+        this.ownerLastName = ownerLastName;
+    }
+
+    @Override public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -93,24 +121,20 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
 
         StudyEnvironmentRoleDTO studyEnvironmentRoleDTO = (StudyEnvironmentRoleDTO) o;
 
-        if ( ! Objects.equals(uuid, studyEnvironmentRoleDTO.uuid)) { return false; }
+        if (!Objects.equals(uuid, studyEnvironmentRoleDTO.uuid)) {
+            return false;
+        }
 
         return true;
     }
 
-    @Override
-    public int hashCode() {
+    @Override public int hashCode() {
         return Objects.hashCode(uuid);
     }
 
-    @Override
-    public String toString() {
-        return "StudyEnvironmentRoleDTO{" +
-                "uuid=" + uuid +
-                ", studyUuid='" + studyUuid + "'" +
-                ", studyEnvironmentUuid='" + studyEnvironmentUuid + "'" +
-                ", roleUuid='" + roleUuid + "'" +
-                ", roleType='" + roleType + "'" +
-                '}';
+    @Override public String toString() {
+        return "StudyEnvironmentRoleDTO{" + "uuid=" + uuid + ", studyUuid='" + studyUuid + "'" + ", studyEnvironmentUuid='" + studyEnvironmentUuid + "'"
+                + ", roleUuid='" + roleUuid + "'" + ", roleType='" + roleType + "'" + ", roleType='" + ownerFirstName + "'" + ", roleType='" + ownerLastName
+                + "'" + '}';
     }
 }
