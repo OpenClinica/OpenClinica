@@ -123,8 +123,9 @@ public class OpenRosaServiceImpl implements OpenRosaService {
             Instant end = Instant.now();
             logger.info("***** Time execution for {} method : {}   *****", new Object() {
             }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
-            throw new RuntimeException("***UserList failed");
-            //return response;
+            // to test the future.complete(null)
+            //throw new RuntimeException("***UserList failed");
+            return response;
 
         };
         return callManagementApi(getUserList);
