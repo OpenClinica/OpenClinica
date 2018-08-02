@@ -1,6 +1,5 @@
 package org.akaza.openclinica.controller.openrosa;
 
-import org.akaza.openclinica.core.OCCreatePostgresAppServer;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.hibernate.UserTypeDao;
@@ -8,7 +7,6 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.domain.user.UserType;
 import org.akaza.openclinica.service.OCUserDTO;
-import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
