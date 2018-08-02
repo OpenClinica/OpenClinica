@@ -90,6 +90,10 @@ public class ParticipantValidator extends SubjectTransferValidator {
             return false;
     }
 
+    /**
+     * if it's site level, then also need to check study 
+     * @return
+     */
     private boolean isEnrollmentCapEnforced(){
         StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(this.dataSource);
         String enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getId(), "enforceEnrollmentCap").getValue();
@@ -195,13 +199,15 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	        }else {
 	        	// check the manually provided value
 	        	if (subjectTransferBean.getStudySubjectId().contains("<") || subjectTransferBean.getStudySubjectId().contains(">")) {
-		        	 e.reject("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements");                
+		        	 e.reject("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements","Participant ID provided in the request contains unsupported  HTML (< and >) characters"); 
+		        	 return;
 	            }
 	        }
 	        
 	        
 	        if (isEnrollmentCapped()){
-	        	 e.reject("current_study_full");             
+	        	 e.reject("current_study_full","Participants enrollment cap has reached and hence NO MORE participant can be added to the study");   
+	        	 return;
             }
 	        
 	        /**

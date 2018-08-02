@@ -140,6 +140,15 @@ public class StudyParticipantController {
 				String studyOID, String siteOID) throws Exception {
 			ResponseEntity response = null;
 			
+			ResponseStudyParticipantsBulkDTO responseStudyParticipantsBulkDTO = new ResponseStudyParticipantsBulkDTO();
+			UserAccountBean  user = this.participantService.getUserAccount(request);
+			String createdBy = user.getLastName() + " " + user.getFirstName(); 			
+			responseStudyParticipantsBulkDTO.setCreatedBy(createdBy);  
+			
+			SimpleDateFormat  format = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+			String  DateToStr = format.format(new Date());
+			responseStudyParticipantsBulkDTO.setCreatedAt(DateToStr);
+			
 			if (!file.isEmpty()) {
 				
 				try {
@@ -147,24 +156,18 @@ public class StudyParticipantController {
 				     
 				     return this.createNewStudySubjectsInBulk(request, null, studyOID, siteOID, subjectKeyList);
 
-				  } catch (IOException e) {
-				    System.err.println(e.getMessage());       
+				  } catch (Exception e) {
+				    System.err.println(e.getMessage()); 
+				    
+					String validation_failed_message = e.getMessage();
+				    responseStudyParticipantsBulkDTO.setMessage(validation_failed_message);					
 				  }
-			}else {
 				
-				ResponseStudyParticipantsBulkDTO responseStudyParticipantsBulkDTO = new ResponseStudyParticipantsBulkDTO();
-				UserAccountBean  user = this.participantService.getUserAccount(request);
-				String createdBy = user.getLastName() + " " + user.getFirstName(); 			
-				responseStudyParticipantsBulkDTO.setCreatedBy(createdBy);  
-				
-				SimpleDateFormat  format = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-				String  DateToStr = format.format(new Date());
-				responseStudyParticipantsBulkDTO.setCreatedAt(DateToStr);
-				responseStudyParticipantsBulkDTO.setMessage("Can not read file " + file.getOriginalFilename());
-			 		        	
-		   		response = new ResponseEntity(responseStudyParticipantsBulkDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-		     
+			}else {								
+				responseStudyParticipantsBulkDTO.setMessage("Can not read file " + file.getOriginalFilename());			 	
 			}
+			
+			response = new ResponseEntity(responseStudyParticipantsBulkDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
 			return response;
 		}
 
