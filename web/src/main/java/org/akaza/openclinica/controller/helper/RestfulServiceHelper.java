@@ -79,14 +79,11 @@ public class RestfulServiceHelper {
 	private ArrayList<String> readFile(MultipartFile file) throws IOException {
 		
 		ArrayList<String> subjectKeyList = new ArrayList<>();
-		Scanner sc = null;
-		try {
-			BufferedReader br;
-			 
+		
+		try(Scanner sc = new Scanner(file.getInputStream())){
+			
 			 String line;
-			 InputStream inputStream = file.getInputStream();
-			 sc = new Scanner(inputStream, "UTF-8");
-			 
+			
 			 while (sc.hasNextLine()) {
 				 line = sc.nextLine();
 				 subjectKeyList.add(line);
