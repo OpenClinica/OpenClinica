@@ -783,7 +783,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 
 	public void persistPermissionTag(OCodmComplexTypeDefinitionPermissionTags sbsPermissionTags, EventDefinitionCrf eventDefinitionCrf) {
 
-		List<EventDefinitionCrfPermissionTag> persistedPermissionTags = eventDefinitionCrfPermissionTagDao.findByEdcId(eventDefinitionCrf.getEventDefinitionCrfId(), eventDefinitionCrf.getParentId() != null ? eventDefinitionCrf.getParentId() : 0);
+		List<EventDefinitionCrfPermissionTag> persistedPermissionTags = eventDefinitionCrfPermissionTagDao.findByEdcIdTagId(eventDefinitionCrf.getEventDefinitionCrfId(), eventDefinitionCrf.getParentId() != null ? eventDefinitionCrf.getParentId() : 0,null);
 		List<String> sbsTags = null;
 
 		if (StringUtils.isEmpty(sbsPermissionTags.getIds())) {

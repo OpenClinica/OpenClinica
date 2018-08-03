@@ -49,6 +49,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * The main controller servlet for all the work behind study sites for
@@ -217,6 +218,13 @@ public class MainMenuServlet extends SecureController {
         request.setAttribute("iconInfoShown", true);
         request.setAttribute("closeInfoShowIcons", false);
 
+        List<String> tagIds = new ArrayList<>();
+
+        String permissionTags = tagIds
+                .stream()
+                .map(Object::toString)
+                .collect(Collectors.joining(","));
+
         if (ub == null || ub.getId() == 0) {// in case database connection is
             // broken
             forwardPage(Page.MENU, false);
@@ -294,7 +302,7 @@ public class MainMenuServlet extends SecureController {
             return;
         }
         if (currentRole.isMonitor()) {
-            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId());
+            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId()+"&permissionTags="+permissionTags);
             return;
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();
@@ -311,10 +319,10 @@ public class MainMenuServlet extends SecureController {
 
     private void setupSubjectSDVTable() {
 
-        request.setAttribute("studyId", currentStudy.getId());
-        request.setAttribute("showMoreLink", "true");
-        String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
-        request.setAttribute("sdvMatrix", sdvMatrix);
+   //     request.setAttribute("studyId", currentStudy.getId());
+   //     request.setAttribute("showMoreLink", "true");
+   //     String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
+   //     request.setAttribute("sdvMatrix", sdvMatrix);
     }
 
     private void setupStudySubjectStatusStatisticsTable() {

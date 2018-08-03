@@ -35,6 +35,7 @@ import org.springframework.util.StringUtils;
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Create ODM XML ClinicalData Element for a study.
@@ -139,7 +140,15 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             StudyBean parentStudyBean = getParentStudy(clinicalData.getStudyOID());
             StudyBean studyBean = getStudy(clinicalData.getStudyOID());
             // List<EventDefinitionCRFBean> edcs = edcdao.findAllByStudy(parentStudyBean);
-            List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean);
+
+            List<String> tagIds = new ArrayList<>();
+
+            String permissionTags = tagIds
+                    .stream()
+                    .map(Object::toString)
+                    .collect(Collectors.joining(","));
+
+            List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean,permissionTags );
 
             // Subject
             // ***************** OpenClinica: Subject Links Start**************

@@ -159,7 +159,7 @@ public class SDVController {
     @RequestMapping("/viewAllSubjectSDVtmp")
     public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId,
                                           @RequestParam(value = "sdv_restore", required = false) String restore,
-                                          HttpServletResponse response) {
+                                          HttpServletResponse response ,@RequestParam("permissionTags") String permissionTags) {
 
         request.setAttribute("studyId", studyId);
         HttpSession session = request.getSession();
@@ -227,14 +227,14 @@ public class SDVController {
             logger.error("Encoding exception:" + e);
         }
 
-        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "../");
+        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "../",permissionTags);
 
         gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
         return gridMap;
     }
 
     @RequestMapping("/viewAllSubjectSDVform")
-    public ModelMap viewAllSubjectFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId) {
+    public ModelMap viewAllSubjectFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId, @RequestParam("permissionTags") String permissionTags ) {
 
         ModelMap gridMap = new ModelMap();
         StudyDAO studyDAO = new StudyDAO(dataSource);
@@ -280,7 +280,7 @@ public class SDVController {
         }
 
         request.setAttribute("pageMessages", pageMessages);
-        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "");
+        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "",permissionTags);
         gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
         return gridMap;
     }

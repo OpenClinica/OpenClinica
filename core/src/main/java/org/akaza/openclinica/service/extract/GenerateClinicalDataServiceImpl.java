@@ -8,6 +8,7 @@ import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -341,7 +342,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 			}
 
-			List <EventDefinitionCrfPermissionTag> edcPTagIds= getEventDefinitionCrfPermissionTagDao().findByEdcId(eventDefinitionCrf.getEventDefinitionCrfId(),eventDefinitionCrf.getParentId()!=null? eventDefinitionCrf.getParentId(): 0);
+            List<String> tagIds = new ArrayList<>();
+
+			List <EventDefinitionCrfPermissionTag> edcPTagIds= getEventDefinitionCrfPermissionTagDao().findByEdcIdTagId(eventDefinitionCrf.getEventDefinitionCrfId(),eventDefinitionCrf.getParentId()!=null? eventDefinitionCrf.getParentId(): 0,tagIds);
 			if(edcPTagIds.size()!=0){
               continue;
 			}

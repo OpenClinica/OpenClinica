@@ -15,6 +15,7 @@ import java.util.Date;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.stream.Collectors;
 
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
@@ -208,11 +209,13 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                     StudyEventDefinitionBean sed = (StudyEventDefinitionBean)seddao.findByPK(studyEvent.getStudyEventDefinitionId());
                     eventCRF.setCrf(crf);
 
+                    List<String> tagIds = new ArrayList<>();
+
                     List < AuditBean> abs= (List<AuditBean>) adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId());
                     for (AuditBean ab : abs) {
                         if (ab.getAuditTable().equalsIgnoreCase("item_data")) {
                             EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, sed.getId(), crf.getId());
-                            List <EventDefinitionCrfPermissionTag> edcPTagIds= eventDefinitionCrfPermissionTagDao.findByEdcId(edc.getId(), edc.getParentId());
+                            List <EventDefinitionCrfPermissionTag> edcPTagIds= eventDefinitionCrfPermissionTagDao.findByEdcIdTagId(edc.getId(), edc.getParentId(),tagIds);
 
                             if(edcPTagIds.size()!=0){
                                 ab.setOldValue("<Masked>");

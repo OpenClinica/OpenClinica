@@ -198,14 +198,22 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
-	public Collection findAllStudySiteFiltered(StudyBean studyBean) {
+	public Collection findAllStudySiteFiltered(StudyBean studyBean, String permissionTags) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
 		variables.put(new Integer(1), new Integer(studyBean.getParentStudyId()));
 		variables.put(new Integer(2), new Integer(studyBean.getId()));
 		variables.put(new Integer(3), new Integer(studyBean.getId()));
 
-		String sql = digester.getQuery("findAllStudySiteFiltered");
+
+		String sql = "";
+		if(StringUtils.isEmpty(permissionTags)) {
+			 sql = digester.getQuery("findAllStudySiteFiltered");
+		}else{
+			variables.put(new Integer(4), new String (permissionTags));
+			variables.put(new Integer(5), new String (permissionTags));
+			 sql = digester.getQuery("findAllStudySiteFilteredWithTagIds");
+		}
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
 		Iterator it = alist.iterator();
