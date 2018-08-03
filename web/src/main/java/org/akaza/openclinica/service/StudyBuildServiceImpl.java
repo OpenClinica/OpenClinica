@@ -3,13 +3,11 @@ package org.akaza.openclinica.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.sf.json.util.JSONUtils;
-import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
@@ -22,7 +20,6 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
@@ -30,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -37,9 +35,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -238,7 +234,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
     public boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId) {
         boolean studyUserRoleUpdated = false;
-        ResponseEntity<StudyEnvironmentRoleDTO[]> userRoles = getUserRoles(request);
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> userRoles = getUserRoles(request);
 
         if (userRoles == null)
             return studyUserRoleUpdated;
@@ -325,7 +321,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return true;
     }
 
-    public ResponseEntity getUserRoles(HttpServletRequest request) {
+    public ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request) {
         Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
         if (userContextMap == null)
             return null;
@@ -345,7 +341,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         jsonConverter.setObjectMapper(objectMapper);
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
-        ResponseEntity<StudyEnvironmentRoleDTO[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, StudyEnvironmentRoleDTO[].class);
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<StudyEnvironmentRoleDTO>>() {});
         logger.debug("Response: getUserRoles:" + response);
         if (logger.isDebugEnabled()) {
             for (StudyEnvironmentRoleDTO userRole: response.getBody()) {
