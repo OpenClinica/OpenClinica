@@ -3,6 +3,8 @@ package org.akaza.openclinica.controller.helper;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.web.multipart.MultipartFile;
 
 import liquibase.util.StringUtils;
@@ -20,6 +22,8 @@ import java.util.Map;
 import java.util.Scanner;
 
 public class RestfulServiceHelper {
+	
+	private final static Logger log = LoggerFactory.getLogger("RestfulServiceHelper");
 	
 	//CSV file header	
 	private static final String [] FILE_HEADER_MAPPING = {"ParticipantID"};
@@ -58,7 +62,7 @@ public class RestfulServiceHelper {
 	     		 }
 	         }
 		}catch (Exception e) {
-	        e.printStackTrace();
+			log.error("Exception with cause = {} {}", e.getCause(), e.getMessage());
 	    }
 		
         
@@ -90,7 +94,7 @@ public class RestfulServiceHelper {
 			 }
 			
 		} catch (Exception e) {
-	        e.printStackTrace();
+			log.error("Exception with cause = {} {}", e.getCause(), e.getMessage());
 	    }
 		
 		return subjectKeyList;
