@@ -106,8 +106,8 @@ public class StudyParticipantController {
 		@RequestMapping(value = "/{studyOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
 				@RequestParam("file") MultipartFile file,
-				//@RequestPart("json") Optional<JsonPojo> map,
-				//@RequestParam("size") Integer size,				
+				//will implement this JsonPojo class  when we decide to pass additional parameters
+				//@RequestPart("json") Optional<JsonPojo> map,								
 				@PathVariable("studyOID") String studyOID) throws Exception {
 			
 		

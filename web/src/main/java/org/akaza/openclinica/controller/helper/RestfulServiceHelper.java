@@ -5,6 +5,8 @@ import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.springframework.web.multipart.MultipartFile;
 
+import liquibase.util.StringUtils;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStream;
@@ -15,6 +17,7 @@ import java.nio.file.Paths;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
+import java.util.Scanner;
 
 public class RestfulServiceHelper {
 	
@@ -31,27 +34,33 @@ public class RestfulServiceHelper {
 	 */
 	public static ArrayList<String> readCSVFile(MultipartFile file) throws IOException {
 		
-		 BufferedReader reader;
-		 ArrayList<String> subjectKeyList = new ArrayList<>();
-		 String line;
-		 InputStream is = file.getInputStream();
-		 reader = new BufferedReader(new InputStreamReader(is));
+		ArrayList<String> subjectKeyList = new ArrayList<>();
 		 
-		//Create the CSVFormat object with the header mapping		 
-		 CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(FILE_HEADER_MAPPING).withFirstRecordAsHeader().withTrim();
+		try {
+			 BufferedReader reader;
+				
+			 String line;
+			 InputStream is = file.getInputStream();
+			 reader = new BufferedReader(new InputStreamReader(is));
+			 
+			//Create the CSVFormat object with the header mapping		 
+			 CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(FILE_HEADER_MAPPING).withFirstRecordAsHeader().withTrim();
 
-         CSVParser csvParser = new CSVParser(reader, csvFileFormat);
-       
-         //Get a list of CSV file records              
-         Iterable<CSVRecord> csvRecords = csvParser.getRecords();
-         for (CSVRecord csvRecord : csvRecords) {		      	
-        	     	          	 
-        	  String participantID = csvRecord.get("ParticipantID");
-        	  
-        	  if (participantID != null && !(participantID.isEmpty())) {
-     			 subjectKeyList.add(participantID);     							     				         
-     		 }
-         }
+	         CSVParser csvParser = new CSVParser(reader, csvFileFormat);
+	       
+	         //Get a list of CSV file records              	         
+	         for (CSVRecord csvRecord : csvParser) {		      	
+	        	     	          	 
+	        	  String participantID = csvRecord.get("ParticipantID");
+	        	  
+	        	  if (StringUtils.isNotEmpty(participantID)) {
+	     			 subjectKeyList.add(participantID);     							     				         
+	     		 }
+	         }
+		}catch (Exception e) {
+	        e.printStackTrace();
+	    }
+		
         
 		 
 		return subjectKeyList;
@@ -64,15 +73,26 @@ public class RestfulServiceHelper {
 	 * @throws IOException
 	 */
 	private ArrayList<String> readFile(MultipartFile file) throws IOException {
-		BufferedReader br;
-		 ArrayList<String> subjectKeyList = new ArrayList<>();
-		 String line;
-		 InputStream is = file.getInputStream();
-		 br = new BufferedReader(new InputStreamReader(is));
-		 while ((line = br.readLine()) != null && !(line.isEmpty())) {
-			 subjectKeyList.add(line);
-							     				         
-		 }
+		
+		ArrayList<String> subjectKeyList = new ArrayList<>();
+		Scanner sc = null;
+		try {
+			BufferedReader br;
+			 
+			 String line;
+			 InputStream inputStream = file.getInputStream();
+			 sc = new Scanner(inputStream, "UTF-8");
+			 
+			 while (sc.hasNextLine()) {
+				 line = sc.nextLine();
+				 subjectKeyList.add(line);
+								     				         
+			 }
+			
+		} catch (Exception e) {
+	        e.printStackTrace();
+	    }
+		
 		return subjectKeyList;
 	}
 	
