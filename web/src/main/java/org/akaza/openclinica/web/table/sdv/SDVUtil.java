@@ -220,7 +220,7 @@ public class SDVUtil {
         return eventCRFDAO.countEventCRFsByStudySubject(studySubjectId, studyId, studyId);
     }
 
-    public void setDataAndLimitVariables(TableFacade tableFacade, int studyId, HttpServletRequest request) {
+    public void setDataAndLimitVariables(TableFacade tableFacade, int studyId, HttpServletRequest request,String permissionTags) {
 
         Limit limit = tableFacade.getLimit();
 
@@ -229,10 +229,10 @@ public class SDVUtil {
 
         String restore = request.getAttribute(limit.getId() + "_restore") + "";
         if (!limit.isComplete()) {
-            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
+            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId,permissionTags);
             tableFacade.setTotalRows(totalRows);
         } else if (restore != null && "true".equalsIgnoreCase(restore)) {
-            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
+            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId,permissionTags);
             int pageNum = limit.getRowSelect().getPage();
             int maxRows = limit.getRowSelect().getMaxRows();
             tableFacade.setMaxRows(maxRows);
@@ -246,7 +246,7 @@ public class SDVUtil {
         int rowEnd = limit.getRowSelect().getRowEnd();
         // Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(),
         // studySubjectSDVFilter, subjectSort, rowStart, rowEnd);
-        Collection<SubjectSDVContainer> items = getFilteredItems(eventCRFSDVFilter, eventCRFSDVSort, rowStart, rowEnd, studyId, request);
+        Collection<SubjectSDVContainer> items = getFilteredItems(eventCRFSDVFilter, eventCRFSDVSort, rowStart, rowEnd, studyId, request,permissionTags);
         tableFacade.setItems(items);
         /*
          * Limit limit = tableFacade.getLimit();
@@ -270,10 +270,10 @@ public class SDVUtil {
         int pn = p != null && p.length() > 0 ? Integer.parseInt(p) : 1;
     }
 
-    public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId) {
+    public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId , String permissionTags) {
 
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-        return eventCRFDAO.getCountWithFilter(studyId, studyId, eventCRFSDVFilter);
+        return eventCRFDAO.getCountWithFilter(studyId, studyId, eventCRFSDVFilter,permissionTags);
 
     }
 
@@ -305,7 +305,7 @@ public class SDVUtil {
 
     @SuppressWarnings("unchecked")
     private Collection<SubjectSDVContainer> getFilteredItems(EventCRFSDVFilter filterSet, EventCRFSDVSort sortSet, int rowStart, int rowEnd, int studyId,
-            HttpServletRequest request) {
+            HttpServletRequest request , String permissionTags) {
 
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
@@ -382,7 +382,7 @@ public class SDVUtil {
          * 
          * }
          */
-        eventCRFBeans = eventCRFDAO.getWithFilterAndSort(studyId, studyId, filterSet, sortSet, rowStart, rowEnd);
+        eventCRFBeans = eventCRFDAO.getWithFilterAndSort(studyId, studyId, filterSet, sortSet, rowStart, rowEnd ,permissionTags);
         return getSubjectRows(eventCRFBeans, request);
     }
 
@@ -615,7 +615,7 @@ public class SDVUtil {
      * }
      */
 
-    public String renderEventCRFTableWithLimit(HttpServletRequest request, int studyId, String pathPrefix) {
+    public String renderEventCRFTableWithLimit(HttpServletRequest request, int studyId, String pathPrefix , String permissionTags) {
 
         // boolean showMoreLink = Boolean.parseBoolean(request.getAttribute("showMoreLink").toString());//commented by
         // Jamuna, throwing null pointer exception
@@ -641,7 +641,7 @@ public class SDVUtil {
 
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvRequirementDefinition"), new SDVRequirementMatcher());
 
-        this.setDataAndLimitVariables(tableFacade, studyId, request);
+        this.setDataAndLimitVariables(tableFacade, studyId, request,permissionTags);
 
         // tableFacade.setItems(items);
 

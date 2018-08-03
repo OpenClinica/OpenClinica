@@ -668,14 +668,25 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return executeFindAllQuery("getEventCRFsByStudyIdentifier", variables);
     }
 
-    public Integer getCountWithFilter(int studyId, int parentStudyId, EventCRFSDVFilter filter) {
+    public Integer getCountWithFilter(int studyId, int parentStudyId, EventCRFSDVFilter filter , String permissionTags) {
 
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(1, studyId);
-        variables.put(2, parentStudyId);
-        String sql = digester.getQuery("getCountWithFilter");
+
+        String sql = digester.getQuery("getCountWithFilterPart1");
+        if(StringUtils.isEmpty(permissionTags)) {
+            sql =sql+" "+ digester.getQuery("getCountWithFilter");
+            variables.put(1, studyId);
+            variables.put(2, parentStudyId);
+        }else{
+            sql =sql+" "+ digester.getQuery("getCountWithFilterWithTagId");
+            variables.put(1, permissionTags);
+            variables.put(2, studyId);
+            variables.put(3, parentStudyId);
+        }
+        sql =sql+" "+ digester.getQuery("getCountWithFilterPart2");
+
         sql += filter.execute("");
 
         ArrayList rows = this.select(sql, variables);
@@ -690,14 +701,25 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
     }
 
     public ArrayList<EventCRFBean> getWithFilterAndSort(int studyId, int parentStudyId, EventCRFSDVFilter filter, EventCRFSDVSort sort, int rowStart,
-            int rowEnd) {
+            int rowEnd, String permissionTags) {
         ArrayList<EventCRFBean> eventCRFs = new ArrayList<EventCRFBean>();
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(1, studyId);
-        variables.put(2, parentStudyId);
-        String sql = digester.getQuery("getWithFilterAndSort");
+
+        String sql = digester.getQuery("getWithFilterAndSortPart1");
+        if(StringUtils.isEmpty(permissionTags)) {
+            sql =sql+" "+ digester.getQuery("getCountWithFilter");
+            variables.put(1, studyId);
+            variables.put(2, parentStudyId);
+        }else{
+            sql =sql+" "+ digester.getQuery("getCountWithFilterWithTagId");
+            variables.put(1, permissionTags);
+            variables.put(2, studyId);
+            variables.put(3, parentStudyId);
+        }
+        sql =sql+" "+ digester.getQuery("getWithFilterAndSortPart2");
+
         sql = sql + filter.execute("");
         // sql = sql + sort.execute("");
         sql = sql + " order By  ec.date_created ASC "; // major hack
