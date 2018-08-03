@@ -34,6 +34,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -105,7 +106,8 @@ public class StudyParticipantController {
 		@RequestMapping(value = "/{studyOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
 				@RequestParam("file") MultipartFile file,
-				//@RequestParam("size") Integer size,				
+				//will implement this JsonPojo class  when we decide to pass additional parameters
+				//@RequestPart("json") Optional<JsonPojo> map,								
 				@PathVariable("studyOID") String studyOID) throws Exception {
 			
 		
@@ -138,41 +140,38 @@ public class StudyParticipantController {
 				String studyOID, String siteOID) throws Exception {
 			ResponseEntity response = null;
 			
+			ResponseStudyParticipantsBulkDTO responseStudyParticipantsBulkDTO = new ResponseStudyParticipantsBulkDTO();
+			UserAccountBean  user = this.participantService.getUserAccount(request);
+			String createdBy = user.getLastName() + " " + user.getFirstName(); 			
+			responseStudyParticipantsBulkDTO.setCreatedBy(createdBy);  
+			
+			SimpleDateFormat  format = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
+			String  DateToStr = format.format(new Date());
+			responseStudyParticipantsBulkDTO.setCreatedAt(DateToStr);
+			
 			if (!file.isEmpty()) {
-				BufferedReader br;
-				ArrayList<String> subjectKeyList = new ArrayList<>();
+				
 				try {
-				     String line;
-				     InputStream is = file.getInputStream();
-				     br = new BufferedReader(new InputStreamReader(is));
-				     while ((line = br.readLine()) != null && !(line.isEmpty())) {
-				    	 subjectKeyList.add(line);
-				    					     				         
-				     }
+					 ArrayList<String> subjectKeyList = RestfulServiceHelper.readCSVFile(file);
 				     
 				     return this.createNewStudySubjectsInBulk(request, null, studyOID, siteOID, subjectKeyList);
 
-				  } catch (IOException e) {
-				    System.err.println(e.getMessage());       
+				  } catch (Exception e) {
+				    System.err.println(e.getMessage()); 
+				    
+					String validation_failed_message = e.getMessage();
+				    responseStudyParticipantsBulkDTO.setMessage(validation_failed_message);					
 				  }
-			}else {
 				
-				ResponseStudyParticipantsBulkDTO responseStudyParticipantsBulkDTO = new ResponseStudyParticipantsBulkDTO();
-				UserAccountBean  user = this.participantService.getUserAccount(request);
-				String createdBy = user.getLastName() + " " + user.getFirstName(); 			
-				responseStudyParticipantsBulkDTO.setCreatedBy(createdBy);  
-				
-				SimpleDateFormat  format = new SimpleDateFormat("dd-M-yyyy hh:mm:ss");
-				String  DateToStr = format.format(new Date());
-				responseStudyParticipantsBulkDTO.setCreatedAt(DateToStr);
-				responseStudyParticipantsBulkDTO.setMessage("Can not read file " + file.getOriginalFilename());
-			 		        	
-		   		response = new ResponseEntity(responseStudyParticipantsBulkDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-		     
+			}else {								
+				responseStudyParticipantsBulkDTO.setMessage("Can not read file " + file.getOriginalFilename());			 	
 			}
+			
+			response = new ResponseEntity(responseStudyParticipantsBulkDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
 			return response;
 		}
-		
+
+				
 		/**
 		 * 
 		 * @param request
@@ -333,9 +332,9 @@ public class StudyParticipantController {
 			responseStudyParticipantsBulkDTO.setCreatedAt(DateToStr);
 			
 			responseStudyParticipantsBulkDTO.setFailureCount(failureCount);
-			responseStudyParticipantsBulkDTO.setUploadCount(uploadCount);
+			responseStudyParticipantsBulkDTO.setUploadCount(uploadCount - failureCount);
 			
-		  if (errorMsgsAll != null && errorMsgsAll.size() != 0) {	
+		  if (errorMsgsAll != null && errorMsgsAll.size() != 0 && failureCount == uploadCount ) {	
 			  responseStudyParticipantsBulkDTO.setMessage(validation_failed_message);
 			  response = new ResponseEntity(responseStudyParticipantsBulkDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
 	      } else {

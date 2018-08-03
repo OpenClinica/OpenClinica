@@ -37,6 +37,7 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	private UserAccountDAO userAccountDAO;
 	private StudyParameterValueDAO studyParameterValueDAO;
 	private StudyBean currentStudy;
+	private StudyBean siteStudy;
 	
 	private boolean isBulkMode = false;
 	
@@ -90,11 +91,32 @@ public class ParticipantValidator extends SubjectTransferValidator {
             return false;
     }
 
+    /**
+     * if it's site level, then also need to check study 
+     * @return
+     */
     private boolean isEnrollmentCapEnforced(){
         StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(this.dataSource);
+       
+        boolean capEnforcedSite = false;
+        String  enrollmentCapStatusSite = null;
+        
         String enrollmentCapStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getId(), "enforceEnrollmentCap").getValue();
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
-        return capEnforced;
+        
+        // check at the site level
+        if(siteStudy != null) {
+        	int siteId = siteStudy.getId();
+        	enrollmentCapStatusSite = studyParameterValueDAO.findByHandleAndStudy(siteId, "enforceEnrollmentCap").getValue();
+        	capEnforcedSite = Boolean.valueOf(enrollmentCapStatusSite);        	
+        }
+        
+        if(capEnforcedSite || capEnforced) {
+        	return true;
+        }else {
+        	return false;
+        }
+        
     }
 
     public String generateParticipantIdUsingTemplate(StudyBean currentStudy) {
@@ -134,12 +156,13 @@ public class ParticipantValidator extends SubjectTransferValidator {
 
 
         }
-return wtr.toString();
+        return wtr.toString();
     }
     
 	 public void validate(Object obj, Errors e) {
 	        SubjectTransferBean subjectTransferBean = (SubjectTransferBean) obj;
-	        currentStudy = subjectTransferBean.getStudy();
+	        currentStudy = subjectTransferBean.getStudy();	        
+	        
 	        if (currentStudy == null) {
 	        	currentStudy = getStudyDAO().findByPublicOid(subjectTransferBean.getStudyOid());
 	        }
@@ -150,24 +173,38 @@ return wtr.toString();
 	            return;
 	        }
 
+	        /**
+	         *  check role permission at study level
+	         */
 	        String userName = subjectTransferBean.getOwner().getName();
 	        String studyOid = currentStudy.getOid();
-	        StudyUserRoleBean role = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,studyOid);
-	        if (role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
-	            e.reject("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
-	            return;
+	        if(!checkUserPermission(e, userName, studyOid)) {
+	        	
+	        	// if has no permission at study level, then continue to check at site level
+	        	 if (subjectTransferBean.getSiteIdentifier() != null) {
+	 	        	siteStudy = getStudyDAO().findSiteByOid(subjectTransferBean.getStudyOid(), subjectTransferBean.getSiteIdentifier());
+	 	        	
+	 	        	if (siteStudy == null) {
+	 	 	            e.reject("subjectTransferValidator.site_does_not_exist", new Object[] { subjectTransferBean.getSiteIdentifier() },
+	 	 	                    "Site identifier you specified does not correspond to a valid site.");
+	 	 	            return;
+	 	 	        }
+	 	        	 
+	 	        	/**
+	 	        	 *  check role permission at site level	        	
+	 	        	 */
+	 		        studyOid = siteStudy.getOid();
+	 		        if(!checkUserPermission(e, userName, studyOid)) {
+	 		        	return;
+	 		        }
+	 		        
+	 	        }else {
+	 	        	return;
+	 	        }	        	     
+	        	
 	        }
 
-	        if (subjectTransferBean.getSiteIdentifier() != null) {
-	        	currentStudy = getStudyDAO().findSiteByOid(subjectTransferBean.getStudyOid(), subjectTransferBean.getSiteIdentifier());
-	        }
-	        subjectTransferBean.setStudy(currentStudy);
-	        if (currentStudy == null) {
-	            e.reject("subjectTransferValidator.site_does_not_exist", new Object[] { subjectTransferBean.getSiteIdentifier() },
-	                    "Site identifier you specified does not correspond to a valid site.");
-	            return;
-	        }
-	        
+	          
 	        int handleStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
 	        String idSetting = "";
 	        StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectIdGeneration");
@@ -192,13 +229,15 @@ return wtr.toString();
 	        }else {
 	        	// check the manually provided value
 	        	if (subjectTransferBean.getStudySubjectId().contains("<") || subjectTransferBean.getStudySubjectId().contains(">")) {
-		        	 e.reject("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements");                
+		        	 e.reject("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements","Participant ID provided in the request contains unsupported  HTML (< and >) characters"); 
+		        	 return;
 	            }
 	        }
 	        
 	        
 	        if (isEnrollmentCapped()){
-	        	 e.reject("current_study_full");             
+	        	 e.reject("current_study_full","Participants enrollment cap has reached and hence NO MORE participant can be added to the study");   
+	        	 return;
             }
 	        
 	        /**
@@ -237,6 +276,26 @@ return wtr.toString();
 
 	        
 	    }
+
+	/**
+	 * @param e
+	 * @param userName
+	 * @param studyOid
+	 */
+	private boolean checkUserPermission(Errors e, String userName, String studyOid) {
+		boolean hasPermission =true;
+		
+		StudyUserRoleBean role = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,studyOid);
+		if(role == null) {
+			 e.reject("subjectTransferValidator.no_roles", "You do not have any role set up for user " + userName + " in study " + studyOid );
+			 hasPermission = false;
+		}else if(role.getId() == 0 || role.getRole().equals(Role.MONITOR)) {
+		    e.reject("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
+		    hasPermission = false;
+		}
+		
+		return  hasPermission;
+	}
 
 	/**
 	 * @return
