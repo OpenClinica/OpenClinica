@@ -81,7 +81,7 @@ public class RestoreStudySubjectServlet extends SecureController {
 
             StudyDAO studydao = new StudyDAO(sm.getDataSource());
             StudyBean study = (StudyBean) studydao.findByPK(studyId);
-
+            study.setParentStudyName(((StudyBean) studydao.findByPK(study.getParentStudyId())).getName());
             // find study events
             StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
 //            ArrayList events = sedao.findAllByStudyAndStudySubjectId(study, studySubId);
