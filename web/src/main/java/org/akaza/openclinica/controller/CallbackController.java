@@ -65,8 +65,9 @@ public class CallbackController {
             String error = req.getParameter("error");
             if (error != null) {
                 if (error.equals("login_required")) {
-                    logger.info("CallbackController In login_required:%%%%%%%%");
-                    res.sendRedirect(controller.buildAuthorizeUrl(req, false /* don't do SSO, SSO already failed */));
+                    String authorizeUrl = controller.buildAuthorizeUrl(req, false/* don't do SSO, SSO already failed */);
+                    logger.info("CallbackController In login_required:%%%%%%%%" + authorizeUrl);
+                    res.sendRedirect(authorizeUrl);
                 } else if (error.equals("unauthorized")) {
                     logger.info("CallbackController In unauthorized:%%%%%%%%");
                     String smURL = CoreResources.getField("smURL");

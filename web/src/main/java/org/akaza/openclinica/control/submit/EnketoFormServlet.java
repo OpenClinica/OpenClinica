@@ -5,9 +5,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.core.LockInfo;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
@@ -20,7 +18,6 @@ import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.pform.PFormCache;
-import org.apache.commons.lang.StringUtils;
 
 public class EnketoFormServlet extends SecureController {
 

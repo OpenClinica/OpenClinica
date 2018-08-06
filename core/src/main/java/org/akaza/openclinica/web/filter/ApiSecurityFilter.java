@@ -119,7 +119,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             } else {
                                 OCUserDTO userDTO = getUserDetails(request);
                                 if (userDTO.getUsername().equalsIgnoreCase("root")) {
-                                    CoreResources.setRootUserAccountBean(request, dataSource);
+                                    ub = CoreResources.setRootUserAccountBean(request, dataSource);
                                     ub.setUserUuid(userDTO.getUuid());
                                     userAccountDAO.update(ub);
                                 } else {

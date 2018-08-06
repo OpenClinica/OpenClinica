@@ -72,7 +72,8 @@ public class ListStudySubjectsServlet extends SecureController {
         }
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("" +
+                "may_not_submit_data"), "1");
     }
 
     @Override

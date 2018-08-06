@@ -18,6 +18,14 @@ import java.util.Objects;
 /**
  * A DTO for the StudyEnvironmentRole entity.
  */
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * A DTO for the StudyEnvironmentRole entity.
+ */
 @JsonIgnoreProperties(ignoreUnknown = true)
 public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Serializable {
 
@@ -29,15 +37,21 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
 
     private String studyEnvironmentUuid;
 
-    @NotNull private String roleUuid;
+    @NotNull
+    private String roleUuid;
+
+    // TODO: @NotNull
+    private String dynamicRoleUuid;
+
+    private String baseRoleName;
+
+    private String baseRoleUuid;
 
     private String roleName;
 
-    @NotNull private UserServiceRoleType roleType;
+    private RoleType roleType;
 
-    private String ownerFirstName;
-
-    private String ownerLastName;
+    private List<PermissionDTO> permissions;
 
     public String getUuid() {
         return uuid;
@@ -54,7 +68,6 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
     public void setStudyUuid(String studyUuid) {
         this.studyUuid = studyUuid;
     }
-
     public String getStudyEnvironmentUuid() {
         return studyEnvironmentUuid;
     }
@@ -79,6 +92,30 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
         this.roleUuid = roleUuid;
     }
 
+    public String getDynamicRoleUuid() {
+        return dynamicRoleUuid;
+    }
+
+    public void setDynamicRoleUuid(String dynamicRoleUuid) {
+        this.dynamicRoleUuid = dynamicRoleUuid;
+    }
+
+    public String getBaseRoleName() {
+        return baseRoleName;
+    }
+
+    public void setBaseRoleName(String baseRoleName) {
+        this.baseRoleName = baseRoleName;
+    }
+
+    public String getBaseRoleUuid() {
+        return baseRoleUuid;
+    }
+
+    public void setBaseRoleUuid(String baseRoleUuid) {
+        this.baseRoleUuid = baseRoleUuid;
+    }
+
     public String getRoleName() {
         return roleName;
     }
@@ -87,31 +124,24 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
         this.roleName = roleName;
     }
 
-    public UserServiceRoleType getRoleType() {
+    public RoleType getRoleType() {
         return roleType;
     }
 
-    public void setRoleType(UserServiceRoleType roleType) {
+    public void setRoleType(RoleType roleType) {
         this.roleType = roleType;
     }
 
-    public String getOwnerFirstName() {
-        return ownerFirstName;
+    public List<PermissionDTO> getPermissions() {
+        return permissions;
     }
 
-    public void setOwnerFirstName(String ownerFirstName) {
-        this.ownerFirstName = ownerFirstName;
+    public void setPermissions(List<PermissionDTO> permissions) {
+        this.permissions = permissions;
     }
 
-    public String getOwnerLastName() {
-        return ownerLastName;
-    }
-
-    public void setOwnerLastName(String ownerLastName) {
-        this.ownerLastName = ownerLastName;
-    }
-
-    @Override public boolean equals(Object o) {
+    @Override
+    public boolean equals(Object o) {
         if (this == o) {
             return true;
         }
@@ -121,20 +151,25 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
 
         StudyEnvironmentRoleDTO studyEnvironmentRoleDTO = (StudyEnvironmentRoleDTO) o;
 
-        if (!Objects.equals(uuid, studyEnvironmentRoleDTO.uuid)) {
-            return false;
-        }
+        if ( ! Objects.equals(uuid, studyEnvironmentRoleDTO.uuid)) { return false; }
 
         return true;
     }
 
-    @Override public int hashCode() {
+    @Override
+    public int hashCode() {
         return Objects.hashCode(uuid);
     }
 
-    @Override public String toString() {
-        return "StudyEnvironmentRoleDTO{" + "uuid=" + uuid + ", studyUuid='" + studyUuid + "'" + ", studyEnvironmentUuid='" + studyEnvironmentUuid + "'"
-                + ", roleUuid='" + roleUuid + "'" + ", roleType='" + roleType + "'" + ", roleType='" + ownerFirstName + "'" + ", roleType='" + ownerLastName
-                + "'" + '}';
+    @Override
+    public String toString() {
+        return "StudyEnvironmentRoleDTO{" +
+                "uuid=" + uuid +
+                ", studyUuid='" + studyUuid + "'" +
+                ", studyEnvironmentUuid='" + studyEnvironmentUuid + "'" +
+                ", roleUuid='" + roleUuid + "'" +
+                ", dynamicRoleUuid='" + dynamicRoleUuid + "'" +
+                ", roleType='" + roleType + "'" +
+                '}';
     }
 }
