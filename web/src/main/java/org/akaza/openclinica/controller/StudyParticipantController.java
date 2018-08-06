@@ -152,6 +152,14 @@ public class StudyParticipantController {
 			if (!file.isEmpty()) {
 				
 				try {
+					 String fileNm = file.getOriginalFilename();
+					 //only support CSV file
+					 if(!(fileNm.endsWith(".csv")) ){
+						 throw new Exception("The file format is not supported at this time, please send CSV file, like *.csv ");
+					 }
+					 if(this.participantService.isSystemGenerating(studyOID)) {
+						 throw new Exception("This study has set up participant ID to be System-generated, bulk upload is not supported at this time ");
+					 }
 					 ArrayList<String> subjectKeyList = RestfulServiceHelper.readCSVFile(file);
 				     
 				     return this.createNewStudySubjectsInBulk(request, null, studyOID, siteOID, subjectKeyList);
@@ -265,6 +273,9 @@ public class StudyParticipantController {
 			String validation_passed_message = "SUCCESS";
 					
 			StudyBean study = this.setSchema(studyOID, request);
+			StudyBean studyBean = null;
+			studyBean = this.participantService.validateRequestAndReturnStudy(studyOID, siteOID,request);
+			
 			UserAccountBean  user = this.participantService.getUserAccount(request);
 			
 			int failureCount = 0;
@@ -294,7 +305,7 @@ public class StudyParticipantController {
 		        
 		        DataBinder dataBinder = new DataBinder(subjectTransferBean);
 		        errors = dataBinder.getBindingResult();
-		        participantValidator.validate(subjectTransferBean, errors);
+		        participantValidator.validateBulk(subjectTransferBean, errors);
 		        
 		        if(errors.hasErrors()) {
 		        	ArrayList validerrors = new ArrayList(errors.getAllErrors());
