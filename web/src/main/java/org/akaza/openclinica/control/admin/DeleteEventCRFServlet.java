@@ -151,9 +151,9 @@ public class DeleteEventCRFServlet extends SecureController {
                 if (lockInfo != null) {
                     UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
                     UserAccountBean ubean = (UserAccountBean) udao.findByPK(lockInfo.getUserId());
-                    String errorData = resword.getString("CRF_unavailable")
-                            + " User " + ubean.getName() + " " + resword.getString("Currently_entering_data")
-                            + resword.getString("CRF_perform_action") +"\\n";
+                    String errorData = "This form is currently unavailable for this action.\\n " +
+                            "User " + ubean.getName() +" is currently entering data.\\n " +
+                            resword.getString("CRF_perform_action") +"\\n";
                     request.setAttribute("errorData", errorData);
                 }
                 if ("confirm".equalsIgnoreCase(action)) {
