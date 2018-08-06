@@ -65,15 +65,9 @@
  </tr>
 
  <tr>
-   <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/></td>
-   <td class="table_cell"><c:out value="${subject.uniqueIdentifier}"/></td>
- </tr>
- <tr>
-   <td class="table_header_column"><fmt:message key="gender" bundle="${resword}"/></td>
-   <td class="table_cell"><c:out value="${subject.gender}"/></td></tr>
- <tr>
    <td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/></td>
-   <td class="table_cell"><fmt:formatDate value="${subject.createdDate}" pattern="${dteFormat}"/></td></tr>
+   <td class="table_cell"><fmt:formatDate value="${subject.createdDate}" pattern="${dteFormat}"/></td>
+ </tr>
  </table>
  </div>
 </div></div></div></div></div></div></div></div>
