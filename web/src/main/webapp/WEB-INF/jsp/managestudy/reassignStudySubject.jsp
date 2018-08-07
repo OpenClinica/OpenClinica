@@ -83,7 +83,7 @@
     
    <table border="0" cellpadding="0" cellspacing="0"> 
    <tr>
-    <td>
+    <td style="padding-left:50px;">
       <c:choose>
        <c:when test="${displayStudy.parent.id==studySub.studyId }">   
         <input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.id}"/>">
@@ -112,7 +112,7 @@
   </tr> 
   <c:forEach var="child" items="${displayStudy.children}">
     <tr>
-      <td>
+      <td style="padding-left:100px;">
         <c:choose> 	 
           <c:when test="${child.id==studySub.studyId }">      
             &nbsp;&nbsp;
