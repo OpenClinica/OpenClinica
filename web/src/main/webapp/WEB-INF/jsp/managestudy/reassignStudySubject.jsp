@@ -86,19 +86,19 @@
     <td style="padding-left:50px;">
       <c:choose>
        <c:when test="${displayStudy.parent.id==studySub.studyId }">   
-        <input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.id}"/>">
+        <input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.id}"/>" class="hide">
         <c:out value="${displayStudy.parent.name}"/>
         <b><i><fmt:message key="currently_in" bundle="${restext}"/></i></b>
        </c:when> 	 
        <c:otherwise>          
         <c:if test="${displayStudy.status.available}">
-          <input type="radio" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>">
+          <input type="radio" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>" class="hide">
           <b>
             <c:out value="${displayStudy.parent.name}"/>
           </b>
         </c:if>
         <c:if test="${displayStudy.status.locked}">
-          <input type="radio" disabled="true" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>">
+          <input type="radio" disabled="true" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>" class="hide">
           <b>
             <c:out value="${displayStudy.parent.name}"/>
           </b>
