@@ -209,7 +209,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
 
                     List<String> tagIds = new ArrayList<>();
 
-                  List < AuditBean> abs= (List<AuditBean>) adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId());
+                    List < AuditBean> abs= (List<AuditBean>) adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId());
                     for (AuditBean ab : abs) {
                         if (ab.getAuditTable().equalsIgnoreCase("item_data")) {
                             EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, sed.getId(), crf.getId());

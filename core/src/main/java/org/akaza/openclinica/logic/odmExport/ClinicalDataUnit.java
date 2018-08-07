@@ -9,7 +9,10 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -58,6 +61,13 @@ public class ClinicalDataUnit extends OdmUnit {
         odmClinicalData.setStudyOID(studyOID);
 
         OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
+        List<String> tagIds = new ArrayList<>();
+
+        String permissionTags = tagIds
+                .stream()
+                .map(Object::toString)
+                .collect(Collectors.joining("','", "'", "'"));
+
         if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
             String mvoid = "";
             if (this.dataset != null) {
@@ -76,7 +86,7 @@ public class ClinicalDataUnit extends OdmUnit {
                 odmClinicalData.setMetaDataVersionOID("v1.0.0");
             }
         }
-        oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds, this.odmBean.getOdmType());
+        oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds, this.odmBean.getOdmType(),permissionTags);
     }
 
     public OdmClinicalDataBean getOdmClinicalData() {

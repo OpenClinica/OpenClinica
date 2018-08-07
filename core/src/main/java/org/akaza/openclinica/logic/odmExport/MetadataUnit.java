@@ -15,6 +15,7 @@ import java.util.Iterator;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import javax.sql.DataSource;
 
@@ -184,6 +185,13 @@ public class MetadataUnit extends OdmUnit {
             logger.info("null, because there is no study event definition in this study.");
             return;
         }
+        List<String> tagIds = new ArrayList<>();
+
+
+        String permissionTags = tagIds
+                .stream()
+                .map(Object::toString)
+                .collect(Collectors.joining("','", "'", "'"));
 
         StudyBean study = studyBase.getStudy();
 
@@ -218,8 +226,9 @@ public class MetadataUnit extends OdmUnit {
             // populate Include
             this.collectIncludeFromParentInSameFile();
 
+
             // populate protocol
-            oedao.getUpdatedSiteMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion());
+            oedao.getUpdatedSiteMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion(),permissionTags);
         } else {
             if (dataset != null) {
                 metadata.setOid(dataset.getODMMetaDataVersionOid());
@@ -254,7 +263,7 @@ public class MetadataUnit extends OdmUnit {
             // studyId,
             // metadata, this.getODMBean().getODMVersion());
             // studyBase.setNullClSet(nullCodeSet);
-            oedao.getMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion());
+            oedao.getMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion(),permissionTags);
             metadata.setRuleSetRules(getRuleSetRuleDao().findByRuleSetStudyIdAndStatusAvail(parentStudyId));
         }
     }

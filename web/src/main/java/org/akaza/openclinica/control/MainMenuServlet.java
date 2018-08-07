@@ -223,7 +223,7 @@ public class MainMenuServlet extends SecureController {
         String permissionTags = tagIds
                 .stream()
                 .map(Object::toString)
-                .collect(Collectors.joining(","));
+                .collect(Collectors.joining("','", "'", "'"));
 
         if (ub == null || ub.getId() == 0) {// in case database connection is
             // broken
