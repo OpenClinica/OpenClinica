@@ -129,7 +129,7 @@ public class ViewStudySubjectServlet extends SecureController {
             de.setMaximumSampleOrdinal(sedao.getMaxSampleOrdinal(sed, studySubject));
 
             Status status = de.getStudyEvent().getStatus();
-            if (status == Status.AVAILABLE)
+            if (status == Status.AVAILABLE || status == Status.AUTO_DELETED)
                 displayEvents.add(de);
             // event.setEventCRFs(createAllEventCRFs(eventCRFs,
             // eventDefinitionCRFs));

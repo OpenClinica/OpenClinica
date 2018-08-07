@@ -64,16 +64,60 @@
    <td class="table_cell"><c:out value="${studySub.label}"/></td>
  </tr>
 
- <tr>
-   <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/></td>
-   <td class="table_cell"><c:out value="${subject.uniqueIdentifier}"/></td>
- </tr>
- <tr>
-   <td class="table_header_column"><fmt:message key="gender" bundle="${resword}"/></td>
-   <td class="table_cell"><c:out value="${subject.gender}"/></td></tr>
- <tr>
-   <td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/></td>
-   <td class="table_cell"><fmt:formatDate value="${subject.createdDate}" pattern="${dteFormat}"/></td></tr>
+  <c:choose>
+    <c:when test='${study.parentStudyId > 0}'>
+      <tr valign="top">
+        <td class="table_header_column"><fmt:message key="study_name" bundle="${resword}"/>:</td>
+        <td class="table_cell"><c:out value="${study.parentStudyName}"/></td>
+      </tr>
+      <tr valign="top">
+        <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/>:</td>
+        <td class="table_cell"><c:out value="${study.name}"/></td>
+      </tr>
+    </c:when>
+    <c:otherwise>
+      <tr valign="top">
+        <td class="table_header_column"><fmt:message key="study_name" bundle="${resword}"/>:</td>
+        <td class="table_cell"><c:out value="${study.name}"/></td>
+      </tr>
+      <tr valign="top">
+        <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/>:</td>
+        <td class="table_cell"></td>
+      </tr>
+    </c:otherwise>
+  </c:choose>
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="created_by" bundle="${resword}"/>:
+    </td>
+    <td class="table_cell">
+      <c:out value="${studySub.owner.name}"/>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="date_created" bundle="${resword}"/>:
+    </td>
+    <td class="table_cell">
+      <fmt:formatDate value="${studySub.createdDate}" pattern="${dteFormat}"/>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="last_updated_by" bundle="${resword}"/>:
+    </td>
+    <td class="table_cell">
+      <c:out value="${studySub.updater.name}"/>&nbsp;
+    </td>
+  </tr>
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="date_updated" bundle="${resword}"/>:
+    </td>
+    <td class="table_cell">
+      <fmt:formatDate value="${studySub.updatedDate}" pattern="${dteFormat}"/>&nbsp;
+    </td>
+  </tr>
  </table>
  </div>
 </div></div></div></div></div></div></div></div>

@@ -838,7 +838,6 @@ div#subjectSDV table#sdv {
 }
 
 .alert.small {
-  line-height: 3px;
   margin-bottom: 10px;
   font-size: small;
   text-align: left;

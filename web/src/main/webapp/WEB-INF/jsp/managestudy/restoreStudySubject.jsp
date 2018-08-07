@@ -13,27 +13,27 @@
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: all">
-		<td class="sidebar_tab">
+    <td class="sidebar_tab">
 
-		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
+    <a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-down gray" border="0" align="right" hspace="10"></span></a>
 
-		<fmt:message key="instructions" bundle="${resword}"/>
+    <fmt:message key="instructions" bundle="${resword}"/>
 
-		<div class="sidebar_tab_content">
+    <div class="sidebar_tab_content">
          <fmt:message key="confirm_restoration_of_this_subject_to_study"  bundle="${resword}"/> <c:out value="${study.name}"/>. <fmt:message key="the_subject_and_all_data_associated_with_it_in" bundle="${resword}"/> 
-		</div>
+    </div>
 
-		</td>
-	
-	</tr>
-	<tr id="sidebar_Instructions_closed" style="display: none">
-		<td class="sidebar_tab">
+    </td>
+  
+  </tr>
+  <tr id="sidebar_Instructions_closed" style="display: none">
+    <td class="sidebar_tab">
 
 		<a href="javascript:leftnavExpand('sidebar_Instructions_open'); leftnavExpand('sidebar_Instructions_closed');"><span class="icon icon-caret-right gray" border="0" align="right" hspace="10"></span></a>
 
-		<fmt:message key="instructions" bundle="${resword}"/>
+    <fmt:message key="instructions" bundle="${resword}"/>
 
-		</td>
+    </td>
   </tr>
 <jsp:include page="../include/sideInfo.jsp"/>
 
@@ -52,14 +52,50 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
   <%-- <tr valign="top"><td class="table_header_column"><fmt:message key="subject_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${subject.id}"/></td></tr> --%>
   <tr valign="top"><td class="table_header_column"><fmt:message key="study_subject_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.label}"/></td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${subject.uniqueIdentifier}"/></td></tr>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="gender" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${subject.gender}"/></td></tr>
+  <c:choose>
+    <c:when test='${study.parentStudyId > 0}'>
+      <tr valign="top">
+        <td class="table_header_column">
+          <fmt:message key="study_name" bundle="${resword}"/>:
+        </td>
+        <td class="table_cell">
+          <c:out value="${study.parentStudyName}"/>
+        </td>
+      </tr>
+      <tr valign="top">
+        <td class="table_header_column">
+          <fmt:message key="site_name" bundle="${resword}"/>:
+        </td>
+        <td class="table_cell">
+          <c:out value="${study.name}"/>
+        </td>
+      </tr>
+    </c:when>
+    <c:otherwise>
+      <tr valign="top">
+        <td class="table_header_column">
+          <fmt:message key="study_name" bundle="${resword}"/>:
+        </td>
+        <td class="table_cell">
+          <c:out value="${study.name}"/>
+        </td>
+      </tr>
+      <tr valign="top">
+        <td class="table_header_column">
+          <fmt:message key="site_name" bundle="${resword}"/>:
+        </td>
+        <td class="table_cell"></td>
+      </tr>
+    </c:otherwise>
+  </c:choose>
+  <!-- <tr valign="top"><td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${subject.uniqueIdentifier}"/></td></tr>
+  <tr valign="top"><td class="table_header_column"><fmt:message key="gender" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${subject.gender}"/></td></tr> -->
     
   <%-- <tr valign="top"><td class="table_header_column"><fmt:message key="label" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.label}"/></td></tr> --%>
-  <tr valign="top"><td class="table_header_column"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.secondaryLabel}"/>
+  <!-- <tr valign="top"><td class="table_header_column"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.secondaryLabel}"/>
   </td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="enrollment_date" bundle="${resword}"/>:</td>
-  <td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}"/></td></tr>
+  <td class="table_cell"><fmt:formatDate value="${studySub.enrollmentDate}" pattern="${dteFormat}"/></td></tr> -->
   <tr valign="top"><td class="table_header_column"><fmt:message key="created_by" bundle="${resword}"/>:</td><td class="table_cell"><c:out value="${studySub.owner.name}"/></td></tr>
   <tr valign="top"><td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/>:</td><td class="table_cell"><fmt:formatDate value="${studySub.createdDate}" pattern="${dteFormat}"/>
   </td></tr>
@@ -112,7 +148,18 @@
            <td class="table_cell"><fmt:formatDate value="${displayEvents.studyEvent.dateEnded}" pattern="${dteFormat}"/></td>
            <td class="table_cell"><c:out value="${displayEvents.studyEvent.location}"/></td>
            <td class="table_cell"><c:out value="${displayEvents.studyEvent.updater.name}"/></td>
-           <td class="table_cell"><c:out value="${displayEvents.studyEvent.status.name}"/></td>
+           <c:choose>
+              <c:when test="${displayEvents.studyEvent.status.name == 'auto-removed'}">
+                <td class="table_cell">
+                  <fmt:message key="removed" bundle="${resword}"/>
+                </td>
+              </c:when>
+              <c:otherwise>
+                <td class="table_cell">
+                  <c:out value="${displayEvents.studyEvent.status.name}"/>
+                </td>
+              </c:otherwise>
+           </c:choose>
         </tr>
         </c:forEach>
    </table>  

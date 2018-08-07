@@ -12,6 +12,7 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -163,41 +164,81 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
      */
     public StudyBean validateRequestAndReturnStudy(String studyOid, String siteOid,HttpServletRequest request) {
 
-       
+        String userName = getUserAccount(request).getName();
+        StudyBean study = null;
+        StudyBean site = null;
+        
         if (studyOid == null && siteOid == null) {
             throw new OpenClinicaSystemException("studySubjectEndpoint.provide_valid_study_site", "Provide a valid study/site.");
         }
         if (studyOid != null && siteOid == null) {
-            StudyBean study = getStudyDao().findByOid(studyOid);
+            study = getStudyDao().findByOid(studyOid);
             if (study == null) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_identifier", "The study identifier you provided is not valid.");
             }
-            StudyUserRoleBean studySur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount(request).getName(), study.getId());
-            if (studySur.getStatus() != Status.AVAILABLE) {
+            StudyUserRoleBean studySur = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
+            if (studySur == null) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.insufficient_permissions",
                         "You do not have sufficient privileges to proceed with this operation.");
             }
             return study;
         }
         if (studyOid != null && siteOid != null) {
-            StudyBean study = getStudyDao().findByOid(studyOid);
-            StudyBean site = getStudyDao().findByOid(siteOid);
+            study = getStudyDao().findByOid(studyOid);
+            site = getStudyDao().findByOid(siteOid);
             if (study == null || site == null || site.getParentStudyId() != study.getId()) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_site_identifier",
                         "The study/site identifier you provided is not valid.");
             }
-            StudyUserRoleBean siteSur = getUserAccountDao().findRoleByUserNameAndStudyId(getUserAccount(request).getName(), site.getId());
-            if (siteSur.getStatus() != Status.AVAILABLE) {
-                throw new OpenClinicaSystemException("studySubjectEndpoint.insufficient_permissions",
-                        "You do not have sufficient privileges to proceed with this operation.");
-            }
-            return site;
-        }
-        return null;
+            
+            /**
+             * check study level
+             */
+            StudyUserRoleBean studyLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
+            if (studyLevelRole == null) {
+            	/**
+                 * continue to check site level
+                 */
+                StudyUserRoleBean siteLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(getUserAccount(request).getName(), siteOid);
+                if (siteLevelRole == null) {
+                    throw new OpenClinicaSystemException("studySubjectEndpoint.insufficient_permissions",
+                    		"You do not have any role set up for user " + userName + " in study " + siteOid );
+                }else if(siteLevelRole.getId() == 0 || siteLevelRole.getRole().equals(Role.MONITOR)) {
+                	throw new OpenClinicaSystemException("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
+                }
+            }else if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
+            	throw new OpenClinicaSystemException("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
+            }  		                           
+           
+   		}
+        return site;
+        
     }
     
     
-    
+    public boolean isSystemGenerating(String studyOid) {
+    	
+    	boolean isSystemGenerating = false;
+    	
+    	StudyBean currentStudy = null;
+    	currentStudy = getStudyDao().findByOid(studyOid); 
+        int handleStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+        String idSetting = "";
+        StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectIdGeneration");
+        idSetting = subjectIdGenerationParameter.getValue();
+       
+        /**
+		 *  Participant ID auto generate
+		 */
+        if ((idSetting.equals("auto editable") || idSetting.equals("auto non-editable"))) {
+	        StudyParameterValueBean participantIdTemplateSetting = this.getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "participantIdTemplate");
+	        if (participantIdTemplateSetting!=null && participantIdTemplateSetting.getValue() != null) {
+	        	isSystemGenerating = true;	        			        	   
+            }
+        }
+        
+        return isSystemGenerating;
+    }
     
     /**
      * Helper Method to get the user account
