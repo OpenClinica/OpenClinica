@@ -87,10 +87,8 @@
       <c:choose>
        <c:when test="${displayStudy.parent.id==studySub.studyId }">   
         <input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.id}"/>">
-        <b>
-          <c:out value="${displayStudy.parent.name}"/>
-          <fmt:message key="currently_in" bundle="${restext}"/>
-        </b>
+        <c:out value="${displayStudy.parent.name}"/>
+        <b><i><fmt:message key="currently_in" bundle="${restext}"/></i></b>
        </c:when> 	 
        <c:otherwise>          
         <c:if test="${displayStudy.status.available}">
@@ -119,7 +117,7 @@
             <div class="homebox_bullets">
               <input type="radio" checked name="studyId" value="<c:out value="${child.id}"/>">
               <c:out value="${child.name}"/>
-              <fmt:message key="currently_in" bundle="${restext}"/>
+              <b><i><fmt:message key="currently_in" bundle="${restext}"/></i></b>
             </div>
           </c:when> 	 
           <c:otherwise>          
