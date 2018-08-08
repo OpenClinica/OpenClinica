@@ -27,6 +27,7 @@ public class RestfulServiceHelper {
 	
 	//CSV file header	
 	private static final String [] FILE_HEADER_MAPPING = {"ParticipantID"};
+	private static final String ParticipantID_header = "ParticipantID";
 	
 	     
 
@@ -34,9 +35,9 @@ public class RestfulServiceHelper {
 	/**
 	 * @param file
 	 * @return
-	 * @throws IOException
+	 * @throws Exception 
 	 */
-	public static ArrayList<String> readCSVFile(MultipartFile file) throws IOException {
+	public static ArrayList<String> readCSVFile(MultipartFile file) throws Exception {
 		
 		ArrayList<String> subjectKeyList = new ArrayList<>();
 		 
@@ -52,17 +53,25 @@ public class RestfulServiceHelper {
 
 	         CSVParser csvParser = new CSVParser(reader, csvFileFormat);
 	       
-	         //Get a list of CSV file records              	         
-	         for (CSVRecord csvRecord : csvParser) {		      	
-	        	     	          	 
-	        	  String participantID = csvRecord.get("ParticipantID");
-	        	  
-	        	  if (StringUtils.isNotEmpty(participantID)) {
-	     			 subjectKeyList.add(participantID);     							     				         
-	     		 }
+	         try {
+	        	//Get a list of CSV file records              	         
+		         for (CSVRecord csvRecord : csvParser) {		      	
+		        	     	          	 
+		        	  String participantID = csvRecord.get(ParticipantID_header);
+		        	  
+		        	  if (StringUtils.isNotEmpty(participantID)) {
+		     			 subjectKeyList.add(participantID);     							     				         
+		     		 }
+		         }
+	         }catch(java.lang.IllegalArgumentException e) {
+	        	 subjectKeyList = readFile(file);
+	        	
+		         
+		     
 	         }
+	         
 		}catch (Exception e) {
-			log.error("Exception with cause = {} {}", e.getCause(), e.getMessage());
+			throw new Exception(" This CSV format is not supported ");
 	    }
 		
         
@@ -76,7 +85,7 @@ public class RestfulServiceHelper {
 	 * @return
 	 * @throws IOException
 	 */
-	private ArrayList<String> readFile(MultipartFile file) throws IOException {
+	private static ArrayList<String> readFile(MultipartFile file) throws IOException {
 		
 		ArrayList<String> subjectKeyList = new ArrayList<>();
 		
@@ -84,10 +93,29 @@ public class RestfulServiceHelper {
 			
 			 String line;
 			
+			 int lineNm = 1;
+			 int position = 0;
+			 
 			 while (sc.hasNextLine()) {
 				 line = sc.nextLine();
-				 subjectKeyList.add(line);
-								     				         
+				 String[] lineVal= line.split(",", 0);
+				 
+				 // check ParticipantID column number
+				 if(lineNm ==1) {
+					 
+					 for(int i=0; i < lineVal.length;i++) {
+						 lineVal.equals(ParticipantID_header);
+						 position = i;
+						 
+						 break;
+					 }
+				 }else {
+					 subjectKeyList.add(lineVal[position]);
+				 }
+				 
+				 
+				
+				 lineNm++;
 			 }
 			
 		} catch (Exception e) {
