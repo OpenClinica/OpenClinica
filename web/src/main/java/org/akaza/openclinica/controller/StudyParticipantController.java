@@ -63,6 +63,9 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiResponse;
 
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
@@ -86,6 +89,10 @@ public class StudyParticipantController {
 		private String dateFormat;	 
 		protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 		
+		@ApiOperation(value = "To create a participant at study level",  notes = "Will read the subjectKey value provided by the user if the study participant ID is configured to be Manually generated  ")
+		@ApiResponses(value = {
+		        @ApiResponse(code = 200, message = "Successful operation"),
+		        @ApiResponse(code = 400, message = "Bad Request -- Normally nmeans Found validation errors, for detail please see the error list")})
 		@RequestMapping(value = "/{studyOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
@@ -109,7 +116,7 @@ public class StudyParticipantController {
 		
 		}
 		
-		
+		@ApiOperation(value = "To create a participant at study site level",  notes = "Will read the subjectKey")
 		@RequestMapping(value = "/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request, 
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
@@ -133,6 +140,7 @@ public class StudyParticipantController {
 			  }
 		}
 		
+		@ApiOperation(value = "To create participants at study level in bulk",  notes = "Will read the subjectKeys in CSV file")
 		@RequestMapping(value = "/{studyOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
 				@RequestParam("file") MultipartFile file,
@@ -145,7 +153,7 @@ public class StudyParticipantController {
 			
 		}
 		
-		
+		@ApiOperation(value = "To create participants at study site level in bulk",  notes = "Will read the subjectKeys in CSV file")
 		@RequestMapping(value = "/{studyOID}/sites/{siteOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request,
 				@RequestParam("file") MultipartFile file,
@@ -389,14 +397,14 @@ public class StudyParticipantController {
 		}
 		
 		
-		
+		@ApiOperation(value = "To get all participants at study level",  notes = "only work for authorized users with the right acecss permission")
 		@RequestMapping(value = "/{studyOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {
 			
 			return listStudySubjects(studyOid, null, request);
 		}
 
-		
+		@ApiOperation(value = "To get all participants at study site level",  notes = "only work for authorized users with the right acecss permission ")
 		@RequestMapping(value = "/{studyOID}/sites/{sitesOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudySite(@PathVariable("studyOID") String studyOid,@PathVariable("sitesOID") String siteOid,HttpServletRequest request) throws Exception {
 			
