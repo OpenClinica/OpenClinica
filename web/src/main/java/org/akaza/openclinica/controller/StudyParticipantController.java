@@ -34,6 +34,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import org.akaza.openclinica.controller.dto.ParticipantRestfulRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -87,18 +88,23 @@ public class StudyParticipantController {
 		
 		@RequestMapping(value = "/{studyOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
-				@RequestBody HashMap<String, Object> map,
+				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
 				@PathVariable("studyOID") String studyOID) throws Exception {
-			
+			String subjectKeyVal = participantRestfulRequestDTO.getSubjectKey();
+			HashMap<String, Object> map = new HashMap<>();
+			map.put("subjectKey", subjectKeyVal);
 			return this.createNewStudySubject(request, map, studyOID, null);
 		}
 		
 		
 		@RequestMapping(value = "/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request, 
-				@RequestBody HashMap<String, Object> map,
+				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
 				@PathVariable("studyOID") String studyOID,
 				@PathVariable("siteOID") String siteOID) throws Exception {
+			String subjectKeyVal = participantRestfulRequestDTO.getSubjectKey();
+			HashMap<String, Object> map = new HashMap<>();
+			map.put("subjectKey", subjectKeyVal);
 			
 			return this.createNewStudySubject(request, map, studyOID, siteOID);
 		}
@@ -110,7 +116,7 @@ public class StudyParticipantController {
 				//@RequestPart("json") Optional<JsonPojo> map,								
 				@PathVariable("studyOID") String studyOID) throws Exception {
 			
-		
+			 this.setSchema(studyOID, request);
 			 return createNewStudyParticipantsInBulk(request, file, studyOID, null);
 			
 		}
@@ -123,7 +129,7 @@ public class StudyParticipantController {
 				@PathVariable("studyOID") String studyOID,
 				@PathVariable("siteOID") String siteOID) throws Exception {
 			
-			
+			this.setSchema(studyOID, request);
             return createNewStudyParticipantsInBulk(request, file, studyOID, siteOID);
 		}
 
@@ -362,14 +368,14 @@ public class StudyParticipantController {
 		
 		@RequestMapping(value = "/{studyOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {
-		
+			
 			return listStudySubjects(studyOid, null, request);
 		}
 
 		
 		@RequestMapping(value = "/{studyOID}/sites/{sitesOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudySite(@PathVariable("studyOID") String studyOid,@PathVariable("sitesOID") String siteOid,HttpServletRequest request) throws Exception {
-		
+			
 			return listStudySubjects(studyOid, siteOid, request);
 		}
 

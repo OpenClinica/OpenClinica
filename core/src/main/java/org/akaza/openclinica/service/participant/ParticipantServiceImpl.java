@@ -87,9 +87,20 @@ public class ParticipantServiceImpl implements ParticipantService {
        }
        
        // create study subject
+       StudyBean siteStudy = null;
+       String siteOid = subjectTransfer.getSiteIdentifier();
+       if (siteOid != null) {
+        	siteStudy = this.getStudyDao().findSiteByOid(subjectTransfer.getStudyOid(), siteOid);
+        	
+       }
        StudySubjectBean studySubject = new StudySubjectBean();
        studySubject.setSubjectId(subject.getId());
-       studySubject.setStudyId(subjectTransfer.getStudy().getId());
+       if(siteStudy != null) {
+    	   studySubject.setStudyId(siteStudy.getId());
+       }else {
+    	   studySubject.setStudyId(subjectTransfer.getStudy().getId());
+       }
+       
        studySubject.setLabel(subjectTransfer.getStudySubjectId());
        studySubject.setStatus(Status.AVAILABLE);
        studySubject.setOwner(subjectTransfer.getOwner());
@@ -99,9 +110,9 @@ public class ParticipantServiceImpl implements ParticipantService {
        }
        
        //update subject account
-       if(currentStudy.getId() != subjectTransfer.getStudy().getId()) {
+       if(siteStudy != null) {
     	   //update at site level
-    	   updateStudySubjectSize(subjectTransfer.getStudy());
+    	   updateStudySubjectSize(siteStudy);
     	   // update at parent level
     	   updateStudySubjectSize(currentStudy);
        }else {
