@@ -257,7 +257,7 @@ public class CreateDatasetServlet extends SecureController {
                     request.setAttribute(BEAN_MONTHS, getMonths());
                     request.setAttribute(BEAN_YEARS, getYears());
 
-                    forwardPage(Page.CREATE_DATASET_3);
+                    forwardPage(Page.CREATE_DATASET_4);
                 }
             }
 
@@ -303,7 +303,7 @@ public class CreateDatasetServlet extends SecureController {
                 request.setAttribute(BEAN_MONTHS, getMonths());
                 request.setAttribute(BEAN_YEARS, getYears());
 
-                forwardPage(Page.CREATE_DATASET_3);
+                forwardPage(Page.CREATE_DATASET_4);
             } else {
                 DatasetBean dsb = (DatasetBean) session.getAttribute("newDataset");
 
