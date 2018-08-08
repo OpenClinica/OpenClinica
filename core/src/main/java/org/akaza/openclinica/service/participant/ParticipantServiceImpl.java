@@ -104,6 +104,10 @@ public class ParticipantServiceImpl implements ParticipantService {
        studySubject.setLabel(subjectTransfer.getStudySubjectId());
        studySubject.setStatus(Status.AVAILABLE);
        studySubject.setOwner(subjectTransfer.getOwner());
+       Date now = new Date();
+       studySubject.setCreatedDate(now);
+       studySubject.setUpdater(subjectTransfer.getOwner());
+       studySubject.setUpdatedDate(now);
        studySubject = this.getStudySubjectDao().createWithoutGroup(studySubject);
        if (!studySubject.isActive()) {
            throw new OpenClinicaException("Could not create study subject", "4");

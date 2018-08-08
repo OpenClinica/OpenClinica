@@ -448,7 +448,21 @@ public class StudyParticipantController {
 		        for(StudySubjectBean studySubject:studySubjects) {
 		        	StudyParticipantDTO spDTO= new StudyParticipantDTO();
 		        	        			        			        	
-		        	spDTO.setSubjectKey(studySubject.getLabel());		        	
+		        	spDTO.setSubjectKey(studySubject.getLabel());
+		        	spDTO.setStatus(studySubject.getStatus().getName());
+		        	if(studySubject.getOwner()!=null) {
+		        		spDTO.setCreatedBy(studySubject.getOwner().getName());
+		        	}
+		        	if(studySubject.getCreatedDate()!=null) {
+		        		spDTO.setCreatedAt(studySubject.getCreatedDate().toLocaleString());
+		        	}
+		        	if(studySubject.getUpdatedDate() !=null) {
+		        		spDTO.setLastModified(studySubject.getUpdatedDate().toLocaleString());
+		        	}
+		        	if(studySubject.getUpdater() != null) {
+		        		spDTO.setLastModifiedBy(studySubject.getUpdater().getName());
+		        	}
+		        	
 		        			        	
 		        	studyParticipantDTOs.add(spDTO);
 		        }
