@@ -93,7 +93,20 @@ public class StudyParticipantController {
 			String subjectKeyVal = participantRestfulRequestDTO.getSubjectKey();
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("subjectKey", subjectKeyVal);
-			return this.createNewStudySubject(request, map, studyOID, null);
+			
+			ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
+							
+			try {
+				return this.createNewStudySubject(request, map, studyOID, null);
+			} catch (Exception e) {
+			    System.err.println(e.getMessage()); 
+			    
+				String validation_failed_message = e.getMessage();
+			    responseFailureStudyParticipantSingleDTO.getMessage().add(validation_failed_message);
+			    ResponseEntity response = new ResponseEntity(responseFailureStudyParticipantSingleDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+				return response;
+			  }
+		
 		}
 		
 		
@@ -106,7 +119,18 @@ public class StudyParticipantController {
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("subjectKey", subjectKeyVal);
 			
-			return this.createNewStudySubject(request, map, studyOID, siteOID);
+			ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
+			
+			try {
+				return this.createNewStudySubject(request, map, studyOID, siteOID);
+			} catch (Exception e) {
+			    System.err.println(e.getMessage()); 
+			    
+				String validation_failed_message = e.getMessage();
+			    responseFailureStudyParticipantSingleDTO.getMessage().add(validation_failed_message);
+			    ResponseEntity response = new ResponseEntity(responseFailureStudyParticipantSingleDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+				return response;
+			  }
 		}
 		
 		@RequestMapping(value = "/{studyOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})

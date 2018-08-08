@@ -191,11 +191,14 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
             if (study == null) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_identifier", "The study identifier you provided is not valid.");
             }
-            StudyUserRoleBean studySur = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
-            if (studySur == null) {
+            StudyUserRoleBean studyLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
+            if (studyLevelRole == null) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.insufficient_permissions",
                         "You do not have sufficient privileges to proceed with this operation.");
-            }
+            }else if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
+            	throw new OpenClinicaSystemException("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
+            } 
+            
             return study;
         }
         if (studyOid != null && siteOid != null) {
