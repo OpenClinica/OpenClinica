@@ -143,11 +143,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
 
             List<String> tagIds = new ArrayList<>();
 
-            String permissionTags = tagIds
-                    .stream()
-                    .map(Object::toString)
-                    .collect(Collectors.joining(","));
-
+            String[] permissionTags = tagIds.toArray(new String[tagIds.size()]);
             List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean,permissionTags );
 
             // Subject

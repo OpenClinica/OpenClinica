@@ -8,13 +8,9 @@ package org.akaza.openclinica.dao.core;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
-import java.sql.PreparedStatement;
-import java.sql.SQLException;
-import java.sql.Types;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.Map;
-import java.util.Set;
+import java.sql.*;
+import java.util.*;
+import java.util.Date;
 
 /**
  * @author thickerson
@@ -50,6 +46,11 @@ public class PreparedStatementFactory {
     }
 
     public PreparedStatement generate(PreparedStatement ps) throws SQLException, NullPointerException {
+        return generate( ps,  null);
+    }
+
+
+        public PreparedStatement generate(PreparedStatement ps, Connection con) throws SQLException, NullPointerException {
 
         Set varSet = variables.entrySet();
         for (Iterator varIt = varSet.iterator(); varIt.hasNext();) {
@@ -71,6 +72,14 @@ public class PreparedStatementFactory {
 
                 if ("java.lang.String".equals(objType)) {
                     ps.setString(order.intValue(), objParam.toString());
+                } else if (String[].class.getName().equals(objType)) {
+                    String [] arr =  (String[])objParam;
+                    if(con!=null){
+                        Array sqlArray =con.createArrayOf(JDBCType.VARCHAR.getName(),arr);
+                        ps.setArray (order.intValue(), sqlArray);
+                    }else{
+                        throw new NullPointerException("connection is null");
+                    }
                 } else if ("java.lang.Float".equals(objType)) {
                     Float objFloatParam = (Float) objParam;
                     ps.setFloat(order.intValue(), objFloatParam.floatValue());
