@@ -12,7 +12,7 @@ public class StudyParticipantDTO {
     private String lastModified;
     private String lastModifiedBy;
     
-	private ArrayList<String> message;
+
 
 	public String getSubjectKey() {
 		return subjectKey;
@@ -22,13 +22,7 @@ public class StudyParticipantDTO {
 		this.subjectKey = subjectKey;
 	}
 
-	public ArrayList<String> getMessage() {
-		return message;
-	}
-
-	public void setMessage(ArrayList<String> message) {
-		this.message = message;
-	}
+	
 
 	public String getStatus() {
 		return status;

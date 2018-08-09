@@ -168,7 +168,7 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	        }
 	        
 	        if (currentStudy == null) {
-	            e.reject("subjectTransferValidator.study_does_not_exist", new Object[] { subjectTransferBean.getStudyOid() }, "Study identifier you specified "
+	            e.reject("errorCode.studyNotExist", new Object[] { subjectTransferBean.getStudyOid() }, "Study identifier you specified "
 	                + subjectTransferBean.getStudyOid() + " does not correspond to a valid study.");
 	            return;
 	        }
@@ -184,29 +184,29 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	        StudyUserRoleBean studyLevelRole = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,studyOid);
 			if(studyLevelRole == null) {
 				if (subjectTransferBean.getSiteIdentifier() != null) {
-	 	        	siteStudy = getStudyDAO().findSiteByOid(subjectTransferBean.getStudyOid(), siteOid);
+	 	        	siteStudy = subjectTransferBean.getSiteStudy();
 	 	        	if (siteStudy == null) {
-	 	 	            e.reject("subjectTransferValidator.site_does_not_exist", new Object[] { siteOid },
+	 	 	            e.reject("errorCode.siteNotExist", new Object[] { siteOid },
 	 	 	                    "Site identifier you specified does not correspond to a valid site.");
 	 	 	            return;
 	 	 	        }else {
 	 	 	        	StudyUserRoleBean siteLevelRole = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,siteOid);
 	 	 	        	if(siteLevelRole == null) {
-	 	 	        		 e.reject("subjectTransferValidator.no_roles", "You do not have any role set up for user " + userName + " in study " + siteOid );
+	 	 	        		 e.reject("errorCode.noRoleSetUp", "You do not have any role set up for user " + userName + " in study site " + siteOid );
 	 	 	        		return;
 	 	 	        	}else if(siteLevelRole.getId() == 0 || siteLevelRole.getRole().equals(Role.MONITOR)) {
-	 	 				    e.reject("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
+	 	 				    e.reject("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
 	 	 				    return;
 	 	 				}
 	 	 	        }
 		        }else {
-		        	 e.reject("subjectTransferValidator.no_roles", "You do not have any role set up for user " + userName + " in study " + studyOid );
+		        	 e.reject("errorCode.noRoleSetUp", "You do not have any role set up for user " + userName + " in study " + studyOid );
 		        	 return;
 		        }
 				
 				 
 			}else if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
-			    e.reject("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
+			    e.reject("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
 			    return;
 			}
 				          
@@ -234,14 +234,14 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	        }else {
 	        	// check the manually provided value
 	        	if (subjectTransferBean.getStudySubjectId().contains("<") || subjectTransferBean.getStudySubjectId().contains(">")) {
-		        	 e.reject("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements","Participant ID provided in the request contains unsupported  HTML (< and >) characters"); 
+		        	 e.reject("errorCode.participantIDContainsUnsupportedHTMLCharacter","Participant ID provided in the request contains unsupported  HTML (< and >) characters"); 
 		        	 return;
 	            }
 	        }
 	        
 	        
 	        if (isEnrollmentCapped()){
-	        	 e.reject("current_study_full","Participants enrollment cap has reached and hence NO MORE participant can be added to the study");   
+	        	 e.reject("errorCode.participantsEnrollmentCapReached","Participants enrollment cap has reached and hence NO MORE participant can be added to the study");   
 	        	 return;
             }
 	        
@@ -252,37 +252,27 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	        StudyBean checkStudy = currentStudy;
 	        
 	        if(getStudySubjectDao().findByLabelAndStudy(subjectTransferBean.getPersonId(), checkStudy).getId() != 0) {
-	        	 e.reject("Study Participant", "Participant ID " + subjectTransferBean.getPersonId() + " already exists with that ID, please use different ID");
+	        	 e.reject("errorCode.participantIDNotUnique", "Participant ID " + subjectTransferBean.getPersonId() + " already exists with that ID, please use different ID");
 		         return;				
 			}
         	        
 	        StudyParameterValueBean studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectPersonIdRequired");
 	        String personId = subjectTransferBean.getPersonId();
 	        if ("required".equals(studyParameter.getValue()) && (personId == null || personId.length() < 1)) {
-	            e.reject("subjectTransferValidator.personId_required", new Object[] { currentStudy.getName() }, "personId is required for the study: " + currentStudy.getName());
+	            e.reject("errorCode.subjectPersonIdRequired", new Object[] { currentStudy.getName() }, "personId is required for the study: " + currentStudy.getName());
 	            return;
 	        }
-
-	        if (personId != null && personId.length() > 255) {
-	            e.reject("subjectTransferValidator.personId_invalid_length", new Object[] { personId }, "personId: " + personId
-	                + " cannot be longer than 255 characters.");
-	            return;
-	        }
-			
 	        
 	        String studySubjectId = subjectTransferBean.getStudySubjectId();
 	        if (studySubjectId == null || studySubjectId.length() < 1) {
-	            e.reject("subjectTransferValidator.studySubjectId_required");
+	            e.reject("errorCode.participantIDEmpty");
 	            return;
 	        } else if (studySubjectId.length() > 30) {
-	            e.reject("subjectTransferValidator.studySubjectId_invalid_length", new Object[] { studySubjectId }, "studySubjectId: " + studySubjectId
+	            e.reject("errorCode.participantIDLongerThan30Characters", new Object[] { studySubjectId }, "studySubjectId: " + studySubjectId
 	                + " cannot be longer than 30 characters.");
 	            return;
 	        }
-        	        
-	        
-
-	        
+     	        
 	    }
 
 	 public void validateBulk(Object obj, Errors e) {
@@ -292,41 +282,17 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	        if (currentStudy == null) {
 	        	currentStudy = getStudyDAO().findByPublicOid(subjectTransferBean.getStudyOid());
 	        }
-	        	          
-	        int handleStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
-	        String idSetting = "";
-	        StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectIdGeneration");
-	        idSetting = subjectIdGenerationParameter.getValue();
-	        if ((idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) && ! this.isBulkMode()) {
-	        	
-	        	/**
-				 *  Participant ID auto generate
-				 */
-	        	String nextLabel = null;
-		        StudyParameterValueBean participantIdTemplateSetting = this.getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "participantIdTemplate");
-		        if (participantIdTemplateSetting!=null && participantIdTemplateSetting.getValue() != null) {
-		        	nextLabel = this.generateParticipantIdUsingTemplate(this.currentStudy);		        			        	   
-	            }else {
-	            	// generated by default template
-		        	nextLabel = createSubjectIdByDefaultTemplate(); 		        	
-	            }
-		        
-		        subjectTransferBean.setPersonId(nextLabel);
-	            subjectTransferBean.setStudySubjectId(nextLabel);
-	        	
-	        }else {
-	        	// check the manually provided value
-	        	if (subjectTransferBean.getStudySubjectId().contains("<") || subjectTransferBean.getStudySubjectId().contains(">")) {
-		        	 e.reject("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements","Participant ID provided in the request contains unsupported  HTML (< and >) characters"); 
-		        	 return;
-	            }
-	        }
-	        
-	        
-	        if (isEnrollmentCapped()){
-	        	 e.reject("current_study_full","Participants enrollment cap has reached and hence NO MORE participant can be added to the study");   
+        	          	       
+        	// check the manually provided value
+        	if (subjectTransferBean.getStudySubjectId().contains("<") || subjectTransferBean.getStudySubjectId().contains(">")) {
+	        	 e.reject("errorCode.participantIDContainsUnsupportedHTMLCharacter","Participant ID provided in the request contains unsupported  HTML (< and >) characters"); 
 	        	 return;
-         }
+            }
+    	        	        
+	        if (isEnrollmentCapped()){
+	        	 e.reject("errorCode.participantsEnrollmentCapReached","Participants enrollment cap has reached and hence NO MORE participant can be added to the study");   
+	        	 return;
+	        }
 	        
 	        /**
 			 * Applicable ONLY when manual entry: Participant ID provided in the request is a duplicate. A participant already exists with that ID
@@ -335,37 +301,28 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	        StudyBean checkStudy = currentStudy;
       	        
 	        if(getStudySubjectDao().findByLabelAndStudy(subjectTransferBean.getPersonId(), checkStudy).getId() != 0) {
-	        	 e.reject("Study Participant", "Participant ID " + subjectTransferBean.getPersonId() + " already exists with that ID, please use different ID");
+	        	 e.reject("errorCode.participantIDNotUnique", "Participant ID " + subjectTransferBean.getPersonId() + " already exists with that ID, please use different ID");
 		         return;				
 			}
-     	        
+     	    
+	        int handleStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();		     
 	        StudyParameterValueBean studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectPersonIdRequired");
 	        String personId = subjectTransferBean.getPersonId();
 	        if ("required".equals(studyParameter.getValue()) && (personId == null || personId.length() < 1)) {
-	            e.reject("subjectTransferValidator.personId_required", new Object[] { currentStudy.getName() }, "personId is required for the study: " + currentStudy.getName());
+	            e.reject("errorCode.subjectPersonIdRequired", new Object[] { currentStudy.getName() }, "personId is required for the study: " + currentStudy.getName());
 	            return;
 	        }
-
-	        if (personId != null && personId.length() > 255) {
-	            e.reject("subjectTransferValidator.personId_invalid_length", new Object[] { personId }, "personId: " + personId
-	                + " cannot be longer than 255 characters.");
-	            return;
-	        }
-			
 	        
 	        String studySubjectId = subjectTransferBean.getStudySubjectId();
 	        if (studySubjectId == null || studySubjectId.length() < 1) {
-	            e.reject("subjectTransferValidator.studySubjectId_required");
+	            e.reject("errorCode.participantIDEmpty");
 	            return;
 	        } else if (studySubjectId.length() > 30) {
-	            e.reject("subjectTransferValidator.studySubjectId_invalid_length", new Object[] { studySubjectId }, "studySubjectId: " + studySubjectId
+	            e.reject("errorCode.participantIDLongerThan30Characters", new Object[] { studySubjectId }, "ParticipantID: " + studySubjectId
 	                + " cannot be longer than 30 characters.");
 	            return;
 	        }
-     	        
-	        
-
-	        
+    	   	        
 	    }
 
 	/**

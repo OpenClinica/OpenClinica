@@ -4,34 +4,17 @@ import java.util.List;
 
 public class ResponseSuccessListAllParticipantsByStudyDTO {
 
-	private String studyOid;
-	private String siteOid;
-	private String message;
-	protected List<StudyParticipantDTO> studySubjects;
 	
-	public String getStudyOid() {
-		return studyOid;
+	protected List<StudyParticipantDTO> studyParticipants;
+
+	public List<StudyParticipantDTO> getStudyParticipants() {
+		return studyParticipants;
 	}
-	public void setStudyOid(String studyOid) {
-		this.studyOid = studyOid;
+
+	public void setStudyParticipants(List<StudyParticipantDTO> studyParticipants) {
+		this.studyParticipants = studyParticipants;
 	}
-	public String getSiteOid() {
-		return siteOid;
-	}
-	public void setSiteOid(String siteOid) {
-		this.siteOid = siteOid;
-	}
-	public String getMessage() {
-		return message;
-	}
-	public void setMessage(String message) {
-		this.message = message;
-	}
-	public List<StudyParticipantDTO> getStudySubjects() {
-		return studySubjects;
-	}
-	public void setStudySubjects(List<StudyParticipantDTO> studySubjects) {
-		this.studySubjects = studySubjects;
-	}
+	
+	
 	
 }
