@@ -87,21 +87,36 @@ public class ParticipantServiceImpl implements ParticipantService {
        }
        
        // create study subject
+       StudyBean siteStudy = null;
+       String siteOid = subjectTransfer.getSiteIdentifier();
+       if (siteOid != null) {
+        	siteStudy = this.getStudyDao().findSiteByOid(subjectTransfer.getStudyOid(), siteOid);
+        	
+       }
        StudySubjectBean studySubject = new StudySubjectBean();
        studySubject.setSubjectId(subject.getId());
-       studySubject.setStudyId(subjectTransfer.getStudy().getId());
+       if(siteStudy != null) {
+    	   studySubject.setStudyId(siteStudy.getId());
+       }else {
+    	   studySubject.setStudyId(subjectTransfer.getStudy().getId());
+       }
+       
        studySubject.setLabel(subjectTransfer.getStudySubjectId());
        studySubject.setStatus(Status.AVAILABLE);
        studySubject.setOwner(subjectTransfer.getOwner());
+       Date now = new Date();
+       studySubject.setCreatedDate(now);
+       studySubject.setUpdater(subjectTransfer.getOwner());
+       studySubject.setUpdatedDate(now);
        studySubject = this.getStudySubjectDao().createWithoutGroup(studySubject);
        if (!studySubject.isActive()) {
            throw new OpenClinicaException("Could not create study subject", "4");
        }
        
        //update subject account
-       if(currentStudy.getId() != subjectTransfer.getStudy().getId()) {
+       if(siteStudy != null) {
     	   //update at site level
-    	   updateStudySubjectSize(subjectTransfer.getStudy());
+    	   updateStudySubjectSize(siteStudy);
     	   // update at parent level
     	   updateStudySubjectSize(currentStudy);
        }else {
@@ -176,11 +191,14 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
             if (study == null) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.invalid_study_identifier", "The study identifier you provided is not valid.");
             }
-            StudyUserRoleBean studySur = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
-            if (studySur == null) {
+            StudyUserRoleBean studyLevelRole = getUserAccountDao().findTheRoleByUserNameAndStudyOid(userName, studyOid);
+            if (studyLevelRole == null) {
                 throw new OpenClinicaSystemException("studySubjectEndpoint.insufficient_permissions",
                         "You do not have sufficient privileges to proceed with this operation.");
-            }
+            }else if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
+            	throw new OpenClinicaSystemException("subjectTransferValidator.insufficient_permissions", "You do not have sufficient privileges to proceed with this operation.");
+            } 
+            
             return study;
         }
         if (studyOid != null && siteOid != null) {

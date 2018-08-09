@@ -249,12 +249,8 @@ public class ParticipantValidator extends SubjectTransferValidator {
 			 * Applicable ONLY when manual entry: Participant ID provided in the request is a duplicate. A participant already exists with that ID
 			 * in study level
 			 */
-	        StudyBean checkStudy = null;
-	        if (siteStudy == null) {
-	        	checkStudy = siteStudy;
-	        }else{
-	        	checkStudy = currentStudy;
-	        }
+	        StudyBean checkStudy = currentStudy;
+	        
 	        if(getStudySubjectDao().findByLabelAndStudy(subjectTransferBean.getPersonId(), checkStudy).getId() != 0) {
 	        	 e.reject("Study Participant", "Participant ID " + subjectTransferBean.getPersonId() + " already exists with that ID, please use different ID");
 		         return;				
@@ -337,10 +333,7 @@ public class ParticipantValidator extends SubjectTransferValidator {
 			 * in study level
 			 */
 	        StudyBean checkStudy = currentStudy;
-	        if (siteStudy != null) {
-	        	checkStudy = siteStudy;
-	        }
-	        
+      	        
 	        if(getStudySubjectDao().findByLabelAndStudy(subjectTransferBean.getPersonId(), checkStudy).getId() != 0) {
 	        	 e.reject("Study Participant", "Participant ID " + subjectTransferBean.getPersonId() + " already exists with that ID, please use different ID");
 		         return;				
