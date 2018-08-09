@@ -76,11 +76,41 @@
 	</tr>
     <%-- BWP 3098 >> switch displays for Info box--%>
     <tr id="sidebar_Info_closed"<c:if test="${closeInfoShowIcons}">style="display: none"</c:if>>
-		<td class="sidebar_tab">
+		<td class="sidebar_tab" style="border-bottom: 1px solid #999;">
 
 		<a href="javascript:leftnavExpand('sidebar_Info_open'); leftnavExpand('sidebar_Info_closed');"><span class="icon icon-caret-right gray"></span></a>
 
-		Info
+		<fmt:message key="info" bundle="${resword}"/>
+
+		</td>
+	</tr>
+	<tr id="sidebar_Links_open"<c:if test="${!closeQuickLinks}">style="display: none"</c:if>>
+		<td class="sidebar_tab">
+
+		<a href="javascript:leftnavExpand('sidebar_Links_open'); leftnavExpand('sidebar_Links_closed');">
+               <span class="icon icon-caret-down gray"></span>
+		</a>
+
+		<fmt:message key="quick_links" bundle="${resword}"/>
+
+		<div class="sidebar_tab_content">
+
+			<span style="color: #789EC5">
+			<c:url var="viewNotes" value="/ViewNotes"/>
+	    <a href="${viewNotes}?module=submit&listNotes_f_discrepancyNoteBean.user=<c:out value="${userBean.name}"/>"><fmt:message key="notes_assigned_to_me" bundle="${restext}"/></a>
+
+   	</div>
+
+		</td>
+	</tr>
+	</tr>
+    <%-- OC-8695 --%>
+    <tr id="sidebar_Links_closed"<c:if test="${closeQuickLinks}">style="display: none"</c:if>>
+		<td class="sidebar_tab">
+
+		<a href="javascript:leftnavExpand('sidebar_Links_open'); leftnavExpand('sidebar_Links_closed');"><span class="icon icon-caret-right gray"></span></a>
+
+		<fmt:message key="quick_links" bundle="${resword}"/>
 
 		</td>
 	</tr>
@@ -179,7 +209,6 @@
 	<a href="RequestPassword"><fmt:message key="forgot_password" bundle="${resword}"/></a>
 </c:otherwise>
 </c:choose>
-
 
 <!-- End Sidebar Contents -->
 
