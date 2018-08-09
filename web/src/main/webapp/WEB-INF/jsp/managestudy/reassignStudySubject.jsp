@@ -126,44 +126,65 @@
 <p><strong><fmt:message key="please_choose_a_study_in_the_following_list2" bundle="${restext}"/></strong></P>
     
    <table border="0" cellpadding="0" cellspacing="0"> 
-   <tr><td>   	 
+   <tr>
+    <td style="padding-left:50px;">
+      <c:choose>
+       <c:when test="${displayStudy.parent.id==studySub.studyId }">   
+        <input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.id}"/>" class="hide">
+        <c:out value="${displayStudy.parent.name}"/>
+        <b><i><fmt:message key="currently_in" bundle="${restext}"/></i></b>
+       </c:when> 	 
+       <c:otherwise>          
+        <c:if test="${displayStudy.status.available}">
+          <input type="radio" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>" class="hide">
+          <b>
+            <c:out value="${displayStudy.parent.name}"/>
+          </b>
+        </c:if>
+        <c:if test="${displayStudy.status.locked}">
+          <input type="radio" disabled="true" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>" class="hide">
+          <b>
+            <c:out value="${displayStudy.parent.name}"/>
+          </b>
+        </c:if>
+       </c:otherwise>
+      </c:choose> 
+      <br>
+    </td>
+  </tr> 
+  <c:forEach var="child" items="${displayStudy.children}">
+    <tr>
+      <td style="padding-left:100px;">
         <c:choose> 	 
-         <c:when test="${displayStudy.parent.id==studySub.studyId }">      
-                      
-          <input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> <fmt:message key="currently_in" bundle="${restext}"/></b>         
-                  	 
-         </c:when> 	 
-         <c:otherwise>          
-          <c:if test="${displayStudy.status.available}">
-                <input type="radio" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> </b>
-          </c:if>
-          <c:if test="${displayStudy.status.locked}">
-                <input type="radio" disabled="true" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> </b>
-          </c:if>
-         </c:otherwise>
-        </c:choose> 
-        <br>        
-     </td></tr> 
-      <c:forEach var="child" items="${displayStudy.children}">
-      <tr><td>
-         <c:choose> 	 
-         <c:when test="${child.id==studySub.studyId }">      
-           &nbsp;&nbsp;<div class="homebox_bullets"><input type="radio" checked name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/> <fmt:message key="currently_in" bundle="${restext}"/></div>
-         </c:when> 	 
-         <c:otherwise>          
+          <c:when test="${child.id==studySub.studyId }">      
+            &nbsp;&nbsp;
+            <div class="homebox_bullets">
+              <input type="radio" checked name="studyId" value="<c:out value="${child.id}"/>">
+              <c:out value="${child.name}"/>
+              <b><i><fmt:message key="currently_in" bundle="${restext}"/></i></b>
+            </div>
+          </c:when> 	 
+          <c:otherwise>          
             <c:if test="${child.status.available}"> 
-                &nbsp;&nbsp;<div class="homebox_bullets"><input type="radio" name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/></div>
+              &nbsp;&nbsp;
+              <div class="homebox_bullets">
+                <input type="radio" name="studyId" value="<c:out value="${child.id}"/>">
+                <c:out value="${child.name}"/>
+              </div>
             </c:if>
-             <c:if test="${child.status.locked}">
-                 &nbsp;&nbsp;<div class="homebox_bullets"><input type="radio" disabled="true" name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/></div>
-             </c:if>
-         </c:otherwise>
+            <c:if test="${child.status.locked}">
+              &nbsp;&nbsp;
+              <div class="homebox_bullets">
+                <input type="radio" disabled="true" name="studyId" value="<c:out value="${child.id}"/>">
+                <c:out value="${child.name}"/>
+              </div>
+            </c:if>
+          </c:otherwise>
         </c:choose>       
-      
-      </td></tr>
-      </c:forEach>
-    
-   </table>
+      </td>
+    </tr>
+  </c:forEach>
+</table>
   <p><input type="submit" name="Submit" value="<fmt:message key="reassign_subject" bundle="${resword}"/>" class="button_long">
       <input type="button" onclick="confirmCancel('ListStudySubjects');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
   </p>
