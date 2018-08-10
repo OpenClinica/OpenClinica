@@ -359,7 +359,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);
             }
             request.setAttribute(EnketoFormServlet.FORM_URL, formUrlObject.getFormUrl());
-            request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module);
+            request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module + "&listNotes_f_discrepancyNoteBean.disType=Query");
             request.setAttribute(JINI, jini);
         }
         return true;
