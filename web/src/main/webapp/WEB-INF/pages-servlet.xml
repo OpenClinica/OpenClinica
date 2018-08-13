@@ -43,9 +43,9 @@
         <property name="instructionsBoxSetup" value="OPENINSTRUCTIONS"/>
     </bean>
 
-    <!-- <bean name="setUpUserInterceptor" class="org.akaza.openclinica.controller.helper.SetUpUserInterceptor">
+    <bean name="setUpUserInterceptor" class="org.akaza.openclinica.controller.helper.SetUpUserInterceptor">
     	<property name="dataSource" ref="dataSource"/>
-    </mvc:bean> -->
+    </bean>
 
     <mvc:interceptors>
         <bean id="enrollmentInterceptor" class="org.akaza.openclinica.controller.helper.EnrollmentInterceptor"/>
