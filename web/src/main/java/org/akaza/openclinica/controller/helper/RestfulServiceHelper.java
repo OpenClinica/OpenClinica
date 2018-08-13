@@ -1,10 +1,16 @@
 package org.akaza.openclinica.controller.helper;
 
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.web.multipart.MultipartFile;
 
 import liquibase.util.StringUtils;
@@ -16,10 +22,15 @@ import java.io.InputStreamReader;
 import java.io.Reader;
 import java.nio.file.Files;
 import java.nio.file.Paths;
+import java.sql.Connection;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 public class RestfulServiceHelper {
 	
@@ -29,9 +40,16 @@ public class RestfulServiceHelper {
 	private static final String [] FILE_HEADER_MAPPING = {"ParticipantID"};
 	private static final String ParticipantID_header = "ParticipantID";
 	
-	     
+	
+	private DataSource dataSource;	
+	private StudyDAO studyDao;     
 
 	
+	public RestfulServiceHelper(DataSource dataSource2) {
+		dataSource = dataSource2;
+	}
+
+
 	/**
 	 * @param file
 	 * @return
@@ -125,5 +143,49 @@ public class RestfulServiceHelper {
 		return subjectKeyList;
 	}
 	
+	 /**
+	  * 
+	  * @param studyOid
+	  * @param request
+	  * @return
+	 * @throws Exception 
+	  */
+	 public StudyBean setSchema(String studyOid, HttpServletRequest request) throws OpenClinicaSystemException {
+		// first time, the default DB schema for restful service is public
+		 StudyBean study = getStudyDao().findByPublicOid(studyOid);
+		
+		 Connection con;
+		 String schemaNm="";
+		 
+		 if (study == null) {
+			 throw new OpenClinicaSystemException("errorCode.studyNotExist","The study identifier you provided:" + studyOid + " is not valid.");
+			 
+         }else {
+       	  schemaNm = study.getSchemaName();
+         }
+		 
+		 
+		try {
+			request.setAttribute("requestSchema",schemaNm);
+			request.setAttribute("changeStudySchema",schemaNm);
+			con = dataSource.getConnection();
+			CoreResources.setSchema(con);
+		} catch (SQLException e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+       // get correct study from the right DB schema 
+		study = getStudyDao().findByOid(studyOid);
+        
+        return study;
+	 }
 
+    /**
+	 * 
+	 * @return
+	 */
+	 public StudyDAO getStudyDao() {
+        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
+        return studyDao;
+    }
 }

@@ -19,5 +19,5 @@ public interface ParticipantService {
 	 public List<StudySubjectBean> getStudySubject(StudyBean study);
 	 public StudyBean validateRequestAndReturnStudy(String studyOid, String siteOid,HttpServletRequest request);
 	 public UserAccountBean getUserAccount(HttpServletRequest request);
-	 public boolean isSystemGenerating(String studyOid);
+	 public boolean isSystemGenerating(StudyBean studyBean);
 }

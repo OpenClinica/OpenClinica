@@ -43,6 +43,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.participant.ParticipantService;
+import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.validator.ParticipantValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -86,6 +87,7 @@ public class StudyParticipantController {
 		private StudySubjectDAO ssDao;
 		private UserAccountDAO userAccountDao;
 		
+		private RestfulServiceHelper serviceHelper;
 		private String dateFormat;	 
 		protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 		
@@ -147,8 +149,7 @@ public class StudyParticipantController {
 				//will implement this JsonPojo class  when we decide to pass additional parameters
 				//@RequestPart("json") Optional<JsonPojo> map,								
 				@PathVariable("studyOID") String studyOID) throws Exception {
-			
-			 this.setSchema(studyOID, request);
+						 
 			 return createNewStudyParticipantsInBulk(request, file, studyOID, null);
 			
 		}
@@ -161,7 +162,7 @@ public class StudyParticipantController {
 				@PathVariable("studyOID") String studyOID,
 				@PathVariable("siteOID") String siteOID) throws Exception {
 			
-			this.setSchema(studyOID, request);
+			
             return createNewStudyParticipantsInBulk(request, file, studyOID, siteOID);
 		}
 
@@ -193,17 +194,17 @@ public class StudyParticipantController {
 					 String fileNm = file.getOriginalFilename();
 					 //only support CSV file
 					 if(!(fileNm.endsWith(".csv")) ){
-						 throw new Exception("The file format is not supported at this time, please send CSV file, like *.csv ");
+						 throw new OpenClinicaSystemException("errorCode.notSupportedFileFormat","The file format is not supported at this time, please send CSV file, like *.csv ");
 					 }
-					 if(this.participantService.isSystemGenerating(studyOID)) {
-						 throw new Exception("This study has set up participant ID to be System-generated, bulk upload is not supported at this time ");
-					 }
+					 
 					 ArrayList<String> subjectKeyList = RestfulServiceHelper.readCSVFile(file);
 				     
 				     return this.createNewStudySubjectsInBulk(request, null, studyOID, siteOID, subjectKeyList);
 
-				  } catch (Exception e) {
-				    System.err.println(e.getMessage()); 
+				  }catch(OpenClinicaSystemException e) {
+					  String validation_failed_message = e.getErrorCode();
+					  responseStudyParticipantsBulkDTO.setMessage(validation_failed_message);				   
+				  }catch (Exception e) {	
 				    
 					String validation_failed_message = e.getMessage();
 				    responseStudyParticipantsBulkDTO.setMessage(validation_failed_message);					
@@ -246,8 +247,14 @@ public class StudyParticipantController {
 			StudyParticipantDTO studyParticipantDTO = this.buildStudyParticipantDTO(map);
 					
 			subjectTransferBean.setOwner(this.participantService.getUserAccount(request));
-			StudyBean study = this.setSchema(studyOID, request);
+			
+			StudyBean study = this.getRestfulServiceHelper().setSchema(studyOID, request);
 			subjectTransferBean.setStudy(study);
+			
+			if(siteOID != null) {
+				StudyBean siteStudy = getStudyDao().findSiteByOid(subjectTransferBean.getStudyOid(), siteOID);
+				subjectTransferBean.setSiteStudy(siteStudy);
+			}
 			
 			ParticipantValidator participantValidator = new ParticipantValidator(dataSource);
 	        Errors errors = null;
@@ -261,8 +268,13 @@ public class StudyParticipantController {
 	        	Iterator errorIt = validerrors.iterator();
 	        	
 	        	while(errorIt.hasNext()) {
-	        		ObjectError oe = (ObjectError) errorIt.next();	        			        	
-	        		errorMessages.add(oe.getDefaultMessage());
+	        		ObjectError oe = (ObjectError) errorIt.next();
+	        		if(oe.getCode()!=null) {
+	        			errorMessages.add(oe.getCode());
+	        		}else {
+	        			errorMessages.add(oe.getDefaultMessage());
+	        		}
+	        		
 	        		
 	        	}
 	        }
@@ -310,11 +322,19 @@ public class StudyParticipantController {
 			String validation_failed_message = "Found validation failure,please see detail error message for each subjectKey";
 			String validation_passed_message = "SUCCESS";
 					
-			StudyBean study = this.setSchema(studyOID, request);
+			StudyBean study = this.getRestfulServiceHelper().setSchema(studyOID, request);
 			StudyBean studyBean = null;
-			studyBean = this.participantService.validateRequestAndReturnStudy(studyOID, siteOID,request);
-			
+			studyBean = this.participantService.validateRequestAndReturnStudy(studyOID, siteOID,request);			
+        	if(this.participantService.isSystemGenerating(studyBean)) {
+				 throw new OpenClinicaSystemException("errorCode.bulkUploadNotSupportSystemGeneratedSetting","This study has set up participant ID to be System-generated, bulk upload is not supported at this time ");
+			 }
+        	
 			UserAccountBean  user = this.participantService.getUserAccount(request);
+			
+			StudyBean siteStudy = null;
+			if(siteOID != null) {
+				siteStudy = getStudyDao().findSiteByOid(studyOID, siteOID);				
+			}
 			
 			int failureCount = 0;
 			int uploadCount = subjectKeys.size();
@@ -327,6 +347,7 @@ public class StudyParticipantController {
 				subjectTransferBean.setStudyOid(studyOID);
 				subjectTransferBean.setStudy(study);
 				subjectTransferBean.setOwner(user);
+				subjectTransferBean.setSiteStudy(siteStudy);
 				
 				String uri = request.getRequestURI();
 				if(uri.indexOf("/sites/") >  0) {
@@ -350,7 +371,12 @@ public class StudyParticipantController {
 		        	Iterator errorIt = validerrors.iterator();
 		        	while(errorIt.hasNext()) {
 		        		ObjectError oe = (ObjectError) errorIt.next();		        				        		
-						errorMsgs.add(oe.getDefaultMessage());		        		
+						
+						if(oe.getCode()!=null) {
+							errorMsgs.add(oe.getCode());
+		        		}else {
+		        			errorMsgs.add(oe.getDefaultMessage());
+		        		}
 		        	}
 		        }
 		        
@@ -421,37 +447,29 @@ public class StudyParticipantController {
 		 */
 		private ResponseEntity<Object> listStudySubjects(String studyOid, String siteOid, HttpServletRequest request)
 				throws Exception {
-			ArrayList<ErrorObject> errorObjects = new ArrayList<ErrorObject>();
-			ErrorObject errorOBject = null;
 			ResponseEntity<Object> response = null;
-			String validation_failed_message = "VALIDATION FAILED";
-			String validation_passed_message = "SUCCESS";		
-			
-			 try {
+			try {
 		         	     
-		            StudyBean studyBean = null;
+		            StudyBean study = null;
 		            try {
-		            	StudyBean study = this.setSchema(studyOid, request);
-		            	studyBean = this.participantService.validateRequestAndReturnStudy(studyOid, siteOid,request);
+		            	study = this.getRestfulServiceHelper().setSchema(studyOid, request);
+		            	study = this.participantService.validateRequestAndReturnStudy(studyOid, siteOid,request);
 		            } catch (OpenClinicaSystemException e) {	                	               	                
-		                errorOBject = createErrorObject("List Study Object failed", "studyRef:  " + studyOid + " siteRef: " + siteOid, e.getErrorCode());
-		    			errorObjects.add(errorOBject);
-		    			ResponseDTO responseDTO = new  ResponseDTO();
-		    			responseDTO.setErrors(errorObjects);
-		    			responseDTO.setMessage(e.getMessage());
+		                
+		                String errorMsg = e.getErrorCode();
+		                HashMap<String, String> map = new HashMap<>();
+		                map.put("studyOid", studyOid);
+		                map.put("siteOid", siteOid);
+		    			ParameterizedErrorVM responseDTO =new ParameterizedErrorVM(errorMsg, map);
+		    			
 		        		response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
 		            }
 		            
-		            if(studyBean != null) {
+		            if(study != null) {
 		            	ResponseSuccessListAllParticipantsByStudyDTO responseSuccess =  new ResponseSuccessListAllParticipantsByStudyDTO();
 		            	
-		            	ArrayList<StudyParticipantDTO> studyParticipantDTOs = getStudyParticipantDTOs(studyOid, siteOid,studyBean);
-		            	  
-		 	            responseSuccess.setMessage(validation_passed_message +  " - Found Study Subjects: " + studyParticipantDTOs.size() );
-		            	responseSuccess.setStudyOid(studyOid);
-		            	responseSuccess.setSiteOid(siteOid);
-		 	            responseSuccess.setStudySubjects(studyParticipantDTOs);
-		 	          
+		            	ArrayList<StudyParticipantDTO> studyParticipantDTOs = getStudyParticipantDTOs(studyOid, siteOid,study);            	  		 	            
+		 	            responseSuccess.setStudyParticipants(studyParticipantDTOs);		 	          
 		            	
 		 	            response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 		            }	           
@@ -658,43 +676,12 @@ public class StudyParticipantController {
 		        ssDao = ssDao != null ? ssDao : new StudySubjectDAO(dataSource);
 		        return ssDao;
 		    }
+		
+		public  RestfulServiceHelper getRestfulServiceHelper() {
+				serviceHelper = serviceHelper != null ? serviceHelper : new RestfulServiceHelper(dataSource);
+		        return serviceHelper;
+		}
 		 
 		 
-		 /**
-		  * 
-		  * @param studyOid
-		  * @param request
-		  * @return
-		 * @throws Exception 
-		  */
-		 public StudyBean setSchema(String studyOid, HttpServletRequest request) throws OpenClinicaSystemException {
-			// first time, the default DB schema for restful service is public
-			 StudyBean study = getStudyDao().findByPublicOid(studyOid);
-			
-			 Connection con;
-			 String schemaNm="";
-			 
-			 if (study == null) {
-				 throw new OpenClinicaSystemException("The study identifier you provided:" + studyOid + " is not valid.");
-				 
-	          }else {
-	        	  schemaNm = study.getSchemaName();
-	          }
-			 
-			 
-			try {
-				request.setAttribute("requestSchema",schemaNm);
-				request.setAttribute("changeStudySchema",schemaNm);
-				con = dataSource.getConnection();
-				CoreResources.setSchema(con);
-			} catch (SQLException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-	        // get correct study from the right DB schema 
-			study = getStudyDao().findByOid(studyOid);
-	         
-	         return study;
-		 }
-
+		
 }
