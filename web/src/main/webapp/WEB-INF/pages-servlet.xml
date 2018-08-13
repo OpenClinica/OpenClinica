@@ -43,10 +43,13 @@
         <property name="instructionsBoxSetup" value="OPENINSTRUCTIONS"/>
     </bean>
 
-    <bean name="setUpUserInterceptor" class="org.akaza.openclinica.controller.helper.SetUpUserInterceptor">
+    <!-- <bean name="setUpUserInterceptor" class="org.akaza.openclinica.controller.helper.SetUpUserInterceptor">
     	<property name="dataSource" ref="dataSource"/>
-    </bean>
+    </mvc:bean> -->
 
+    <mvc:interceptors>
+        <bean id="enrollmentInterceptor" class="org.akaza.openclinica.controller.helper.EnrollmentInterceptor"/>
+    </mvc:interceptors>
 	
     <bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller" >
         <property name="mappingLocation" value="classpath:properties/mappingMarshaller.xml" />
