@@ -200,13 +200,26 @@ public class ViewNotesDaoImpl extends NamedParameterJdbcDaoSupport implements Vi
 
         // Append sort criteria
         if (sort != null) {
+            terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.orderby"));
             if (!sort.getSorters().isEmpty()) {
-                terms.add(queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.orderby"));
-            }
-            for (String sortKey : sort.getSorters().keySet()) {
-                String sortQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.sort." + sortKey);
-                terms.add(sortQuery);
-                terms.add(sort.getSorters().get(sortKey));
+                for (String sortKey : sort.getSorters().keySet()) {
+                    String sortQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.sort." + sortKey);
+                    terms.add(sortQuery);
+                    terms.add(sort.getSorters().get(sortKey));
+                }
+            } else {
+                // set default sorting OC-9405
+                String[] defaultSort = {"days", "site_id", "label"};
+                int count = 0;
+                for (String sortKey : defaultSort) {
+                    count++;
+                    String sortQuery = queryStore.query(QUERYSTORE_FILE, "findAllDiscrepancyNotes.sort." + sortKey);
+                    terms.add(sortQuery);
+                    terms.add("ASC");
+                    if (count < defaultSort.length) {
+                        terms.add(",");
+                    }
+                }
             }
         }
 
