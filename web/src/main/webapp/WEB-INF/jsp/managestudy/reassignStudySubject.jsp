@@ -70,19 +70,11 @@
         <td class="table_header_column"><fmt:message key="study_name" bundle="${resword}"/>:</td>
         <td class="table_cell"><c:out value="${study.parentStudyName}"/></td>
       </tr>
-      <tr valign="top">
-        <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/>:</td>
-        <td class="table_cell"><c:out value="${study.name}"/></td>
-      </tr>
     </c:when>
     <c:otherwise>
       <tr valign="top">
         <td class="table_header_column"><fmt:message key="study_name" bundle="${resword}"/>:</td>
         <td class="table_cell"><c:out value="${study.name}"/></td>
-      </tr>
-      <tr valign="top">
-        <td class="table_header_column"><fmt:message key="site_name" bundle="${resword}"/>:</td>
-        <td class="table_cell"></td>
       </tr>
     </c:otherwise>
   </c:choose>
