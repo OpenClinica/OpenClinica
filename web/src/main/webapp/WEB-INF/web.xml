@@ -529,6 +529,11 @@
         <servlet-class>org.akaza.openclinica.control.admin.ListCRFServlet</servlet-class>
     </servlet>
     <servlet>
+        <display-name>NoAccess</display-name>
+        <servlet-name>NoAccessServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.NoAccessServlet</servlet-class>
+    </servlet>
+    <servlet>
         <display-name>DefineStudyEvent</display-name>
         <servlet-name>DefineStudyEventServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.managestudy.DefineStudyEventServlet</servlet-class>
@@ -1678,6 +1683,10 @@
     <servlet-mapping>
         <servlet-name>ListCRFServlet</servlet-name>
         <url-pattern>/ListCRF</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>NoAccessServlet</servlet-name>
+        <url-pattern>/NoAccess</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
         <servlet-name>DefineStudyEventServlet</servlet-name>

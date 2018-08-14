@@ -1,45 +1,22 @@
 package org.akaza.openclinica.controller;
 
-import java.io.UnsupportedEncodingException;
-import java.net.URLEncoder;
-import java.sql.Connection;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.FormLayoutBean;
-import org.akaza.openclinica.bean.submit.ItemBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
+import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.core.LockInfo;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -48,10 +25,11 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.view.Page;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -64,6 +42,16 @@ import org.springframework.web.bind.annotation.ExceptionHandler;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.sql.DataSource;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
+import java.sql.Connection;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Implement the functionality for displaying a table of Event CRFs for Source Data
@@ -92,6 +80,11 @@ public class ChangeCRFVersionController {
     EventCRFLocker eventCRFLocker;
     @Autowired
     UserAccountDao userAccountDao;
+    @Autowired
+    private EventCrfDao eventCrfDao;
+    @Autowired
+    private PermissionService permissionService;
+
     ResourceBundle resword, resformat, respage;
 
     public ChangeCRFVersionController() {
@@ -106,7 +99,8 @@ public class ChangeCRFVersionController {
     public ModelMap chooseCRFVersion(HttpServletRequest request, HttpServletResponse response, @RequestParam("crfId") int crfId,
             @RequestParam("crfName") String crfName, @RequestParam("formLayoutId") int formLayoutId, @RequestParam("formLayoutName") String formLayoutName,
             @RequestParam("studySubjectLabel") String studySubjectLabel, @RequestParam("studySubjectId") int studySubjectId,
-            @RequestParam("eventCRFId") int eventCRFId, @RequestParam("eventDefinitionCRFId") int eventDefinitionCRFId)
+            @RequestParam("eventCrfId") int eventCRFId, @RequestParam("eventDefinitionCRFId") int eventDefinitionCRFId,
+            @RequestParam("originatingPage") String originatingPage)
 
     {
 
@@ -130,6 +124,7 @@ public class ChangeCRFVersionController {
         request.setAttribute("crfName", crfName);
         request.setAttribute("formLayoutId", formLayoutId);
         request.setAttribute("formLayoutName", formLayoutName.trim());
+        request.setAttribute(SecureController.ORIGINATING_PAGE, originatingPage);
 
         ArrayList<String> pageMessages = initPageMessages(request);
         Object errorMessage = request.getParameter("errorMessage");
@@ -154,6 +149,10 @@ public class ChangeCRFVersionController {
 
         EventCRFDAO ecdao = new EventCRFDAO(dataSource);
         EventCRFBean ecb = (EventCRFBean) ecdao.findByPK(eventCRFId);
+        final EventCrf ec = eventCrfDao.findById(eventCRFId);
+        if (permissionService.hasFormAccess(ec, formLayoutId, 0, request) != true) {
+            redirect(request, response, "/NoAccess?originatingPage="+ originatingPage);
+        }
 
         StudyEventDAO sedao = new StudyEventDAO(dataSource);
         StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());

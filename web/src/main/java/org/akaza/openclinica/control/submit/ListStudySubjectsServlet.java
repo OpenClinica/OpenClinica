@@ -27,8 +27,12 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.PermissionServiceImpl;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Servlet for creating a table.
@@ -78,13 +82,19 @@ public class ListStudySubjectsServlet extends SecureController {
 
     @Override
     protected void processRequest() throws Exception {
+        WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+        PermissionServiceImpl permissionService = (PermissionServiceImpl) webApplicationContext .getBean("permissionService");
+        String permissionTags = permissionService.getPermissionTagsString(request);
         FormProcessor fp = new FormProcessor(request);
         if(fp.getString("showMoreLink").equals("")){
             showMoreLink = true;
         }else {
             showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
         }
+        logger.info("CurrentStudy:" + currentPublicStudy.getSchemaName());
+        logger.info("StudyParameterConfig:" + currentPublicStudy.getStudyParameterConfig().toString());
         String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+        logger.info("idSetting:" + idSetting);
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
             //Shaoyu Su

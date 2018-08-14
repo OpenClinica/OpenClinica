@@ -374,22 +374,22 @@ public class EventCrfLayerBuilder {
     }
 
     private void viewEventCrfContentLink(HtmlBuilder builder, StudySubjectBean studySubject, EventCRFBean eventCrf, StudyEventBean studyEvent) {
-        String href = "ViewEventCRFContent?id=" + studySubject.getId() + "&ecId=" + eventCrf.getId() + "&eventId=" + studyEvent.getId();
-        builder.a().href(href).close();
+        String href = "ViewEventCRFContent?id=" + studySubject.getId() + "&eventCrfId=" + eventCrf.getId() + "&eventId=" + studyEvent.getId();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>");
         builder.aEnd();
     }
 
     private void viewEventCrfContentLinkPrint(HtmlBuilder builder, StudySubjectBean studySubject, EventCRFBean eventCrf, StudyEventBean studyEvent) {
-        String href = "ViewEventCRFContent?id=" + studySubject.getId() + "&ecId=" + eventCrf.getId() + "&eventId=" + studyEvent.getId();
-        builder.a().href(href).close();
+        String href = "ViewEventCRFContent?id=" + studySubject.getId() + "&eventCrfId=" + eventCrf.getId() + "&eventId=" + studyEvent.getId();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-print\"/>");
         builder.aEnd();
     }
 
     private void viewEventCrfContentLink(HtmlBuilder builder, StudySubjectBean studySubject, EventCRFBean eventCrf, StudyEventBean studyEvent, String link) {
-        String href = "ViewEventCRFContent?id=" + studySubject.getId() + "&ecId=" + eventCrf.getId() + "&eventId=" + studyEvent.getId();
-        builder.a().href(href).close();
+        String href = "ViewEventCRFContent?id=" + studySubject.getId() + "&eventCrfId=" + eventCrf.getId() + "&eventId=" + studyEvent.getId();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
         builder.aEnd();
     }
@@ -411,7 +411,7 @@ public class EventCrfLayerBuilder {
 
         String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId=" + eventCrfId + "&originatingPage="
                 + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=view";
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
         builder.aEnd();
     }
@@ -432,7 +432,7 @@ public class EventCrfLayerBuilder {
 
         String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId=" + eventCrfId + "&originatingPage="
                 + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=view";
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>");
         builder.aEnd();
     }
@@ -454,7 +454,7 @@ public class EventCrfLayerBuilder {
 
         String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId=" + eventCrfId + "&originatingPage="
                 + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=view";
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
         builder.aEnd();
     }
@@ -476,7 +476,7 @@ public class EventCrfLayerBuilder {
 
         String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId=" + eventCrfId + "&originatingPage="
                 + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=view";
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-search\"/>");
         builder.aEnd();
     }
@@ -495,7 +495,7 @@ public class EventCrfLayerBuilder {
     }
 
     private void printDataEntry(HtmlBuilder builder, EventCRFBean eventCrf, String link) {
-        // String href = "javascript:openDocWindow('PrintDataEntry?ecId=" + eventCrf.getId() + "')";
+        // String href = "javascript:openDocWindow('PrintDataEntry?eventCrfId=" + eventCrf.getId() + "')";
         String href = this.contextPath + "" + "/rest/clinicaldata/html/print/" + this.currentStudy.getOid() + "/" + this.studySubject.getOid() + "/"
                 + this.getStudyEventForThisEventCRF().getStudyEventDefinition().getOid() + "%5b" + this.getStudyEventForThisEventCRF().getSampleOrdinal()
                 + "%5d/" + getCRFVersionOID();
@@ -551,42 +551,42 @@ public class EventCrfLayerBuilder {
 
     private void removeEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject) {
         String href = "RemoveEventCRF?action=confirm&id=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-cancel\"/>");
         builder.aEnd();
     }
 
     private void removeEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, String link) {
         String href = "RemoveEventCRF?action=confirm&id=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
         builder.aEnd();
     }
 
     private void restoreEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject) {
         String href = "RestoreEventCRF?action=confirm&id=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-ccw\"/>");
         builder.aEnd();
     }
 
     private void restoreEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, String link) {
         String href = "RestoreEventCRF?action=confirm&id=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
         builder.aEnd();
     }
 
     private void deleteEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject) {
-        String href = "DeleteEventCRF?action=confirm&ssId=" + studySubject.getId() + "&ecId=" + eventCrf.getId();
-        builder.a().href(href).close();
+        String href = "DeleteEventCRF?action=confirm&ssId=" + studySubject.getId() + "&eventCrfId=" + eventCrf.getId();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-trash red\"/>");
         builder.aEnd();
     }
 
     private void deleteEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, String link) {
-        String href = "DeleteEventCRF?action=confirm&ssId=" + studySubject.getId() + "&ecId=" + eventCrf.getId();
-        builder.a().href(href).close();
+        String href = "DeleteEventCRF?action=confirm&ssId=" + studySubject.getId() + "&eventCrfId=" + eventCrf.getId();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
         builder.aEnd();
     }
@@ -602,7 +602,7 @@ public class EventCrfLayerBuilder {
 
         String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEvent.getId() + "&eventCrfId=" + eventCrf.getId()
                 + "&originatingPage=" + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=edit";
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-pencil\"/>");
         builder.aEnd();
     }
@@ -617,21 +617,21 @@ public class EventCrfLayerBuilder {
         }
         String href = "EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEvent.getId() + "&eventCrfId=" + eventCrf.getId()
                 + "&originatingPage=" + "ListEventsForSubjects%3Fmodule=submit%26defId=" + studyEventDefinition.getId() + "&mode=edit";
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
         builder.aEnd();
     }
 
     private void initialDataEntryParameterizedLink(HtmlBuilder builder, EventCRFBean eventCrf) {
         String href = "InitialDataEntry?eventCRFId=" + eventCrf.getId() + "&exitTo=ListStudySubjects";
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-pencil\"/>");
         builder.aEnd();
     }
 
     private void initialDataEntryParameterizedLink(HtmlBuilder builder, EventCRFBean eventCrf, String link) {
         String href = "InitialDataEntry?eventCRFId=" + eventCrf.getId() + "&exitTo=ListStudySubjects";
-        builder.a().href(href).close();
+        builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
         builder.aEnd();
     }

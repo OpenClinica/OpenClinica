@@ -49,6 +49,7 @@ import java.util.*;
 public class StudyBuildServiceImpl implements StudyBuildService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+    PermissionService permissionService;
     @Autowired
     private StudyDao studyDao;
     @Autowired
@@ -61,6 +62,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     private SchemaServiceDao schemaServiceDao;
     @Autowired
     private UserAccountDao userAccountDao;
+
+    public StudyBuildServiceImpl(PermissionService permissionService) {
+        this.permissionService = permissionService;
+    }
 
     public StudyInfoObject process(HttpServletRequest request, Study study, UserAccountBean ub) throws Exception  {
         boolean isUserUpdated;
@@ -322,33 +327,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
     public ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request) {
-        Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
-        if (userContextMap == null)
-            return null;
-        String userUuid = (String) userContextMap.get("userUuid");
-        String uri = CoreResources.getField("SBSUrl") + userUuid + "/roles";
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Accept-Charset", "UTF-8");
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
-        jsonConverter.setObjectMapper(objectMapper);
-        converters.add(jsonConverter);
-        restTemplate.setMessageConverters(converters);
-        ResponseEntity<List<StudyEnvironmentRoleDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<StudyEnvironmentRoleDTO>>() {});
-        logger.debug("Response: getUserRoles:" + response);
-        if (logger.isDebugEnabled()) {
-            for (StudyEnvironmentRoleDTO userRole: response.getBody()) {
-                logger.debug("UserRole in updateStudyUserRoles: role: " + userRole.getRoleName() + " uuid:" + userRole.getUuid() );
-            }
-        }
-        return response;
+        return permissionService.getUserRoles(request);
     }
 
     public ResponseEntity getUserDetails (HttpServletRequest request) {

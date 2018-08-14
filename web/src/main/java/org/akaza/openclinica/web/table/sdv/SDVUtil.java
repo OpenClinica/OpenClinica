@@ -1046,9 +1046,8 @@ public class SDVUtil {
         String href = request.getContextPath() + "/EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId="
                 + eventDefinitionCRFId + "&originatingPage=pages/viewAllSubjectSDVtmp?sdv_restore=true%26studyId=" + studyId + "&mode=view";
         builder.append(
-                "<center><a title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0' href='" + href + "' ></a></center>");
+                "<center><a title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + " accessCheck' border='0' href='" + href + "' ></a></center>");
         // "<input type=\"hidden\" statusId=\"1\" />"
-        builder.append("</a>");
         builder.append(" ");
         builder.append(input.toString());
         return builder.toString();

@@ -49,7 +49,7 @@
     
     
     <query>
-        <name>findAllStudySiteFilteredWithTagIds</name>
+        <name>findAllCrfsForStudySiteFilteredWithTagIds</name>
         <sql>SELECT edc.* FROM event_definition_crf edc where study_id in (?,?)
 			and event_definition_crf_id not in (SELECT parent_id FROM event_definition_crf where study_id in (?) and parent_id !=0 )
 			and event_definition_crf_id not in (select event_definition_crf_id from event_definition_crf_permission_tag where permission_tag_id != all (?))
