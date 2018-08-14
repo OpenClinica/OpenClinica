@@ -22,6 +22,12 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.controller.Auth0Controller;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
+import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.EventCRFLocker;
@@ -55,6 +61,7 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
@@ -210,6 +217,8 @@ public abstract class SecureController extends HttpServlet  {
     private EventCRFLocker eventCrfLocker;
 
     private final String COMMON = "common";
+
+    public static final String ORIGINATING_PAGE = "originatingPage";
 
     // user is in
 
@@ -1364,6 +1373,24 @@ public abstract class SecureController extends HttpServlet  {
             return true;
         else
             return false;
+    }
+
+    public String getPermissionTagsString() {
+        PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+        String permissionTags = permissionService.getPermissionTagsString(request);
+        return permissionTags;
+    }
+    public List<String>  getPermissionTagsList() {
+        PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+        List<String> permissionTagsList = permissionService.getPermissionTagsList(request);
+        return permissionTagsList;
+    }
+
+    public boolean hasFormAccess(EventCrf ec) {
+        Integer formLayoutId = new Integer(request.getParameter("formLayoutId"));
+        Integer studyEventId = new Integer(request.getParameter("studyEventId"));
+        PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+        return permissionService.hasFormAccess(ec, formLayoutId, studyEventId, request);
     }
 
 }

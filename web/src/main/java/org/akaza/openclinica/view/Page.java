@@ -37,8 +37,10 @@ public enum Page {
      */
                 MENU("/WEB-INF/jsp/menu.jsp", "Welcome to OpenClinica"),
                 MENU_SERVLET("/MainMenu", "Welcome to OpenClinica Main Servlet"),
-              
-    // YW 06-25-2007 <<
+                NO_ACCESS("/WEB-INF/jsp/noAccess.jsp", "No Access"),
+
+
+ // YW 06-25-2007 <<
     /**
      * Page for reset password when password is expired.
      */

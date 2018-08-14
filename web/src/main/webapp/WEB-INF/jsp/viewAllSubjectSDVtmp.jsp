@@ -42,7 +42,10 @@
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jmesa.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.jmesa.js"></script>
-  <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery-migrate-1.1.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery-migrate-1.1.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="../includes/permissionTagAccess.js"></script>
+
+
 <%-- view all subjects starts here --%>
 <script type="text/javascript">
 
@@ -89,135 +92,6 @@
 <jsp:useBean scope='session' id='sSdvRestore' class='java.lang.String' />
 <c:set var="restore" value="true"/>
 <c:if test="${sSdvRestore=='false'}"><c:set var="restore" value="false"/></c:if>
-
-<%--
-<!-- These DIVs define shaded box borders -->
-<div id="startBox" class="box_T"><div class="box_L"><div class="box_R"><div class="box_B">
-<div class="box_TL"><div class="box_TR"><div class="box_BL"><div class="box_BR">
-<div class="textbox_center">
-<form method="GET" action="viewAllSubjectSDVform" name="sdvFilterForm">
-    --%><%--<input type="hidden" name="srch" value="y" />--%><%--
-                    <input type="hidden" name="studyId" value="${studyId}"/>
-                    <table border="0" cellpadding="0" cellspacing="0">
-                        <tr valign="top"><td><b><fmt:message key="filter_events_by" bundle="${resword}"/>:</b></td></tr>
-                        <tr valign="top">
-                            <td><fmt:message key="study_subject" bundle="${resword}"/>:</td>
-                            <td><div class="formfieldL_BG" style="margin-right:10px">
-                                <input type="text" name="study_subject_id" class="formfieldS" />
-                            </div>
-                            </td>
-                            <td><fmt:message key="event_crf" bundle="${resword}"/>:</td>
-                            <td>
-                                <div class="formfieldM_BG" style="margin-right:10px">
-                                    --%><%--<c:set var="status1" value="${statusId}"/>--%><%--
-                                    <select name="eventCRFName" class="formfieldM">
-                                        <option value="0">--<fmt:message key="all" bundle="${resword}"/>--</option>
-                                        --%><%-- probably need to use study event name here --%><%--
-                                        <c:forEach var="eventCRFNam" items="${eventCRFNames}">
-                                            <option value="${eventCRFNam}">${eventCRFNam}</option>
-                                        </c:forEach>
-                                    </select>
-                                </div>
-                            </td>
-                            <td><fmt:message key="study_event_definition" bundle="${resword}"/>:</td>
-                            <td>
-                                <div class="formfieldM_BG">
-                                    --%><%--<c:set var="status1" value="${statusId}"/>--%><%--
-                                    <select name="studyEventDefinition" class="formfieldM">
-                                        <option value="0">--<fmt:message key="all" bundle="${resword}"/>--</option>
-                                        --%><%-- probably need to use study event name here --%><%--
-                                        <c:forEach var="studyEventDefinition" items="${studyEventDefinitions}">
-                                        <option value="<c:out value="${studyEventDefinition.id}"/>"><c:out value="${studyEventDefinition.name}"/>
-                                            </c:forEach>
-                                    </select>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr valign="top">
-                            <td><fmt:message key="study_event_status" bundle="${resword}"/>:</td>
-                            <td>
-                                <div class="formfieldM_BG" style="margin-right:10px">
-                                    --%><%--<c:set var="status1" value="${statusId}"/>--%><%--
-                                    <select name="studyEventStatus" class="formfieldM">
-                                        <option value="-1">--<fmt:message key="all" bundle="${resword}"/>--</option>
-                                        <c:forEach var="studyEventStatus" items="${studyEventStatuses}">
-                                        <option value="<c:out value="${studyEventStatus.id}"/>"><c:out value="${studyEventStatus.name}"/>
-                                            </c:forEach>
-                                    </select>
-                                </div>
-                            </td>
-                            <td><fmt:message key="event_crf_status" bundle="${resword}"/>:</td>
-                            <td>
-                                <div class="formfieldM_BG" style="margin-right:10px">
-                                    --%><%--<c:set var="status1" value="${statusId}"/>--%><%--
-                                    <select name="eventCRFStatus" class="formfieldM">
-                                        <option value="-1">--<fmt:message key="all" bundle="${resword}"/>--</option>
-                                        <c:forEach var="eventCRFStatus" items="${eventCRFDStatuses}">
-                                        <option value="<c:out value="${eventCRFStatus.id}"/>"><c:out value="${eventCRFStatus.name}"/>
-                                            </c:forEach>
-                                    </select>
-                                </div>
-                            </td>
-                            <td>
-                                <fmt:message key="event_crf_sdv_status" bundle="${resword}"/>:
-                            </td>
-                            <td>
-                                <div class="formfieldM_BG">
-                                    --%><%--<c:set var="status1" value="${statusId}"/>--%><%--
-                                    <select name="eventcrfSDVStatus" class="formfieldM">
-                                        <option value="N/A"><fmt:message key="N/A" bundle="${resword}"/></option>
-                                        <option value="None"><fmt:message key="none" bundle="${resword}"/></option>
-                                        <option value="Complete"><fmt:message key="complete" bundle="${resword}"/></option>
-                                    </select>
-                                </div>
-                            </td>
-                        </tr>
-                        <tr valign="top">
-                            <td>
-                                <fmt:message key="event_crf_sdv_require" bundle="${resword}"/>:
-                            </td>
-                            <td>
-                                <div class="formfieldM_BG" style="margin-right:10px">
-                                    --%><%--<c:set var="status1" value="${statusId}"/>--%><%--
-                                    <select name="sdvRequirement" class="formfieldM">
-                                        <option value="0">--<fmt:message key="all" bundle="${resword}"/>--</option>
-                                        <c:forEach var="sdvRequirement" items="${sdvRequirements}">
-                                        <option value="<c:out value="${sdvRequirement.code}"/>"><c:out value="${sdvRequirement.description}"/>
-                                            </c:forEach>
-                                    </select>
-                                </div>
-                            </td>
-                            <td>
-                                <fmt:message key="event_crf_date_updated" bundle="${resword}"/>:
-                            </td>
-                            <td>
-                                <div class="formfieldS_BG" style="width:157px">
-                                    <input type="text" name="startUpdatedDate" value="${startUpdatedDate}" class="formfieldS" id="startUpdatedDateField"><A HREF="#"><img src="../images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="startDateTrigger"/>
-                                    <script type="text/javascript">
-                                        Calendar.setup({inputField  : "startUpdatedDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "startDateTrigger" });
-                                    </script>
-                                </a>
-                                </div>
-                            </td>
-                            <td><div><b><fmt:message key="To" bundle="${resword}"/></b></div></td>
-                            <td><div class="formfieldS_BG" style="width:157px">
-                                <input type="text" name="endDate" value="${endDate}" class="formfieldS" id="endDateField">
-                                <A HREF="#">
-                                    <img src="../images/bt_Calendar.gif" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="startDateTriggerB"/>
-                                    <script type="text/javascript">
-                                        Calendar.setup({inputField  : "endDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "startDateTriggerB" });
-                                    </script>
-                                </a>
-                            </div>
-                            </td>
-                        </tr>
-                        <tr>
-                            <td colspan="6" align="right"><input type="submit" name="submit" value="<fmt:message key="apply_filter" bundle="${resword}"/>" class="button_medium"></td>
-                        </tr>
-                    </table>
-                </form>
-            </div>
-        </div></div></div></div></div></div></div></div>--%>
 
 <script type="text/javascript">
     function prompt(formObj,crfId){

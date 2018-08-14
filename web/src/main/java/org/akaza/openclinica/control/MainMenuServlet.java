@@ -19,6 +19,7 @@ import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFact
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
+import org.akaza.openclinica.controller.Auth0Controller;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
@@ -29,6 +30,7 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.service.StudyBuildServiceImpl;
 import org.akaza.openclinica.view.Page;
@@ -218,12 +220,7 @@ public class MainMenuServlet extends SecureController {
         request.setAttribute("iconInfoShown", true);
         request.setAttribute("closeInfoShowIcons", false);
 
-        List<String> tagIds = new ArrayList<>();
-
-        String permissionTags = tagIds
-                .stream()
-                .map(Object::toString)
-                .collect(Collectors.joining("','", "'", "'"));
+        String permissionTags = getPermissionTagsString();
 
         if (ub == null || ub.getId() == 0) {// in case database connection is
             // broken
