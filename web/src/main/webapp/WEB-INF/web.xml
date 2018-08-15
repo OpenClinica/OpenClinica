@@ -1513,7 +1513,7 @@
     </servlet-mapping>
 
     <servlet-mapping>
-        <servlet-name>ListStudySubjectsServlet</servlet-name>
+        <servlet-name>MainMenuServlet</servlet-name>
         <url-pattern>/MainMenu</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
