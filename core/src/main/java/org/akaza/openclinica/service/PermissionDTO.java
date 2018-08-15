@@ -1,17 +1,22 @@
 package org.akaza.openclinica.service;
 
 
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+
 import java.io.Serializable;
 import java.util.Objects;
 
 /**
  * A DTO for the Permission entity.
  */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class PermissionDTO extends AbstractAuditingDTO implements Serializable {
 
     private String uuid;
 
     private String tagId;
+
+    private String tagName;
 
     private String operation;
 
@@ -31,6 +36,14 @@ public class PermissionDTO extends AbstractAuditingDTO implements Serializable {
 
     public void setTagId(String tagId) {
         this.tagId = tagId;
+    }
+
+    public String getTagName() {
+        return tagName;
+    }
+
+    public void setTagName(String tagName) {
+        this.tagName = tagName;
     }
 
     public String getOperation() {
