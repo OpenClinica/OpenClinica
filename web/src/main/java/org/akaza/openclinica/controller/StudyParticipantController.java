@@ -94,7 +94,7 @@ public class StudyParticipantController {
 		@ApiOperation(value = "To create a participant at study level",  notes = "Will read the subjectKey value provided by the user if the study participant ID is configured to be Manually generated  ")
 		@ApiResponses(value = {
 		        @ApiResponse(code = 200, message = "Successful operation"),
-		        @ApiResponse(code = 400, message = "Bad Request -- Normally nmeans Found validation errors, for detail please see the error list")})
+		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list")})
 		@RequestMapping(value = "/{studyOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,

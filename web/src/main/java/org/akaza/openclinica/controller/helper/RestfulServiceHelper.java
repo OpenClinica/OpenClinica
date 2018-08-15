@@ -1,7 +1,12 @@
 package org.akaza.openclinica.controller.helper;
 
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.csv.CSVFormat;
@@ -11,11 +16,15 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.validation.Errors;
 import org.springframework.web.multipart.MultipartFile;
 
 import liquibase.util.StringUtils;
 
 import java.io.BufferedReader;
+import java.io.File;
 import java.io.IOException;
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -29,7 +38,9 @@ import java.util.List;
 import java.util.Map;
 import java.util.Scanner;
 
+import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
 
 public class RestfulServiceHelper {
@@ -42,7 +53,8 @@ public class RestfulServiceHelper {
 	
 	
 	private DataSource dataSource;	
-	private StudyDAO studyDao;     
+	private StudyDAO studyDao; 
+	private UserAccountDAO userAccountDAO;
 
 	
 	public RestfulServiceHelper(DataSource dataSource2) {
@@ -180,6 +192,99 @@ public class RestfulServiceHelper {
         return study;
 	 }
 
+	 /**
+	  * 
+	  * @param file
+	  * @return
+	  * @throws IOException
+	  */
+	 public static String readFileToString(MultipartFile file) throws IOException{
+         StringBuilder sb = new StringBuilder();
+         try(Scanner sc = new Scanner(file.getInputStream())){
+        	 String currentLine;
+		
+        	 while (sc.hasNextLine()) {
+        		 currentLine = sc.nextLine();
+		         sb.append(currentLine);
+		     }
+		
+		 }
+		
+	       return sb.toString();
+	 }
+	 
+	 public boolean verifyRole(String userName,  String study_oid,
+				String site_oid, Errors e) {
+			
+		 boolean hasRolePermission = true;
+			// check for site role & user permission if ok -> return yes,
+			//if no-> check for study permissions & role
+		  String studyOid = study_oid;
+	      String siteOid = site_oid;
+			
+	      StudyUserRoleBean studyLevelRole = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,studyOid);
+			if(studyLevelRole == null) {
+				if (siteOid != null) {
+	 	        	
+	 	 	        	StudyUserRoleBean siteLevelRole = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,siteOid);
+	 	 	        	if(siteLevelRole == null) {
+	 	 	        		 e.reject("errorCode.noRoleSetUp", "You do not have any role set up for user " + userName + " in study site " + siteOid );
+	 	 	        		hasRolePermission = false;
+	 	 	        	}else if(siteLevelRole.getId() == 0 || siteLevelRole.getRole().equals(Role.MONITOR)) {
+	 	 				    e.reject("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
+	 	 				  hasRolePermission = false;
+	 	 				}
+	 	 	        
+		        }else {
+		        	 e.reject("errorCode.noRoleSetUp", "You do not have any role set up for user " + userName + " in study " + studyOid );
+		        	 hasRolePermission = false;
+		        }	 		 
+	        
+		    }else {
+		    	if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
+	 				    e.reject("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
+	 				   hasRolePermission = false;
+	 				}
+		    }
+			
+			
+			return hasRolePermission;
+			
+	 }
+	 
+	 /**
+     * Helper Method to get the user account
+     * 
+     * @return UserAccountBean
+     */
+    public UserAccountBean getUserAccount(HttpServletRequest request) {
+    	UserAccountBean userBean;    
+    	
+    	if(request.getSession().getAttribute("userBean") != null) {
+    		userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+    		
+    	}else {
+    		 Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	        String username = null;
+    	        if (principal instanceof UserDetails) {
+    	            username = ((UserDetails) principal).getUsername();
+    	        } else {
+    	            username = principal.toString();
+    	        }
+    	        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
+    	        userBean = (UserAccountBean) userAccountDao.findByUserName(username);
+    	}
+    	
+    	return userBean;
+       
+	}
+    
+    public File getXSDFile(HttpServletRequest request,String fileNm) {
+    	HttpSession session = request.getSession();
+        ServletContext context = session.getServletContext();
+        
+    	return new File(SpringServletAccess.getPropertiesDir(context) + fileNm);
+    }
     /**
 	 * 
 	 * @return
@@ -187,5 +292,11 @@ public class RestfulServiceHelper {
 	 public StudyDAO getStudyDao() {
         studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
         return studyDao;
+     }
+	 
+
+    public UserAccountDAO getUserAccountDAO() {
+    	userAccountDAO = userAccountDAO != null ? userAccountDAO : new UserAccountDAO(dataSource);
+        return userAccountDAO;
     }
 }

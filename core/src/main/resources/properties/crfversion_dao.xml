@@ -23,6 +23,10 @@
         <name>findAllByOid</name>
         <sql>SELECT * FROM CRF_VERSION where oc_oid=?</sql>
     </query>
+    <query>
+        <name>findAllByFormOid</name>
+        <sql>SELECT v.* FROM s_study_1test.CRF_VERSION v, s_study_1test.CRF c where v.crf_id =c.crf_id and c.oc_oid=?</sql>
+    </query>
 	<query>
 		<name>findAllByCRF</name>
 		<sql>SELECT * FROM CRF_VERSION WHERE crf_id =? order by DATE_CREATED desc </sql>

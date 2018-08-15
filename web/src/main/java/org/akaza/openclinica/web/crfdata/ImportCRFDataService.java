@@ -1091,4 +1091,372 @@ public class ImportCRFDataService {
         newEventCrfBean.setStage(DataEntryStage.INITIAL_DATA_ENTRY);
         return newEventCrfBean;
     }
+    
+    /*
+     * purpose: Build a map of EventCRFs and the statuses they should have post-import. Assumes EventCRFs have been
+     * created for "Not Started" forms.
+     */
+    public void fetchEventCRFStatuses(ODMContainer odmContainer, HashMap<Integer, String> importedCRFStatuses) {
+        EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
+        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
+        StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
+        StudyDAO studyDAO = new StudyDAO(ds);
+        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+
+        String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
+        StudyBean studyBean = studyDAO.findByOid(studyOID);
+
+        ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
+        for (SubjectDataBean subjectDataBean : subjectDataBeans) {
+            ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
+
+            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+            for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
+                ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
+
+                String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
+
+                StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
+                        studyBean.getId(), studyBean.getParentStudyId());
+                logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
+
+                StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
+                        studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
+
+                for (FormDataBean formDataBean : formDataBeans) {
+
+                    CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+
+                    ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByFormOid(formDataBean.getFormOID());
+                    for (CRFVersionBean crfVersionBean : crfVersionBeans) {
+                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectVersion(studyEventBean, studySubjectBean, crfVersionBean);
+                        for (EventCRFBean ecb : eventCrfBeans) {
+                            Integer ecbId = new Integer(ecb.getId());
+
+                            if (!importedCRFStatuses.keySet().contains(ecbId) && formDataBean.getEventCRFStatus() != null) {
+                                importedCRFStatuses.put(ecb.getId(), formDataBean.getEventCRFStatus());
+                            }
+                        }
+                    }
+
+                }
+            }
+        }
+    }
+    
+    public List<DisplayItemBeanWrapper> lookupValidationErrors(HttpServletRequest request, ODMContainer odmContainer, UserAccountBean ub,
+            HashMap<String, String> totalValidationErrors, HashMap<String, String> hardValidationErrors, ArrayList<Integer> permittedEventCRFIds)
+            throws OpenClinicaException {
+
+        DisplayItemBeanWrapper displayItemBeanWrapper = null;
+        HashMap validationErrors = new HashMap();
+        List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
+        ImportHelper importHelper = new ImportHelper();
+        FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
+        DiscrepancyValidator discValidator = new DiscrepancyValidator(request, discNotes);
+        // create a second Validator, this one for hard edit checks
+        HashMap<String, String> hardValidator = new HashMap<String, String>();
+
+        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+        StudyDAO studyDAO = new StudyDAO(ds);
+        StudyBean studyBean = studyDAO.findByOid(odmContainer.getCrfDataPostImportContainer().getStudyOID());
+        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
+        StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
+        HashMap<String, ItemDataBean> blankCheck = new HashMap<String, ItemDataBean>();
+        String hardValidatorErrorMsgs = "";
+
+        ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
+        int totalEventCRFCount = 0;
+        int totalItemDataBeanCount = 0;
+        // int totalValidationErrors = 0;
+        for (SubjectDataBean subjectDataBean : subjectDataBeans) {
+            ArrayList<DisplayItemBean> displayItemBeans = new ArrayList<DisplayItemBean>();
+            logger.debug("iterating through subject data beans: found " + subjectDataBean.getSubjectOID());
+            ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
+            totalEventCRFCount += studyEventDataBeans.size();
+
+            // ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
+            // to stop repeats...?
+            StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+
+            for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
+                int parentStudyId = studyBean.getParentStudyId();
+                StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getId(), parentStudyId);
+                ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
+                logger.debug("iterating through study event data beans: found " + studyEventDataBean.getStudyEventOID());
+
+                int ordinal = 1;
+                try {
+                    ordinal = new Integer(studyEventDataBean.getStudyEventRepeatKey()).intValue();
+                } catch (Exception e) {
+                    // trying to catch NPEs, because tags can be without the
+                    // repeat key
+                }
+                StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
+                        sedBean.getId(), ordinal);
+
+                displayItemBeans = new ArrayList<DisplayItemBean>();
+
+                for (FormDataBean formDataBean : formDataBeans) {
+                    Map<String,Integer> groupMaxOrdinals = new HashMap<String,Integer>();
+                    displayItemBeanWrapper = null;
+                    CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+                    EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
+                    ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByFormOid(formDataBean.getFormOID());
+                    ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
+
+                    if ((crfVersionBeans == null) || (crfVersionBeans.size() == 0)) {
+                        MessageFormat mf = new MessageFormat("");
+                        mf.applyPattern(respage.getString("your_crf_version_oid_did_not_generate"));
+                        Object[] arguments = { formDataBean.getFormOID() };
+
+                        throw new OpenClinicaException(mf.format(arguments), "");
+                    }
+                    CRFVersionBean crfVersion = crfVersionBeans.get(0);
+                    // if you have a mispelled form oid you get an error here
+                    // need to error out gracefully and post an error
+                    logger.debug("iterating through form beans: found " + crfVersion.getOid());
+                    // may be the point where we cut off item groups etc and
+                    // instead work on sections
+                    EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
+                    EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
+                    EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(),
+                            crfVersion.getId());
+                    if (eventCRFBean != null) {
+                        if (permittedEventCRFIds.contains(new Integer(eventCRFBean.getId()))) {
+                            
+                            for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
+                                groupMaxOrdinals.put(itemGroupDataBean.getItemGroupOID(),1);
+                            }
+                            // if and only if it's in the correct status do we need
+                            // to generate the beans
+                            // <<tbh, 09/2008
+                            // also need to create a group name checker here for
+                            // correctness, tbh
+                            for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
+                                ArrayList<ItemBean> blankCheckItems = new ArrayList<ItemBean>();
+                                ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
+                                logger.debug("iterating through group beans: " + itemGroupDataBean.getItemGroupOID());
+                                // put a checker in here
+                                ItemGroupDAO itemGroupDAO = new ItemGroupDAO(ds);
+                                ItemGroupBean testBean = itemGroupDAO.findByOid(itemGroupDataBean.getItemGroupOID());
+                                if (testBean == null) {
+                                    // TODO i18n of message
+                                    // logger.debug("hit the exception for item groups! " +
+                                    // itemGroupDataBean.getItemGroupOID());
+                                    MessageFormat mf = new MessageFormat("");
+                                    mf.applyPattern(respage.getString("your_item_group_oid_for_form_oid"));
+                                    Object[] arguments = { itemGroupDataBean.getItemGroupOID(), formDataBean.getFormOID() };
+
+                                    throw new OpenClinicaException(mf.format(arguments), "");
+                                }
+                                totalItemDataBeanCount += itemDataBeans.size();
+
+                                for (ImportItemDataBean importItemDataBean : itemDataBeans) {
+                                    logger.debug("   iterating through item data beans: " + importItemDataBean.getItemOID());
+                                    ItemDAO itemDAO = new ItemDAO(ds);
+                                    ItemFormMetadataDAO itemFormMetadataDAO = new ItemFormMetadataDAO(ds);
+
+                                    List<ItemBean> itemBeans = itemDAO.findByOid(importItemDataBean.getItemOID());
+                                    if (!itemBeans.isEmpty()) {
+                                        ItemBean itemBean = itemBeans.get(0);
+                                        logger.debug("   found " + itemBean.getName());
+                                        // throw a null pointer? hopefully not if its been checked...
+                                        DisplayItemBean displayItemBean = new DisplayItemBean();
+                                        displayItemBean.setItem(itemBean);
+
+                                        ArrayList<ItemFormMetadataBean> metadataBeans = itemFormMetadataDAO.findAllByItemId(itemBean.getId());
+                                        logger.debug("      found metadata item beans: " + metadataBeans.size());
+                                        // groupOrdinal = the ordinal in item groups, for repeating items
+                                        int groupOrdinal = 1;
+                                        if (itemGroupDataBean.getItemGroupRepeatKey() != null) {
+                                            try {
+                                                groupOrdinal = new Integer(itemGroupDataBean.getItemGroupRepeatKey()).intValue();
+                                                if (groupOrdinal > groupMaxOrdinals.get(itemGroupDataBean.getItemGroupOID())) {
+                                                    groupMaxOrdinals.put(itemGroupDataBean.getItemGroupOID(),groupOrdinal);
+                                                }
+                                            } catch (Exception e) {
+                                                // do nothing here currently, we are
+                                                // looking for a number format
+                                                // exception
+                                                // from the above.
+                                                logger.debug("found npe for group ordinals, line 344!");
+                                            }
+                                        }
+                                        ItemDataBean itemDataBean = createItemDataBean(itemBean, eventCRFBean, importItemDataBean.getValue(), ub, groupOrdinal);
+                                        blankCheckItems.add(itemBean);
+                                        String newKey = groupOrdinal + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
+                                                + subjectDataBean.getSubjectOID();
+                                        blankCheck.put(newKey, itemDataBean);
+                                        logger.info("adding " + newKey + " to blank checks");
+                                        if (!metadataBeans.isEmpty()) {
+                                            ItemFormMetadataBean metadataBean = metadataBeans.get(0);
+                                            // also
+                                            // possible
+                                            // nullpointer
+
+                                            displayItemBean.setData(itemDataBean);
+                                            displayItemBean.setMetadata(metadataBean);
+                                            // set event def crf?
+                                            displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
+                                            String eventCRFRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
+                                            // if you do indeed leave off this in the XML it will pass but return 'null'
+                                            // tbh
+                                            attachValidator(displayItemBean, importHelper, discValidator, hardValidator, request, eventCRFRepeatKey,
+                                                    studySubjectBean.getOid());
+                                            displayItemBeans.add(displayItemBean);
+
+                                        } else {
+                                            MessageFormat mf = new MessageFormat("");
+                                            mf.applyPattern(respage.getString("no_metadata_could_be_found"));
+                                            Object[] arguments = { importItemDataBean.getItemOID() };
+
+                                            throw new OpenClinicaException(mf.format(arguments), "");
+                                        }
+                                    } else {
+                                        // report the error there
+                                        MessageFormat mf = new MessageFormat("");
+                                        mf.applyPattern(respage.getString("no_item_could_be_found"));
+                                        Object[] arguments = { importItemDataBean.getItemOID() };
+
+                                        throw new OpenClinicaException(mf.format(arguments), "");
+                                    }
+                                }// end item data beans
+                                logger.debug(".. found blank check: " + blankCheck.toString());
+                                // >> TBH #5548 did we create any repeated blank spots? If so, fill them in with an Item
+                                // Data Bean
+
+                                // JN: this max Ordinal can cause problems as it assumes the latest values, and when
+                                // there
+                                // is an entry with nongroup towards the
+                                // end. Refer: MANTIS 6113
+
+                                for (int i = 1; i <= groupMaxOrdinals.get(itemGroupDataBean.getItemGroupOID()); i++) {
+                                    for (ItemBean itemBean : blankCheckItems) {
+                                        String newKey = i + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
+                                                + subjectDataBean.getSubjectOID();
+                                        if (blankCheck.get(newKey) == null) {
+                                            // if it already exists, Do Not Add It.
+                                            ItemDataBean itemDataCheck = getItemDataDao().findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(),
+                                                    eventCRFBean.getId(), i);
+                                            logger.debug("found item data bean id: " + itemDataCheck.getId() + " for ordinal " + i);
+                                            if (itemDataCheck.getId() == 0) {
+                                                ItemDataBean blank = createItemDataBean(itemBean, eventCRFBean, "", ub, i);
+                                                DisplayItemBean displayItemBean = new DisplayItemBean();
+                                                displayItemBean.setItem(itemBean);
+                                                displayItemBean.setData(blank);
+                                                // displayItemBean.setMetadata(metadataBean);
+                                                // set event def crf?
+                                                displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
+                                                String eventCRFRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
+                                                // if you do indeed leave off this in the XML it will pass but return
+                                                // 'null'
+
+                                                displayItemBeans.add(displayItemBean);
+                                                logger.debug("... adding display item bean");
+                                            }
+                                        }
+                                        logger.debug("found a blank at " + i + ", adding " + blankCheckItems.size() + " blank items");
+                                    }
+                                }
+                                blankCheckItems = new ArrayList<ItemBean>();
+                            }// end item group data beans
+
+                        }// matches if on permittedCRFIDs
+
+                        CRFDAO crfDAO = new CRFDAO(ds);
+                        CRFBean crfBean = crfDAO.findByVersionId(crfVersion.getCrfId());
+                        // seems like an extravagance, but is not contained in crf
+                        // version or event crf bean
+                        validationErrors = discValidator.validate();
+                        // totalValidationErrors += validationErrors.size();
+                        // totalValidationErrors.
+                        // totalValidationErrors.addAll(validationErrors);
+                        for (Object errorKey : validationErrors.keySet()) {
+                            // logger.debug(errorKey.toString() + " -- " + validationErrors.get(errorKey));
+                            // JN: to avoid duplicate errors
+                            if (!totalValidationErrors.containsKey(errorKey.toString()))
+                                totalValidationErrors.put(errorKey.toString(), validationErrors.get(errorKey).toString());
+                            // assuming that this will be put back in to the core
+                            // method's hashmap, updating statically, tbh 06/2008
+                            logger.debug("+++ adding " + errorKey.toString());
+                        }
+                        logger.debug("-- hard validation checks: --");
+                        for (Object errorKey : hardValidator.keySet()) {
+                            logger.debug(errorKey.toString() + " -- " + hardValidator.get(errorKey));
+                            hardValidationErrors.put(errorKey.toString(), hardValidator.get(errorKey));
+                            // updating here 'statically' tbh 06/2008
+                            hardValidatorErrorMsgs += hardValidator.get(errorKey) + "<br/><br/>";
+                        }
+
+                        String studyEventId = studyEvent.getId() + "";
+                        String crfVersionId = crfVersion.getId() + "";
+
+                        logger.debug("creation of wrapper: original count of display item beans " + displayItemBeans.size() + ", count of item data beans "
+                                + totalItemDataBeanCount + " count of validation errors " + validationErrors.size() + " count of study subjects "
+                                + subjectDataBeans.size() + " count of event crfs " + totalEventCRFCount + " count of hard error checks "
+                                + hardValidator.size());
+                        // check if we need to overwrite
+                        DataEntryStage dataEntryStage = eventCRFBean.getStage();
+                        Status eventCRFStatus = eventCRFBean.getStatus();
+                        boolean overwrite = false;
+                        // tbh >>
+                        // //JN: Commenting out the following 2 lines, coz the prompt should come in the cases on
+                        if (// eventCRFStatus.equals(Status.UNAVAILABLE) ||
+                        dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
+                                || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                            overwrite = true;
+                        }
+                        // << tbh, adding extra statuses to prevent appending, 06/2009
+
+                        // SummaryStatsBean ssBean = new SummaryStatsBean();
+                        // ssBean.setDiscNoteCount(totalValidationErrors);
+                        // ssBean.setEventCrfCount(totalEventCRFCount);
+                        // ssBean.setStudySubjectCount(subjectDataBeans.size());
+                        // // add other stats here, tbh
+                        // not working here, need to do it in a different method,
+                        // tbh
+
+                        // summary stats added tbh 05/2008
+                        // JN: Changed from validationErrors to totalValidationErrors to create discrepancy notes for
+                        // all
+                        // the
+                        displayItemBeanWrapper = new DisplayItemBeanWrapper(displayItemBeans, true, overwrite, validationErrors, studyEventId, crfVersionId,
+                                studyEventDataBean.getStudyEventOID(), studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(),
+                                crfVersion.getName(), studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey(), eventCRFBean);
+
+                        // JN: Commenting out the following code, since we shouldn't re-initialize at this point, as
+                        // validationErrors would get overwritten and the
+                        // older errors will be overriden. Moving it after the form.
+                        // Removing the comments for now, since it seems to be creating duplicate Discrepancy Notes.
+                        validationErrors = new HashMap();
+                        discValidator = new DiscrepancyValidator(request, discNotes);
+                        // reset to allow for new errors...
+                    }
+                }// after forms
+                 // validationErrors = new HashMap();
+                 // discValidator = new DiscrepancyValidator(request, discNotes);
+                if (displayItemBeanWrapper != null && displayItemBeans.size() > 0)
+                    wrappers.add(displayItemBeanWrapper);
+            }// after study events
+
+            // remove repeats here? remove them below by only forwarding the
+            // first
+            // each wrapper represents an Event CRF and a Form, but we don't
+            // have all events for all forms
+            // need to not add a wrapper for every event + form combination,
+            // but instead for every event + form combination which is present
+            // look at the hack below and see what happens
+        }// after study subjects
+
+        // throw the OC exception here at the end, if hard edit checks are not
+        // empty
+
+        // we statically update the hash map here, so it should not have to be
+        // thrown, tbh 06/2008
+        if (!hardValidator.isEmpty()) {
+            // throw new OpenClinicaException(hardValidatorErrorMsgs, "");
+        }
+        return wrappers;
+    }
 }
