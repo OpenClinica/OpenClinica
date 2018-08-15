@@ -344,7 +344,7 @@ public class ChangeStudyServlet extends SecureController {
 
         }
 
-        forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+        forwardPage(Page.MENU);
 
     }
 
