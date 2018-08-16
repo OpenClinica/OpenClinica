@@ -124,14 +124,11 @@
  <tr>
     <td class="table_header_column_top">&nbsp;</td>
     <td class="table_header_column_top"><fmt:message key="name" bundle="${resword}"/></td>
-    <td class="table_header_column_top"><fmt:message key="description" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="event" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="CRF" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="version2" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="data_type" bundle="${resword}"/></td>
-    <td class="table_header_column_top"><fmt:message key="units" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="response_label" bundle="${resword}"/></td>
-    <td class="table_header_column_top"><fmt:message key="PHI" bundle="${resword}"/></td>
 
   </tr>
 <c:set var="count" value="0"/>
@@ -148,7 +145,6 @@
    </c:choose>
    </td>
    <td class="table_cell"><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>&itemName=<c:out value="${item.name}"/>')"><c:out value="${item.name}"/></a></td>
-   <td class="table_cell"><c:out value="${item.description}"/>&nbsp;</td>
    <td class="table_cell">
     <input type="hidden" name="itemDefName<c:out value="${count}"/>" value="<c:out value="${item.defName}"/>">
    <c:out value="${item.defName}"/>&nbsp;
@@ -170,7 +166,6 @@
       </c:forEach>&nbsp;
     </td>
    <td class="table_cell"><c:out value="${item.dataType.name}"/>&nbsp;</td>
-   <td class="table_cell"><c:out value="${item.units}"/>&nbsp;</td>
 
     <td class="table_cell">
       <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
@@ -184,16 +179,6 @@
         </c:choose>
       </c:forEach>&nbsp;
     </td>
-    <td class="table_cell">
-     <c:choose>
-      <c:when test="${item.phiStatus}">
-        <fmt:message key="yes" bundle="${resword}"/>
-      </c:when>
-      <c:otherwise>
-        <fmt:message key="no" bundle="${resword}"/>
-      </c:otherwise>
-    </c:choose>
-   </td>
 
   </tr>
   <c:set var="count" value="${count+1}"/>

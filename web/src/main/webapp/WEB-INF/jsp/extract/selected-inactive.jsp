@@ -4,7 +4,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
-<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/> 
+<fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 
 <span class="table_title_extract"><fmt:message key="subject_attributes" bundle="${resword}"/></span>
 <div style="width: 600px">
@@ -17,13 +17,13 @@
  <tr>
     <td class="table_cell"><c:choose>
      <c:when test="${newDataset.showSubjectStatus}">
-       <input type="checkbox" checked name="subj_status" value="yes" disabled="disabled">  
+       <input type="checkbox" checked name="subj_status" value="yes" disabled="disabled">
      </c:when>
      <c:otherwise>
        <input type="checkbox" name="subj_status" value="yes" disabled="disabled">
      </c:otherwise>
-    </c:choose>    
-   </td>   
+    </c:choose>
+   </td>
 </tr>
 </table>
 </div>
@@ -44,32 +44,32 @@
  <tr>
  <td class="table_cell"><c:choose>
      <c:when test="${newDataset.showEventLocation}">
-       <input type="checkbox" checked name="location" value="yes" disabled="disabled">  
+       <input type="checkbox" checked name="location" value="yes" disabled="disabled">
      </c:when>
      <c:otherwise>
        <input type="checkbox" name="location" value="yes" disabled="disabled">
      </c:otherwise>
-    </c:choose>    
-   </td>   
+    </c:choose>
+   </td>
    <td class="table_cell">
    <c:choose>
      <c:when test="${newDataset.showEventStart}">
-       <input type="checkbox" checked name="start" value="yes" disabled="disabled">  
+       <input type="checkbox" checked name="start" value="yes" disabled="disabled">
      </c:when>
      <c:otherwise>
        <input type="checkbox" name="start" value="yes" disabled="disabled">
      </c:otherwise>
     </c:choose>
-   </td>  
-   <td class="table_cell"> 
+   </td>
+   <td class="table_cell">
      <c:choose>
      <c:when test="${newDataset.showEventEnd}">
-       <input type="checkbox" checked name="end" value="yes" disabled="disabled">  
+       <input type="checkbox" checked name="end" value="yes" disabled="disabled">
      </c:when>
      <c:otherwise>
        <input type="checkbox" name="end" value="yes" disabled="disabled">
      </c:otherwise>
-    </c:choose>   
+    </c:choose>
    </td>
  <td class="table_cell">
  <c:choose>
@@ -79,8 +79,8 @@
      <c:otherwise>
        <input type="checkbox" name="event_status" value="yes" disabled="disabled">
      </c:otherwise>
-   </c:choose>  
- </td> 
+   </c:choose>
+ </td>
 </tr>
 </table>
 </div>
@@ -99,13 +99,13 @@
  <tr>
  <td class="table_cell"><c:choose>
      <c:when test="${newDataset.showCRFversion}">
-       <input type="checkbox" checked name="crf_version" value="yes" disabled="disabled">  
+       <input type="checkbox" checked name="crf_version" value="yes" disabled="disabled">
      </c:when>
      <c:otherwise>
        <input type="checkbox" name="crf_version" value="yes" disabled="disabled">
      </c:otherwise>
-    </c:choose>    
-   </td>   
+    </c:choose>
+   </td>
  <td class="table_cell">
  <c:choose>
      <c:when test="${newDataset.showCRFstatus}">
@@ -114,7 +114,7 @@
      <c:otherwise>
        <input type="checkbox" name="crf_status" value="yes" disabled="disabled">
      </c:otherwise>
-   </c:choose>  
+   </c:choose>
  </td>
 </tr>
 </table>
@@ -134,21 +134,18 @@
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
  <tr>
     <td class="table_header_column_top">&nbsp;</td>
-    <td class="table_header_column_top"><fmt:message key="name" bundle="${resword}"/></td>          
-    <td class="table_header_column_top"><fmt:message key="description" bundle="${resword}"/></td> 
-    <td class="table_header_column_top"><fmt:message key="event" bundle="${resword}"/></td> 
-    <td class="table_header_column_top"><fmt:message key="CRF" bundle="${resword}"/></td> 
+    <td class="table_header_column_top"><fmt:message key="name" bundle="${resword}"/></td>
+    <td class="table_header_column_top"><fmt:message key="event" bundle="${resword}"/></td>
+    <td class="table_header_column_top"><fmt:message key="CRF" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="version2" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="data_type" bundle="${resword}"/></td>
-    <td class="table_header_column_top"><fmt:message key="units" bundle="${resword}"/></td>    
     <td class="table_header_column_top"><fmt:message key="response_label" bundle="${resword}"/></td>
-    <td class="table_header_column_top"><fmt:message key="PHI" bundle="${resword}"/></td>  
-    
-  </tr> 
+
+  </tr>
 <c:set var="count" value="0"/>
-<c:forEach var='item' items='${allSelectedItems}'>  
+<c:forEach var='item' items='${allSelectedItems}'>
   <tr>
-   <td class="table_cell">   
+   <td class="table_cell">
    <c:choose>
     <c:when test="${item.selected}">
       <input type="checkbox" name="itemSelected<c:out value="${count}"/>" checked value="yes" disabled="disabled">
@@ -162,7 +159,6 @@
        <a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value='${item.id}'/>&itemName=<c:out value='${item.name}'/>')">
            <c:out value="${item.name}"/></a>
    </td>
-   <td class="table_cell"><c:out value="${item.description}"/>&nbsp;</td>
    <td class="table_cell">
     <input type="hidden" name="itemDefName<c:out value="${count}"/>" value="<c:out value="${item.defName}"/>">
    <c:out value="${item.defName}"/>&nbsp;
@@ -179,13 +175,12 @@
           </c:when>
           <c:otherwise>
            <c:out value="${meta.crfVersionName}"/>,<br>
-          </c:otherwise> 
-        </c:choose> 
+          </c:otherwise>
+        </c:choose>
       </c:forEach>&nbsp;
     </td>
-   <td class="table_cell"><c:out value="${item.dataType.name}"/>&nbsp;</td>    
-   <td class="table_cell"><c:out value="${item.units}"/>&nbsp;</td>
-  
+   <td class="table_cell"><c:out value="${item.dataType.name}"/>&nbsp;</td>
+
     <td class="table_cell">
       <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
         <c:choose>
@@ -194,21 +189,11 @@
           </c:when>
           <c:otherwise>
             <c:out value="${meta.responseSet.label}"/>,<br>
-          </c:otherwise> 
-        </c:choose> 
+          </c:otherwise>
+        </c:choose>
       </c:forEach>&nbsp;
-    </td>  
-    <td class="table_cell">
-     <c:choose>
-      <c:when test="${item.phiStatus}">
-        <fmt:message key="yes" bundle="${resword}"/>
-      </c:when>
-      <c:otherwise>
-        <fmt:message key="no" bundle="${resword}"/>
-      </c:otherwise>
-    </c:choose>
-   </td>  
-   
+    </td>
+
   </tr>
   <c:set var="count" value="${count+1}"/>
 </c:forEach>

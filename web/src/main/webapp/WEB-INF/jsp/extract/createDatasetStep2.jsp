@@ -171,19 +171,12 @@ function notSelectAll() {
  <tr>
     <td class="table_header_column_top">&nbsp;</td>
     <td class="table_header_column_top"><fmt:message key="name" bundle="${resword}"/></td>
-    <td class="table_header_column_top"><fmt:message key="description" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="version2" bundle="${resword}"/></td>
-    <td class="table_header_column_top"><fmt:message key="section_s" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="group_s" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="data_type" bundle="${resword}"/></td>
-    <td class="table_header_column_top"><fmt:message key="units" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="response_type" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="response_label" bundle="${resword}"/></td>
-    <td class="table_header_column_top"><fmt:message key="PHI" bundle="${resword}"/></td>
     <td class="table_header_column_top"><fmt:message key="required" bundle="${resword}"/>?</td>
-    <td class="table_header_column_top"><fmt:message key="validation" bundle="${resword}"/></td>
-    <td class="table_header_column_top"><fmt:message key="default_value" bundle="${resword}"/></td>
-    <td class="table_header_column_top"><fmt:message key="max_repeats" bundle="${resword}"/></td>
 
   </tr>
 <c:set var="count" value="0"/>
@@ -200,7 +193,6 @@ function notSelectAll() {
    </c:choose>
    </td>
    <td class="table_cell"><a href="javascript: openDocWindow('ViewItemDetail?itemId=<c:out value="${item.id}"/>')"><c:out value="${item.name}"/></a></td>
-   <td class="table_cell"><c:out value="${item.description}"/>&nbsp;</td>
    <td class="table_cell">
       <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
         <c:choose>
@@ -214,21 +206,6 @@ function notSelectAll() {
       </c:forEach>
       &nbsp;
     </td>
-
-   <%-- SECTION --%>
-
-   <td class="table_cell">
-   <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
-        <c:choose>
-          <c:when test="${status.last}">
-           <c:out value="${meta.sectionName}"/>
-          </c:when>
-          <c:otherwise>
-            <c:out value="${meta.sectionName}"/>,<br>
-          </c:otherwise>
-        </c:choose>
-      </c:forEach>
-   &nbsp;</td>
 
    <%-- GROUP --%>
 
@@ -253,10 +230,6 @@ function notSelectAll() {
    <%-- DATA TYPE --%>
 
    <td class="table_cell"><c:out value="${item.dataType.name}"/>&nbsp;</td>
-
-   <%-- UNITS --%>
-
-   <td class="table_cell"><c:out value="${item.units}"/>&nbsp;</td>
 
    <%-- RESPONSE TYPE --%>
 
@@ -292,20 +265,6 @@ function notSelectAll() {
       &nbsp;
     </td>
 
-    <%-- PHI --%>
-
-    <td class="table_cell">
-     <c:choose>
-      <c:when test="${item.phiStatus}">
-        <fmt:message key="yes" bundle="${resword}"/>
-      </c:when>
-      <c:otherwise>
-        <fmt:message key="no" bundle="${resword}"/>
-      </c:otherwise>
-    </c:choose>
-    &nbsp;
-   </td>
-
    <%-- REQUIRED --%>
 
    <td class="table_cell">
@@ -323,53 +282,6 @@ function notSelectAll() {
     </c:choose>
 
     </c:forEach>
-   &nbsp;</td>
-
-   <%-- VALIDATION --%>
-
-   <td class="table_cell">
-      <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
-        <c:choose>
-          <c:when test="${meta.regexp==null || meta.regexp==''}"></c:when>
-          <c:when test="${status.last}">
-           <c:out value="${meta.regexp}"/>
-          </c:when>
-          <c:otherwise>
-            <c:out value="${meta.regexp}"/>,<br>
-          </c:otherwise>
-        </c:choose>
-      </c:forEach>
-    &nbsp;</td>
-
-   <%-- DEFAULT VALUE --%>
-
-   <td class="table_cell">
-      <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
-        <c:choose>
-          <c:when test="${meta.defaultValue==null || meta.defaultValue==''}"></c:when>
-          <c:when test="${status.last}">
-           <c:out value="${meta.defaultValue}" default="None"/>
-          </c:when>
-          <c:otherwise>
-            <c:out value="${meta.defaultValue}" default="None"/>,<br>
-          </c:otherwise>
-        </c:choose>
-      </c:forEach>
-    &nbsp;</td>
-
-   <%-- MAX REPEATS --%>
-
-   <td class="table_cell">
-   <c:forEach var="meta" items="${item.itemMetas}" varStatus="status">
-        <c:choose>
-          <c:when test="${status.last}">
-           <c:out value="${meta.repeatMax}"/>
-          </c:when>
-          <c:otherwise>
-            <c:out value="${meta.repeatMax}"/>,<br>
-          </c:otherwise>
-        </c:choose>
-      </c:forEach>
    &nbsp;</td>
 
   </tr>
