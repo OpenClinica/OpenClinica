@@ -16,8 +16,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.login.ErrorMessage;
-import org.akaza.openclinica.bean.login.ErrorObject;
-import org.akaza.openclinica.bean.login.ImportDataResponseDTO;
+import org.akaza.openclinica.bean.login.ImportDataResponseFailureDTO;
+import org.akaza.openclinica.bean.login.ImportDataResponseSuccessDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
@@ -45,12 +45,12 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
 
 import io.swagger.annotations.Api;
@@ -63,8 +63,8 @@ import io.swagger.annotations.ApiResponses;
 * @author Tao Li
 *
 */
-@Controller
-@RequestMapping(value = "/auth/api/clinicaldata/import")
+@RestController
+@RequestMapping(value = "/auth/api/clinicaldata")
 @Api(value = "DataImport", tags = { "DataImport" }, description = "REST API for Study Data Import")
 public class DataController {
 	
@@ -75,12 +75,11 @@ public class DataController {
 	private DataSource dataSource;
 	
 	private final Locale locale= new Locale("en_US");
-	
+		
 	private ImportCRFDataService dataService;
 	private RestfulServiceHelper serviceHelper;
 	@Autowired
 	private RuleSetServiceInterface ruleSetService;
-
  
    private final DataImportService dataImportService = new DataImportService();
    @Autowired
@@ -88,12 +87,12 @@ public class DataController {
 	XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
 	
 	protected UserAccountBean userBean;	
-	private ImportDataResponseDTO responseDTO;
-
+    private ImportDataResponseSuccessDTO responseSuccessDTO;
+    
 	@ApiOperation(value = "To import study data in XML file",  notes = "Will read the data in XML file and validate study,event and participant against the  setup first, for more detail please refer to OpenClinical online document  ")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 200, message = "Successful operation"),
-	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error message")})
+	        @ApiResponse(code = 400, message = "Bad Request -- Normally means found validation errors, for detail please see the error message")})
 
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<Object> importDataXMLFile(HttpServletRequest request, MultipartFile file) throws Exception {
@@ -105,7 +104,7 @@ public class DataController {
 		String validation_passed_message = "SUCCESS";
 		
 		String importXml = null;	    
-		responseDTO = new ImportDataResponseDTO();
+		responseSuccessDTO = new ImportDataResponseSuccessDTO();
 		
        try {
     	   	String fileNm = file.getOriginalFilename();
@@ -132,12 +131,13 @@ public class DataController {
        }
 
 		if (errorMsgs != null && errorMsgs.size() != 0) {
+			ImportDataResponseFailureDTO responseDTO = new ImportDataResponseFailureDTO();
 			responseDTO.setMessage(validation_failed_message);
 			responseDTO.setErrors(errorMsgs);
 			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-		} else {
-			responseDTO.setMessage(validation_passed_message);
-			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.OK);
+		} else {			
+			responseSuccessDTO.setMessage(validation_passed_message);
+			response = new ResponseEntity(responseSuccessDTO, org.springframework.http.HttpStatus.OK);
 		}
 		
 		return response;
@@ -300,7 +300,7 @@ public class DataController {
                    detailMessages.add("Audit messages:" + convertToErrorString(auditMsgs));
                    detailMessages.add("Rule Action messages:" + convertToErrorString(ruleActionMsgs));
                    detailMessages.add("Skip CRF messages:" + convertToErrorString(skippedCRFMsgs));
-                   this.responseDTO.setDetailMessages(detailMessages);
+                   this.responseSuccessDTO.setDetailMessages(detailMessages);
                
                } else {
                	for (ObjectError error : errors.getAllErrors()) {
