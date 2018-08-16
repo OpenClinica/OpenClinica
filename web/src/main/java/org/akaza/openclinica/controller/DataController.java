@@ -97,7 +97,7 @@ public class DataController {
 	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<Object> importDataXMLFile(HttpServletRequest request, MultipartFile file) throws Exception {
 	
-   	ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();				
+		ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();				
 		ResponseEntity<Object> response = null;
 
 		String validation_failed_message = "VALIDATION FAILED";
@@ -170,8 +170,8 @@ public class DataController {
 	            }
 	            int endIndex = importXml.indexOf("</ODM>");	            
 	            if(beginIndex < 0 || endIndex < 0) {
-	            	String err_msg = "Please send valid content with correct root tag";
-	                ErrorMessage errorOBject = createErrorMessage("errorCode.wrongXmlRootTag", err_msg);
+	            	String err_msg = "Please send valid content with correct root tag ODM";
+	                ErrorMessage errorOBject = createErrorMessage("errorCode.XmlRootTagisNotODM", err_msg);
 	        		errorMsgs.add(errorOBject);	        		
 	        		return errorMsgs;
 	            }
@@ -182,7 +182,7 @@ public class DataController {
 	            
 	            if (userBean == null) {
 	                String err_msg = "Please send request as a valid user";
-	                ErrorMessage errorOBject = createErrorMessage("errorCode.invalidUser", err_msg);
+	                ErrorMessage errorOBject = createErrorMessage("errorCode.InvalidUser", err_msg);
 	        		errorMsgs.add(errorOBject);	        		
 	        		return errorMsgs;
 	            }
@@ -224,8 +224,8 @@ public class DataController {
 	                        Object[] arguments = { me1.getMessage() };
 	                        String errCode = mf.format(arguments);
 	                       
-	                        String err_msg = "Your XML is not well-formed.";
-	    	                ErrorMessage errorOBject = createErrorMessage("errorCode.xmlNotWellFormed", err_msg);
+	                        String err_msg = "Your XML file is not well-formed.";
+	    	                ErrorMessage errorOBject = createErrorMessage("errorCode.XmlNotWellFormed", err_msg);
 	    	        		errorMsgs.add(errorOBject);
 	                    }
 	                }	               
@@ -264,7 +264,7 @@ public class DataController {
                    if (errorMessagesFromValidation.size() > 0) {
                        String err_msg = convertToErrorString(errorMessagesFromValidation);
                        
-   	                ErrorMessage errorOBject = createErrorMessage("errorCode.validationFailed", err_msg);
+   	                ErrorMessage errorOBject = createErrorMessage("errorCode.ValidationFailed", err_msg);
    	        		errorMsgs.add(errorOBject);
    	        		
    	        		return errorMsgs;
@@ -275,7 +275,7 @@ public class DataController {
 
                    if (errorMessagesFromValidation.size() > 0) {
                        String err_msg = convertToErrorString(errorMessagesFromValidation);
-                       ErrorMessage errorOBject = createErrorMessage("errorCode.validationFailed", err_msg);
+                       ErrorMessage errorOBject = createErrorMessage("errorCode.ValidationFailed", err_msg);
    	        		errorMsgs.add(errorOBject); 
    	        		
    	        		return errorMsgs;
@@ -297,18 +297,19 @@ public class DataController {
 
                    // add detail messages to reponseDTO
                    ArrayList<String> detailMessages = new ArrayList();
-                   detailMessages.add("Audit messages:" + convertToErrorString(auditMsgs));
-                   detailMessages.add("Rule Action messages:" + convertToErrorString(ruleActionMsgs));
-                   detailMessages.add("Skip CRF messages:" + convertToErrorString(skippedCRFMsgs));
+                   detailMessages.add("Audit Messages:" + convertToErrorString(auditMsgs));
+                   detailMessages.add("Rule Action Messages:" + convertToErrorString(ruleActionMsgs));
+                   detailMessages.add("Skip CRF Messages:" + convertToErrorString(skippedCRFMsgs));
                    this.responseSuccessDTO.setDetailMessages(detailMessages);
                
                } else {
-               	for (ObjectError error : errors.getAllErrors()) {
-               		String err_msg = error.getDefaultMessage();
-               		String errCode = error.getCode();
-               		ErrorMessage errorMessage = createErrorMessage(errCode,err_msg );
-   	        		errorMsgs.add(errorMessage);
-               	}
+            	   
+	               	for (ObjectError error : errors.getAllErrors()) {
+	               		String err_msg = error.getDefaultMessage();
+	               		String errCode = error.getCode();
+	               		ErrorMessage errorMessage = createErrorMessage(errCode,err_msg );
+	   	        		errorMsgs.add(errorMessage);
+	               	}
                }
 
 	            return errorMsgs;
