@@ -34,6 +34,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory;
@@ -80,6 +81,9 @@ public class SDVController {
     @Autowired
     @Qualifier("sidebarInit")
     private SidebarInit sidebarInit;
+
+    @Autowired
+    private PermissionService permissionService;
 
     public SDVController() {
     }
@@ -159,10 +163,11 @@ public class SDVController {
     @RequestMapping("/viewAllSubjectSDVtmp")
     public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId,
                                           @RequestParam(value = "sdv_restore", required = false) String restore,
-                                          HttpServletResponse response ,@RequestParam("permissionTags") String permissionTags) {
+                                          HttpServletResponse response ) {
 
         request.setAttribute("studyId", studyId);
         HttpSession session = request.getSession();
+        String permissionTags = permissionService.getPermissionTagsString(request);
 
         if(!mayProceed(request)){
             try{

@@ -682,8 +682,9 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         }else{
             sql =sql+" "+ digester.getQuery("getCountWithFilterWithTagId");
             variables.put(1, permissionTags);
-            variables.put(2, studyId);
-            variables.put(3, parentStudyId);
+            variables.put(2, permissionTags);
+            variables.put(3, studyId);
+            variables.put(4, parentStudyId);
         }
         sql =sql+" "+ digester.getQuery("getCountWithFilterPart2");
 
@@ -715,8 +716,9 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         }else{
             sql =sql+" "+ digester.getQuery("getCountWithFilterWithTagId");
             variables.put(1, permissionTags);
-            variables.put(2, studyId);
-            variables.put(3, parentStudyId);
+            variables.put(2, permissionTags);
+            variables.put(3, studyId);
+            variables.put(4, parentStudyId);
         }
         sql =sql+" "+ digester.getQuery("getWithFilterAndSortPart2");
 
