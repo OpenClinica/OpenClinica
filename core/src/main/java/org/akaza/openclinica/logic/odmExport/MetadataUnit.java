@@ -17,6 +17,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
@@ -30,11 +31,14 @@ import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.bean.odmbeans.RangeCheckBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.service.PermissionService;
+import org.springframework.http.HttpRequest;
 
 /**
  * A class for ODM metadata of one study.
@@ -46,6 +50,7 @@ public class MetadataUnit extends OdmUnit {
     private OdmStudyBean odmStudy;
     private StudyBean parentStudy;
     private RuleSetRuleDao ruleSetRuleDao;
+    private PermissionService permissionService;
 
     public static final String FAKE_STUDY_NAME = "OC_FORM_LIB_STUDY";
     public static final String FAKE_STUDY_OID = "OC_FORM_LIB";
@@ -78,10 +83,11 @@ public class MetadataUnit extends OdmUnit {
     }
 
     public MetadataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, RuleSetRuleDao ruleSetRuleDao,
-            boolean showArchived) {
+            boolean showArchived ,PermissionService permissionService) {
         super(ds, dataset, odmBean, study, category, showArchived);
         this.odmStudy = new OdmStudyBean();
         this.ruleSetRuleDao = ruleSetRuleDao;
+        this.permissionService = permissionService;
         if (study.getParentStudyId() > 0) {
             this.parentStudy = (StudyBean) new StudyDAO(ds).findByPK(study.getParentStudyId());
         } else {
@@ -185,14 +191,12 @@ public class MetadataUnit extends OdmUnit {
             logger.info("null, because there is no study event definition in this study.");
             return;
         }
-        List<String> tagIds = new ArrayList<>();
 
-
-        String permissionTags = tagIds
-                .stream()
-                .map(Object::toString)
-                .collect(Collectors.joining("','", "'", "'"));
-
+        String permissionTags = "";
+        HttpServletRequest request = CoreResources.getRequest();
+        if (request != null) {
+            permissionTags = permissionService.getPermissionTagsString(CoreResources.getRequest());
+        }
         StudyBean study = studyBase.getStudy();
 
         StudyConfigService studyConfig = new StudyConfigService(this.ds);

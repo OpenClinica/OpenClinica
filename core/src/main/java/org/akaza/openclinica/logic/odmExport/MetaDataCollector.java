@@ -20,6 +20,7 @@ import org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.job.JobTerminationMonitor;
+import org.akaza.openclinica.service.PermissionService;
 
 /**
  * Populate metadata for a ODM XML file. It supports:
@@ -41,13 +42,15 @@ public class MetaDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmStudyBean> odmStudyMap;
     private static int textLength = 4000;
     private RuleSetRuleDao ruleSetRuleDao;
+    private PermissionService permissionService;
     // protected final Logger logger =
     // LoggerFactory.getLogger(getClass().getName());
 
-    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao, boolean showArchived) {
+    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao, boolean showArchived,PermissionService permissionService) {
         super(ds, study, showArchived);
         this.ruleSetRuleDao = ruleSetRuleDao;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
+        this.permissionService=permissionService;
     }
 
     public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao) {
@@ -57,9 +60,10 @@ public class MetaDataCollector extends OdmDataCollector {
 
     }
 
-    public MetaDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy, RuleSetRuleDao ruleSetRuleDao) {
+    public MetaDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy, RuleSetRuleDao ruleSetRuleDao ,PermissionService permissionService) {
         super(ds, dataset, currentStudy);
         this.ruleSetRuleDao = ruleSetRuleDao;
+        this.permissionService =permissionService;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
     }
 
@@ -81,7 +85,7 @@ public class MetaDataCollector extends OdmDataCollector {
             JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
             StudyBean study = u.getStudy();
-            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(), getRuleSetRuleDao(), showArchived);
+            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(), getRuleSetRuleDao(), showArchived ,permissionService );
             meta.collectOdmStudy(null);
             if (this.getCategory() == 1) {
                 if (study.isSite(study.getParentStudyId())) {

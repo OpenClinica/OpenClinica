@@ -329,8 +329,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
 
 			}
+			List<String> tagIds = permissionService.getPermissionTagsList(CoreResources.getRequest());
 
-            List<String> tagIds = new ArrayList<>();
 
 			List <EventDefinitionCrfPermissionTag> edcPTagIds=
 					getEventDefinitionCrfPermissionTagDao().findByEdcIdTagId(

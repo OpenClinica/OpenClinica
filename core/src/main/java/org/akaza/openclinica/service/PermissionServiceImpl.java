@@ -53,14 +53,16 @@ public class PermissionServiceImpl implements PermissionService {
 
         if (!dto.isPresent()) {
             logger.error("Study:" + studyEnvironmentUuid + " not found for this user");
-            return null;
+            return new ArrayList<>();
         }
 
         logger.debug("Response: getUserRoles:" + dto);
         if (CollectionUtils.isEmpty(dto.get().getPermissions())) {
-            return null;
+            return new ArrayList<>();
         }
-        List<String> tagIds = dto.get().getPermissions().stream().map(PermissionDTO::getTagId).collect(Collectors.toList());
+        List<String> tagIds = dto.get().getPermissions().stream().map(PermissionDTO::getTagId).collect(Collectors.toList()).size()!=0 ?dto.get().getPermissions().stream().map(PermissionDTO::getTagId).collect(Collectors.toList()):new ArrayList<>();
+
+
         return tagIds;
     }
 
@@ -100,8 +102,8 @@ public class PermissionServiceImpl implements PermissionService {
     public String getPermissionTagsString(HttpServletRequest request) {
         List<String> tagsList = getPermissionTagsList(request);
         if (CollectionUtils.isEmpty(tagsList))
-            return null;
-        String tags = tagsList.stream().collect(Collectors.joining(",", "'", "'"));
+            return "";
+        String tags = tagsList.stream().collect(Collectors.joining("','", "'", "'"));
         return tags;
     }
 
