@@ -47,6 +47,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.service.extract.OdmFileCreation;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
@@ -58,6 +59,7 @@ import org.quartz.SchedulerException;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.scheduling.quartz.QuartzJobBean;
 import org.springframework.util.StringUtils;
@@ -97,6 +99,9 @@ public class XsltTransformJob extends QuartzJobBean {
     private ArchivedDatasetFileDAO archivedDatasetFileDao;
     private AuditEventDAO auditEventDAO;
     private DatasetDAO datasetDao;
+
+    @Autowired
+    private PermissionService permissionService;
 
     //private final SaxonTransformerFactory transformerFactory = SaxonTransformerFactory.newInstance();
     private final TransformerFactory transformerFactory = new net.sf.saxon.TransformerFactoryImpl();
@@ -184,7 +189,7 @@ public class XsltTransformJob extends QuartzJobBean {
                     odmFileCreation.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean,
                     currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",
                     (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType(),
-                    userBean);
+                    userBean,permissionService);
 
             // won't save a record of the XML to db
             // won't be a zipped file, so that we can submit it for

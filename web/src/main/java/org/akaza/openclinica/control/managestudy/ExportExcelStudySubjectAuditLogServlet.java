@@ -209,8 +209,7 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                     StudyEventDefinitionBean sed = (StudyEventDefinitionBean)seddao.findByPK(studyEvent.getStudyEventDefinitionId());
                     eventCRF.setCrf(crf);
 
-                    List<String> tagIds = new ArrayList<>();
-
+                    List<String> tagIds = getPermissionTagsList().size()!=0 ?getPermissionTagsList():new ArrayList<>();
 
                     List < AuditBean> abs= (List<AuditBean>) adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId());
                     for (AuditBean ab : abs) {

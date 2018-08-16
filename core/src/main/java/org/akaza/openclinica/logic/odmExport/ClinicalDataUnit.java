@@ -14,13 +14,17 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
+import org.akaza.openclinica.service.PermissionService;
+import org.springframework.beans.factory.annotation.Autowired;
 
 /**
  * A class for one ODM ClinicalData Element.
@@ -31,6 +35,7 @@ import org.akaza.openclinica.dao.extract.OdmExtractDAO;
 public class ClinicalDataUnit extends OdmUnit {
     private OdmClinicalDataBean odmClinicalData;
     private String studySubjectIds;
+    private PermissionService permissionService;
 
     public ClinicalDataUnit() {
     }
@@ -40,13 +45,15 @@ public class ClinicalDataUnit extends OdmUnit {
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category,PermissionService permissionService) {
         super(ds, dataset, odmBean, study, category);
+        this.permissionService=permissionService;
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, String studySubjectIds) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, String studySubjectIds,PermissionService permissionService) {
         super(ds, dataset, odmBean, study, category);
+        this.permissionService = permissionService;
         this.odmClinicalData = new OdmClinicalDataBean();
         this.studySubjectIds = studySubjectIds;
     }
@@ -61,12 +68,13 @@ public class ClinicalDataUnit extends OdmUnit {
         odmClinicalData.setStudyOID(studyOID);
 
         OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
-        List<String> tagIds = new ArrayList<>();
 
-        String permissionTags = tagIds
-                .stream()
-                .map(Object::toString)
-                .collect(Collectors.joining("','", "'", "'"));
+
+        String permissionTags = "";
+        HttpServletRequest request = CoreResources.getRequest();
+        if (request != null) {
+             permissionTags=permissionService.getPermissionTagsString(CoreResources.getRequest());
+        }
 
         if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
             String mvoid = "";
