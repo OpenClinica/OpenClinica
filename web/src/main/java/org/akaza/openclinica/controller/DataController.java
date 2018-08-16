@@ -15,6 +15,7 @@ import java.util.ResourceBundle;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import org.akaza.openclinica.bean.login.ErrorMessage;
 import org.akaza.openclinica.bean.login.ErrorObject;
 import org.akaza.openclinica.bean.login.ImportDataResponseDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -31,11 +32,10 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
+import org.akaza.openclinica.service.DataImportService;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
-
-import org.akaza.openclinica.web.restful.data.DataImportService;
 import org.akaza.openclinica.web.restful.data.bean.BaseStudyDefinitionBean;
 import org.akaza.openclinica.web.restful.data.validator.CRFDataImportValidator;
 import org.exolab.castor.mapping.Mapping;
@@ -64,7 +64,7 @@ import io.swagger.annotations.ApiResponses;
 *
 */
 @Controller
-@RequestMapping(value = "/auth/api/v1/data")
+@RequestMapping(value = "/auth/api/clinicaldata/import")
 @Api(value = "DataImport", tags = { "DataImport" }, description = "REST API for Study Data Import")
 public class DataController {
 	
@@ -95,10 +95,10 @@ public class DataController {
 	        @ApiResponse(code = 200, message = "Successful operation"),
 	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error message")})
 
-	@RequestMapping(value = "/import", method = RequestMethod.POST)
+	@RequestMapping(value = "/", method = RequestMethod.POST)
 	public ResponseEntity<Object> importDataXMLFile(HttpServletRequest request, MultipartFile file) throws Exception {
 	
-   	ArrayList<ErrorObject> errorObjects = new ArrayList<ErrorObject>();				
+   	ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();				
 		ResponseEntity<Object> response = null;
 
 		String validation_failed_message = "VALIDATION FAILED";
@@ -116,24 +116,24 @@ public class DataController {
 			 }
 			
 			importXml = RestfulServiceHelper.readFileToString(file);
-       		errorObjects = importDataInTransaction(importXml,request);
+       		errorMsgs = importDataInTransaction(importXml,request);
        } catch (OpenClinicaSystemException e) {
     	 
     	   String err_msg = e.getMessage();
-           ErrorObject error = createErrorObject(e.getErrorCode(), err_msg, "error");
-    	   errorObjects.add(error);
+           ErrorMessage error = createErrorMessage(e.getErrorCode(), err_msg);
+    	   errorMsgs.add(error);
            
        }catch (Exception e) {
     	  
     	   String err_msg = "Error processing data import request.";
-           ErrorObject error = createErrorObject("Import Data Validation", err_msg, "error");
-    	   errorObjects.add(error);
+           ErrorMessage error = createErrorMessage("errorCode.Exception", err_msg);
+    	   errorMsgs.add(error);
            
        }
 
-		if (errorObjects != null && errorObjects.size() != 0) {
+		if (errorMsgs != null && errorMsgs.size() != 0) {
 			responseDTO.setMessage(validation_failed_message);
-			responseDTO.setErrors(errorObjects);
+			responseDTO.setErrors(errorMsgs);
 			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
 		} else {
 			responseDTO.setMessage(validation_passed_message);
@@ -150,18 +150,18 @@ public class DataController {
 	 * @return
 	 * @throws Exception
 	 */
-	protected ArrayList<ErrorObject> importDataInTransaction(String importXml,HttpServletRequest request) throws Exception {
+	protected ArrayList<ErrorMessage> importDataInTransaction(String importXml,HttpServletRequest request) throws Exception {
 	        ResourceBundleProvider.updateLocale(new Locale("en_US"));
-	        ArrayList<ErrorObject> errorObjects = new ArrayList<ErrorObject>();
+	        ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
 	       
 	        try {
 	        	// check more xml format--  can't be blank
 	            if (importXml == null) {
 	                String err_msg = "Your XML content is blank.";
-	                ErrorObject errorOBject = createErrorObject("Import Data Validation", err_msg, "error");
-	        		errorObjects.add(errorOBject);
+	                ErrorMessage errorOBject = createErrorMessage("errorCode.BlankFile", err_msg);
+	        		errorMsgs.add(errorOBject);
 	        		
-	        		return errorObjects;
+	        		return errorMsgs;
 	            }
 	            // check more xml format--  must put  the xml content in <ODM> tag
 	            int beginIndex = importXml.indexOf("<ODM>");
@@ -171,9 +171,9 @@ public class DataController {
 	            int endIndex = importXml.indexOf("</ODM>");	            
 	            if(beginIndex < 0 || endIndex < 0) {
 	            	String err_msg = "Please send valid content with correct root tag";
-	                ErrorObject errorOBject = createErrorObject("Import Data Validation", err_msg, "error");
-	        		errorObjects.add(errorOBject);	        		
-	        		return errorObjects;
+	                ErrorMessage errorOBject = createErrorMessage("errorCode.wrongXmlRootTag", err_msg);
+	        		errorMsgs.add(errorOBject);	        		
+	        		return errorMsgs;
 	            }
 	            
 	            importXml = importXml.substring(beginIndex, endIndex + 6);
@@ -182,9 +182,9 @@ public class DataController {
 	            
 	            if (userBean == null) {
 	                String err_msg = "Please send request as a valid user";
-	                ErrorObject errorOBject = createErrorObject("Import Data Validation", err_msg, "error");
-	        		errorObjects.add(errorOBject);	        		
-	        		return errorObjects;
+	                ErrorMessage errorOBject = createErrorMessage("errorCode.invalidUser", err_msg);
+	        		errorMsgs.add(errorOBject);	        		
+	        		return errorMsgs;
 	            }
 	          		         
 	            File xsdFile = this.getRestfulServiceHelper().getXSDFile(request, "ODM1-3-0.xsd");
@@ -225,8 +225,8 @@ public class DataController {
 	                        String errCode = mf.format(arguments);
 	                       
 	                        String err_msg = "Your XML is not well-formed.";
-	    	                ErrorObject errorOBject = createErrorObject("Import Data Validation", err_msg, errCode);
-	    	        		errorObjects.add(errorOBject);
+	    	                ErrorMessage errorOBject = createErrorMessage("errorCode.xmlNotWellFormed", err_msg);
+	    	        		errorMsgs.add(errorOBject);
 	                    }
 	                }	               
                
@@ -264,10 +264,10 @@ public class DataController {
                    if (errorMessagesFromValidation.size() > 0) {
                        String err_msg = convertToErrorString(errorMessagesFromValidation);
                        
-   	                ErrorObject errorOBject = createErrorObject("Import Data Validation", err_msg, "Error");
-   	        		errorObjects.add(errorOBject);
+   	                ErrorMessage errorOBject = createErrorMessage("errorCode.validationFailed", err_msg);
+   	        		errorMsgs.add(errorOBject);
    	        		
-   	        		return errorObjects;
+   	        		return errorMsgs;
                    }
                 
                    errorMessagesFromValidation = dataImportService.validateData(odmContainer, dataSource, coreResources, studyBean, userBean,
@@ -275,10 +275,10 @@ public class DataController {
 
                    if (errorMessagesFromValidation.size() > 0) {
                        String err_msg = convertToErrorString(errorMessagesFromValidation);
-                       ErrorObject errorOBject = createErrorObject("Import Data Validation", err_msg, "Error");
-   	        		errorObjects.add(errorOBject); 
+                       ErrorMessage errorOBject = createErrorMessage("errorCode.validationFailed", err_msg);
+   	        		errorMsgs.add(errorOBject); 
    	        		
-   	        		return errorObjects;
+   	        		return errorMsgs;
                    }
 
                    // setup ruleSets to run if applicable
@@ -306,12 +306,12 @@ public class DataController {
                	for (ObjectError error : errors.getAllErrors()) {
                		String err_msg = error.getDefaultMessage();
                		String errCode = error.getCode();
-   	                ErrorObject errorOBject = createErrorObject("Import Data Validation", err_msg, errCode);
-   	        		errorObjects.add(errorOBject);
+               		ErrorMessage errorMessage = createErrorMessage(errCode,err_msg );
+   	        		errorMsgs.add(errorMessage);
                	}
                }
 
-	            return errorObjects;
+	            return errorMsgs;
 	            
 	        } catch (Exception e) {	         
 	            logger.error("Error processing data import request", e);
@@ -319,12 +319,12 @@ public class DataController {
 	        }	       
 	    }
 	    
-	    public ErrorObject createErrorObject(String resource, String code, String field) {
-			ErrorObject errorOBject = new ErrorObject();
-			errorOBject.setResource(resource);
-			errorOBject.setCode(code);
-			errorOBject.setField(field);
-			return errorOBject;
+	    public ErrorMessage createErrorMessage(String code, String message) {
+	    	ErrorMessage errorMsg = new ErrorMessage();
+	    	errorMsg.setCode(code);
+	    	errorMsg.setMessage(message);
+	    	
+			return errorMsg;
 		}
 	    
 	    private String convertToErrorString(List<String> errorMessages) {

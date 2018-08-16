@@ -1,4 +1,4 @@
-package org.akaza.openclinica.web.restful.data;
+package org.akaza.openclinica.service;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -42,6 +42,10 @@ import org.akaza.openclinica.web.job.TriggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.mock.web.MockHttpServletRequest;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Isolation;
+import org.springframework.transaction.annotation.Propagation;
+import org.springframework.transaction.annotation.Transactional;
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 
 /**
@@ -49,6 +53,8 @@ import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
  * @author thickerson, daniel
  * 
  */
+@Service("DataImportService")
+@Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
 public class DataImportService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());

@@ -5,8 +5,8 @@ import java.util.ArrayList;
 public class ImportDataResponseDTO {
 	private String message;	
 	private ArrayList<String> detailMessages;
-	private String id;
-	private ArrayList<ErrorObject> errors;
+	
+	private ArrayList<ErrorMessage> errors;
 	
 	public String getMessage() {
 		return message;
@@ -14,16 +14,11 @@ public class ImportDataResponseDTO {
 	public void setMessage(String message) {
 		this.message = message;
 	}
-	public String getId() {
-		return id;
-	}
-	public void setId(String id) {
-		this.id = id;
-	}
-	public ArrayList<ErrorObject> getErrors() {
+	
+	public ArrayList<ErrorMessage> getErrors() {
 		return errors;
 	}
-	public void setErrors(ArrayList<ErrorObject> errors) {
+	public void setErrors(ArrayList<ErrorMessage> errors) {
 		this.errors = errors;
 	}
 	public ArrayList<String> getDetailMessages() {
