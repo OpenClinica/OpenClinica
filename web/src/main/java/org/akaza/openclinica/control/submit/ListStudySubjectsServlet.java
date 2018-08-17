@@ -53,7 +53,6 @@ public class ListStudySubjectsServlet extends SecureController {
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
-    private boolean showMoreLink;
     private StudyParameterValueDAO studyParameterValueDAO;
     Locale locale;
 
@@ -84,6 +83,8 @@ public class ListStudySubjectsServlet extends SecureController {
     protected void processRequest() throws Exception {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
         FormProcessor fp = new FormProcessor(request);
+        boolean showMoreLink;
+
         if(fp.getString("showMoreLink").equals("")){
             showMoreLink = true;
         }else {
@@ -120,15 +121,15 @@ public class ListStudySubjectsServlet extends SecureController {
                 request.setAttribute("id", new Integer(studySubject.getId()).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             } else {
-                createTable();
+                createTable(showMoreLink);
             }
         } else {
-            createTable();
+            createTable(showMoreLink);
         }
 
     }
 
-    private void createTable() {
+    private void createTable(boolean showMoreLink) {
 
         ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(showMoreLink);
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());

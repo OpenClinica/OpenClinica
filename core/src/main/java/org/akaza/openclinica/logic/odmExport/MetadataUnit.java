@@ -195,7 +195,7 @@ public class MetadataUnit extends OdmUnit {
         String permissionTags = "";
         HttpServletRequest request = CoreResources.getRequest();
         if (request != null) {
-            permissionTags = permissionService.getPermissionTagsString(CoreResources.getRequest());
+            permissionTags = "";//permissionService.getPermissionTagsString(CoreResources.getRequest());
         }
         StudyBean study = studyBase.getStudy();
 
