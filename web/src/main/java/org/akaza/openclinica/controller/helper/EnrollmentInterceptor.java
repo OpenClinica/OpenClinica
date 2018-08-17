@@ -11,6 +11,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.slf4j.Logger;
@@ -58,13 +59,13 @@ public class EnrollmentInterceptor extends HandlerInterceptorAdapter {
     }
 
     private boolean isEnrollmentCapEnforced(HttpServletRequest httpServletRequest, StudyBean currentStudy) {
-        String enrollmentCapStatus = null;
-        if (currentStudy.getParentStudyId() != 0) {
-            enrollmentCapStatus = studyParameterValueDao.findByStudyIdParameter(currentStudy.getParentStudyId(), "enforceEnrollmentCap").getValue();
-        } else {
+        String enrollmentCapStatus = "false";
+        int currentId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
 
-            enrollmentCapStatus = studyParameterValueDao.findByStudyIdParameter(currentStudy.getId(), "enforceEnrollmentCap").getValue();
-        }
+        StudyParameterValue enrollmentCap = studyParameterValueDao.findByStudyIdParameter(currentId, "enforceEnrollmentCap");
+        if (enrollmentCap != null)
+            enrollmentCapStatus =  enrollmentCap.getValue();
+
         boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
         return capEnforced;
     }
@@ -75,7 +76,7 @@ public class EnrollmentInterceptor extends HandlerInterceptorAdapter {
         HttpSession session = httpServletRequest.getSession();
         StudyBean currentStudy = (StudyBean) session.getAttribute("study");
 
-        if (currentStudy != null) {
+        if (currentStudy != null && currentStudy.getId() != 0) {
             if (currentStudy.getStatus() != null && currentStudy.getStatus().isAvailable()) {
                 capIsOn = isEnrollmentCapEnforced(httpServletRequest, currentStudy);
 
