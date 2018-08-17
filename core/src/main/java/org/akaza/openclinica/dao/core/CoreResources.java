@@ -511,7 +511,7 @@ public class CoreResources implements ResourceLoaderAware {
     }
 
     public static HttpServletRequest getRequest() {
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.currentRequestAttributes();
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
         if (requestAttributes != null && requestAttributes.getRequest() != null) {
             HttpServletRequest request = requestAttributes.getRequest();
             return request;
