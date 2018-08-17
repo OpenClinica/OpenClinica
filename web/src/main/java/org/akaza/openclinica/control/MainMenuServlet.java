@@ -220,8 +220,6 @@ public class MainMenuServlet extends SecureController {
         request.setAttribute("iconInfoShown", true);
         request.setAttribute("closeInfoShowIcons", false);
 
-        String permissionTags = getPermissionTagsString();
-
         if (ub == null || ub.getId() == 0) {// in case database connection is
             // broken
             forwardPage(Page.MENU, false);
@@ -299,7 +297,7 @@ public class MainMenuServlet extends SecureController {
             return;
         }
         if (currentRole.isMonitor()) {
-            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId()+"&permissionTags="+permissionTags);
+            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId());
             return;
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();

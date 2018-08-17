@@ -83,8 +83,6 @@ public class ListStudySubjectsServlet extends SecureController {
     @Override
     protected void processRequest() throws Exception {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-        PermissionServiceImpl permissionService = (PermissionServiceImpl) webApplicationContext .getBean("permissionService");
-        String permissionTags = permissionService.getPermissionTagsString(request);
         FormProcessor fp = new FormProcessor(request);
         if(fp.getString("showMoreLink").equals("")){
             showMoreLink = true;

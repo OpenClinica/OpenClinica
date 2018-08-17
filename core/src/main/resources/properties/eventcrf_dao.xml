@@ -240,9 +240,9 @@
         <name>getCountWithFilterWithTagId</name>
         <sql>
              edc.event_definition_crf_id not in
-            (select event_definition_crf_id from event_definition_crf_permission_tag where permission_tag_id not in (?)) AND
+            (select event_definition_crf_id from event_definition_crf_permission_tag where permission_tag_id != all (?)) AND
             coalesce(edc.parent_id,0) not in
-            (select event_definition_crf_id from event_definition_crf_permission_tag where permission_tag_id not in (?)) AND
+            (select event_definition_crf_id from event_definition_crf_permission_tag where permission_tag_id != all (?)) AND
         </sql>
     </query>
 
