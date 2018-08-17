@@ -1144,7 +1144,7 @@ public class OpenRosaServices {
         int index = result.indexOf(phraseToLookForInOdm);
         if (index == -1) {
             logger.error(" Current Study Event location can't be found in ODM ");
-            return null;
+            return result;
         }
 
         String part1 = result.substring(0, index + phraseToLookForInOdm.length());

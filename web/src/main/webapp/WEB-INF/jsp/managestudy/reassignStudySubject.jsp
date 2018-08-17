@@ -64,62 +64,101 @@
    <td class="table_cell"><c:out value="${studySub.label}"/></td>
  </tr>
 
- <tr>
-   <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/></td>
-   <td class="table_cell"><c:out value="${subject.uniqueIdentifier}"/></td>
- </tr>
- <tr>
-   <td class="table_header_column"><fmt:message key="gender" bundle="${resword}"/></td>
-   <td class="table_cell"><c:out value="${subject.gender}"/></td></tr>
- <tr>
-   <td class="table_header_column"><fmt:message key="date_created" bundle="${resword}"/></td>
-   <td class="table_cell"><fmt:formatDate value="${subject.createdDate}" pattern="${dteFormat}"/></td></tr>
+  <c:choose>
+    <c:when test='${study.parentStudyId > 0}'>
+      <tr valign="top">
+        <td class="table_header_column"><fmt:message key="study_name" bundle="${resword}"/>:</td>
+        <td class="table_cell"><c:out value="${study.parentStudyName}"/></td>
+      </tr>
+    </c:when>
+    <c:otherwise>
+      <tr valign="top">
+        <td class="table_header_column"><fmt:message key="study_name" bundle="${resword}"/>:</td>
+        <td class="table_cell"><c:out value="${study.name}"/></td>
+      </tr>
+    </c:otherwise>
+  </c:choose>
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="created_by" bundle="${resword}"/>:
+    </td>
+    <td class="table_cell">
+      <c:out value="${studySub.owner.name}"/>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="date_created" bundle="${resword}"/>:
+    </td>
+    <td class="table_cell">
+      <fmt:formatDate value="${studySub.createdDate}" pattern="${dteFormat}"/>
+    </td>
+  </tr>
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="last_updated_by" bundle="${resword}"/>:
+    </td>
+    <td class="table_cell">
+      <c:out value="${studySub.updater.name}"/>&nbsp;
+    </td>
+  </tr>
+  <tr valign="top">
+    <td class="table_header_column">
+      <fmt:message key="date_updated" bundle="${resword}"/>:
+    </td>
+    <td class="table_cell">
+      <fmt:formatDate value="${studySub.updatedDate}" pattern="${dteFormat}"/>&nbsp;
+    </td>
+  </tr>
  </table>
  </div>
 </div></div></div></div></div></div></div></div>
 </div>
 <br>
-<p><strong><fmt:message key="please_choose_a_study_in_the_following_list2" bundle="${restext}"/></strong></P>
+<strong><fmt:message key="please_choose_a_study_in_the_following_list2" bundle="${restext}"/></strong>
+<br><br>
     
    <table border="0" cellpadding="0" cellspacing="0"> 
-   <tr><td>   	 
+   <tr>
+    <td style="padding-left:25px;">
+      <input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.id}"/>" class="invisible">
+      <c:out value="${displayStudy.parent.name}"/>
+      <c:if test="${displayStudy.parent.id==studySub.studyId }">
+        <b><i><fmt:message key="currently_in" bundle="${restext}"/></i></b>
+      </c:if>
+      <br><br>
+    </td>
+  </tr> 
+  <c:forEach var="child" items="${displayStudy.children}">
+    <tr>
+      <td style="padding-left:100px;">
         <c:choose> 	 
-         <c:when test="${displayStudy.parent.id==studySub.studyId }">      
-                      
-          <input type="radio" checked name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> <fmt:message key="currently_in" bundle="${restext}"/></b>         
-                  	 
-         </c:when> 	 
-         <c:otherwise>          
-          <c:if test="${displayStudy.status.available}">
-                <input type="radio" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> </b>
-          </c:if>
-          <c:if test="${displayStudy.status.locked}">
-                <input type="radio" disabled="true" name="studyId" value="<c:out value="${displayStudy.parent.id}"/>"><b><c:out value="${displayStudy.parent.name}"/> </b>
-          </c:if>
-         </c:otherwise>
-        </c:choose> 
-        <br>        
-     </td></tr> 
-      <c:forEach var="child" items="${displayStudy.children}">
-      <tr><td>
-         <c:choose> 	 
-         <c:when test="${child.id==studySub.studyId }">      
-           &nbsp;&nbsp;<div class="homebox_bullets"><input type="radio" checked name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/> <fmt:message key="currently_in" bundle="${restext}"/></div>
-         </c:when> 	 
-         <c:otherwise>          
+          <c:when test="${child.id==studySub.studyId }">      
+            <div class="homebox_bullets">
+              <input type="radio" checked name="studyId" value="<c:out value="${child.id}"/>">
+              <c:out value="${child.name}"/>
+              <b><i><fmt:message key="currently_in" bundle="${restext}"/></i></b>
+            </div>
+          </c:when> 	 
+          <c:otherwise>          
             <c:if test="${child.status.available}"> 
-                &nbsp;&nbsp;<div class="homebox_bullets"><input type="radio" name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/></div>
+              <div class="homebox_bullets">
+                <input type="radio" name="studyId" value="<c:out value="${child.id}"/>">
+                <c:out value="${child.name}"/>
+              </div>
             </c:if>
-             <c:if test="${child.status.locked}">
-                 &nbsp;&nbsp;<div class="homebox_bullets"><input type="radio" disabled="true" name="studyId" value="<c:out value="${child.id}"/>"><c:out value="${child.name}"/></div>
-             </c:if>
-         </c:otherwise>
+            <c:if test="${child.status.locked}">
+              <div class="homebox_bullets">
+                <input type="radio" disabled="true" name="studyId" value="<c:out value="${child.id}"/>">
+                <c:out value="${child.name}"/>
+              </div>
+            </c:if>
+          </c:otherwise>
         </c:choose>       
-      
-      </td></tr>
-      </c:forEach>
-    
-   </table>
+      </td>
+    </tr>
+  </c:forEach>
+</table>
   <p><input type="submit" name="Submit" value="<fmt:message key="reassign_subject" bundle="${resword}"/>" class="button_long">
       <input type="button" onclick="confirmCancel('ListStudySubjects');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
   </p>

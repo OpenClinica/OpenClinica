@@ -5,10 +5,6 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.workflow" var="resworkflow"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
-<%-- Temporarily adding this alert message to catch any scenarios that does not calculate the enrollment cap --%>
-<c:if test="${empty enrollmentCapped}">
-    <script>alert("Enrollment Cap needs to be calculated!")</script>
-</c:if>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
 <%
     String currentURL = null;
@@ -46,24 +42,24 @@
 <c:choose>
     <c:when test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
         <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
-        <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
-        <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
-        <link rel="stylesheet" href="../includes/css/icomoon-style.css">
+        <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/includes/css/icomoon-style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
-        <script type="text/javascript" src="../js/lib/es6-promise.auto.min.js"></script>
-        <script type="text/javascript" src="../js/lib/client.js"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/es6-promise.auto.min.js"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/client.js"></script>
         <script type="text/javascript">
             var storage = new CrossStorageClient(crossStorageURL);
         </script>
-        <script type="text/javascript" language="JavaScript" src="../includes/sessionTimeout.js"></script>
-        <script type="text/javascript" language="JavaScript" src="../includes/auth0/captureKeyboardMouseEvents.js"></script>
+        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/sessionTimeout.js"></script>
+        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/auth0/captureKeyboardMouseEvents.js"></script>
         <script type="text/javascript">
             console.log("***********************************Getting crossStorage");
             var storage = new CrossStorageClient(crossStorageURL, {
                 timeout: 7000
             });
         </script>
-        <script type="text/javascript" language="JavaScript" src="../includes/moment.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
     </c:when>
     <c:otherwise>
         <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
@@ -236,17 +232,17 @@
             <c:set var="isHref"/>
 
             <c:if test="${param.isSpringController}">
-                <c:set var="isHref" value="../ListStudySubjects"/>
+                <c:set var="isHref" value="../MainMenu"/>
                 <c:set var="isLogo" value="../images/logo-color-on-dark.svg"/>
             </c:if>
 
             <c:if test="${param.isSpringControllerCCV}">
-                <c:set var="isHref" value="../../ListStudySubjects"/>
+                <c:set var="isHref" value="../../MainMenu"/>
                 <c:set var="isLogo" value="../../images/logo-color-on-dark.svg"/>
             </c:if>
 
             <c:if test="${!param.isSpringController}">
-                <c:set var="isHref" value="ListStudySubjects"/>
+                <c:set var="isHref" value="MainMenu"/>
                 <c:set var="isLogo" value="images/logo-color-on-dark.svg"/>
             </c:if>
 
@@ -367,7 +363,7 @@
                                                                             <td align="right" style="font-weight: normal;">
                                                                                 <ul>
                                                                                     <c:if test="${userRole.coordinator || userRole.director}">
-                                                                                        <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_home"
+                                                                                        <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home"
                                                                                                                                         bundle="${resword}"/></a>
                                                                                         </li>
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message

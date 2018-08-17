@@ -5,12 +5,8 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.core.LockInfo;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
@@ -20,13 +16,15 @@ import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.pform.PFormCache;
-import org.apache.commons.lang.StringUtils;
+import org.apache.commons.collections4.CollectionUtils;
+
+import java.util.List;
+import java.util.Optional;
 
 public class EnketoFormServlet extends SecureController {
 
     private static final long serialVersionUID = 6508949502349649137L;
 
-    public static final String ORIGINATING_PAGE = "originatingPage";
     public static final String STUDYSUBJECTID = "studySubjectId";
     public static final String MODE = "mode";
     public static final String FORM_URL = "formURL";
@@ -82,15 +80,22 @@ public class EnketoFormServlet extends SecureController {
         Study parentStudy = enketoCredentials.getParentStudy(currentStudy.getOid());
         StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         Role role = currentRole.getRole();
+        EventCrf eventCrf = null;
         if (eventCrfId == 0 && studyEvent != null && formLayout != null) {
-            EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
+            eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
             if (eventCrf != null) {
                 eventCrfId = eventCrf.getEventCrfId();
                 logger.debug("The event crf status changed from not-started to started");
             }
 
+        } else {
+            eventCrf = eventCrfDao.findById(eventCrfId);
         }
-
+        final EventCrf ec = eventCrf;
+        if (hasFormAccess(ec) != true) {
+            forwardPage(Page.NO_ACCESS);
+            return;
+        }
         String loadWarning = generateErrorMessage(studyEvent, formLayout);
         boolean isFormLocked = determineCRFLock(studyEvent, formLayout);
         if (Integer.valueOf(eventCrfId) > 0) {

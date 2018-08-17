@@ -344,15 +344,15 @@ public class ChangeStudyServlet extends SecureController {
 
         }
 
-        forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+        forwardPage(Page.MENU);
 
     }
 
     private void setupSubjectSDVTable() {
 
-        request.setAttribute("studyId", currentStudy.getId());
-        String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
-        request.setAttribute("sdvMatrix", sdvMatrix);
+     //   request.setAttribute("studyId", currentStudy.getId());
+     //   String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
+     //   request.setAttribute("sdvMatrix", sdvMatrix);
     }
 
     private void setupStudySubjectStatusStatisticsTable() {

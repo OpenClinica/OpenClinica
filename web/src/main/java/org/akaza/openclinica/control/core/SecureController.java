@@ -21,6 +21,14 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.controller.Auth0Controller;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
+import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
+import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.core.SessionManager;
@@ -41,6 +49,8 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.StudyBuildService;
+import org.akaza.openclinica.service.StudyBuildServiceImpl;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -51,6 +61,7 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
@@ -59,11 +70,14 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.InternetAddress;
@@ -204,6 +218,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     private EventCRFLocker eventCrfLocker;
 
     private final String COMMON = "common";
+
+    public static final String ORIGINATING_PAGE = "originatingPage";
 
     // user is in
 
@@ -372,8 +388,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return scheduler;
     }
 
+
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
         request.setCharacterEncoding("UTF-8");
+//        checkPermissions();
         session = request.getSession();
         // BWP >> 1/8/2008
         try {
@@ -448,6 +466,20 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             if (ub == null || StringUtils.isEmpty(ub.getName())) {
                 UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
                 ub = (UserAccountBean) uDAO.findByEmail(userName);
+                if (ub == null || StringUtils.isEmpty(ub.getName())) {
+                    session.invalidate();
+                    SecurityContextHolder.clearContext();
+                    ServletContext context = getServletContext();
+                    WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+                    Auth0Controller controller = (Auth0Controller) webApplicationContext .getBean("auth0Controller");
+                    String authorizeUrl = controller.buildAuthorizeUrl(request, false/* don't do SSO, SSO already failed */);
+                    logger.info("Secure" +
+                            "" +
+                            "" +
+                            "Controller In login_required:%%%%%%%%" + authorizeUrl);
+                    response.sendRedirect(authorizeUrl);
+                    return;
+                }
                 session.setAttribute("userBean", ub);
             }
             request.setAttribute("userBean", ub);
@@ -481,6 +513,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 }
                 session.setAttribute("publicStudy", currentPublicStudy);
                 request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
+                if (StringUtils.isEmpty(currentPublicStudy.getIdentifier()))
+                    throw new Exception("No study assigned to this user:" + ub.getName() + " uuid:" + ub.getUserUuid());
                 currentStudy = (StudyBean) sdao.findByUniqueIdentifier(currentPublicStudy.getIdentifier());
                 if (currentStudy != null) {
                     currentStudy.setParentStudyName(currentPublicStudy.getParentStudyName());
@@ -1340,6 +1374,24 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             return true;
         else
             return false;
+    }
+
+    public String getPermissionTagsString() {
+        PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+        String permissionTags = permissionService.getPermissionTagsString(request);
+        return permissionTags;
+    }
+    public List<String>  getPermissionTagsList() {
+        PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+        List<String> permissionTagsList = permissionService.getPermissionTagsList(request);
+        return permissionTagsList;
+    }
+
+    public boolean hasFormAccess(EventCrf ec) {
+        Integer formLayoutId = new Integer(request.getParameter("formLayoutId"));
+        Integer studyEventId = new Integer(request.getParameter("studyEventId"));
+        PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+        return permissionService.hasFormAccess(ec, formLayoutId, studyEventId, request);
     }
 
 }

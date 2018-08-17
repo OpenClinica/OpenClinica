@@ -220,7 +220,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
             ps = con.prepareStatement(query);
 
-            ps = psf.generate(ps);// enter variables here!
+            ps = psf.generate(ps,con);// enter variables here!
 
             {
                 rs = ps.executeQuery();

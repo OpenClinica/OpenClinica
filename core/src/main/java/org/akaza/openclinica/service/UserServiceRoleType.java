@@ -1,4 +1,4 @@
-package org.akaza.openclinica.controller.helper;
+package org.akaza.openclinica.service;
 
 /**
  * Created by shivavadla on 6/7/17.

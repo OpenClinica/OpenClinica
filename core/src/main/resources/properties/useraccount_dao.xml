@@ -107,6 +107,10 @@
 		<sql>select * from study_user_role where user_name=?</sql>
 	</query>
 	<query>
+		<name>findAllRolesByUserNameAndStudyOid</name>
+		<sql>select r.* from public.study_user_role r,public.study s where s.study_id=r.study_id and r.user_name=? and s.oc_oid =?</sql>
+	</query>
+	<query>
 		<name>findRole</name>
 		<sql>select * from user_role where role_name=?</sql>
 	</query>

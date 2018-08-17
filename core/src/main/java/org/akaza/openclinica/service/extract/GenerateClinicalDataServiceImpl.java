@@ -1,71 +1,27 @@
 package org.akaza.openclinica.service.extract;
 
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.HashMap;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Set;
-
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.odmbeans.AuditLogBean;
-import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
-import org.akaza.openclinica.bean.odmbeans.ChildNoteBean;
-import org.akaza.openclinica.bean.odmbeans.DiscrepancyNoteBean;
-import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
-import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
-import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ExportFormDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ExportStudyEventDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ExportSubjectDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
-import org.akaza.openclinica.bean.submit.crfdata.SubjectGroupDataBean;
+import org.akaza.openclinica.bean.odmbeans.*;
+import org.akaza.openclinica.bean.submit.crfdata.*;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.AuditLogEventDao;
-import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
-import org.akaza.openclinica.dao.hibernate.ItemDao;
-import org.akaza.openclinica.dao.hibernate.ItemGroupDao;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.AuditLogEvent;
-import org.akaza.openclinica.domain.datamap.CrfBean;
-import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
-import org.akaza.openclinica.domain.datamap.DnEventCrfMap;
-import org.akaza.openclinica.domain.datamap.DnItemDataMap;
-import org.akaza.openclinica.domain.datamap.DnStudyEventMap;
-import org.akaza.openclinica.domain.datamap.DnStudySubjectMap;
-import org.akaza.openclinica.domain.datamap.DnSubjectMap;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import org.akaza.openclinica.domain.datamap.Item;
-import org.akaza.openclinica.domain.datamap.ItemData;
-import org.akaza.openclinica.domain.datamap.ItemGroup;
-import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-import org.akaza.openclinica.domain.datamap.StudySubject;
-import org.akaza.openclinica.domain.datamap.StudyUserRole;
-import org.akaza.openclinica.domain.datamap.SubjectEventStatus;
-import org.akaza.openclinica.domain.datamap.SubjectGroupMap;
-import org.akaza.openclinica.domain.datamap.VersioningMap;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.service.PermissionService;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * Generate CDISC-ODM clinical data without data set.
@@ -74,6 +30,7 @@ import javax.servlet.http.HttpServletRequest;
  * 
  */
 
+@Service("generateClinicalDataService")
 public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataService {
 	protected final static Logger LOGGER = LoggerFactory.getLogger("org.akaza.openclinica.service.extract.GenerateClinicalDataServiceImpl");
 	protected final static String DELIMITER = ",";
@@ -85,6 +42,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private static final Object STUDY_EVENT = "study_event";
 	private static final Object SUBJECT_GROUP_MAP = "subject_group_map";
 	private static boolean isActiveRoleAtSite = true;
+
+	@Autowired
+	PermissionService permissionService;
 
 	private StudyDao studyDao;
 
@@ -101,6 +61,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private ItemDao itemDao;
 	private ItemGroupDao itemGroupDao;
 	private EventDefinitionCrfDao eventDefinitionCrfDao;
+	private EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
 
 	public AuditLogEventDao getAuditEventDAO() {
 		return auditEventDAO;
@@ -227,7 +188,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			// exportSubjectDataBean.setAuditLogs(studySubj.getA)
 			if (studySubj.getSubject().getDateOfBirth() != null)
 				exportSubjectDataBean.setDateOfBirth(studySubj.getSubject().getDateOfBirth() + "");
-			exportSubjectDataBean.setSubjectGender(studySubj.getSubject().getGender() + "");
+			exportSubjectDataBean.setSubjectGender(studySubj.getSubject().getGender()!=null?studySubj.getSubject().getGender().toString():"");
 
 			for (SubjectGroupMap subjGrpMap : studySubj.getSubjectGroupMaps()) {
 				SubjectGroupDataBean subjGrpDataBean = new SubjectGroupDataBean();
@@ -257,7 +218,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 			exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
 
-			exportSubjectDataBean.setEnrollmentDate(studySubj.getEnrollmentDate() + "");
+			exportSubjectDataBean.setEnrollmentDate(studySubj.getEnrollmentDate()!=null?studySubj.getEnrollmentDate().toString():"");
+
 		}
 		return exportSubjectDataBean;
 
@@ -367,6 +329,17 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
 
 			}
+			List<String> tagIds = new ArrayList<>();//permissionService.getPermissionTagsList(CoreResources.getRequest());
+
+
+			List <EventDefinitionCrfPermissionTag> edcPTagIds=
+					getEventDefinitionCrfPermissionTagDao().findByEdcIdTagId(
+							eventDefinitionCrf.getEventDefinitionCrfId(),eventDefinitionCrf.getParentId()!=null? eventDefinitionCrf.getParentId(): 0, tagIds);
+			if(edcPTagIds.size()!=0){
+              continue;
+			}
+
+
 
 			// This logic is to use the same method for both S_OID/SS_OID/*/* and full path
 			if (hiddenCrfCheckPassed) {
@@ -1041,4 +1014,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		this.eventDefinitionCrfDao = eventDefinitionCrfDao;
 	}
 
+	public EventDefinitionCrfPermissionTagDao getEventDefinitionCrfPermissionTagDao() {
+		return eventDefinitionCrfPermissionTagDao;
+	}
+
+	public void setEventDefinitionCrfPermissionTagDao(EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao) {
+		this.eventDefinitionCrfPermissionTagDao = eventDefinitionCrfPermissionTagDao;
+	}
 }

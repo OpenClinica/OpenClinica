@@ -166,11 +166,18 @@
     </query>
 
     <query>
-        <name>getCountWithFilter</name>
+        <name>getCountWithFilterPart1</name>
         <sql>select count(distinct ec.event_crf_id) from event_crf ec, study_event se, study_subject ss,study_event_definition sed,study s,
             event_definition_crf edc, crf crf,crf_version cv
             where ec.study_event_id = se.study_event_id AND
-            se.study_subject_id = ss.study_subject_id AND
+        </sql>
+    </query>
+
+
+    <query>
+        <name>getCountWithFilterPart2</name>
+        <sql>
+             se.study_subject_id = ss.study_subject_id AND
             ss.study_id = s.study_id AND
             se.study_event_definition_id = sed.study_event_definition_id  AND
             crf.crf_id = cv.crf_id AND edc.crf_id = crf.crf_id AND cv.crf_version_id = ec.crf_version_id AND
@@ -189,11 +196,18 @@
     </query>
 
     <query>
-        <name>getWithFilterAndSort</name>
+        <name>getWithFilterAndSortPart1</name>
         <sql>select distinct ec.* from event_crf ec, study_event se, study_subject ss,study_event_definition sed,study s,
             event_definition_crf edc, crf crf,crf_version cv
             where ec.study_event_id = se.study_event_id AND
-            se.study_subject_id = ss.study_subject_id AND
+        </sql>
+    </query>
+
+
+    <query>
+        <name>getWithFilterAndSortPart2</name>
+        <sql>
+             se.study_subject_id = ss.study_subject_id AND
             ss.study_id = s.study_id AND
             se.study_event_definition_id = sed.study_event_definition_id  AND
             crf.crf_id = cv.crf_id AND edc.crf_id = crf.crf_id AND cv.crf_version_id = ec.crf_version_id AND
@@ -208,6 +222,27 @@
 	        OR 
 	        ( edc.study_id = ss.study_id  ) 
 	        )
+        </sql>
+    </query>
+
+    <query>
+        <name>getCountWithFilter</name>
+        <sql>
+             edc.event_definition_crf_id not in
+            (select event_definition_crf_id from event_definition_crf_permission_tag) AND
+            coalesce(edc.parent_id,0) not in
+            (select event_definition_crf_id from event_definition_crf_permission_tag) AND
+        </sql>
+    </query>
+
+
+    <query>
+        <name>getCountWithFilterWithTagId</name>
+        <sql>
+             edc.event_definition_crf_id not in
+            (select event_definition_crf_id from event_definition_crf_permission_tag where permission_tag_id != all (?)) AND
+            coalesce(edc.parent_id,0) not in
+            (select event_definition_crf_id from event_definition_crf_permission_tag where permission_tag_id != all (?)) AND
         </sql>
     </query>
 

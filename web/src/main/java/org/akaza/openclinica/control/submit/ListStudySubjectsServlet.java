@@ -27,8 +27,12 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.PermissionServiceImpl;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * Servlet for creating a table.
@@ -49,7 +53,6 @@ public class ListStudySubjectsServlet extends SecureController {
     private EventCRFDAO eventCRFDAO;
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
-    private boolean showMoreLink;
     private StudyParameterValueDAO studyParameterValueDAO;
     Locale locale;
 
@@ -72,18 +75,25 @@ public class ListStudySubjectsServlet extends SecureController {
         }
 
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
-        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("may_not_submit_data"), "1");
+        throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("" +
+                "may_not_submit_data"), "1");
     }
 
     @Override
     protected void processRequest() throws Exception {
+        WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
         FormProcessor fp = new FormProcessor(request);
+        boolean showMoreLink;
+
         if(fp.getString("showMoreLink").equals("")){
             showMoreLink = true;
         }else {
             showMoreLink = Boolean.parseBoolean(fp.getString("showMoreLink"));
         }
+        logger.info("CurrentStudy:" + currentPublicStudy.getSchemaName());
+        logger.info("StudyParameterConfig:" + currentPublicStudy.getStudyParameterConfig().toString());
         String idSetting = currentStudy.getStudyParameterConfig().getSubjectIdGeneration();
+        logger.info("idSetting:" + idSetting);
         // set up auto study subject id
         if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
             //Shaoyu Su
@@ -111,15 +121,15 @@ public class ListStudySubjectsServlet extends SecureController {
                 request.setAttribute("id", new Integer(studySubject.getId()).toString());
                 forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
             } else {
-                createTable();
+                createTable(showMoreLink);
             }
         } else {
-            createTable();
+            createTable(showMoreLink);
         }
 
     }
 
-    private void createTable() {
+    private void createTable(boolean showMoreLink) {
 
         ListStudySubjectTableFactory factory = new ListStudySubjectTableFactory(showMoreLink);
         factory.setStudyEventDefinitionDao(getStudyEventDefinitionDao());

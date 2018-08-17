@@ -29,12 +29,15 @@ import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.PermissionService;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Create ODM XML ClinicalData Element for a study.
@@ -50,12 +53,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
     private final String COMMON = "common";
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private StudyDAO sdao;
+    PermissionService permissionService;
 
-    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean) {
+    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean,PermissionService permissionService) {
         super();
         this.clinicalData = clinicaldata;
         this.dataSource = dataSource;
         this.userBean = userBean;
+        this.permissionService=permissionService;
     }
 
     /**
@@ -139,7 +144,13 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             StudyBean parentStudyBean = getParentStudy(clinicalData.getStudyOID());
             StudyBean studyBean = getStudy(clinicalData.getStudyOID());
             // List<EventDefinitionCRFBean> edcs = edcdao.findAllByStudy(parentStudyBean);
-            List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean);
+
+            String[] permissionTags = null;
+            HttpServletRequest request = CoreResources.getRequest();
+            if (request != null) {
+                permissionTags =permissionService.getPermissionTagsStringArray(CoreResources.getRequest());
+            }
+            List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean,permissionTags );
 
             // Subject
             // ***************** OpenClinica: Subject Links Start**************
@@ -176,7 +187,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             //
             for (ExportStudyEventDataBean se : ses) {
 
-                if (!clinical || (clinical && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) {
+                if ((!clinical || (clinical && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) && se.getExportFormData().size()!=0) {
                     // For developers, please do not change order of properties sorted, it will break OpenRosaService
                     // Manifest Call for odm file
                     xml.append(indent + indent + indent + "<StudyEventData StudyEventOID=\"" + StringEscapeUtils.escapeXml(se.getStudyEventOID()));

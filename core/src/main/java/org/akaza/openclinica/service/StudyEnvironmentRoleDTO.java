@@ -1,5 +1,16 @@
 package org.akaza.openclinica.service;
 
+/**
+ * Created by yogi on 6/22/17.
+ */
+
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.akaza.openclinica.service.AbstractAuditingDTO;
+
+import com.fasterxml.jackson.annotation.JsonIgnoreProperties;
+import org.akaza.openclinica.service.UserServiceRoleType;
+
 import javax.validation.constraints.NotNull;
 import java.io.Serializable;
 import java.util.Objects;
@@ -7,6 +18,15 @@ import java.util.Objects;
 /**
  * A DTO for the StudyEnvironmentRole entity.
  */
+import javax.validation.constraints.NotNull;
+import java.io.Serializable;
+import java.util.List;
+import java.util.Objects;
+
+/**
+ * A DTO for the StudyEnvironmentRole entity.
+ */
+@JsonIgnoreProperties(ignoreUnknown = true)
 public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Serializable {
 
     private String uuid;
@@ -20,9 +40,18 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
     @NotNull
     private String roleUuid;
 
+    // TODO: @NotNull
+    private String dynamicRoleUuid;
+
+    private String baseRoleName;
+
+    private String baseRoleUuid;
+
     private String roleName;
 
     private RoleType roleType;
+
+    private List<PermissionDTO> permissions;
 
     public String getUuid() {
         return uuid;
@@ -63,6 +92,30 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
         this.roleUuid = roleUuid;
     }
 
+    public String getDynamicRoleUuid() {
+        return dynamicRoleUuid;
+    }
+
+    public void setDynamicRoleUuid(String dynamicRoleUuid) {
+        this.dynamicRoleUuid = dynamicRoleUuid;
+    }
+
+    public String getBaseRoleName() {
+        return baseRoleName;
+    }
+
+    public void setBaseRoleName(String baseRoleName) {
+        this.baseRoleName = baseRoleName;
+    }
+
+    public String getBaseRoleUuid() {
+        return baseRoleUuid;
+    }
+
+    public void setBaseRoleUuid(String baseRoleUuid) {
+        this.baseRoleUuid = baseRoleUuid;
+    }
+
     public String getRoleName() {
         return roleName;
     }
@@ -77,6 +130,14 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
 
     public void setRoleType(RoleType roleType) {
         this.roleType = roleType;
+    }
+
+    public List<PermissionDTO> getPermissions() {
+        return permissions;
+    }
+
+    public void setPermissions(List<PermissionDTO> permissions) {
+        this.permissions = permissions;
     }
 
     @Override
@@ -107,6 +168,7 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
                 ", studyUuid='" + studyUuid + "'" +
                 ", studyEnvironmentUuid='" + studyEnvironmentUuid + "'" +
                 ", roleUuid='" + roleUuid + "'" +
+                ", dynamicRoleUuid='" + dynamicRoleUuid + "'" +
                 ", roleType='" + roleType + "'" +
                 '}';
     }

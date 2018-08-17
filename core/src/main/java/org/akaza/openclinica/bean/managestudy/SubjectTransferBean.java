@@ -30,6 +30,7 @@ public class SubjectTransferBean extends EntityBean {
     private Date enrollmentDate;
     private String secondaryId;
     private String siteIdentifier;
+    private StudyBean siteStudy;
 
     UserAccountBean owner;
 
@@ -150,5 +151,13 @@ public class SubjectTransferBean extends EntityBean {
     public void setStudy(StudyBean study) {
         this.study = study;
     }
+
+	public StudyBean getSiteStudy() {
+		return siteStudy;
+	}
+
+	public void setSiteStudy(StudyBean siteStudy) {
+		this.siteStudy = siteStudy;
+	}
 
 }

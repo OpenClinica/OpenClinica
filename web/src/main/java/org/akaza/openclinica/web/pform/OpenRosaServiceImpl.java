@@ -1,9 +1,10 @@
 package org.akaza.openclinica.web.pform;
 
-import com.auth0.json.auth.UserInfo;
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.OCUserRoleDTO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.service.*;
 import org.apache.commons.lang.StringUtils;
@@ -15,7 +16,6 @@ import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
@@ -25,16 +25,7 @@ import org.springframework.web.client.RestTemplate;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
 
-import javax.xml.parsers.DocumentBuilder;
-import javax.xml.parsers.DocumentBuilderFactory;
-import javax.xml.parsers.ParserConfigurationException;
-import javax.xml.transform.Transformer;
-import javax.xml.transform.TransformerException;
-import javax.xml.transform.TransformerFactory;
-import javax.xml.transform.dom.DOMSource;
-import javax.xml.transform.stream.StreamResult;
 import java.io.IOException;
-import java.io.StringWriter;
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
@@ -109,29 +100,31 @@ public class OpenRosaServiceImpl implements OpenRosaService {
     private List<OCUserRoleDTO> getOcUserRoleDTOs(StudyAndSiteEnvUuid studyAndSiteEnvUuid) {
         Supplier<ResponseEntity<List<OCUserRoleDTO>>> getUserList = () -> {
 
-                String baseUrl = CoreResources.getField("SBSUrl");
+            String baseUrl = CoreResources.getField("SBSUrl");
 
-                String uri = baseUrl.replaceAll("/users/", "") + "/study-environments/" + studyAndSiteEnvUuid.studyEnvUuid + "/users-with-roles";
+            String uri = baseUrl.replaceAll("/users/", "") + "/study-environments/" + studyAndSiteEnvUuid.studyEnvUuid + "/users-with-roles";
 
-                RestTemplate restTemplate = new RestTemplate();
-                HttpHeaders headers = new HttpHeaders();
-                headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-                ObjectMapper objectMapper = new ObjectMapper();
-                objectMapper.registerModule(new JavaTimeModule());
-                headers.add("Authorization", "Bearer " + accessToken);
-                headers.add("Accept-Charset", "UTF-8");
-                HttpEntity<String> entity = new HttpEntity<String>(headers);
-                List<HttpMessageConverter<?>> converters = new ArrayList<>();
-                MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
-                jsonConverter.setObjectMapper(objectMapper);
-                converters.add(jsonConverter);
-                restTemplate.setMessageConverters(converters);
-                Instant start = Instant.now();
-                ResponseEntity<List<OCUserRoleDTO>> response =
-                        restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<OCUserRoleDTO>>() {});
-                Instant end = Instant.now();
-                logger.info("***** Time execution for {} method : {}   *****", new Object() {
-                }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
+            RestTemplate restTemplate = new RestTemplate();
+            HttpHeaders headers = new HttpHeaders();
+            headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+            ObjectMapper objectMapper = new ObjectMapper();
+            objectMapper.registerModule(new JavaTimeModule());
+            headers.add("Authorization", "Bearer " + accessToken);
+            headers.add("Accept-Charset", "UTF-8");
+            HttpEntity<String> entity = new HttpEntity<String>(headers);
+            List<HttpMessageConverter<?>> converters = new ArrayList<>();
+            MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+            jsonConverter.setObjectMapper(objectMapper);
+            converters.add(jsonConverter);
+            restTemplate.setMessageConverters(converters);
+            Instant start = Instant.now();
+            ResponseEntity<List<OCUserRoleDTO>> response =
+                    restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<OCUserRoleDTO>>() {});
+            Instant end = Instant.now();
+            logger.info("***** Time execution for {} method : {}   *****", new Object() {
+            }.getClass().getEnclosingMethod().getName(), Duration.between(start, end));
+            // to test the future.complete(null)
+            //throw new RuntimeException("***UserList failed");
             return response;
 
         };

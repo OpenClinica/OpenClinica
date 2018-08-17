@@ -19,6 +19,7 @@ import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFact
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
+import org.akaza.openclinica.controller.Auth0Controller;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
@@ -49,6 +50,7 @@ import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
+import java.util.stream.Collectors;
 
 /**
  * The main controller servlet for all the work behind study sites for
@@ -311,10 +313,10 @@ public class MainMenuServlet extends SecureController {
 
     private void setupSubjectSDVTable() {
 
-        request.setAttribute("studyId", currentStudy.getId());
-        request.setAttribute("showMoreLink", "true");
-        String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
-        request.setAttribute("sdvMatrix", sdvMatrix);
+   //     request.setAttribute("studyId", currentStudy.getId());
+   //     request.setAttribute("showMoreLink", "true");
+   //     String sdvMatrix = getSDVUtil().renderEventCRFTableWithLimit(request, currentStudy.getId(), "");
+   //     request.setAttribute("sdvMatrix", sdvMatrix);
     }
 
     private void setupStudySubjectStatusStatisticsTable() {

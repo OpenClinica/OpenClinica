@@ -20,7 +20,6 @@ import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.ErrorObject;
 import org.akaza.openclinica.bean.login.EventDefinitionDTO;
 import org.akaza.openclinica.bean.login.FacilityInfo;
 import org.akaza.openclinica.bean.login.ResponseSuccessEventDefDTO;
@@ -40,10 +39,8 @@ import org.akaza.openclinica.controller.dto.ParticipantIdVariable;
 import org.akaza.openclinica.controller.dto.SiteStatusDTO;
 import org.akaza.openclinica.controller.dto.StudyEnvStatusDTO;
 import org.akaza.openclinica.controller.helper.AsyncStudyHelper;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.service.OCUserDTO;
-import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
+import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -568,7 +565,7 @@ public class StudyController {
         AsyncStudyHelper asyncStudyHelper = new AsyncStudyHelper("Study Creation Started", "PENDING", LocalTime.now());
         AsyncStudyHelper.put(parameters.uniqueStudyID, asyncStudyHelper);
 
-        ResponseEntity<HashMap> responseEntity = processSSOUserContext(request, parameters.studyEnvUuid);
+        ResponseEntity<HashMap<String, Object>> responseEntity = processSSOUserContext(request, parameters.studyEnvUuid);
 
         UserAccountBean ownerUserAccount = getStudyOwnerAccountWithCreatedUser(request, responseEntity);
         if (ownerUserAccount == null) {
@@ -910,8 +907,8 @@ public class StudyController {
         return response;
     }
 
-    private ResponseEntity<HashMap> processSSOUserContext(HttpServletRequest request, String studyEnvUuid) throws Exception {
-        ResponseEntity<HashMap> responseEntity = null;
+    private ResponseEntity<HashMap<String, Object>> processSSOUserContext(HttpServletRequest request, String studyEnvUuid) throws Exception {
+        ResponseEntity<HashMap<String, Object>> responseEntity = null;
         HttpSession session = request.getSession();
         if (session == null) {
             logger.error("Cannot proceed without a valid session.");
@@ -920,7 +917,7 @@ public class StudyController {
         Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) session.getAttribute("userContextMap");
         if (userContextMap == null)
             return responseEntity;
-        ResponseEntity<StudyEnvironmentRoleDTO[]> studyUserRoles = studyBuildService.getUserRoles(request);
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> studyUserRoles = studyBuildService.getUserRoles(request);
         HashMap<String, String> userMap = getUserInfo(request, userContextMap, studyUserRoles);
         UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute("userBean");
 
@@ -942,12 +939,13 @@ public class StudyController {
             userDTO.put("firstName", ub.getFirstName());
             userDTO.put("lastName", ub.getLastName());
             userDTO.put("apiKey", ub.getApiKey());
-            responseEntity = new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
+            responseEntity = new ResponseEntity<HashMap<String, Object>>(userDTO, org.springframework.http.HttpStatus.OK);
         }
         return responseEntity;
     }
 
-    private HashMap<String, String> getUserInfo(HttpServletRequest request, Map<String, Object> userContextMap, ResponseEntity<StudyEnvironmentRoleDTO[]> studyUserRoles) throws Exception {
+    private HashMap<String, String> getUserInfo(HttpServletRequest request, Map<String, Object> userContextMap,
+                                                ResponseEntity<List<StudyEnvironmentRoleDTO>> studyUserRoles) throws Exception {
         String studyEnvUuid = (String) request.getAttribute("studyEnvUuid");
         HashMap<String, String> map = new HashMap<>();
         ArrayList<LinkedHashMap<String, String>> roles = new ArrayList<>();
@@ -1871,7 +1869,7 @@ public class StudyController {
         return ownerUserAccount;
     }
 
-    public UserAccountBean getStudyOwnerAccountWithCreatedUser(HttpServletRequest request, ResponseEntity<HashMap> responseEntity) {
+    public UserAccountBean getStudyOwnerAccountWithCreatedUser(HttpServletRequest request, ResponseEntity<HashMap<String, Object>> responseEntity) {
         UserAccountBean ownerUserAccount = null;
         if (responseEntity != null) {
             HashMap hashMap = responseEntity.getBody();

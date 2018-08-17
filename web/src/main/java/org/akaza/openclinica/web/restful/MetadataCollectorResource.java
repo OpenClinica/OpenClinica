@@ -19,6 +19,7 @@ import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
+import org.akaza.openclinica.service.PermissionService;
 import org.cdisc.ns.odm.v130.ODM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -188,11 +189,11 @@ public class MetadataCollectorResource {
     }
 
     public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
-            boolean clinical, boolean showArchived) {
+            boolean clinical, boolean showArchived, PermissionService permissionService) {
         StudyBean studyBean = getStudyDao().findByOid(studyOID);
         if (studyBean != null)
             studyBean = populateStudyBean(studyBean);
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived);
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived,permissionService);
         AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
         MetaDataCollector.setTextLength(200);
 
