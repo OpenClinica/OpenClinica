@@ -196,7 +196,7 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
         variables.put(new Integer(3), new Integer(studyBean.getId()));
 
 		String sql = "";
-		if(permissionTags.length==0) {
+		if(permissionTags ==null || permissionTags.length==0) {
 			 sql = digester.getQuery("findAllStudySiteFiltered");
 		}else{
 			variables.put(new Integer(4),  permissionTags);

@@ -675,7 +675,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         HashMap variables = new HashMap();
 
         String sql = digester.getQuery("getCountWithFilterPart1");
-        if(permissionTags.length==0) {
+        if(permissionTags ==null || permissionTags.length==0) {
             sql =sql+" "+ digester.getQuery("getCountWithFilter");
             variables.put(new Integer(1), studyId);
             variables.put(new Integer(2), parentStudyId);
@@ -709,7 +709,7 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         HashMap variables = new HashMap();
 
         String sql = digester.getQuery("getWithFilterAndSortPart1");
-        if(permissionTags.length==0) {
+        if(permissionTags ==null || permissionTags.length==0) {
             sql =sql+" "+ digester.getQuery("getCountWithFilter");
             variables.put(1, studyId);
             variables.put(2, parentStudyId);
