@@ -11,6 +11,7 @@ import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -41,6 +42,22 @@ public class PermissionServiceImpl implements PermissionService {
     private EventCrfDao eventCrfDao;
     @Autowired
     private StudyDao studyDao;
+    @Value("${auth0.domain}")
+    private String domain;
+    private static final String CREATE_TOKEN_API_PATH = "/oauth/token";
+
+
+    /**
+     * This is the client id of your auth0 application (see Settings page on auth0 dashboard)
+     */
+    @Value(value = "${auth0.apiClientId}")
+    private String clientId;
+
+    /**
+     * This is the client secret of your auth0 application (see Settings page on auth0 dashboard)
+     */
+    @Value(value = "${auth0.apiClientSecret}")
+    private String clientSecret;
 
     private boolean checkStudyUuid(String studyUuid, int parentStudyId) {
         if (parentStudyId == 0) return false;
@@ -49,10 +66,15 @@ public class PermissionServiceImpl implements PermissionService {
             return true;
         return false;
     }
+
     public List<String> getPermissionTagsList(HttpServletRequest request) {
         HttpSession session = request.getSession();
         ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRoles(request);
         StudyBean study = (StudyBean) session.getAttribute("study");
+        return getTagList(roles, study);
+    }
+
+    private List<String> getTagList(ResponseEntity<List<StudyEnvironmentRoleDTO>> roles, StudyBean study) {
         String tmpUuid = null;
         if (StringUtils.isNotEmpty(study.getStudyEnvUuid()))
             tmpUuid = study.getStudyEnvUuid();
@@ -115,6 +137,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     public String getPermissionTagsString(HttpServletRequest request) {
         List<String> tagsList = getPermissionTagsList(request);
+        return getTagsString(tagsList);
+    }
+
+    private String getTagsString(List<String> tagsList) {
         if (CollectionUtils.isEmpty(tagsList))
             return "";
         String tags = tagsList.stream().collect(Collectors.joining("','", "'", "'"));
@@ -123,6 +149,10 @@ public class PermissionServiceImpl implements PermissionService {
 
     public String[] getPermissionTagsStringArray(HttpServletRequest request) {
         List<String> tagsList = getPermissionTagsList(request);
+        return getStringArray(tagsList);
+    }
+
+    private String[] getStringArray(List<String> tagsList) {
         if (CollectionUtils.isEmpty(tagsList))
             return null;
         String[] tags = tagsList.toArray(new String[tagsList.size()]);
@@ -174,4 +204,63 @@ public class PermissionServiceImpl implements PermissionService {
 
         return true;
     }
+
+    public List<String> getPermissionTagsListWithoutRequest(StudyBean study, String userUuid) {
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRolesWithoutRequest(userUuid);
+        return getTagList(roles, study);
+    }
+
+    public String getPermissionTagsStringWithoutRequest(StudyBean study, String userUuid) {
+        List<String> tagsList = getPermissionTagsListWithoutRequest(study, userUuid);
+        return getTagsString(tagsList);    }
+
+    public String[] getPermissionTagsStringArrayWithoutRequest(StudyBean study, String userUuid) {
+        List<String> tagsList = getPermissionTagsListWithoutRequest(study, userUuid);
+        return getStringArray(tagsList);    }
+
+    public ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRolesWithoutRequest(String userUuid) {
+
+        String uri = CoreResources.getField("SBSUrl") + userUuid + "/roles";
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String accessToken = getAccessToken();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        jsonConverter.setObjectMapper(objectMapper);
+        converters.add(jsonConverter);
+        restTemplate.setMessageConverters(converters);
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<StudyEnvironmentRoleDTO>>() {});
+        logger.debug("Response: getUserRoles:" + response);
+        if (logger.isDebugEnabled()) {
+            for (StudyEnvironmentRoleDTO userRole: response.getBody()) {
+                logger.debug("UserRole in updateStudyUserRoles: role: " + userRole.getRoleName() + " uuid:" + userRole.getUuid() );
+            }
+        }
+        return response;
+    }
+
+    public String getAccessToken() {
+        logger.debug("Creating Auth0 Api Token");
+
+        TokenRequestDTO tokenRequestDTO = new TokenRequestDTO()
+                .grantType("client_credentials")
+                .clientId(clientId)
+                .clientSecret(clientSecret)
+                .audience("https://www.openclinica.com");
+
+        HttpEntity requestEntity = new HttpEntity(tokenRequestDTO);
+        String createTokenUrl = "https://" + domain + CREATE_TOKEN_API_PATH;
+        RestTemplate restTemplate = new RestTemplate();
+
+        ResponseEntity<TokenResponseDTO> tokenResponse = restTemplate.exchange(createTokenUrl, HttpMethod.POST, requestEntity, TokenResponseDTO.class);
+        String accessToken = tokenResponse.getBody().getAccessToken();
+        return accessToken;
+    }
+
 }

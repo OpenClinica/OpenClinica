@@ -15,6 +15,7 @@ import java.util.LinkedHashMap;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -35,6 +36,7 @@ import org.akaza.openclinica.service.PermissionService;
 public class ClinicalDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmClinicalDataBean> odmClinicalDataMap;
     private PermissionService permissionService;
+    private UserAccountBean userAccountBean;
 
 
     /**
@@ -42,9 +44,10 @@ public class ClinicalDataCollector extends OdmDataCollector {
      * @param ds
      * @param dataset
      */
-    public ClinicalDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy , PermissionService permissionService) {
+    public ClinicalDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy , PermissionService permissionService,UserAccountBean userAccountBean) {
         super(ds, dataset, currentStudy);
         this.permissionService = permissionService;
+        this.userAccountBean = userAccountBean;
         this.odmClinicalDataMap = new LinkedHashMap<String, OdmClinicalDataBean>();
     }
 
@@ -59,7 +62,7 @@ public class ClinicalDataCollector extends OdmDataCollector {
         while (it.hasNext()) {
             JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
-            ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory(),permissionService);
+            ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory(),permissionService,userAccountBean);
             cdata.setCategory(this.getCategory());
             StudySubjectDAO ssdao = new StudySubjectDAO(this.ds);
             cdata.setStudySubjectIds(ssdao.findStudySubjectIdsByStudyIds(u.getStudy().getId()+""));

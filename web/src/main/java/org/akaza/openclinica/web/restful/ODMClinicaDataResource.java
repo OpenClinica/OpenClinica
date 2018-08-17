@@ -137,7 +137,7 @@ public class ODMClinicaDataResource {
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                         formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId()),
-                clinical, archived ,permissionService);
+                clinical, archived ,permissionService,userAccountBean);
         if (report.getClinicalDataMap() == null)
             return null;
 
@@ -263,7 +263,7 @@ public class ODMClinicaDataResource {
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                         formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
-                clinical, archived,permissionService);
+                clinical, archived,permissionService,userBean);
 
         report.createOdmXml(true, clinical, getDataSource(), userBean,permissionService);
         LOGGER.debug(report.getXmlOutput().toString().trim());

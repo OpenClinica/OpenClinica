@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
@@ -51,6 +52,8 @@ public class MetadataUnit extends OdmUnit {
     private StudyBean parentStudy;
     private RuleSetRuleDao ruleSetRuleDao;
     private PermissionService permissionService;
+    private UserAccountBean userAccountBean;
+    private StudyBean study;
 
     public static final String FAKE_STUDY_NAME = "OC_FORM_LIB_STUDY";
     public static final String FAKE_STUDY_OID = "OC_FORM_LIB";
@@ -83,11 +86,13 @@ public class MetadataUnit extends OdmUnit {
     }
 
     public MetadataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, RuleSetRuleDao ruleSetRuleDao,
-            boolean showArchived ,PermissionService permissionService) {
+            boolean showArchived ,PermissionService permissionService ,UserAccountBean userAccountBean) {
         super(ds, dataset, odmBean, study, category, showArchived);
         this.odmStudy = new OdmStudyBean();
         this.ruleSetRuleDao = ruleSetRuleDao;
         this.permissionService = permissionService;
+        this.userAccountBean = userAccountBean;
+        this.study=study;
         if (study.getParentStudyId() > 0) {
             this.parentStudy = (StudyBean) new StudyDAO(ds).findByPK(study.getParentStudyId());
         } else {
@@ -193,10 +198,9 @@ public class MetadataUnit extends OdmUnit {
         }
 
         String permissionTags = "";
-        HttpServletRequest request = CoreResources.getRequest();
-        if (request != null) {
-            permissionTags = permissionService.getPermissionTagsString(CoreResources.getRequest());
-        }
+        permissionTags =permissionService.getPermissionTagsStringWithoutRequest(study,userAccountBean.getUserUuid());
+
+
         StudyBean study = studyBase.getStudy();
 
         StudyConfigService studyConfig = new StudyConfigService(this.ds);
