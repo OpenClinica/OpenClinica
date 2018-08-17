@@ -18,6 +18,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
@@ -36,6 +37,7 @@ public class ClinicalDataUnit extends OdmUnit {
     private OdmClinicalDataBean odmClinicalData;
     private String studySubjectIds;
     private PermissionService permissionService;
+    private UserAccountBean userAccountBean;
 
     public ClinicalDataUnit() {
     }
@@ -45,9 +47,10 @@ public class ClinicalDataUnit extends OdmUnit {
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category,PermissionService permissionService) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category,PermissionService permissionService , UserAccountBean userAccountBean) {
         super(ds, dataset, odmBean, study, category);
         this.permissionService=permissionService;
+        this.userAccountBean=userAccountBean;
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
@@ -71,10 +74,8 @@ public class ClinicalDataUnit extends OdmUnit {
 
 
         String permissionTags = "";
-        HttpServletRequest request = CoreResources.getRequest();
-        if (request != null) {
-             permissionTags=permissionService.getPermissionTagsString(CoreResources.getRequest());
-        }
+        permissionTags =permissionService.getPermissionTagsStringWithoutRequest(study,userAccountBean.getUserUuid());
+
 
         if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
             String mvoid = "";

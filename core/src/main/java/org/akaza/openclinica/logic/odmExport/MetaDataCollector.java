@@ -15,9 +15,11 @@ import java.util.LinkedHashMap;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
+import org.akaza.openclinica.bean.odmbeans.UserBean;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.job.JobTerminationMonitor;
 import org.akaza.openclinica.service.PermissionService;
@@ -43,11 +45,13 @@ public class MetaDataCollector extends OdmDataCollector {
     private static int textLength = 4000;
     private RuleSetRuleDao ruleSetRuleDao;
     private PermissionService permissionService;
+    private UserAccountBean userAccountBean;
     // protected final Logger logger =
     // LoggerFactory.getLogger(getClass().getName());
 
-    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao, boolean showArchived,PermissionService permissionService) {
+    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao, boolean showArchived,PermissionService permissionService,UserAccountBean userAccountBean) {
         super(ds, study, showArchived);
+        this.userAccountBean=userAccountBean;
         this.ruleSetRuleDao = ruleSetRuleDao;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
         this.permissionService=permissionService;
@@ -85,7 +89,7 @@ public class MetaDataCollector extends OdmDataCollector {
             JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
             StudyBean study = u.getStudy();
-            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(), getRuleSetRuleDao(), showArchived ,permissionService );
+            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(), getRuleSetRuleDao(), showArchived ,permissionService,userAccountBean );
             meta.collectOdmStudy(null);
             if (this.getCategory() == 1) {
                 if (study.isSite(study.getParentStudyId())) {
