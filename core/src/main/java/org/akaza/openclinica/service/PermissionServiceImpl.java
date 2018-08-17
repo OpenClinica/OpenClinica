@@ -121,6 +121,14 @@ public class PermissionServiceImpl implements PermissionService {
         return tags;
     }
 
+    public String[] getPermissionTagsStringArray(HttpServletRequest request) {
+        List<String> tagsList = getPermissionTagsList(request);
+        if (CollectionUtils.isEmpty(tagsList))
+            return null;
+        String[] tags = tagsList.toArray(new String[tagsList.size()]);
+        return tags;
+    }
+
     public boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request) {
 
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");

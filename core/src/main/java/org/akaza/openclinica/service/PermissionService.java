@@ -12,6 +12,8 @@ public interface PermissionService {
 
     String getPermissionTagsString(HttpServletRequest request);
 
+    String[] getPermissionTagsStringArray(HttpServletRequest request);
+
     ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request);
 
     boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request);

@@ -30,7 +30,6 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.service.StudyBuildServiceImpl;
 import org.akaza.openclinica.view.Page;
@@ -220,8 +219,6 @@ public class MainMenuServlet extends SecureController {
         request.setAttribute("iconInfoShown", true);
         request.setAttribute("closeInfoShowIcons", false);
 
-        //String permissionTags = getPermissionTagsString();
-
         if (ub == null || ub.getId() == 0) {// in case database connection is
             // broken
             forwardPage(Page.MENU, false);
@@ -299,7 +296,7 @@ public class MainMenuServlet extends SecureController {
             return;
         }
         if (currentRole.isMonitor()) {
-            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId()+"&permissionTags=");
+            response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId());
             return;
         } else if (currentRole.isCoordinator() || currentRole.isDirector()) {
             setupStudySiteStatisticsTable();
