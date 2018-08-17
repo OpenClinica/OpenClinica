@@ -406,7 +406,7 @@
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                                                                         <li>
-                                                                                            <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}&permissionTags="><fmt:message
+                                                                                            <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
                                                                                                     key="nav_sdv" bundle="${resword}"/></a></li>
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
                                                                                                 key="queries" bundle="${resword}"/></a></li>
@@ -478,7 +478,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}&permissionTags="><fmt:message
+                <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
                         key="nav_source_data_verification" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
@@ -584,7 +584,7 @@
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
                         <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-                        <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}&permissionTags="><fmt:message
+                        <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
                                 key="nav_source_data_verification" bundle="${resword}"/></a><br/></div>
                     </c:otherwise>
                 </c:choose>

@@ -668,23 +668,23 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
         return executeFindAllQuery("getEventCRFsByStudyIdentifier", variables);
     }
 
-    public Integer getCountWithFilter(int studyId, int parentStudyId, EventCRFSDVFilter filter , String permissionTags) {
+    public Integer getCountWithFilter(int studyId, int parentStudyId, EventCRFSDVFilter filter , String[] permissionTags) {
 
         setTypesExpected();
 
         HashMap variables = new HashMap();
 
         String sql = digester.getQuery("getCountWithFilterPart1");
-        if(StringUtils.isEmpty(permissionTags)) {
+        if(permissionTags.length==0) {
             sql =sql+" "+ digester.getQuery("getCountWithFilter");
-            variables.put(1, studyId);
-            variables.put(2, parentStudyId);
+            variables.put(new Integer(1), studyId);
+            variables.put(new Integer(2), parentStudyId);
         }else{
             sql =sql+" "+ digester.getQuery("getCountWithFilterWithTagId");
-            variables.put(1, permissionTags);
-            variables.put(2, permissionTags);
-            variables.put(3, studyId);
-            variables.put(4, parentStudyId);
+            variables.put(new Integer(1), permissionTags);
+            variables.put(new Integer(2), permissionTags);
+            variables.put(new Integer(3), studyId);
+            variables.put(new Integer(4), parentStudyId);
         }
         sql =sql+" "+ digester.getQuery("getCountWithFilterPart2");
 
@@ -702,14 +702,14 @@ public class EventCRFDAO<K extends String, V extends ArrayList> extends Auditabl
     }
 
     public ArrayList<EventCRFBean> getWithFilterAndSort(int studyId, int parentStudyId, EventCRFSDVFilter filter, EventCRFSDVSort sort, int rowStart,
-            int rowEnd, String permissionTags) {
+            int rowEnd, String[]  permissionTags) {
         ArrayList<EventCRFBean> eventCRFs = new ArrayList<EventCRFBean>();
         setTypesExpected();
 
         HashMap variables = new HashMap();
 
         String sql = digester.getQuery("getWithFilterAndSortPart1");
-        if(StringUtils.isEmpty(permissionTags)) {
+        if(permissionTags.length==0) {
             sql =sql+" "+ digester.getQuery("getCountWithFilter");
             variables.put(1, studyId);
             variables.put(2, parentStudyId);

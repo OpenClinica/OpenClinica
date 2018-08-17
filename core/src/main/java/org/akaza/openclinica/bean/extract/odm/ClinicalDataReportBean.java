@@ -145,13 +145,11 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             StudyBean studyBean = getStudy(clinicalData.getStudyOID());
             // List<EventDefinitionCRFBean> edcs = edcdao.findAllByStudy(parentStudyBean);
 
-            List<String> tagIds = new ArrayList<>();
+            String[] permissionTags = null;
             HttpServletRequest request = CoreResources.getRequest();
             if (request != null) {
-                 tagIds =permissionService.getPermissionTagsList(CoreResources.getRequest());
+                permissionTags =permissionService.getPermissionTagsStringArray(CoreResources.getRequest());
             }
-
-            String[] permissionTags = tagIds.toArray(new String[tagIds.size()]);
             List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean,permissionTags );
 
             // Subject

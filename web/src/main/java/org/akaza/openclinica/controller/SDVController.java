@@ -167,8 +167,9 @@ public class SDVController {
 
         request.setAttribute("studyId", studyId);
         HttpSession session = request.getSession();
-        String permissionTags = permissionService.getPermissionTagsString(request);
 
+
+        String[] permissionTags = permissionService.getPermissionTagsStringArray(request);
         if(!mayProceed(request)){
             try{
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
@@ -239,7 +240,7 @@ public class SDVController {
     }
 
     @RequestMapping("/viewAllSubjectSDVform")
-    public ModelMap viewAllSubjectFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId, @RequestParam("permissionTags") String permissionTags ) {
+    public ModelMap viewAllSubjectFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId) {
 
         ModelMap gridMap = new ModelMap();
         StudyDAO studyDAO = new StudyDAO(dataSource);
@@ -248,6 +249,7 @@ public class SDVController {
         String pattern = "MM/dd/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 
+        String[] permissionTags = permissionService.getPermissionTagsStringArray(request);
         //  List<StudyEventBean> studyEventBeans = studyEventDAO.findAllByStudy(studyBean);
         //  List<EventCRFBean> eventCRFBeans = sdvUtil.getAllEventCRFs(studyEventBeans);
 
