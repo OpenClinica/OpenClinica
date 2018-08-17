@@ -42,24 +42,24 @@
 <c:choose>
     <c:when test="${requestFromSpringController == 'true' || requestFromSpringControllerCCV == 'true'}">
         <c:set var="urlPrefix" value="${pageContext.request.contextPath}/"/>
-        <script type="text/JavaScript" language="JavaScript" src="../includes/jmesa/jquery.min.js"></script>
-        <script type="text/javascript" language="JavaScript" src="../includes/jmesa/jquery.blockUI.js"></script>
-        <link rel="stylesheet" href="../includes/css/icomoon-style.css">
+        <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
+        <link rel="stylesheet" href="${pageContext.request.contextPath}/includes/css/icomoon-style.css">
         <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
-        <script type="text/javascript" src="../js/lib/es6-promise.auto.min.js"></script>
-        <script type="text/javascript" src="../js/lib/client.js"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/es6-promise.auto.min.js"></script>
+        <script type="text/javascript" src="${pageContext.request.contextPath}/js/lib/client.js"></script>
         <script type="text/javascript">
             var storage = new CrossStorageClient(crossStorageURL);
         </script>
-        <script type="text/javascript" language="JavaScript" src="../includes/sessionTimeout.js"></script>
-        <script type="text/javascript" language="JavaScript" src="../includes/auth0/captureKeyboardMouseEvents.js"></script>
+        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/sessionTimeout.js"></script>
+        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/auth0/captureKeyboardMouseEvents.js"></script>
         <script type="text/javascript">
             console.log("***********************************Getting crossStorage");
             var storage = new CrossStorageClient(crossStorageURL, {
                 timeout: 7000
             });
         </script>
-        <script type="text/javascript" language="JavaScript" src="../includes/moment.min.js"></script>
+        <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
     </c:when>
     <c:otherwise>
         <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
@@ -232,17 +232,17 @@
             <c:set var="isHref"/>
 
             <c:if test="${param.isSpringController}">
-                <c:set var="isHref" value="../ListStudySubjects"/>
+                <c:set var="isHref" value="../MainMenu"/>
                 <c:set var="isLogo" value="../images/logo-color-on-dark.svg"/>
             </c:if>
 
             <c:if test="${param.isSpringControllerCCV}">
-                <c:set var="isHref" value="../../ListStudySubjects"/>
+                <c:set var="isHref" value="../../MainMenu"/>
                 <c:set var="isLogo" value="../../images/logo-color-on-dark.svg"/>
             </c:if>
 
             <c:if test="${!param.isSpringController}">
-                <c:set var="isHref" value="ListStudySubjects"/>
+                <c:set var="isHref" value="MainMenu"/>
                 <c:set var="isLogo" value="images/logo-color-on-dark.svg"/>
             </c:if>
 
@@ -363,7 +363,7 @@
                                                                             <td align="right" style="font-weight: normal;">
                                                                                 <ul>
                                                                                     <c:if test="${userRole.coordinator || userRole.director}">
-                                                                                        <li><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_home"
+                                                                                        <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home"
                                                                                                                                         bundle="${resword}"/></a>
                                                                                         </li>
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
@@ -406,7 +406,7 @@
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                                                                         <li>
-                                                                                            <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}&permissionTags="><fmt:message
+                                                                                            <a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
                                                                                                     key="nav_sdv" bundle="${resword}"/></a></li>
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
                                                                                                 key="queries" bundle="${resword}"/></a></li>
@@ -478,7 +478,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
                 <div class="taskLink"><a href="${urlPrefix}ViewStudyEvents"><fmt:message key="nav_view_events" bundle="${resword}"/></a></div>
-                <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}&permissionTags="><fmt:message
+                <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
                         key="nav_source_data_verification" bundle="${resword}"/></a></div>
             </div>
             <div class="taskRightColumn">
@@ -584,7 +584,7 @@
                     <c:otherwise>
                         <div class="taskLink"><a href="${urlPrefix}ListSite?read=true"><fmt:message key="nav_sites" bundle="${resword}"/></a></div>
                         <div class="taskLink"><a href="${urlPrefix}ListCRF?module=manage"><fmt:message key="nav_crfs" bundle="${resword}"/></a></div>
-                        <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}&permissionTags="><fmt:message
+                        <div class="taskLink"><a href="${urlPrefix}pages/viewAllSubjectSDVtmp?sdv_restore=${restore}&studyId=${study.id}"><fmt:message
                                 key="nav_source_data_verification" bundle="${resword}"/></a><br/></div>
                     </c:otherwise>
                 </c:choose>

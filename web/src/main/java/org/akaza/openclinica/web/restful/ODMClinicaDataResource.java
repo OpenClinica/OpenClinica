@@ -19,6 +19,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.service.PermissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -53,6 +54,8 @@ public class ODMClinicaDataResource {
     private MetadataCollectorResource metadataCollectorResource;
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private PermissionService permissionService;
 
     public MetadataCollectorResource getMetadataCollectorResource() {
         return metadataCollectorResource;
@@ -134,11 +137,11 @@ public class ODMClinicaDataResource {
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                         formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId()),
-                clinical, archived);
+                clinical, archived ,permissionService,userAccountBean);
         if (report.getClinicalDataMap() == null)
             return null;
 
-        report.createOdmXml(true, clinical, getDataSource(), userAccountBean);
+        report.createOdmXml(true, clinical, getDataSource(), userAccountBean,permissionService);
         // xmlSerializer.setForceTopLevelObject(true);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -260,9 +263,9 @@ public class ODMClinicaDataResource {
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                         formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
-                clinical, archived);
+                clinical, archived,permissionService,userBean);
 
-        report.createOdmXml(true, clinical, getDataSource(), userBean);
+        report.createOdmXml(true, clinical, getDataSource(), userBean,permissionService);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();

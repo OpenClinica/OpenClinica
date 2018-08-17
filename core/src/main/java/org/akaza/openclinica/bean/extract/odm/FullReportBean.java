@@ -17,6 +17,7 @@ import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.service.PermissionService;
 
 /**
  * Create one ODM XML file.
@@ -34,7 +35,7 @@ public class FullReportBean extends OdmXmlReportBean {
     /**
      * Create one ODM XML This method is still under construction. Right now it is for Snapshot filetype only.
      */
-    public void createOdmXml(boolean isDataset, boolean clinical, DataSource dataSource, UserAccountBean userBean) {
+    public void createOdmXml(boolean isDataset, boolean clinical, DataSource dataSource, UserAccountBean userBean,PermissionService permissionService) {
         this.addHeading();
         this.addRootStartLine();
 
@@ -62,7 +63,7 @@ public class FullReportBean extends OdmXmlReportBean {
             while (itc.hasNext()) {
                 OdmClinicalDataBean c = itc.next();
                 if (c.getExportSubjectData().size() > 0) {
-                    addNodeClinicalData(c, clinical, dataSource, userBean);
+                    addNodeClinicalData(c, clinical, dataSource, userBean,permissionService);
                 }
             }
         }
@@ -95,8 +96,8 @@ public class FullReportBean extends OdmXmlReportBean {
         this.addRootEndLine();
     }
 
-    public void createChunkedOdmXml(boolean isDataset, boolean header, boolean footer, DataSource dataSource, UserAccountBean userBean) {
-        ClinicalDataReportBean data = new ClinicalDataReportBean(this.clinicaldata, dataSource, userBean);
+    public void createChunkedOdmXml(boolean isDataset, boolean header, boolean footer, DataSource dataSource, UserAccountBean userBean,PermissionService permissionService) {
+        ClinicalDataReportBean data = new ClinicalDataReportBean(this.clinicaldata, dataSource, userBean,permissionService);
         data.setXmlOutput(this.getXmlOutput());
         data.setODMVersion(this.getODMVersion());
         data.addNodeClinicalData(header, footer, false);
@@ -119,8 +120,8 @@ public class FullReportBean extends OdmXmlReportBean {
         admin.addNodeAdminData();
     }
 
-    public void addNodeClinicalData(OdmClinicalDataBean clinicaldata, boolean clinical, DataSource dataSource, UserAccountBean userBean) {
-        ClinicalDataReportBean data = new ClinicalDataReportBean(clinicaldata, dataSource, userBean);
+    public void addNodeClinicalData(OdmClinicalDataBean clinicaldata, boolean clinical, DataSource dataSource, UserAccountBean userBean ,PermissionService permissionService) {
+        ClinicalDataReportBean data = new ClinicalDataReportBean(clinicaldata, dataSource, userBean,permissionService);
         data.setODMVersion(this.getODMVersion());
         data.setXmlOutput(this.getXmlOutput());
         data.addNodeClinicalData(true, true, clinical);

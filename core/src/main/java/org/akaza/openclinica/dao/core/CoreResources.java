@@ -584,7 +584,7 @@ public class CoreResources implements ResourceLoaderAware {
                 schema = DATAINFO.getProperty("schema");
         }
         logger.debug("Current thread schema:" + tenantSchema.get());
-        logger.debug("Current schema for JDBC connections:" + schema);
+        logger.debug("Current thread:" + Thread.currentThread().getId() + " Current schema for JDBC connections:" + schema);
         return schema;
     }
 

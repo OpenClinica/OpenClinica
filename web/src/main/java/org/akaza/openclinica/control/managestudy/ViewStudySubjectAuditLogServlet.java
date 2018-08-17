@@ -207,7 +207,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                     eventCRF.setCrf(crf);
                     // Get the event crf audits
 
-                    List<String> tagIds = new ArrayList<>();
+                    List<String> tagIds = getPermissionTagsList().size()!=0 ?getPermissionTagsList():new ArrayList<>();
 
                     List < AuditBean> abs= (List<AuditBean>) adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId());
                     for (AuditBean ab : abs) {

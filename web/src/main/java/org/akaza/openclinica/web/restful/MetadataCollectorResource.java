@@ -6,11 +6,9 @@ import java.util.LinkedHashMap;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.odmbeans.ODMBean;
-import org.akaza.openclinica.bean.odmbeans.OdmAdminDataBean;
-import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
-import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
+import org.akaza.openclinica.bean.odmbeans.*;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -19,6 +17,7 @@ import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
+import org.akaza.openclinica.service.PermissionService;
 import org.cdisc.ns.odm.v130.ODM;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
@@ -188,11 +187,11 @@ public class MetadataCollectorResource {
     }
 
     public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
-            boolean clinical, boolean showArchived) {
+                                                            boolean clinical, boolean showArchived, PermissionService permissionService , UserAccountBean userAccountBean) {
         StudyBean studyBean = getStudyDao().findByOid(studyOID);
         if (studyBean != null)
             studyBean = populateStudyBean(studyBean);
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived);
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived,permissionService,userAccountBean);
         AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
         MetaDataCollector.setTextLength(200);
 

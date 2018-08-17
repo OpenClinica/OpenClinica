@@ -27,13 +27,18 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory;
@@ -80,6 +85,12 @@ public class SDVController {
     @Autowired
     @Qualifier("sidebarInit")
     private SidebarInit sidebarInit;
+
+    @Autowired
+    private EventCrfDao eventCrfDao;
+
+    @Autowired
+    private PermissionService permissionService;
 
     public SDVController() {
     }
@@ -159,11 +170,13 @@ public class SDVController {
     @RequestMapping("/viewAllSubjectSDVtmp")
     public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId,
                                           @RequestParam(value = "sdv_restore", required = false) String restore,
-                                          HttpServletResponse response ,@RequestParam("permissionTags") String permissionTags) {
+                                          HttpServletResponse response ) {
 
         request.setAttribute("studyId", studyId);
         HttpSession session = request.getSession();
 
+
+        String[] permissionTags = permissionService.getPermissionTagsStringArray(request);
         if(!mayProceed(request)){
             try{
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
@@ -234,7 +247,7 @@ public class SDVController {
     }
 
     @RequestMapping("/viewAllSubjectSDVform")
-    public ModelMap viewAllSubjectFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId, @RequestParam("permissionTags") String permissionTags ) {
+    public ModelMap viewAllSubjectFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("studyId") int studyId) {
 
         ModelMap gridMap = new ModelMap();
         StudyDAO studyDAO = new StudyDAO(dataSource);
@@ -243,6 +256,7 @@ public class SDVController {
         String pattern = "MM/dd/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 
+        String[] permissionTags = permissionService.getPermissionTagsStringArray(request);
         //  List<StudyEventBean> studyEventBeans = studyEventDAO.findAllByStudy(studyBean);
         //  List<EventCRFBean> eventCRFBeans = sdvUtil.getAllEventCRFs(studyEventBeans);
 
@@ -362,6 +376,13 @@ public class SDVController {
             }
             return null;
         }
+
+        if (hasFormAccess(crfId ,request) != true) {
+//			     return;
+        }
+
+
+
         //For the messages that appear in the left column of the results page
         ArrayList<String> pageMessages = new ArrayList<String>();
 
@@ -630,4 +651,9 @@ public class SDVController {
 
         return false;
     }
+    public boolean hasFormAccess(int ecId,HttpServletRequest request) {
+        EventCrf ec = eventCrfDao.findById(ecId);
+        return permissionService.hasFormAccess(ec, ec.getFormLayout().getFormLayoutId(), ec.getStudyEvent().getStudyEventId(), request);
+    }
+
 }

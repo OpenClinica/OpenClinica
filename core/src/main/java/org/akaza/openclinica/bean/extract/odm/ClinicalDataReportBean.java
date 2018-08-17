@@ -29,9 +29,11 @@ import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.PermissionService;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.util.StringUtils;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
 import java.util.*;
@@ -51,12 +53,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
     private final String COMMON = "common";
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private StudyDAO sdao;
+    PermissionService permissionService;
 
-    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean) {
+    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean,PermissionService permissionService) {
         super();
         this.clinicalData = clinicaldata;
         this.dataSource = dataSource;
         this.userBean = userBean;
+        this.permissionService=permissionService;
     }
 
     /**
@@ -141,9 +145,9 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             StudyBean studyBean = getStudy(clinicalData.getStudyOID());
             // List<EventDefinitionCRFBean> edcs = edcdao.findAllByStudy(parentStudyBean);
 
-            List<String> tagIds = new ArrayList<>();
+            String[] permissionTags = null;
+           permissionTags =permissionService.getPermissionTagsStringArrayWithoutRequest(studyBean,userBean.getUserUuid());
 
-            String[] permissionTags = tagIds.toArray(new String[tagIds.size()]);
             List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean,permissionTags );
 
             // Subject

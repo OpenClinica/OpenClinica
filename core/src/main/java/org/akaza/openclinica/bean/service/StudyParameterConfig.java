@@ -335,4 +335,30 @@ public class StudyParameterConfig implements Serializable{
     public void setParticipantIdTemplate(String participantIdTemplate) {
         this.participantIdTemplate = participantIdTemplate;
     }
+
+    @Override
+    public String toString() {
+        return "StudyParameterConfig{" +
+                "collectDob='" + collectDob + '\'' +
+                ", discrepancyManagement='" + discrepancyManagement + '\'' +
+                ", genderRequired='" + genderRequired + '\'' +
+                ", subjectPersonIdRequired='" + subjectPersonIdRequired + '\'' +
+                ", interviewerNameRequired='" + interviewerNameRequired + '\'' +
+                ", interviewerNameDefault='" + interviewerNameDefault + '\'' +
+                ", interviewerNameEditable='" + interviewerNameEditable + '\'' +
+                ", interviewDateRequired='" + interviewDateRequired + '\'' +
+                ", interviewDateDefault='" + interviewDateDefault + '\'' +
+                ", interviewDateEditable='" + interviewDateEditable + '\'' +
+                ", subjectIdGeneration='" + subjectIdGeneration + '\'' +
+                ", subjectIdPrefixSuffix='" + subjectIdPrefixSuffix + '\'' +
+                ", personIdShownOnCRF='" + personIdShownOnCRF + '\'' +
+                ", secondaryLabelViewable='" + secondaryLabelViewable + '\'' +
+                ", adminForcedReasonForChange='" + adminForcedReasonForChange + '\'' +
+                ", eventLocationRequired='" + eventLocationRequired + '\'' +
+                ", participantPortal='" + participantPortal + '\'' +
+                ", randomization='" + randomization + '\'' +
+                ", participantIdTemplate='" + participantIdTemplate + '\'' +
+                ", enforceEnrollmentCap='" + enforceEnrollmentCap + '\'' +
+                '}';
+    }
 }
