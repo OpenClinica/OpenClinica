@@ -85,6 +85,7 @@ import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
 import javax.servlet.ServletException;
 import javax.servlet.ServletOutputStream;
+import javax.servlet.SingleThreadModel;
 import javax.servlet.http.HttpServlet;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -151,7 +152,7 @@ import java.util.*;
  *
  * @author ssachs
  */
-public abstract class SecureController extends HttpServlet  {
+public abstract class SecureController extends HttpServlet implements SingleThreadModel {
     protected ServletContext context;
     protected SessionManager sm;
     // protected final Logger logger =

@@ -5,11 +5,9 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.*;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -41,18 +39,36 @@ public class PermissionServiceImpl implements PermissionService {
     private FormLayoutDao formLayoutDao;
     @Autowired
     private EventCrfDao eventCrfDao;
+    @Autowired
+    private StudyDao studyDao;
 
+    private boolean checkStudyUuid(String studyUuid, int parentStudyId) {
+        if (parentStudyId == 0) return false;
+        Study study = studyDao.findById(parentStudyId);
+        if (StringUtils.equals(study.getStudyEnvUuid(), studyUuid))
+            return true;
+        return false;
+    }
     public List<String> getPermissionTagsList(HttpServletRequest request) {
         HttpSession session = request.getSession();
         ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRoles(request);
-        StudyBean publicStudy = (StudyBean) session.getAttribute("publicStudy");
-        String studyEnvironmentUuid = publicStudy.getStudyEnvUuid();
+        StudyBean study = (StudyBean) session.getAttribute("study");
+        String tmpUuid = null;
+        if (StringUtils.isNotEmpty(study.getStudyEnvUuid()))
+            tmpUuid = study.getStudyEnvUuid();
+        else if ((StringUtils.isNotEmpty(study.getStudyEnvSiteUuid())))
+            tmpUuid = study.getStudyEnvSiteUuid();
 
+        final String uuId = tmpUuid;
+        if (StringUtils.isEmpty(uuId)){
+            logger.error("***********Uuid should not be empty:");
+        }
         Optional<StudyEnvironmentRoleDTO> dto =
-                roles.getBody().stream().filter(o -> o.getStudyEnvironmentUuid().equals(studyEnvironmentUuid)).findFirst();
+                roles.getBody().stream().filter(o -> (StringUtils.equals(o.getStudyEnvironmentUuid(), uuId) ||
+                        (StringUtils.isNotEmpty(study.getStudyEnvSiteUuid()) && checkStudyUuid(o.getStudyEnvironmentUuid(), study.getParentStudyId())))).findFirst();
 
         if (!dto.isPresent()) {
-            logger.error("Study:" + studyEnvironmentUuid + " not found for this user");
+            logger.error("Study:" + uuId + " not found for this user");
             return new ArrayList<>();
         }
 
@@ -60,9 +76,7 @@ public class PermissionServiceImpl implements PermissionService {
         if (CollectionUtils.isEmpty(dto.get().getPermissions())) {
             return new ArrayList<>();
         }
-        List<String> tagIds = dto.get().getPermissions().stream().map(PermissionDTO::getTagId).collect(Collectors.toList()).size()!=0 ?dto.get().getPermissions().stream().map(PermissionDTO::getTagId).collect(Collectors.toList()):new ArrayList<>();
-
-
+        List<String> tagIds = dto.get().getPermissions().stream().map(PermissionDTO::getTagId).collect(Collectors.toList());
         return tagIds;
     }
 
@@ -120,13 +134,24 @@ public class PermissionServiceImpl implements PermissionService {
                 ec = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
                 if (ec == null) {
                     eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-                            studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(), formLayout.getCrf().getCrfId(), currentStudy.getId());
+                            studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(),
+                            formLayout.getCrf().getCrfId(), currentStudy.getId());
+                }
+                if (eventDefCrf == null && currentStudy.getParentStudyId() != 0) {
+                    Study parentStudy = studyDao.findById(currentStudy.getParentStudyId());
+                    eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+                            studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(),
+                            formLayout.getCrf().getCrfId(), parentStudy.getStudyId());
+                    if (eventDefCrf == null) {
+                        logger.error("EventDefCrf should not be null");
+                        return false;
+                    }
                 }
             }
         } else {
             eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-                    eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(), eventCrf.getCrfVersion().getCrf().getCrfId(), currentStudy.getId());
-
+                    eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(),
+                    eventCrf.getCrfVersion().getCrf().getCrfId(), currentStudy.getId());
         }
 
         List<String> permissionTagsList = getPermissionTagsList(request);
