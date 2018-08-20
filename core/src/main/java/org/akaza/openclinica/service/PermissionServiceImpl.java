@@ -164,6 +164,11 @@ public class PermissionServiceImpl implements PermissionService {
         StudyBean currentStudy = (StudyBean) request.getSession().getAttribute("study");
         EventDefinitionCrf eventDefCrf = null;
         final EventCrf eventCrf = ec;
+        int studyId = currentStudy.getId();
+        if (currentStudy.getParentStudyId() != 0) {
+            studyId = currentStudy.getParentStudyId();
+        }
+
         if (ec == null) {
             StudyEvent studyEvent = studyEventDao.findById(studyEventId);
             FormLayout formLayout = formLayoutDao.findById(formLayoutId);
@@ -173,23 +178,18 @@ public class PermissionServiceImpl implements PermissionService {
                 if (ec == null) {
                     eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
                             studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(),
-                            formLayout.getCrf().getCrfId(), currentStudy.getId());
-                }
-                if (eventDefCrf == null && currentStudy.getParentStudyId() != 0) {
-                    Study parentStudy = studyDao.findById(currentStudy.getParentStudyId());
-                    eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-                            studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(),
-                            formLayout.getCrf().getCrfId(), parentStudy.getStudyId());
-                    if (eventDefCrf == null) {
-                        logger.error("EventDefCrf should not be null");
-                        return false;
-                    }
+                            formLayout.getCrf().getCrfId(), studyId);
                 }
             }
         } else {
             eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
                     eventCrf.getStudyEvent().getStudyEventDefinition().getStudyEventDefinitionId(),
-                    eventCrf.getCrfVersion().getCrf().getCrfId(), currentStudy.getId());
+                    eventCrf.getCrfVersion().getCrf().getCrfId(), studyId);
+        }
+
+        if (eventDefCrf == null) {
+            logger.error("EventDefCrf should not be null");
+            return false;
         }
 
         List<String> permissionTagsList = getPermissionTagsList(request);

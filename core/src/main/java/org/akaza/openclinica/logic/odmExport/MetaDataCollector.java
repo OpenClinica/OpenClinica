@@ -64,10 +64,11 @@ public class MetaDataCollector extends OdmDataCollector {
 
     }
 
-    public MetaDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy, RuleSetRuleDao ruleSetRuleDao ,PermissionService permissionService) {
+    public MetaDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy, RuleSetRuleDao ruleSetRuleDao ,PermissionService permissionService,UserAccountBean userAccountBean) {
         super(ds, dataset, currentStudy);
         this.ruleSetRuleDao = ruleSetRuleDao;
         this.permissionService =permissionService;
+        this.userAccountBean = userAccountBean;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
     }
 

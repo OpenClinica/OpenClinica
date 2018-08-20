@@ -68,7 +68,7 @@ public class OdmFileCreation {
 
 
         Integer ssNumber = getStudySubjectNumber(studySubjectNumber);
-        MetaDataCollector mdc = new MetaDataCollector(dataSource, datasetBean, currentStudy, ruleSetRuleDao,permissionService);
+        MetaDataCollector mdc = new MetaDataCollector(dataSource, datasetBean, currentStudy, ruleSetRuleDao,permissionService,userBean);
         AdminDataCollector adc = new AdminDataCollector(dataSource, datasetBean, currentStudy);
         ClinicalDataCollector cdc = new ClinicalDataCollector(dataSource, datasetBean, currentStudy,permissionService,userBean);
 
@@ -196,7 +196,7 @@ public class OdmFileCreation {
                 } // for
                 studySubjectIds = studySubjectIds.replaceFirst(",", "");
 
-                ClinicalDataUnit cdata = new ClinicalDataUnit(dataSource, datasetBean, cdc.getOdmbean(), u.getStudy(), cdc.getCategory(), studySubjectIds,permissionService);
+                ClinicalDataUnit cdata = new ClinicalDataUnit(dataSource, datasetBean, cdc.getOdmbean(), u.getStudy(), cdc.getCategory(), studySubjectIds,permissionService,userBean);
                 cdata.setCategory(cdc.getCategory());
                 cdata.collectOdmClinicalData();
 
