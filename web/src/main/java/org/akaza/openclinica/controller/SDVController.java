@@ -377,14 +377,19 @@ public class SDVController {
             return null;
         }
 
+        ArrayList<String> pageMessages = new ArrayList<String>();
+
         if (hasFormAccess(crfId ,request) != true) {
-//			     return;
+            pageMessages.add("You do not have permission to access this form");
+            request.setAttribute("sdv_restore", "false");
+            request.setAttribute("pageMessages", pageMessages);
+            sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
+      return null;
         }
 
 
 
         //For the messages that appear in the left column of the results page
-        ArrayList<String> pageMessages = new ArrayList<String>();
 
         List<Integer> eventCRFIds = new ArrayList<Integer>();
         eventCRFIds.add(crfId);
@@ -392,6 +397,7 @@ public class SDVController {
 
         if (updateCRFs) {
             pageMessages.add("The Event CRFs have been source data verified.");
+            request.setAttribute("sdv_restore", "true");
         } else {
 
             pageMessages
@@ -400,7 +406,6 @@ public class SDVController {
         }
         request.setAttribute("pageMessages", pageMessages);
 
-        request.setAttribute("sdv_restore", "true");
 
         //model.addAttribute("allParams",parameterMap);
         //model.addAttribute("verified",updateCRFs);
@@ -421,6 +426,15 @@ public class SDVController {
         List<Integer> eventCRFIds = new ArrayList<Integer>();
         eventCRFIds.add(crfId);
         boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), false);
+
+        if (hasFormAccess(crfId ,request) != false) {
+            pageMessages.add("You do not have permission to access this form");
+            request.setAttribute("sdv_restore", "true");
+            request.setAttribute("pageMessages", pageMessages);
+            sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
+            return null;
+        }
+
 
         if (updateCRFs) {
             pageMessages.add("The application has unset SDV for the Event CRF.");
@@ -651,6 +665,7 @@ public class SDVController {
 
         return false;
     }
+
     public boolean hasFormAccess(int ecId,HttpServletRequest request) {
         EventCrf ec = eventCrfDao.findById(ecId);
         return permissionService.hasFormAccess(ec, ec.getFormLayout().getFormLayoutId(), ec.getStudyEvent().getStudyEventId(), request);
