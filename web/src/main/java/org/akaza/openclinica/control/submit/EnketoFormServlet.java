@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.core.LockInfo;
+import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.datamap.*;
@@ -17,6 +18,7 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.collections4.CollectionUtils;
+import org.apache.commons.lang.StringUtils;
 
 import java.util.List;
 import java.util.Optional;
@@ -92,7 +94,7 @@ public class EnketoFormServlet extends SecureController {
             eventCrf = eventCrfDao.findById(eventCrfId);
         }
         final EventCrf ec = eventCrf;
-        if (hasFormAccess(ec) != true) {
+        if (!StringUtils.equalsIgnoreCase(mode, "preview") && hasFormAccess(ec) != true) {
             forwardPage(Page.NO_ACCESS);
             return;
         }
