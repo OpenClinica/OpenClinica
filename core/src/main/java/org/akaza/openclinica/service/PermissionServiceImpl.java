@@ -170,15 +170,17 @@ public class PermissionServiceImpl implements PermissionService {
         }
 
         if (ec == null) {
-            StudyEvent studyEvent = studyEventDao.findById(studyEventId);
-            FormLayout formLayout = formLayoutDao.findById(formLayoutId);
+            if (formLayoutId != null && studyEventId != null) {
+                StudyEvent studyEvent = studyEventDao.findById(studyEventId);
+                FormLayout formLayout = formLayoutDao.findById(formLayoutId);
 
-            if (studyEvent != null && formLayout != null) {
-                ec = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
-                if (ec == null) {
-                    eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-                            studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(),
-                            formLayout.getCrf().getCrfId(), studyId);
+                if (studyEvent != null && formLayout != null) {
+                    ec = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
+                    if (ec == null) {
+                        eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+                                studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(),
+                                formLayout.getCrf().getCrfId(), studyId);
+                    }
                 }
             }
         } else {

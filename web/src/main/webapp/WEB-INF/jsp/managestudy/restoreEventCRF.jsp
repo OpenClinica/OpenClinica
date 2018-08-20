@@ -130,13 +130,13 @@
  </c:if>
  <c:choose>
     <c:when test="${!empty items}">
-     <form action='RestoreEventCRF?action=submit&id=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
+     <form action='RestoreEventCRF?action=submit&eventCrfId=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
       <input type="submit" name="submit" value="<fmt:message key="restore_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="this_crf_has_data_restore" bundle="${resword}"/>");'>
      </form>
     
     </c:when>
     <c:otherwise>
-      <form action='RestoreEventCRF?action=submit&id=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
+      <form action='RestoreEventCRF?action=submit&eventCrfId=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
       <input type="submit" name="submit" value="<fmt:message key="restore_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_restore_it" bundle="${resword}"/>");'>
      </form>    
     </c:otherwise>
