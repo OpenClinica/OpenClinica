@@ -54,11 +54,12 @@ public class ClinicalDataUnit extends OdmUnit {
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, String studySubjectIds,PermissionService permissionService) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, String studySubjectIds,PermissionService permissionService,UserAccountBean userAccountBean) {
         super(ds, dataset, odmBean, study, category);
         this.permissionService = permissionService;
         this.odmClinicalData = new OdmClinicalDataBean();
         this.studySubjectIds = studySubjectIds;
+        this.userAccountBean=userAccountBean;
     }
 
     public void collectOdmClinicalData() {
