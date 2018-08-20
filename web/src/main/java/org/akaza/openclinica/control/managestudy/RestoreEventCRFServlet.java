@@ -64,7 +64,7 @@ public class RestoreEventCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        int eventCRFId = fp.getInt("id");// eventCRFId
+        int eventCRFId = fp.getInt("eventCrfId");// eventCRFId
         int studySubId = fp.getInt("studySubId");// studySubjectId
         checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"));
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
