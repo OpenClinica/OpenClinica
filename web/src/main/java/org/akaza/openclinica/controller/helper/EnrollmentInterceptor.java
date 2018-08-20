@@ -33,8 +33,6 @@ import java.util.Locale;
  * An "interceptor" class that sets up a UserAccount and stores it in the Session, before
  * another class is initialized and potentially uses that UserAccount.
  */
-@EnableWebMvc
-@Configuration
 public class EnrollmentInterceptor extends HandlerInterceptorAdapter {
 
     public static final String USER_BEAN_NAME = "userBean";
@@ -101,5 +99,21 @@ public class EnrollmentInterceptor extends HandlerInterceptorAdapter {
 
         // If there is no current study it shouldn't matter if the variable is set to false.
         return false;
+    }
+
+    public DataSource getDataSource() {
+        return dataSource;
+    }
+
+    public void setDataSource(DataSource dataSource) {
+        this.dataSource = dataSource;
+    }
+
+    public StudyParameterValueDao getStudyParameterValueDao() {
+        return studyParameterValueDao;
+    }
+
+    public void setStudyParameterValueDao(StudyParameterValueDao studyParameterValueDao) {
+        this.studyParameterValueDao = studyParameterValueDao;
     }
 }
