@@ -126,6 +126,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     public static final String VIEW_MODE = "view";
     public static final String EDIT_MODE = "edit";
     public static final String JINI = "jini";
+    private static final String VIEW_NOTES = "ViewNotes";
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -359,7 +360,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);
             }
             request.setAttribute(EnketoFormServlet.FORM_URL, formUrlObject.getFormUrl());
-            request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module + "&listNotes_f_discrepancyNoteBean.disType=Query");
+            String referer = request.getHeader("referer");
+            String[] splitReferer = referer.split(VIEW_NOTES + "\\?");
+            String viewNotesUrl = splitReferer.length > 1 ? VIEW_NOTES + "?" + splitReferer[1]
+                    : VIEW_NOTES + "?" + "module=" + module + "&listNotes_f_discrepancyNoteBean.disType=Query";
+            request.setAttribute(ORIGINATING_PAGE, viewNotesUrl);
             request.setAttribute(JINI, jini);
         }
         return true;
