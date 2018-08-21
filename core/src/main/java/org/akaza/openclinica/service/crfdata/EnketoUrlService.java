@@ -182,8 +182,7 @@ public class EnketoUrlService {
 
     public FormUrlObject getInitialDataEntryUrl(String subjectContextKey, PFormCacheSubjectContextEntry subjectContext, String studyOid,
                                                 String flavor, Role role,
-            String mode, String hash, String loadWarning, boolean isFormLocked) throws Exception {
-        // Call Enketo api to get edit url
+                                                String mode, String hash, String loadWarning, boolean isFormLocked) throws Exception {
         Study parentStudy = enketoCredentials.getParentStudy(studyOid);
         studyOid = parentStudy.getOc_oid();
         EnketoCredentials credentials = EnketoCredentials.getInstance(studyOid);
