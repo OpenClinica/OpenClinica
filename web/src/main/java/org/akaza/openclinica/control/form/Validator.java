@@ -860,7 +860,7 @@ public class Validator {
                 errorMessage = resexception.getString("field_submission_url_not_unique");
                 break;
             case DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS:
-                errorMessage = resexception.getString("id_can_not_contain_html_lessthan_or_greaterthan_elements");
+                errorMessage = resexception.getString("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements");
                 break;
             }
         }

@@ -290,9 +290,7 @@
                                     <td class="table_actions" valign="top">
                                      <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
                                         <c:if test="${!userRole.monitor}">
-                                          <a href="UpdateStudySubject?id=<c:out value="${studySub.id}"/>&amp;action=show">
-                                            Edit
-                                          </a>
+                                        <a href="javascript:;" id="editParticipantID">Edit</a>
                                         </c:if>
                                       </c:if>
                                     </td>
@@ -890,3 +888,107 @@
     </script>
   </c:when>
 </c:choose>
+
+<div id="editSubjectForm" style="display: none">
+    <form name="subjectForm" action="UpdateStudySubject" method="post">
+        <input type="hidden" name="subjectOverlay" value="true">
+        <input type="hidden" name="action" value="confirm"/>
+        <input type="hidden" name="id" value="<c:out value="${studySub.id}"/>"/>
+
+        <table border="0" cellpadding="0" align="center" style="cursor:default;">
+            <tr style="height:10px;">
+                <td class="formlabel" align="left"><h3 class="addNewSubjectTitle"><fmt:message key="update_study_subject_details" bundle="${resword}"/></h3></td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="lines"></div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div style="max-height: 550px; min-width:400px; background:#FFFFFF; overflow-y: auto;">
+                        <table>
+                            <tr valign="top">
+                                <td class="formlabel" align="left">
+                                    <jsp:include page="../include/showSubmitted.jsp"/>
+                                    <input class="form-control" type="hidden" name="addWithEvent" value="1"/><span class="addNewStudyLayout">
+                                <fmt:message key="study_subject_ID" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
+                                </td>
+                                <td valign="top">
+                                    <table border="0" cellpadding="0" cellspacing="0" class="full-width">
+                                        <tr>
+                                            <td valign="top">
+                                                <div class="formfieldXL_BG">
+                                                    <c:choose>
+                                                        <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
+                                                            <input onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45"
+                                                                   class="formfield form-control" disabled>
+                                                            <input class="form-control" type="hidden" name="label" value="<c:out value="${label}"/>">
+                                                        </c:when>
+                                                        <c:otherwise>
+                                                            <input onfocus="this.select()" type="text" name="label" value="<c:out value="${studySub.label}"/>" width="30"
+                                                                   class="formfieldXL form-control">
+                                                        </c:otherwise>
+                                                    </c:choose>
+                                                </div>
+                                            </td>
+                                        </tr>
+                                        <tr>
+                                            <td>
+                                                <jsp:include page="../showMessage.jsp">
+                                                    <jsp:param name="key" value="label"/>
+                                                </jsp:include>
+                                            </td>
+                                        </tr>
+
+                                    </table>
+                                </td>
+                            </tr>
+
+
+                        </table>
+                    </div>
+                </td>
+            </tr>
+            <tr>
+                <td>
+                    <div class="lines"></div>
+                </td>
+            </tr>
+            <tr>
+                <td colspan="2" style="text-align: center;">
+                    <input type="submit" name="Submit" value="Edit"/>
+                    &nbsp;
+                    <a href="javascript:;" id="cancelEdit">
+                    <input type="button" id="cancel" name="cancel" value="Cancel"/>
+                    </a>
+
+                    <div id="dvForCalander_${rand}" style="width:1px; height:1px;"></div>
+                </td>
+            </tr>
+
+        </table>
+
+    </form>
+</div>
+
+<script type="text/javascript">
+
+    var jsAtt = '${showOverlay}';
+
+    if (jsAtt === "true"){
+        jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
+    }
+
+     jQuery(document).ready(function () {
+        jQuery('#editParticipantID').click(function () {
+            jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
+        });
+
+        jQuery('#cancelEdit').click(function () {
+            jQuery.unblockUI();
+            return false;
+        });
+     });
+
+</script>

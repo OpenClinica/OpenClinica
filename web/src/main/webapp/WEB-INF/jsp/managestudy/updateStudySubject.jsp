@@ -96,10 +96,6 @@
           <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include>
         </td>
       </tr>
-
-
-
-
     </table>
     </div>
     </div></div></div></div></div></div></div></div>
