@@ -392,7 +392,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                             if ((!role.equals(Role.MONITOR))
                                                     && studySubject.getStatus().equals(Status.AVAILABLE)
                                                     && studyBean.getStatus().equals(org.akaza.openclinica.bean.core.Status.AVAILABLE)) {
-                                                String removeUrl = "/RemoveEventCRF?action=confirm&id=" + eventCrf.getEventCrfId() + "&studySubId="
+                                                String removeUrl = "/RemoveEventCRF?action=confirm&eventCrfId=" + eventCrf.getEventCrfId() + "&studySubId="
                                                         + studySubject.getStudySubjectId();
                                                 xml.append(indent + indent + indent + indent + indent + indent + "<OpenClinica:link rel=\"remove\" href=\""
                                                         + StringEscapeUtils.escapeXml(removeUrl) + "\"");
