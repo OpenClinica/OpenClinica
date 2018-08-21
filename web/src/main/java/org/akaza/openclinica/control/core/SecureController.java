@@ -538,7 +538,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     currentPublicStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentPublicStudy.getParentStudyId())).getName());
                     request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                     currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId())).getName());
+/*
                     request.setAttribute("requestSchema", "public");
+*/
                 }
                 // YW >>
             }
