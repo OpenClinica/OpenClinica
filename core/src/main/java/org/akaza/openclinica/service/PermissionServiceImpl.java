@@ -168,10 +168,12 @@ public class PermissionServiceImpl implements PermissionService {
         if (currentStudy.getParentStudyId() != 0) {
             studyId = currentStudy.getParentStudyId();
         }
-
         if (ec == null) {
             if (formLayoutId != null && studyEventId != null) {
                 StudyEvent studyEvent = studyEventDao.findById(studyEventId);
+                // if we don't have studyEvent and EventCrf is null then this is a view request, so return true
+                if (studyEvent == null)
+                    return true;
                 FormLayout formLayout = formLayoutDao.findById(formLayoutId);
 
                 if (studyEvent != null && formLayout != null) {
