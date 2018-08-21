@@ -116,7 +116,7 @@ public class ChangeCRFVersionController {
         resetPanel(request);
         ModelMap gridMap = new ModelMap();
 
-        request.setAttribute("eventCRFId", eventCRFId);
+        request.setAttribute("eventCrfId", eventCRFId);
         request.setAttribute("studySubjectLabel", studySubjectLabel);
         request.setAttribute("eventDefinitionCRFId", eventDefinitionCRFId);
         request.setAttribute("studySubjectId", studySubjectId);
@@ -228,13 +228,15 @@ public class ChangeCRFVersionController {
             @RequestParam(value = "formLayoutId", required = false) int formLayoutId,
             @RequestParam(value = "formLayoutName", required = false) String formLayoutName,
             @RequestParam(value = "studySubjectLabel", required = false) String studySubjectLabel,
-            @RequestParam(value = "studySubjectId", required = false) int studySubjectId, @RequestParam(value = "eventCRFId", required = false) int eventCRFId,
+            @RequestParam(value = "studySubjectId", required = false) int studySubjectId,
+            @RequestParam(value = "eventCrfId", required = false) int eventCRFId,
             @RequestParam(value = "eventDefinitionCRFId", required = false) int eventDefinitionCRFId,
             @RequestParam(value = "selectedVersionId", required = false) int selectedVersionId,
             @RequestParam(value = "selectedVersionName", required = false) String selectedVersionName,
             @RequestParam(value = "eventName", required = false) String eventName,
             @RequestParam(value = "eventCreateDate", required = false) String eventCreateDate,
             @RequestParam(value = "eventOrdinal", required = false) String eventOrdinal,
+            @RequestParam(value = "originatingPage", required = false) String originatingPage,
 
             @RequestParam("confirmCRFVersionSubmit") String as)
 
@@ -250,7 +252,7 @@ public class ChangeCRFVersionController {
         selectedVersionName = (formLayoutDao.findByPK(selectedVersionId)).getName().trim();
 
         resetPanel(request);
-        request.setAttribute("eventCRFId", eventCRFId);
+        request.setAttribute("eventCrfId", eventCRFId);
         request.setAttribute("studySubjectLabel", studySubjectLabel);
         request.setAttribute("eventDefinitionCRFId", eventDefinitionCRFId);
         request.setAttribute("studySubjectId", studySubjectId);
@@ -266,6 +268,8 @@ public class ChangeCRFVersionController {
         request.setAttribute("eventName", eventName);
         request.setAttribute("eventCreateDate", eventCreateDate);
         request.setAttribute("eventOrdinal", eventOrdinal);
+        request.setAttribute("originatingPage", originatingPage);
+
 
         ModelMap gridMap = new ModelMap();
         ArrayList<String> pageMessages = initPageMessages(request);
@@ -283,9 +287,11 @@ public class ChangeCRFVersionController {
             params.append("&selectedVersionName=" + selectedVersionName);
             params.append("&studySubjectLabel=" + studySubjectLabel);
             params.append("&studySubjectId=" + studySubjectId);
-            params.append("&eventCRFId=" + eventCRFId);
+            params.append("&eventCrfId=" + eventCRFId);
             params.append("&eventDefinitionCRFId=" + eventDefinitionCRFId);
             params.append("&errorMessage=" + errorMessage);
+            params.append("&originatingPage=" + originatingPage);
+
 
             if (redirect(request, response, params.toString()) == null) {
                 return null;
@@ -511,7 +517,7 @@ public class ChangeCRFVersionController {
     public ModelMap changeCRFVersionAction(HttpServletRequest request, HttpServletResponse response, @RequestParam("crfId") int crfId,
             @RequestParam("crfName") String crfName, @RequestParam("formLayoutId") int formLayoutId, @RequestParam("formLayoutName") String formLayoutName,
             @RequestParam("studySubjectLabel") String studySubjectLabel, @RequestParam("studySubjectId") int studySubjectId,
-            @RequestParam("eventCRFId") int eventCRFId, @RequestParam("eventDefinitionCRFId") int eventDefinitionCRFId,
+            @RequestParam("eventCrfId") int eventCRFId, @RequestParam("eventDefinitionCRFId") int eventDefinitionCRFId,
             @RequestParam(value = "newFormLayoutId", required = true) int newFormLayoutId)
 
     {

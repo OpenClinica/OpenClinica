@@ -76,7 +76,7 @@ public class RemoveEventCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        int eventCRFId = fp.getInt("id");// eventCRFId
+        int eventCRFId = fp.getInt("eventCrfId");// eventCRFId
         int studySubId = fp.getInt("studySubId");// studySubjectId
         checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"));
         String originatingPage = request.getParameter(ORIGINATING_PAGE);

@@ -141,13 +141,13 @@
 	</c:choose>
    <c:choose>
     <c:when test="${!empty items && count>0}">
-     <form action='RemoveEventCRF?action=submit&id=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
+     <form action='RemoveEventCRF?action=submit&eventCrfId=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
       <input type="submit" name="submit" value="<fmt:message key="remove_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="this_crf_has_data_remove" bundle="${resword}"/>");'>
       <input type="button" onclick="confirmCancel('ViewStudyEvents');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
      </form>
     </c:when>
     <c:otherwise>
-      <form action='RemoveEventCRF?action=submit&id=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
+      <form action='RemoveEventCRF?action=submit&eventCrfId=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
       <input type="submit" name="submit" value="<fmt:message key="remove_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_remove_it" bundle="${resword}"/>");'>
       <input type="button" onclick="confirmCancel('ViewStudyEvents');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
      </form>

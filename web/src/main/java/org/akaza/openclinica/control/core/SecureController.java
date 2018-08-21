@@ -1388,8 +1388,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     public boolean hasFormAccess(EventCrf ec) {
-        Integer formLayoutId = new Integer(request.getParameter("formLayoutId"));
-        Integer studyEventId = new Integer(request.getParameter("studyEventId"));
+        Integer formLayoutId = request.getParameter("formLayoutId") != null? new Integer(request.getParameter("formLayoutId")) : null;
+        Integer studyEventId = request.getParameter("studyEventId") != null? new Integer(request.getParameter("studyEventId")) : null;
         PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
         return permissionService.hasFormAccess(ec, formLayoutId, studyEventId, request);
     }

@@ -240,7 +240,7 @@
     <%-- nothing for right now --%>&nbsp;
 </c:when>
 <c:otherwise>
-<c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
+<c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCrfId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
 <tr valign="top">
 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" /></td>
 
@@ -579,7 +579,7 @@
  (study.status.available )
  && !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)}">
 
-  <td>  <a class="accessCheck" href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}" />&formLayoutName=<c:out value="${dec.eventCRF.formLayout.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>"
+  <td>  <a class="accessCheck" href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}" />&formLayoutName=<c:out value="${dec.eventCRF.formLayout.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
    onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
    onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><span
       name="Reassign" class="icon icon-icon-reassign3" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="6"></span></a>
