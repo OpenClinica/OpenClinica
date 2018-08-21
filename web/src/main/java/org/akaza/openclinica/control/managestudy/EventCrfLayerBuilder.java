@@ -550,28 +550,28 @@ public class EventCrfLayerBuilder {
     }
 
     private void removeEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject) {
-        String href = "RemoveEventCRF?action=confirm&id=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
+        String href = "RemoveEventCRF?action=confirm&eventCrfId=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
         builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-cancel\"/>");
         builder.aEnd();
     }
 
     private void removeEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, String link) {
-        String href = "RemoveEventCRF?action=confirm&id=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
+        String href = "RemoveEventCRF?action=confirm&eventCrfId=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
         builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
         builder.aEnd();
     }
 
     private void restoreEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject) {
-        String href = "RestoreEventCRF?action=confirm&id=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
+        String href = "RestoreEventCRF?action=confirm&eventCrfId=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
         builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append("<span border=\"0\" align=\"left\" class=\"icon icon-ccw\"/>");
         builder.aEnd();
     }
 
     private void restoreEventCrf(HtmlBuilder builder, EventCRFBean eventCrf, StudySubjectBean studySubject, String link) {
-        String href = "RestoreEventCRF?action=confirm&id=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
+        String href = "RestoreEventCRF?action=confirm&eventCrfId=" + eventCrf.getId() + "&studySubId=" + studySubject.getId();
         builder.a().append(" class=\"accessCheck\"  ").href(href).close();
         builder.append(link);
         builder.aEnd();
