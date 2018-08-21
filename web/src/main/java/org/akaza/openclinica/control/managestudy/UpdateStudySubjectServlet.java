@@ -7,10 +7,8 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
-import java.util.Calendar;
 import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
@@ -24,12 +22,10 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.control.admin.UpdateSubjectServlet;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -46,7 +42,6 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.apache.commons.lang.StringUtils;
 
 /**
  * @author jxu Processes request to update a study subject
@@ -54,6 +49,10 @@ import org.apache.commons.lang.StringUtils;
 public class UpdateStudySubjectServlet extends SecureController {
 
     SimpleDateFormat yformat = new SimpleDateFormat("yyyy");
+
+    StudySubjectBean studySub;
+    SubjectBean subject;
+    FormDiscrepancyNotes formDiscNotes;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -66,7 +65,7 @@ public class UpdateStudySubjectServlet extends SecureController {
         }
 
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
-            || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) {
+                || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) {
             return;
         }
 
@@ -76,13 +75,13 @@ public class UpdateStudySubjectServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        FormDiscrepancyNotes formDiscNotes = null;
         StudyDAO stdao = new StudyDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO studySubdao = new StudySubjectDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
+        boolean updateIsValid = false;
 
-        String fromResolvingNotes = fp.getString("fromResolvingNotes",true);
+        String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
         if (StringUtil.isBlank(fromResolvingNotes)) {
             session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
             session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
@@ -90,7 +89,7 @@ public class UpdateStudySubjectServlet extends SecureController {
             checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"));
         }
 
-        int studySubId = fp.getInt("id", true);// studySubjectId
+        int studySubId = Integer.valueOf(fp.getString("id"));
 
         if (studySubId == 0) {
             addPageMessage(respage.getString("please_choose_study_subject_to_edit"));
@@ -103,10 +102,10 @@ public class UpdateStudySubjectServlet extends SecureController {
                 return;
             }
 
-            StudySubjectBean studySub = (StudySubjectBean) studySubdao.findByPK(studySubId);
-            SubjectBean subject = (SubjectBean) sdao.findByPK(studySub.getSubjectId());
+            studySub = (StudySubjectBean) studySubdao.findByPK(studySubId);
+            subject = (SubjectBean) sdao.findByPK(studySub.getSubjectId());
             StudyBean study = (StudyBean) stdao.findByPK(studySub.getStudyId());
-            
+
 
             StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
             StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
@@ -149,28 +148,28 @@ public class UpdateStudySubjectServlet extends SecureController {
 
                 session.setAttribute("studySub", studySub);
                 session.setAttribute("subject", subject);
-                
+
                 List<DiscrepancyNoteBean> discNotes = getDiscNotesForSubjectStudySubject(study, subject.getId(), studySub.getId());
                 setRequestAttributesForNotes(discNotes);
-                
+
 
                 formDiscNotes = new FormDiscrepancyNotes();
                 session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, formDiscNotes);
-                
-
 
 
                 forwardPage(Page.UPDATE_STUDY_SUBJECT);
             } else if ("confirm".equalsIgnoreCase(action)) {
+                session.setAttribute("subject", subject);
                 List<DiscrepancyNoteBean> discNotes = getDiscNotesForSubjectStudySubject(study, subject.getId(), studySub.getId());
                 setRequestAttributesForNotes(discNotes);
-                confirm(sgdao);
+                updateIsValid = validateEditSubject(sgdao);
 
-            } else if ("submit".equalsIgnoreCase(action)) {// submit to DB
-                StudySubjectBean studySubject = (StudySubjectBean) session.getAttribute("studySub");
-                SubjectBean sub = (SubjectBean) session.getAttribute("subject");
+            }
 
-                studySubject.setUpdater(ub);
+            // This block commits the update to the DB, should be based on the if above.
+            if (updateIsValid) {
+
+                studySub.setUpdater(ub);
 
                 // TODO remove these once we clear the study parameter config
                 /*
@@ -191,16 +190,16 @@ public class UpdateStudySubjectServlet extends SecureController {
                     }
                 }
                 */
-                sub.setUpdater(ub);
-                
-                updateClosedQueriesForUpdatedStudySubjectFields(study, sub, studySubject);
-                studySubdao.update(studySubject);
-                sdao.update(sub);
+                subject.setUpdater(ub);
+
+                updateClosedQueriesForUpdatedStudySubjectFields(study, subject, studySub);
+                studySubdao.update(studySub);
+                sdao.update(subject);
 
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
-                AddNewSubjectServlet.saveFieldNotes("enrollmentDate", fdn, dndao, studySubject.getId(), "studySub", currentStudy);
+                AddNewSubjectServlet.saveFieldNotes("enrollmentDate", fdn, dndao, studySub.getId(), "studySub", currentStudy);
 
                 ArrayList groups = (ArrayList) session.getAttribute("groups");
                 if (!groups.isEmpty()) {
@@ -208,9 +207,9 @@ public class UpdateStudySubjectServlet extends SecureController {
                         StudyGroupClassBean sgc = (StudyGroupClassBean) groups.get(i);
                         /*We will be allowing users to remove a subject from all groups. Issue-4524*/
                         if (sgc.getStudyGroupId() == 0) {
-                            Collection subjectGroups = sgmdao.findAllByStudySubject(studySubject.getId());
-                            for (Iterator it = subjectGroups.iterator(); it.hasNext();) {
-                                sgmdao.deleteTestGroupMap(((SubjectGroupMapBean)it.next()).getId());
+                            Collection subjectGroups = sgmdao.findAllByStudySubject(studySub.getId());
+                            for (Iterator it = subjectGroups.iterator(); it.hasNext(); ) {
+                                sgmdao.deleteTestGroupMap(((SubjectGroupMapBean) it.next()).getId());
                             }
                         } else {
                             SubjectGroupMapBean sgm = new SubjectGroupMapBean();
@@ -218,7 +217,7 @@ public class UpdateStudySubjectServlet extends SecureController {
                             sgm.setStudyGroupId(sgc.getStudyGroupId());
                             sgm.setNotes(sgc.getGroupNotes());
                             sgm.setStudyGroupClassId(sgc.getId());
-                            sgm.setStudySubjectId(studySubject.getId());
+                            sgm.setStudySubjectId(studySub.getId());
                             sgm.setStatus(Status.AVAILABLE);
                             if (sgm.getStudyGroupId() > 0) {
                                 if (gMap != null && gMap.getId() > 0) {
@@ -242,12 +241,7 @@ public class UpdateStudySubjectServlet extends SecureController {
                 session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 request.setAttribute("id", new Integer(studySubId).toString());
 
-                // forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
-                response.sendRedirect(request.getContextPath() + "/ViewStudySubject?id=" +  new Integer(studySubId).toString());
-            } else {
-                addPageMessage(respage.getString("no_action_specified"));
-                forwardPage(Page.LIST_STUDY_SUBJECTS);
-                return;
+                response.sendRedirect(request.getContextPath() + "/ViewStudySubject?id=" + new Integer(studySubId).toString());
             }
 
         }
@@ -262,7 +256,7 @@ public class UpdateStudySubjectServlet extends SecureController {
 
         List<DiscrepancyNoteBean> discNotes = getDiscNotesForSubjectStudySubject(study, updatedStudySubject.getSubjectId(), updatedStudySubject.getId());
 
-        for (DiscrepancyNoteBean note: discNotes) {
+        for (DiscrepancyNoteBean note : discNotes) {
             if (note.getColumn().equals("enrollment_date") && note.getResStatus().equals(ResolutionStatus.CLOSED) &&
                     !existingStudySubject.getEnrollmentDate().equals(updatedStudySubject.getEnrollmentDate())) {
                 note.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());
@@ -322,26 +316,22 @@ public class UpdateStudySubjectServlet extends SecureController {
         return child;
     }
 
-    /**
-     * Processes 'confirm' request, validate the study subject object
-     *
-     * @throws Exception
-     */
-    private void confirm(StudyGroupDAO sgdao) throws Exception {
+    // Due to a change in page flow, this method mostly handles validation checks.
+    private boolean validateEditSubject(StudyGroupDAO sgdao) throws Exception {
         HashMap manualErrors = new HashMap();
-        ArrayList classes = (ArrayList) session.getAttribute("groups");
-        SubjectBean subject = (SubjectBean) session.getAttribute("subject");
-        StudySubjectBean studySub = (StudySubjectBean) session.getAttribute("studySub");
-        FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-        DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
+        FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
+
+        DiscrepancyValidator validator = new DiscrepancyValidator(request, discNotes);
         FormProcessor fp = new FormProcessor(request);
 
-        // Update: allow data entry person role to edit subject on study level (https://jira.openclinica.com/browse/OC-8620)
-        if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant2()){
+        int studySubId = Integer.valueOf(fp.getString("id"));
 
-            v.addValidation("label", Validator.NO_BLANKS);
-            v.addValidation("label", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
-            v.addValidation("label", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
+        // Update: allow data entry person role to edit subject on study level (https://jira.openclinica.com/browse/OC-8620)
+        if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant2()) {
+
+            validator.addValidation("label", Validator.NO_BLANKS);
+            validator.addValidation("label", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
+            validator.addValidation("label", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
 
             if (!StringUtil.isBlank(fp.getString("label"))) {
                 StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
@@ -357,21 +347,18 @@ public class UpdateStudySubjectServlet extends SecureController {
 
             studySub.setLabel(fp.getString("label"));
             subject.setGender(' ');
-            errors = v.validate();
+            errors = validator.validate();
             addMultipleErrors(manualErrors);
 
             session.setAttribute("studySub", studySub);
             session.setAttribute("subject", subject);
-    
-
-
 
             if (!errors.isEmpty()) {
                 logger.info("has errors");
                 if (StringUtil.isBlank(studySub.getLabel())) {
                     addPageMessage(respage.getString("must_enter_subject_ID_for_identifying") + respage.getString("this_may_be_external_ID_number")
-                        + respage.getString("you_may_enter_study_subject_ID_listed")
-                        + respage.getString("study_subject_ID_should_not_contain_protected_information"));
+                            + respage.getString("you_may_enter_study_subject_ID_listed")
+                            + respage.getString("study_subject_ID_should_not_contain_protected_information"));
                 } else {
                     StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
                     StudySubjectBean sub1 = (StudySubjectBean) subdao.findAnotherBySameLabel(studySub.getLabel(), studySub.getStudyId(), studySub.getId());
@@ -380,38 +367,43 @@ public class UpdateStudySubjectServlet extends SecureController {
                     }
                 }
 
-                request.setAttribute("formMessages", errors);
-                forwardPage(Page.UPDATE_STUDY_SUBJECT);
-    
+                addPageMessage(respage.getString("there_were_some_errors_submission"));
+
+                setInputMessages(errors);
+                fp.addPresetValue("label", fp.getString("label"));
+                setPresetValues(fp.getPresetValues());
+
+                Object isSubjectOverlay = fp.getRequest().getParameter("subjectOverlay");
+                request.setAttribute("showOverlay", true);
+                request.setAttribute("subjectId", fp.getString("label"));
+                forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+
+                return false;
+
             } else {
-                forwardPage(Page.UPDATE_STUDY_SUBJECT_CONFIRM);
+                return true;
             }
         }
-
+        addPageMessage(resexception.getString("no_permission"));
+        return false;
     }
 
 
-    private void setLocalDOB(SubjectBean subject){
+    private void setLocalDOB(SubjectBean subject) {
         Date birthDate = subject.getDateOfBirth();
-        try 
-        {
-            if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1"))
-            {
+        try {
+            if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
                 String localBirthDate = local_df.format(birthDate);
                 request.setAttribute("localBirthDate", localBirthDate);
-            }
-            else if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
-            {
+            } else if (currentStudy.getStudyParameterConfig().getCollectDob().equals("2")) {
                 String localBirthDate = yformat.format(birthDate);
                 request.setAttribute("localBirthDate", localBirthDate);
             }
-        }
-        catch (NullPointerException e) 
-        {
+        } catch (NullPointerException e) {
             logger.debug("update subject: cannot convert date " + birthDate);
         }
     }
-    
+
     private List<DiscrepancyNoteBean> getDiscNotesForSubjectStudySubject(StudyBean study, Integer subjectId, Integer studySubId) {
         // If the study subject derives from a site, and is being viewed from a parent study,
         // then the study IDs will be different. However, since each note is
@@ -441,6 +433,7 @@ public class UpdateStudySubjectServlet extends SecureController {
         }
         return allNotesforSubject;
     }
+
     private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans) {
         for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
             if ("unique_identifier".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
@@ -460,7 +453,8 @@ public class UpdateStudySubjectServlet extends SecureController {
         }
 
     }
-    private void addMultipleErrors(Map<String,List<String>> newErrors) {
+
+    private void addMultipleErrors(Map<String, List<String>> newErrors) {
         for (String newField : newErrors.keySet()) {
             List<String> newFieldErrors = (List<String>) newErrors.get(newField);
             List<String> fieldErrors;
