@@ -656,7 +656,7 @@
 </script>
 
 <div id="navAddSubjectForm" style="display: none">
-    <form name="subjectForm" action="AddNewSubject" method="post">
+    <form name="subjectForm" action="${pageContext.request.contextPath}/AddNewSubject" method="post">
         <input type="hidden" name="subjectOverlay" value="true">
 
         <table border="0" cellpadding="0" align="center" style="cursor:default;">
