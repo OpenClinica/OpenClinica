@@ -2,6 +2,7 @@ package org.akaza.openclinica.controller;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -380,11 +382,10 @@ public class SDVController {
         ArrayList<String> pageMessages = new ArrayList<String>();
 
         if (hasFormAccess(crfId ,request) != true) {
-            pageMessages.add("You do not have permission to access this form");
-            request.setAttribute("sdv_restore", "false");
-            request.setAttribute("pageMessages", pageMessages);
-            sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
-      return null;
+            Page page1 = Page.valueOf(Page.NO_ACCESS.name());
+            String temp = page1.getFileName();
+            sdvUtil.forwardRequestFromController(request, response, temp);
+            return null;
         }
 
 
@@ -427,13 +428,12 @@ public class SDVController {
         eventCRFIds.add(crfId);
         boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), false);
 
-        if (hasFormAccess(crfId ,request) != false) {
-            pageMessages.add("You do not have permission to access this form");
-            request.setAttribute("sdv_restore", "true");
-            request.setAttribute("pageMessages", pageMessages);
-            sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
+        if (hasFormAccess(crfId ,request) != true) {
+            Page page1 = Page.valueOf(Page.NO_ACCESS.name());
+            String temp = page1.getFileName();
+            sdvUtil.forwardRequestFromController(request, response, temp);
             return null;
-        }
+            }
 
 
         if (updateCRFs) {

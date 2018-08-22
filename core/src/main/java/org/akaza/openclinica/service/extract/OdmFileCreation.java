@@ -207,15 +207,15 @@ public class OdmFileCreation {
                 // report.setOdmStudy(mdc.getOdmStudy());
                 report.setOdmBean(mdc.getODMBean());
                 if (firstIteration && fromIndex >= newRows.size()) {
-                    report.createChunkedOdmXml(Boolean.TRUE, true, true, this.dataSource, userBean,permissionService);
+                    report.createChunkedOdmXml(Boolean.TRUE, true, true, this.dataSource, userBean,permissionService,null);
                     firstIteration = false;
                 } else if (firstIteration) {
-                    report.createChunkedOdmXml(Boolean.TRUE, true, false, this.dataSource, userBean,permissionService);
+                    report.createChunkedOdmXml(Boolean.TRUE, true, false, this.dataSource, userBean,permissionService,null);
                     firstIteration = false;
                 } else if (fromIndex >= newRows.size()) {
-                    report.createChunkedOdmXml(Boolean.TRUE, false, true, this.dataSource, userBean,permissionService);
+                    report.createChunkedOdmXml(Boolean.TRUE, false, true, this.dataSource, userBean,permissionService,null);
                 } else {
-                    report.createChunkedOdmXml(Boolean.TRUE, false, false, this.dataSource, userBean,permissionService);
+                    report.createChunkedOdmXml(Boolean.TRUE, false, false, this.dataSource, userBean,permissionService,null);
                 }
                 fId = createFileK(ODMXMLFileName, generalFileDir, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false,
                         zipped, deleteOld, userBean);
