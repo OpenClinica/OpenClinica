@@ -33,6 +33,8 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.PermissionService;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -157,7 +159,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
            if(crossForm) {
                permissionTags=loadPermissionTags();
            }else{
-               permissionTags =permissionService.getPermissionTagsStringArrayWithoutRequest(studyBean,userBean.getUserUuid());
+               permissionTags =permissionService.getPermissionTagsStringArrayWithoutRequest(studyBean,userBean.getUserUuid(),getRequest());
            }
 
             List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean,permissionTags );
@@ -954,4 +956,13 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         }
         return tagsSet.toArray(new String[0]);
     }
+    private HttpServletRequest getRequest() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            return request;
+        }
+        return null;
+    }
+
 }
