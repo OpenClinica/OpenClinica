@@ -112,19 +112,19 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	}
 
-	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID,int userId) {
+	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID,int userId,boolean crossForm) {
 		LinkedHashMap<String, OdmClinicalDataBean> hm = new LinkedHashMap<String, OdmClinicalDataBean>();
 
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
 		List<StudySubject> studySubjs = study.getStudySubjects();
 		if (study.getStudies().size() < 1) {
-			hm.put(studyOID, constructClinicalData(study, studySubjs,userId));
+			hm.put(studyOID, constructClinicalData(study, studySubjs,userId,crossForm));
 		}
 		// return odmClinicalDataBean;
 		else {
-			hm.put(studyOID, constructClinicalData(study, studySubjs,userId));// at study level
+			hm.put(studyOID, constructClinicalData(study, studySubjs,userId,crossForm));// at study level
 			for (Study s : study.getStudies()) {// all the sites
-				hm.put(s.getOc_oid(), constructClinicalData(s, s.getStudySubjects(),userId));
+				hm.put(s.getOc_oid(), constructClinicalData(s, s.getStudySubjects(),userId,crossForm));
 			}
 		}
 
@@ -140,10 +140,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return studySubjs;
 	}
 
-	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID,int userId) {
+	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID,int userId ,boolean crossForm) {
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
 
-		return constructClinicalData(study, listStudySubjects(studySubjectOID),userId);
+		return constructClinicalData(study, listStudySubjects(studySubjectOID),userId,crossForm);
 	}
 
 	public StudyDao getStudyDao() {
@@ -154,12 +154,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		this.studyDao = studyDao;
 	}
 
-	private OdmClinicalDataBean constructClinicalData(Study study, List<StudySubject> studySubjs,int userId) {
+	private OdmClinicalDataBean constructClinicalData(Study study, List<StudySubject> studySubjs,int userId,boolean crossForm  ) {
 
-		return constructClinicalDataStudy(studySubjs, study, null, null,userId);
+		return constructClinicalDataStudy(studySubjs, study, null, null,userId,crossForm);
 	}
 
-	private OdmClinicalDataBean constructClinicalDataStudy(List<StudySubject> studySubjs, Study study, List<StudyEvent> studyEvents, String formVersionOID,int userId) {
+	private OdmClinicalDataBean constructClinicalDataStudy(List<StudySubject> studySubjs, Study study, List<StudyEvent> studyEvents, String formVersionOID,int userId,boolean crossForm) {
 		OdmClinicalDataBean odmClinicalDataBean = new OdmClinicalDataBean();
 		ExportSubjectDataBean expSubjectBean;
 		List<ExportSubjectDataBean> exportSubjDataBeanList = new ArrayList<ExportSubjectDataBean>();
@@ -167,7 +167,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			studyEvents = (ArrayList<StudyEvent>) getStudySubjectDao().fetchListSEs(studySubj.getOcOid());
 
 			if (studyEvents != null) {
-				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID,userId);
+				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID,userId,crossForm);
 				exportSubjDataBeanList.add(expSubjectBean);
 
 				odmClinicalDataBean.setExportSubjectData(exportSubjDataBeanList);
@@ -180,7 +180,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	@SuppressWarnings("unchecked")
-	private ExportSubjectDataBean setExportSubjectDataBean(StudySubject studySubj, Study study, List<StudyEvent> studyEvents, String formVersionOIDs,int userId) {
+	private ExportSubjectDataBean setExportSubjectDataBean(StudySubject studySubj, Study study, List<StudyEvent> studyEvents, String formVersionOIDs,int userId,boolean crossForm) {
 
 		ExportSubjectDataBean exportSubjectDataBean = new ExportSubjectDataBean();
 
@@ -215,7 +215,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			if (isCollectDns())
 				exportSubjectDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(studySubj));
 
-			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(study, studySubj, studyEvents,formVersionOIDs,userId));
+			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(study, studySubj, studyEvents,formVersionOIDs,userId,crossForm));
 
 			exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
 
@@ -241,7 +241,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return subjectBelongs;
 	}
 
-	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(Study study, StudySubject ss, List<StudyEvent> sEvents, String formVersionOID, int userId) {
+	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(Study study, StudySubject ss, List<StudyEvent> sEvents, String formVersionOID, int userId,boolean crossForm) {
 		ArrayList<ExportStudyEventDataBean> al = new ArrayList<ExportStudyEventDataBean>();
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -279,7 +279,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				if (collectDns)
 					expSEBean.setDiscrepancyNotes(fetchDiscrepancyNotes(se));
 
-				expSEBean.setExportFormData(getFormDataForClinicalStudy(study, ss, se, formVersionOID,userId));
+				expSEBean.setExportFormData(getFormDataForClinicalStudy(study, ss, se, formVersionOID,userId,crossForm));
 				expSEBean.setStudyEventDefinition(se.getStudyEventDefinition());
 				al.add(expSEBean);
 			}
@@ -288,7 +288,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return al;
 	}
 
-	private ArrayList<ExportFormDataBean> getFormDataForClinicalStudy(Study study, StudySubject ss, StudyEvent se, String formVersionOID,int userId) {
+	private ArrayList<ExportFormDataBean> getFormDataForClinicalStudy(Study study, StudySubject ss, StudyEvent se, String formVersionOID,int userId,boolean crossForm) {
 		List<ExportFormDataBean> formDataBean = new ArrayList<ExportFormDataBean>();
 		boolean formCheck = true;
 		if (formVersionOID != null)
@@ -337,7 +337,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			studyBean.setParentStudyId(study.getStudy()!=null?study.getStudy().getStudyId():0);
 
 			UserAccount userAccount = getUserAccountDao().findByUserId(userId);
-			List<String> tagIds = permissionService.getPermissionTagsListWithoutRequest(studyBean,userAccount.getUserUuid());
+			List<String> tagIds = null;
+			if(crossForm) {
+				tagIds = loadPermissionTags();
+			}else{
+				 tagIds = permissionService.getPermissionTagsListWithoutRequest(studyBean,userAccount.getUserUuid(),getRequest());
+			}
 
 			List <EventDefinitionCrfPermissionTag> edcPTagIds=
 					getEventDefinitionCrfPermissionTagDao().findByEdcIdTagId(
@@ -860,7 +865,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	 */
 	@Override
 	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID,
-			Boolean collectDNs, Boolean collectAudit, Locale locale, int userId) {
+			Boolean collectDNs, Boolean collectAudit, Locale locale, int userId , boolean crossForm) {
 		setLocale(locale);
 		setCollectDns(collectDNs);
 		setCollectAudits(collectAudit);
@@ -900,23 +905,23 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			LOGGER.debug("Adding all the study events,formevents as it is a *");
 			LOGGER.debug("study subject is not all and so is study");
 
-			clinicalDataHash.put(studyOID, getClinicalData(studyOID, studySubjectOID,userId));
+			clinicalDataHash.put(studyOID, getClinicalData(studyOID, studySubjectOID,userId,crossForm));
 
 			return clinicalDataHash;
 		} else if (studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL) && studySubjectOID.equals(INDICATE_ALL)
 				&& !studyOID.equals(INDICATE_ALL)) {
 			LOGGER.info("At the study level.. study event,study subject and forms are *");
-			return getClinicalData(studyOID,userId);
+			return getClinicalData(studyOID,userId,crossForm);
 		} else if (!studyEventOID.equals(INDICATE_ALL) && !studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL)
 				&& formVersionOID.equals(INDICATE_ALL)) {
 			LOGGER.info("Obtaining the form version specific");
-			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, null,userId));
+			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, null,userId,crossForm));
 			return clinicalDataHash;
 		}
 
 		else if (!studyEventOID.equals(INDICATE_ALL) && !studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL)
 				&& !formVersionOID.equals(INDICATE_ALL)) {
-			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, formVersionOID,userId));
+			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, formVersionOID,userId,crossForm));
 			return clinicalDataHash;
 		}
 
@@ -931,7 +936,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return locale;
 	}
 
-	private OdmClinicalDataBean getClinicalDatas(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID,int userId) {
+	private OdmClinicalDataBean getClinicalDatas(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID,int userId,boolean crossForm) {
 		int seOrdinal = 0;
 		String temp = studyEventOID;
 		List<StudyEvent> studyEvents = new ArrayList<StudyEvent>();
@@ -956,7 +961,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 		}
 
-		return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID,userId);
+		return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID,userId,crossForm);
 	}
 
 	private List<StudyEvent> fetchSE(int seOrdinal, List<StudyEvent> studyEvents, String ssOID) {
@@ -1028,5 +1033,16 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	public void setEventDefinitionCrfPermissionTagDao(EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao) {
 		this.eventDefinitionCrfPermissionTagDao = eventDefinitionCrfPermissionTagDao;
+	}
+	private List <String> loadPermissionTags(){
+		List<EventDefinitionCrfPermissionTag> tags = getEventDefinitionCrfPermissionTagDao().findAll();
+
+		List<String> tagsList = new ArrayList<>();
+		for (EventDefinitionCrfPermissionTag tag : tags) {
+			if(!tagsList.contains(tag.getPermissionTagId())) {
+				tagsList.add(tag.getPermissionTagId());
+			}
+		}
+		return tagsList;
 	}
 }

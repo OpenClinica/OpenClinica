@@ -10,6 +10,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.*;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -42,6 +43,9 @@ public class MetadataCollectorResource {
 
     @Autowired
     private RuleSetRuleDao ruleSetRuleDao;
+
+    @Autowired
+    private EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
 
     @Autowired
     private CoreResources coreResources;
@@ -98,7 +102,7 @@ public class MetadataCollectorResource {
 
         StudyBean studyBean = getStudyDao().findByOid(studyOID);
 
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao());
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),null,null);
         AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
         MetaDataCollector.setTextLength(200);
 
@@ -154,7 +158,7 @@ public class MetadataCollectorResource {
         StudyBean studyBean = getStudyDao().findByOid(studyOID);
         if (studyBean != null)
             studyBean = populateStudyBean(studyBean);
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao());
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),null,null);
         AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
         MetaDataCollector.setTextLength(200);
 
@@ -187,11 +191,11 @@ public class MetadataCollectorResource {
     }
 
     public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
-                                                            boolean clinical, boolean showArchived, PermissionService permissionService , UserAccountBean userAccountBean) {
+                                                            boolean crossForm, boolean showArchived, PermissionService permissionService , UserAccountBean userAccountBean) {
         StudyBean studyBean = getStudyDao().findByOid(studyOID);
         if (studyBean != null)
             studyBean = populateStudyBean(studyBean);
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived,permissionService,userAccountBean);
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived,permissionService,userAccountBean,crossForm,eventDefinitionCrfPermissionTagDao);
         AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
         MetaDataCollector.setTextLength(200);
 
@@ -213,7 +217,7 @@ public class MetadataCollectorResource {
         adc.collectFileData();
 
         FullReportBean report = new FullReportBean();
-        if (!clinical) {
+        if (!crossForm) {
             report.setAdminDataMap(adc.getOdmAdminDataMap());
             report.setOdmStudyMap(mdc.getOdmStudyMap());
         } else {

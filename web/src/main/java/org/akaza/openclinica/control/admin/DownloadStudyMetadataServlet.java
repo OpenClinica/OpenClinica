@@ -14,14 +14,18 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.logic.odmExport.AdminDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
 public class DownloadStudyMetadataServlet extends SecureController {
     public static String STUDY_ID = "studyId";
+
 
     /**
      * Checks whether the user has the correct privilege
@@ -41,7 +45,9 @@ public class DownloadStudyMetadataServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        MetaDataCollector mdc = new MetaDataCollector(sm.getDataSource(), currentStudy, getRuleSetRuleDao());
+        PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
+
+        MetaDataCollector mdc = new MetaDataCollector(sm.getDataSource(), currentStudy, getRuleSetRuleDao(),ub,permissionService);
         AdminDataCollector adc = new AdminDataCollector(sm.getDataSource(), currentStudy);
         MetaDataCollector.setTextLength(200);
 

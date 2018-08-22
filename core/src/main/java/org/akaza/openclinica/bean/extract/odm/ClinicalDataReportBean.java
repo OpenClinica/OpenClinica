@@ -20,6 +20,7 @@ import org.akaza.openclinica.bean.submit.crfdata.*;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -32,11 +33,15 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.PermissionService;
 import org.apache.commons.lang.StringEscapeUtils;
 import org.springframework.util.StringUtils;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+import java.awt.*;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.List;
 import java.util.stream.Collectors;
 
 /**
@@ -53,14 +58,19 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
     private final String COMMON = "common";
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private StudyDAO sdao;
-    PermissionService permissionService;
+    private PermissionService permissionService;
+    private EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
+    private boolean crossForm;
 
-    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean,PermissionService permissionService) {
+    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean,PermissionService permissionService , EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao , boolean crossForm) {
         super();
         this.clinicalData = clinicaldata;
         this.dataSource = dataSource;
         this.userBean = userBean;
         this.permissionService=permissionService;
+        this.eventDefinitionCrfPermissionTagDao=eventDefinitionCrfPermissionTagDao;
+        this.crossForm=crossForm;
+
     }
 
     /**
@@ -73,7 +83,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         // this.addRootEndLine();
     }
 
-    public void addNodeClinicalData(boolean header, boolean footer, boolean clinical) {
+    public void addNodeClinicalData(boolean header, boolean footer) {
         String ODMVersion = this.getODMVersion();
         // when collecting data, only item with value has been collected.
         StringBuffer xml = this.getXmlOutput();
@@ -93,7 +103,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             role = userRole.getRole();
         }
 
-        if (clinical) {
+        if (crossForm) {
             xml.append(indent + indent + "<UserInfo OpenClinica:UserName=\"" + StringEscapeUtils.escapeXml(userBean.getName()) + "\" OpenClinica:UserRole=\"" + StringEscapeUtils.escapeXml(role.getDescription()) + "\"/>");
         }
 
@@ -146,7 +156,11 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             // List<EventDefinitionCRFBean> edcs = edcdao.findAllByStudy(parentStudyBean);
 
             String[] permissionTags = null;
-           permissionTags =permissionService.getPermissionTagsStringArrayWithoutRequest(studyBean,userBean.getUserUuid());
+           if(crossForm) {
+               permissionTags=loadPermissionTags();
+           }else{
+               permissionTags =permissionService.getPermissionTagsStringArrayWithoutRequest(studyBean,userBean.getUserUuid(),getRequest());
+           }
 
             List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean,permissionTags );
 
@@ -185,7 +199,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             //
             for (ExportStudyEventDataBean se : ses) {
 
-                if ((!clinical || (clinical && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) && se.getExportFormData().size()!=0) {
+                if ((!crossForm || (crossForm && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) && se.getExportFormData().size()!=0) {
                     // For developers, please do not change order of properties sorted, it will break OpenRosaService
                     // Manifest Call for odm file
                     xml.append(indent + indent + indent + "<StudyEventData StudyEventOID=\"" + StringEscapeUtils.escapeXml(se.getStudyEventOID()));
@@ -303,7 +317,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     //
                     ArrayList<ExportFormDataBean> forms = se.getExportFormData();
                     for (ExportFormDataBean form : forms) {
-                        if (!clinical || (clinical && !form.getStatus().equals(EventCRFStatus.INVALID.getI18nDescription(getLocale())))) {
+                        if (!crossForm || (crossForm && !form.getStatus().equals(EventCRFStatus.INVALID.getI18nDescription(getLocale())))) {
 
                             xml.append(indent + indent + indent + indent + "<FormData FormOID=\"" + StringEscapeUtils.escapeXml(form.getFormOID()));
                             if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
@@ -934,4 +948,21 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         }
         return true;
     }
+    private String[] loadPermissionTags(){
+        List<EventDefinitionCrfPermissionTag> tags = eventDefinitionCrfPermissionTagDao.findAll();
+        Set<String> tagsSet = new HashSet<>();
+        for (EventDefinitionCrfPermissionTag tag : tags) {
+            tagsSet.add(tag.getPermissionTagId());
+        }
+        return tagsSet.toArray(new String[0]);
+    }
+    private HttpServletRequest getRequest() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            return request;
+        }
+        return null;
+    }
+
 }
