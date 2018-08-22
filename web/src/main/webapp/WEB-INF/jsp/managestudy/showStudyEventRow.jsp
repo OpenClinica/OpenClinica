@@ -390,7 +390,7 @@
 		</c:otherwise>
 		</c:choose>
 		<c:if test="${(study.status.available) && (!userRole.monitor) && (!currRow.bean.studyEvent.subjectEventStatus.locked)
-			&&(dec.eventCRF.status.name != 'completed')}">
+			&&(dec.eventCRF.status.name != 'completed') && dedc.edc.status.available}">
 		<td>
 		 <a class="accessCheck" href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
 			onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
@@ -402,7 +402,7 @@
 
 
 		    <c:if test="${ (userRole.director || userRole.coordinator) &&
- (study.status.available ) && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped)}">
+ (study.status.available ) && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped) && dedc.edc.status.available}">
    <td>
 
     <a class="accessCheck"  access_attr='<c:out value="${dec.eventCRF.id}"/>'
