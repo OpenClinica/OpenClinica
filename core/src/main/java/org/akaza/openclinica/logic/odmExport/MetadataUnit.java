@@ -38,6 +38,8 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
 import org.akaza.openclinica.service.PermissionService;
 import org.springframework.http.HttpRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * A class for ODM metadata of one study.
@@ -203,7 +205,7 @@ public class MetadataUnit extends OdmUnit {
         if(crossForm) {
             permissionTags=loadPermissionTags();
         }else{
-            permissionTags =permissionService.getPermissionTagsStringWithoutRequest(study,userAccountBean.getUserUuid());
+            permissionTags =permissionService.getPermissionTagsStringWithoutRequest(study,userAccountBean.getUserUuid(),getRequest());
         }
 
 
@@ -597,6 +599,14 @@ public class MetadataUnit extends OdmUnit {
         }
         return  tagsList.stream().collect(Collectors.joining("','", "'", "'"));
 
+    }
+    private HttpServletRequest getRequest() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            return request;
+        }
+        return null;
     }
 
 }

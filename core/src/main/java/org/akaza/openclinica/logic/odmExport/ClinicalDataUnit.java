@@ -26,6 +26,8 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
 import org.akaza.openclinica.service.PermissionService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * A class for one ODM ClinicalData Element.
@@ -75,7 +77,7 @@ public class ClinicalDataUnit extends OdmUnit {
 
 
         String permissionTags = "";
-        permissionTags =permissionService.getPermissionTagsStringWithoutRequest(study,userAccountBean.getUserUuid());
+        permissionTags =permissionService.getPermissionTagsStringWithoutRequest(study,userAccountBean.getUserUuid(),getRequest());
 
 
         if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
@@ -129,5 +131,14 @@ public class ClinicalDataUnit extends OdmUnit {
 
     public void setStudySubjectIds(String studySubjectIds) {
         this.studySubjectIds = studySubjectIds;
+    }
+
+    private HttpServletRequest getRequest() {
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            return request;
+        }
+        return null;
     }
 }

@@ -341,7 +341,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			if(crossForm) {
 				tagIds = loadPermissionTags();
 			}else{
-				 tagIds = permissionService.getPermissionTagsListWithoutRequest(studyBean,userAccount.getUserUuid());
+				 tagIds = permissionService.getPermissionTagsListWithoutRequest(studyBean,userAccount.getUserUuid(),getRequest());
 			}
 
 			List <EventDefinitionCrfPermissionTag> edcPTagIds=
