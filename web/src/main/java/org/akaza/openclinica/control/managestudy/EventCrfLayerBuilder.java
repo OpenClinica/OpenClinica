@@ -200,14 +200,12 @@ public class EventCrfLayerBuilder {
                     html.nbsp().nbsp();
                     html.tdEnd().trEnd(0);
                 }
-                if (currentRole.isDirector() || currentUser.isSysAdmin()) {
-                    html.tr(0).valign("top").close();
-                    html.td(0).styleClass(table_cell_left).close();
-                    removeEventCrf(html, eventCrfBean, studySubject);
-                    html.nbsp().nbsp();
-                    removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
-                    html.tdEnd().trEnd(0);
-                }
+                html.tr(0).valign("top").close();
+                html.td(0).styleClass(table_cell_left).close();
+                removeEventCrf(html, eventCrfBean, studySubject);
+                html.nbsp().nbsp();
+                removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
+                html.tdEnd().trEnd(0);
             }
             // Delete the crf should be allowed for all user types and all roles except Monitor(https://jira.openclinica.com/browse/OC-8798)
             if (currentStudy.getStatus() == Status.AVAILABLE && !currentRole.isMonitor()) {
@@ -251,6 +249,20 @@ public class EventCrfLayerBuilder {
                     initialDataEntryLink(html, eventCrfBean == null ? new EventCRFBean() : eventCrfBean, studySubject, eventDefinitionCrf, getStudyEvent(),
                             reswords.getString("enter_data"));
                     html.tdEnd().trEnd(0);
+                    if (eventCrfStatus == DataEntryStage.INITIAL_DATA_ENTRY) {
+                        html.tr(0).valign("top").close();
+                        html.td(0).styleClass(table_cell_left).close();
+                        removeEventCrf(html, eventCrfBean, studySubject);
+                        html.nbsp().nbsp();
+                        removeEventCrf(html, eventCrfBean, studySubject, reswords.getString("remove"));
+                        html.tdEnd().trEnd(0);
+                        html.tr(0).valign("top").close();
+                        html.td(0).styleClass(table_cell_left).close();
+                        deleteEventCrf(html, eventCrfBean, studySubject);
+                        html.nbsp().nbsp();
+                        deleteEventCrf(html, eventCrfBean, studySubject, reswords.getString("delete"));
+                        html.tdEnd().trEnd(0);
+                    }
                 }
             }
 
