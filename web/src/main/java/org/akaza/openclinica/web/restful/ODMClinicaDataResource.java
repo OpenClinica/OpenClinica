@@ -16,9 +16,11 @@ import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
 import org.akaza.openclinica.service.PermissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,6 +33,11 @@ import com.sun.jersey.api.view.Viewable;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
 
 /***
  * * Rest service for ODM clinical data usage
@@ -48,6 +55,8 @@ public class ODMClinicaDataResource {
     private static final Logger LOGGER = LoggerFactory.getLogger(ODMClinicaDataResource.class);
     private static final int INDENT_LEVEL = 2;
 
+    @Autowired
+    private EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
     @Autowired
     private ClinicalDataCollectorResource clinicalDataCollectorResource;
     @Autowired
@@ -111,7 +120,7 @@ public class ODMClinicaDataResource {
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
-        boolean clinical = false;
+        boolean crossForm = false;
         boolean archived = false;
 
         if (showArchived != null && (showArchived.equalsIgnoreCase("no") || showArchived.equalsIgnoreCase("n")))
@@ -120,9 +129,9 @@ public class ODMClinicaDataResource {
             archived = true;
 
         if (clinicalData.equalsIgnoreCase("no") || clinicalData.equalsIgnoreCase("n"))
-            clinical = false;
+            crossForm = false;
         if (clinicalData.equalsIgnoreCase("yes") || clinicalData.equalsIgnoreCase("y"))
-            clinical = true;
+            crossForm = true;
         if (includeDns.equalsIgnoreCase("no") || includeDns.equalsIgnoreCase("n"))
             includeDN = false;
         if (includeAudits.equalsIgnoreCase("no") || includeAudits.equalsIgnoreCase("n"))
@@ -136,12 +145,14 @@ public class ODMClinicaDataResource {
         XMLSerializer xmlSerializer = new XMLSerializer();
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                        formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId()),
-                clinical, archived ,permissionService,userAccountBean);
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId(),crossForm),
+                crossForm, archived ,permissionService,userAccountBean);
         if (report.getClinicalDataMap() == null)
             return null;
 
-        report.createOdmXml(true, clinical, getDataSource(), userAccountBean,permissionService);
+
+
+        report.createOdmXml(true, crossForm, getDataSource(), userAccountBean,permissionService,eventDefinitionCrfPermissionTagDao);
         // xmlSerializer.setForceTopLevelObject(true);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -231,7 +242,7 @@ public class ODMClinicaDataResource {
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
-        boolean clinical = false;
+        boolean crossForm = false;
         boolean archived = false;
 
         if (showArchived != null && (showArchived.equalsIgnoreCase("no") || showArchived.equalsIgnoreCase("n")))
@@ -249,9 +260,9 @@ public class ODMClinicaDataResource {
         }
 
         if (clinicalData.equalsIgnoreCase("no") || clinicalData.equalsIgnoreCase("n"))
-            clinical = false;
+            crossForm = false;
         if (clinicalData.equalsIgnoreCase("yes") || clinicalData.equalsIgnoreCase("y"))
-            clinical = true;
+            crossForm = true;
         if (includeDns.equalsIgnoreCase("no") || includeDns.equalsIgnoreCase("n"))
             includeDN = false;
         if (includeAudits.equalsIgnoreCase("no") || includeAudits.equalsIgnoreCase("n"))
@@ -262,10 +273,10 @@ public class ODMClinicaDataResource {
             includeAudit = true;
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
-                clinical, archived,permissionService,userBean);
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId,crossForm),
+                crossForm, archived,permissionService,userBean);
 
-        report.createOdmXml(true, clinical, getDataSource(), userBean,permissionService);
+        report.createOdmXml(true, crossForm, getDataSource(), userBean,permissionService,eventDefinitionCrfPermissionTagDao);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();
@@ -291,5 +302,7 @@ public class ODMClinicaDataResource {
                 return subjectIdentifier;
         }
     }
+
+
 
 }

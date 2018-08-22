@@ -10,11 +10,7 @@
 package org.akaza.openclinica.logic.odmExport;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -34,10 +30,12 @@ import org.akaza.openclinica.bean.odmbeans.RangeCheckBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
 import org.akaza.openclinica.service.PermissionService;
 import org.springframework.http.HttpRequest;
 
@@ -51,8 +49,10 @@ public class MetadataUnit extends OdmUnit {
     private OdmStudyBean odmStudy;
     private StudyBean parentStudy;
     private RuleSetRuleDao ruleSetRuleDao;
+    private EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
     private PermissionService permissionService;
     private UserAccountBean userAccountBean;
+    private boolean crossForm;
     private StudyBean study;
 
     public static final String FAKE_STUDY_NAME = "OC_FORM_LIB_STUDY";
@@ -86,13 +86,15 @@ public class MetadataUnit extends OdmUnit {
     }
 
     public MetadataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, RuleSetRuleDao ruleSetRuleDao,
-            boolean showArchived ,PermissionService permissionService ,UserAccountBean userAccountBean) {
+            boolean showArchived ,PermissionService permissionService ,UserAccountBean userAccountBean,boolean crossForm ,EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao) {
         super(ds, dataset, odmBean, study, category, showArchived);
         this.odmStudy = new OdmStudyBean();
         this.ruleSetRuleDao = ruleSetRuleDao;
+        this.eventDefinitionCrfPermissionTagDao=eventDefinitionCrfPermissionTagDao;
         this.permissionService = permissionService;
         this.userAccountBean = userAccountBean;
         this.study=study;
+        this.crossForm =crossForm;
         if (study.getParentStudyId() > 0) {
             this.parentStudy = (StudyBean) new StudyDAO(ds).findByPK(study.getParentStudyId());
         } else {
@@ -198,7 +200,11 @@ public class MetadataUnit extends OdmUnit {
         }
 
         String permissionTags = "";
-        permissionTags =permissionService.getPermissionTagsStringWithoutRequest(study,userAccountBean.getUserUuid());
+        if(crossForm) {
+            permissionTags=loadPermissionTags();
+        }else{
+            permissionTags =permissionService.getPermissionTagsStringWithoutRequest(study,userAccountBean.getUserUuid());
+        }
 
 
         StudyBean study = studyBase.getStudy();
@@ -578,6 +584,19 @@ public class MetadataUnit extends OdmUnit {
 
     public void setParentStudy(StudyBean parentStudy) {
         this.parentStudy = parentStudy;
+    }
+
+    private String loadPermissionTags(){
+        List<EventDefinitionCrfPermissionTag> tags = eventDefinitionCrfPermissionTagDao.findAll();
+
+        List<String> tagsList = new ArrayList<>();
+        for (EventDefinitionCrfPermissionTag tag : tags) {
+            if(!tagsList.contains(tag.getPermissionTagId())) {
+                tagsList.add(tag.getPermissionTagId());
+            }
+        }
+        return  tagsList.stream().collect(Collectors.joining("','", "'", "'"));
+
     }
 
 }
