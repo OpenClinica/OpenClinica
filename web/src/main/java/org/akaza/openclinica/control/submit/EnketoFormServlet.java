@@ -94,9 +94,12 @@ public class EnketoFormServlet extends SecureController {
             eventCrf = eventCrfDao.findById(eventCrfId);
         }
         final EventCrf ec = eventCrf;
-        if (!StringUtils.equalsIgnoreCase(mode, "preview") && hasFormAccess(ec) != true) {
-            forwardPage(Page.NO_ACCESS);
-            return;
+        if (eventCrfId != 0 || studyEvent != null) {
+            if (!StringUtils.equalsIgnoreCase(mode, "preview") &&
+                    hasFormAccess(ec) != true) {
+                forwardPage(Page.NO_ACCESS);
+                return;
+            }
         }
         String loadWarning = generateErrorMessage(studyEvent, formLayout);
         boolean isFormLocked = determineCRFLock(studyEvent, formLayout);

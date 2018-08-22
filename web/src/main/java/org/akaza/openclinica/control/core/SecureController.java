@@ -538,7 +538,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     currentPublicStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentPublicStudy.getParentStudyId())).getName());
                     request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                     currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId())).getName());
-                    request.setAttribute("requestSchema", "public");
+/*                    request.setAttribute("requestSchema", "public");*/
                 }
                 // YW >>
             }
@@ -660,11 +660,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             if (!request.getRequestURI().endsWith("ResetPassword")) {
                 passwdTimeOut();
             }
+            request.setAttribute("enrollmentCapped", isEnrollmentCapped());
             request.setAttribute("requestSchema", getRequestSchema(request));
             mayProceed();
             // pingJobServer(request);
             // Set if enrollment is capped. Used by navBar.jsp to hide "Add Participant" link in the menu
-            request.setAttribute("enrollmentCapped", isEnrollmentCapped());
             processRequest();
         } catch (InconsistentStateException ise) {
             ise.printStackTrace();

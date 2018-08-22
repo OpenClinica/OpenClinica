@@ -20,6 +20,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.MetaDataVersionProtocolBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.bean.odmbeans.UserBean;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.job.JobTerminationMonitor;
 import org.akaza.openclinica.service.PermissionService;
@@ -44,21 +45,27 @@ public class MetaDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmStudyBean> odmStudyMap;
     private static int textLength = 4000;
     private RuleSetRuleDao ruleSetRuleDao;
+    private EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
     private PermissionService permissionService;
     private UserAccountBean userAccountBean;
+    private boolean crossForm;
     // protected final Logger logger =
     // LoggerFactory.getLogger(getClass().getName());
 
-    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao, boolean showArchived,PermissionService permissionService,UserAccountBean userAccountBean) {
+    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao, boolean showArchived, PermissionService permissionService, UserAccountBean userAccountBean , boolean crossForm, EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao) {
         super(ds, study, showArchived);
         this.userAccountBean=userAccountBean;
         this.ruleSetRuleDao = ruleSetRuleDao;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
         this.permissionService=permissionService;
+        this.crossForm=crossForm;
+        this.eventDefinitionCrfPermissionTagDao = eventDefinitionCrfPermissionTagDao;
     }
 
-    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao) {
+    public MetaDataCollector(DataSource ds, StudyBean study, RuleSetRuleDao ruleSetRuleDao,UserAccountBean userAccountBean ,PermissionService permissionService) {
         super(ds, study);
+        this.userAccountBean=userAccountBean;
+        this.permissionService=permissionService;
         this.ruleSetRuleDao = ruleSetRuleDao;
         odmStudyMap = new LinkedHashMap<String, OdmStudyBean>();
 
@@ -90,7 +97,7 @@ public class MetaDataCollector extends OdmDataCollector {
             JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
             StudyBean study = u.getStudy();
-            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(), getRuleSetRuleDao(), showArchived ,permissionService,userAccountBean );
+            MetadataUnit meta = new MetadataUnit(this.ds, this.dataset, this.getOdmbean(), study, this.getCategory(), getRuleSetRuleDao(), showArchived ,permissionService,userAccountBean,crossForm,eventDefinitionCrfPermissionTagDao );
             meta.collectOdmStudy(null);
             if (this.getCategory() == 1) {
                 if (study.isSite(study.getParentStudyId())) {

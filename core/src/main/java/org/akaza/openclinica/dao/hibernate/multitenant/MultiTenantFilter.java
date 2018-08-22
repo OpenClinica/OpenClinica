@@ -90,9 +90,9 @@ import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdent
         switch (path) {
         case "ListStudy":
         case "ChangeStudy":
-            req.setAttribute("requestSchema", "public");
+/*            req.setAttribute("requestSchema", "public");
             tenant = "public";
-            logger.debug("Request schema is set to 'public'");
+            logger.debug("Request schema is set to 'public'");*/
             break;
         default:
             if (session == null)
