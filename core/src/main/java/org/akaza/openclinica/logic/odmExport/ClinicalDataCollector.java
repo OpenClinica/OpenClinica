@@ -35,8 +35,7 @@ import org.akaza.openclinica.service.PermissionService;
 
 public class ClinicalDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmClinicalDataBean> odmClinicalDataMap;
-    private PermissionService permissionService;
-    private UserAccountBean userAccountBean;
+
 
 
     /**
@@ -44,10 +43,8 @@ public class ClinicalDataCollector extends OdmDataCollector {
      * @param ds
      * @param dataset
      */
-    public ClinicalDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy , PermissionService permissionService,UserAccountBean userAccountBean) {
+    public ClinicalDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy ) {
         super(ds, dataset, currentStudy);
-        this.permissionService = permissionService;
-        this.userAccountBean = userAccountBean;
         this.odmClinicalDataMap = new LinkedHashMap<String, OdmClinicalDataBean>();
     }
 
@@ -62,7 +59,7 @@ public class ClinicalDataCollector extends OdmDataCollector {
         while (it.hasNext()) {
             JobTerminationMonitor.check();
             OdmStudyBase u = it.next();
-            ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory(),permissionService,userAccountBean);
+            ClinicalDataUnit cdata = new ClinicalDataUnit(this.ds, this.dataset, this.getOdmbean(), u.getStudy(), this.getCategory());
             cdata.setCategory(this.getCategory());
             StudySubjectDAO ssdao = new StudySubjectDAO(this.ds);
             cdata.setStudySubjectIds(ssdao.findStudySubjectIdsByStudyIds(u.getStudy().getId()+""));

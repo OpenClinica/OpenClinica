@@ -256,7 +256,7 @@ public class RuleController {
         StudyDAO studyDao = new StudyDAO(dataSource);
         currentStudy = studyDao.findByOid(studyOid);
 
-        MetaDataCollector mdc = new MetaDataCollector(dataSource, currentStudy, getRuleSetRuleDao(),userAccount,null);
+        MetaDataCollector mdc = new MetaDataCollector(dataSource, currentStudy, getRuleSetRuleDao(),null);
         AdminDataCollector adc = new AdminDataCollector(dataSource, currentStudy);
         // RulesDataCollector rdc = new RulesDataCollector(sm.getDataSource(), currentStudy,getRuleSetRuleDao());
         MetaDataCollector.setTextLength(200);

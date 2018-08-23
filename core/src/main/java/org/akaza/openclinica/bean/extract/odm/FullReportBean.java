@@ -36,7 +36,7 @@ public class FullReportBean extends OdmXmlReportBean {
     /**
      * Create one ODM XML This method is still under construction. Right now it is for Snapshot filetype only.
      */
-    public void createOdmXml(boolean isDataset, boolean clinical, DataSource dataSource, UserAccountBean userBean,PermissionService permissionService , EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao) {
+    public void createOdmXml(boolean isDataset, boolean clinical, DataSource dataSource, UserAccountBean userBean,String[] permissionTagsStringArray) {
         this.addHeading();
         this.addRootStartLine();
 
@@ -64,7 +64,7 @@ public class FullReportBean extends OdmXmlReportBean {
             while (itc.hasNext()) {
                 OdmClinicalDataBean c = itc.next();
                 if (c.getExportSubjectData().size() > 0) {
-                    addNodeClinicalData(c, clinical, dataSource, userBean,permissionService,eventDefinitionCrfPermissionTagDao);
+                    addNodeClinicalData(c, clinical, dataSource, userBean,permissionTagsStringArray);
                 }
             }
         }
@@ -97,8 +97,8 @@ public class FullReportBean extends OdmXmlReportBean {
         this.addRootEndLine();
     }
 
-    public void createChunkedOdmXml(boolean isDataset, boolean header, boolean footer, DataSource dataSource, UserAccountBean userBean, PermissionService permissionService , EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao) {
-        ClinicalDataReportBean data = new ClinicalDataReportBean(this.clinicaldata, dataSource, userBean,permissionService,eventDefinitionCrfPermissionTagDao,false);
+    public void createChunkedOdmXml(boolean isDataset, boolean header, boolean footer, DataSource dataSource, UserAccountBean userBean ,String[] permissionTagsStringArray) {
+        ClinicalDataReportBean data = new ClinicalDataReportBean(this.clinicaldata, dataSource, userBean,false,permissionTagsStringArray);
         data.setXmlOutput(this.getXmlOutput());
         data.setODMVersion(this.getODMVersion());
         data.addNodeClinicalData(header, footer);
@@ -121,8 +121,8 @@ public class FullReportBean extends OdmXmlReportBean {
         admin.addNodeAdminData();
     }
 
-    public void addNodeClinicalData(OdmClinicalDataBean clinicaldata, boolean crossForm, DataSource dataSource, UserAccountBean userBean ,PermissionService permissionService, EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao) {
-        ClinicalDataReportBean data = new ClinicalDataReportBean(clinicaldata, dataSource, userBean,permissionService,eventDefinitionCrfPermissionTagDao,crossForm);
+    public void addNodeClinicalData(OdmClinicalDataBean clinicaldata, boolean crossForm, DataSource dataSource, UserAccountBean userBean,String[] permissionTagsStringArray) {
+        ClinicalDataReportBean data = new ClinicalDataReportBean(clinicaldata, dataSource, userBean,crossForm,permissionTagsStringArray);
         data.setODMVersion(this.getODMVersion());
         data.setXmlOutput(this.getXmlOutput());
         data.addNodeClinicalData(true, true);
