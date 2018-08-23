@@ -56,19 +56,16 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
     private UserAccountBean userBean;
     protected Locale locale = ResourceBundleProvider.getLocale();
     private final String COMMON = "common";
-    private EventDefinitionCrfDao eventDefinitionCrfDao;
     private StudyDAO sdao;
-    private PermissionService permissionService;
-    private EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
+    private String[] permissionTagsStringArray;
     private boolean crossForm;
 
-    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean,PermissionService permissionService , EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao , boolean crossForm) {
+    public ClinicalDataReportBean(OdmClinicalDataBean clinicaldata, DataSource dataSource, UserAccountBean userBean , boolean crossForm,String[] permissionTagsStringArray) {
         super();
         this.clinicalData = clinicaldata;
         this.dataSource = dataSource;
         this.userBean = userBean;
-        this.permissionService=permissionService;
-        this.eventDefinitionCrfPermissionTagDao=eventDefinitionCrfPermissionTagDao;
+        this.permissionTagsStringArray=permissionTagsStringArray;
         this.crossForm=crossForm;
 
     }
@@ -155,14 +152,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             StudyBean studyBean = getStudy(clinicalData.getStudyOID());
             // List<EventDefinitionCRFBean> edcs = edcdao.findAllByStudy(parentStudyBean);
 
-            String[] permissionTags = null;
-           if(crossForm) {
-               permissionTags=loadPermissionTags();
-           }else{
-               permissionTags =permissionService.getPermissionTagsStringArrayWithoutRequest(studyBean,userBean.getUserUuid(),getRequest());
-           }
 
-            List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean,permissionTags );
+            List<EventDefinitionCRFBean> edcs = (List<EventDefinitionCRFBean>) edcdao.findAllStudySiteFiltered(studyBean,permissionTagsStringArray );
 
             // Subject
             // ***************** OpenClinica: Subject Links Start**************
@@ -948,21 +939,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         }
         return true;
     }
-    private String[] loadPermissionTags(){
-        List<EventDefinitionCrfPermissionTag> tags = eventDefinitionCrfPermissionTagDao.findAll();
-        Set<String> tagsSet = new HashSet<>();
-        for (EventDefinitionCrfPermissionTag tag : tags) {
-            tagsSet.add(tag.getPermissionTagId());
-        }
-        return tagsSet.toArray(new String[0]);
-    }
-    private HttpServletRequest getRequest() {
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (requestAttributes != null && requestAttributes.getRequest() != null) {
-            HttpServletRequest request = requestAttributes.getRequest();
-            return request;
-        }
-        return null;
-    }
+
+
 
 }

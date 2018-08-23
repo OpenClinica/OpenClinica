@@ -102,7 +102,7 @@ public class MetadataCollectorResource {
 
         StudyBean studyBean = getStudyDao().findByOid(studyOID);
 
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),null,null);
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao());
         AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
         MetaDataCollector.setTextLength(200);
 
@@ -158,7 +158,7 @@ public class MetadataCollectorResource {
         StudyBean studyBean = getStudyDao().findByOid(studyOID);
         if (studyBean != null)
             studyBean = populateStudyBean(studyBean);
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(),null,null);
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao());
         AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
         MetaDataCollector.setTextLength(200);
 
@@ -191,11 +191,11 @@ public class MetadataCollectorResource {
     }
 
     public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
-                                                            boolean crossForm, boolean showArchived, PermissionService permissionService , UserAccountBean userAccountBean) {
+                                                            boolean crossForm, boolean showArchived , String permissionTagsString) {
         StudyBean studyBean = getStudyDao().findByOid(studyOID);
         if (studyBean != null)
             studyBean = populateStudyBean(studyBean);
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived,permissionService,userAccountBean,crossForm,eventDefinitionCrfPermissionTagDao);
+        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived,permissionTagsString);
         AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
         MetaDataCollector.setTextLength(200);
 

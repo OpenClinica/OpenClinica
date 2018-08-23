@@ -38,6 +38,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 /***
  * * Rest service for ODM clinical data usage
@@ -141,18 +142,30 @@ public class ODMClinicaDataResource {
         if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
             includeAudit = true;
         UserAccountBean userAccountBean = ((UserAccountBean) request.getSession().getAttribute("userBean"));
+        StudyDAO sdao = new StudyDAO(getDataSource());
+        StudyBean studyBean = sdao.findByOid(studyOID);
+        String permissionTagsString="";
+        String[] permissionTagsStringArray;
+
+        if(crossForm) {
+            permissionTagsString=loadPermissionTagsString();
+            permissionTagsStringArray=loadPermissionTagsStringArray();
+        }else {
+            permissionTagsString = permissionService.getPermissionTagsString(studyBean, request);
+            permissionTagsStringArray=permissionService.getPermissionTagsStringArray(studyBean,request);
+        }
 
         XMLSerializer xmlSerializer = new XMLSerializer();
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                         formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId(),crossForm),
-                crossForm, archived ,permissionService,userAccountBean);
+                crossForm, archived ,permissionTagsString);
         if (report.getClinicalDataMap() == null)
             return null;
 
 
 
-        report.createOdmXml(true, crossForm, getDataSource(), userAccountBean,permissionService,eventDefinitionCrfPermissionTagDao);
+        report.createOdmXml(true, crossForm, getDataSource(), userAccountBean,permissionTagsStringArray);
         // xmlSerializer.setForceTopLevelObject(true);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -271,12 +284,24 @@ public class ODMClinicaDataResource {
             includeDN = true;
         if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
             includeAudit = true;
+        StudyDAO sdao = new StudyDAO(getDataSource());
+        StudyBean studyBean = sdao.findByOid(studyOID);
+        String permissionTagsString="";
+        String[] permissionTagsStringArray;
+        if(crossForm) {
+            permissionTagsString=loadPermissionTagsString();
+            permissionTagsStringArray=loadPermissionTagsStringArray();
+        }else {
+            permissionTagsString = permissionService.getPermissionTagsString(studyBean, request);
+            permissionTagsStringArray=permissionService.getPermissionTagsStringArray(studyBean,request);
+        }
+
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                         formVersionOID, includeDN, includeAudit, request.getLocale(), userId,crossForm),
-                crossForm, archived,permissionService,userBean);
+                crossForm, archived,permissionTagsString);
 
-        report.createOdmXml(true, crossForm, getDataSource(), userBean,permissionService,eventDefinitionCrfPermissionTagDao);
+        report.createOdmXml(true, crossForm, getDataSource(), userBean, permissionTagsStringArray);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();
@@ -303,6 +328,25 @@ public class ODMClinicaDataResource {
         }
     }
 
+    private String loadPermissionTagsString(){
+        List<EventDefinitionCrfPermissionTag> tags = eventDefinitionCrfPermissionTagDao.findAll();
 
+        List<String> tagsList = new ArrayList<>();
+        for (EventDefinitionCrfPermissionTag tag : tags) {
+            if(!tagsList.contains(tag.getPermissionTagId())) {
+                tagsList.add(tag.getPermissionTagId());
+            }
+        }
+        return  tagsList.stream().collect(Collectors.joining("','", "'", "'"));
+
+    }
+    private String[] loadPermissionTagsStringArray(){
+        List<EventDefinitionCrfPermissionTag> tags = eventDefinitionCrfPermissionTagDao.findAll();
+        Set<String> tagsSet = new HashSet<>();
+        for (EventDefinitionCrfPermissionTag tag : tags) {
+            tagsSet.add(tag.getPermissionTagId());
+        }
+        return tagsSet.toArray(new String[0]);
+    }
 
 }

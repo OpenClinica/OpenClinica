@@ -115,7 +115,7 @@ public class StudyEndpoint {
     private String getReport(StudyBean currentStudy){
 //    	ServletContext servletContext =
 //    	    (ServletContext) context.getMessageContext().get(MessageContext.SERVLET_CONTEXT);
-        MetaDataCollector mdc = new MetaDataCollector(dataSource, currentStudy,ruleSetRuleDao,null,null);
+        MetaDataCollector mdc = new MetaDataCollector(dataSource, currentStudy,ruleSetRuleDao);
         AdminDataCollector adc = new AdminDataCollector(dataSource, currentStudy);
         MetaDataCollector.setTextLength(200);
 

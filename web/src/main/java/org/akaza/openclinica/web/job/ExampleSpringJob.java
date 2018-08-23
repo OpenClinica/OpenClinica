@@ -26,6 +26,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.quartz.JobDataMap;
@@ -76,6 +77,7 @@ public class ExampleSpringJob extends QuartzJobBean {
     private JobDetailFactoryBean jobDetailBean;
     private CoreResources coreResources;
     private RuleSetRuleDao ruleSetRuleDao;
+    private PermissionService permissionService;
 
     @Override
     protected void executeInternal(JobExecutionContext context) throws JobExecutionException {
@@ -179,7 +181,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                 userBean = (UserAccountBean) userAccountDAO.findByPK(userId);
                 // needs to also be captured by the servlet, tbh
                 // logger.debug("-- gen tab file 00");
-                generateFileService = new GenerateExtractFileService(dataSource, coreResources, ruleSetRuleDao);
+                generateFileService = new GenerateExtractFileService(dataSource, coreResources, ruleSetRuleDao,permissionService);
 
                 // logger.debug("-- gen tab file 00");
 
