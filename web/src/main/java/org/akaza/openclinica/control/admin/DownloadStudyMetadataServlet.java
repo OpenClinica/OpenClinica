@@ -46,7 +46,7 @@ public class DownloadStudyMetadataServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
 
-        MetaDataCollector mdc = new MetaDataCollector(sm.getDataSource(), currentStudy, getRuleSetRuleDao());
+        MetaDataCollector mdc = new MetaDataCollector(sm.getDataSource(), currentStudy, getRuleSetRuleDao(),getPermissionTagsString());
         AdminDataCollector adc = new AdminDataCollector(sm.getDataSource(), currentStudy);
         MetaDataCollector.setTextLength(200);
 
