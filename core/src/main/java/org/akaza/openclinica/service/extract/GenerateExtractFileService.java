@@ -57,19 +57,17 @@ public class GenerateExtractFileService {
 
 
     public GenerateExtractFileService(DataSource ds, HttpServletRequest request, CoreResources coreResources,
-            RuleSetRuleDao ruleSetRuleDao ,PermissionService permissionService) {
+            RuleSetRuleDao ruleSetRuleDao) {
         this.ds = ds;
         this.request = request;
         this.coreResources = coreResources;
         this.ruleSetRuleDao = ruleSetRuleDao;
-        this.permissionService=permissionService;
     }
 
-    public GenerateExtractFileService(DataSource ds, CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao,PermissionService permissionService) {
+    public GenerateExtractFileService(DataSource ds, CoreResources coreResources,RuleSetRuleDao ruleSetRuleDao) {
         this.ds = ds;
         this.coreResources = coreResources;
         this.ruleSetRuleDao = ruleSetRuleDao;
-        this.permissionService=permissionService;
     }
 
     public void setUpResourceBundles() {

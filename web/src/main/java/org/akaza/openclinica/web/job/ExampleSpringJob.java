@@ -181,7 +181,7 @@ public class ExampleSpringJob extends QuartzJobBean {
                 userBean = (UserAccountBean) userAccountDAO.findByPK(userId);
                 // needs to also be captured by the servlet, tbh
                 // logger.debug("-- gen tab file 00");
-                generateFileService = new GenerateExtractFileService(dataSource, coreResources, ruleSetRuleDao,permissionService);
+                generateFileService = new GenerateExtractFileService(dataSource, coreResources, ruleSetRuleDao);
 
                 // logger.debug("-- gen tab file 00");
 

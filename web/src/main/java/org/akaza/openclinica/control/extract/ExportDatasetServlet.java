@@ -104,8 +104,7 @@ public class ExportDatasetServlet extends SecureController {
 
         GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(),request,
                 (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources"),
-                (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetRuleDao"),
-                (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService"));
+                (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetRuleDao"));
         String action = fp.getString("action");
         int datasetId = fp.getInt("datasetId");
         int adfId = fp.getInt("adfId");
