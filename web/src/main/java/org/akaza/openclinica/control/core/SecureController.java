@@ -1377,11 +1377,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
         int  expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
-        if (currentPublicStudy.getId() > 0) {
-            if (currentPublicStudy.getParentStudyId() > 0) {
-                request.setAttribute("requestSchema", "public");
-            }
-        }
+        request.setAttribute("requestSchema", "public");
 
         if (numberOfSubjects >= expectedTotalEnrollment && capIsOn)
             return true;
