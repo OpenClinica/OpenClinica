@@ -209,17 +209,17 @@ public class PermissionServiceImpl implements PermissionService {
         return true;
     }
 
-    public List<String> getPermissionTagsListWithoutRequest(StudyBean study, String userUuid,HttpServletRequest request) {
+    public List<String> getPermissionTagsList(StudyBean study,HttpServletRequest request) {
         ResponseEntity<List<StudyEnvironmentRoleDTO>> roles = getUserRoles(request);
         return getTagList(roles, study);
     }
 
-    public String getPermissionTagsStringWithoutRequest(StudyBean study, String userUuid,HttpServletRequest request) {
-        List<String> tagsList = getPermissionTagsListWithoutRequest(study, userUuid ,request);
+    public String getPermissionTagsString(StudyBean study,HttpServletRequest request) {
+        List<String> tagsList = getPermissionTagsList(study ,request);
         return getTagsString(tagsList);    }
 
-    public String[] getPermissionTagsStringArrayWithoutRequest(StudyBean study, String userUuid,HttpServletRequest request) {
-        List<String> tagsList = getPermissionTagsListWithoutRequest(study, userUuid,request);
+    public String[] getPermissionTagsStringArray(StudyBean study,HttpServletRequest request) {
+        List<String> tagsList = getPermissionTagsList(study,request);
         return getStringArray(tagsList);    }
 
     public String getAccessToken() {

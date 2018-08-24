@@ -38,6 +38,7 @@ import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -101,7 +102,7 @@ public class ExportDatasetServlet extends SecureController {
         ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
 
-        GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(),
+        GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(),request,
                 (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources"),
                 (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetRuleDao"));
         String action = fp.getString("action");

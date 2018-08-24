@@ -184,12 +184,14 @@ public class XsltTransformJob extends QuartzJobBean {
             // generate file directory for file service
             datasetBean.setName(datasetBean.getName().replaceAll(" ", "_"));
             logger.debug("--> job starting: ");
+            String permissionTagsString = (String) context.getScheduler().getContext().get("permissionTagsString");
+            String[] permissionTagsStringArray = (String[]) context.getScheduler().getContext().get("permissionTagsStringArray");
 
             HashMap<String, Integer> answerMap =
                     odmFileCreation.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean,
                     currentStudy, "", eb, currentStudy.getId(), currentStudy.getParentStudyId(), "99",
                     (Boolean) dataMap.get(ZIPPED), false, (Boolean) dataMap.get(DELETE_OLD), epBean.getOdmType(),
-                    userBean,permissionService);
+                    userBean,permissionTagsString,permissionTagsStringArray);
 
             // won't save a record of the XML to db
             // won't be a zipped file, so that we can submit it for

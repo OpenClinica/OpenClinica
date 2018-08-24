@@ -45,9 +45,8 @@ public class DownloadStudyMetadataServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
 
-        MetaDataCollector mdc = new MetaDataCollector(sm.getDataSource(), currentStudy, getRuleSetRuleDao(),ub,permissionService);
+        MetaDataCollector mdc = new MetaDataCollector(sm.getDataSource(), currentStudy, getRuleSetRuleDao(),getPermissionTagsString());
         AdminDataCollector adc = new AdminDataCollector(sm.getDataSource(), currentStudy);
         MetaDataCollector.setTextLength(200);
 

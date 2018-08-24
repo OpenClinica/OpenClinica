@@ -38,6 +38,7 @@ import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.PermissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -52,6 +53,8 @@ public class GenerateExtractFileService {
     private static File files[]=null;
     private static List<File> oldFiles = new LinkedList<File>();
     private final RuleSetRuleDao ruleSetRuleDao;
+    private PermissionService permissionService;
+
 
     public GenerateExtractFileService(DataSource ds, HttpServletRequest request, CoreResources coreResources,
             RuleSetRuleDao ruleSetRuleDao) {
@@ -138,9 +141,12 @@ public class GenerateExtractFileService {
             StudyBean currentStudy, String generalFileDirCopy,ExtractBean eb,
             Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped, boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean){
 
+        String permissionTagsString =permissionService.getPermissionTagsString(currentStudy,request);
+        String[] permissionTagsStringArray =permissionService.getPermissionTagsStringArray(currentStudy,request);
+
         return new OdmFileCreation().createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean,
                 currentStudy, generalFileDirCopy, eb,
-                currentStudyId, parentStudyId, studySubjectNumber, zipped, saveToDB, deleteOld, odmType, userBean,null);
+                currentStudyId, parentStudyId, studySubjectNumber, zipped, saveToDB, deleteOld, odmType, userBean,permissionTagsString,permissionTagsStringArray);
     }
 
     public List<File> getOldFiles(){
@@ -151,9 +157,7 @@ public class GenerateExtractFileService {
      * createSPSSFile, added by tbh, 01/2009
      *
      * @param db
-     * @param eb
-     * @param currentstudyid
-     * @param parentstudy
+
      * @return
      */
     public HashMap<String, Integer> createSPSSFile(DatasetBean db, ExtractBean eb2, StudyBean currentStudy, StudyBean parentStudy, long sysTimeBegin,
