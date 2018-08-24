@@ -1357,7 +1357,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected boolean isEnrollmentCapped(){
 
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
-        String currentSchema = (String) request.getAttribute("requestSchema");
+        String previousSchema = (String) request.getAttribute("requestSchema");
         request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
 
         boolean capIsOn = isEnrollmentCapEnforced();
@@ -1374,7 +1374,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
         int  expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
 
-        request.setAttribute("requestSchema", "currentSchema");
+        request.setAttribute("requestSchema", previousSchema);
 
         if (numberOfSubjects >= expectedTotalEnrollment && capIsOn)
             return true;
