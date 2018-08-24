@@ -669,11 +669,11 @@ public class OdmExtractDAO extends DatasetDAO {
         }
     }
 
-    public void getUpdatedSiteMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, String permissionTags) {
+    public void getUpdatedSiteMetadata(int parentStudyId, int studyId, MetaDataVersionBean metadata, String odmVersion, String permissionTagsString) {
         HashMap<Integer, Integer> cvIdPoses = new HashMap<Integer, Integer>();
 
         this.setStudyEventAndFormMetaTypesExpected();
-        ArrayList rows = this.select(this.getStudyEventAndFormMetaSql(parentStudyId, studyId, true, showArchivedSql(showArchived),permissionTags));
+        ArrayList rows = this.select(this.getStudyEventAndFormMetaSql(parentStudyId, studyId, true, showArchivedSql(showArchived),permissionTagsString));
         Iterator it = rows.iterator();
         String sedprev = "";
         MetaDataVersionProtocolBean protocol = metadata.getProtocol();
@@ -2141,7 +2141,7 @@ public class OdmExtractDAO extends DatasetDAO {
         return nullValueCVs;
     }
 
-    public void getClinicalData(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, String studySubjectIds, String odmType , String permissionTags) {
+    public void getClinicalData(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, String studySubjectIds, String odmType , String permissionTagsString) {
         String dbName = CoreResources.getDBName();
         String subprev = "";
         HashMap<String, Integer> sepos = new HashMap<String, Integer>();
@@ -2188,7 +2188,7 @@ public class OdmExtractDAO extends DatasetDAO {
             this.setSubjectEventFormDataTypesExpected(odmVersion);
             ArrayList viewRows = select(getOCSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             Iterator iter = viewRows.iterator();
-            this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses, odmType,permissionTags);
+            this.setDataWithOCAttributes(study, dataset, data, odmVersion, iter, oidPoses, odmType,permissionTagsString);
         } else {
             logger.info("getSubjectEventFormSql=" + getSubjectEventFormSqlSS(studyIds, sedIds, itemIds, dateConstraint, datasetItemStatusId, studySubjectIds));
             this.setSubjectEventFormDataTypesExpected();
@@ -2307,7 +2307,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventBean.getStudyEventDefinitionId(), crfBean.getId());
                     //             List <EventDefinitionCrfPermissionTag> edcPTagIds= eventDefinitionCrfPermissionTagDao.findByEdcIdTagId(edc.getId(), edc.getParentId(),tagIds);
 
-                    formIsTagged = permissionTagLookupCheck(edc, permissionTags);
+                    formIsTagged = permissionTagLookupCheck(edc, permissionTagsString);
 
 
                     if (oidPoses.containsKey(ecId) && !formIsTagged) {
@@ -2965,7 +2965,7 @@ public class OdmExtractDAO extends DatasetDAO {
     }
 
     protected void setDataWithOCAttributes(StudyBean study, DatasetBean dataset, OdmClinicalDataBean data, String odmVersion, Iterator iter,
-            HashMap<Integer, String> oidPoses, String odmType , String permissionTags) {
+            HashMap<Integer, String> oidPoses, String odmType , String permissionTagsString) {
         String subprev = "";
         HashMap<String, Integer> sepos = new HashMap<String, Integer>();
         String seprev = "";
@@ -3006,7 +3006,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
             EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcdao.findByPK(edcId);
             StudyEventDefinitionBean sed = seddao.findByOid(sedOID);
-            formIsTagged = permissionTagLookupCheck(edc, permissionTags);
+            formIsTagged = permissionTagLookupCheck(edc, permissionTagsString);
             if (formIsTagged && sed.getType().equals("common")) {
                 sedIsTagged = true;
             }

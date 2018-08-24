@@ -38,8 +38,7 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 public class ClinicalDataUnit extends OdmUnit {
     private OdmClinicalDataBean odmClinicalData;
     private String studySubjectIds;
-    private PermissionService permissionService;
-    private UserAccountBean userAccountBean;
+    private String permissionTagsString;
 
     public ClinicalDataUnit() {
     }
@@ -49,19 +48,17 @@ public class ClinicalDataUnit extends OdmUnit {
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category,PermissionService permissionService , UserAccountBean userAccountBean) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category) {
         super(ds, dataset, odmBean, study, category);
-        this.permissionService=permissionService;
-        this.userAccountBean=userAccountBean;
+
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, String studySubjectIds,PermissionService permissionService,UserAccountBean userAccountBean) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, String studySubjectIds,String permissionTagsString) {
         super(ds, dataset, odmBean, study, category);
-        this.permissionService = permissionService;
+        this.permissionTagsString=permissionTagsString;
         this.odmClinicalData = new OdmClinicalDataBean();
         this.studySubjectIds = studySubjectIds;
-        this.userAccountBean=userAccountBean;
     }
 
     public void collectOdmClinicalData() {
@@ -76,8 +73,6 @@ public class ClinicalDataUnit extends OdmUnit {
         OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
 
 
-        String permissionTags = "";
-        permissionTags =permissionService.getPermissionTagsStringWithoutRequest(study,userAccountBean.getUserUuid(),getRequest());
 
 
         if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
@@ -98,7 +93,7 @@ public class ClinicalDataUnit extends OdmUnit {
                 odmClinicalData.setMetaDataVersionOID("v1.0.0");
             }
         }
-        oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds, this.odmBean.getOdmType(),permissionTags);
+        oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds, this.odmBean.getOdmType(),permissionTagsString);
     }
 
     public OdmClinicalDataBean getOdmClinicalData() {
@@ -133,12 +128,5 @@ public class ClinicalDataUnit extends OdmUnit {
         this.studySubjectIds = studySubjectIds;
     }
 
-    private HttpServletRequest getRequest() {
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (requestAttributes != null && requestAttributes.getRequest() != null) {
-            HttpServletRequest request = requestAttributes.getRequest();
-            return request;
-        }
-        return null;
-    }
+
 }

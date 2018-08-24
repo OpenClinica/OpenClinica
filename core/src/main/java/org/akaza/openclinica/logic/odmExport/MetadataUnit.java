@@ -51,11 +51,8 @@ public class MetadataUnit extends OdmUnit {
     private OdmStudyBean odmStudy;
     private StudyBean parentStudy;
     private RuleSetRuleDao ruleSetRuleDao;
-    private EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
-    private PermissionService permissionService;
-    private UserAccountBean userAccountBean;
-    private boolean crossForm;
-    private StudyBean study;
+    private String permissionTagsString;
+
 
     public static final String FAKE_STUDY_NAME = "OC_FORM_LIB_STUDY";
     public static final String FAKE_STUDY_OID = "OC_FORM_LIB";
@@ -88,15 +85,11 @@ public class MetadataUnit extends OdmUnit {
     }
 
     public MetadataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, RuleSetRuleDao ruleSetRuleDao,
-            boolean showArchived ,PermissionService permissionService ,UserAccountBean userAccountBean,boolean crossForm ,EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao) {
+            boolean showArchived ,String permissionTagsString) {
         super(ds, dataset, odmBean, study, category, showArchived);
         this.odmStudy = new OdmStudyBean();
         this.ruleSetRuleDao = ruleSetRuleDao;
-        this.eventDefinitionCrfPermissionTagDao=eventDefinitionCrfPermissionTagDao;
-        this.permissionService = permissionService;
-        this.userAccountBean = userAccountBean;
-        this.study=study;
-        this.crossForm =crossForm;
+        this.permissionTagsString=permissionTagsString;
         if (study.getParentStudyId() > 0) {
             this.parentStudy = (StudyBean) new StudyDAO(ds).findByPK(study.getParentStudyId());
         } else {
@@ -201,12 +194,7 @@ public class MetadataUnit extends OdmUnit {
             return;
         }
 
-        String permissionTags = "";
-        if(crossForm) {
-            permissionTags=loadPermissionTags();
-        }else{
-            permissionTags =permissionService.getPermissionTagsStringWithoutRequest(study,userAccountBean.getUserUuid(),getRequest());
-        }
+
 
 
         StudyBean study = studyBase.getStudy();
@@ -244,7 +232,7 @@ public class MetadataUnit extends OdmUnit {
 
 
             // populate protocol
-            oedao.getUpdatedSiteMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion(),permissionTags);
+            oedao.getUpdatedSiteMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion(),permissionTagsString);
         } else {
             if (dataset != null) {
                 metadata.setOid(dataset.getODMMetaDataVersionOid());
@@ -279,7 +267,7 @@ public class MetadataUnit extends OdmUnit {
             // studyId,
             // metadata, this.getODMBean().getODMVersion());
             // studyBase.setNullClSet(nullCodeSet);
-            oedao.getMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion(),permissionTags);
+            oedao.getMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion(),permissionTagsString);
             metadata.setRuleSetRules(getRuleSetRuleDao().findByRuleSetStudyIdAndStatusAvail(parentStudyId));
         }
     }
@@ -588,25 +576,6 @@ public class MetadataUnit extends OdmUnit {
         this.parentStudy = parentStudy;
     }
 
-    private String loadPermissionTags(){
-        List<EventDefinitionCrfPermissionTag> tags = eventDefinitionCrfPermissionTagDao.findAll();
 
-        List<String> tagsList = new ArrayList<>();
-        for (EventDefinitionCrfPermissionTag tag : tags) {
-            if(!tagsList.contains(tag.getPermissionTagId())) {
-                tagsList.add(tag.getPermissionTagId());
-            }
-        }
-        return  tagsList.stream().collect(Collectors.joining("','", "'", "'"));
-
-    }
-    private HttpServletRequest getRequest() {
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (requestAttributes != null && requestAttributes.getRequest() != null) {
-            HttpServletRequest request = requestAttributes.getRequest();
-            return request;
-        }
-        return null;
-    }
 
 }

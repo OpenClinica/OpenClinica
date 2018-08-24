@@ -16,11 +16,11 @@ public interface PermissionService {
 
     ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request);
 
-    List<String> getPermissionTagsListWithoutRequest(StudyBean study, String userUuid,HttpServletRequest request);
+    List<String> getPermissionTagsList(StudyBean study,HttpServletRequest request);
 
-    String getPermissionTagsStringWithoutRequest(StudyBean study, String userUuid,HttpServletRequest request);
+    String getPermissionTagsString(StudyBean study,HttpServletRequest request);
 
-    String[] getPermissionTagsStringArrayWithoutRequest(StudyBean study, String userUuid ,HttpServletRequest request);
+    String[] getPermissionTagsStringArray(StudyBean study ,HttpServletRequest request);
 
     boolean hasFormAccess(EventCrf ec, Integer formLayoutId, Integer studyEventId, HttpServletRequest request);
 
