@@ -27,6 +27,7 @@ import org.akaza.openclinica.job.AutowiringSpringBeanJobFactory;
 import org.akaza.openclinica.job.JobExecutionExceptionListener;
 import org.akaza.openclinica.job.JobTriggerListener;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -73,6 +74,9 @@ public class ExtractController {
     @Autowired
     private OpenClinicaSchedulerFactoryBean schedulerFactoryBean;
 
+    @Autowired
+    private PermissionService permissionService;
+
     public static String TRIGGER_GROUP_NAME = "XsltTriggers";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -89,7 +93,7 @@ public class ExtractController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public ModelMap processSubmit(@RequestParam("id") String id,
-            @RequestParam("datasetId") String datasetId, HttpServletRequest request, HttpServletResponse response)  {
+            @RequestParam("datasetId") String datasetId, HttpServletRequest request, HttpServletResponse response) throws SchedulerException {
         if(!mayProceed(request)){
             try{
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
@@ -180,6 +184,12 @@ public class ExtractController {
             e.printStackTrace();
         }
         jobScheduler = getSchemaScheduler(request, context, jobScheduler);
+       String permissionTagsString =permissionService.getPermissionTagsString((StudyBean)request.getSession().getAttribute("study"),request);
+        String[] permissionTagsStringArray =permissionService.getPermissionTagsStringArray((StudyBean)request.getSession().getAttribute("study"),request);
+
+        jobScheduler.getContext().put("permissionTagsString",permissionTagsString);
+        jobScheduler.getContext().put("permissionTagsStringArray",permissionTagsStringArray);
+
         // String xmlFilePath = generalFileDir + ODMXMLFileName;
         simpleTrigger = xsltService.generateXsltTrigger(jobScheduler, xsltPath,
                 generalFileDir, // xml_file_path

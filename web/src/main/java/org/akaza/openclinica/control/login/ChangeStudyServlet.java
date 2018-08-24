@@ -124,6 +124,7 @@ public class ChangeStudyServlet extends SecureController {
             validateChangeStudy(studies, studyList);
             logger.info("submit");
             changeStudy();
+            return;
         }
 
     }

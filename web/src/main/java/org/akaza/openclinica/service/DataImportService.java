@@ -135,7 +135,7 @@ public class DataImportService {
 
         // validation errors, the same as in the ImportCRFDataServlet. DRY?
         Boolean eventCRFStatusesValid = getImportCRFDataService(dataSource).eventCRFStatusesValid(odmContainer, userBean);
-        List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, userBean);
+        List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, userBean, Boolean.TRUE);
         // The following line updates a map that is used for setting the EventCRF status post import
         getImportCRFDataService(dataSource).fetchEventCRFStatuses(odmContainer, importedCRFStatuses);
 

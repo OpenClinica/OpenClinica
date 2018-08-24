@@ -240,7 +240,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
             subjectLink
                     .append("<a href=\"ViewStudySubject?id="
-                            + studySubjectBean.getSubjectId());
+                            + studySubjectBean.getId());
             subjectLink.append("\">" + studySubjectBean.getLabel() + "</a>");
             theItem.put("studySubject.label", subjectLink.toString());
             theItem.put("studySubject.status", studySubjectBean.getStatus());
