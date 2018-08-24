@@ -25,7 +25,7 @@
     </query>
     <query>
         <name>findAllByFormOid</name>
-        <sql>SELECT v.* FROM s_study_1test.CRF_VERSION v, s_study_1test.CRF c where v.crf_id =c.crf_id and c.oc_oid=?</sql>
+        <sql>SELECT v.* FROM CRF_VERSION v,CRF c where v.crf_id =c.crf_id and c.oc_oid=?</sql>
     </query>
 	<query>
 		<name>findAllByCRF</name>

@@ -89,7 +89,7 @@ public class ImportCRFDataService {
      * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the
      * findByEventSubjectVersion method in EventCRFDAO. May return more than one, hmm.
      */
-    public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub) {
+    public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs) {
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
@@ -152,6 +152,9 @@ public class ImportCRFDataService {
                                     || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) && upsert.isNotStarted()) {
 
                                 EventCRFBean newEventCrfBean = buildEventCrfBean(studySubjectBean, studyEventBean, formLayoutBean, crfVersionBean, ub);
+                                if (persistEventCrfs){
+                                    newEventCrfBean = (EventCRFBean) eventCrfDAO.create(newEventCrfBean);
+                                }
 
                                 logger.debug("   created and added new event crf");
 
@@ -1076,7 +1079,7 @@ public class ImportCRFDataService {
     }
 
     public EventCRFBean buildEventCrfBean(StudySubjectBean studySubjectBean, StudyEventBean studyEventBean, FormLayoutBean formLayoutBean,
-            CRFVersionBean crfVersionBean, UserAccountBean ub) {
+                                          CRFVersionBean crfVersionBean, UserAccountBean ub) {
         EventCRFBean newEventCrfBean = new EventCRFBean();
         newEventCrfBean.setStudyEventId(studyEventBean.getId());
         newEventCrfBean.setStudySubjectId(studySubjectBean.getId());
