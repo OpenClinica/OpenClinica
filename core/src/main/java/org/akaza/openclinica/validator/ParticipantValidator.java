@@ -172,14 +172,21 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	                + subjectTransferBean.getStudyOid() + " does not correspond to a valid study.");
 	            return;
 	        }
+	        
+	        String siteOid = subjectTransferBean.getSiteIdentifier();
+	        StudyBean siteStudy = subjectTransferBean.getSiteStudy();
+	        if(siteOid !=null && siteStudy == null) {
+	        	 e.reject("errorCode.siteNotExist", new Object[] { siteOid },
+	 	                    "Site identifier you specified does not correspond to a valid site.");
+	 	            return;
+	        }
 
 	        /**
 	         *  check role permission at study  and site level
 	         */
 	        	
 	        String userName = subjectTransferBean.getOwner().getName();
-	        String studyOid = currentStudy.getOid();
-	        String siteOid = subjectTransferBean.getSiteIdentifier();
+	        String studyOid = currentStudy.getOid();	        
 	        
 	        StudyUserRoleBean studyLevelRole = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,studyOid);
 			if(studyLevelRole == null) {

@@ -199,9 +199,14 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         }else if (studyOid != null && siteOid != null) {
             study = getStudyDao().findByOid(studyOid);
             site = getStudyDao().findByOid(siteOid);
-            if (study == null || site == null || site.getParentStudyId() != study.getId()) {
-                throw new OpenClinicaSystemException("errorCode.invalidStudySiteIdentifier",
-                        "The study/site identifier you provided is not valid.");
+            if (study == null) {
+                throw new OpenClinicaSystemException("errorCode.invalidStudyIdentifier",
+                        "The study identifier you provided is not valid.");
+            }
+            
+            if (site == null || site.getParentStudyId() != study.getId()) {
+                throw new OpenClinicaSystemException("errorCode.invalidSiteIdentifier",
+                        "The site identifier you provided is not valid.");
             }
             
             /**
