@@ -12,6 +12,7 @@ package org.akaza.openclinica.logic.odmExport;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 import javax.servlet.http.HttpServletRequest;
@@ -39,6 +40,7 @@ public class ClinicalDataUnit extends OdmUnit {
     private OdmClinicalDataBean odmClinicalData;
     private String studySubjectIds;
     private String permissionTagsString;
+    private Set<Integer> edcSet;
 
     public ClinicalDataUnit() {
     }
@@ -54,11 +56,12 @@ public class ClinicalDataUnit extends OdmUnit {
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, String studySubjectIds,String permissionTagsString) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, String studySubjectIds,String permissionTagsString , Set<Integer> edcSet) {
         super(ds, dataset, odmBean, study, category);
         this.permissionTagsString=permissionTagsString;
         this.odmClinicalData = new OdmClinicalDataBean();
         this.studySubjectIds = studySubjectIds;
+        this.edcSet=edcSet;
     }
 
     public void collectOdmClinicalData() {
@@ -70,10 +73,7 @@ public class ClinicalDataUnit extends OdmUnit {
         }
         odmClinicalData.setStudyOID(studyOID);
 
-        OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
-
-
-
+        OdmExtractDAO oedao = new OdmExtractDAO(this.ds,edcSet);
 
         if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
             String mvoid = "";

@@ -11,15 +11,19 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.extract.DatasetBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.hibernate.ArchivedDatasetFilePermissionTagDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.datamap.ArchivedDatasetFilePermissionTag;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
+import java.util.List;
 import java.util.Locale;
 
 /**
@@ -48,6 +52,20 @@ public class AccessFileServlet extends SecureController {
         ArchivedDatasetFileBean asdfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(fileId);
         StudyDAO studyDao = new StudyDAO(sm.getDataSource());
         DatasetBean dsBean = (DatasetBean) dsDao.findByPK(asdfBean.getDatasetId());
+
+        List<String> permissionTagsList= getPermissionTagsList();
+        List<ArchivedDatasetFilePermissionTag> adfTags = getArchivedDatasetFileTags(asdfBean.getId());
+
+        for(ArchivedDatasetFilePermissionTag adfTag:adfTags){
+           if(!permissionTagsList.contains(adfTag.getPermissionTagId())){
+               String originatingPage ="ExportDataset?datasetId="+ dsBean.getId();
+               request.setAttribute("originatingPage", originatingPage);
+               forwardPage(Page.NO_ACCESS);
+               return;
+           }
+        }
+
+
         int parentId = currentStudy.getParentStudyId();
         if(parentId==0)//Logged in at study level
         {
@@ -137,4 +155,9 @@ if( dsBean.getStudyId() != currentStudy.getId())		{
 
     }
 
+    public List<ArchivedDatasetFilePermissionTag>  getArchivedDatasetFileTags(int adfId) {
+        ArchivedDatasetFilePermissionTagDao adfDao = (ArchivedDatasetFilePermissionTagDao) SpringServletAccess.getApplicationContext(context).getBean("archivedDatasetFilePermissionTagDao");
+        List<ArchivedDatasetFilePermissionTag> adfTags = adfDao.findAllByArchivedDatasetFileId(adfId);
+        return adfTags;
+    }
 }
