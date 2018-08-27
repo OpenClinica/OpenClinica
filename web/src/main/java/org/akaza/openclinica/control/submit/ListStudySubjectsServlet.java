@@ -85,6 +85,13 @@ public class ListStudySubjectsServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         boolean showMoreLink;
 
+        String addNewSubjectOverlay = fp.getRequest().getParameter("addNewSubject");
+        if (addNewSubjectOverlay != null){
+            if (addNewSubjectOverlay.equals("true")){
+                request.setAttribute("showOverlay", true);
+            }
+        }
+
         if(fp.getString("showMoreLink").equals("")){
             showMoreLink = true;
         }else {
