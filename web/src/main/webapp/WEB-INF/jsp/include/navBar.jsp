@@ -380,7 +380,7 @@
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                                                                         <c:if test="${study.status.available && !enrollmentCapped}">
-                                                                                            <li><a href="javascript:;" id="navAddSubject"><fmt:message
+                                                                                            <li><a href="${urlPrefix}ListStudySubjects?addNewSubject=true"><fmt:message
                                                                                                     key="nav_add_subject" bundle="${resword}"/></a></li>
                                                                                         </c:if>
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
@@ -393,7 +393,7 @@
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                                                                         <c:if test="${study.status.available && !enrollmentCapped}">
-                                                                                            <li><a href="javascript:;" id="navAddSubject"><fmt:message
+                                                                                            <li><a href="${urlPrefix}ListStudySubjects?addNewSubject=true"><fmt:message
                                                                                                     key="nav_add_subject" bundle="${resword}"/></a></li>
                                                                                         </c:if>
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
@@ -500,7 +500,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
                 <c:if test="${study.status.available && !enrollmentCapped}">
-                    <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
             </div>
@@ -520,7 +520,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
                 <c:if test="${study.status.available && !enrollmentCapped}">
-                    <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
             </div>
@@ -548,7 +548,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
                 <c:if test="${study.status.available && !enrollmentCapped}">
-                    <div class="taskLink"><a href="javascript:;" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
             </div>
@@ -630,6 +630,7 @@
     $(document).keyup(function(e) {
         if (e.keyCode == 27) { // escape key maps to keycode `27`
             dropdown.style.display="none";
+            jQuery.unblockUI();
         }
     });
 
