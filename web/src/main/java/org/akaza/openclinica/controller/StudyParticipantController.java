@@ -143,6 +143,18 @@ public class StudyParticipantController {
 		}
 		
 		@ApiOperation(value = "To create participants at study level in bulk",  notes = "Will read the subjectKeys in CSV file")
+		@ApiResponses(value = {
+		        @ApiResponse(code = 200, message = "Successful operation"),
+		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
+		        		+ "<br />Error Code                                            Descriptions"
+		        		+ "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
+		        		+ "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
+		        		+ "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
+		        		+ "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
+		        		+ "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
+		        		+ "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
+		        		+ "<br />participantIDNotUnique                        : Participant ID already exists."
+		        		+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 		@RequestMapping(value = "/{studyOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
 				@RequestParam("file") MultipartFile file,
@@ -155,6 +167,18 @@ public class StudyParticipantController {
 		}
 		
 		@ApiOperation(value = "To create participants at study site level in bulk",  notes = "Will read the subjectKeys in CSV file")
+		@ApiResponses(value = {
+		        @ApiResponse(code = 200, message = "Successful operation"),
+		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
+		        		+ "<br />Error Code                                            Descriptions"
+		        		+ "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
+		        		+ "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
+		        		+ "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
+		        		+ "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
+		        		+ "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
+		        		+ "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
+		        		+ "<br />participantIDNotUnique                        : Participant ID already exists."
+		        		+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 		@RequestMapping(value = "/{studyOID}/sites/{siteOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request,
 				@RequestParam("file") MultipartFile file,
