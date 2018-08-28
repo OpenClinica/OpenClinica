@@ -959,11 +959,12 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align: center;">
-                    <input type="submit" name="Submit" value="Edit"/>
-                    &nbsp;
                     <a href="javascript:;" id="cancelEdit">
                     <input type="button" id="cancel" name="cancel" value="Cancel"/>
                     </a>
+                    &nbsp;
+                    <input type="submit" name="Submit" value="Edit"/>
+
 
                     <div id="dvForCalander_${rand}" style="width:1px; height:1px;"></div>
                 </td>
