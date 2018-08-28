@@ -91,9 +91,9 @@
 
     <tr>
         <td colspan="2" style="text-align: center;">
-            <input type="submit" name="addSubject" value="Add"/>
-            &nbsp;
             <input type="button" id="cancel" name="cancel" value="Cancel"/>
+            &nbsp;
+            <input type="submit" name="addSubject" value="Add"/>
 
             <div id="dvForCalander_${rand}" style="width:1px; height:1px;"></div>
         </td>
