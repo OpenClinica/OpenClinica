@@ -54,8 +54,6 @@ public class ImportCRFDataServlet extends SecureController {
 
     Locale locale;
 
-    private ImportCRFDataService dataService;
-
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
     FileUploadHelper uploadHelper = new FileUploadHelper();
 
@@ -242,7 +240,7 @@ public class ImportCRFDataServlet extends SecureController {
             // 3.e. are those item groups in that crf version?
             // 3.f. are those items in that item group?
 
-            List<String> errors = getImportCRFDataService().validateStudyMetadata(odmContainer, ub.getActiveStudyId());
+            List<String> errors = getImportCRFDataService().validateStudyMetadata(odmContainer, ub.getActiveStudyId(), locale);
             if (CollectionUtils.isNotEmpty(errors)) {
                 // add to session
                 // forward to another page
@@ -361,7 +359,7 @@ public class ImportCRFDataServlet extends SecureController {
                         List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
 
                         tempDisplayItemBeanWrappers = getImportCRFDataService().lookupValidationErrors(request, odmContainer, ub, totalValidationErrors,
-                                hardValidationErrors, permittedEventCRFs);
+                                hardValidationErrors, permittedEventCRFs, null);
                         logger.debug("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
                         logger.debug("size of total validation errors: " + totalValidationErrors.size());
                         displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
@@ -457,8 +455,7 @@ public class ImportCRFDataServlet extends SecureController {
     }
 
     public ImportCRFDataService getImportCRFDataService() {
-        dataService = this.dataService != null ? dataService : new ImportCRFDataService(sm.getDataSource(), locale);
-        return dataService;
+        return (ImportCRFDataService) SpringServletAccess.getApplicationContext(context).getBean("importCRFDataService");
     }
 
     @Override

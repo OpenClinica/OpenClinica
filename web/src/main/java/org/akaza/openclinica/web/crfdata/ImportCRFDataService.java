@@ -4,13 +4,7 @@ import java.math.BigDecimal;
 import java.text.MessageFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.ResourceBundle;
+import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -50,8 +44,12 @@ import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
+import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -64,24 +62,34 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;
 
 public class ImportCRFDataService {
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     private final DataSource ds;
-
     private ItemDataDAO itemDataDao;
 
-    public static ResourceBundle respage;
 
-    public ImportCRFDataService(DataSource ds, Locale locale) {
-        ResourceBundleProvider.updateLocale(locale);
-        respage = ResourceBundleProvider.getPageMessagesBundle(locale);
+    @Autowired
+    private ViewStudySubjectService viewStudySubjectService;
+
+    @Autowired
+    private UserAccountDao userAccountDao;
+
+    @Autowired
+    private StudyEventDao studyEventDao;
+
+
+    public ImportCRFDataService(DataSource ds) {
         this.ds = ds;
     }
 
@@ -120,18 +128,52 @@ public class ImportCRFDataService {
                         studyBean.getId(), studyBean.getParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
 
-                StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
-                        studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
-                // @pgawade 16-March-2011 Do not allow the data import
-                // if event status is one of the - stopped, signed,
-                // locked
-                if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)
-                        || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)
-                        || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.STOPPED)) {
-                    return null;
+
+                StudyEventBean studyEventBean = null;
+
+                UserAccount userAccount = userAccountDao.findById(ub.getId());
+
+
+                if (!studyEventDefinitionBean.isTypeCommon()) {
+
+                    studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
+                            studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
+
+
+                    // @pgawade 16-March-2011 Do not allow the data import
+                    // if event status is one of the - stopped, signed,
+                    // locked
+                    if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)
+                            || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)
+                            || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.STOPPED)) {
+                        return null;
+                    }
                 }
                 for (FormDataBean formDataBean : formDataBeans) {
+
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+                    CRFDAO crfDAO = new CRFDAO(ds);
+
+                    if (studyEventDefinitionBean.isTypeCommon()){
+
+                        String formOid = formDataBean.getFormOID();
+                        CRFBean crfBean = crfDAO.findByOid(formOid);
+                        CommonEventContainerDTO commonEventContainerDTO = viewStudySubjectService.addCommonForm(studyEventDefinitionBean.getOid(),crfBean.getOid(),
+                                studySubjectBean.getOid(),userAccount,studyBean.getOid());
+
+                        StudyEventBean tempStudyEventBean = new StudyEventBean();
+                        tempStudyEventBean.setStudySubjectId(commonEventContainerDTO.getStudySubject().getStudySubjectId());
+                        tempStudyEventBean.setSubjectEventStatus(SubjectEventStatus.NOT_SCHEDULED);
+                        tempStudyEventBean.setStudyEventDefinitionId(commonEventContainerDTO.getStudyEventDefinition().getStudyEventDefinitionId());
+                        // More fields here .....
+                        studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
+
+
+                        //studyEventBean = studyEventDao.findById(commonEventContainerDTO.getStudyEvent().getId());
+                        //studyEventBean = (StudyEventBean) studyEventDAO.findByPK(commonEventContainerDTO.getStudyEvent().getStudyEventId());
+
+                    }
+
 
                     ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
 
@@ -147,7 +189,8 @@ public class ImportCRFDataService {
                             logger.debug("   found no event crfs from Study Event id " + studyEventBean.getId() + ", location " + studyEventBean.getLocation());
                             // spell out criteria and create a bean if
                             // necessary, avoiding false-positives
-                            if ((studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
+                            if ((studyEventDefinitionBean.isTypeCommon()
+                                    ||studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
                                     || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
                                     || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) && upsert.isNotStarted()) {
 
@@ -353,8 +396,11 @@ public class ImportCRFDataService {
     }
 
     public List<DisplayItemBeanWrapper> lookupValidationErrors(HttpServletRequest request, ODMContainer odmContainer, UserAccountBean ub,
-            HashMap<String, String> totalValidationErrors, HashMap<String, String> hardValidationErrors, List<EventCRFBean> permittedEventCRFs)
+                                                               HashMap<String, String> totalValidationErrors, HashMap<String, String> hardValidationErrors, List<EventCRFBean> permittedEventCRFs, Locale locale)
             throws OpenClinicaException {
+
+        ResourceBundleProvider.updateLocale(locale);
+        ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 
         DisplayItemBeanWrapper displayItemBeanWrapper = null;
         HashMap validationErrors = new HashMap();
@@ -522,7 +568,7 @@ public class ImportCRFDataService {
                                                 // 'null'
                                                 // tbh
                                                 attachValidator(displayItemBean, importHelper, discValidator, hardValidator, request, eventCRFRepeatKey,
-                                                        studySubjectBean.getOid());
+                                                        studySubjectBean.getOid(), respage);
                                                 displayItemBeans.add(displayItemBean);
 
                                             } else {
@@ -665,7 +711,7 @@ public class ImportCRFDataService {
     }
 
     private void attachValidator(DisplayItemBean displayItemBean, ImportHelper importHelper, DiscrepancyValidator v, HashMap<String, String> hardv,
-            javax.servlet.http.HttpServletRequest request, String eventCRFRepeatKey, String studySubjectOID) throws OpenClinicaException {
+                                 HttpServletRequest request, String eventCRFRepeatKey, String studySubjectOID, ResourceBundle respage) throws OpenClinicaException {
         org.akaza.openclinica.bean.core.ResponseType rt = displayItemBean.getMetadata().getResponseSet().getResponseType();
         String itemOid = displayItemBean.getItem().getOid() + "_" + eventCRFRepeatKey + "_" + displayItemBean.getData().getOrdinal() + "_" + studySubjectOID;
         // note the above, generating an ordinal on top of the OID to view
@@ -888,7 +934,10 @@ public class ImportCRFDataService {
      * that study? 3.c. is that site in that study? 3.d. is that crf version in that study event def? 3.e. are those
      * item groups in that crf version? 3.f. are those items in that item group?
      */
-    public List<String> validateStudyMetadata(ODMContainer odmContainer, int currentStudyId) {
+    public List<String> validateStudyMetadata(ODMContainer odmContainer, int currentStudyId, Locale locale) {
+
+        ResourceBundleProvider.updateLocale(locale);
+        ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
         List<String> errors = new ArrayList<String>();
         MessageFormat mf = new MessageFormat("");
 
@@ -959,7 +1008,9 @@ public class ImportCRFDataService {
                                 StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(
                                         studySubjectBean.getId(), studyEventDefintionBean.getId(),
                                         Integer.valueOf(studyEventDataBean.getStudyEventRepeatKey()));
-                                if (studyEvent == null || studyEvent.getId() == 0) {
+                                if (studyEventDefintionBean.isTypeCommon()){
+                                    // Do something probably not sure....
+                                } else if (studyEvent == null || studyEvent.getId() == 0) {
                                     mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
                                     Object[] arguments = { sedOid, oid };
                                     errors.add(mf.format(arguments));
@@ -1148,8 +1199,11 @@ public class ImportCRFDataService {
     }
     
     public List<DisplayItemBeanWrapper> lookupValidationErrors(HttpServletRequest request, ODMContainer odmContainer, UserAccountBean ub,
-            HashMap<String, String> totalValidationErrors, HashMap<String, String> hardValidationErrors, ArrayList<Integer> permittedEventCRFIds)
+                                                               HashMap<String, String> totalValidationErrors, HashMap<String, String> hardValidationErrors, ArrayList<Integer> permittedEventCRFIds, Locale locale)
             throws OpenClinicaException {
+
+        ResourceBundleProvider.updateLocale(locale);
+        ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
 
         DisplayItemBeanWrapper displayItemBeanWrapper = null;
         HashMap validationErrors = new HashMap();
@@ -1306,7 +1360,7 @@ public class ImportCRFDataService {
                                             // if you do indeed leave off this in the XML it will pass but return 'null'
                                             // tbh
                                             attachValidator(displayItemBean, importHelper, discValidator, hardValidator, request, eventCRFRepeatKey,
-                                                    studySubjectBean.getOid());
+                                                    studySubjectBean.getOid(), respage);
                                             displayItemBeans.add(displayItemBean);
 
                                         } else {

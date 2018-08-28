@@ -41,6 +41,7 @@ import org.akaza.openclinica.web.job.CrfBusinessLogicHelper;
 import org.akaza.openclinica.web.job.TriggerService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
@@ -72,6 +73,9 @@ public class DataImportService {
 
     Locale locales;
 
+    @Autowired
+    private ImportCRFDataService importCRFDataService;
+
     public Locale getLocale() {
         if (locales == null)
             locales = new Locale("en-US");
@@ -90,7 +94,7 @@ public class DataImportService {
             UserAccountBean userBean, List<DisplayItemBeanWrapper> displayItemBeanWrappers, HashMap<Integer, String> importedCRFStatuses) {
 
         logger.debug("passing an odm container and study bean id: " + studyBean.getId());
-        List<String> errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getId());
+        List<String> errors = getImportCRFDataService().validateStudyMetadata(odmContainer, studyBean.getId(),getLocale() );
 
         if (errors == null)
             return new ArrayList<String>();
@@ -111,7 +115,8 @@ public class DataImportService {
      * @param resources
      * @param studyBean
      * @param userBean
-     * @param xml
+     * @param displayItemBeanWrappers
+     * @param importedCRFStatuses
      * @return
      * @throws Exception
      * 
@@ -134,10 +139,10 @@ public class DataImportService {
         auditMsg.append(respage.getString("passed_oid_metadata_check") + " ");
 
         // validation errors, the same as in the ImportCRFDataServlet. DRY?
-        Boolean eventCRFStatusesValid = getImportCRFDataService(dataSource).eventCRFStatusesValid(odmContainer, userBean);
-        List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, userBean, Boolean.TRUE);
+        Boolean eventCRFStatusesValid = getImportCRFDataService().eventCRFStatusesValid(odmContainer, userBean);
+        List<EventCRFBean> eventCRFBeans = getImportCRFDataService().fetchEventCRFBeans(odmContainer, userBean, Boolean.TRUE);
         // The following line updates a map that is used for setting the EventCRF status post import
-        getImportCRFDataService(dataSource).fetchEventCRFStatuses(odmContainer, importedCRFStatuses);
+        getImportCRFDataService().fetchEventCRFStatuses(odmContainer, importedCRFStatuses);
 
         ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
 
@@ -186,8 +191,8 @@ public class DataImportService {
             MockHttpServletRequest request = new MockHttpServletRequest();
             request.addPreferredLocale(getLocale());
 
-            tempDisplayItemBeanWrappers = getImportCRFDataService(dataSource).lookupValidationErrors(request, odmContainer, userBean, totalValidationErrors,
-                    hardValidationErrors, permittedEventCRFIds);
+            tempDisplayItemBeanWrappers = getImportCRFDataService().lookupValidationErrors(request, odmContainer, userBean, totalValidationErrors,
+                    hardValidationErrors, permittedEventCRFIds, getLocale() );
             displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
             logger.debug("size of total validation errors: " + (totalValidationErrors.size() + hardValidationErrors.size()));
             ArrayList<SubjectDataBean> subjectData = odmContainer.getCrfDataPostImportContainer().getSubjectData();
@@ -398,12 +403,12 @@ public class DataImportService {
         return messages;
     }
 
-    private ImportCRFDataService getImportCRFDataService(DataSource dataSource) {
+    private ImportCRFDataService getImportCRFDataService() {
         /*
          * if (locale == null) {locale = new Locale("en-US");} dataService = this.dataService != null? dataService : new
          * ImportCRFDataService(dataSource, locale);
          */
-        return new ImportCRFDataService(dataSource, getLocale());
+        return importCRFDataService;
     }
 
     private ArrayList<String> getReturnList(String status, String msg, String auditMsg) {

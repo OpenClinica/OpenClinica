@@ -69,6 +69,8 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
         this.oidGenerator = oidGenerator;
     }
 
+    private final String COMMON = "common";
+
     /**
      * @return Returns the category.
      */
@@ -225,6 +227,11 @@ public class StudyEventDefinitionBean extends AuditableEntityBean implements Com
 
     public void setCrfsWithDefaultVersion(Map crfsWithDefaultVersion) {
         this.crfsWithDefaultVersion = crfsWithDefaultVersion;
+    }
+
+
+    public Boolean isTypeCommon(){
+        return getType().equals(COMMON);
     }
 
     /*

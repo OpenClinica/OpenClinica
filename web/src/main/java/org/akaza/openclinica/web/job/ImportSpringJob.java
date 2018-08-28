@@ -285,7 +285,7 @@ public class ImportSpringJob extends QuartzJobBean {
     private ImportCRFDataService getImportCRFDataService(DataSource dataSource) {
         // TODO dynamic locale?
         // Locale locale = new Locale("en-US");
-        dataService = this.dataService != null ? dataService : new ImportCRFDataService(dataSource, locale);
+        dataService = this.dataService != null ? dataService : new ImportCRFDataService(dataSource);
         return dataService;
     }
 
@@ -384,7 +384,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 }
             }
             // next: check, then import
-            List<String> errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getId());
+            List<String> errors = getImportCRFDataService(dataSource).validateStudyMetadata(odmContainer, studyBean.getId(), locale);
             // this needs to be replaced with the study name from the job, since
             // the user could be in any study ...
             if (errors != null) {
@@ -499,7 +499,7 @@ public class ImportSpringJob extends QuartzJobBean {
                 try {
                     List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
                     tempDisplayItemBeanWrappers = getImportCRFDataService(dataSource).lookupValidationErrors(request, odmContainer, ub, totalValidationErrors,
-                            hardValidationErrors, permittedEventCRFs);
+                            hardValidationErrors, permittedEventCRFs, null);
                     logger.debug("size of total validation errors: " + totalValidationErrors.size());
                     displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
                 } catch (NullPointerException npe1) {

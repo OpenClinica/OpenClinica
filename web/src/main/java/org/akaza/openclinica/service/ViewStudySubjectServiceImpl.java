@@ -1,6 +1,7 @@
 package org.akaza.openclinica.service;
 
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.Status;
@@ -68,8 +69,44 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
         }
 
         request.setAttribute("requestSchema", publicStudy.getSchemaName());
-        Study study = studyDao.findByOcOID(studyOid);
+        //Study study = studyDao.findByOcOID(studyOid);
 
+        CommonEventContainerDTO commonEventContainerDTO =
+                addCommonForm(studyEventDefinitionOid,crfOid,studySubjectOid,userAccount,studyOid);
+
+        StudyEvent studyEvent = null;
+        if (commonEventContainerDTO.getEventCrfId() == 0) {
+            // schedule new Study Event
+            studyEvent = scheduleNewStudyEvent(commonEventContainerDTO.getStudySubject(),
+                    commonEventContainerDTO.getStudyEventDefinition(),
+                    commonEventContainerDTO.getMaxOrdinal(),
+                    commonEventContainerDTO.getUserAccount());
+        } else {
+            // use existing study Event
+            studyEvent = commonEventContainerDTO.getEventCrf().getStudyEvent();
+        }
+
+
+        String url = "/EnketoFormServlet?formLayoutId=" + commonEventContainerDTO.getFormLayout().getFormLayoutId()
+                + "&studyEventId=" + studyEvent.getStudyEventId()
+                + "&eventCrfId=" + commonEventContainerDTO.getEventCrfId()
+                + "&originatingPage=ViewStudySubject%3Fid%3D" + commonEventContainerDTO.getStudySubject().getStudySubjectId()
+                + "&mode=edit";
+
+        ViewStudySubjectDTO viewStudySubjectDTO = new ViewStudySubjectDTO();
+        viewStudySubjectDTO.setUrl(url);
+        return viewStudySubjectDTO;
+    }
+
+
+
+    public CommonEventContainerDTO addCommonForm(String studyEventDefinitionOid, String crfOid, String studySubjectOid,
+                                                 UserAccount userAccount, String studyOid) {
+
+        final String COMMON = "common";
+
+
+        Study study = studyDao.findByOcOID(studyOid);
         if (study == null) {
             logger.error("Study  is null");
             return null;
@@ -141,21 +178,16 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
                 }
             }
         }
-        if (eventCrfId == 0) {
-            // schedule new Study Event
-            studyEvent = scheduleNewStudyEvent(studySubject, studyEventDefinition, maxOrdinal, userAccount);
-        } else {
-            // use existing study Event
-            studyEvent = eventCrf.getStudyEvent();
-        }
 
+        CommonEventContainerDTO commonEventContainerDTO = new CommonEventContainerDTO();
+        commonEventContainerDTO.setEventCrfId(eventCrfId);
+        commonEventContainerDTO.setFormLayout(formLayout);
+        commonEventContainerDTO.setEventCrf(eventCrf);
+        commonEventContainerDTO.setStudyEventDefinition(studyEventDefinition);
+        commonEventContainerDTO.setUserAccount(userAccount);
+        commonEventContainerDTO.setStudySubject(studySubject);
 
-        String url = "/EnketoFormServlet?formLayoutId=" + formLayout.getFormLayoutId() + "&studyEventId=" + studyEvent.getStudyEventId()
-                + "&eventCrfId=" + eventCrfId + "&originatingPage=ViewStudySubject%3Fid%3D" + studySubject.getStudySubjectId() + "&mode=edit";
-
-        ViewStudySubjectDTO viewStudySubjectDTO = new ViewStudySubjectDTO();
-        viewStudySubjectDTO.setUrl(url);
-        return viewStudySubjectDTO;
+        return commonEventContainerDTO;
     }
 
     public Page getPage(HttpServletRequest request, String studyOid, String name) {
