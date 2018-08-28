@@ -5,6 +5,7 @@ import static org.akaza.openclinica.dao.hibernate.multitenant.CurrentTenantIdent
 import java.io.File;
 import java.text.SimpleDateFormat;
 import java.util.Date;
+import java.util.List;
 import java.util.Properties;
 
 import javax.servlet.http.HttpServletRequest;
@@ -93,7 +94,7 @@ public class ExtractController {
      */
     @RequestMapping(method = RequestMethod.GET)
     public ModelMap processSubmit(@RequestParam("id") String id,
-            @RequestParam("datasetId") String datasetId, HttpServletRequest request, HttpServletResponse response) throws SchedulerException {
+                                  @RequestParam("datasetId") String datasetId, HttpServletRequest request, HttpServletResponse response) {
         if(!mayProceed(request)){
             try{
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
@@ -115,7 +116,7 @@ public class ExtractController {
         datasetDao = new DatasetDAO(dataSource);
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
         CoreResources cr =  new CoreResources();
-        
+
 
         ExtractPropertyBean epBean = cr.findExtractPropertyBeanById(new Integer(id).intValue(),datasetId);
 
@@ -184,11 +185,19 @@ public class ExtractController {
             e.printStackTrace();
         }
         jobScheduler = getSchemaScheduler(request, context, jobScheduler);
-       String permissionTagsString =permissionService.getPermissionTagsString((StudyBean)request.getSession().getAttribute("study"),request);
+        String permissionTagsString =permissionService.getPermissionTagsString((StudyBean)request.getSession().getAttribute("study"),request);
         String[] permissionTagsStringArray =permissionService.getPermissionTagsStringArray((StudyBean)request.getSession().getAttribute("study"),request);
+        List<String> permissionTagsList =permissionService.getPermissionTagsList((StudyBean)request.getSession().getAttribute("study"),request);
 
-        jobScheduler.getContext().put("permissionTagsString",permissionTagsString);
-        jobScheduler.getContext().put("permissionTagsStringArray",permissionTagsStringArray);
+
+        try {
+            jobScheduler.getContext().put("permissionTagsString",permissionTagsString);
+            jobScheduler.getContext().put("permissionTagsStringArray",permissionTagsStringArray);
+            jobScheduler.getContext().put("permissionTagsList",permissionTagsList);
+        } catch (SchedulerException e) {
+            e.printStackTrace();
+        }
+
 
         // String xmlFilePath = generalFileDir + ODMXMLFileName;
         simpleTrigger = xsltService.generateXsltTrigger(jobScheduler, xsltPath,
@@ -196,10 +205,10 @@ public class ExtractController {
                 endFilePath + File.separator,
                 exportFileName,
                 dsBean.getId(),
-                epBean, 
-                userBean, 
+                epBean,
+                userBean,
                 LocaleResolver.getLocale(request).getLanguage(),
-                cnt,  
+                cnt,
                 SQLInitServlet.getField("filePath") + "xslt",
                 this.TRIGGER_GROUP_NAME,
                 (StudyBean) request.getSession().getAttribute("publicStudy"),

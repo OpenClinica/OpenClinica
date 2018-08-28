@@ -60,12 +60,18 @@ public class OdmExtractDAO extends DatasetDAO {
     EventDefinitionCrfTagDAO edctdao = new EventDefinitionCrfTagDAO(ds);
     StudyEventDAO sedao = new StudyEventDAO(ds);
     EventCRFDAO ecdao = new EventCRFDAO(ds);
+    Set<Integer> edcSet;
 
     EventDefinitionCrfTagService eventDefinitionCrfTagService;
     protected boolean showArchived;
 
     public OdmExtractDAO(DataSource ds) {
         super(ds);
+    }
+
+    public OdmExtractDAO(DataSource ds,Set<Integer> edcSet) {
+        super(ds);
+        this.edcSet=edcSet;
     }
 
     public OdmExtractDAO(DataSource ds, boolean showArchived) {
@@ -3852,6 +3858,10 @@ public class OdmExtractDAO extends DatasetDAO {
             ArrayList viewRows = select(permissionTagsLookupWithPermissionTags(edc, permissionTags));
             logger.info("permissionTagsLookup : "
                     + permissionTagsLookupWithPermissionTags(edc, permissionTags));
+            if(viewRows.size()>0){
+                // save the edc.getId in list and return to Job.
+                edcSet.add(edc.getId());
+            }
             return (viewRows.size() > 0 ?  false:  true) ;
 
         } else {

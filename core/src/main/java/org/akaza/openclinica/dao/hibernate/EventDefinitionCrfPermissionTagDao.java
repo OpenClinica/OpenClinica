@@ -7,6 +7,7 @@ import org.akaza.openclinica.domain.datamap.RepeatCount;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -49,6 +50,14 @@ public class EventDefinitionCrfPermissionTagDao extends AbstractDomainDao<EventD
         String query = "select permissionTagId from " + getDomainClassName() + " do where do.eventDefinitionCrf.eventDefinitionCrfId = :ecdId";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("ecdId", edc.getEventDefinitionCrfId());
+        return q.list();
+    }
+
+@Transactional
+public List<String> findTagsForEdcId(int edcId) {
+        String query = "select permissionTagId from " + getDomainClassName() + " do where do.eventDefinitionCrf.eventDefinitionCrfId = :edcId";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("edcId", edcId);
         return q.list();
     }
 
