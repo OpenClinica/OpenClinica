@@ -169,7 +169,7 @@ public class ViewNotesServlet extends SecureController {
         ItemDAO itemDao = new ItemDAO(sm.getDataSource());
         EventCRFDAO eventCRFDao = new EventCRFDAO(sm.getDataSource());
 
-        ListNotesTableFactory factory = new ListNotesTableFactory(showMoreLink);
+        ListNotesTableFactory factory = new ListNotesTableFactory(showMoreLink, getPermissionTagsList());
         factory.setSubjectDao(sdao);
         factory.setStudySubjectDao(subdao);
         factory.setUserAccountDao(uadao);

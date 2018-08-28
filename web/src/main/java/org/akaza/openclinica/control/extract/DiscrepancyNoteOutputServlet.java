@@ -1,6 +1,7 @@
 package org.akaza.openclinica.control.extract;
 
 import static java.util.Collections.emptySet;
+import static java.util.stream.Collectors.toList;
 
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -30,11 +31,13 @@ import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.bean.submit.ItemGroupBean;
 import org.akaza.openclinica.bean.submit.ItemGroupMetadataBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.core.util.Pair;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.ListNotesFilter;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -47,6 +50,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.DiscrepancyNoteThread;
@@ -59,7 +63,7 @@ import org.springframework.web.context.support.WebApplicationContextUtils;
 
 /**
  * A servlet that sends via HTTP a file containing Discrepancy-Note related data.
- * 
+ *
  * @author Bruce W. Perry
  * @see ChooseDownloadFormat
  * @see org.akaza.openclinica.bean.extract.DownloadDiscrepancyNote
@@ -69,6 +73,8 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     // file back to the user
     public static String CONTENT_DISPOSITION_HEADER = "Content-Disposition";
     public static String CONTENT_DISPOSITION_VALUE = "attachment; filename=";
+    private Map<String, String> discrepancyNoteTypesDecoder = makeDiscrepancyNoteTypesDecoder();
+    private Map<String, String> resolutionStatusDecoder = makeResolutionStatusDecoder();
 
     /* Handle the HTTP Get or Post request. */
     @Override
@@ -130,18 +136,19 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(getFilters(request), getDateFormat(), discrepancyNoteTypesDecoder,
                 resolutionStatusDecoder);
-        List<DiscrepancyNoteBean> notes = viewNotesService.listNotes(currentStudy, filter, ViewNotesSortCriteria.buildFilterCriteria(getSortOrder(request)));
+        List<DiscrepancyNoteBean> notes = viewNotesService.listNotes(currentStudy, filter, ViewNotesSortCriteria.buildFilterCriteria(getSortOrder(request)), getPermissionTagsList());
         ArrayList<DiscrepancyNoteBean> allDiscNotes = notes instanceof ArrayList ? (ArrayList<DiscrepancyNoteBean>) notes
                 : new ArrayList<DiscrepancyNoteBean>(notes);
 
-        allDiscNotes = populateRowsWithAttachedData(allDiscNotes);
+        ArrayList<DiscrepancyNoteBean> accessList = (ArrayList<DiscrepancyNoteBean>) removeNoAccessNotes(allDiscNotes);
+        accessList = populateRowsWithAttachedData(accessList);
 
         // Now we have to package all the discrepancy notes in DiscrepancyNoteThread objects
         // Do the filtering for type or status here
         DiscrepancyNoteUtil discNoteUtil = new DiscrepancyNoteUtil();
 
         Set<Integer> resolutionStatusIds = emptySet();
-        List<DiscrepancyNoteThread> discrepancyNoteThreads = discNoteUtil.createThreads(allDiscNotes, sm.getDataSource(), studyBean);
+        List<DiscrepancyNoteThread> discrepancyNoteThreads = discNoteUtil.createThreads(accessList, sm.getDataSource(), studyBean);
 
         if ("csv".equalsIgnoreCase(format)) {
             /*
@@ -168,6 +175,25 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         }
     }
 
+    private boolean checkNoteAccess(ItemDataDao itemDataDao, String entityType, int itemDataId) {
+        if (entityType.equalsIgnoreCase("itemData")) {
+
+            ItemData itemData = itemDataDao.findById(itemDataId);
+            if (hasFormAccess(itemData.getEventCrf())) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    private List<DiscrepancyNoteBean> removeNoAccessNotes(List<DiscrepancyNoteBean> notes) {
+        ItemDataDao itemDataDao = (ItemDataDao) SpringServletAccess.getApplicationContext(context).getBean("itemDataDao");
+        List<DiscrepancyNoteBean> accessList = notes.stream().filter(note -> checkNoteAccess(itemDataDao, note.getEntityType(), note.getEntityId()))
+                .collect(toList());
+        return accessList;
+
+    }
+
     private Map<String, String> makeDiscrepancyNoteTypesDecoder() {
         Map<String, String> decoder = new HashMap<String, String>();
 
@@ -180,8 +206,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         return decoder;
     }
 
-    private Map<String, String> discrepancyNoteTypesDecoder = makeDiscrepancyNoteTypesDecoder();
-
     private Map<String, String> makeResolutionStatusDecoder() {
         Map<String, String> decoder = new HashMap<String, String>();
 
@@ -193,8 +217,6 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
         return decoder;
     }
 
-    private Map<String, String> resolutionStatusDecoder = makeResolutionStatusDecoder();
-
     private String getDateFormat() {
         Locale locale = LocaleResolver.getLocale(request);
         ResourceBundle resformat = ResourceBundleProvider.getFormatBundle(locale);
@@ -203,11 +225,11 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
 
     private Map<String, String> getFilters(HttpServletRequest request) {
         Map<String, String> filters = new HashMap<String, String>();
-        String ids[] = { "studySubject.label", "siteId", "studySubject.labelExact", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate",
+        String ids[] = {"studySubject.label", "siteId", "studySubject.labelExact", "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate",
                 "discrepancyNoteBean.description", "discrepancyNoteBean.user", "discrepancyNoteBean.disType", "discrepancyNoteBean.entityType",
                 "discrepancyNoteBean.resolutionStatus", "age", "days",
 
-                "eventName", "crfName", "entityName", "entityValue", "discrepancyNoteBean.description", "discrepancyNoteBean.user" };
+                "eventName", "crfName", "entityName", "entityValue", "discrepancyNoteBean.description", "discrepancyNoteBean.user"};
         for (String s : ids) {
             String val = request.getParameter(s);
             if (val != null) {
@@ -218,7 +240,7 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
     }
 
     private List<Pair<String, String>> getSortOrder(HttpServletRequest request) {
-        String ids[] = { "studySubject.label", "discrepancyNoteBean.createdDate", "days", "age" };
+        String ids[] = {"studySubject.label", "discrepancyNoteBean.createdDate", "days", "age"};
 
         List<Pair<String, String>> sortOrders = new ArrayList<Pair<String, String>>(4);
         for (String s : ids) {
