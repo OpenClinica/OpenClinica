@@ -146,7 +146,7 @@ public class GenerateExtractFileService {
 
         return new OdmFileCreation().createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean,
                 currentStudy, generalFileDirCopy, eb,
-                currentStudyId, parentStudyId, studySubjectNumber, zipped, saveToDB, deleteOld, odmType, userBean,permissionTagsString,permissionTagsStringArray);
+                currentStudyId, parentStudyId, studySubjectNumber, zipped, saveToDB, deleteOld, odmType, userBean,permissionTagsString,permissionTagsStringArray,null);
     }
 
     public List<File> getOldFiles(){

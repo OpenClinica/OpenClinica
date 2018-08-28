@@ -430,7 +430,7 @@ public class ImportSpringJob extends QuartzJobBean {
             }
             ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
             // validation errors, the same as in the ImportCRFDataServlet. DRY?
-            List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, ub);
+            List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE);
             List<EventCRFBean> permittedEventCRFs = new ArrayList<EventCRFBean>();
             Boolean eventCRFStatusesValid = getImportCRFDataService(dataSource).eventCRFStatusesValid(odmContainer, ub);
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();

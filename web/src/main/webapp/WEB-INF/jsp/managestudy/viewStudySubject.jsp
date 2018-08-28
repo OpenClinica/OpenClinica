@@ -290,7 +290,9 @@
                                     <td class="table_actions" valign="top">
                                      <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
                                         <c:if test="${!userRole.monitor}">
-                                        <a href="javascript:;" id="editParticipantID">Edit</a>
+                                        <a href="javascript:;" id="editParticipantID">
+                                        <fmt:message key="edit" bundle="${resword}"/>
+                                        </a>
                                         </c:if>
                                       </c:if>
                                     </td>

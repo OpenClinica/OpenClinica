@@ -389,8 +389,7 @@
 		 </c:if>
 		</c:otherwise>
 		</c:choose>
-		<c:if test="${(study.status.available) && (!userRole.monitor) && (!currRow.bean.studyEvent.subjectEventStatus.locked)
-			&&(dec.eventCRF.status.name != 'completed')}">
+		<c:if test="${(study.status.available) && (!userRole.monitor) && (!currRow.bean.studyEvent.subjectEventStatus.locked) && (dec.eventCRF.status.name != 'completed') && !(dec.stage.invalid)}">
 		<td>
 		 <a class="accessCheck" href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySub.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
 			onMouseDown="javascript:setImage('bt_Delete1','images/bt_Delete_d.gif');"
@@ -400,11 +399,9 @@
 		 </td>
 		 </c:if>
 
-
 		    <c:if test="${ (userRole.director || userRole.coordinator) &&
- (study.status.available ) && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped)}">
+ (study.status.available ) && !(currRow.bean.studyEvent.subjectEventStatus.locked || currRow.bean.studyEvent.subjectEventStatus.skipped) && !(dec.stage.invalid)}">
    <td>
-
     <a class="accessCheck"  access_attr='<c:out value="${dec.eventCRF.id}"/>'
 	   href='pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}" />&formLayoutName=<c:out value="${dec.eventCRF.formLayout.name}" />&studySubjectLabel=<c:out value="${studySub.label}"/>&studySubjectId=<c:out value="${studySub.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>'
    onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"

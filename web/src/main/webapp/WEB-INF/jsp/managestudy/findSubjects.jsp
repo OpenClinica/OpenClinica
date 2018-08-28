@@ -107,7 +107,6 @@
         document.getElementById("btn").focus();
     };
 </script>
-
 <div id="findSubjectsDiv">
     <form  action="${pageContext.request.contextPath}/ListStudySubjects">
         <input type="hidden" name="module" value="admin">

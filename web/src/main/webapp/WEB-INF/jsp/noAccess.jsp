@@ -15,62 +15,35 @@
 <jsp:include page="include/sideAlert.jsp"/>
 <jsp:include page="include/sideInfo.jsp"/>
 
-<%--<c:choose>
-    <c:when test="${userBean != null && userRole != null && userRole.role.name != 'invalid' && passwordExpired == 'no'}">
-        <!-- homeheader.jsp BEGIN -->
-        <jsp:include page="include/home-header.jsp"/>
-        <!-- homeheader.jsp END -->
+<link rel="stylesheet" href="//code.jquery.com/ui/1.12.1/themes/base/jquery-ui.css">
+<style>
+    .no-close .ui-dialog-titlebar-close {
+        display: none;
+    }
+</style>
+<script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
 
-        <jsp:include page="include/sidebar.jsp"/>
-    </c:when>
-    <c:otherwise>
-        <jsp:include page="login-include/login-header.jsp"/>
+    <script type="application/javascript">
+        var redirectPath = '<%= request.getAttribute("originatingPage") %>';
+    </script>
+    <script>
+        $(function() {
+            $("#dialog").dialog({
+                dialogClass: "no-close",
+                buttons: [
+                    {
+                        text: "OK",
+                        click: function () {
+                            location.href =  redirectPath;
+                        }
+                    }
+                ]
+            })
+        });
+    </script>
 
-        <jsp:include page="include/userbox-inactive.jsp"/>
-        <table border="0" cellpadding=0" cellspacing="0">
-        <tr><td class="sidebar" valign="top"><br><b><a href="${pageContext.request.contextPath}/pages/logout"><fmt:message key="logout" bundle="${restext}"/></a></b></br></td>
-        <td class="content" valign="top">
-    </c:otherwise>
-</c:choose>--%>
-
-<h1><span class="title_manage"><fmt:message key="permission_tag_noaccess_header" bundle="${resword}"/></span></h1>
-
-<c:if test="${! empty formMessages}">
-    <!-- initial position for data entry error messages; we'll
-    improve the style as well -->
-
-    <div id="errorMessagesContainer" class="aka_err_message">
-        <ul>
-            <c:forEach var="formMsg" items="${formMessages}">
-                <li style="color:  #ff0000"><span style="text-decoration: underline"><strong><label for="<c:out value="${formMsg.key}" />"><c:out value="${formMsg.value}" /></label></strong></span></li>
-            </c:forEach>
-        </ul>
-        <!--  Use the formMessages request attribute to grab each validation
-      error message?
-      error messages look like:
-
-       Woops, you forgot to provide a value for
-       <strong><label for="formElementName">formElementName</label></strong>.<br/>-->
-
-    </div>
-</c:if>
-<font class="bodytext">
-
-<fmt:message key="permission_tag_noaccess_body" bundle="${resword}"/>
-
-</font>
-</td></tr></table>
-
-<c:choose>
-    <c:when test="${userBean != null && userRole != null && userRole.role.name != 'invalid' && passwordExpired == 'no'}">
-        <jsp:include page="include/footer.jsp"/>
-    </c:when>
-    <c:otherwise>
-        <jsp:include page="login-include/error-login-footer.jsp"/>
-    </c:otherwise>
-
-</c:choose>
-
-
-
-
+<div id="dialog" title="">
+    <fmt:message key="permission_tag_noaccess_header" bundle="${resword}"/>
+    <br><br>
+    <fmt:message key="permission_tag_noaccess_body" bundle="${resword}"/>
+</div>

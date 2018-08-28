@@ -11,13 +11,7 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.LinkedList;
-import java.util.List;
+import java.util.*;
 
 import javax.sql.DataSource;
 
@@ -63,7 +57,7 @@ public class OdmFileCreation {
 
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, StudyBean currentStudy,
                                                   String generalFileDirCopy, ExtractBean eb, Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped,
-                                                  boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean ,String permissionTagsString,String[] permissionTagsStringArray) {
+                                                  boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean ,String permissionTagsString,String[] permissionTagsStringArray, Set<Integer> edcSet) {
 
 
 
@@ -196,7 +190,7 @@ public class OdmFileCreation {
                 } // for
                 studySubjectIds = studySubjectIds.replaceFirst(",", "");
 
-                ClinicalDataUnit cdata = new ClinicalDataUnit(dataSource, datasetBean, cdc.getOdmbean(), u.getStudy(), cdc.getCategory(), studySubjectIds,permissionTagsString);
+                ClinicalDataUnit cdata = new ClinicalDataUnit(dataSource, datasetBean, cdc.getOdmbean(), u.getStudy(), cdc.getCategory(), studySubjectIds,permissionTagsString,edcSet);
                 cdata.setCategory(cdc.getCategory());
                 cdata.collectOdmClinicalData();
 
