@@ -12,6 +12,7 @@ import java.util.HashMap;
 import java.util.Locale;
 
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -84,6 +85,11 @@ public class ListStudySubjectsServlet extends SecureController {
         WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
         FormProcessor fp = new FormProcessor(request);
         boolean showMoreLink;
+
+        int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
+        StudyParameterValueBean parentSPV = spvdao.findByHandleAndStudy(parentStudyId, "subjectIdGeneration");
+        currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
 
         String addNewSubjectOverlay = fp.getRequest().getParameter("addNewSubject");
         if (addNewSubjectOverlay != null){
