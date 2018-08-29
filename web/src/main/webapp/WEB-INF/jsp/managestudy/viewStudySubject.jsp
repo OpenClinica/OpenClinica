@@ -398,7 +398,7 @@
 </c:choose>
 <a name="events"></a>
 </div>
-<div class="section expanded" id="subjectEvents" data-section-number="1">
+<div class="section expanded hide" id="subjectEvents" data-section-number="1">
   <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
     <fmt:message key="visits" bundle="${resword}"/>
   </div>
