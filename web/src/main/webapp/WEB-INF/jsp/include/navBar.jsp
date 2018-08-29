@@ -380,7 +380,7 @@
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                                                                         <c:if test="${study.status.available && !enrollmentCapped}">
-                                                                                            <li><a href="${urlPrefix}ListStudySubjects?addNewSubject=true id="navAddSubject""><fmt:message
+                                                                                            <li><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubject""><fmt:message
                                                                                                     key="nav_add_subject" bundle="${resword}"/></a></li>
                                                                                         </c:if>
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
@@ -393,7 +393,7 @@
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                                                                         <c:if test="${study.status.available && !enrollmentCapped}">
-                                                                                            <li><a href="${urlPrefix}ListStudySubjects?addNewSubject=true id="navAddSubject""><fmt:message
+                                                                                            <li><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubject""><fmt:message
                                                                                                     key="nav_add_subject" bundle="${resword}"/></a></li>
                                                                                         </c:if>
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
