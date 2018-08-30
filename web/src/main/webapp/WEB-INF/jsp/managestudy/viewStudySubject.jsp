@@ -963,7 +963,7 @@
                     <input type="button" id="cancel" name="cancel" value="Cancel"/>
                     </a>
                     &nbsp;
-                    <input type="submit" name="Submit" value="Edit"/>
+                    <input type="submit" name="Submit" value="Update"/>
 
 
                     <div id="dvForCalander_${rand}" style="width:1px; height:1px;"></div>
