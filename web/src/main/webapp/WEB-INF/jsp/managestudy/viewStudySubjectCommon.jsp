@@ -344,7 +344,7 @@ $(function() {
             var submission = {
                 studyStatus: studyEventData['@OpenClinica:Status'],
                 hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
-                updatedDate: formData['@OpenClinica:UpdatedDate'].split(' ')[0],
+                updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
                 updatedBy: formData['@OpenClinica:UpdatedBy'],
                 fields: copyObject(form.submissionFields),
                 links: collectLinks(studyEventData, formData)

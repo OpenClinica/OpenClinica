@@ -186,6 +186,7 @@ public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
         commonEventContainerDTO.setStudyEventDefinition(studyEventDefinition);
         commonEventContainerDTO.setUserAccount(userAccount);
         commonEventContainerDTO.setStudySubject(studySubject);
+        commonEventContainerDTO.setMaxOrdinal(maxOrdinal);
 
         return commonEventContainerDTO;
     }

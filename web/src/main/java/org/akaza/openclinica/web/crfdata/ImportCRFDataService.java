@@ -132,14 +132,11 @@ public class ImportCRFDataService {
                 StudyEventBean studyEventBean = null;
 
                 UserAccount userAccount = userAccountDao.findById(ub.getId());
-
+              
+                studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
+                        studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
 
                 if (!studyEventDefinitionBean.isTypeCommon()) {
-
-                    studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
-                            studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
-
-
                     // @pgawade 16-March-2011 Do not allow the data import
                     // if event status is one of the - stopped, signed,
                     // locked
@@ -149,12 +146,16 @@ public class ImportCRFDataService {
                         return null;
                     }
                 }
+                
                 for (FormDataBean formDataBean : formDataBeans) {
 
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
                     CRFDAO crfDAO = new CRFDAO(ds);
 
-                    if (studyEventDefinitionBean.isTypeCommon()){
+                    /**
+                     *  if repeat to import same data file,only first time need to create  for common events
+                     */
+                    if (studyEventDefinitionBean.isTypeCommon() && studyEventBean == null){
 
                         String formOid = formDataBean.getFormOID();
                         CRFBean crfBean = crfDAO.findByOid(formOid);
@@ -162,16 +163,26 @@ public class ImportCRFDataService {
                                 studySubjectBean.getOid(),userAccount,studyBean.getOid());
 
                         StudyEventBean tempStudyEventBean = new StudyEventBean();
+                        Date today = new Date();
+                        tempStudyEventBean.setCreatedDate(today);
+                        tempStudyEventBean.setDateStarted(today);
+                        tempStudyEventBean.setName(commonEventContainerDTO.getStudyEventDefinition().getName());
+                        tempStudyEventBean.setOwner(ub);
+                        ArrayList eventCRFs = new ArrayList<>();
+                        eventCRFs.add(commonEventContainerDTO.getEventCrf());
+                        tempStudyEventBean.setEventCRFs(eventCRFs);
+                        tempStudyEventBean.setOwnerId(ub.getId());
+                        tempStudyEventBean.setStudySubject(studySubjectBean);
+                        tempStudyEventBean.setUpdater(ub);
+                        tempStudyEventBean.setUpdatedDate(today);
                         tempStudyEventBean.setStudySubjectId(commonEventContainerDTO.getStudySubject().getStudySubjectId());
                         tempStudyEventBean.setSubjectEventStatus(SubjectEventStatus.NOT_SCHEDULED);
-                        tempStudyEventBean.setStudyEventDefinitionId(commonEventContainerDTO.getStudyEventDefinition().getStudyEventDefinitionId());
-                        // More fields here .....
+                        tempStudyEventBean.setStatus(Status.AVAILABLE);
+                        tempStudyEventBean.setStudyEventDefinitionId(commonEventContainerDTO.getStudyEventDefinition().getStudyEventDefinitionId());                        
+                        tempStudyEventBean.setSampleOrdinal(Integer.parseInt(sampleOrdinal));
+                        
                         studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
-
-
-                        //studyEventBean = studyEventDao.findById(commonEventContainerDTO.getStudyEvent().getId());
-                        //studyEventBean = (StudyEventBean) studyEventDAO.findByPK(commonEventContainerDTO.getStudyEvent().getStudyEventId());
-
+                       
                     }
 
 

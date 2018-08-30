@@ -359,7 +359,7 @@ public class ImportCRFDataServlet extends SecureController {
                         List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
 
                         tempDisplayItemBeanWrappers = getImportCRFDataService().lookupValidationErrors(request, odmContainer, ub, totalValidationErrors,
-                                hardValidationErrors, permittedEventCRFs, null);
+                                hardValidationErrors, permittedEventCRFs, locale);
                         logger.debug("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
                         logger.debug("size of total validation errors: " + totalValidationErrors.size());
                         displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
