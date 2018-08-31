@@ -381,7 +381,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 					dataBean.setCreatedBy(ecrf.getUserAccount().getUserName());
 					dataBean.setUpdatedDate(ecrf.getDateUpdated());
 					UserAccount updatedUserAccount = userAccountDao.findById(ecrf.getUpdateId());
-					dataBean.setUpdatedBy(updatedUserAccount.getUserName());
+					if(updatedUserAccount != null) {
+						dataBean.setUpdatedBy(updatedUserAccount.getUserName());
+					}else {
+						// or not set?
+						dataBean.setUpdatedBy(ecrf.getUserAccount().getUserName());
+					}
+					
 					if (ecrf.getFormLayout().getName() != null)
 						dataBean.setFormLayoutName(ecrf.getFormLayout().getName());
 					if (collectAudits)
