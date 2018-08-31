@@ -22,28 +22,22 @@
     }
 </style>
 <script src="https://code.jquery.com/ui/1.12.1/jquery-ui.js"></script>
-
-    <script type="application/javascript">
-        var redirectPath = '<%= request.getAttribute("originatingPage") %>';
-    </script>
-    <script>
-        $(function() {
-            $("#dialog").dialog({
-                dialogClass: "no-close",
-                buttons: [
-                    {
-                        text: "OK",
-                        click: function () {
-                            location.href =  redirectPath;
-                        }
-                    }
-                ]
-            })
-        });
-    </script>
-
 <div id="dialog" title="">
     <fmt:message key="permission_tag_noaccess_header" bundle="${resword}"/>
     <br><br>
     <fmt:message key="permission_tag_noaccess_body" bundle="${resword}"/>
 </div>
+<script type="application/javascript">
+    var redirectPath = '<%= request.getAttribute("originatingPage") %>';
+    $("#dialog").dialog({
+        dialogClass: "no-close",
+        buttons: [
+            {
+                text: "OK",
+                click: function () {
+                    location.href =  redirectPath;
+                }
+            }
+        ]
+    })
+</script>
