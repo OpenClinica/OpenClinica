@@ -154,34 +154,43 @@ public class ImportCRFDataService {
 
                     /**
                      *  if repeat to import same data file,only first time need to create  for common events
+                     *  
+                     *  and have current logic :
+		                if not found, the insert,
+		                if found, just update
                      */
-                    if (studyEventDefinitionBean.isTypeCommon() && studyEventBean == null){
+                    if (studyEventDefinitionBean.isTypeCommon() && (studyEventBean == null || studyEventBean.getId() == 0)){
 
                         String formOid = formDataBean.getFormOID();
                         CRFBean crfBean = crfDAO.findByOid(formOid);
                         CommonEventContainerDTO commonEventContainerDTO = viewStudySubjectService.addCommonForm(studyEventDefinitionBean.getOid(),crfBean.getOid(),
                                 studySubjectBean.getOid(),userAccount,studyBean.getOid());
-
-                        StudyEventBean tempStudyEventBean = new StudyEventBean();
-                        Date today = new Date();
-                        tempStudyEventBean.setCreatedDate(today);
-                        tempStudyEventBean.setDateStarted(today);
-                        tempStudyEventBean.setName(commonEventContainerDTO.getStudyEventDefinition().getName());
-                        tempStudyEventBean.setOwner(ub);
-                        ArrayList eventCRFs = new ArrayList<>();
-                        eventCRFs.add(commonEventContainerDTO.getEventCrf());
-                        tempStudyEventBean.setEventCRFs(eventCRFs);
-                        tempStudyEventBean.setOwnerId(ub.getId());
-                        tempStudyEventBean.setStudySubject(studySubjectBean);
-                        tempStudyEventBean.setUpdater(ub);
-                        tempStudyEventBean.setUpdatedDate(today);
-                        tempStudyEventBean.setStudySubjectId(commonEventContainerDTO.getStudySubject().getStudySubjectId());
-                        tempStudyEventBean.setSubjectEventStatus(SubjectEventStatus.NOT_SCHEDULED);
-                        tempStudyEventBean.setStatus(Status.AVAILABLE);
-                        tempStudyEventBean.setStudyEventDefinitionId(commonEventContainerDTO.getStudyEventDefinition().getStudyEventDefinitionId());                        
-                        tempStudyEventBean.setSampleOrdinal(Integer.parseInt(sampleOrdinal));
                         
-                        studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
+                        int existingMaxOrdinal = commonEventContainerDTO.getMaxOrdinal();
+                        if(this.passOrdinalLogicCheck(Integer.parseInt(sampleOrdinal), existingMaxOrdinal)) {
+                        	 StudyEventBean tempStudyEventBean = new StudyEventBean();
+                             Date today = new Date();
+                             tempStudyEventBean.setCreatedDate(today);
+                             tempStudyEventBean.setDateStarted(today);
+                             tempStudyEventBean.setName(commonEventContainerDTO.getStudyEventDefinition().getName());
+                             tempStudyEventBean.setOwner(ub);
+                             ArrayList eventCRFs = new ArrayList<>();
+                             eventCRFs.add(commonEventContainerDTO.getEventCrf());
+                             tempStudyEventBean.setEventCRFs(eventCRFs);
+                             tempStudyEventBean.setOwnerId(ub.getId());
+                             tempStudyEventBean.setStudySubject(studySubjectBean);
+                             tempStudyEventBean.setUpdater(ub);
+                             tempStudyEventBean.setUpdatedDate(today);
+                             tempStudyEventBean.setStudySubjectId(commonEventContainerDTO.getStudySubject().getStudySubjectId());
+                             tempStudyEventBean.setSubjectEventStatus(SubjectEventStatus.NOT_SCHEDULED);
+                             tempStudyEventBean.setStatus(Status.AVAILABLE);
+                             tempStudyEventBean.setStudyEventDefinitionId(commonEventContainerDTO.getStudyEventDefinition().getStudyEventDefinitionId());                        
+                             tempStudyEventBean.setSampleOrdinal(Integer.parseInt(sampleOrdinal));
+                             
+                             studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
+                        }
+
+                       
                        
                     }
 
@@ -1526,5 +1535,35 @@ public class ImportCRFDataService {
             // throw new OpenClinicaException(hardValidatorErrorMsgs, "");
         }
         return wrappers;
+    }
+    
+    /**
+     * if (sampleOrdinal = existingMaxOrdinal + 1)
+		// this is valid
+		// Insert logic goes here ..... 
+		if (sampleOrdinal == null)
+			// Insert logic goes and deduce sampleOrdinal == existingMaxOrdinal + 1
+		if (sampleOrdinal = existingMaxOrdinal)
+			// Update logic goes here ....
+		if (sampleOrdinal != existingMaxOrdinal && sampleOrdinal != existingMaxOrdinal +1)
+			// Reject this 
+		 * 
+		 * 
+		 * Note: 
+		 * the above sampleOrdinal will have relationship with the value of StudyEventRepeatKey in xml file		 
+		 * 
+		 * String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
+
+     * @return
+     */
+    public boolean passOrdinalLogicCheck(int sampleOrdinal,int existingMaxOrdinal){
+		boolean passCheck = true;
+	
+		// Reject this
+		if (sampleOrdinal > existingMaxOrdinal && sampleOrdinal != existingMaxOrdinal +1) {
+			passCheck = false;
+		}
+    		
+    	return passCheck;	
     }
 }
