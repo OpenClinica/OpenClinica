@@ -182,7 +182,9 @@ public class DiscrepancyNoteOutputServlet extends SecureController {
             if (hasFormAccess(itemData.getEventCrf())) {
                 return true;
             }
-        }
+        } else if (entityType.equalsIgnoreCase("studyEvent"))
+            return true;
+
         return false;
     }
 
