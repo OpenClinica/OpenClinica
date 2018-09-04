@@ -327,27 +327,30 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             studyEvent.setUpdateId(container.getUser().getUserId());
             studyEvent.setDateUpdated(new Date());
             studyEventDao.saveOrUpdate(studyEvent);
-            StudySubject studySubject = container.getSubject();
+        }
+        StudySubject studySubject = container.getSubject();
 
-            if (studySubject.getStatus() == Status.SIGNED) {
-                String subjectOldStatusId = "1";
-                AuditLogEvent subjectAuditLogEvent = new AuditLogEvent();
-                subjectAuditLogEvent.setAuditTable(STUDYSUBJECT);
-                subjectAuditLogEvent.setEntityId(studySubject.getStudySubjectId());
-                subjectAuditLogEvent.setEntityName("Status");
-                subjectAuditLogEvent.setAuditLogEventType(new AuditLogEventType(3));
-                subjectAuditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
+        // This code previously existed within the above if block. This resulted in a bug where if an event was scheduled
+        // for a participant that was already signed then entering data in that new event would bypass the logic. By moving
+        // it here the subject status should be properly updated, regardless of the status of any other events.
+        if (studySubject.getStatus() == Status.SIGNED) {
+            String subjectOldStatusId = "1";
+            AuditLogEvent subjectAuditLogEvent = new AuditLogEvent();
+            subjectAuditLogEvent.setAuditTable(STUDYSUBJECT);
+            subjectAuditLogEvent.setEntityId(studySubject.getStudySubjectId());
+            subjectAuditLogEvent.setEntityName("Status");
+            subjectAuditLogEvent.setAuditLogEventType(new AuditLogEventType(3));
+            subjectAuditLogEvent.setNewValue(String.valueOf(SubjectEventStatus.SIGNED.getId()));
 
-                List<AuditLogEvent> subjectAles = auditLogEventDao.findByParam(subjectAuditLogEvent);
-                for (AuditLogEvent audit : subjectAles) {
-                    subjectOldStatusId = audit.getOldValue();
-                    break;
-                }
-                studySubject.setStatus(Status.getByCode(Integer.valueOf(subjectOldStatusId)));
-                studySubject.setUpdateId(container.getUser().getUserId());
-                studySubject.setDateUpdated(new Date());
-                studySubjectDao.saveOrUpdate(studySubject);
+            List<AuditLogEvent> subjectAles = auditLogEventDao.findByParam(subjectAuditLogEvent);
+            for (AuditLogEvent audit : subjectAles) {
+                subjectOldStatusId = audit.getOldValue();
+                break;
             }
+            studySubject.setStatus(Status.getByCode(Integer.valueOf(subjectOldStatusId)));
+            studySubject.setUpdateId(container.getUser().getUserId());
+            studySubject.setDateUpdated(new Date());
+            studySubjectDao.saveOrUpdate(studySubject);
         }
     }
 
