@@ -357,17 +357,13 @@ public class ResolveDiscrepancyServlet extends SecureController {
                             EDIT_MODE, loadWarning, true);
                 } else
                     formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb,
-                            role, EDIT_MODE,  loadWarning,false);
+                            role, EDIT_MODE, loadWarning, false);
             } else {
                 String hash = formLayout.getXform();
                 formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);
             }
             request.setAttribute(EnketoFormServlet.FORM_URL, formUrlObject.getFormUrl());
-            String referer = request.getHeader("referer");
-            String[] splitReferer = referer.split(VIEW_NOTES + "\\?");
-            String viewNotesUrl = splitReferer.length > 1 ? VIEW_NOTES + "?" + splitReferer[1]
-                    : VIEW_NOTES + "?" + "module=" + module + "&listNotes_f_discrepancyNoteBean.disType=Query";
-            request.setAttribute(ORIGINATING_PAGE, viewNotesUrl);
+            request.setAttribute(ORIGINATING_PAGE, viewNotesUrl(module));
             request.setAttribute(JINI, jini);
         }
         return true;
@@ -398,6 +394,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             ItemDataDao itemDataDao = (ItemDataDao) SpringServletAccess.getApplicationContext(context).getBean("itemDataDao");
             ItemData itemData = itemDataDao.findById(discrepancyNoteBean.getEntityId());
             if (!hasFormAccess(itemData.getEventCrf())) {
+                request.setAttribute(ORIGINATING_PAGE, viewNotesUrl(module));
                 forwardPage(Page.NO_ACCESS);
                 return;
             }
@@ -909,6 +906,14 @@ public class ResolveDiscrepancyServlet extends SecureController {
             }
         }
         return xformOutput;
+    }
+
+    private String viewNotesUrl(String module) {
+        String referer = request.getHeader("referer");
+        String[] splitReferer = referer.split(VIEW_NOTES + "\\?");
+        String viewNotesUrl = splitReferer.length > 1 ? VIEW_NOTES + "?" + splitReferer[1]
+                : VIEW_NOTES + "?" + "module=" + module + "&listNotes_f_discrepancyNoteBean.disType=Query";
+        return viewNotesUrl;
     }
 
 }
