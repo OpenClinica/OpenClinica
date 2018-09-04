@@ -195,6 +195,7 @@ public class DiscrepancyNoteController {
         DiscrepancyNoteBean eventParentNote = (DiscrepancyNoteBean) getDnDao().findByPK(dnb.getParentDnId());
         eventParentNote.setResolutionStatusId(dnb.getResolutionStatusId());
         eventParentNote.setDiscrepancyNoteTypeId(dnb.getDiscrepancyNoteTypeId());
+        eventParentNote.setDetailedNotes(detailedNotes);
         eventParentNote.setAssignedUserId(assignedUserBean.getId());
         eventParentNote.setUpdater(ownerBean);
         getDnDao().update(eventParentNote); // update parent DN

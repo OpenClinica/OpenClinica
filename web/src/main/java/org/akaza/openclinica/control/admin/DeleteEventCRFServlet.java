@@ -286,6 +286,7 @@ public class DeleteEventCRFServlet extends SecureController {
         itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
         itemParentNote.setAssignedUser(null);
         itemParentNote.setOwner(ub);
+        itemParentNote.setDetailedNotes(detailedNotes);
         getDnDao().update(itemParentNote); // update parent DN
         getDnDao().updateAssignedUserToNull(itemParentNote); // update parent DN assigned user
 
