@@ -307,7 +307,7 @@ public class UpdateStudyEventServlet extends SecureController {
             }
         }
         // below added 092007, tbh, task #1390
-        if (!ub.isSysAdmin() && !currentRole.getRole().equals(Role.STUDYDIRECTOR) && !currentRole.getRole().equals(Role.COORDINATOR)) {
+        if (!currentRole.getRole().equals(Role.STUDYDIRECTOR) && !currentRole.getRole().equals(Role.COORDINATOR)) {
             statuses.remove(SubjectEventStatus.LOCKED);
         }
 
