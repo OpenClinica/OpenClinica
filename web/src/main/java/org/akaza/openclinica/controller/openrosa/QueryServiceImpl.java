@@ -156,11 +156,14 @@ public class QueryServiceImpl implements QueryService {
         dn.setEntityType("itemData");
 
         dn.setDetailedNotes(queryBean.getComment());
-        if (queryBean.getType().equals(QueryType.QUERY.getName()))
+        if (queryBean.getType().equals(QueryType.QUERY.getName())) {
             dn.setDiscrepancyNoteType(new DiscrepancyNoteType(3));
-        else if (queryBean.getType().equals(QueryType.REASON.getName()))
+            setResolutionStatus(queryBean, dn);
+        }else if
+            (queryBean.getType().equals(QueryType.REASON.getName())){
             dn.setDiscrepancyNoteType(new DiscrepancyNoteType(4));
-
+            dn.setResolutionStatus(resolutionStatusDao.findById(5));
+        }
         String user = queryBean.getUser();
         if (user == null) {
             dn.setUserAccountByOwnerId(helperBean.getContainer().getUser());
@@ -168,7 +171,6 @@ public class QueryServiceImpl implements QueryService {
             UserAccount userAccountByOwnerId = userAccountDao.findByUserName(user);
             dn.setUserAccountByOwnerId(userAccountByOwnerId);
         }
-        setResolutionStatus(queryBean, dn);
 
         String assignedTo = "";
         if (queryBean.getComment().startsWith("Automatic query for:")) {

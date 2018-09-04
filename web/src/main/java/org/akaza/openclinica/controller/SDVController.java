@@ -68,6 +68,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller("sdvController")
 public class SDVController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    public static final String ORIGINATING_PAGE = "originatingPage";
 
     public final static String SUBJECT_SDV_TABLE_ATTRIBUTE = "sdvTableAttribute";
     @Autowired
@@ -340,7 +341,7 @@ public class SDVController {
         if (parameterMap.isEmpty()) {
             pageMessages.add("None of the Event CRFs were selected for SDV.");
             request.setAttribute("pageMessages", pageMessages);
-            sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
+            sdvUtil.forwardRequestFromController(request, response, redirection);
 
         }
         List<Integer> eventCRFIds = sdvUtil.getListOfSdvEventCRFIds(parameterMap.keySet());
@@ -367,7 +368,7 @@ public class SDVController {
 
     @RequestMapping("/handleSDVGet")
     public String sdvOneCRFFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("crfId") int crfId,
-            @RequestParam("redirection") String redirection, ModelMap model) {
+            @RequestParam("redirection") String redirection, @RequestParam("studyId") int studyId, ModelMap model) {
 
 
 			 if(!mayProceed(request)){
@@ -382,9 +383,7 @@ public class SDVController {
         ArrayList<String> pageMessages = new ArrayList<String>();
 
         if (hasFormAccess(crfId ,request) != true) {
-            Page page1 = Page.valueOf(Page.NO_ACCESS.name());
-            String temp = page1.getFileName();
-            sdvUtil.forwardRequestFromController(request, response, temp);
+            forwardToNoAccessPage(request,response,redirection,studyId);
             return null;
         }
 
@@ -419,7 +418,7 @@ public class SDVController {
 
     @RequestMapping("/handleSDVRemove")
     public String changeSDVHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("crfId") int crfId,
-            @RequestParam("redirection") String redirection, ModelMap model) {
+            @RequestParam("redirection") String redirection, @RequestParam("studyId") int studyId, ModelMap model) {
 
         //For the messages that appear in the left column of the results page
         ArrayList<String> pageMessages = new ArrayList<String>();
@@ -429,9 +428,7 @@ public class SDVController {
         boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), false);
 
         if (hasFormAccess(crfId ,request) != true) {
-            Page page1 = Page.valueOf(Page.NO_ACCESS.name());
-            String temp = page1.getFileName();
-            sdvUtil.forwardRequestFromController(request, response, temp);
+            forwardToNoAccessPage(request,response,redirection,studyId);
             return null;
             }
 
@@ -671,4 +668,11 @@ public class SDVController {
         return permissionService.hasFormAccess(ec, ec.getFormLayout().getFormLayoutId(), ec.getStudyEvent().getStudyEventId(), request);
     }
 
+private void forwardToNoAccessPage(HttpServletRequest request,HttpServletResponse response,String redirection,int studyId){
+    Page page1 = Page.valueOf(Page.NO_ACCESS.name());
+    String temp = page1.getFileName();
+    String originatingPage = request.getContextPath() + "/pages/" + redirection+ "?sdv_restore=true&studyId=" + studyId;
+    request.setAttribute(ORIGINATING_PAGE, originatingPage);
+    sdvUtil.forwardRequestFromController(request, response, temp);
+}
 }

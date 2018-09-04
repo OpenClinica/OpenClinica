@@ -10,16 +10,13 @@ package org.akaza.openclinica.control.managestudy;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.List;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.managestudy.DisplayStudyEventBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
-import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
@@ -28,11 +25,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
@@ -157,7 +150,38 @@ public class RemoveStudyEventServlet extends SecureController {
                                 item.setUpdater(ub);
                                 item.setUpdatedDate(new Date());
                                 iddao.update(item);
+                                DiscrepancyNoteDAO dnDao = new DiscrepancyNoteDAO(sm.getDataSource());
+                                List dnNotesOfRemovedItem = dnDao.findExistingNotesForItemData(item.getId());
+                                if (!dnNotesOfRemovedItem.isEmpty()) {
+                                    DiscrepancyNoteBean itemParentNote = null;
+                                    for (Object obj : dnNotesOfRemovedItem) {
+                                        if (((DiscrepancyNoteBean) obj).getParentDnId() == 0) {
+                                            itemParentNote = (DiscrepancyNoteBean) obj;
+                                        }
+                                    }
+                                    DiscrepancyNoteBean dnb = new DiscrepancyNoteBean();
+                                    if (itemParentNote != null) {
+                                        dnb.setParentDnId(itemParentNote.getId());
+                                        dnb.setDiscrepancyNoteTypeId(itemParentNote.getDiscrepancyNoteTypeId());
+                                    }
+                                    dnb.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                                    dnb.setStudyId(currentStudy.getId());
+                                    dnb.setAssignedUserId(ub.getId());
+                                    dnb.setOwner(ub);
+                                    dnb.setEntityType(DiscrepancyNoteBean.ITEM_DATA);
+                                    dnb.setEntityId(item.getId());
+                                    dnb.setColumn("value");
+                                    dnb.setCreatedDate(new Date());
+                                    String detailedNotes="The item has been removed, this Query has been Closed.";
+                                    dnb.setDetailedNotes(detailedNotes);
+                                    dnDao.create(dnb);
+                                    dnDao.createMapping(dnb);
+                                    itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                                    itemParentNote.setDetailedNotes(detailedNotes);
+                                    dnDao.update(itemParentNote);
+                                }
                             }
+
                         }
                     }
                 }

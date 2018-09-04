@@ -242,10 +242,12 @@ public class EventService implements EventServiceInterface {
 							dnb.setEntityId(item.getId());
 							dnb.setColumn("value");
 							dnb.setCreatedDate(new Date());
-							dnb.setDetailedNotes("The item has been removed, this Query has been Closed.");
+							String detailedNotes="The item has been removed, this Query has been Closed.";
+							dnb.setDetailedNotes(detailedNotes);
 							getDiscrepancyNoteDao().create(dnb);
 							getDiscrepancyNoteDao().createMapping(dnb);
 							itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+							itemParentNote.setDetailedNotes(detailedNotes);
 							getDiscrepancyNoteDao().update(itemParentNote);
 						}
 					}
