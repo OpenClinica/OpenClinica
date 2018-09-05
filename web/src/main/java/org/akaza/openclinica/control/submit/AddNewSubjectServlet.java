@@ -36,6 +36,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Configurable;
+import org.springframework.context.annotation.ComponentScan;
 import org.springframework.web.context.support.SpringBeanAutowiringSupport;
 
 import javax.servlet.ServletException;
@@ -207,7 +208,7 @@ public class AddNewSubjectServlet extends SecureController {
             }
 
             DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
-            String label = fp.getString(INPUT_LABEL).trim();
+            String label = fp.getString(INPUT_LABEL);
 
             if (label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
                 label = generateParticipantIdUsingTemplate();

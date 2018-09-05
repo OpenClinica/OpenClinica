@@ -47,7 +47,7 @@
   <p><fmt:message key="your_current_active_study_is" bundle="${restext}"/> <c:out value="${publicStudy.name}"/>,
    <c:choose>
     <c:when test="${!userRole.invalid}">
-     <fmt:message key="with_a_role_of" bundle="${restext}"/> <c:out value="${userRole.role.description}"/>.
+     <fmt:message key="with_a_role_of" bundle="${restext}"/> <c:out value="${sessionScope.customUserRole}"/>.
     </c:when>
     <c:otherwise>
      <fmt:message key="but_no_role" bundle="${restext}"/>
@@ -84,7 +84,7 @@
                        <c:if test="${studyRole.envType == 'TEST'}">(<c:out value="Test"/>)</c:if>
                        <c:if test="${studyRole.envType == 'PROD'}">(<c:out value="Production"/>)</c:if>
                        <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
-                       (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>) </td>
+                       (<c:out value="${siteRoleMap[studyRole.studyId] }"/>) </td>
                  </tr>
                </c:if>
             </c:when>
@@ -95,7 +95,7 @@
                      <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>">
                      <b><c:out value="${studyRole.studyName}"/> 
                      <c:if test="${studyRole.envType == 'TEST'}">(<c:out value="Test"/>)</c:if>
-                     <c:if test="${studyRole.envType == 'PROD'}">(<c:out value="Production"/>)</c:if> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
+                     <c:if test="${studyRole.envType == 'PROD'}">(<c:out value="Production"/>)</c:if> (<c:out value="${studyRoleMap[studyRole.studyId] }"/>)</b></td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">
@@ -118,7 +118,7 @@
                       <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
                       <c:if test="${studyRole.envType == 'TEST'}">(<c:out value="Test"/>)</c:if>
                       <c:if test="${studyRole.envType == 'PROD'}">(<c:out value="Production"/>)</c:if>
-                      (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</td>
+                      (<c:out value="${siteRoleMap[studyRole.studyId] }"/>)</td>
                  </tr>
                 </c:if>
                </c:if>
@@ -130,7 +130,7 @@
                       <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>">
                       <b><c:out value="${studyRole.studyName}"/> 
                       <c:if test="${studyRole.envType == 'TEST'}">(<c:out value="Test"/>)</c:if>
-                      <c:if test="${studyRole.envType == 'PROD'}">(<c:out value="Production"/>)</c:if> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
+                      <c:if test="${studyRole.envType == 'PROD'}">(<c:out value="Production"/>)</c:if> (<c:out value="${studyRoleMap[studyRole.studyId] }"/>)</b></td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">

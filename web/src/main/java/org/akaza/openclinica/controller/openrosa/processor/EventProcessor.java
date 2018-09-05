@@ -252,9 +252,9 @@ public class EventProcessor implements Processor {
             if ((studyEvent.getSubjectEventStatusId().intValue() == SubjectEventStatus.SCHEDULED.getCode().intValue())
                     || (studyEvent.getSubjectEventStatusId().intValue() == SubjectEventStatus.NOT_SCHEDULED.getCode().intValue()
                             && studyEventDefinition.getType().equals(COMMON))) {
-                newStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
             }
 
+            newStatus = SubjectEventStatus.DATA_ENTRY_STARTED;
         } else {
             // Get a count of CRFs defined for the event
             // TODO: What i need to do to fix this is get the study from the context

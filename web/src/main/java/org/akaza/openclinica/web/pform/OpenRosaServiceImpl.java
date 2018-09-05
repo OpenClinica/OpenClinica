@@ -65,13 +65,13 @@ public class OpenRosaServiceImpl implements OpenRosaService {
 
     public String getUserListFromUserService(StudyAndSiteEnvUuid studyAndSiteEnvUuid) throws Exception {
 
-        List<OCUserRoleDTO> userList = getOcUserRoleDTOs(studyAndSiteEnvUuid);
+        List<OCUserRoleDTO> userList = getOcUserRoleDTOs(studyAndSiteEnvUuid.studyEnvUuid);
         return getUsersAsXml(userList, studyAndSiteEnvUuid);
     }
 
     public OCUserDTO fetchUserInfoFromUserService(StudyAndSiteEnvUuid studyAndSiteEnvUuid, String username) throws Exception {
 
-        List<OCUserRoleDTO> userList = getOcUserRoleDTOs(studyAndSiteEnvUuid);
+        List<OCUserRoleDTO> userList = getOcUserRoleDTOs(studyAndSiteEnvUuid.studyEnvUuid);
         for (OCUserRoleDTO ocUser : userList) {
             List<StudyEnvironmentRoleDTO> roles = ocUser.getRoles();
             OCUserDTO userInfo = ocUser.getUserInfo();
@@ -82,12 +82,12 @@ public class OpenRosaServiceImpl implements OpenRosaService {
     }
 
 
-    private List<OCUserRoleDTO> getOcUserRoleDTOs(StudyAndSiteEnvUuid studyAndSiteEnvUuid) {
+    public List<OCUserRoleDTO> getOcUserRoleDTOs(String studyEnvUuid) {
         Supplier<ResponseEntity<List<OCUserRoleDTO>>> getUserList = () -> {
 
             String baseUrl = CoreResources.getField("SBSUrl");
 
-            String uri = baseUrl.replaceAll("/users/", "") + "/study-environments/" + studyAndSiteEnvUuid.studyEnvUuid + "/users-with-roles";
+            String uri = baseUrl.replaceAll("/users/", "") + "/study-environments/" + studyEnvUuid + "/users-with-roles";
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();

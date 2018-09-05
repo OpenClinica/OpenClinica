@@ -48,6 +48,7 @@
 <jsp:useBean scope='request' id='studyToView' class='org.akaza.openclinica.bean.managestudy.StudyBean'/>
 <jsp:useBean scope='request' id='sitesToView' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='userRolesToView' class='java.util.ArrayList'/>
+<jsp:useBean scope='request' id='customRoles' class='java.util.HashMap'/>
 <jsp:useBean scope='request' id='subjectsToView' class='java.util.ArrayList'/>
 <jsp:useBean scope='request' id='definitionsToView' class='java.util.ArrayList'/>
 
