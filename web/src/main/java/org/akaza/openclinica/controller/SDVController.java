@@ -345,7 +345,19 @@ public class SDVController {
 
         }
         List<Integer> eventCRFIds = sdvUtil.getListOfSdvEventCRFIds(parameterMap.keySet());
-        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), true);
+        List<Integer> filteredEventCRFIds = new ArrayList<>();
+        for (Integer eventCrfId : eventCRFIds) {
+            if (hasFormAccess(eventCrfId, request) == true) {
+                filteredEventCRFIds.add(eventCrfId);
+            }
+        }
+        if (filteredEventCRFIds.size() == 0) {
+            forwardToNoAccessPage(request, response, redirection, studyId);
+            return null;
+        }
+
+
+        boolean updateCRFs = sdvUtil.setSDVerified(filteredEventCRFIds, getCurrentUser(request).getId(), true);
 
         if (updateCRFs) {
             pageMessages.add("The Event CRFs have been source data verified.");
