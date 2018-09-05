@@ -421,17 +421,14 @@ public class SDVController {
             @RequestParam("redirection") String redirection, @RequestParam("studyId") int studyId, ModelMap model) {
 
         //For the messages that appear in the left column of the results page
-        ArrayList<String> pageMessages = new ArrayList<String>();
-
-        List<Integer> eventCRFIds = new ArrayList<Integer>();
-        eventCRFIds.add(crfId);
-        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), false);
-
         if (hasFormAccess(crfId ,request) != true) {
             forwardToNoAccessPage(request,response,redirection,studyId);
             return null;
-            }
-
+        }
+        ArrayList<String> pageMessages = new ArrayList<String>();
+        List<Integer> eventCRFIds = new ArrayList<Integer>();
+        eventCRFIds.add(crfId);
+        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), false);
 
         if (updateCRFs) {
             pageMessages.add("The application has unset SDV for the Event CRF.");
