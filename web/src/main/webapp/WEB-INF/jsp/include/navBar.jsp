@@ -380,7 +380,7 @@
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                                                                         <c:if test="${study.status.available && !enrollmentCapped}">
-                                                                                            <li><a href="${urlPrefix}ListStudySubjects?addNewSubject=true"><fmt:message
+                                                                                            <li><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubject""><fmt:message
                                                                                                     key="nav_add_subject" bundle="${resword}"/></a></li>
                                                                                         </c:if>
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
@@ -393,7 +393,7 @@
                                                                                         <li><a href="${urlPrefix}ListStudySubjects"><fmt:message
                                                                                                 key="nav_subject_matrix" bundle="${resword}"/></a></li>
                                                                                         <c:if test="${study.status.available && !enrollmentCapped}">
-                                                                                            <li><a href="${urlPrefix}ListStudySubjects?addNewSubject=true"><fmt:message
+                                                                                            <li><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubject""><fmt:message
                                                                                                     key="nav_add_subject" bundle="${resword}"/></a></li>
                                                                                         </c:if>
                                                                                         <li><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message
@@ -500,7 +500,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
                 <c:if test="${study.status.available && !enrollmentCapped}">
-                    <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
             </div>
@@ -520,7 +520,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
                 <c:if test="${study.status.available && !enrollmentCapped}">
-                    <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
             </div>
@@ -548,7 +548,7 @@
             <div class="taskLeftColumn">
                 <div class="taskLink"><a href="${urlPrefix}ListStudySubjects"><fmt:message key="nav_subject_matrix" bundle="${resword}"/></a></div>
                 <c:if test="${study.status.available && !enrollmentCapped}">
-                    <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
+                    <div class="taskLink"><a href="${urlPrefix}ListStudySubjects?addNewSubject=true" id="navAddSubjectSD"><fmt:message key="nav_add_subject" bundle="${resword}"/></a></div>
                 </c:if>
                 <div class="taskLink"><a href="${urlPrefix}ViewNotes?module=submit&listNotes_f_discrepancyNoteBean.disType=Query"><fmt:message key="queries" bundle="${resword}"/></a></div>
             </div>
@@ -603,26 +603,6 @@
 </div>
 
 <script type="text/javascript">
-    jQuery(document).ready(function () {
-        jQuery('#navAddSubject').click(function () {
-            jQuery.blockUI({message: jQuery('#navAddSubjectForm'), css: {left: "300px", top: "10px"}});
-        });
-
-        jQuery('#cancel').click(function () {
-            jQuery.unblockUI();
-            return false;
-        });
-    });
-    jQuery(document).ready(function () {
-        jQuery('#navAddSubjectSD').click(function () {
-            jQuery.blockUI({message: jQuery('#navAddSubjectForm'), css: {left: "300px", top: "10px"}});
-        });
-
-        jQuery('#cancel').click(function () {
-            jQuery.unblockUI();
-            return false;
-        });
-    });
 
     dropdown = document.getElementById("subnav_Tasks");
 
@@ -655,82 +635,3 @@
         }
     }
 </script>
-
-<div id="navAddSubjectForm" style="display: none">
-    <form name="subjectForm" action="${pageContext.request.contextPath}/AddNewSubject" method="post">
-        <input type="hidden" name="subjectOverlay" value="true">
-
-        <table border="0" cellpadding="0" align="center" style="cursor:default;">
-            <tr style="height:10px;">
-                <td class="formlabel" align="left"><h3 class="addNewSubjectTitle"><fmt:message key="add_new_subject" bundle="${resword}"/></h3></td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="lines"></div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div style="max-height: 550px; min-width:400px; background:#FFFFFF; overflow-y: auto;">
-                        <table>
-                            <tr valign="top">
-                                <td class="formlabel" align="left">
-                                    <jsp:include page="../include/showSubmitted.jsp"/>
-                                    <input class="form-control" type="hidden" name="addWithEvent" value="1"/><span class="addNewStudyLayout">
-                                <fmt:message key="study_subject_ID" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
-                                </td>
-                                <td valign="top">
-                                    <table border="0" cellpadding="0" cellspacing="0" class="full-width">
-                                        <tr>
-                                            <td valign="top">
-                                                <div class="formfieldXL_BG">
-                                                    <c:choose>
-                                                        <c:when test="${study.studyParameterConfig.subjectIdGeneration =='auto non-editable'}">
-                                                            <input onfocus="this.select()" type="text" value="<c:out value="${label}"/>" size="45"
-                                                                   class="formfield form-control" disabled>
-                                                            <input class="form-control" type="hidden" name="label" value="<c:out value="${label}"/>">
-                                                        </c:when>
-                                                        <c:otherwise>
-                                                            <input onfocus="this.select()" type="text" name="label" value="<c:out value="${label}"/>" width="30"
-                                                                   class="formfieldXL form-control">
-                                                        </c:otherwise>
-                                                    </c:choose>
-                                                </div>
-                                            </td>
-                                        </tr>
-                                        <tr>
-                                            <td>
-                                                <jsp:include page="../showMessage.jsp">
-                                                    <jsp:param name="key" value="label"/>
-                                                </jsp:include>
-                                            </td>
-                                        </tr>
-
-                                    </table>
-                                </td>
-                            </tr>
-
-
-                        </table>
-                    </div>
-                </td>
-            </tr>
-            <tr>
-                <td>
-                    <div class="lines"></div>
-                </td>
-            </tr>
-            <tr>
-                <td colspan="2" style="text-align: center;">
-                    <input type="submit" name="addSubject" value="Add"/>
-                    &nbsp;
-                    <input type="button" id="cancel" name="cancel" value="Cancel"/>
-
-                    <div id="dvForCalander_${rand}" style="width:1px; height:1px;"></div>
-                </td>
-            </tr>
-
-        </table>
-
-    </form>
-</div>

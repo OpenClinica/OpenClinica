@@ -398,7 +398,7 @@
 </c:choose>
 <a name="events"></a>
 </div>
-<div class="section expanded" id="subjectEvents" data-section-number="1">
+<div class="section expanded hide" id="subjectEvents" data-section-number="1">
   <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
     <fmt:message key="visits" bundle="${resword}"/>
   </div>
@@ -959,11 +959,12 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align: center;">
-                    <input type="submit" name="Submit" value="Edit"/>
-                    &nbsp;
                     <a href="javascript:;" id="cancelEdit">
                     <input type="button" id="cancel" name="cancel" value="Cancel"/>
                     </a>
+                    &nbsp;
+                    <input type="submit" name="Submit" value="Update"/>
+
 
                     <div id="dvForCalander_${rand}" style="width:1px; height:1px;"></div>
                 </td>
