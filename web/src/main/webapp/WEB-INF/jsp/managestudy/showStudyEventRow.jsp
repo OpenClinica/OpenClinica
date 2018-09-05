@@ -65,7 +65,7 @@
         <c:if test="${userRole.manageStudy && study.status.available  && currRow.bean.studyEvent.studyEventDefinition.status.available && (currRow.bean.studyEvent.studyEventDefinition.status.available)}">
             
             <td>
-                <a class="accessCheck" href="DeleteStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
+                <a href="DeleteStudyEvent?action=confirm&id=<c:out value="${currRow.bean.studyEvent.id}"/>&studySubId=<c:out value="${studySub.id}"/>"
                  onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
                  onMouseUp="javascript:setImage('bt_Remove1','images/bt_Remove.gif');"><span
                  name="bt_Delete1" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>"

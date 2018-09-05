@@ -469,6 +469,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			stage = EventCRFStatus.INVALID.getI18nDescription(getLocale());
 		}
 
+		if (status.equals(Status.RESET)) {
+			stage = EventCRFStatus.INVALID.getI18nDescription(getLocale());
+		}
+
 		return stage;
 
 	}
