@@ -126,40 +126,9 @@ public class ViewStudyServlet extends SecureController {
                     request.setAttribute("requestSchema", publicStudy.getSchemaName());
                     subjects = ssdao.findAllByStudy(study);
                 }
-/*
-                Map<String, CustomRole> customRoles = new HashMap<>();
-                OpenRosaService openRosaService = (OpenRosaService) SpringServletAccess.getApplicationContext(context).getBean("openRosaService");
-
-                openRosaService.getOcUserRoleDTOs()
-                if (CollectionUtils.isNotEmpty(userRoles)) {
-                    StudyUserRoleBean s = (StudyUserRoleBean) userRoles.get(0);
-                    s.
-                    userRoles.forEach(u->{
-                        StudyUserRoleBean sur = (StudyUserRoleBean) u;
-                        CustomRole customRole = new CustomRole();
-                        populateCustomUserRoles(customRole, sur.getUserName());
-                        customRoles.put(sur.getUserName(), customRole);
-                    });
-                }
-  */              // find all subjects in the study, include ones in sites
+              // find all subjects in the study, include ones in sites
                 StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
                 EventDefinitionCRFDAO edcdao = new EventDefinitionCRFDAO(sm.getDataSource());
-                // StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
-
-//                ArrayList displayStudySubs = new ArrayList();
-//                for (int i = 0; i < subjects.size(); i++) {
-//                    StudySubjectBean studySub = (StudySubjectBean) subjects.get(i);
-//                    // find all events
-//                    ArrayList events = sedao.findAllByStudySubject(studySub);
-//
-//                    // find all eventcrfs for each event
-//                    EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
-//
-//                    DisplayStudySubjectBean dssb = new DisplayStudySubjectBean();
-//                    dssb.setStudyEvents(events);
-//                    dssb.setStudySubject(studySub);
-//                    displayStudySubs.add(dssb);
-//                }
 
                 // find all events in the study, include ones in sites
                 ArrayList definitions = seddao.findAllByStudy(study);
