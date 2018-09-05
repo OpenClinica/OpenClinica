@@ -333,92 +333,42 @@ $(function() {
                 return;
 
             var formData = studyEventData.FormData;
-			var formDataArray = studyEventData.FormData;
             if (!formData)
                 return;
 
-			if($.isArray(formDataArray)){
-				
-				$.each( formDataArray, function( i,formData) {
-						
-					
-						 var formOid = formData['@FormOID'];
-						 var form = studyEvent.forms[formOid];
-						 
-						 if (!form)
-						return;
-						 
-						 var submission = {
-							studyStatus: studyEventData['@OpenClinica:Status'],
-							hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
-							updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
-							updatedBy: formData['@OpenClinica:UpdatedBy'],
-							fields: copyObject(form.submissionFields),
-							links: collectLinks(studyEventData, formData)
-						};
-						collection(formData.ItemGroupData).forEach(function(igd) {
-							collection(igd.ItemData).forEach(function(itemData) {
-								var itemOid = itemData['@ItemOID'];
-								var data = submission.fields[itemOid];
-								if (data) {
-									var value = itemData['@Value'];
-									var item = items[itemOid];
-									if (item.codes) {
-										value = value.split(',').map(function(code) {
-											return item.codes[code];
-										}).join(', ');
-									}
-									data.push(value);
-								}
-							});
-						});
+            var formOid = formData['@FormOID'];
+            var form = studyEvent.forms[formOid];
+            if (!form)
+                return;
 
-						form.submissions.push(submission);
-						form.showMe = true;
-						studyEvent.showMe = true;
-				});
-				
-			}else{
-				
-				 var formOid = formData['@FormOID'];
-				 var form = studyEvent.forms[formOid];
-				 
-				 if (!form)
-						return;
-				 
-				 var submission = {
-					studyStatus: studyEventData['@OpenClinica:Status'],
-					hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
-					updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
-					updatedBy: formData['@OpenClinica:UpdatedBy'],
-					fields: copyObject(form.submissionFields),
-					links: collectLinks(studyEventData, formData)
-				};
-				collection(formData.ItemGroupData).forEach(function(igd) {
-					collection(igd.ItemData).forEach(function(itemData) {
-						var itemOid = itemData['@ItemOID'];
-						var data = submission.fields[itemOid];
-						if (data) {
-							var value = itemData['@Value'];
-							var item = items[itemOid];
-							if (item.codes) {
-								value = value.split(',').map(function(code) {
-									return item.codes[code];
-								}).join(', ');
-							}
-							data.push(value);
-						}
-					});
-				});
+            var submission = {
+                studyStatus: studyEventData['@OpenClinica:Status'],
+                hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
+                updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
+                updatedBy: formData['@OpenClinica:UpdatedBy'],
+                fields: copyObject(form.submissionFields),
+                links: collectLinks(studyEventData, formData)
+            };
+            collection(formData.ItemGroupData).forEach(function(igd) {
+                collection(igd.ItemData).forEach(function(itemData) {
+                    var itemOid = itemData['@ItemOID'];
+                    var data = submission.fields[itemOid];
+                    if (data) {
+                        var value = itemData['@Value'];
+                        var item = items[itemOid];
+                        if (item.codes) {
+                            value = value.split(',').map(function(code) {
+                                return item.codes[code];
+                            }).join(', ');
+                        }
+                        data.push(value);
+                    }
+                });
+            });
 
-				form.submissions.push(submission);
-				form.showMe = true;
-				studyEvent.showMe = true;
-			}	
-           
-           
-
-            
+            form.submissions.push(submission);
+            form.showMe = true;
+            studyEvent.showMe = true;
         });
 
         var hideClass = 'oc-status-removed';
