@@ -74,6 +74,9 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
     private boolean canMonitor;
 
+    private String studyEnvUuid;
+    private String siteUuid;
+
     public StudyUserRoleBean() {
         role = Role.INVALID;
         studyId = 0;
@@ -271,5 +274,21 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 
     public boolean isDirector() {
         return this.role == Role.STUDYDIRECTOR;
+    }
+
+    public String getStudyEnvUuid() {
+        return studyEnvUuid;
+    }
+
+    public void setStudyEnvUuid(String studyEnvUuid) {
+        this.studyEnvUuid = studyEnvUuid;
+    }
+
+    public String getSiteUuid() {
+        return siteUuid;
+    }
+
+    public void setSiteUuid(String siteUuid) {
+        this.siteUuid = siteUuid;
     }
 }

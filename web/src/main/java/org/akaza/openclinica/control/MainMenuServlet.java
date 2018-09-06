@@ -145,7 +145,7 @@ public class MainMenuServlet extends SecureController {
         CoreResources.setRequestSchema(request, "public");
         StudyBuildService studyService = ctx.getBean("studyBuildService", StudyBuildServiceImpl.class);
 
-        studyService.updateStudyUserRoles(request, studyService.getUserAccountObject(ub), ub.getActiveStudyId());
+        studyService.updateStudyUserRoles(request, studyService.getUserAccountObject(ub), ub.getActiveStudyId(), studyEnvUuid);
         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
 
         ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getName());
@@ -191,6 +191,7 @@ public class MainMenuServlet extends SecureController {
             if (ub.getActiveStudyId() == currentPublicStudy.getId())
                 return isRenewAuth;
             ub.setActiveStudyId(currentPublicStudy.getId());
+            session.setAttribute("customUserRole", session.getAttribute("altCustomUserRole"));
         }
 
         return isRenewAuth;

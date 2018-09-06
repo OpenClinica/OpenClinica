@@ -345,7 +345,19 @@ public class SDVController {
 
         }
         List<Integer> eventCRFIds = sdvUtil.getListOfSdvEventCRFIds(parameterMap.keySet());
-        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), true);
+        List<Integer> filteredEventCRFIds = new ArrayList<>();
+        for (Integer eventCrfId : eventCRFIds) {
+            if (hasFormAccess(eventCrfId, request) == true) {
+                filteredEventCRFIds.add(eventCrfId);
+            }
+        }
+        if (filteredEventCRFIds.size() == 0) {
+            forwardToNoAccessPage(request, response, redirection, studyId);
+            return null;
+        }
+
+
+        boolean updateCRFs = sdvUtil.setSDVerified(filteredEventCRFIds, getCurrentUser(request).getId(), true);
 
         if (updateCRFs) {
             pageMessages.add("The Event CRFs have been source data verified.");
@@ -421,17 +433,14 @@ public class SDVController {
             @RequestParam("redirection") String redirection, @RequestParam("studyId") int studyId, ModelMap model) {
 
         //For the messages that appear in the left column of the results page
-        ArrayList<String> pageMessages = new ArrayList<String>();
-
-        List<Integer> eventCRFIds = new ArrayList<Integer>();
-        eventCRFIds.add(crfId);
-        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), false);
-
         if (hasFormAccess(crfId ,request) != true) {
             forwardToNoAccessPage(request,response,redirection,studyId);
             return null;
-            }
-
+        }
+        ArrayList<String> pageMessages = new ArrayList<String>();
+        List<Integer> eventCRFIds = new ArrayList<Integer>();
+        eventCRFIds.add(crfId);
+        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), false);
 
         if (updateCRFs) {
             pageMessages.add("The application has unset SDV for the Event CRF.");
