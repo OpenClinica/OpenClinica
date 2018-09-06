@@ -293,7 +293,7 @@
         <div id="UserInfo">
             <div id="userDropdown">
                 <ul>
-                    <li><a href="#"><b><c:out value="${userBean.name}"/></b> (<c:out value="${userRole.role.description}"/>)<span
+                    <li><a href="#"><b><c:out value="${userBean.name}"/></b> (<c:out value="${sessionScope.customUserRole}"/>)<span
                             class="icon icon-caret-down white"></span></a></a>
                         <!-- First Tier Drop Down -->
                         <ul class="dropdown_BG">

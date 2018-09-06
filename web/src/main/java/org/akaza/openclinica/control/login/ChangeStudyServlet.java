@@ -7,11 +7,7 @@
  */
 package org.akaza.openclinica.control.login;
 
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Locale;
-
+import org.akaza.openclinica.bean.core.CustomRole;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -27,25 +23,25 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.StudyBuildService;
+import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.http.ResponseEntity;
+
+import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * @author jxu
@@ -70,6 +66,7 @@ public class ChangeStudyServlet extends SecureController {
     private StudyGroupDAO studyGroupDAO;
     private DiscrepancyNoteDAO discrepancyNoteDAO;
     private StudyParameterValueDAO studyParameterValueDAO;
+    private StudyBuildService studyBuildService;
 
     // < ResourceBundlerestext;
 
@@ -82,6 +79,7 @@ public class ChangeStudyServlet extends SecureController {
 
     }
 
+
     @Override
     public void processRequest() throws Exception {
 
@@ -90,9 +88,12 @@ public class ChangeStudyServlet extends SecureController {
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
 
-        ArrayList studies = udao.findStudyByUser(ub.getName(), (ArrayList) sdao.findAll());
-        request.setAttribute("siteRoleMap", Role.siteRoleMap);
-        request.setAttribute("studyRoleMap", Role.studyRoleMap);
+        ArrayList<StudyUserRoleBean> studies = udao.findStudyByUser(ub.getName(), (ArrayList) sdao.findAll());
+        CustomRole customRole = new CustomRole();
+
+        populateCustomUserRoles(customRole, ub.getName());
+        request.setAttribute("siteRoleMap", customRole.siteRoleMap);
+        request.setAttribute("studyRoleMap", customRole.studyRoleMap);
         if(request.getAttribute("label")!=null) {
             String label = (String) request.getAttribute("label");
             if(label.length()>0) {
@@ -123,7 +124,7 @@ public class ChangeStudyServlet extends SecureController {
 
             validateChangeStudy(studies, studyList);
             logger.info("submit");
-            changeStudy();
+            changeStudy(customRole);
             return;
         }
 
@@ -179,7 +180,7 @@ public class ChangeStudyServlet extends SecureController {
         }
         return null;
     }
-    private void changeStudy() throws Exception {
+    private void changeStudy(CustomRole customRole) throws Exception {
         Validator v = new Validator(request);
         FormProcessor fp = new FormProcessor(request);
         String newStudySchema = fp.getString("changeStudySchema", true);
@@ -314,6 +315,10 @@ public class ChangeStudyServlet extends SecureController {
 
             currentRole = (StudyUserRoleBean) session.getAttribute("studyWithRole");
             session.setAttribute("userRole", currentRole);
+            if (currentPublicStudy.getParentStudyId() == 0)
+                session.setAttribute("customUserRole", customRole.studyRoleMap.get(currentPublicStudy.getId()));
+            else
+                session.setAttribute("customUserRole", customRole.siteRoleMap.get(currentPublicStudy.getId()));
             session.removeAttribute("studyWithRole");
             addPageMessage(restext.getString("current_study_changed_succesfully"));
         }

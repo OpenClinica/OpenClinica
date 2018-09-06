@@ -31,8 +31,6 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
 
     private String uuid;
 
-    private String studyUuid;
-
     private String siteUuid;
 
     private String studyEnvironmentUuid;
@@ -42,6 +40,7 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
 
     // TODO: @NotNull
     private String dynamicRoleUuid;
+    private String dynamicRoleName;
 
     private String baseRoleName;
 
@@ -61,13 +60,6 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
         this.uuid = uuid;
     }
 
-    public String getStudyUuid() {
-        return studyUuid;
-    }
-
-    public void setStudyUuid(String studyUuid) {
-        this.studyUuid = studyUuid;
-    }
     public String getStudyEnvironmentUuid() {
         return studyEnvironmentUuid;
     }
@@ -155,6 +147,13 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
 
         return true;
     }
+    public String getDynamicRoleName() {
+        return dynamicRoleName;
+    }
+
+    public void setDynamicRoleName(String dynamicRoleName) {
+        this.dynamicRoleName = dynamicRoleName;
+    }
 
     @Override
     public int hashCode() {
@@ -165,11 +164,11 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
     public String toString() {
         return "StudyEnvironmentRoleDTO{" +
                 "uuid=" + uuid +
-                ", studyUuid='" + studyUuid + "'" +
                 ", studyEnvironmentUuid='" + studyEnvironmentUuid + "'" +
                 ", roleUuid='" + roleUuid + "'" +
                 ", dynamicRoleUuid='" + dynamicRoleUuid + "'" +
                 ", roleType='" + roleType + "'" +
+                ", dynamicRoleName='" + dynamicRoleName + "'" +
                 '}';
     }
 }

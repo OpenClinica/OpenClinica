@@ -9,10 +9,7 @@
 package org.akaza.openclinica.control.core;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.DiscrepancyNoteType;
-import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -22,13 +19,6 @@ import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.controller.Auth0Controller;
-import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
-import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
-import org.akaza.openclinica.service.PermissionService;
-import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.core.SessionManager;
@@ -37,6 +27,8 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
+import org.akaza.openclinica.dao.hibernate.ChangeStudyDTO;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
@@ -45,12 +37,14 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.StudyBuildService;
-import org.akaza.openclinica.service.StudyBuildServiceImpl;
+import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -61,7 +55,6 @@ import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
 import org.akaza.openclinica.web.bean.EntityBeanTable;
-import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.quartz.JobKey;
 import org.quartz.SchedulerException;
@@ -97,6 +90,7 @@ import java.net.URL;
 import java.net.URLEncoder;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * This class enhances the Controller in several ways.
@@ -602,6 +596,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     }
                 }
             }
+
 
             if (currentRole == null || currentRole.getId() <= 0) {
                 // if (ub.getId() > 0 && currentPublicStudy.getId() > 0) {
@@ -1399,5 +1394,19 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         PermissionService permissionService = (PermissionService) SpringServletAccess.getApplicationContext(context).getBean("permissionService");
         return permissionService.hasFormAccess(ec, formLayoutId, studyEventId, request);
     }
+    protected CustomRole checkMatchingUuid(CustomRole customRole, ChangeStudyDTO changeStudyDTO, StudyEnvironmentRoleDTO s) {
+        if (StringUtils.equals(changeStudyDTO.getStudyEnvUuid().toString(), s.getStudyEnvironmentUuid())) {
+            customRole.studyRoleMap.put(changeStudyDTO.getStudyId(), s.getDynamicRoleName());
+            customRole.siteRoleMap.put(changeStudyDTO.getStudyId(), s.getDynamicRoleName());
+        }
+        return customRole;
+    }
 
+    protected void populateCustomUserRoles(CustomRole customRole, String username) {
+        StudyBuildService studyBuildService = (StudyBuildService) SpringServletAccess.getApplicationContext(context).getBean("studyBuildService");
+        StudyDao studyDao = (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
+        List<ChangeStudyDTO> byUser = studyDao.findByUser(username);
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> userRoles = studyBuildService.getUserRoles(request);
+        Set<CustomRole> customRoles = userRoles.getBody().stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
+    }
 }

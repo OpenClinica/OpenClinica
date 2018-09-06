@@ -160,7 +160,7 @@
 	</query>
 	<query>
 	 <name>findStudyByUser</name>
-	 <sql>select sur.role_name, sur.study_id ,s.name, s.env_type
+	 <sql>select sur.role_name, sur.study_id ,s.name, s.env_type, s.study_env_uuid, s.study_env_site_uuid
 	      from study_user_role sur, study s
           where sur.study_id = s.study_id and sur.status_id = 1 
           and sur.role_name != 'admin' and sur.user_name=?

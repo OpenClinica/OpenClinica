@@ -223,7 +223,7 @@ public class StudyController {
         if (ub != null){
             CoreResources.setRequestSchema(request, "public");
             // update the user roles since they may have changed
-            studyBuildService.updateStudyUserRoles(request, studyBuildService.getUserAccountObject(ub), ub.getActiveStudyId());
+            studyBuildService.updateStudyUserRoles(request, studyBuildService.getUserAccountObject(ub), ub.getActiveStudyId(), null);
             // get the new bean
             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
             if (StringUtils.isEmpty(ub.getUserUuid()))
@@ -1893,7 +1893,7 @@ public class StudyController {
     public UserAccountBean getSiteOwnerAccount(HttpServletRequest request, StudyBean study) {
         UserAccountBean ownerUserAccount = (UserAccountBean) request.getSession().getAttribute("userBean");
         studyBuildService.updateStudyUserRoles(request, studyBuildService.getUserAccountObject(ownerUserAccount)
-                , ownerUserAccount.getActiveStudyId());
+                , ownerUserAccount.getActiveStudyId(), null);
         StudyUserRoleBean currentRole = getUserRole(ownerUserAccount, study);
 
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)) {
