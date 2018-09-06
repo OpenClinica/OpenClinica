@@ -269,7 +269,29 @@ public class ImportCRFDataServlet extends SecureController {
             ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, sm.getDataSource());
             // The eventCRFBeans list omits EventCRFs that don't match UpsertOn rules. If EventCRF did not exist and
             // doesn't match upsert, it won't be created.
-            List<EventCRFBean> eventCRFBeans = getImportCRFDataService().fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE);
+          
+            List<EventCRFBean> eventCRFBeans = null;
+            HashMap eventCRFBeansWithValidationMap = getImportCRFDataService().validateAndfetchEventCRFBeans(odmContainer, ub, Boolean.FALSE);
+            if(eventCRFBeansWithValidationMap != null) {
+            	eventCRFBeans = (ArrayList<EventCRFBean>) eventCRFBeansWithValidationMap.get("eventCRFBeans");
+            	errors.addAll((ArrayList<String>) eventCRFBeansWithValidationMap.get("errors"));
+            	
+            	if (CollectionUtils.isNotEmpty(errors)) {
+                    // add to session
+                    // forward to another page
+                    logger.info(errors.toString());
+                    for (String error : errors) {
+                        addPageMessage(error);
+                    }
+                    if (errors.size() > 0) {
+                        // fail = true;
+                        forwardPage(Page.IMPORT_CRF_DATA);
+                    }
+                } else {                    
+                    addPageMessage(respage.getString("passed_common_events_check"));
+                }
+            }
+            
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();

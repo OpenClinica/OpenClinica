@@ -41,6 +41,14 @@
 		<sql>SELECT * FROM CRF WHERE source_study_id=?</sql>
 	</query>
 	<query>
+		<name>findAllByStudyEvent</name>
+		<sql>select crf.* from event_crf  ec, form_layout fl,crf_version , crf
+            where ec.form_layout_id=fl.form_layout_id
+            and ec.study_event_id=? 
+            and crf.crf_id=crf_version.crf_id
+            and ec.crf_version_id=crf_version.crf_version_id</sql>
+	</query>
+	<query>
 		<name>findAllByStatus</name>
 		<sql>SELECT * FROM CRF where status_id=?</sql>
 	</query>
