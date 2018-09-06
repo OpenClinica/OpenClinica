@@ -218,8 +218,8 @@
 				<tr>
 				<c:choose>
 
-				 <c:when test="${dedc.status.name=='locked' || (currRow.bean.studyEvent.subjectEventStatus.signed && !userRole.manageStudy)}">
-				 	
+				 <c:when test="${dedc.status.name=='locked'}">
+
 				 </c:when>
 
 				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">

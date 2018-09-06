@@ -23,7 +23,6 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyConfigService;
@@ -33,15 +32,15 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.StudyBuildService;
-import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
-import org.springframework.http.ResponseEntity;
 
-import java.util.*;
-import java.util.stream.Collectors;
+import java.util.ArrayList;
+import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
 
 /**
  * @author jxu
@@ -334,6 +333,7 @@ public class ChangeStudyServlet extends SecureController {
         Integer assignedDiscrepancies = getDiscrepancyNoteDAO().getViewNotesCountWithFilter(" AND dn.assigned_user_id ="
                 + ub.getId() + " AND (dn.resolution_status_id=1 OR dn.resolution_status_id=2 OR dn.resolution_status_id=3)", currentStudy);
         request.setAttribute("assignedDiscrepancies", assignedDiscrepancies == null ? 0 : assignedDiscrepancies);
+        request.setAttribute("enrollmentCapped", isEnrollmentCapped());
 
         if (currentRole.isInvestigator() || currentRole.isResearchAssistant()|| currentRole.isResearchAssistant2()) {
             forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
