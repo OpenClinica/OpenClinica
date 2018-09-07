@@ -22,7 +22,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "dn_study_subject_map")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DnStudySubjectMap extends DataMapDomainObject {
 
 	private DnStudySubjectMapId dnStudySubjectMapId;

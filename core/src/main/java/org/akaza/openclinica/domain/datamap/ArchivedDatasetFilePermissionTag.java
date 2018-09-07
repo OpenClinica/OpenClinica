@@ -13,7 +13,6 @@ import java.util.Date;
 
 @Entity
 @Table(name = "archived_dataset_file_permission_tag")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "archived_dataset_file_permission_tag_id_seq") })
 public class ArchivedDatasetFilePermissionTag extends DataMapDomainObject {
 

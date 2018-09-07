@@ -20,7 +20,6 @@ import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "repeat_count")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "repeat_count_repeat_count_id_seq") })
 public class RepeatCount extends DataMapDomainObject {
 
