@@ -35,6 +35,7 @@ import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.job.JobTerminationMonitor;
+import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
 import org.akaza.openclinica.logic.odmExport.ClinicalDataUtil;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.MetadataUnit;
@@ -763,7 +764,7 @@ public class OdmExtractDAO extends DatasetDAO {
      * global crfs, i.e crfs that do not belong to
      * any particular CRF. In order to comply with cdisc ODM, the studyOID, studyeventDefOID etc will be static values
      * which do not exist in the database.
-     * 
+     *
      * @param metadata
      */
 
@@ -1454,7 +1455,7 @@ public class OdmExtractDAO extends DatasetDAO {
              * String subassign = (String) row.get("subject_assignment");
              * String sgname = (String) row.get("sg_name");
              * String des = (String) row.get("description");
-             * 
+             *
              * if (sgcprev.equals(sgcid + "")) {
              * StudyGroupItemBean sg = new StudyGroupItemBean();
              * sg.setName(sgname);
@@ -2313,7 +2314,14 @@ public class OdmExtractDAO extends DatasetDAO {
                     EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, studyEventBean.getStudyEventDefinitionId(), crfBean.getId());
                     //             List <EventDefinitionCrfPermissionTag> edcPTagIds= eventDefinitionCrfPermissionTagDao.findByEdcIdTagId(edc.getId(), edc.getParentId(),tagIds);
 
-                    formIsTagged = permissionTagLookupCheck(edc, permissionTagsString);
+
+                    formIsTagged= isFormTagged(edc);
+                    if(formIsTagged & permissionTagsString != null && permissionTagsString.length() > 0){
+                        formIsTagged = permissionAccessCheck(edc, permissionTagsString);
+                    }else if(formIsTagged && (permissionTagsString == null || permissionTagsString.length()==0)){
+                        ClinicalDataCollector.datasetFiltered="YES";
+                    }
+
 
 
                     if (oidPoses.containsKey(ecId) && !formIsTagged) {
@@ -3012,7 +3020,14 @@ public class OdmExtractDAO extends DatasetDAO {
 
             EventDefinitionCRFBean edc = (EventDefinitionCRFBean) edcdao.findByPK(edcId);
             StudyEventDefinitionBean sed = seddao.findByOid(sedOID);
-            formIsTagged = permissionTagLookupCheck(edc, permissionTagsString);
+
+            formIsTagged= isFormTagged(edc);
+            if(formIsTagged & permissionTagsString != null && permissionTagsString.length() > 0){
+                formIsTagged = permissionAccessCheck(edc, permissionTagsString);
+            }else if(formIsTagged && (permissionTagsString == null || permissionTagsString.length()==0)){
+                ClinicalDataCollector.datasetFiltered="YES";
+            }
+
             if (formIsTagged && sed.getType().equals("common")) {
                 sedIsTagged = true;
             }
@@ -3404,7 +3419,7 @@ public class OdmExtractDAO extends DatasetDAO {
     /**
      * The form display is determined the way items are ordered in CRF and this information is obtained from OID and
      * nothing hence this approach
-     * 
+     *
      * @param crfVersionIds
      * @return
      */
@@ -3851,25 +3866,29 @@ public class OdmExtractDAO extends DatasetDAO {
         return arr;
     }
 
-    private boolean permissionTagLookupCheck(EventDefinitionCRFBean edc, String permissionTags) {
+    private boolean permissionAccessCheck(EventDefinitionCRFBean edc, String permissionTags) {
         logger.debug("Begin to permissionTagsLookup");
 
-        if (permissionTags != null && permissionTags.length() > 0) {
             ArrayList viewRows = select(permissionTagsLookupWithPermissionTags(edc, permissionTags));
-            logger.info("permissionTagsLookup : "
+            logger.info("permissionAccessCheck : "
                     + permissionTagsLookupWithPermissionTags(edc, permissionTags));
             if(viewRows.size()>0){
                 // save the edc.getId in list and return to Job.
                 edcSet.add(edc.getId());
+                return false;
+            }else{
+                ClinicalDataCollector.datasetFiltered="YES";
+                return true;
             }
-            return (viewRows.size() > 0 ?  false:  true) ;
+    }
 
-        } else {
+
+    private boolean isFormTagged(EventDefinitionCRFBean edc) {
+        logger.debug("Begin to permissionTagsLookup");
             ArrayList viewRows = select(permissionTagsLookupNoPermissionTags(edc));
             logger.info("permissionTagsLookup : "
                     + permissionTagsLookupNoPermissionTags(edc));
             return (viewRows.size() > 0 ?  true:  false) ;
-        }
-
     }
+
 }

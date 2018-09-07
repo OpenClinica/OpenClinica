@@ -35,7 +35,7 @@ import org.akaza.openclinica.service.PermissionService;
 
 public class ClinicalDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmClinicalDataBean> odmClinicalDataMap;
-
+    public static String datasetFiltered = "NO";
 
 
     /**
