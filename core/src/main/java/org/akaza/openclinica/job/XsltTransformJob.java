@@ -10,6 +10,7 @@ import java.io.IOException;
 import java.text.DecimalFormat;
 import java.util.*;
 import java.util.Map.Entry;
+import java.util.stream.Collectors;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipOutputStream;
 
@@ -44,6 +45,8 @@ import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.logic.odmExport.ClinicalDataCollector;
+import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.service.extract.OdmFileCreation;
@@ -194,6 +197,7 @@ public class XsltTransformJob extends QuartzJobBean {
             Set<Integer> edcSet = new HashSet<>();
 
             ArchivedDatasetFileBean fbFinal=null;
+            ClinicalDataCollector.datasetFiltered="NO";
 
             HashMap<String, Integer> answerMap =
                     odmFileCreation.createODMFile(epBean.getFormat(), sysTimeBegin, generalFileDir, datasetBean,
@@ -839,7 +843,12 @@ public class XsltTransformJob extends QuartzJobBean {
         ArchivedDatasetFileBean fbInitial = new ArchivedDatasetFileBean();
         // Deleting off the original file archive dataset file.
 
-        fbInitial.setName(name);
+        if(ClinicalDataCollector.datasetFiltered.equals("YES")) {
+            fbInitial.setName(name + "(filtered)");
+        }else{
+            fbInitial.setName(name);
+        }
+
         fbInitial.setFileReference(dir + name);
 
         // JN: the following is to convert to KB, not possible without changing
