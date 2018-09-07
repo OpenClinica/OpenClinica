@@ -844,7 +844,7 @@ public class XsltTransformJob extends QuartzJobBean {
         // Deleting off the original file archive dataset file.
 
         if(ClinicalDataCollector.datasetFiltered.equals("YES")) {
-            fbInitial.setName(name + "(filtered)");
+            fbInitial.setName("filtered-"+ name);
         }else{
             fbInitial.setName(name);
         }
