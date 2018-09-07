@@ -33,7 +33,6 @@ import org.hibernate.annotations.Type;
 @Entity
 @Table(name = "study_subject", uniqueConstraints = @UniqueConstraint(columnNames = "oc_oid"))
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "study_subject_study_subject_id_seq") })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudySubject  extends DataMapDomainObject {
 
 	private int studySubjectId;
@@ -230,8 +229,7 @@ public class StudySubject  extends DataMapDomainObject {
 	
 	@JoinColumn(name="study_subject_id")
 	
-	@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-	public List<StudyEvent> getStudyEvents() {
+		public List<StudyEvent> getStudyEvents() {
 		return this.studyEvents;
 	}
 

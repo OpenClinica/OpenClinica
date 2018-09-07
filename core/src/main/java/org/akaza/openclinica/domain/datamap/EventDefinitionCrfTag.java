@@ -26,7 +26,6 @@ import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "event_definition_crf_tag")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "event_definition_crf_tag_id_seq") })
 public class EventDefinitionCrfTag extends DataMapDomainObject {
 

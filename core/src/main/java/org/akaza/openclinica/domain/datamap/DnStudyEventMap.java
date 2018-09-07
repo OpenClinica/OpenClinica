@@ -25,7 +25,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "dn_study_event_map")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DnStudyEventMap implements MutableDomainObject,Serializable{
 
 	private DnStudyEventMapId dnStudyEventMapId;

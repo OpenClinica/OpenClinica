@@ -20,7 +20,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "study_type")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudyType  extends DataMapDomainObject {
 
 	private int studyTypeId;

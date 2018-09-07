@@ -31,7 +31,6 @@ import org.hibernate.annotations.Parameter;
 @Entity
 @Table(name = "study_event")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "study_event_study_event_id_seq") })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 
 public class StudyEvent extends DataMapDomainObject  {
 

@@ -14,7 +14,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.math.BigInteger;
 import java.util.ArrayList;
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class RuleSetDao extends AbstractDomainDao<RuleSetBean> {
 
     @Override

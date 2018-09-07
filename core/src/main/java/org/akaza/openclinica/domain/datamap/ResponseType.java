@@ -18,7 +18,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "response_type")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class ResponseType  extends DataMapDomainObject {
 
 	private int responseTypeId;
