@@ -240,13 +240,22 @@ public class ImportCRFDataService {
                         }
 
                         // below to prevent duplicates
-
                         for (EventCRFBean ecb : eventCrfBeans) {
-                            if ((upsert.isDataEntryStarted() && ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY))
-                                    || (upsert.isDataEntryComplete() && ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)))
-                                if (!eventCRFBeans.contains(ecb)) {
-                                    eventCRFBeans.add(ecb);
-                                }
+                        	//new requirments:common events has nothing related to upsert setting
+                        	if(studyEventDefinitionBean.isTypeCommon()) {
+                        		 if ((upsert.isDataEntryStarted() && ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY))
+                                         || (ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)))
+                                     if (!eventCRFBeans.contains(ecb)) {
+                                         eventCRFBeans.add(ecb);
+                                     }
+                        	}else {
+                        		 if ((upsert.isDataEntryStarted() && ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY))
+                                         || (upsert.isDataEntryComplete() && ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)))
+                                     if (!eventCRFBeans.contains(ecb)) {
+                                         eventCRFBeans.add(ecb);
+                                     }
+                        	}
+                           
                         }
                     }
                 }
@@ -257,7 +266,11 @@ public class ImportCRFDataService {
         return eventCRFBeans;
     }
     
+        
     /**
+     * This method focus on some specific validation about the XML file data, such as repeatKey,
+     * 
+     * This method should call before any data update/insert
      * 
      * @param odmContainer
      * @param ub
@@ -265,11 +278,12 @@ public class ImportCRFDataService {
      * @return
      */
     @SuppressWarnings("rawtypes")
-	public HashMap<String, ArrayList> validateAndfetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs) {
-    	HashMap eventCRFBeansWithValidationMap = new HashMap<String, ArrayList>();
-    	List<String> errors = new ArrayList<String>();    	
-        ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
-        
+	public ArrayList<String> validateEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub) {
+    	
+    	ArrayList<String> errors = new ArrayList<String>(); 
+    	ArrayList<String> commonEventsFormRepeatKeys = new ArrayList<String>(); 
+    	String commonEventFormRepeatKey = null;
+                
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
@@ -280,14 +294,12 @@ public class ImportCRFDataService {
         if (upsert == null)
             upsert = new UpsertOnBean();
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
-        StudyBean studyBean = studyDAO.findByOid(studyOID);
+        StudyBean studyBean = studyDAO.findByOid(studyOID);        
         if (studyBean.getStatus() != Status.AVAILABLE) {            
-            errors.add("Study status is :" + studyBean.getStatus() + ", so dataImport is not allowed.");
-            
-            eventCRFBeansWithValidationMap.put("errors", errors);
-            eventCRFBeansWithValidationMap.put("eventCRFBeans", eventCRFBeans);
-            return eventCRFBeansWithValidationMap;
+            errors.add("Study status is :" + studyBean.getStatus() + ", so dataImport is not allowed.");                    
+            return errors;
         }
+        
         ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
         for (SubjectDataBean subjectDataBean : subjectDataBeans) {
             ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
@@ -326,19 +338,27 @@ public class ImportCRFDataService {
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
                     CRFDAO crfDAO = new CRFDAO(ds);
 
-                    /**
-                     *  if repeat to import same data file,only first time need to create  for common events
-                     *  
-                     *  and have current logic :
-		                if not found, the insert,
-		                if found, just update
-                     */
                     if (studyEventDefinitionBean.isTypeCommon()){
 
                         String formOid = formDataBean.getFormOID();
                         CRFBean crfBean = crfDAO.findByOid(formOid);
                         CommonEventContainerDTO commonEventContainerDTO = viewStudySubjectService.addCommonForm(studyEventDefinitionBean.getOid(),crfBean.getOid(),
                                 studySubjectBean.getOid(),userAccount,studyBean.getOid());
+                        
+                        /**
+                         *  Here check the xml data
+                         */
+                        commonEventFormRepeatKey = studyOID+subjectDataBean.getSubjectOID()+studyEventDataBean.getStudyEventOID()+studyEventDataBean.getStudyEventRepeatKey();                        
+                        if(commonEventFormRepeatKey!=null) {
+                        	if(!(commonEventsFormRepeatKeys.contains(commonEventFormRepeatKey))) {
+                        
+                        		commonEventsFormRepeatKeys.add(commonEventFormRepeatKey);
+                        	}else {
+                        		
+                        		 errors.add("Import in different forms with same repeatKey: " + sampleOrdinal + " for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                             	
+                                 return errors;
+                        	}
+                        }
                         
                         Boolean isRepeating = studyEventDefinitionBean.isRepeating();
                         
@@ -348,19 +368,18 @@ public class ImportCRFDataService {
                         if(sampleOrdinal == null) {
                         	errors.add("Missing studyEventRepeatKey for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
                         	
-                        	eventCRFBeansWithValidationMap.put("errors", errors);
-                            return eventCRFBeansWithValidationMap;
+                            return errors;
                         }else {
                         	//Non-Repeating - Data import with correct (1) repeatKey
                         	if(!isRepeating) {
                         		if(!(sampleOrdinal.equals("1"))) {
                         			 errors.add("Non-Repeating - correct repeatKey should be 1, but found  repeatKey: " + sampleOrdinal + " for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
-                                 	
-                                	 eventCRFBeansWithValidationMap.put("errors", errors);
-                                     return eventCRFBeansWithValidationMap;
+                                 	 
+                                     return errors;
                         		}
                         	}
                         	
+                        	// check existing data in database
                         	studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
                                     studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
                         	ArrayList crfs =crfDAO.findAllByStudyEvent(studyEventBean.getId());
@@ -373,8 +392,7 @@ public class ImportCRFDataService {
                                  if(!(formOid.equals(existingFormOId)) ) {
                                 	 errors.add("Import in different forms with same repeatKey: " + sampleOrdinal + " for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
                                 	
-                                	 eventCRFBeansWithValidationMap.put("errors", errors);
-                                     return eventCRFBeansWithValidationMap;
+                                     return errors;
                                  }
                         	}
                         	
@@ -383,95 +401,27 @@ public class ImportCRFDataService {
                             	int existingMaxOrdinal = commonEventContainerDTO.getMaxOrdinal();
                             	
                                 if(this.passOrdinalLogicCheck(Integer.parseInt(sampleOrdinal), existingMaxOrdinal)) {
-                                	 StudyEventBean tempStudyEventBean = new StudyEventBean();
-                                     Date today = new Date();
-                                     tempStudyEventBean.setCreatedDate(today);
-                                     tempStudyEventBean.setDateStarted(today);
-                                     tempStudyEventBean.setName(commonEventContainerDTO.getStudyEventDefinition().getName());
-                                     tempStudyEventBean.setOwner(ub);
-                                     ArrayList tempEventCRFs = new ArrayList<>();
-                                     tempEventCRFs.add(commonEventContainerDTO.getEventCrf());
-                                     tempStudyEventBean.setEventCRFs(tempEventCRFs);
-                                     tempStudyEventBean.setOwnerId(ub.getId());
-                                     tempStudyEventBean.setStudySubject(studySubjectBean);
-                                     tempStudyEventBean.setUpdater(ub);
-                                     tempStudyEventBean.setUpdatedDate(today);
-                                     tempStudyEventBean.setStudySubjectId(commonEventContainerDTO.getStudySubject().getStudySubjectId());
-                                     tempStudyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
-                                     tempStudyEventBean.setStatus(Status.AVAILABLE);
-                                     tempStudyEventBean.setStudyEventDefinitionId(commonEventContainerDTO.getStudyEventDefinition().getStudyEventDefinitionId());                        
-                                     tempStudyEventBean.setSampleOrdinal(Integer.parseInt(sampleOrdinal));
-                                     
-                                     studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
-                                     
+                                	 ;
                                      
                                 }else {
                                 	int correctRepeatKey = existingMaxOrdinal + 1;
                                 	errors.add("Validation error found about studyEventRepeatKey, the value " + sampleOrdinal +" is too big, suggest to reset as "+ correctRepeatKey + " StudyEventOID: " + studyEventDataBean.getStudyEventOID());
-                                	eventCRFBeansWithValidationMap.put("errors", errors);
-                                    return eventCRFBeansWithValidationMap;
+                                	
+                                    return errors;
                                 }
                             }
+                            
                         }
 
-                    	
-                    
-                                              
+                            
                        
                     }
 
-
-                    ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
-
-                    for (FormLayoutBean formLayoutBean : formLayoutBeans) {
-                        ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByCRFId(formLayoutBean.getCrfId());
-                        ArrayList<EventCRFBean> eventCrfBeans = eventCrfDAO.findByEventSubjectFormLayout(studyEventBean, studySubjectBean, formLayoutBean);
-                        CRFVersionBean crfVersionBean = crfVersionBeans.get(0);
-                        // what if we have begun with creating a study
-                        // event, but haven't entered data yet? this would
-                        // have us with a study event, but no corresponding
-                        // event crf, yet.
-                        if (eventCrfBeans.isEmpty()) {
-                            logger.debug("   found no event crfs from Study Event id " + studyEventBean.getId() + ", location " + studyEventBean.getLocation());
-                            // spell out criteria and create a bean if
-                            // necessary, avoiding false-positives
-                            if ((studyEventDefinitionBean.isTypeCommon()
-                                    ||studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SCHEDULED)
-                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
-                                    || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED)) && upsert.isNotStarted()) {
-
-                                EventCRFBean newEventCrfBean = buildEventCrfBean(studySubjectBean, studyEventBean, formLayoutBean, crfVersionBean, ub);
-                                if (persistEventCrfs){
-                                    newEventCrfBean = (EventCRFBean) eventCrfDAO.create(newEventCrfBean);
-                                }
-
-                                logger.debug("   created and added new event crf");
-
-                                if (!eventCRFBeans.contains(newEventCrfBean)) {
-                                    eventCRFBeans.add(newEventCrfBean);
-                                }
-
-                            }
-                        }
-
-                        // below to prevent duplicates
-
-                        for (EventCRFBean ecb : eventCrfBeans) {
-                            if ((upsert.isDataEntryStarted() && ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY))
-                                    || (upsert.isDataEntryComplete() && ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)))
-                                if (!eventCRFBeans.contains(ecb)) {
-                                    eventCRFBeans.add(ecb);
-                                }
-                        }
-                    }
                 }
             }
         }
-        // if it's null, throw an error, since they should be existing beans for
-        // iteration one
-        eventCRFBeansWithValidationMap.put("eventCRFBeans", eventCRFBeans);
-        eventCRFBeansWithValidationMap.put("errors", errors);
-        return eventCRFBeansWithValidationMap;
+      
+        return errors;
     }
 
     /*
@@ -530,8 +480,14 @@ public class ImportCRFDataService {
                                     || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.DATA_ENTRY_STARTED)
                                     || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.COMPLETED))) {
 
-                                if (!upsert.isNotStarted())
+                            	//new requirments:common events has nothing related to upsert setting
+                            	if(studyEventDefinitionBean.isTypeCommon()) {
+                            		;
+                            	}else {
+                            		if (!upsert.isNotStarted())
                                     return false;
+                            	}
+                               
 
                             }
                         }
@@ -539,10 +495,19 @@ public class ImportCRFDataService {
                         // below to prevent duplicates
 
                         for (EventCRFBean ecb : eventCrfBeans) {
-                            if (!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
-                                    && !(ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && upsert.isDataEntryComplete())) {
-                                return false;
-                            }
+                        	//new requirments:common events has nothing related to upsert setting
+                        	if(studyEventDefinitionBean.isTypeCommon()) {
+                        		if (!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) )
+                                        && !(ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) )) {
+                                    return false;
+                                }
+                        	}else {
+                        		if (!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
+                                        && !(ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && upsert.isDataEntryComplete())) {
+                                    return false;
+                                }
+                        	}
+                            
                         }
                     }
                 }
