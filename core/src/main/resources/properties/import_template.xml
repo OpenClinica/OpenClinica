@@ -1,34 +1,34 @@
 <?xml version="1.0" encoding="UTF-8"?>
 <ODM xmlns="http://www.cdisc.org/ns/odm/v1.3" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.cdisc.org/ns/odm/v1.3 ODM1-3.xsd" ODMVersion="1.3" FileOID="1D20080412202420" FileType="Snapshot" Description="Demographics Import" CreationDateTime="2008-04-12T20:24:20" >
 
-<!-- Replace the S_OID with the Study OID of the Study to which you are importing data. -->
-	 <ClinicalData StudyOID="S_OID" MetaDataVersionOID="null">
+	<!-- Replace the S_OID with the Study OID of the Study to which you are importing data. -->
+	<ClinicalData StudyOID="S_OID" MetaDataVersionOID="null">
 
-<!-- Specify whether or not to update existing data based on the current status of that data. May be set to "true" (update) or "false" (do not update) for each of the listed statuses. If you specify DataEntryComplete as "true" you are NOT prompted for a Reason for Change, though any data imported for those records will be updated. Use that setting for non-regulated studies only.-->	 
-	 <UpsertOn NotStarted="false" DataEntryStarted="false" DataEntryComplete="false"/>
-	 
-	 <!-- Replace the SS_OID with the Study Subject OID for whom you're importing data. This Subject must already be enrolled and scheduled for the Event to which you are importing. -->
-	 <SubjectData SubjectKey="SS_OID">
+		<!-- Specify whether or not to update existing data based on the current status of that data. May be set to "true" (update) or "false" (do not update) for each of the listed statuses. If you specify DataEntryComplete as "true" you are NOT prompted for a Reason for Change, though any data imported for those records will be updated. Use that setting for non-regulated studies only.-->
+		<UpsertOn NotStarted="false" DataEntryStarted="false" DataEntryComplete="false"/>
 
-	 <!-- Replace the SE_OID with the OID of the Study Event, and the StartDate and EndDate to the appropriate values for the Event. For non-repeating Events, the StudyEventRepeatKey should be set to 1. For repeating Events, specify the ordinal for the occurrence of the Event to which you are importing. For example, specify 2 to import the data into the second repeat occurrence of an Event. -->
+		<!-- Replace the SS_OID with the Study Subject OID for whom you're importing data. This Subject must already be enrolled and scheduled for the Event to which you are importing. -->
+		<SubjectData SubjectKey="SS_OID">
+
+			<!-- Replace the SE_OID with the OID of the Study Event, and the StartDate and EndDate to the appropriate values for the Event. For non-repeating Events, the StudyEventRepeatKey should be set to 1. For repeating Events, specify the ordinal for the occurrence of the Event to which you are importing. For example, specify 2 to import the data into the second repeat occurrence of an Event. -->
 			<StudyEventData StudyEventOID="SE_OID" OpenClinica:StartDate="2017-09-29" OpenClinica:EndDate="2017-09-29" OpenClinica:Status="data entry started" StudyEventRepeatKey="1">
 
-			<!-- Replace the F_OID with the OID of the Form that will be populated with the imported data. 
-				 Replace the FormLayoutOID with the FormLayoutRef OID in the study metadata.
-				 Specify the status the Form should have after the import is complete. Options are initial data entry or completed.-->
+				<!-- Replace the F_OID with the OID of the Form that will be populated with the imported data.
+                     Replace the FormLayoutOID with the FormLayoutRef OID in the study metadata.
+                     Specify the status the Form should have after the import is complete. Options are initial data entry or complete.-->
 				<FormData FormOID="F_OID" OpenClinica:FormLayoutOID="1.1" OpenClinica:Status="initial data entry">
- 
- 				<!-- Replace the IG_OID with the Item Group OID. If the Group is a Grid, specify the row number for the insert in ItemGroupRepeatKey. TransactionType for an import should always be Insert.-->
+
+					<!-- Replace the IG_OID with the Item Group OID. If the Group is a Grid, specify the row number for the insert in ItemGroupRepeatKey. TransactionType for an import should always be Insert.-->
 					<ItemGroupData ItemGroupOID="IG_OID" ItemGroupRepeatKey="1" TransactionType="Insert">
- 
- 					<!-- For each Item in the Form, replace the I_OID with the Item OID and specify the value that should be imported into that Item. Add or remove lines below as needed to match the Items and values to be imported.-->
-						<ItemData ItemOID="I_OID" Value="2017-09-13"/>							
-						<ItemData ItemOID="I_OID" Value="1"/>                        
+
+						<!-- For each Item in the Form, replace the I_OID with the Item OID and specify the value that should be imported into that Item. Add or remove lines below as needed to match the Items and values to be imported.-->
+						<ItemData ItemOID="I_OID" Value="2017-09-13"/>
+						<ItemData ItemOID="I_OID" Value="1"/>
 						<ItemData ItemOID="I_OID" Value="Headache"/>
-                    </ItemGroupData>
-                </FormData>
-            </StudyEventData>
-        </SubjectData>
-	   <!-- To import data for more than one Subject, copy and paste the opening and closing SubjectData tags, and everything between those tags. Then update OIDs and values as needed.-->		
+					</ItemGroupData>
+				</FormData>
+			</StudyEventData>
+		</SubjectData>
+		<!-- To import data for more than one Subject, copy and paste the opening and closing SubjectData tags, and everything between those tags. Then update OIDs and values as needed.-->
 	</ClinicalData>
 </ODM>
