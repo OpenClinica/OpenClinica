@@ -166,7 +166,7 @@ public class ImportCRFDataService {
                         CommonEventContainerDTO commonEventContainerDTO = viewStudySubjectService.addCommonForm(studyEventDefinitionBean.getOid(),crfBean.getOid(),
                                 studySubjectBean.getOid(),userAccount,studyBean.getOid());
                         
-                        //for common events, if not provided studyEventRepeatKey, the skip/reject
+                        //for common events, if not provided studyEventRepeatKey, then skip/reject
                      
                     	studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
                                 studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
@@ -308,8 +308,13 @@ public class ImportCRFDataService {
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 
-                String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
-
+                String sampleOrdinal = null;
+                if(studyEventDataBean.getStudyEventRepeatKey() == null || studyEventDataBean.getStudyEventRepeatKey().trim().isEmpty()) {
+                	sampleOrdinal =  "1";
+                }else {
+                	sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey();
+                }
+                
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
                         studyBean.getId(), studyBean.getParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
@@ -365,7 +370,7 @@ public class ImportCRFDataService {
                         //for common events, if not provided studyEventRepeatKey, then skip/reject
                         sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey();
                        
-                        if(sampleOrdinal == null) {
+                        if(sampleOrdinal == null || sampleOrdinal.trim().isEmpty()) {
                         	errors.add("Missing studyEventRepeatKey for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
                         	
                             return errors;
@@ -379,7 +384,7 @@ public class ImportCRFDataService {
                         		}
                         	}
                         	
-                        	// check existing data in database
+                        	// check existing data in database, if found it, then will update it
                         	studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
                                     studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
                         	ArrayList crfs =crfDAO.findAllByStudyEvent(studyEventBean.getId());
@@ -449,7 +454,12 @@ public class ImportCRFDataService {
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 
-                String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
+                String sampleOrdinal = null;
+                if(studyEventDataBean.getStudyEventRepeatKey() == null || studyEventDataBean.getStudyEventRepeatKey().trim().isEmpty()) {
+                	sampleOrdinal =  "1";
+                }else {
+                	sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey();
+                }
 
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
                         studyBean.getId(), studyBean.getParentStudyId());
