@@ -135,6 +135,14 @@ public class ImportCRFInfoContainer {
                                     importCrfInfo.setEventCRFID(null);
                                 }
                             }
+                            
+                            /**
+                             *  Common events will always be updated 
+                             */
+                            if(studyEventDefinitionBean.isTypeCommon()) {
+                            	importCrfInfo.setProcessImport(true);
+                            }
+                            
                             importCRFList.add(importCrfInfo);
                             if (importCrfInfo.isProcessImport())
                                 formMap.put(formDataBean.getFormOID(), "true");
@@ -155,6 +163,14 @@ public class ImportCRFInfoContainer {
                             if (!(ecb.getStage().equals(DataEntryStage.INITIAL_DATA_ENTRY) && upsert.isDataEntryStarted())
                                     && !(ecb.getStage().equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) && upsert.isDataEntryComplete()))
                                 importCrfInfo.setProcessImport(false);
+                            
+                            /**
+                             *  Common events will always be updated 
+                             */
+                            if(studyEventDefinitionBean.isTypeCommon()) {
+                            	importCrfInfo.setProcessImport(true);
+                            }
+                            
                             importCRFList.add(importCrfInfo);
                             if (importCrfInfo.isProcessImport())
                                 formMap.put(formDataBean.getFormOID(), "true");
@@ -172,8 +188,9 @@ public class ImportCRFInfoContainer {
 
     private boolean isCRFStatusValid(String crfStatus, UpsertOnBean upsert, EventCRFBean ecb) {
 
-        if (ecb != null && ecb.getStatus() == Status.UNAVAILABLE)
-            return false;
+    	//OC-9543
+       /* if (ecb != null && ecb.getStatus() == Status.UNAVAILABLE)
+            return false;*/
         if (StringUtils.equals(crfStatus, INITIAL_DATA_ENTRY.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.COMPLETE.getName()))

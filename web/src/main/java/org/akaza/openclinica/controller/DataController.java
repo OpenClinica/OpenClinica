@@ -90,7 +90,7 @@ public class DataController {
     private ImportDataResponseSuccessDTO responseSuccessDTO;
     private XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
 
-    @ApiOperation(value = "To import study data in XML file", notes = "Will read the data in XML file and validate study,event and participant against the  setup first, for more detail please refer to OpenClinical online document  ")
+    @ApiOperation(value = "To import study data in XML file", notes = "Will read the data in XML file and validate study,event and participant against the  setup first, for more detail please refer to OpenClinica online document  ")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful operation"),
             @ApiResponse(code = 400, message = "Bad Request -- Normally means found validation errors, for detail please see the error message")})
