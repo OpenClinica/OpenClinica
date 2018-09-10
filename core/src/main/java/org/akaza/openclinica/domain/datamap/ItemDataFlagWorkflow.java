@@ -24,7 +24,6 @@ import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "item_data_flag_workflow")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "item_data_flag_workflow_id_seq") })
 public class ItemDataFlagWorkflow extends DataMapDomainObject {
 

@@ -474,7 +474,7 @@
    <td class="table_header_row_left"><fmt:message key="user_name" bundle="${resword}"/></td>
    <td class="table_header_row"><fmt:message key="first_name" bundle="${resword}"/></td>
    <td class="table_header_row"><fmt:message key="last_name" bundle="${resword}"/></td>
-   <td class="table_header_row"><fmt:message key="role" bundle="${resword}"/></td>
+   <td class="table_header_row"><fmt:message key="base_role" bundle="${resword}"/></td>
    <td class="table_header_row"><fmt:message key="study_name" bundle="${resword}"/></td>
   </tr>
   <c:forEach var="user" items="${userRolesToView}">

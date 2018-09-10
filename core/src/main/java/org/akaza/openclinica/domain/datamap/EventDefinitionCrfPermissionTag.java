@@ -12,7 +12,6 @@ import java.util.Date;
 
 @Entity
 @Table(name = "event_definition_crf_permission_tag")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "event_definition_crf_permission_tag_id_seq") })
 public class EventDefinitionCrfPermissionTag extends DataMapDomainObject {
 

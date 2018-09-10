@@ -24,7 +24,6 @@ import org.hibernate.annotations.Parameter;
 @Entity
 @Table(name = "study_parameter", uniqueConstraints = @UniqueConstraint(columnNames = "handle"))
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "study_parameter_study_parameter_id_seq") })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudyParameter  extends DataMapDomainObject {
 
 	private int studyParameterId;
