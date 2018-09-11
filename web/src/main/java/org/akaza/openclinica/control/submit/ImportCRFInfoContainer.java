@@ -194,9 +194,9 @@ public class ImportCRFInfoContainer {
 
     private boolean isCRFStatusValid(String crfStatus, UpsertOnBean upsert, EventCRFBean ecb) {
 
-    	//OC-9543
-       /* if (ecb != null && ecb.getStatus() == Status.UNAVAILABLE)
-            return false;*/
+    
+        if (ecb != null && ecb.getStatus() == Status.UNAVAILABLE)
+            return false;
         if (StringUtils.equals(crfStatus, INITIAL_DATA_ENTRY.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.COMPLETE.getName()))
