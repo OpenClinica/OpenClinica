@@ -87,8 +87,14 @@ public class ImportCRFInfoContainer {
             Map<String, Map<String, String>> eventMap = new HashMap<String, Map<String, String>>();
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
-                String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
-
+                
+                String sampleOrdinal = null;
+                if(studyEventDataBean.getStudyEventRepeatKey() == null || studyEventDataBean.getStudyEventRepeatKey().trim().isEmpty()) {
+                	sampleOrdinal =  "1";
+                }else {
+                	sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey();
+                }
+                
                 StudyEventDefinitionBean studyEventDefinitionBean = studyEventDefinitionDAO.findByOidAndStudy(studyEventDataBean.getStudyEventOID(),
                         studyBean.getId(), studyBean.getParentStudyId());
                 logger.info("find all by def and subject " + studyEventDefinitionBean.getName() + " study subject " + studySubjectBean.getName());
@@ -188,9 +194,9 @@ public class ImportCRFInfoContainer {
 
     private boolean isCRFStatusValid(String crfStatus, UpsertOnBean upsert, EventCRFBean ecb) {
 
-    	//OC-9543
-       /* if (ecb != null && ecb.getStatus() == Status.UNAVAILABLE)
-            return false;*/
+    
+        if (ecb != null && ecb.getStatus() == Status.UNAVAILABLE)
+            return false;
         if (StringUtils.equals(crfStatus, INITIAL_DATA_ENTRY.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE.getName()) ||
                 StringUtils.equals(crfStatus, DataEntryStage.COMPLETE.getName()))

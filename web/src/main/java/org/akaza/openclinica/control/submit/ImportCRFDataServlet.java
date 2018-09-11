@@ -282,6 +282,8 @@ public class ImportCRFDataServlet extends SecureController {
                 if (errors.size() > 0) {
                     // fail = true;
                     forwardPage(Page.IMPORT_CRF_DATA);
+                    
+                    return;
                 }
             } else {                    
                 addPageMessage(respage.getString("passed_common_events_check"));
