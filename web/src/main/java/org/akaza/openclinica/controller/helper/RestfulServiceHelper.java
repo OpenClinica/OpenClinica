@@ -165,31 +165,21 @@ public class RestfulServiceHelper {
 	 public StudyBean setSchema(String studyOid, HttpServletRequest request) throws OpenClinicaSystemException {
 		// first time, the default DB schema for restful service is public
 		 StudyBean study = getStudyDao().findByPublicOid(studyOid);
-		
+
 		 Connection con;
 		 String schemaNm="";
-		 
+
 		 if (study == null) {
 			 throw new OpenClinicaSystemException("errorCode.studyNotExist","The study identifier you provided:" + studyOid + " is not valid.");
-			 
-         }else {
-       	  schemaNm = study.getSchemaName();
-         }
-		 
-		 
-		try {
-			request.setAttribute("requestSchema",schemaNm);
-			request.setAttribute("changeStudySchema",schemaNm);
-			con = dataSource.getConnection();
-			CoreResources.setSchema(con);
-		} catch (SQLException e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
-		}
-       // get correct study from the right DB schema 
-		study = getStudyDao().findByOid(studyOid);
-        
-        return study;
+
+		 } else {
+			schemaNm = study.getSchemaName();
+		 }
+		 request.setAttribute("requestSchema", schemaNm);
+		 // get correct study from the right DB schema
+		 study = getStudyDao().findByOid(studyOid);
+
+		 return study;
 	 }
 
 	 /**
