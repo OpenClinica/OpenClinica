@@ -332,7 +332,8 @@ public class ImportCRFDataService {
                     if (studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.LOCKED)
                             || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)
                             || studyEventBean.getSubjectEventStatus().equals(SubjectEventStatus.STOPPED)) {
-                        return null;
+                    	errors.add("Do not allow the data import, if scheduled event is one of the status - stopped, signed,locked");
+                        return errors;
                     }
                 }
                 
