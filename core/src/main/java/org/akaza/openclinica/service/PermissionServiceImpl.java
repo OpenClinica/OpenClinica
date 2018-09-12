@@ -178,7 +178,7 @@ public class PermissionServiceImpl implements PermissionService {
 
                 if (studyEvent != null && formLayout != null) {
                     ec = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
-                    if (ec == null) {
+                    if (ec == null || eventDefCrf == null) {
                         eventDefCrf = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(
                                 studyEvent.getStudyEventDefinition().getStudyEventDefinitionId(),
                                 formLayout.getCrf().getCrfId(), studyId);
