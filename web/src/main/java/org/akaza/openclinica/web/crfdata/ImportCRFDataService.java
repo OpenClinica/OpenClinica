@@ -1199,7 +1199,7 @@ public class ImportCRFDataService {
                 throw new OpenClinicaException("Unknown Study OID", "");
 
                 // } else if (studyBean.getId() != currentStudyId) {
-            } else if (!CoreResources.isPublicStudySameAsTenantStudy(studyBean, currentStudyId, ds)) {
+            } else if (!CoreResources.isPublicStudySameAsTenantStudy(studyBean, studyOid, ds)) {
                 mf.applyPattern(respage.getString("your_current_study_is_not_the_same_as"));
                 Object[] arguments = { studyBean.getName() };
                 //
