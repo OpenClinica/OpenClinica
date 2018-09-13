@@ -1242,7 +1242,7 @@ public class ImportCRFDataService {
                                     studyBean.getParentStudyId());
                             if (studyEventDefintionBean != null && studyEventDefintionBean.isTypeCommon()) {
                             	// Do nothing
-                            }else if (studyEventDataBean.getStudyEventRepeatKey() == null)
+                            }else if (studyEventDataBean.getStudyEventRepeatKey() == null || studyEventDataBean.getStudyEventRepeatKey().trim().isEmpty())
                                 studyEventDataBean.setStudyEventRepeatKey("1");
                            
 
