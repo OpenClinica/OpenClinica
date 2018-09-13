@@ -109,6 +109,7 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/includes/**").permitAll().anyRequest().permitAll();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER);
         http.csrf().disable();
+        http.headers().cacheControl().disable();
     }
 
     public String getDomain() {
