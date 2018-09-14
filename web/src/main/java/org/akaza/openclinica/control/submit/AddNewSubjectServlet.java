@@ -52,7 +52,7 @@ import java.util.*;
  *
  * @author ssachs
  * @version CVS: $Id: AddNewSubjectServlet.java,v 1.15 2005/07/05 17:20:43 jxu
- *          Exp $
+ * Exp $
  */
 @Configurable
 public class AddNewSubjectServlet extends SecureController {
@@ -97,7 +97,6 @@ public class AddNewSubjectServlet extends SecureController {
     public static final String EXISTING_SUB_SHOWN = "existingSubShown";
 
 
-
     public static final String STUDY_EVENT_DEFINITION = "studyEventDefinition";
     public static final String LOCATION = "location";
 
@@ -120,6 +119,7 @@ public class AddNewSubjectServlet extends SecureController {
         super.init();
         SpringBeanAutowiringSupport.processInjectionBasedOnCurrentContext(this);
     }
+
     /*
      * (non-Javadoc)
      *
@@ -211,7 +211,7 @@ public class AddNewSubjectServlet extends SecureController {
 
             if (label.equalsIgnoreCase(resword.getString("id_generated_Save_Add"))) {
                 label = generateParticipantIdUsingTemplate();
-                    request.setAttribute(INPUT_LABEL,label);
+                request.setAttribute(INPUT_LABEL, label);
             }
             v.addValidation(INPUT_LABEL, Validator.NO_BLANKS);
 
@@ -239,24 +239,24 @@ public class AddNewSubjectServlet extends SecureController {
                 Validator.addError(errors, INPUT_LABEL, resexception.getString("another_assigned_this_ID_choose_unique"));
             }
 
-            if (isEnrollmentCapped()){
+            if (isEnrollmentCapped()) {
                 Validator.addError(errors, INPUT_LABEL, resexception.getString("current_study_full"));
             }
             //checkIfStudyEnrollmentCapped(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_full"));
 
-            if(!errors.isEmpty() && subIdSetting.equalsIgnoreCase("auto non-editable")&& !isEnrollmentCapped()){
+            if (!errors.isEmpty() && subIdSetting.equalsIgnoreCase("auto non-editable") && !isEnrollmentCapped()) {
                 // generate default template
 
                 StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
 
                 StudySubjectBean studySubjectBean = new StudySubjectBean();
-                while(studySubjectBean!=null) {
+                while (studySubjectBean != null) {
                     Random rnd = new Random();
                     int n = 100000 + rnd.nextInt(900000);
                     label = currentStudy.getOid() + "-" + n;
-                    studySubjectBean= ssdao.findByLabel(label);
-                if(studySubjectBean!=null && !studySubjectBean.isActive())
-                    studySubjectBean=null;
+                    studySubjectBean = ssdao.findByLabel(label);
+                    if (studySubjectBean != null && !studySubjectBean.isActive())
+                        studySubjectBean = null;
                 }
 
 
@@ -282,17 +282,10 @@ public class AddNewSubjectServlet extends SecureController {
 
             } else {
 
+                int subjectCount = getSubjectCount();
 
-                int subjectCount = currentStudy.getSubjectCount();
-                if(subjectCount==0) {
-                    StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-                    ArrayList ss = ssdao.findAllBySiteId(currentStudy.getId());
-                    if (ss != null) {
-                        subjectCount = ss.size();
-                    }
-                }
                 StudyDAO studydao = new StudyDAO(sm.getDataSource());
-                currentStudy.setSubjectCount(subjectCount+1);
+                currentStudy.setSubjectCount(subjectCount + 1);
                 currentStudy.setType(StudyType.GENETIC);
                 studydao.update(currentStudy);
 
@@ -325,29 +318,29 @@ public class AddNewSubjectServlet extends SecureController {
                 addPageMessage(respage.getString("subject_with_unique_identifier") + studySubject.getLabel() + respage.getString("X_was_created_succesfully"));
                 request.setAttribute("id", studySubject.getId() + "");
                 //forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
-                response.sendRedirect(request.getContextPath() + "/ViewStudySubject?id=" +  new Integer(studySubject.getId()).toString());
+                response.sendRedirect(request.getContextPath() + "/ViewStudySubject?id=" + new Integer(studySubject.getId()).toString());
                 return;
             }
         }// end of no error (errors.isEmpty())
     }// end of fp.isSubmitted()
 
     private List<RuleSetBean> createRuleSet(StudySubjectBean ssub,
-			StudyEventDefinitionBean sed) {
+                                            StudyEventDefinitionBean sed) {
 
-    	return getRuleSetDao().findAllByStudyEventDef(sed);
+        return getRuleSetDao().findAllByStudyEventDef(sed);
 
 
-	}
+    }
+
     private RuleSetService getRuleSetService() {
         return (RuleSetService) SpringServletAccess.getApplicationContext(context).getBean("ruleSetService");
     }
 
 
     private RuleSetDao getRuleSetDao() {
-       return (RuleSetDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetDao");
+        return (RuleSetDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetDao");
 
     }
-
 
 
     protected void createStudyEvent(FormProcessor fp, StudySubjectBean s) {
@@ -381,7 +374,7 @@ public class AddNewSubjectServlet extends SecureController {
 
                 se.setSampleOrdinal(sedao.getMaxSampleOrdinal(sed, s) + 1);
                 sedao.create(se);
-            //    getRuleSetService().runRulesInBeanProperty(createRuleSet(s,sed),currentStudy,ub,request,s);
+                //    getRuleSetService().runRulesInBeanProperty(createRuleSet(s,sed),currentStudy,ub,request,s);
 
 
             }
@@ -442,12 +435,13 @@ public class AddNewSubjectServlet extends SecureController {
      */
     public static void saveFieldNotes(String field, FormDiscrepancyNotes notes, DiscrepancyNoteDAO dndao, int entityId, String entityType, StudyBean sb) {
 
-    	 saveFieldNotes( field,  notes,  dndao,  entityId,  entityType,  sb, -1) ;
+        saveFieldNotes(field, notes, dndao, entityId, entityType, sb, -1);
 
-    	}
+    }
+
     public static void saveFieldNotes(String field, FormDiscrepancyNotes notes,
-    		DiscrepancyNoteDAO dndao, int entityId, String entityType, StudyBean sb,
-    		int event_crf_id) {
+                                      DiscrepancyNoteDAO dndao, int entityId, String entityType, StudyBean sb,
+                                      int event_crf_id) {
 
         if (notes == null || dndao == null || sb == null) {
             // logger.info("AddNewSubjectServlet,saveFieldNotes:parameter is
@@ -455,8 +449,8 @@ public class AddNewSubjectServlet extends SecureController {
             return;
         }
         ArrayList fieldNotes = notes.getNotes(field);
-        if ((fieldNotes == null || fieldNotes.size() < 1 ) && event_crf_id >0){
-          	fieldNotes = notes.getNotes(field);
+        if ((fieldNotes == null || fieldNotes.size() < 1) && event_crf_id > 0) {
+            fieldNotes = notes.getNotes(field);
         }
         // System.out.println("+++ notes size:" + fieldNotes.size() + " for field " + field);
         for (int i = 0; i < fieldNotes.size(); i++) {
@@ -501,9 +495,9 @@ public class AddNewSubjectServlet extends SecureController {
                 dnb.setParentDnId(dnb.getId());
                 dnb = (DiscrepancyNoteBean) dndao.create(dnb);
                 dndao.createMapping(dnb);
-            } else if(dnb.getParentDnId()>0){
-                DiscrepancyNoteBean parentNote = (DiscrepancyNoteBean)dndao.findByPK(dnb.getParentDnId());
-                if(dnb.getDiscrepancyNoteTypeId()==parentNote.getDiscrepancyNoteTypeId() && dnb.getResolutionStatusId()!=parentNote.getResolutionStatusId()) {
+            } else if (dnb.getParentDnId() > 0) {
+                DiscrepancyNoteBean parentNote = (DiscrepancyNoteBean) dndao.findByPK(dnb.getParentDnId());
+                if (dnb.getDiscrepancyNoteTypeId() == parentNote.getDiscrepancyNoteTypeId() && dnb.getResolutionStatusId() != parentNote.getResolutionStatusId()) {
                     parentNote.setResolutionStatusId(dnb.getResolutionStatusId());
                     dndao.update(parentNote);
                 }
@@ -547,18 +541,11 @@ public class AddNewSubjectServlet extends SecureController {
         Map<String, Object> data = new HashMap<String, Object>();
         String templateID = "";
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
-        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(currentStudy.getParentStudyId()==0 ?currentStudy.getId():currentStudy.getParentStudyId(), "participantIdTemplate");
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(currentStudy.getParentStudyId() == 0 ? currentStudy.getId() : currentStudy.getParentStudyId(), "participantIdTemplate");
         if (spv != null)
             templateID = spv.getValue();
 
-        int subjectCount = currentStudy.getSubjectCount();
-        if(subjectCount==0) {
-            StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-            ArrayList ss = ssdao.findAllBySiteId(currentStudy.getId());
-            if (ss != null) {
-                subjectCount = ss.size();
-            }
-        }
+        int subjectCount = getSubjectCount();
         String siteId = currentStudy.getIdentifier();
 
         // Adding Sample data to validate templateID
@@ -570,7 +557,7 @@ public class AddNewSubjectServlet extends SecureController {
         try {
             template = new Template("template name", new StringReader(templateID), freemarkerConfiguration);
             template.process(data, wtr);
-            logger.info("Template ID  :"+ wtr.toString());
+            logger.info("Template ID  :" + wtr.toString());
 
         } catch (TemplateException te) {
             te.printStackTrace();
@@ -581,7 +568,17 @@ public class AddNewSubjectServlet extends SecureController {
 
 
         }
-return wtr.toString();
+        return wtr.toString();
+    }
+
+    private int getSubjectCount() {
+        int subjectCount = 0;
+        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+        ArrayList ss = ssdao.findAllBySiteId(currentStudy.getId());
+        if (ss != null) {
+            subjectCount = ss.size();
+        }
+        return subjectCount;
     }
 
 }
