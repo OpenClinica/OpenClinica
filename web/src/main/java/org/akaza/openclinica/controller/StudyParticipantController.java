@@ -292,8 +292,6 @@ public class StudyParticipantController {
 			  	studyParticipantDTO.setSubjectKey(label);
 
 				StudySubjectBean subject = this.getStudySubjectDAO().findByLabel(label);
-				//Study studyObject = studySpringDao.findByLabelAndStudyOrParentStudy(label, studySpringDao.findByOcOID(study.getOid()));
-				//StudySubjectBean subject = studySubjectDao.findByLabelAndStudyOrParentStudy(label, studySpringDao.findByOcOID(study.getOid())).get;
 
 				studyParticipantDTO.setSubjectOid(subject.getOid());
 
