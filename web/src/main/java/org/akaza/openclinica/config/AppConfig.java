@@ -33,7 +33,7 @@ import java.net.URL;
         @PropertySource("classpath:auth0.properties"),
         @PropertySource("classpath:datainfo.properties")
 })
-@Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
+@Order(2)
 
 public class AppConfig extends WebSecurityConfigurerAdapter {
     /**
@@ -109,7 +109,7 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
         http.authorizeRequests().antMatchers("/includes/**").permitAll().anyRequest().permitAll();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER);
         http.csrf().disable();
-        http.headers().cacheControl().disable();
+        http.headers().cacheControl();
     }
 
     public String getDomain() {
@@ -150,4 +150,12 @@ public class AppConfig extends WebSecurityConfigurerAdapter {
         corsConfigurationSource.registerCorsConfiguration("/pages/auth/api/**", restApiCorsConfiguration);
         return corsConfigurationSource;
     }
+
+    @Configuration
+    @Order(1)
+    public static class DontCacheFonts extends WebSecurityConfigurerAdapter {
+        protected void configure(HttpSecurity http) throws Exception {
+            http.antMatcher("/includes/fonts/**").headers().cacheControl().disable();
+        }
+    }    
 }
