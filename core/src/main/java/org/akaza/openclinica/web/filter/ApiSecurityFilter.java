@@ -65,7 +65,10 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
-        if (authHeader != null) {
+        if (request.getSession().getAttribute("userBean") != null ) {
+            UserAccountBean userAccountBean = (UserAccountBean)request.getSession().getAttribute("userBean");
+            logger.debug("This user is already logged in {}",userAccountBean.getName());
+        } else if (authHeader != null) {
             StringTokenizer st = new StringTokenizer(authHeader);
             if (st.hasMoreTokens()) {
                 String basic = st.nextToken();
@@ -119,7 +122,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             } else {
                                 OCUserDTO userDTO = getUserDetails(request);
                                 if (userDTO.getUsername().equalsIgnoreCase("root")) {
-                                    CoreResources.setRootUserAccountBean(request, dataSource);
+                                    ub = CoreResources.setRootUserAccountBean(request, dataSource);
                                     ub.setUserUuid(userDTO.getUuid());
                                     userAccountDAO.update(ub);
                                 } else {

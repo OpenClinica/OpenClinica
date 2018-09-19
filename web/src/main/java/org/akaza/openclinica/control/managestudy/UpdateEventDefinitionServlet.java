@@ -361,10 +361,12 @@ public class UpdateEventDefinitionServlet extends SecureController {
                             dnb.setEntityId(item.getId());
                             dnb.setColumn("value");
                             dnb.setCreatedDate(new Date());
-                            dnb.setDetailedNotes("The item has been removed, this Query has been Closed.");
+                            String detailedNotes="The item has been removed, this Query has been Closed.";
+                            dnb.setDetailedNotes(detailedNotes);
                             dnDao.create(dnb);
                             dnDao.createMapping(dnb);
                             itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                            itemParentNote.setDetailedNotes(detailedNotes);
                             dnDao.update(itemParentNote);
                         }
                     }

@@ -31,7 +31,6 @@ import org.hibernate.annotations.Parameter;
 @Entity
 @Table(name = "study_event")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "study_event_study_event_id_seq") })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 
 public class StudyEvent extends DataMapDomainObject  {
 
@@ -121,7 +120,7 @@ public class StudyEvent extends DataMapDomainObject  {
 		this.studyEventDefinition = studyEventDefinition;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "study_subject_id")
 	public StudySubject getStudySubject() {
 		return this.studySubject;

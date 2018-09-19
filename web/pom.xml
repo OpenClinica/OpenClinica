@@ -98,7 +98,6 @@
         <dependency>
             <groupId>org.springframework.security</groupId>
             <artifactId>spring-security-jwt</artifactId>
-            <version>1.0.7.RELEASE</version>
         </dependency>
 
 
@@ -444,6 +443,11 @@
             <artifactId>springfox-spring-web</artifactId>
         </dependency>
 
+        <dependency>
+	    <groupId>org.apache.commons</groupId>
+	    	<artifactId>commons-csv</artifactId>
+		    <version>1.5</version>
+		</dependency>
     </dependencies>
 
     <build>

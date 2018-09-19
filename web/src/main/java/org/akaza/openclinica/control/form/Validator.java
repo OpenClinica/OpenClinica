@@ -860,7 +860,7 @@ public class Validator {
                 errorMessage = resexception.getString("field_submission_url_not_unique");
                 break;
             case DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS:
-                errorMessage = resexception.getString("id_can_not_contain_html_lessthan_or_greaterthan_elements");
+                errorMessage = resexception.getString("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements");
                 break;
             }
         }
@@ -1172,7 +1172,7 @@ break;
      * Instead of rewriting the whole Validation do this.
      */
     protected String getFieldValue(String fieldName) {
-        return request.getParameter(fieldName) == null ? request.getAttribute(fieldName) == null ? null : request.getAttribute(fieldName).toString() : request
+        return (request.getParameter(fieldName) == null || request.getParameter(fieldName).equals(resword.getString("id_generated_Save_Add"))) ? request.getAttribute(fieldName) == null ? null : request.getAttribute(fieldName).toString() : request
                 .getParameter(fieldName);
     }
 

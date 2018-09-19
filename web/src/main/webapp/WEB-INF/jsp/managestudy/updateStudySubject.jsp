@@ -50,7 +50,6 @@
 <jsp:include page="../include/sideInfo.jsp"/>
 
 <jsp:useBean scope="session" id="studySub" class="org.akaza.openclinica.bean.managestudy.StudySubjectBean"/>
-<jsp:useBean scope="session" id="enrollDateStr" class="java.lang.String"/>
 
 <body class="aka_bodywidth" onload=
   "if(! detectFirefoxWindows(navigator.userAgent)){document.getElementById('centralContainer').style.display='none';new Effect.Appear('centralContainer', {duration:1});};
@@ -97,152 +96,6 @@
           <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="label"/></jsp:include>
         </td>
       </tr>
-
-      <tr valign="top">
-        <td class="formlabel"><fmt:message key="secondary_ID" bundle="${resword}"/>:</td><td><div class="formfieldXL_BG"><input type="text" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" class="formfieldXL"></div>
-        </td>
-      </tr>
-      <tr valign="top">
-        <td></td>
-        <td>
-          <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="secondaryLabel"/></jsp:include>
-        </td>
-      </tr>
-
-      <tr valign="top">
-      <td class="formlabel"><fmt:message key="enrollment_date" bundle="${resword}"/>:</td>
-      <td>
-      <div class="formfieldXL_BG">
-
-        <input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" class="formfieldXL" id="enrollmentDateField">
-        <span class="icon icon-calendar" alt="<fmt:message key="show_calendar" bundle="${resword}"/>" title="<fmt:message key="show_calendar" bundle="${resword}"/>" border="0" id="enrollmentDateTrigger"/>
-          <script type="text/javascript">
-          Calendar.setup({inputField  : "enrollmentDateField", ifFormat    : "<fmt:message key="date_format_calender" bundle="${resformat}"/>", button      : "enrollmentDateTrigger" });
-          </script>*
-          <%-- DN for enrollment date goes here --%>
-          <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-              <c:set var="isNew" value="${hasEnrollmentNote eq 'yes' ? 0 : 1}"/>
-                  <c:choose>
-                      <c:when test="${hasEnrollmentNote eq 'yes'}">
-                          <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${studySub.id}&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
-                              <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="${enrollmentNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                          </a>
-                      </c:when>
-                      <c:otherwise>
-                          <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?subjectId=${studySub.id}&id=${studySub.id}&writeToDB=1&name=studySub&field=enrollmentDate&column=enrollment_date','spanAlert-enrollmentDate'); return false;">
-                              <span id="flag_enrollmentDate" name="flag_enrollmentDate" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                          </a>
-                      </c:otherwise>
-                  </c:choose>
-              </c:if>
-      </div>
-      <br><jsp:include page="../showMessage.jsp"><jsp:param name="key" value="enrollmentDate"/></jsp:include></td>
-     </tr>
-
-    <c:if test="${study.studyParameterConfig.subjectPersonIdRequired=='required' || study.studyParameterConfig.subjectPersonIdRequired=='optional'}">
-        <tr valign="top">
-            <td class="form_label"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
-            <td colspan="1">
-              <div class="formfieldXL_BG"><input type="text" name="uniqueIdentifier" value="<c:out value="${subject.uniqueIdentifier}"/>" class="formfieldXL"></div>
-              <c:if test="${study.studyParameterConfig.subjectPersonIdRequired == 'required'}">&nbsp;*</c:if>
-              <%-- DN for person ID goes here --%>
-              <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                <c:set var="isNew" value="${hasUniqueIDNote eq 'yes' ? 0 : 1}"/>
-                <c:choose>
-                  <c:when test="${hasUniqueIDNote eq 'yes'}">
-                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
-                      <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="${uniqueIDNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                    </a>
-                  </c:when>
-                  <c:otherwise>
-                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=uniqueIdentifier&column=unique_identifier','spanAlert-uniqueIdentifier'); return false;">
-                      <span id="flag_uniqueIdentifier" name="flag_uniqueIdentifier" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                    </a>
-                  </c:otherwise>
-                </c:choose>
-              </c:if>
-            </td>
-        </tr>
-        <tr valign="top">
-          <td></td>
-          <td>
-            <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="uniqueIdentifier"/></jsp:include>
-          </td>
-        </tr>
-    </c:if>
-
-    <tr valign="top">
-        <td class="formlabel"><fmt:message key="gender" bundle="${resword}"/>:</td>
-        <td colspan="2">
-          <input type="radio" name="gender" <c:if test="${subject.gender == 109}">checked</c:if> value="m"><fmt:message key="male" bundle="${resword}"/>
-          <input type="radio" name="gender" <c:if test="${subject.gender == 102}">checked</c:if> value="f"><fmt:message key="female" bundle="${resword}"/>
-          <input type="radio" name="gender"  <c:if test="${!(subject.gender == 109 || subject.gender == 102)}">checked</c:if> value=" "><fmt:message key="not_specified" bundle="${resword}"/>
-          <c:if test="${study.studyParameterConfig.genderRequired}">&nbsp;*</c:if>
-              <%-- DN for gender goes here --%>
-              <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                <c:set var="isNew" value="${hasGenderNote eq 'yes' ? 0 : 1}"/>
-                <c:choose>
-                  <c:when test="${hasGenderNote eq 'yes'}">
-                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
-                      <span id="flag_gender" name="flag_gender" class="${genderNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                    </a>
-                  </c:when>
-                  <c:otherwise>
-                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=gender&column=gender','spanAlert-gender'); return false;">
-                      <span id="flag_gender" name="flag_gender" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                    </a>
-                  </c:otherwise>
-                </c:choose>
-              </c:if>
-         <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="gender"/></jsp:include>
-        </td>
-    </tr>
-
-
-    <c:if test="${study.studyParameterConfig.collectDob=='1' || study.studyParameterConfig.collectDob=='2' }">
-    <tr valign="top">
-        <td class="formlabel" >
-        <c:if test="${study.studyParameterConfig.collectDob=='1'}"><fmt:message key="date_of_birth" bundle="${resword}"/></c:if>
-        <c:if test="${study.studyParameterConfig.collectDob=='2'}"><fmt:message key="year_of_birth" bundle="${resword}"/></c:if>
-        :</td>
-        <td>
-          <div class="formfieldXL_BG">
-            <input type="text" name="localBirthDate" value="<c:out value="${localBirthDate}"/>" class="formfieldXL">
-            (
-            <c:if test="${study.studyParameterConfig.collectDob=='1'}"><fmt:message key="date_format" bundle="${resformat}"/></c:if>
-            <c:if test="${study.studyParameterConfig.collectDob=='2'}"><fmt:message key="date_format_year" bundle="${resformat}"/></c:if>
-            ) *
-
-
-              <%-- DN for DOB goes here --%>
-              <c:if test="${study.studyParameterConfig.discrepancyManagement=='true' && !study.status.locked}">
-                <c:set var="isNew" value="${hasDOBNote eq 'yes' ? 0 : 1}"/>
-                <c:choose>
-                  <c:when test="${hasDOBNote eq 'yes'}">
-                    <a href="#" onClick="openDNoteWindow('ViewDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">
-                      <span id="flag_dateOfBirth" name="flag_dateOfBirth" class="${dOBNote.resStatus.iconFilePath}" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                    </a>
-                  </c:when>
-                  <c:otherwise>
-                    <a href="#" onClick="openDNoteWindow('CreateDiscrepancyNote?writeToDB=1&subjectId=${studySub.id}&id=${subject.id}&name=subject&field=dateOfBirth&column=date_of_birth','spanAlert-dateOfBirth'); return false;">
-                      <span id="flag_dateOfBirth" name="flag_dateOfBirth" class="fa fa-bubble-white" border="0" alt="<fmt:message key="discrepancy_note" bundle="${resword}"/>" title="<fmt:message key="discrepancy_note" bundle="${resword}"/>" >
-                    </a>
-                  </c:otherwise>
-                </c:choose>
-              </c:if>
-          </div>
-        </td>
-        </tr>
-     <tr valign="top">
-      <td><fmt:message key="field_required" bundle="${resword}"/></td>
-      <td>
-        <jsp:include page="../showMessage.jsp"><jsp:param name="key" value="localBirthDate"/></jsp:include>
-      </td>
-      
-      </tr>
-
-    </c:if>
-
     </table>
     </div>
     </div></div></div></div></div></div></div></div>
@@ -263,18 +116,9 @@
       <input type="text" name="secondaryLabel" value="<c:out value="${studySub.secondaryLabel}"/>" disabled="disabled" class="formfieldM">
       </td></tr>
 
-      <tr valign="top"><td class="table_header_column"><fmt:message key="enrollment_date" bundle="${resword}"/>:</td><td class="table_cell">
-      <input type="text" name="enrollmentDate" value="<c:out value="${enrollDateStr}" />" disabled="disabled" class="formfieldM" id="enrollmentDateField">
-      </td></tr>
 
-    <c:if test="${study.studyParameterConfig.subjectPersonIdRequired=='required' || study.studyParameterConfig.subjectPersonIdRequired=='optional'}">
-        <tr valign="top">
-            <td class="table_header_column"><fmt:message key="person_ID" bundle="${resword}"/>:</td>
-            <td class="table_cell">
-              <input type="text" name="uniqueIdentifier" disabled="disabled" value="<c:out value="${subject.uniqueIdentifier}"/>" class="formfieldXL">
-            </td>
-        </tr>
-    </c:if>
+
+
 
       <tr valign="top"><td class="table_header_column"><fmt:message key="gender" bundle="${resword}"/>:</td><td class="table_cell">
           <input type="radio" name="gender" disabled="disabled" <c:if test="${subject.gender == 109}">checked</c:if> value="m"><fmt:message key="male" bundle="${resword}"/>

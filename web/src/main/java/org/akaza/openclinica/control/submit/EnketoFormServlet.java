@@ -5,12 +5,9 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
-import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.core.LockInfo;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.core.form.StringUtil;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
@@ -20,17 +17,19 @@ import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.pform.PFormCache;
+import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+
+import java.util.List;
+import java.util.Optional;
 
 public class EnketoFormServlet extends SecureController {
 
     private static final long serialVersionUID = 6508949502349649137L;
 
-    public static final String ORIGINATING_PAGE = "originatingPage";
     public static final String STUDYSUBJECTID = "studySubjectId";
     public static final String MODE = "mode";
-    public static final String FORM_URL1 = "formURL1";
-    public static final String FORM_URL2 = "formURL2";
+    public static final String FORM_URL = "formURL";
     public static final String CRF_VERSION_ID = "crfVersionId";
     public static final String FORM_LAYOUT_ID = "formLayoutId";
     public static final String STUDY_EVENT_ID = "studyEventId";
@@ -56,11 +55,7 @@ public class EnketoFormServlet extends SecureController {
         int studyEventId = Integer.valueOf(request.getParameter(STUDY_EVENT_ID));
         int eventCrfId = Integer.valueOf(request.getParameter(EVENT_CRF_ID));
 
-        String jini ="false";
-        String jiniEnabled =CoreResources.getField("jini.enabled");
-        if (!jiniEnabled.equals("") && jiniEnabled.equalsIgnoreCase("true")) {
-            jini = "true";
-        }
+
         FormUrlObject formUrlObject = null;
 
         StudyEvent studyEvent = studyEventDao.findById(Integer.valueOf(studyEventId));
@@ -76,6 +71,7 @@ public class EnketoFormServlet extends SecureController {
             subjectContext.setStudyEventDefinitionId(String.valueOf(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId()));
             subjectContext.setOrdinal(String.valueOf(studyEvent.getSampleOrdinal()));
             subjectContext.setStudyEventId(String.valueOf(studyEvent.getStudyEventId()));
+            request.setAttribute(STUDYSUBJECTID, studyEvent.getStudySubject().getLabel());
         }
         subjectContext.setFormLayoutOid(formLayout.getOcOid());
         subjectContext.setUserAccountId(String.valueOf(ub.getId()));
@@ -86,15 +82,25 @@ public class EnketoFormServlet extends SecureController {
         Study parentStudy = enketoCredentials.getParentStudy(currentStudy.getOid());
         StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
         Role role = currentRole.getRole();
+        EventCrf eventCrf = null;
         if (eventCrfId == 0 && studyEvent != null && formLayout != null) {
-            EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
+            eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEventId, studyEvent.getStudySubject().getStudySubjectId(), formLayoutId);
             if (eventCrf != null) {
                 eventCrfId = eventCrf.getEventCrfId();
                 logger.debug("The event crf status changed from not-started to started");
             }
 
+        } else {
+            eventCrf = eventCrfDao.findById(eventCrfId);
         }
-
+        final EventCrf ec = eventCrf;
+        if (eventCrfId != 0 || studyEvent != null) {
+            if (!StringUtils.equalsIgnoreCase(mode, "preview") &&
+                    hasFormAccess(ec) != true) {
+                forwardPage(Page.NO_ACCESS);
+                return;
+            }
+        }
         String loadWarning = generateErrorMessage(studyEvent, formLayout);
         boolean isFormLocked = determineCRFLock(studyEvent, formLayout);
         if (Integer.valueOf(eventCrfId) > 0) {
@@ -111,22 +117,8 @@ public class EnketoFormServlet extends SecureController {
         if (!isFormLocked && formUrlObject.isLockOn()) {
             getEventCrfLocker().lock(studyEvent, formLayout, currentPublicStudy.getSchemaName(), ub.getId(), request.getSession().getId());
         }
-        int hashIndex = formUrlObject.getFormUrl().lastIndexOf("#");
-        String part1 = formUrlObject.getFormUrl();
-        String part2 = "";
-        if (hashIndex != -1) {
-            part1 = formUrlObject.getFormUrl().substring(0, hashIndex);
-            part2 = formUrlObject.getFormUrl().substring(hashIndex);
-        }
-        request.setAttribute(FORM_URL1, part1);
-        request.setAttribute(FORM_URL2, part2);
-
-        // request.setAttribute(FORM_URL, "https://enke.to/i/::widgets?a=b");
+        request.setAttribute(FORM_URL, formUrlObject.getFormUrl());
         request.setAttribute(ORIGINATING_PAGE, originatingPage);
-        request.setAttribute(JINI, jini);
-        if (studyEvent != null) {
-            request.setAttribute(STUDYSUBJECTID, studyEvent.getStudySubject().getLabel());
-        }
         forwardPage(Page.ENKETO_FORM_SERVLET);
     }
 

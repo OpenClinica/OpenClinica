@@ -12,11 +12,7 @@ import java.io.IOException;
 import java.io.InputStream;
 import java.io.OutputStream;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 import java.util.zip.ZipEntry;
 import java.util.zip.ZipFile;
 
@@ -36,8 +32,11 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.extract.DatasetDAO;
+import org.akaza.openclinica.dao.hibernate.ArchivedDatasetFilePermissionTagDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.datamap.ArchivedDatasetFilePermissionTag;
+import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.extract.GenerateExtractFileService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -101,7 +100,7 @@ public class ExportDatasetServlet extends SecureController {
         ArchivedDatasetFileDAO asdfdao = new ArchivedDatasetFileDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
 
-        GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(),
+        GenerateExtractFileService generateFileService = new GenerateExtractFileService(sm.getDataSource(),request,
                 (CoreResources) SpringServletAccess.getApplicationContext(context).getBean("coreResources"),
                 (RuleSetRuleDao) SpringServletAccess.getApplicationContext(context).getBean("ruleSetRuleDao"));
         String action = fp.getString("action");
@@ -161,14 +160,20 @@ public class ExportDatasetServlet extends SecureController {
             forwardPage(Page.EXPORT_DATASETS);
         } else if ("delete".equalsIgnoreCase(action) && adfId > 0) {
             boolean success = false;
+
             ArchivedDatasetFileBean adfBean = (ArchivedDatasetFileBean) asdfdao.findByPK(adfId);
+            boolean permissionToDeletedAllowed=checkPermissionsBeforeDeleteArchivedDataset(adfBean);
+            if(!permissionToDeletedAllowed){
+                return;
+            }
+
             File file = new File(adfBean.getFileReference());
             if (!file.canWrite()) {
                 addPageMessage(respage.getString("write_protected"));
             } else {
                 success = file.delete();
                 if (success) {
-                    asdfdao.deleteArchiveDataset(adfBean);
+                    deleteArchivedDataset(asdfdao,adfBean);
                     addPageMessage(respage.getString("file_removed"));
                 } else {
                     addPageMessage(respage.getString("error_removing_file"));
@@ -615,4 +620,30 @@ public class ExportDatasetServlet extends SecureController {
       in.close();
       out.close();
     }
+
+    private void deleteArchivedDataset(ArchivedDatasetFileDAO asdfdao, ArchivedDatasetFileBean adfBean) {
+        getArchivedDatasetFilePermissionTagDao().delete(adfBean.getId());
+        asdfdao.deleteArchiveDataset(adfBean);
+    }
+
+    private boolean checkPermissionsBeforeDeleteArchivedDataset(ArchivedDatasetFileBean adfBean) {
+        List<ArchivedDatasetFilePermissionTag> adfTags = getArchivedDatasetFilePermissionTagDao().findAllByArchivedDatasetFileId(adfBean.getId());
+        List<String> permissionTagsList = getPermissionTagsList();
+
+        for (ArchivedDatasetFilePermissionTag adfTag : adfTags) {
+            if (!permissionTagsList.contains(adfTag.getPermissionTagId())) {
+                String originatingPage = "ExportDataset?datasetId=" + adfBean.getDatasetId();
+                request.setAttribute("originatingPage", originatingPage);
+                forwardPage(Page.NO_ACCESS);
+                return false;
+            }
+        }
+        return true;
+    }
+
+    private ArchivedDatasetFilePermissionTagDao getArchivedDatasetFilePermissionTagDao() {
+        ArchivedDatasetFilePermissionTagDao adfDao = (ArchivedDatasetFilePermissionTagDao) SpringServletAccess.getApplicationContext(context).getBean("archivedDatasetFilePermissionTagDao");
+        return adfDao;
+    }
+
 }

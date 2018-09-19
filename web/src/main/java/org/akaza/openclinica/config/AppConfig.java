@@ -18,13 +18,15 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
-import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.core.authority.mapping.SimpleAuthorityMapper;
 import org.springframework.security.core.session.SessionRegistryImpl;
 import org.springframework.security.web.AuthenticationEntryPoint;
+import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
+import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.web.authentication.LoginUrlAuthenticationEntryPoint;
 import org.springframework.security.web.authentication.logout.LogoutFilter;
 import org.springframework.security.web.authentication.session.RegisterSessionAuthenticationStrategy;
@@ -34,8 +36,16 @@ import org.springframework.security.web.servletapi.SecurityContextHolderAwareReq
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
+import org.springframework.web.cors.CorsConfiguration;
+import org.springframework.web.cors.CorsConfigurationSource;
+import org.springframework.web.cors.UrlBasedCorsConfigurationSource;
+import org.springframework.web.multipart.MultipartResolver;
+import org.springframework.web.multipart.commons.CommonsMultipartResolver;
 
 import javax.servlet.http.HttpServletRequest;
+import java.io.UnsupportedEncodingException;
+import java.net.MalformedURLException;
+import java.net.URL;
 
 @SuppressWarnings("unused")
 @KeycloakConfiguration
@@ -87,6 +97,9 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         return registrationBean;
     }
 
+    @Value(value = "${SBSUrl}")
+    private String sbsUrl;
+
     @Bean
     public FilterRegistrationBean keycloakPreAuthActionsFilterRegistrationBean(
             KeycloakPreAuthActionsFilter filter) {
@@ -120,6 +133,11 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         return new RegisterSessionAuthenticationStrategy(new SessionRegistryImpl());
     }
 
+    @Bean
+    public MultipartResolver multipartResolver() {
+        CommonsMultipartResolver multipartResolver = new CommonsMultipartResolver();
+        return multipartResolver;
+    }
     @Override
     protected void configure(HttpSecurity http) throws Exception {
         super.configure(http);
@@ -129,25 +147,30 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
                         "/callback", "/login",
                         "/pages/customer-service/**",
                         "/pages/callback",
-                        "/pages/ocLogin",
-                        "/sso/login",
+                        "/pages/login",
                         "/pages/resetOCAppTimeout"
 ,                       "/pages/logout",
                         "/pages/invalidateAuth0Token",
                         "/pages/auth/api/**",
                         "/pages/studyversion/**",
                         "/rest2/openrosa/**",
+                        "/sso/login",
+                        "/pages/sso/login",
                         "/pages/odmk/**",
                         "/pages/openrosa/**",
                         "/pages/accounts/**",
                         "/pages/itemdata/**",
+
                         "/pages/odmss/**",
                         "/pages/v2/api-docs",
                         "/pages/swagger-resources/**"
                 ).permitAll()
                 .antMatchers("/partner/home").permitAll()
                 .antMatchers(securedRoute).hasAnyAuthority("ROLE_USER")
-                .antMatchers(securedRoute).authenticated();
+                .antMatchers(securedRoute).authenticated()
+            .and()
+            .cors()
+                .configurationSource(getCorsConfigurationSource());
         http.authorizeRequests().antMatchers("/includes/**").permitAll().anyRequest().permitAll();
         http.sessionManagement().sessionCreationPolicy(SessionCreationPolicy.NEVER);
         http.csrf().disable();
@@ -168,5 +191,27 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Bean
     public static PropertySourcesPlaceholderConfigurer propertyConfigInDev() {
         return new PropertySourcesPlaceholderConfigurer();
+    }
+
+    /**
+     * @return CORS configuration that allows requests from Study Manager application.
+     * @throws MalformedURLException if there is an error parsing study manager url.
+     */
+    private CorsConfigurationSource getCorsConfigurationSource() throws MalformedURLException {
+        UrlBasedCorsConfigurationSource corsConfigurationSource = new UrlBasedCorsConfigurationSource();
+        corsConfigurationSource.setAlwaysUseFullPath(true);
+
+        URL studyManagerUrl = new URL(sbsUrl);
+        String studyManagerHost = studyManagerUrl.getProtocol() + "://" + studyManagerUrl.getAuthority();
+
+        // Set up CORS configuration for REST API endpoints
+        CorsConfiguration restApiCorsConfiguration = new CorsConfiguration();
+        // Allow requests originated from Study Manager
+        restApiCorsConfiguration.addAllowedOrigin(studyManagerHost);
+        restApiCorsConfiguration.setAllowCredentials(true);
+        restApiCorsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
+        restApiCorsConfiguration.addAllowedMethod(CorsConfiguration.ALL);
+        corsConfigurationSource.registerCorsConfiguration("/pages/auth/api/**", restApiCorsConfiguration);
+        return corsConfigurationSource;
     }
 }

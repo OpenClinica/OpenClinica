@@ -129,6 +129,7 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
         this.setTypeExpected(60, TypeNames.STRING);// study env uuid
         this.setTypeExpected(61, TypeNames.BOOL);// published
         this.setTypeExpected(62, TypeNames.INT);// file path
+        this.setTypeExpected(63, TypeNames.INT);// subject count
     }
 
     /**
@@ -468,6 +469,24 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
         }
     }
 
+    public StudyBean findSiteByOid(String parentOid, String siteOid) {
+        StudyBean sb = null;
+        this.unsetTypeExpected();
+        this.setTypesExpected();
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), parentOid);
+        variables.put(new Integer(2), siteOid);
+        ArrayList alist = this.select(digester.getQuery("findSiteByOid"), variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            sb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+            return sb;
+        } else {
+            logger.info("returning null from find by study  or site OID...");
+            return null;
+        }
+    }
     public StudyBean createStepTwo(StudyBean sb) {
         // UPDATE STUDY SET TYPE_ID=?, PROTOCOL_TYPE=?,PROTOCOL_DESCRIPTION=?,
         // PROTOCOL_DATE_VERIFICATION=?, PHASE=?, EXPECTED_TOTAL_ENROLLMENT=?,
@@ -514,7 +533,8 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
         variables.put(new Integer(22), sb.getStudyEnvSiteUuid());
         variables.put(new Integer(23), sb.isPublished());
         variables.put(new Integer(24), sb.getFilePath());
-        variables.put(new Integer(25), new Integer(sb.getId()));
+        variables.put(new Integer(25), sb.getSubjectCount());
+        variables.put(new Integer(26), new Integer(sb.getId()));
         this.execute(digester.getQuery("createStepTwo"), variables, nullVars);
         return sb;
     }
@@ -654,6 +674,7 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
         eb.setStudyEnvUuid((String) hm.get("study_env_uuid"));
         eb.setPublished(((Boolean) hm.get("published")).booleanValue());
         eb.setFilePath((Integer) hm.get("file_path"));
+        eb.setSubjectCount((Integer) hm.get("subject_count"));
         return eb;
     }
 

@@ -27,6 +27,8 @@
   </bean>
 -->
 
+
+
     <!-- Simple redirects to internal resources; URL path substring becomes view name (e.g. '/login.htm' -> 'login') -->
     <bean name="/login/login" class="org.springframework.web.servlet.mvc.UrlFilenameViewController" />
     <bean name="/denied" class="org.springframework.web.servlet.mvc.UrlFilenameViewController"/>
@@ -47,7 +49,15 @@
     	<property name="dataSource" ref="dataSource"/>
     </bean>
 
-	
+    <mvc:interceptors>
+        <bean id="enrollmentInterceptor" class="org.akaza.openclinica.controller.helper.EnrollmentInterceptor">
+        <property name="dataSource" ref="dataSource"/>
+        <property name="studyParameterValueDao" ref="studyParameterValueDao" />
+        </bean>
+    </mvc:interceptors>
+
+    <bean class="org.akaza.openclinica.config.SwaggerConfig"/>
+
     <bean id="castorMarshaller" class="org.springframework.oxm.castor.CastorMarshaller" >
         <property name="mappingLocation" value="classpath:properties/mappingMarshaller.xml" />
     </bean>
@@ -84,6 +94,16 @@
     -->
 
 	<bean class="org.springframework.web.servlet.handler.BeanNameUrlHandlerMapping"/>
+	
+	<bean id="multipartResolver"
+        class="org.springframework.web.multipart.commons.CommonsMultipartResolver">
+        <!-- max upload size in bytes -->
+        <property name="maxUploadSize" value="20971520" /> <!-- 20MB -->
+
+        <!-- max size of file in memory (in bytes) -->
+        <property name="maxInMemorySize" value="1048576" /> <!-- 1MB -->
+
+    </bean>
 
     <!-- Resolves logical view names to JSP views -->
     <bean class="org.springframework.web.servlet.view.InternalResourceViewResolver" id="internalViewResolver"

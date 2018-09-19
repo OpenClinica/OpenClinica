@@ -62,12 +62,12 @@ public class CallbackController {
         this.redirectOnSuccess = "/MainMenu";
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.GET)
+    @RequestMapping(value = "/sso/login", method = RequestMethod.GET)
     protected void getCallback(final HttpServletRequest req, final HttpServletResponse res) throws Exception {
         handle(req, res);
     }
 
-    @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @RequestMapping(value = "/sso/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     protected void postCallback(final HttpServletRequest req, final HttpServletResponse res) throws Exception {
         handle(req, res);
     }
@@ -86,7 +86,7 @@ public class CallbackController {
                 return;
 
             LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) otherClaims.get("https://www.openclinica.com/userContext");
-            String ocUserUuid = (String) userContextMap.get("ocUserUuid");
+            String ocUserUuid = (String) userContextMap.get("userUuid");
 
             req.getSession().setAttribute("accessToken", kp.getKeycloakSecurityContext().getTokenString());
 

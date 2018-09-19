@@ -107,6 +107,10 @@
 		<sql>select * from study_user_role where user_name=?</sql>
 	</query>
 	<query>
+		<name>findAllRolesByUserNameAndStudyOid</name>
+		<sql>select r.* from public.study_user_role r,public.study s where s.study_id=r.study_id and r.user_name=? and s.oc_oid =?</sql>
+	</query>
+	<query>
 		<name>findRole</name>
 		<sql>select * from user_role where role_name=?</sql>
 	</query>
@@ -156,7 +160,7 @@
 	</query>
 	<query>
 	 <name>findStudyByUser</name>
-	 <sql>select sur.role_name, sur.study_id ,s.name, s.env_type
+	 <sql>select sur.role_name, sur.study_id ,s.name, s.env_type, s.study_env_uuid, s.study_env_site_uuid
 	      from study_user_role sur, study s
           where sur.study_id = s.study_id and sur.status_id = 1 
           and sur.role_name != 'admin' and sur.user_name=?

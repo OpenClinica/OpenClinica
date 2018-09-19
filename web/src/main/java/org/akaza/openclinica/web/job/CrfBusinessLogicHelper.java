@@ -421,4 +421,183 @@ public class CrfBusinessLogicHelper {
 
         return true;
     }
+    
+    /**
+     * The following methods are for 'mark CRF Started' Note that we will also wrap Study Event status changes in this
+     * code, possibly split out in a later release, tbh 06/2008
+     * 
+     * @return
+     */
+    public boolean markCRFStarted(EventCRFBean ecb, UserAccountBean ub, boolean inTransaction) throws Exception {
+        EventCRFDAO eventCrfDao = new EventCRFDAO(ds);
+        StudyDAO sdao = new StudyDAO(ds);
+        StudyBean study = sdao.findByStudySubjectId(ecb.getStudySubjectId());
+        EventDefinitionCRFBean edcb = getEventDefinitionCrfByStudyEventAndCrfVersion(ecb, study);
+
+        StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(ds);
+        StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(edcb.getStudyEventDefinitionId());
+        CRFDAO crfDao = new CRFDAO(ds);
+        ArrayList crfs = (ArrayList) crfDao.findAllActiveByDefinition(sedBean);
+        sedBean.setCrfs(crfs);
+
+        logger.debug("inout_event_crf_id:" + ecb.getId());
+        logger.debug("inout_study_event_def_id:" + sedBean.getId());
+
+        Status newStatus = Status.AVAILABLE;
+        DataEntryStage newStage = ecb.getStage();
+
+        ecb.setUpdater(ub);
+        ecb.setUpdatedDate(new Date());
+
+        ecb.setStatus(newStatus);
+        ecb.setStage(newStage);
+        ecb = (EventCRFBean) eventCrfDao.update(ecb);
+        logger.debug("just updated event crf id: " + ecb.getId());
+
+        StudyEventDAO sedao = new StudyEventDAO(ds);
+        StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+        if (seb.getSubjectEventStatus().isScheduled() || seb.getSubjectEventStatus().isNotScheduled() || seb.getSubjectEventStatus().isDE_Started()) {
+            // change status for study event
+            seb.setUpdatedDate(new Date());
+            seb.setUpdater(ub);
+            seb.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+            seb = (StudyEventBean) sedao.update(seb,inTransaction);
+        }
+
+        return true;
+    }
+    
+    /**
+     * The following methods are for 'mark CRF complete' Note that we will also wrap Study Event status changes in this
+     * code, possibly split out in a later release, tbh 06/2008
+     * 
+     * @return
+     */
+    public boolean markCRFComplete(EventCRFBean ecb, UserAccountBean ub, boolean inTransaction) throws Exception {
+        DataEntryStage stage = ecb.getStage();
+        EventCRFDAO eventCrfDao = new EventCRFDAO(ds);
+        ItemDataDAO itemDataDao = new ItemDataDAO(ds);
+        StudyDAO sdao = new StudyDAO(ds);
+        StudySubjectDAO ssdao = new StudySubjectDAO(ds);
+        StudyBean study = sdao.findByStudySubjectId(ecb.getStudySubjectId());
+        EventDefinitionCRFBean edcb = getEventDefinitionCrfByStudyEventAndCrfVersion(ecb, study);
+
+        // StudyEventDAO studyEventDao = new StudyEventDAO(ds);
+        // StudyEventBean studyEventBean = (StudyEventBean)
+        // studyEventDao.findByPK(ecb.getStudyEventId());
+        // Status studyEventStatus = studyEventBean.getStatus();
+
+        StudyEventDefinitionDAO studyEventDefinitionDao = new StudyEventDefinitionDAO(ds);
+        StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) studyEventDefinitionDao.findByPK(edcb.getStudyEventDefinitionId());
+        CRFDAO crfDao = new CRFDAO(ds);
+        ArrayList crfs = (ArrayList) crfDao.findAllActiveByDefinition(sedBean);
+        sedBean.setCrfs(crfs);
+        // request.setAttribute(TableOfContentsServlet.INPUT_EVENT_CRF_BEAN,
+        // ecb);
+        // request.setAttribute(INPUT_EVENT_CRF_ID, new
+        // Integer(ecb.getId()));
+        logger.debug("inout_event_crf_id:" + ecb.getId());
+        logger.debug("inout_study_event_def_id:" + sedBean.getId());
+
+        Status newStatus = ecb.getStatus();
+        DataEntryStage newStage = ecb.getStage();
+        boolean ide = true;
+
+        newStatus = Status.UNAVAILABLE;
+        // ecb.setUpdaterId(ub.getId());
+        ecb.setUpdater(ub);
+        ecb.setUpdatedDate(new Date());
+        ecb.setDateCompleted(new Date());
+        ecb.setDateValidateCompleted(new Date());
+
+        /*
+         * //for the non-reviewed sections, no item data in DB yet, need to //create them if
+         * (!isEachSectionReviewedOnce()) { boolean canSave = saveItemsToMarkComplete(newStatus); if (canSave == false){
+         * addPageMessage("You may not mark this Event CRF complete, because there are some required entries which have
+         * not been filled out."); return false; } }
+         */
+        ecb.setStatus(newStatus);
+        ecb.setStage(newStage);
+        ecb = (EventCRFBean) eventCrfDao.update(ecb);
+        logger.debug("just updated event crf id: " + ecb.getId());
+        // note the below statement only updates the DATES, not the STATUS
+        eventCrfDao.markComplete(ecb, ide);
+
+        // update all the items' status to complete
+        itemDataDao.updateStatusByEventCRF(ecb, newStatus);
+
+        // change status for study event
+        StudyEventDAO sedao = new StudyEventDAO(ds);
+        StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
+        seb.setUpdatedDate(new Date());
+        seb.setUpdater(ub);
+
+        // updates with Pauls observation from bug:2488:
+        // 1. If there is only one CRF in the event (whether the CRF was
+        // required or not), and data was imported for it, the status of the
+        // event should be Completed.
+        //
+        logger.debug("sed bean get crfs get size: " + sedBean.getCrfs().size());
+        logger.debug("edcb get crf id: " + edcb.getCrfId() + " version size? " + edcb.getVersions().size());
+        logger.debug("ecb get crf id: " + ecb.getCrf().getId());
+        logger.debug("ecb get crf version id: " + ecb.getCRFVersionId());
+
+        if (sedBean.getCrfs().size() == 1) { // && edcb.getCrfId() ==
+            // ecb.getCrf().getId()) {
+
+            seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
+            logger.info("just set subj event status to -- COMPLETED --");
+        }
+        // 2. More than one CRF in the event, all of them being required. If
+        // data is imported into only one CRF, the status of the event
+        // should be
+        // Data Entry Started.
+        //
+        // removing sedBean.getCrfs().size() > 1 &&
+        else if (areAllRequired(seb, study) && !areAllCompleted(seb, study)) {
+
+            seb.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+            logger.info("just set subj event status to -- DATAENTRYSTARTED --");
+        }
+        // 3. More than one CRF in the event, one is required, the other is
+        // not.
+        // If data is imported into the Required CRF, the status of the
+        // event
+        // should be Completed.
+        //
+        // 4. More than one CRF in the event, one is required, the other is
+        // not.
+        // If data is imported into the non-required CRF, the status of the
+        // event should be Data Entry Started.
+        // tbh -- below case covers both
+        // removing sedBean.getCrfs().size() > 1 &&
+        else if (!areAllRequired(seb, study)) {
+            if (areAllRequiredCompleted(seb, study)) {
+                seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
+                logger.info("just set subj event status to -- 3completed3 --");
+            } else {
+                seb.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+                logger.info("just set subj event status to -- DATAENTRYSTARTED --");
+            }
+        }
+
+        // 5. More than one CRF in the event and none of them are required.
+        // If
+        // Data is imported into all the CRFs, the status of the event will
+        // be
+        // Completed. If the data is imported in some of the CRFs, the
+        // status
+        // will be completed as well.
+        // removing sedBean.getCrfs().size() > 1 &&
+
+        else if (noneAreRequired(seb, study)) {
+            seb.setSubjectEventStatus(SubjectEventStatus.COMPLETED);
+            logger.info("just set subj event status to -- 5completed5 --");
+        }
+        logger.debug("just set subj event status, final status is " + seb.getSubjectEventStatus().getName());
+        logger.debug("final overall status is " + seb.getStatus().getName());
+        seb = (StudyEventBean) sedao.update(seb,inTransaction);
+
+        return true;
+    }
 }

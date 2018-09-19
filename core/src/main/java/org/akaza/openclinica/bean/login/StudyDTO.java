@@ -98,7 +98,6 @@ public class StudyDTO {
 		this.expectedTotalEnrollment = expectedTotalEnrollment;
 	}
 
-
 	public String getStatus() {
 		return status;
 	}

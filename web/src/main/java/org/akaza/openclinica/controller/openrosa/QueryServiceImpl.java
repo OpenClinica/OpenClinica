@@ -30,17 +30,15 @@ import org.akaza.openclinica.dao.hibernate.ResolutionStatusDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.DiscrepancyNote;
-import org.akaza.openclinica.domain.datamap.DiscrepancyNoteType;
-import org.akaza.openclinica.domain.datamap.DnItemDataMap;
-import org.akaza.openclinica.domain.datamap.DnItemDataMapId;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.Item;
-import org.akaza.openclinica.domain.datamap.ItemData;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.service.OCUserDTO;
 import org.akaza.openclinica.web.SQLInitServlet;
+import org.akaza.openclinica.web.pform.OpenRosaService;
+import org.akaza.openclinica.web.pform.StudyAndSiteEnvUuid;
 import org.apache.commons.lang.StringUtils;
 import org.codehaus.jackson.map.ObjectMapper;
+import org.springframework.beans.factory.BeanFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.mail.MailException;
@@ -71,6 +69,10 @@ public class QueryServiceImpl implements QueryService {
     private EventCrfDao eventCrfDao;
     @Autowired
     private StudyDao studyDao;
+    @Autowired
+    private OpenRosaService openRosaService;
+    @Autowired
+    private BeanFactory beanFactory;
 
     @Autowired
     private ApplicationContext appContext;
@@ -154,11 +156,14 @@ public class QueryServiceImpl implements QueryService {
         dn.setEntityType("itemData");
 
         dn.setDetailedNotes(queryBean.getComment());
-        if (queryBean.getType().equals(QueryType.QUERY.getName()))
+        if (queryBean.getType().equals(QueryType.QUERY.getName())) {
             dn.setDiscrepancyNoteType(new DiscrepancyNoteType(3));
-        else if (queryBean.getType().equals(QueryType.REASON.getName()))
+            setResolutionStatus(queryBean, dn);
+        }else if
+            (queryBean.getType().equals(QueryType.REASON.getName())){
             dn.setDiscrepancyNoteType(new DiscrepancyNoteType(4));
-
+            dn.setResolutionStatus(resolutionStatusDao.findById(5));
+        }
         String user = queryBean.getUser();
         if (user == null) {
             dn.setUserAccountByOwnerId(helperBean.getContainer().getUser());
@@ -166,7 +171,6 @@ public class QueryServiceImpl implements QueryService {
             UserAccount userAccountByOwnerId = userAccountDao.findByUserName(user);
             dn.setUserAccountByOwnerId(userAccountByOwnerId);
         }
-        setResolutionStatus(queryBean, dn);
 
         String assignedTo = "";
         if (queryBean.getComment().startsWith("Automatic query for:")) {
@@ -176,6 +180,9 @@ public class QueryServiceImpl implements QueryService {
         }
         if (!StringUtils.isEmpty(assignedTo)) {
             UserAccount userAccount = userAccountDao.findByUserName(assignedTo);
+            if (userAccount == null) {
+                userAccount = createUserAccount(assignedTo, helperBean.getContainer().getStudy());
+            }
             helperBean.setUserAccount(userAccount);
             dn.setUserAccount(userAccount);
         }
@@ -185,6 +192,25 @@ public class QueryServiceImpl implements QueryService {
         }
         dn.setDateCreated(new Date());
         return dn;
+    }
+
+    private UserAccount createUserAccount(String assignedTo, Study study) {
+        UserAccount userAccount = null;
+        StudyAndSiteEnvUuid studyAndSiteEnvUuid = new StudyAndSiteEnvUuid();
+        if (study.getStudy() == null)
+            studyAndSiteEnvUuid.setStudyEnvUuid(study.getStudyEnvUuid());
+        else {
+            studyAndSiteEnvUuid.setStudyEnvUuid(study.getStudy().getStudyEnvUuid());
+            studyAndSiteEnvUuid.setSiteEnvUuid(study.getStudyEnvSiteUuid());
+        }
+        try {
+            OCUserDTO ocUserDTO = openRosaService.fetchUserInfoFromUserService(studyAndSiteEnvUuid, assignedTo);
+            userAccount = beanFactory.getBean(UserAccount.class, ocUserDTO);
+
+        } catch (Exception e) {
+            logger.error("Cannot get user info for user:" + assignedTo, e);
+        }
+        return userAccount;
     }
 
     private void handleEmailNotification(QueryServiceHelperBean helperBean, QueryBean queryBean) throws Exception {

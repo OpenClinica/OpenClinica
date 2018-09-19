@@ -923,7 +923,7 @@
             SELECT dn.*
             FROM discrepancy_note dn, dn_item_data_map dsm
             where dsm.item_data_id=?
-            AND dn.discrepancy_note_id=dsm.discrepancy_note_id
+            AND dn.discrepancy_note_id=dsm.discrepancy_note_id AND dn.discrepancy_note_type_id !=4
                    </sql>
     </query>
 
@@ -933,7 +933,7 @@
             SELECT dn.*
             FROM discrepancy_note dn, dn_item_data_map didm
             where didm.item_data_id=? AND dn.parent_dn_id isnull
-            AND dn.discrepancy_note_id=didm.discrepancy_note_id
+            AND dn.discrepancy_note_id=didm.discrepancy_note_id AND dn.discrepancy_note_type_id !=4
                    </sql>
     </query>
 

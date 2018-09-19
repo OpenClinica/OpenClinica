@@ -220,7 +220,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
             ps = con.prepareStatement(query);
 
-            ps = psf.generate(ps);// enter variables here!
+            ps = psf.generate(ps,con);// enter variables here!
 
             {
                 rs = ps.executeQuery();
@@ -1012,7 +1012,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
      * This is the first operation created for the database, so therefore it is the simplest; cull information from the
      * database but not specify any parameters.
      *
-     * @param query
      *            a static query of the database.
      * @return ArrayList of HashMaps carrying the database values.
      */
@@ -2011,7 +2010,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "                                      AND  "
                     + "                                       study_event.study_subject_id = event_crf.study_subject_id  "
                     + "                                      AND " + "                                       (event_crf.status_id " + ecStatusConstraint + ") "
-                    + "                                      ) " + "                   WHERE " + dateConstraint + "                       AND "
+                    + "                                      ) " + "                   WHERE "
                     + "                       study_event_definition.study_event_definition_id IN " + sedin + "                  )  " + "           ) "
                     + "           AND study_subject_id IN ( " + "               SELECT DISTINCT study_subject.study_subject_id "
                     + "                FROM   study_subject   " + "                JOIN   study           ON ( "
@@ -2030,7 +2029,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "                                   study_event.study_event_id = event_crf.study_event_id  " + "                                  AND  "
                     + "                                   study_event.study_subject_id = event_crf.study_subject_id  "
                     + "                                  AND " + "                                   (event_crf.status_id " + ecStatusConstraint + ") "
-                    + "                                  ) " + "               WHERE " + dateConstraint + "                   AND "
+                    + "                                  ) " + "               WHERE  "
                     + "                   study_event_definition.study_event_definition_id IN " + sedin + "           ) " + "           AND "
                     + "           (event_crf.status_id " + ecStatusConstraint + ") " + "   )  " + "   AND  " + "   (item_data.status_id " + itStatusConstraint
                     + ")  " + " ) AS SBQONE, study_event, study_event_definition " + " WHERE  " + " (study_event.study_event_id = SBQONE.studyeventid) "
@@ -2245,7 +2244,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "                                      AND  "
                     + "                                       study_event.study_subject_id = event_crf.study_subject_id  "
                     + "                                      AND " + "                                       (event_crf.status_id " + ecStatusConstraint + ") "
-                    + "                                      ) " + "                   WHERE " + dateConstraint + "                       AND "
+                    + "                                      ) " + "                   WHERE "
                     + "                       study_event_definition.study_event_definition_id IN " + sedin + "                  )  " + "           ) "
                     + "           AND study_subject_id IN ( " + "               SELECT DISTINCT study_subject.study_subject_id "
                     + "                FROM   study_subject   " + "                JOIN   study           ON ( "
@@ -2264,7 +2263,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
                     + "                                   study_event.study_event_id = event_crf.study_event_id  " + "                                  AND  "
                     + "                                   study_event.study_subject_id = event_crf.study_subject_id  "
                     + "                                  AND " + "                                   (event_crf.status_id " + ecStatusConstraint + ") "
-                    + "                                  ) " + "               WHERE " + dateConstraint + "                   AND "
+                    + "                                  ) " + "               WHERE "
                     + "                   study_event_definition.study_event_definition_id IN " + sedin + "           ) " + "           AND "
                     + "           (event_crf.status_id " + ecStatusConstraint + ") " + "   )  " + "   AND  " + "   (item_data.status_id " + itStatusConstraint
                     + ")  " + " ) AS SBQONE, item_group_metadata, item_group " + " WHERE  "
@@ -2276,9 +2275,7 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
     /**
      *
      * @param sedin
-     * @param itin
-     * @param currentstudyid
-     * @param parentstudyid
+
      * @return
      */
     protected String getSQLInKeyDatasetHelper(int studyid, int studyparentid, String sedin, String it_in, String dateConstraint, String ecStatusConstraint,
@@ -2727,7 +2724,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
      * study_subject_id
      *
      * @param studyid
-     * @param studyparentid
      * @param sedin
      * @return
      */

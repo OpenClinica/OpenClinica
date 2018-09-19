@@ -89,7 +89,7 @@ public class UserAccountController {
 	 */
 
 	@RequestMapping(value = "/createuseraccount", method = RequestMethod.POST)
-	public ResponseEntity<HashMap> createOrUpdateAccount(HttpServletRequest request, @RequestBody HashMap<String, String> map) throws Exception {
+	public ResponseEntity<HashMap<String, Object>> createOrUpdateAccount(HttpServletRequest request, @RequestBody HashMap<String, String> map) throws Exception {
 		UserAccountBean  uBean = userCoreService.createUser(request, map);
 		HashMap<String, Object> userDTO = new HashMap<String, Object>();
 		userDTO.put("username", uBean.getName());
@@ -98,7 +98,7 @@ public class UserAccountController {
 		userDTO.put("lastName", uBean.getLastName());
 		userDTO.put("apiKey", uBean.getApiKey());
 		userDTO.put("userUuid", uBean.getUserUuid());
-		return new ResponseEntity<HashMap>(userDTO, org.springframework.http.HttpStatus.OK);
+		return new ResponseEntity<HashMap<String, Object>>(userDTO, org.springframework.http.HttpStatus.OK);
 	}
 
 	protected UserDetails getUserDetails() {

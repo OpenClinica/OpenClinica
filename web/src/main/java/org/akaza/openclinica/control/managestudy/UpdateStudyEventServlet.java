@@ -306,7 +306,7 @@ public class UpdateStudyEventServlet extends SecureController {
             }
         }
         // below added 092007, tbh, task #1390
-        if (!ub.isSysAdmin() && !currentRole.getRole().equals(Role.STUDYDIRECTOR) && !currentRole.getRole().equals(Role.COORDINATOR)) {
+        if (!currentRole.getRole().equals(Role.STUDYDIRECTOR) && !currentRole.getRole().equals(Role.COORDINATOR)) {
             statuses.remove(SubjectEventStatus.LOCKED);
         }
 
@@ -555,24 +555,6 @@ public class UpdateStudyEventServlet extends SecureController {
                 seb.setAttestation("The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
                         + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3"));
                 sedao.update(seb);
-
-                // If all the StudyEvents become signed we will make the
-                // StudySubject signed as well
-                List studyEvents = sedao.findAllByStudySubject(ssub);
-                boolean allSigned = true;
-                for (Iterator iterator = studyEvents.iterator(); iterator.hasNext();) {
-                    StudyEventBean temp = (StudyEventBean) iterator.next();
-                    if (!temp.getSubjectEventStatus().equals(SubjectEventStatus.SIGNED)) {
-                        allSigned = false;
-                        break;
-                    }
-                }
-                if (allSigned) {
-                    logger.debug("Signing StudySubject [" + ssub.getSubjectId() + "]");
-                    ssub.setStatus(Status.SIGNED);
-                    ssub.setUpdater(ub);
-                    ssdao.update(ssub);
-                }
 
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);

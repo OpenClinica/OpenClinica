@@ -400,4 +400,47 @@ public class TriggerService {
 
         return errors;
     }
+    
+    public String generateHardValidationErrorMessage(ArrayList<SubjectDataBean> subjectData, HashMap<String, String> hardValidationErrors, String groupRepeatKey) {
+        StringBuffer sb = new StringBuffer();
+        String studyEventRepeatKey = null;
+        sb.append("");
+        for (SubjectDataBean subjectDataBean : subjectData) {
+            ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
+            for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
+                studyEventRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
+
+                ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
+                for (FormDataBean formDataBean : formDataBeans) {
+                    ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
+                    for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
+                        ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
+                        for (ImportItemDataBean itemDataBean : itemDataBeans) {
+
+                            String oidKey = itemDataBean.getItemOID() + "_" + studyEventRepeatKey + "_" + groupRepeatKey + "_"
+                                    + subjectDataBean.getSubjectOID();
+                            if (hardValidationErrors.containsKey(oidKey)) {
+                                // What about event repeat ordinal and item group and item group repeat ordinal?
+                                sb.append(subjectDataBean.getSubjectOID() + "." + studyEventDataBean.getStudyEventOID());
+                                if (studyEventDataBean.getStudyEventRepeatKey() != null)
+                                    sb.append("(" + studyEventDataBean.getStudyEventRepeatKey() + ")");
+                                sb.append("." + formDataBean.getFormOID() + "." + itemGroupDataBean.getItemGroupOID());
+                                if (itemGroupDataBean.getItemGroupRepeatKey() != null)
+                                    sb.append("(" + itemGroupDataBean.getItemGroupRepeatKey() + ")");
+                                sb.append("." + itemDataBean.getItemOID());
+                                sb.append(": ");
+                                sb.append(itemDataBean.getValue() + " -- ");
+                                sb.append(hardValidationErrors.get(oidKey));
+                                sb.append("");
+                            }
+
+                        }
+                    }
+                }
+            }
+        }
+
+        sb.append("");
+        return sb.toString();
+    }
 }

@@ -37,9 +37,24 @@ public class UserAccountDao extends AbstractDomainDao<UserAccount> {
     }
     public List<UserAccount> findNonRootNonParticipateUsersByStudyId(Integer studyId, Integer parentStudyId) {
         getSessionFactory().getStatistics().logSummary();
-        String query = "select distinct ua.* from user_account ua join study_user_role sur on ua.user_name = sur.user_name where ua.enabled = true and ua.institutional_affiliation != 'PFORM' and ua.user_name != 'root' and ua.status_id!=5 and ua.status_id!=7 and sur.status_id!=5 and sur.status_id!=7  "
-                + " and (sur.study_id = " + studyId + " or  sur.study_id = " + parentStudyId + " ) order by ua.last_name";
-        Query q = getCurrentSession().createNativeQuery(query).addEntity(UserAccount.class);
+        String query = "";
+        Query q;
+        if (parentStudyId != null && parentStudyId > 0) {
+            query = "select distinct ua.* from user_account ua join study_user_role sur on ua.user_name = sur.user_name " +
+                    "where ua.enabled = true and ua.institutional_affiliation != 'PFORM' and ua.user_name != 'root' and ua.status_id!=5 " +
+                    "and ua.status_id!=7 and sur.status_id!=5 and sur.status_id!=7  "
+                    + " and (sur.study_id = :studyId or  sur.study_id = :parentStudyId) order by ua.last_name";
+            q = getCurrentSession().createNativeQuery(query).addEntity(UserAccount.class);
+            q.setParameter("parentStudyId", parentStudyId);
+        } else {
+            query = "select distinct ua.* from user_account ua join study_user_role sur on ua.user_name = sur.user_name " +
+                    "where ua.enabled = true and ua.institutional_affiliation != 'PFORM' and ua.user_name != 'root' " +
+                    "and ua.status_id!=5 " +
+                    "and ua.status_id!=7 and sur.status_id!=5 and sur.status_id!=7  "
+                    + " and sur.study_id = :studyId order by ua.last_name";
+            q = getCurrentSession().createNativeQuery(query).addEntity(UserAccount.class);
+        }
+        q.setParameter("studyId", studyId);
         return (List<UserAccount>) q.list();
     }
 

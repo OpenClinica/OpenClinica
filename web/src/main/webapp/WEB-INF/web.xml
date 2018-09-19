@@ -175,14 +175,13 @@
 
     <servlet-mapping>
         <servlet-name>pages</servlet-name>
-        <url-pattern>/oauth/*</url-pattern>
+        <url-pattern>/sso/*</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
         <servlet-name>pages</servlet-name>
-        <url-pattern>/sso/*</url-pattern>
+        <url-pattern>/oauth/*</url-pattern>
     </servlet-mapping>
-
     <servlet>
         <servlet-name>ws</servlet-name>
         <servlet-class>org.springframework.ws.transport.http.MessageDispatcherServlet</servlet-class>
@@ -532,6 +531,11 @@
         <display-name>ListCRF</display-name>
         <servlet-name>ListCRFServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.admin.ListCRFServlet</servlet-class>
+    </servlet>
+    <servlet>
+        <display-name>NoAccess</display-name>
+        <servlet-name>NoAccessServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.NoAccessServlet</servlet-class>
     </servlet>
     <servlet>
         <display-name>DefineStudyEvent</display-name>
@@ -1685,6 +1689,10 @@
         <url-pattern>/ListCRF</url-pattern>
     </servlet-mapping>
     <servlet-mapping>
+        <servlet-name>NoAccessServlet</servlet-name>
+        <url-pattern>/NoAccess</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
         <servlet-name>DefineStudyEventServlet</servlet-name>
         <url-pattern>/DefineStudyEvent</url-pattern>
     </servlet-mapping>
@@ -2272,6 +2280,5 @@
         <servlet-name>OpenClinicaJersey</servlet-name>
         <url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
-
 
 </web-app>

@@ -7,19 +7,19 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.controller.helper.StudyEnvironmentRoleDTO;
+import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
@@ -27,6 +27,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -34,13 +35,12 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
+import java.util.stream.Collectors;
 
 /**
  * Created by yogi on 11/10/16.
@@ -50,6 +50,7 @@ import java.util.*;
 public class StudyBuildServiceImpl implements StudyBuildService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
+    PermissionService permissionService;
     @Autowired
     private StudyDao studyDao;
     @Autowired
@@ -62,6 +63,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     private SchemaServiceDao schemaServiceDao;
     @Autowired
     private UserAccountDao userAccountDao;
+
+    public StudyBuildServiceImpl(PermissionService permissionService) {
+        this.permissionService = permissionService;
+    }
 
     public StudyInfoObject process(HttpServletRequest request, Study study, UserAccountBean ub) throws Exception  {
         boolean isUserUpdated;
@@ -161,7 +166,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             if (StringUtils.isEmpty(studyEnvUuid))
                 return studyEnvUuidProcessed;
         }
-        updateStudyUserRoles(request, ub, userActiveStudyId);
+        updateStudyUserRoles(request, ub, userActiveStudyId, studyEnvUuid);
 
         StudyDAO studyDAO = new StudyDAO(dataSource);
         StudyBean currentPublicStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
@@ -182,6 +187,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             return studyEnvUuidProcessed;
         }
         StudyUserRoleBean studyUserRoleBean = new StudyUserRoleBean();
+        UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+        UserAccountBean jdbcUb = (UserAccountBean) userAccountDAO.findByUserName(ub.getUserName());
+        ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getUserName());
+        jdbcUb.setRoles(userRoleBeans);
+        session.setAttribute(SecureController.USER_BEAN_NAME, jdbcUb);
+
         ub.setActiveStudy(userStudy);
         userAccountDao.saveOrUpdate(ub);
 
@@ -208,7 +219,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
         if(studyEnvUuidProcessed)
             return true;
-        studyUserRoleUpdated = updateStudyUserRoles(request, ub, userActiveStudyId);
+        studyUserRoleUpdated = updateStudyUserRoles(request, ub, userActiveStudyId, null);
         if (ub.getActiveStudy() == null) {
             logger.error("There are no studies or this user has no studies avaiable");
             return false;
@@ -226,10 +237,20 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         existingStudyUserRoles.forEach(studyToDelete -> studyUserRoleDao.getCurrentSession().delete(studyToDelete));
     }
 
+    private boolean checkIfParentExists(HttpServletRequest request, Study study, List<StudyEnvironmentRoleDTO> roles) {
+        StudyEnvironmentRoleDTO role = roles.stream().filter(s -> s.getStudyEnvironmentUuid().equals(study.getStudy().getStudyEnvSiteUuid())).findAny()
+                .orElse(null);
+        if (role != null) {
+            request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
+            return true;
+        }
+        return false;
+    }
+
     @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
-    public boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId) {
+    public boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId, String altStudyEnvUuid) {
         boolean studyUserRoleUpdated = false;
-        ResponseEntity<StudyEnvironmentRoleDTO[]> userRoles = getUserRoles(request);
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> userRoles = getUserRoles(request);
 
         if (userRoles == null)
             return studyUserRoleUpdated;
@@ -239,16 +260,30 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         Study placeHolderStudy = null;
         for (StudyEnvironmentRoleDTO role: userRoles.getBody()) {
             String uuidToFind = null;
-            if (StringUtils.isNotEmpty(role.getSiteUuid()))
+            boolean siteFlag = false;
+            if (StringUtils.isNotEmpty(role.getSiteUuid())) {
                 uuidToFind = role.getSiteUuid();
-            else
+                siteFlag = true;
+            } else
                 uuidToFind = role.getStudyEnvironmentUuid();
             Study study = studyDao.findByStudyEnvUuid(uuidToFind);
             if (study == null)
                 continue;
-
-            if (study.getStudyId() == userActiveStudyId)
+            boolean parentExists = false;
+            if (siteFlag) {
+                // see if the parent is in this list. If found, assign the custom role of the parent
+                parentExists = checkIfParentExists(request, study, userRoles.getBody());
+            }
+            if (StringUtils.isNotEmpty(altStudyEnvUuid)) {
+                if (uuidToFind.equals(altStudyEnvUuid)) {
+                    request.getSession().setAttribute("altCustomUserRole", role.getDynamicRoleName());
+                }
+            }
+            if (study.getStudyId() == userActiveStudyId) {
                 currentActiveStudyValid = true;
+                if (!parentExists)
+                    request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
+            }
 
             Study parentStudy = study.getStudy();
             Study toUpdate = parentStudy == null ? study : study.getStudy();
@@ -257,6 +292,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 ub.setActiveStudy(toUpdate);
                 userAccountDao.saveOrUpdate(ub);
                 currentActiveStudyValid = true;
+                if (!parentExists)
+                    request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
             }
             placeHolderStudy = study;
             UserAccount userAccount = new UserAccount();
@@ -316,34 +353,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return true;
     }
 
-    public ResponseEntity getUserRoles(HttpServletRequest request) {
-        Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
-        if (userContextMap == null)
-            return null;
-        String userUuid = (String) userContextMap.get("userUuid");
-        String uri = CoreResources.getField("SBSUrl") + userUuid + "/roles";
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Accept-Charset", "UTF-8");
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
-        jsonConverter.setObjectMapper(objectMapper);
-        converters.add(jsonConverter);
-        restTemplate.setMessageConverters(converters);
-        ResponseEntity<StudyEnvironmentRoleDTO[]> response = restTemplate.exchange(uri, HttpMethod.GET, entity, StudyEnvironmentRoleDTO[].class);
-        logger.debug("Response: getUserRoles:" + response);
-        if (logger.isDebugEnabled()) {
-            for (StudyEnvironmentRoleDTO userRole: response.getBody()) {
-                logger.debug("UserRole in updateStudyUserRoles: role: " + userRole.getRoleName() + " uuid:" + userRole.getUuid() );
-            }
-        }
-        return response;
+    public ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request) {
+        return permissionService.getUserRoles(request);
     }
 
     public ResponseEntity getUserDetails (HttpServletRequest request) {

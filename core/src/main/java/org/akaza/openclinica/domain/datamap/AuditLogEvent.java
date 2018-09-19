@@ -27,7 +27,6 @@ import org.hibernate.annotations.Parameter;
 @Entity
 @Table(name = "audit_log_event")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "audit_log_event_audit_id_seq") })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class AuditLogEvent extends DataMapDomainObject implements Serializable {
 
     /**

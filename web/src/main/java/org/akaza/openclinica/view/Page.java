@@ -37,8 +37,10 @@ public enum Page {
      */
                 MENU("/WEB-INF/jsp/menu.jsp", "Welcome to OpenClinica"),
                 MENU_SERVLET("/MainMenu", "Welcome to OpenClinica Main Servlet"),
-              
-    // YW 06-25-2007 <<
+                NO_ACCESS("/WEB-INF/jsp/noAccess.jsp", "No Access"),
+
+
+ // YW 06-25-2007 <<
     /**
      * Page for reset password when password is expired.
      */
@@ -151,7 +153,7 @@ public enum Page {
     UPDATE_STUDY7("/WEB-INF/jsp/managestudy/updateStudy7.jsp", "Update a Study seventh section"),
     UPDATE_STUDY8 ("/WEB-INF/jsp/managestudy/updateStudy8.jsp", "Update a Study last section"),
 
-     LIST_STUDY_SUBJECTS ("/WEB-INF/jsp/managestudy/findSubjects.jsp", "List Study Subjects"),
+    LIST_STUDY_SUBJECTS ("/WEB-INF/jsp/managestudy/findSubjects.jsp", "List Study Subjects"),
     LIST_STUDY_SUBJECTS_SERVLET("/ListStudySubjects", "List Study Subjects"),
 
      UPDATE_STUDY_SERVLET_NEW ("/UpdateStudyNew", "Update a Study"),

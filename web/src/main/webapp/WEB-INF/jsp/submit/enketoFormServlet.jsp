@@ -27,7 +27,7 @@
     console.log("***********************************Getting crossStorage:"+ crossStorageURL);
     var ocAppTimeoutKey = "OCAppTimeout";
     var firstLoginCheck = '<%= session.getAttribute("firstLoginCheck")%>';
-    console.log("Firstr time first:" + firstLoginCheck);
+    console.log("First time value of firstLoginCheck:" + firstLoginCheck);
     var currentUser = "currentUser";
     var appName = "RT";
 </script>
@@ -50,7 +50,7 @@
     <script type="text/javascript" language="javascript">
 
         $(document).ready(function(){
-            var fullEnketoURL = "${formURL1}" +'&jini='+"${jini}" +'&parentWindowOrigin='+encodeURIComponent(window.location.protocol + '//' + window.location.host) +'&PID='+"${studySubjectId}"+ "${formURL2}";
+            var fullEnketoURL = "${formURL}";
             iframe = document.getElementById("enketo");
             iframe.setAttribute('src', fullEnketoURL);
         });
@@ -92,9 +92,9 @@
     updateOCAppTimeout();
     processTimedOuts(true, false);
 </script>
-<iframe id="enketo" style="position:fixed;z-index:1011;top:0;left:0;width:100vw;height:100vh;">
-
-</iframe>
+<div style="overflow:auto;-webkit-overflow-scrolling:touch">
+    <iframe id="enketo" style="z-index:1011;width:100vw;height:100vh;">
+</div>
 </body>
 
 </html>

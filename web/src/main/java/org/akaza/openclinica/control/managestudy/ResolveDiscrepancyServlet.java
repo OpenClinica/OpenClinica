@@ -54,6 +54,8 @@ import org.akaza.openclinica.control.submit.TableOfContentsServlet;
 import org.akaza.openclinica.core.LockInfo;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import org.akaza.openclinica.dao.hibernate.ItemDataDao;
 import org.akaza.openclinica.dao.hibernate.VersioningMapDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
@@ -69,6 +71,7 @@ import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
 import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.domain.datamap.ItemData;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.VersioningMap;
 import org.akaza.openclinica.domain.xform.XformParser;
@@ -126,6 +129,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     public static final String VIEW_MODE = "view";
     public static final String EDIT_MODE = "edit";
     public static final String JINI = "jini";
+    private static final String VIEW_NOTES = "ViewNotes";
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -273,6 +277,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
                 // This section is for version migration ,where item does not exist in the current formLayout
                 boolean itemExistInFormLayout = false;
+                request.setAttribute(STUDYSUBJECTID, "");
                 List<VersioningMap> vms = versioningMapDao.findByVersionIdAndItemId(ecb.getCRFVersionId(), item.getId());
                 for (VersioningMap vm : vms) {
                     if (vm.getFormLayout().getFormLayoutId() == formLayout.getId()) {
@@ -339,6 +344,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
                 String attribute = SINGLE_ITEM_FLAVOR + "[" + idb.getId() + "]";
                 context.setAttribute(attribute, xform);
+            } else {
+                request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
             }
             StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
             Role role = currentRole.getRole();
@@ -350,31 +357,14 @@ public class ResolveDiscrepancyServlet extends SecureController {
                             EDIT_MODE, loadWarning, true);
                 } else
                     formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb,
-                            role, EDIT_MODE,  loadWarning,false);
+                            role, EDIT_MODE, loadWarning, false);
             } else {
                 String hash = formLayout.getXform();
                 formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);
             }
-            int hashIndex = formUrlObject.getFormUrl().lastIndexOf("#");
-            String part1 = formUrlObject.getFormUrl();
-            String part2 = "";
-            if (hashIndex != -1) {
-                part1 = formUrlObject.getFormUrl().substring(0, hashIndex);
-                part2 = formUrlObject.getFormUrl().substring(hashIndex);
-            }
-            request.setAttribute(EnketoFormServlet.FORM_URL1, part1);
-            request.setAttribute(EnketoFormServlet.FORM_URL2, part2);
-            if (isLocked) {
-                request.setAttribute("readOnlyUrl", part1);
-            }
-            request.setAttribute(ORIGINATING_PAGE, "ViewNotes?module=" + module);
+            request.setAttribute(EnketoFormServlet.FORM_URL, formUrlObject.getFormUrl());
+            request.setAttribute(ORIGINATING_PAGE, viewNotesUrl(module));
             request.setAttribute(JINI, jini);
-
-            if (!flavor.equals(SINGLE_ITEM_FLAVOR)) {
-                request.setAttribute(STUDYSUBJECTID, ssb.getLabel());
-            } else {
-                request.setAttribute(STUDYSUBJECTID, "");
-            }
         }
         return true;
     }
@@ -400,6 +390,15 @@ public class ResolveDiscrepancyServlet extends SecureController {
         // check that the note exists
         DiscrepancyNoteBean discrepancyNoteBean = (DiscrepancyNoteBean) dndao.findByPK(noteId);
 
+        if (discrepancyNoteBean.getEntityType().equalsIgnoreCase("itemData")) {
+            ItemDataDao itemDataDao = (ItemDataDao) SpringServletAccess.getApplicationContext(context).getBean("itemDataDao");
+            ItemData itemData = itemDataDao.findById(discrepancyNoteBean.getEntityId());
+            if (!hasFormAccess(itemData.getEventCrf())) {
+                request.setAttribute(ORIGINATING_PAGE, viewNotesUrl(module));
+                forwardPage(Page.NO_ACCESS);
+                return;
+            }
+        }
         if (!discrepancyNoteBean.isActive()) {
             throw new InconsistentStateException(Page.MANAGE_STUDY_SERVLET, resexception.getString("you_are_trying_resolve_discrepancy_not_exist"));
         }
@@ -907,6 +906,14 @@ public class ResolveDiscrepancyServlet extends SecureController {
             }
         }
         return xformOutput;
+    }
+
+    private String viewNotesUrl(String module) {
+        String referer = request.getHeader("referer");
+        String[] splitReferer = referer.split(VIEW_NOTES + "\\?");
+        String viewNotesUrl = splitReferer.length > 1 ? VIEW_NOTES + "?" + splitReferer[1]
+                : VIEW_NOTES + "?" + "module=" + module + "&listNotes_f_discrepancyNoteBean.disType=Query";
+        return viewNotesUrl;
     }
 
 }

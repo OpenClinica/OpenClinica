@@ -133,10 +133,12 @@
       if (objLeftNavRowElement.style) { objLeftNavRowElement = objLeftNavRowElement.style; }
         objLeftNavRowElement.display = (objLeftNavRowElement.display == "none" ) ? "" : "none";
         objExCl = MM_findObj("excl_"+strLeftNavRowElementName);
-        if(objLeftNavRowElement.display == "none"){
-            objExCl.src = "images/bt_Expand.gif";
-        }else{
-            objExCl.src = "images/bt_Collapse.gif";
+        if (objExCl) {
+	        if(objLeftNavRowElement.display == "none"){
+	            objExCl.src = "images/bt_Expand.gif";
+	        }else{
+	            objExCl.src = "images/bt_Collapse.gif";
+	        }
         }
       }
     }

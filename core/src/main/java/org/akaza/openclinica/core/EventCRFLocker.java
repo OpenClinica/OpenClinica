@@ -7,6 +7,8 @@
  */
 package org.akaza.openclinica.core;
 
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.domain.datamap.FormLayout;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.apache.commons.lang.StringUtils;
@@ -136,10 +138,23 @@ public class EventCRFLocker implements Serializable {
         return lockedCRFs.get(createEventCrfLockKey(se, fl, schemaName));
     }
 
+    public LockInfo getLockOwner(StudyEventBean se, FormLayoutBean fl, String schemaName) {
+
+        return lockedCRFs.get(createEventCrfLockKey(se, fl, schemaName));
+    }
+
     public String createEventCrfLockKey(StudyEvent se, FormLayout fl, String schemaName) {
         String key = "";
         if (se != null && fl != null) {
             key = schemaName + se.getStudyEventId() + fl.getFormLayoutId();
+        }
+        return key;
+    }
+
+    public String createEventCrfLockKey(StudyEventBean se, FormLayoutBean fl, String schemaName) {
+        String key = "";
+        if (se != null && fl != null) {
+            key = schemaName + se.getId() + fl.getId();
         }
         return key;
     }

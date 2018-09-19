@@ -184,8 +184,11 @@ public class SignStudySubjectServlet extends SecureController {
             try {
                 StudyEventBean studyEvent = (StudyEventBean) studyEvents.get(l);
                 studyEvent.setUpdater(ub);
-                studyEvent.setUpdatedDate(new Date());
+                Date date = new Date();
+                studyEvent.setUpdatedDate(date);
                 studyEvent.setSubjectEventStatus(SubjectEventStatus.SIGNED);
+                studyEvent.setAttestation("The eCRFs that are part of this event were signed by " + ub.getFirstName() + " " + ub.getLastName() + " (" + ub.getName()
+                        + ") " + "on Date Time " + date + " under the following attestation:\n\n" + resword.getString("sure_to_sign_subject3"));
                 sedao.update(studyEvent);
             } catch (Exception ex) {
                 updated = false;

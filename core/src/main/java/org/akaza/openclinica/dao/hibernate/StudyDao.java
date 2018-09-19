@@ -1,14 +1,15 @@
 package org.akaza.openclinica.dao.hibernate;
 
-import java.math.BigInteger;
-import java.util.List;
-
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.apache.commons.lang.StringUtils;
 import org.hibernate.query.Query;
+import org.hibernate.transform.Transformers;
 import org.springframework.transaction.annotation.Transactional;
+
+import java.math.BigInteger;
+import java.util.List;
 
 @Transactional
 public class StudyDao extends AbstractDomainDao<Study> {
@@ -40,6 +41,28 @@ public class StudyDao extends AbstractDomainDao<Study> {
         q.setParameter("parentStudyId", parentStudyId);
         return (Study) q.uniqueResult();
     }
+
+    public List<ChangeStudyDTO> findByUser(String username) {
+        getSessionFactory().getStatistics().logSummary();
+        String query = " select s.study_id as \"studyId\", concat(s.study_env_uuid, ps.study_env_uuid) as \"studyEnvUuid\", s.study_env_site_uuid as \"siteEnvUuid\" \n" +
+                "\t      from study s left join (select study_id from study_user_role tmp where tmp.status_id = 1 and tmp.role_name != 'admin' and tmp.user_name=:username) sur on (s.study_id=sur.study_id)\n" +
+                "\t      left join study ps on (s.parent_study_id = ps.study_id)";
+        Query q = getCurrentSession().createNativeQuery(query).setResultTransformer(Transformers.aliasToBean(ChangeStudyDTO.class));
+        q.setParameter("username", username);
+        return q.list();
+    }
+
+    public List<ChangeStudyDTO> findAllUsersByStudy(int studyId) {
+        getSessionFactory().getStatistics().logSummary();
+        String query = " select u.user_name as \"username\", concat(s.study_env_uuid, ps.study_env_uuid) as \"studyEnvUuid\", s.study_env_site_uuid as \"siteEnvUuid\" \n" +
+                "from user_account u, study s left join " +
+                "(select study_id from study_user_role tmp where tmp.status_id = 1) sur on (s.study_id=sur.study_id) \n" +
+                "left join study ps on (s.parent_study_id = ps.study_id) where s.study_id=:studyId and sur.user_name=u.user_name and u.status_id=1";
+        Query q = getCurrentSession().createNativeQuery(query).setResultTransformer(Transformers.aliasToBean(ChangeStudyDTO.class));
+        q.setParameter("studyId", studyId);
+        return q.list();
+    }
+
 
     public Study findByOidEnvType(String oid, StudyEnvEnum envType) {
         getSessionFactory().getStatistics().logSummary();

@@ -7,29 +7,16 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-
 import org.akaza.openclinica.bean.core.NumericComparisonOperator;
 import org.akaza.openclinica.bean.core.ResolutionStatus;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyGroupBean;
 import org.akaza.openclinica.bean.managestudy.StudyGroupClassBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
-import org.akaza.openclinica.control.admin.UpdateSubjectServlet;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.DiscrepancyValidator;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
@@ -37,16 +24,14 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.AddNewSubjectServlet;
 import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupClassDAO;
-import org.akaza.openclinica.dao.managestudy.StudyGroupDAO;
-import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
-import org.apache.commons.lang.StringUtils;
+
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 /**
  * @author jxu Processes request to update a study subject
@@ -54,6 +39,10 @@ import org.apache.commons.lang.StringUtils;
 public class UpdateStudySubjectServlet extends SecureController {
 
     SimpleDateFormat yformat = new SimpleDateFormat("yyyy");
+
+    StudySubjectBean studySub;
+    SubjectBean subject;
+    FormDiscrepancyNotes formDiscNotes;
 
     /**
      * Checks whether the user has the right permission to proceed function
@@ -66,7 +55,7 @@ public class UpdateStudySubjectServlet extends SecureController {
         }
 
         if (currentRole.getRole().equals(Role.STUDYDIRECTOR) || currentRole.getRole().equals(Role.COORDINATOR)
-            || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) {
+                || currentRole.getRole().equals(Role.INVESTIGATOR) || currentRole.getRole().equals(Role.RESEARCHASSISTANT) || currentRole.getRole().equals(Role.RESEARCHASSISTANT2)) {
             return;
         }
 
@@ -76,13 +65,13 @@ public class UpdateStudySubjectServlet extends SecureController {
 
     @Override
     public void processRequest() throws Exception {
-        FormDiscrepancyNotes formDiscNotes = null;
         StudyDAO stdao = new StudyDAO(sm.getDataSource());
         SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
         StudySubjectDAO studySubdao = new StudySubjectDAO(sm.getDataSource());
         FormProcessor fp = new FormProcessor(request);
+        boolean updateIsValid = false;
 
-        String fromResolvingNotes = fp.getString("fromResolvingNotes",true);
+        String fromResolvingNotes = fp.getString("fromResolvingNotes", true);
         if (StringUtil.isBlank(fromResolvingNotes)) {
             session.removeAttribute(ViewNotesServlet.WIN_LOCATION);
             session.removeAttribute(ViewNotesServlet.NOTES_TABLE);
@@ -90,7 +79,7 @@ public class UpdateStudySubjectServlet extends SecureController {
             checkStudyFrozen(Page.LIST_STUDY_SUBJECTS_SERVLET, respage.getString("current_study_frozen"));
         }
 
-        int studySubId = fp.getInt("id", true);// studySubjectId
+        int studySubId = Integer.valueOf(fp.getString("id"));
 
         if (studySubId == 0) {
             addPageMessage(respage.getString("please_choose_study_subject_to_edit"));
@@ -103,10 +92,10 @@ public class UpdateStudySubjectServlet extends SecureController {
                 return;
             }
 
-            StudySubjectBean studySub = (StudySubjectBean) studySubdao.findByPK(studySubId);
-            SubjectBean subject = (SubjectBean) sdao.findByPK(studySub.getSubjectId());
+            studySub = (StudySubjectBean) studySubdao.findByPK(studySubId);
+            subject = (SubjectBean) sdao.findByPK(studySub.getSubjectId());
             StudyBean study = (StudyBean) stdao.findByPK(studySub.getStudyId());
-            
+
 
             StudyGroupClassDAO sgcdao = new StudyGroupClassDAO(sm.getDataSource());
             StudyGroupDAO sgdao = new StudyGroupDAO(sm.getDataSource());
@@ -149,37 +138,31 @@ public class UpdateStudySubjectServlet extends SecureController {
 
                 session.setAttribute("studySub", studySub);
                 session.setAttribute("subject", subject);
-                
+
                 List<DiscrepancyNoteBean> discNotes = getDiscNotesForSubjectStudySubject(study, subject.getId(), studySub.getId());
                 setRequestAttributesForNotes(discNotes);
-                
-                // below added tbh 092007
-                String enrollDateStr = studySub.getEnrollmentDate()!=null ?
-                    local_df.format(studySub.getEnrollmentDate()) : "";
-                session.setAttribute("enrollDateStr", enrollDateStr);
-                // above added tbh 092007
+
+
                 formDiscNotes = new FormDiscrepancyNotes();
                 session.setAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME, formDiscNotes);
-                
-               request.setAttribute("localBirthDate", "");//no DOB collected
-               if (!currentStudy.getStudyParameterConfig().getCollectDob().equals("3") &&
-                       subject.getDateOfBirth() != null ){
-                   setLocalDOB( subject);
-               }
 
 
                 forwardPage(Page.UPDATE_STUDY_SUBJECT);
             } else if ("confirm".equalsIgnoreCase(action)) {
+                session.setAttribute("subject", subject);
                 List<DiscrepancyNoteBean> discNotes = getDiscNotesForSubjectStudySubject(study, subject.getId(), studySub.getId());
                 setRequestAttributesForNotes(discNotes);
-                confirm(sgdao);
+                updateIsValid = validateEditSubject(sgdao);
 
-            } else if ("submit".equalsIgnoreCase(action)) {// submit to DB
-                StudySubjectBean studySubject = (StudySubjectBean) session.getAttribute("studySub");
-                SubjectBean sub = (SubjectBean) session.getAttribute("subject");
+            }
 
-                studySubject.setUpdater(ub);
-                
+            // This block commits the update to the DB, should be based on the if above.
+            if (updateIsValid) {
+
+                studySub.setUpdater(ub);
+
+                // TODO remove these once we clear the study parameter config
+                /*
                 if (! currentStudy.getStudyParameterConfig().getCollectDob().equals("3")){
                     if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
                     {
@@ -191,20 +174,22 @@ public class UpdateStudySubjectServlet extends SecureController {
                     }
                     if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1"))
                     {
+
                         Date date_new = local_df.parse(fp.getString(UpdateSubjectServlet.DATE_DOB_TO_SAVE));
                         sub.setDateOfBirth(date_new);
                     }
                 }
-                sub.setUpdater(ub);
-                
-                updateClosedQueriesForUpdatedStudySubjectFields(study, sub, studySubject);
-                studySubdao.update(studySubject);
-                sdao.update(sub);
+                */
+                subject.setUpdater(ub);
+
+                updateClosedQueriesForUpdatedStudySubjectFields(study, subject, studySub);
+                studySubdao.update(studySub);
+                sdao.update(subject);
 
                 // save discrepancy notes into DB
                 FormDiscrepancyNotes fdn = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 DiscrepancyNoteDAO dndao = new DiscrepancyNoteDAO(sm.getDataSource());
-                AddNewSubjectServlet.saveFieldNotes("enrollmentDate", fdn, dndao, studySubject.getId(), "studySub", currentStudy);
+                AddNewSubjectServlet.saveFieldNotes("enrollmentDate", fdn, dndao, studySub.getId(), "studySub", currentStudy);
 
                 ArrayList groups = (ArrayList) session.getAttribute("groups");
                 if (!groups.isEmpty()) {
@@ -212,9 +197,9 @@ public class UpdateStudySubjectServlet extends SecureController {
                         StudyGroupClassBean sgc = (StudyGroupClassBean) groups.get(i);
                         /*We will be allowing users to remove a subject from all groups. Issue-4524*/
                         if (sgc.getStudyGroupId() == 0) {
-                            Collection subjectGroups = sgmdao.findAllByStudySubject(studySubject.getId());
-                            for (Iterator it = subjectGroups.iterator(); it.hasNext();) {
-                                sgmdao.deleteTestGroupMap(((SubjectGroupMapBean)it.next()).getId());
+                            Collection subjectGroups = sgmdao.findAllByStudySubject(studySub.getId());
+                            for (Iterator it = subjectGroups.iterator(); it.hasNext(); ) {
+                                sgmdao.deleteTestGroupMap(((SubjectGroupMapBean) it.next()).getId());
                             }
                         } else {
                             SubjectGroupMapBean sgm = new SubjectGroupMapBean();
@@ -222,7 +207,7 @@ public class UpdateStudySubjectServlet extends SecureController {
                             sgm.setStudyGroupId(sgc.getStudyGroupId());
                             sgm.setNotes(sgc.getGroupNotes());
                             sgm.setStudyGroupClassId(sgc.getId());
-                            sgm.setStudySubjectId(studySubject.getId());
+                            sgm.setStudySubjectId(studySub.getId());
                             sgm.setStatus(Status.AVAILABLE);
                             if (sgm.getStudyGroupId() > 0) {
                                 if (gMap != null && gMap.getId() > 0) {
@@ -246,11 +231,7 @@ public class UpdateStudySubjectServlet extends SecureController {
                 session.removeAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
                 request.setAttribute("id", new Integer(studySubId).toString());
 
-                forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
-            } else {
-                addPageMessage(respage.getString("no_action_specified"));
-                forwardPage(Page.LIST_STUDY_SUBJECTS);
-                return;
+                response.sendRedirect(request.getContextPath() + "/ViewStudySubject?id=" + new Integer(studySubId).toString());
             }
 
         }
@@ -265,7 +246,7 @@ public class UpdateStudySubjectServlet extends SecureController {
 
         List<DiscrepancyNoteBean> discNotes = getDiscNotesForSubjectStudySubject(study, updatedStudySubject.getSubjectId(), updatedStudySubject.getId());
 
-        for (DiscrepancyNoteBean note: discNotes) {
+        for (DiscrepancyNoteBean note : discNotes) {
             if (note.getColumn().equals("enrollment_date") && note.getResStatus().equals(ResolutionStatus.CLOSED) &&
                     !existingStudySubject.getEnrollmentDate().equals(updatedStudySubject.getEnrollmentDate())) {
                 note.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId());
@@ -325,228 +306,49 @@ public class UpdateStudySubjectServlet extends SecureController {
         return child;
     }
 
-    /**
-     * Processes 'confirm' request, validate the study subject object
-     *
-     * @param sub
-     * @throws Exception
-     */
-    private void confirm(StudyGroupDAO sgdao) throws Exception {
+    // Due to a change in page flow, this method mostly handles validation checks.
+    private boolean validateEditSubject(StudyGroupDAO sgdao) throws Exception {
         HashMap manualErrors = new HashMap();
-        ArrayList classes = (ArrayList) session.getAttribute("groups");
-        SubjectBean subject = (SubjectBean) session.getAttribute("subject");
-        StudySubjectBean studySub = (StudySubjectBean) session.getAttribute("studySub");
-        FormDiscrepancyNotes discNotes = (FormDiscrepancyNotes) session.getAttribute(AddNewSubjectServlet.FORM_DISCREPANCY_NOTES_NAME);
-        DiscrepancyValidator v = new DiscrepancyValidator(request, discNotes);
+        FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
+
+        DiscrepancyValidator validator = new DiscrepancyValidator(request, discNotes);
         FormProcessor fp = new FormProcessor(request);
-        java.util.Date enrollDate = studySub.getEnrollmentDate();
+
+        int studySubId = Integer.valueOf(fp.getString("id"));
 
         // Update: allow data entry person role to edit subject on study level (https://jira.openclinica.com/browse/OC-8620)
-        if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant2()){
+        if (ub.isSysAdmin() || currentRole.isManageStudy() || currentRole.isInvestigator() || currentRole.isResearchAssistant() || currentStudy.getParentStudyId() > 0 && currentRole.isResearchAssistant2()) {
 
-            v.addValidation("label", Validator.NO_BLANKS);
-            v.addValidation("label", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
+            validator.addValidation("label", Validator.NO_BLANKS);
+            validator.addValidation("label", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
+            validator.addValidation("label", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 30);
 
-            v.addValidation("secondaryLabel", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
-
-            String eDateString = fp.getString("enrollmentDate");
-            if (!StringUtil.isBlank(eDateString)) {
-                v.addValidation("enrollmentDate", Validator.IS_A_DATE);
-                v.alwaysExecuteLastValidation("enrollmentDate");
-            } else {
-                Validator.addError(manualErrors, "enrollmentDate", resexception.getString("field_not_blank"));
-            }
-
-            if (currentStudy.getStudyParameterConfig().getPersonIdShownOnCRF().equals("true")){
-                v.addValidation("uniqueIdentifier", Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-                v.alwaysExecuteLastValidation("uniqueIdentifier");
-             }
-            
-            String personId = fp.getString("uniqueIdentifier");
-            if (personId.contains("<") || personId.contains(">")) {
-                v.addValidation("uniqueIdentifier", Validator.DOES_NOT_CONTAIN_HTML_LESSTHAN_GREATERTHAN_ELEMENTS);
-            }
-
-            // more study subject id validations
             if (!StringUtil.isBlank(fp.getString("label"))) {
                 StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
 
                 StudySubjectBean sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabel(fp.getString("label").trim(), currentStudy.getId(), studySub.getId());
-
-                // JRWS>> Also look for labels in the child studies
                 if (sub1.getId() == 0) {
                     sub1 = (StudySubjectBean) ssdao.findAnotherBySameLabelInSites(fp.getString("label").trim(), currentStudy.getId(), studySub.getId());
                 }
-
                 if (sub1.getId() > 0) {
                     Validator.addError(manualErrors, "label", resexception.getString("subject_ID_used_by_another_choose_unique"));
                 }
             }
 
-            studySub.setLabel(fp.getString("label"));
-            studySub.setSecondaryLabel(fp.getString("secondaryLabel"));
-
-            try {
-                local_df.setLenient(false);
-                if (!StringUtil.isBlank(eDateString)) {
-                    enrollDate = local_df.parse(eDateString);
-                } else {
-                    enrollDate = null;
-                }
-            } catch (ParseException fe) {
-                logger.warn("Enrollment Date cannot be parsed.");
-            }
-            studySub.setEnrollmentDate(enrollDate);
-            
-            subject.setGender(fp.getString("gender").charAt(0));
-
-            // uniqueIdentifier must be unique in the system
-            if (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("required")
-                    || currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("optional")){
-
-                String uniqueIdentifier = fp.getString("uniqueIdentifier");
-                if (currentStudy.getStudyParameterConfig().getSubjectPersonIdRequired().equals("required") &&
-                        (uniqueIdentifier == null || uniqueIdentifier.isEmpty())) {
-                    Validator.addError(manualErrors, "uniqueIdentifier", resexception.getString("field_not_blank"));
-                    
-                }
-                 if (uniqueIdentifier != null && !uniqueIdentifier.isEmpty()) {
-                    
-                     
-                    if ( uniqueIdentifier.length() > 255){
-                          String descr =  resexception.getString("input_provided_is_not") +  NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO.getDescription() + " 255 " 
-                                     + resword.getString("characters_long") + ".";
-                        Validator.addError(manualErrors, "uniqueIdentifier", descr);
-                        
-                    }
-                    SubjectDAO sdao = new SubjectDAO(sm.getDataSource());
-                    SubjectBean sub1 = (SubjectBean) sdao.findAnotherByIdentifier(uniqueIdentifier, subject.getId());
-                    if (sub1.getId() > 0) {
-                          Validator.addError(manualErrors, "uniqueIdentifier", resexception.getString("person_ID_used_by_another_choose_unique"));
-                    }
-                    SubjectBean subjectWithSameId = sdao.findByUniqueIdentifier(uniqueIdentifier);
-                    if (subjectWithSameId.isActive() && subjectWithSameId.getId() != subject.getId()) {
-                         Validator.addError(manualErrors, "uniqueIdentifier", resexception.getString("another_assigned_this_ID_choose_unique"));
-                        
-                    }
-                }
-                 subject.setUniqueIdentifier(uniqueIdentifier);
-            }
-
-            if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1")){
-                if (!StringUtil.isBlank(fp.getString(UpdateSubjectServlet.DATE_DOB))) {
-                    v.addValidation(UpdateSubjectServlet.DATE_DOB, Validator.IS_A_DATE);
-                    v.alwaysExecuteLastValidation(UpdateSubjectServlet.DATE_DOB);
-                }
-                else if (StringUtil.isBlank(fp.getString(UpdateSubjectServlet.DATE_DOB)) && subject.getDateOfBirth()!= null){
-                    Validator.addError(manualErrors, UpdateSubjectServlet.DATE_DOB, resexception.getString("field_not_blank"));
-                }
-                if ( fp.getDate(UpdateSubjectServlet.DATE_DOB) != null){
-                    subject.setDateOfBirth(fp.getDate(UpdateSubjectServlet.DATE_DOB));
-                    String  converted_date = local_df.format(subject.getDateOfBirth());
-                    request.setAttribute(UpdateSubjectServlet.DATE_DOB_TO_SAVE, converted_date);    
-                }
-                
-            } else if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2")){
-                if (!StringUtils.isBlank(fp.getString(UpdateSubjectServlet.DATE_DOB))) {
-                   
-                    // if DOB was not updated (and originally entered as a full day, post it as is
-                    String submitted_date = fp.getString(UpdateSubjectServlet.DATE_DOB);
-                    
-                    
-                    boolean isTheSameDate = false;
-                    try{
-                        Date fakeDOB = yformat.parse(submitted_date);
-                        if(subject.getDateOfBirth() != null)
-                        {
-                        if (subject.getDateOfBirth().getYear() == (fakeDOB.getYear())){
-                            isTheSameDate=true;
-                            String  converted_date = yformat.format(subject.getDateOfBirth());
-                            request.setAttribute(UpdateSubjectServlet.DATE_DOB_TO_SAVE, converted_date);
-                         }
-                        }
-                    }catch(ParseException pe){
-                        logger.error("update subject: cannot convert date " + submitted_date);
-                    }
-                    
-                    if ( !isTheSameDate){
-                          
-                          v.addValidation(UpdateSubjectServlet.DATE_DOB, Validator.IS_AN_INTEGER);
-                          v.alwaysExecuteLastValidation(UpdateSubjectServlet.DATE_DOB);
-                          v.addValidation(UpdateSubjectServlet.DATE_DOB, Validator.COMPARES_TO_STATIC_VALUE, NumericComparisonOperator.GREATER_THAN_OR_EQUAL_TO, 1000);
-
-                        // get today's year
-                        Date today = new Date();
-                        Calendar c = Calendar.getInstance();
-                        c.setTime(today);
-                        int currentYear = c.get(Calendar.YEAR);
-                        v.addValidation(UpdateSubjectServlet.DATE_DOB, Validator.COMPARES_TO_STATIC_VALUE, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, currentYear);
-                        int yob = fp.getInt(UpdateSubjectServlet.DATE_DOB);
-                        Date fakeDate = new Date(yob);
-                        String dobString = yformat.format(fakeDate);
-                        try {
-                            
-                            Date fakeDOB = yformat.parse(dobString);
-                            if (yob != 0){subject.setDateOfBirth(fakeDOB);}
-                            request.setAttribute(UpdateSubjectServlet.DATE_DOB_TO_SAVE, yob);    
-                        } catch (ParseException pe) {
-                            logger.debug("Parse exception happened.");
-                            Validator.addError(manualErrors, UpdateSubjectServlet.DATE_DOB, resexception.getString("please_enter_a_valid_year_birth"));
-                        }
-                    }
-                    request.setAttribute(UpdateSubjectServlet.DATE_DOB, fp.getString(UpdateSubjectServlet.DATE_DOB));    
-                    
-                }
-                else{
-                    Validator.addError(manualErrors, UpdateSubjectServlet.DATE_DOB, resexception.getString("field_not_blank"));
-                }
-            }
-            
-            if (!StringUtil.isBlank(fp.getString("gender"))) {
-                subject.setGender(fp.getString("gender").charAt(0));
-            } else {
-                if (currentStudy.getStudyParameterConfig().getGenderRequired().equals("true") && subject.getGender() ==  ' '){
-                    Validator.addError(manualErrors, "gender", resexception.getString("field_not_blank"));
-                }
-                subject.setGender(' ');
-            }
-            
-            errors = v.validate();
+            studySub.setLabel(fp.getString("label").trim());
+            subject.setGender(' ');
+            errors = validator.validate();
             addMultipleErrors(manualErrors);
-            
 
-
-            // below added tbh 092007, fix for YY vs YYYY formatting
-            String enrollDateStr = enrollDate != null ? local_df.format(enrollDate) : "";
-    
-            session.setAttribute("enrollDateStr", enrollDateStr);
-            // above added tbh 092007
             session.setAttribute("studySub", studySub);
             session.setAttribute("subject", subject);
-    
-            if (!classes.isEmpty()) {
-                for (int i = 0; i < classes.size(); i++) {
-                    StudyGroupClassBean sgc = (StudyGroupClassBean) classes.get(i);
-                    int groupId = fp.getInt("studyGroupId" + i);
-                    String notes = fp.getString("notes" + i);
-                    v.addValidation("notes" + i, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
-                    sgc.setStudyGroupId(groupId);
-                    sgc.setGroupNotes(notes);
-                    if (groupId > 0) {
-                        StudyGroupBean sgb = (StudyGroupBean) sgdao.findByPK(groupId);
-                        sgc.setStudyGroupName(sgb.getName());
-                    }
-                }
-            }
 
-
-            session.setAttribute("groups", classes);
             if (!errors.isEmpty()) {
                 logger.info("has errors");
                 if (StringUtil.isBlank(studySub.getLabel())) {
                     addPageMessage(respage.getString("must_enter_subject_ID_for_identifying") + respage.getString("this_may_be_external_ID_number")
-                        + respage.getString("you_may_enter_study_subject_ID_listed")
-                        + respage.getString("study_subject_ID_should_not_contain_protected_information"));
+                            + respage.getString("you_may_enter_study_subject_ID_listed")
+                            + respage.getString("study_subject_ID_should_not_contain_protected_information"));
                 } else {
                     StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
                     StudySubjectBean sub1 = (StudySubjectBean) subdao.findAnotherBySameLabel(studySub.getLabel(), studySub.getStudyId(), studySub.getId());
@@ -554,41 +356,44 @@ public class UpdateStudySubjectServlet extends SecureController {
                         addPageMessage(resexception.getString("subject_ID_used_by_another_choose_unique"));
                     }
                 }
-                setLocalDOB( subject);
-                if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
-                    request.setAttribute("localBirthDate", "");
-                request.setAttribute("formMessages", errors);
-                forwardPage(Page.UPDATE_STUDY_SUBJECT);
-    
+
+                addPageMessage(respage.getString("there_were_some_errors_submission"));
+
+                setInputMessages(errors);
+                fp.addPresetValue("label", fp.getString("label"));
+                setPresetValues(fp.getPresetValues());
+
+                Object isSubjectOverlay = fp.getRequest().getParameter("subjectOverlay");
+                request.setAttribute("showOverlay", true);
+                request.setAttribute("subjectId", fp.getString("label"));
+                forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
+
+                return false;
+
             } else {
-                forwardPage(Page.UPDATE_STUDY_SUBJECT_CONFIRM);
+                return true;
             }
         }
-
+        addPageMessage(resexception.getString("no_permission"));
+        return false;
     }
 
 
-    private void setLocalDOB(SubjectBean subject){
+    private void setLocalDOB(SubjectBean subject) {
         Date birthDate = subject.getDateOfBirth();
-        try 
-        {
-            if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("1"))
-            {
+        try {
+            if (currentStudy.getStudyParameterConfig().getCollectDob().equals("1")) {
                 String localBirthDate = local_df.format(birthDate);
                 request.setAttribute("localBirthDate", localBirthDate);
-            }
-            else if ( currentStudy.getStudyParameterConfig().getCollectDob().equals("2"))
-            {
+            } else if (currentStudy.getStudyParameterConfig().getCollectDob().equals("2")) {
                 String localBirthDate = yformat.format(birthDate);
                 request.setAttribute("localBirthDate", localBirthDate);
             }
-        }
-        catch (NullPointerException e) 
-        {
+        } catch (NullPointerException e) {
             logger.debug("update subject: cannot convert date " + birthDate);
         }
     }
-    
+
     private List<DiscrepancyNoteBean> getDiscNotesForSubjectStudySubject(StudyBean study, Integer subjectId, Integer studySubId) {
         // If the study subject derives from a site, and is being viewed from a parent study,
         // then the study IDs will be different. However, since each note is
@@ -618,6 +423,7 @@ public class UpdateStudySubjectServlet extends SecureController {
         }
         return allNotesforSubject;
     }
+
     private void setRequestAttributesForNotes(List<DiscrepancyNoteBean> discBeans) {
         for (DiscrepancyNoteBean discrepancyNoteBean : discBeans) {
             if ("unique_identifier".equalsIgnoreCase(discrepancyNoteBean.getColumn())) {
@@ -637,7 +443,8 @@ public class UpdateStudySubjectServlet extends SecureController {
         }
 
     }
-    private void addMultipleErrors(Map<String,List<String>> newErrors) {
+
+    private void addMultipleErrors(Map<String, List<String>> newErrors) {
         for (String newField : newErrors.keySet()) {
             List<String> newFieldErrors = (List<String>) newErrors.get(newField);
             List<String> fieldErrors;

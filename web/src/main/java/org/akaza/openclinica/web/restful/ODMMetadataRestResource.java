@@ -39,7 +39,6 @@ public class ODMMetadataRestResource {
     @Autowired
     private MetadataCollectorResource metadataCollectorResource;
 
-
     public MetadataCollectorResource getMetadataCollectorResource() {
         return metadataCollectorResource;
     }
@@ -80,11 +79,11 @@ public class ODMMetadataRestResource {
     @GET
     @Path("/xml/view/{studyOID}")
     @Produces(MediaType.TEXT_XML)
-    public String getODMMetadata(@PathParam("studyOID") String studyOID) {
+    public String getODMMetadata(@Context HttpServletRequest request,@PathParam("studyOID") String studyOID) {
         LOGGER.debug("returning here........" + studyOID);
         //return "ODM";
 
-        return metadataCollectorResource.collectODMMetadata(studyOID);
+        return metadataCollectorResource.collectODMMetadata(studyOID,request);
     }
 
 
@@ -117,11 +116,10 @@ public class ODMMetadataRestResource {
     @GET
     @Path("/json/view/{studyOID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getODMMetadataJson(@PathParam("studyOID") String studyOID) {
+    public String getODMMetadataJson(@Context HttpServletRequest request, @PathParam("studyOID") String studyOID) {
         LOGGER.debug("returning here........" + studyOID);
         //return "ODM";
-
-        return metadataCollectorResource.collectODMMetadataJson(studyOID);
+        return metadataCollectorResource.collectODMMetadataJson(studyOID,request);
     }
 
 
@@ -205,18 +203,18 @@ public class ODMMetadataRestResource {
     @GET
     @Path("/xml/view/{studyOID}/{studyEventDefinitionOId}/{formVersionOID}")
     @Produces(MediaType.TEXT_XML)
-    public String getODMMetadataWithFormVersionOID(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID) {
+    public String getODMMetadataWithFormVersionOID(@Context HttpServletRequest request, @PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID) {
         LOGGER.debug("returning here........" + formVersionOID);
-        return metadataCollectorResource.collectODMMetadataForForm(studyOID, formVersionOID);
+        return metadataCollectorResource.collectODMMetadataForForm(studyOID, formVersionOID,request);
     }
 
 
     @GET
     @Path("/json/view/{studyOID}/{studyEventDefinitionOId}/{formVersionOID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getODMMetadataJson(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID) {
+    public String getODMMetadataJson(@Context HttpServletRequest request, @PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID) {
         LOGGER.debug("returning here........" + formVersionOID);
-        return metadataCollectorResource.collectODMMetadataJsonString(studyOID, formVersionOID);
+        return metadataCollectorResource.collectODMMetadataJsonString(studyOID, formVersionOID,request);
     }
 
 

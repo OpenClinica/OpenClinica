@@ -54,8 +54,6 @@ public class ImportCRFDataServlet extends SecureController {
 
     Locale locale;
 
-    private ImportCRFDataService dataService;
-
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
     FileUploadHelper uploadHelper = new FileUploadHelper();
 
@@ -242,7 +240,7 @@ public class ImportCRFDataServlet extends SecureController {
             // 3.e. are those item groups in that crf version?
             // 3.f. are those items in that item group?
 
-            List<String> errors = getImportCRFDataService().validateStudyMetadata(odmContainer, ub.getActiveStudyId());
+            List<String> errors = getImportCRFDataService().validateStudyMetadata(odmContainer, ub.getActiveStudyId(), locale);
             if (CollectionUtils.isNotEmpty(errors)) {
                 // add to session
                 // forward to another page
@@ -271,7 +269,29 @@ public class ImportCRFDataServlet extends SecureController {
             ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, sm.getDataSource());
             // The eventCRFBeans list omits EventCRFs that don't match UpsertOn rules. If EventCRF did not exist and
             // doesn't match upsert, it won't be created.
-            List<EventCRFBean> eventCRFBeans = getImportCRFDataService().fetchEventCRFBeans(odmContainer, ub);
+          
+            errors.addAll((ArrayList<String>) getImportCRFDataService().validateEventCRFBeans(odmContainer, ub));
+           
+        	if (CollectionUtils.isNotEmpty(errors)) {
+                // add to session
+                // forward to another page
+                logger.info(errors.toString());
+                for (String error : errors) {
+                    addPageMessage(error);
+                }
+                if (errors.size() > 0) {
+                    // fail = true;
+                    forwardPage(Page.IMPORT_CRF_DATA);
+                    
+                    return;
+                }
+            } else {                    
+                addPageMessage(respage.getString("passed_common_events_check"));
+            }
+           
+        	 List<EventCRFBean> eventCRFBeans =  getImportCRFDataService().fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE);
+             
+            
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
@@ -361,7 +381,7 @@ public class ImportCRFDataServlet extends SecureController {
                         List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
 
                         tempDisplayItemBeanWrappers = getImportCRFDataService().lookupValidationErrors(request, odmContainer, ub, totalValidationErrors,
-                                hardValidationErrors, permittedEventCRFs);
+                                hardValidationErrors, permittedEventCRFs, locale);
                         logger.debug("generated display item bean wrappers " + tempDisplayItemBeanWrappers.size());
                         logger.debug("size of total validation errors: " + totalValidationErrors.size());
                         displayItemBeanWrappers.addAll(tempDisplayItemBeanWrappers);
@@ -457,8 +477,7 @@ public class ImportCRFDataServlet extends SecureController {
     }
 
     public ImportCRFDataService getImportCRFDataService() {
-        dataService = this.dataService != null ? dataService : new ImportCRFDataService(sm.getDataSource(), locale);
-        return dataService;
+        return (ImportCRFDataService) SpringServletAccess.getApplicationContext(context).getBean("importCRFDataService");
     }
 
     @Override

@@ -49,8 +49,9 @@
 
  
 </span></h1>
-<script type="text/JavaScript" language="JavaScript" src="../../includes/jmesa/jquery.min.js"></script>
-<script type="text/JavaScript" language="JavaScript" src="../../includes/jmesa/jquery-migrate-1.1.1.js"></script> 
+<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery-migrate-1.1.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.blockUI.js"></script>
 
 <script type="text/javascript" language="javascript">
 $.noConflict();
@@ -73,11 +74,11 @@ $.noConflict();
 <input type="hidden" name="crfId" value="${crfBean.id}">
 <input type="hidden" name="crfName" value="${crfName}">
 <input type="hidden" name="formLayoutName" value="${formLayoutName}">
-<input type="hidden" name="eventCRFId" value="${eventCRFId}">
+<input type="hidden" name="eventCrfId" value="${eventCrfId}">
 <input type="hidden" name="eventName" value="${eventName}">
 <input type="hidden" name="eventCreateDate" value="${eventCreateDate}">
 <input type="hidden" name="eventOrdinal" value="${eventOrdinal}">
-        	
+<input type="hidden" name="originatingPage" value="${originatingPage}">
 
 
 <table cellpadding="2" cellspacing="2" border="0" class="dataTable" >

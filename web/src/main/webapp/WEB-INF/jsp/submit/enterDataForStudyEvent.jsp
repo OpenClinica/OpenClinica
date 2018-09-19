@@ -14,6 +14,7 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/permissionTagAccess.js"></script>
 <script type="text/javascript" language="javascript">
     function checkCRFLocked(ecId, url){
         jQuery.post(" return checkCRFLocked?ecId="+ ecId + "&ran="+Math.random(), function(data){
@@ -239,7 +240,7 @@
     <%-- nothing for right now --%>&nbsp;
 </c:when>
 <c:otherwise>
-<c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCRFId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
+<c:set var="getQuery" value="action=ide_s&eventDefinitionCRFId=${dedc.edc.id}&studyEventId=${studyEvent.id}&subjectId=${studySubject.subjectId}&eventCrfId=${dedc.eventCRF.id}&exitTo=EnterDataForStudyEvent?eventId=${eventId}" />
 <tr valign="top">
 <td class="table_cell_left"><c:out value="${dedc.edc.crf.name}" /></td>
 
@@ -382,7 +383,7 @@
                     <td >
                         <c:choose>
                         <c:when test="${dedc.eventCRF.status.id != 0}">
-                            <a href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
+                            <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                                onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','icon icon-pencil-squared');"
                                onclick="return checkCRFLocked('<c:out value="${currentPublicStudy.schemaName}"/><c:out value="${studyEvent.id}"/><c:out value="${dedc.eventCRF.formLayout.id}"/>', '<c:out value="${actionQuery}"/>');">
@@ -390,7 +391,7 @@
                             </a>
                         </c:when>
                         <c:otherwise>
-                              <a id="ide1-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>"
+                              <a id="ide1-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" class="accessCheck"
                                href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                                onMouseDown="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','images/bt_EnterData_d.gif');"
                                onMouseUp="javascript:setImage('bt_EnterData<c:out value="${rowCount}"/>','icon icon-pencil-squared');"
@@ -405,7 +406,7 @@
                 <c:otherwise></c:otherwise>
             </c:choose>
             <td >
-                       <a id="ide2-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>"
+                       <a id="ide2-<c:out value="${studyEvent.id}"/><c:out value="${dedc.edc.crf.id}"/>" class="accessCheck"
                    href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.edc.defaultVersionId}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                    onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                    onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
@@ -485,30 +486,34 @@
 <table><tr align="left">
     <c:choose>
         <c:when test='${actionQuery == "" && dec.stage.name =="invalid" }'>
-           <td><a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
+           <td><a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                onclick="return checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
            <span name="bt_View<c:out value="${rowCount}"/>" class="icon icon-search" border="0" alt="<fmt:message key="view_data" bundle="${resword}"/>" title="<fmt:message key="view_data" bundle="${resword}"/>" align="left" hspace="2"></span></a>
 </td>
 			<c:if test="${(!userRole.monitor && dec.eventCRF.status.name != 'auto-removed') && (study.status.available) && (studySubject.status.available)}">
-          <td>      <a href="RestoreEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
+          <td>      <a class="accessCheck" href="RestoreEventCRF?action=confirm&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                    onMouseDown="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
                    onMouseUp="javascript:setImage('bt_Restore<c:out value="${rowCount}"/>','images/bt_Restore.gif');"
                   ><span name="bt_Restore<c:out value="${rowCount}"/>" class="icon icon-ccw" border="0" alt="<fmt:message key="restore" bundle="${resword}"/>" title="<fmt:message key="restore" bundle="${resword}"/>"  hspace="2"></span></a>
            </td>
-                           <td> <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
+                           <td> <a class="accessCheck" href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>"
                                onMouseDown="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                                onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                               ><span name="bt_Remove<c:out value="${rowCount}"/>" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>"  hspace="2"></span></a>
                               </td>
-
+                <td>  <a class="accessCheck" href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}" />&formLayoutName=<c:out value="${dec.eventCRF.formLayout.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
+                         onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
+                         onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><span
+                        name="Reassign" class="icon icon-icon-reassign3" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="6"></span></a>
+                </td>
             </c:if>
 
         </c:when>
 
         <c:when test='${actionQuery == ""}'>
-           <td><a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
+           <td><a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                onMouseDown="javascript:setImage('bt_View1','images/bt_View_d.gif');"
                onMouseUp="javascript:setImage('bt_View1','images/bt_View.gif');"
                onclick="return checkCRFLocked('<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
@@ -519,7 +524,7 @@
         <c:otherwise>
             <c:if test="${studySubject.status.name != 'removed'&& studySubject.status.name != 'auto-removed' && !userRole.monitor}">
                 <c:if test="${dec.continueInitialDataEntryPermitted}">
-                <td><a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
+                <td><a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');"
                     onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
@@ -541,7 +546,7 @@
                     <span class="bt_EnterData1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="continue_entering_data" bundle="${resword}"/>" title="<fmt:message key="continue_entering_data" bundle="${resword}"/>" align="left" hspace="6"></span></a>
                </td> </c:if>
                 <c:if test="${dec.performAdministrativeEditingPermitted}">
-                <td><a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
+                <td><a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
                     onMouseDown="javascript:setImage('bt_EnterData1','images/bt_EnterData_d.gif');"
                     onMouseUp="javascript:setImage('bt_EnterData1','icon icon-pencil-squared');"
                     onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
@@ -551,7 +556,7 @@
             </c:if>
 
 
-                <td><a href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
+                <td><a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${studyEvent.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="view"/>"
                onMouseDown="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                onMouseUp="javascript:setImage('bt_View<c:out value="${rowCount}"/>','images/bt_View.gif');"
                onclick="return checkCRFLocked'<c:out value="${dec.eventCRF.id}"/>', '<c:out value="${actionQuery}"/>');">
@@ -559,12 +564,12 @@
               </td>
 
             <c:if test="${study.status.available && !userRole.monitor}">
-               <td> <a href="RemoveEventCRF?action=confirm&id=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
+               <td> <a class="accessCheck" href="RemoveEventCRF?action=confirm&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&studySubId=<c:out value="${studySubject.id}"/>"
                    onMouseDown="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
                    onMouseUp="javascript:setImage('bt_Remove<c:out value="${rowCount}"/>','images/bt_Remove.gif');"
                   ><span name="bt_Remove<c:out value="${rowCount}"/>" class="icon icon-cancel" border="0" alt="<fmt:message key="remove" bundle="${resword}"/>" title="<fmt:message key="remove" bundle="${resword}"/>"  hspace="2"></span></a>
                   </td>
-               <td> <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&ecId=<c:out value="${dec.eventCRF.id}"/>"
+               <td><a class="accessCheck" href="DeleteEventCRF?action=confirm&ssId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>"
                    onMouseDown="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                    onMouseUp="javascript:setImage('bt_Delete<c:out value="${rowCount}"/>','images/bt_Delete.gif');"
                   ><span name="bt_Remove<c:out value="${rowCount}"/>" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>" title="<fmt:message key="delete" bundle="${resword}"/>"  hspace="2"></span></a>
@@ -573,12 +578,11 @@
 
                <!--  reasign crf version -->
 
-
  <c:if test="${( userRole.director || userRole.coordinator) &&
  (study.status.available )
  && !(studyEvent.subjectEventStatus.locked || studyEvent.subjectEventStatus.skipped)}">
 
-  <td>  <a href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}" />&formLayoutName=<c:out value="${dec.eventCRF.formLayout.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCRFId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>"
+  <td>  <a class="accessCheck" href="pages/managestudy/chooseCRFVersion?crfId=<c:out value="${dec.eventCRF.crf.id}" />&crfName=<c:out value="${dec.eventCRF.crf.name}" />&formLayoutId=<c:out value="${dec.eventCRF.formLayout.id}" />&formLayoutName=<c:out value="${dec.eventCRF.formLayout.name}" />&studySubjectLabel=<c:out value="${studySubject.label}"/>&studySubjectId=<c:out value="${studySubject.id}"/>&eventCrfId=<c:out value="${dec.eventCRF.id}"/>&eventDefinitionCRFId=<c:out value="${dec.eventDefinitionCRF.id}"/>&originatingPage=<c:out value="${originatingPage}"/>"
    onMouseDown="javascript:setImage('bt_Reassign','images/bt_Reassign_d.gif');"
    onMouseUp="javascript:setImage('bt_Reassign','images/bt_Reassign.gif');"><span
       name="Reassign" class="icon icon-icon-reassign3" border="0" alt="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" title="<fmt:message key="reassign_crf_version" bundle="${resword}"/>" align="left" hspace="6"></span></a>

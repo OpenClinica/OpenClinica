@@ -18,16 +18,19 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.*;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.*;
+import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.service.crfdata.HideCRFManager;
 import org.akaza.openclinica.service.managestudy.StudySubjectService;
 import org.akaza.openclinica.view.Page;
@@ -128,7 +131,9 @@ public class ViewStudySubjectServlet extends SecureController {
 
             de.setMaximumSampleOrdinal(sedao.getMaxSampleOrdinal(sed, studySubject));
 
-            displayEvents.add(de);
+            Status status = de.getStudyEvent().getStatus();
+            if (status == Status.AVAILABLE || status == Status.AUTO_DELETED)
+                displayEvents.add(de);
             // event.setEventCRFs(createAllEventCRFs(eventCRFs,
             // eventDefinitionCRFs));
 
@@ -145,6 +150,11 @@ public class ViewStudySubjectServlet extends SecureController {
         FormProcessor fp = new FormProcessor(request);
         int studySubId = fp.getInt("id", true);// studySubjectId
         String from = fp.getString("from");
+
+        int parentStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
+        StudyParameterValueDao studyParameterValueDao = (StudyParameterValueDao) SpringServletAccess.getApplicationContext(context).getBean("studyParameterValueDao");
+        StudyParameterValue parentSPV = studyParameterValueDao.findByStudyIdParameter(parentStudyId, "subjectIdGeneration");
+        currentStudy.getStudyParameterConfig().setSubjectIdGeneration(parentSPV.getValue());
 
         String module = fp.getString(MODULE);
         request.setAttribute(MODULE, module);

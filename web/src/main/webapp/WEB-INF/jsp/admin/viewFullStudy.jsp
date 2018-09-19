@@ -230,6 +230,19 @@
   <tr valign="top"><td class="table_header_column"><fmt:message key="expected_total_enrollment" bundle="${resword}"/>:</td><td class="table_cell">
   <c:out value="${studyToView.expectedTotalEnrollment}"/>&nbsp;
   </td></tr>
+    <tr valign="top"><td class="table_header_column"><fmt:message key="enrollment_cap_enforced" bundle="${resword}"/>:</td><td class="table_cell">
+
+       <c:choose>
+       <c:when test="${studyToView.studyParameterConfig.enforceEnrollmentCap == 'false'}">
+       <fmt:message key="no" bundle="${resword}"/>
+       </c:when>
+       <c:otherwise>
+      <fmt:message key="yes" bundle="${resword}"/>
+       </c:otherwise>
+       </c:choose>
+
+
+    </td></tr>
   </table>
 </div>
 </div></div></div></div></div></div></div></div>
@@ -287,7 +300,7 @@
 <div class="tablebox_center">
 <table border="0" cellpadding="0" cellspacing="0" width="100%">
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject" bundle="${resword}"/></td>
+  <!-- <tr valign="top"><td class="table_header_column"><fmt:message key="collect_subject" bundle="${resword}"/></td>
    <td class="table_cell">
    <c:choose>
    <c:when test="${studyToView.studyParameterConfig.collectDob == '1'}">
@@ -301,22 +314,30 @@
    </c:otherwise>
   </c:choose>
 
-  </td></tr>
+  </td></tr> -->
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="gender_required" bundle="${resword}"/></td>
-  <td class="table_cell">
-   <c:choose>
-   <c:when test="${studyToView.studyParameterConfig.genderRequired == 'false'}">
-   <fmt:message key="no" bundle="${resword}"/>
-   </c:when>
-   <c:otherwise>
-  <fmt:message key="yes" bundle="${resword}"/>
-   </c:otherwise>
-  </c:choose>
-  </td>
+  <tr valign="top">
+    <td class="table_header_column"><fmt:message key="method_of_creation" bundle="${resword}"/></td>
+    <td class="table_cell">
+      <c:choose>
+        <c:when test="${studyToView.studyParameterConfig.subjectIdGeneration == 'manual'}">
+          <fmt:message key="manual_entry" bundle="${resword}"/>
+        </c:when>
+        <c:otherwise>
+          <fmt:message key="system_generated" bundle="${resword}"/>
+        </c:otherwise>
+      </c:choose>
+    </td>
   </tr>
 
-  <tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/></td>
+  <tr valign="top">
+    <td class="table_header_column"><fmt:message key="id_template" bundle="${resword}"/></td>
+    <td class="table_cell">
+      <c:out value="${studyToView.studyParameterConfig.participantIdTemplate}"/>
+    </td>
+  </tr>
+
+<!--   <tr valign="top"><td class="table_header_column"><fmt:message key="subject_person_ID_required" bundle="${resword}"/></td>
   <td class="table_cell">
    <c:choose>
        <c:when test="${(studyToView.studyParameterConfig.subjectPersonIdRequired == 'required')
@@ -330,7 +351,7 @@
         </c:otherwise>
   </c:choose>
   </td>
-  </tr>
+  </tr> -->
 
   <!--
    <tr valign="top"><td class="table_header_column"><fmt:message key="generate_study_subject_ID_automatically" bundle="${resword}"/></td>
@@ -453,7 +474,7 @@
    <td class="table_header_row_left"><fmt:message key="user_name" bundle="${resword}"/></td>
    <td class="table_header_row"><fmt:message key="first_name" bundle="${resword}"/></td>
    <td class="table_header_row"><fmt:message key="last_name" bundle="${resword}"/></td>
-   <td class="table_header_row"><fmt:message key="role" bundle="${resword}"/></td>
+   <td class="table_header_row"><fmt:message key="base_role" bundle="${resword}"/></td>
    <td class="table_header_row"><fmt:message key="study_name" bundle="${resword}"/></td>
   </tr>
   <c:forEach var="user" items="${userRolesToView}">

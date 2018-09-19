@@ -10,15 +10,14 @@
 package org.akaza.openclinica.logic.odmExport;
 
 import java.math.BigDecimal;
-import java.util.ArrayList;
-import java.util.Iterator;
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.ElementRefBean;
@@ -29,11 +28,18 @@ import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmStudyBean;
 import org.akaza.openclinica.bean.odmbeans.RangeCheckBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import org.akaza.openclinica.dao.hibernate.RuleSetRuleDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyConfigService;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
+import org.akaza.openclinica.service.PermissionService;
+import org.springframework.http.HttpRequest;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * A class for ODM metadata of one study.
@@ -45,6 +51,8 @@ public class MetadataUnit extends OdmUnit {
     private OdmStudyBean odmStudy;
     private StudyBean parentStudy;
     private RuleSetRuleDao ruleSetRuleDao;
+    private String permissionTagsString;
+
 
     public static final String FAKE_STUDY_NAME = "OC_FORM_LIB_STUDY";
     public static final String FAKE_STUDY_OID = "OC_FORM_LIB";
@@ -77,10 +85,11 @@ public class MetadataUnit extends OdmUnit {
     }
 
     public MetadataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, RuleSetRuleDao ruleSetRuleDao,
-            boolean showArchived) {
+            boolean showArchived ,String permissionTagsString) {
         super(ds, dataset, odmBean, study, category, showArchived);
         this.odmStudy = new OdmStudyBean();
         this.ruleSetRuleDao = ruleSetRuleDao;
+        this.permissionTagsString=permissionTagsString;
         if (study.getParentStudyId() > 0) {
             this.parentStudy = (StudyBean) new StudyDAO(ds).findByPK(study.getParentStudyId());
         } else {
@@ -185,6 +194,9 @@ public class MetadataUnit extends OdmUnit {
             return;
         }
 
+
+
+
         StudyBean study = studyBase.getStudy();
 
         StudyConfigService studyConfig = new StudyConfigService(this.ds);
@@ -218,8 +230,9 @@ public class MetadataUnit extends OdmUnit {
             // populate Include
             this.collectIncludeFromParentInSameFile();
 
+
             // populate protocol
-            oedao.getUpdatedSiteMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion());
+            oedao.getUpdatedSiteMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion(),permissionTagsString);
         } else {
             if (dataset != null) {
                 metadata.setOid(dataset.getODMMetaDataVersionOid());
@@ -254,7 +267,7 @@ public class MetadataUnit extends OdmUnit {
             // studyId,
             // metadata, this.getODMBean().getODMVersion());
             // studyBase.setNullClSet(nullCodeSet);
-            oedao.getMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion());
+            oedao.getMetadata(parentStudyId, studyId, metadata, this.odmBean.getODMVersion(),permissionTagsString);
             metadata.setRuleSetRules(getRuleSetRuleDao().findByRuleSetStudyIdAndStatusAvail(parentStudyId));
         }
     }
@@ -562,5 +575,7 @@ public class MetadataUnit extends OdmUnit {
     public void setParentStudy(StudyBean parentStudy) {
         this.parentStudy = parentStudy;
     }
+
+
 
 }

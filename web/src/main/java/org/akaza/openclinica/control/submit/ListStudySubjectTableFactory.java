@@ -128,10 +128,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("rule_oid"), null, null);
         ++index;
-        configureColumn(row.getColumn(columnNames[index]), resword.getString("gender"), null, null, true, false);
-        ++index;
-        configureColumn(row.getColumn(columnNames[index]), resword.getString("secondary_ID"), null, null);
-        ++index;
         // group class columns
         for (int i = index; i < index + studyGroupClasses.size(); i++) {
             StudyGroupClassBean studyGroupClass = studyGroupClasses.get(i - index);
@@ -165,10 +161,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         // tableFacade.addFilterMatcher(new MatcherKey(Integer.class), new
         // SubjectEventStatusFilterMatcher());
 
-        for (int i = 6; i < 6 + studyGroupClasses.size(); i++) {
+        for (int i = 4; i < 4 + studyGroupClasses.size(); i++) {
             tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectGroupFilterMatcher());
         }
-        for (int i = 6 + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
+        for (int i = 4 + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
             tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectEventStatusFilterMatcher());
         }
 
@@ -177,10 +173,44 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     @Override
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         Role r = currentRole.getRole();
-        boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR);
+        boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR) && !isEnrollmentCapped();
 
         tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink));
     }
+
+    private boolean isEnrollmentCapEnforced(){
+        String enrollmentCapStatus=null;
+        if(studyBean.getParentStudyId()!=0){
+            enrollmentCapStatus = getStudyParameterValueDAO().findByHandleAndStudy(studyBean.getParentStudyId(), "enforceEnrollmentCap").getValue();
+        }else {
+            enrollmentCapStatus = getStudyParameterValueDAO().findByHandleAndStudy(studyBean.getId(), "enforceEnrollmentCap").getValue();
+        }
+        boolean capEnforced = Boolean.valueOf(enrollmentCapStatus);
+        return capEnforced;
+    }
+
+
+    protected boolean isEnrollmentCapped(){
+
+        boolean capIsOn = isEnrollmentCapEnforced();
+        int numberOfSubjects = getStudySubjectDAO().getCountofActiveStudySubjects();
+
+        StudyBean sb = null;
+        if(studyBean.getParentStudyId()!=0){
+            sb = (StudyBean) studyDAO.findByPK(studyBean.getParentStudyId());
+        }else{
+            sb = (StudyBean) studyDAO.findByPK(studyBean.getId());
+        }
+        int  expectedTotalEnrollment = sb.getExpectedTotalEnrollment();
+
+        if (numberOfSubjects >= expectedTotalEnrollment && capIsOn)
+            return true;
+        else
+            return false;
+    }
+
+
+
 
     @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
@@ -210,7 +240,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
             subjectLink
                     .append("<a href=\"ViewStudySubject?id="
-                            + studySubjectBean.getSubjectId());
+                            + studySubjectBean.getId());
             subjectLink.append("\">" + studySubjectBean.getLabel() + "</a>");
             theItem.put("studySubject.label", subjectLink.toString());
             theItem.put("studySubject.status", studySubjectBean.getStatus());
@@ -325,8 +355,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("status");
         columnNamesList.add("enrolledAt");
         columnNamesList.add("oid");
-        columnNamesList.add("subject.charGender");
-        columnNamesList.add("secondaryLabel");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
         }
@@ -343,8 +371,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("studySubject.status");
         columnNamesList.add("enrolledAt");
         columnNamesList.add("studySubject.oid");
-        columnNamesList.add("subject.charGender");
-        columnNamesList.add("studySubject.secondaryLabel");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
         }
@@ -796,6 +822,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String participateFormStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getId(), "participantPortal").getValue();
         return participateFormStatus;
     }
+
 
     private String pManageStatus(StudySubjectBean studySubjectBean) throws Exception {
         participantPortalRegistrar = new ParticipantPortalRegistrar();

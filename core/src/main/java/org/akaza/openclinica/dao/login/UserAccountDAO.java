@@ -691,6 +691,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(2, TypeNames.INT);
         this.setTypeExpected(3, TypeNames.STRING);
         this.setTypeExpected(4, TypeNames.STRING);
+        this.setTypeExpected(5, TypeNames.STRING);
+        this.setTypeExpected(6, TypeNames.STRING);
+
         HashMap allStudyUserRoleBeans = new HashMap();
 
         HashMap variables = new HashMap();
@@ -707,6 +710,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
             StudyUserRoleBean sur = new StudyUserRoleBean();
             sur.setRoleName(roleName);
             sur.setStudyId(studyId.intValue());
+            sur.setStudyEnvUuid((String) hm.get("study_env_uuid"));
+            sur.setSiteUuid((String) hm.get("study_env_site_uuid"));
+
             sur.setStudyName(studyName);
             sur.setEnvType(envType);
             allStudyUserRoleBeans.put(studyId, sur);
@@ -897,7 +903,34 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
         return answer;
     }
+    
+    public Collection findAllRolesByUserNameAndStudyOid(String userName,String studyOid) {
+        this.setRoleTypesExpected();
+        ArrayList answer = new ArrayList();
 
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), userName);
+        variables.put(new Integer(2), studyOid);
+        ArrayList alist = this.select(digester.getQuery("findAllRolesByUserNameAndStudyOid"), variables);
+        Iterator it = alist.iterator();
+        while (it.hasNext()) {
+            StudyUserRoleBean surb = this.getRoleFromHashMap((HashMap) it.next());
+            answer.add(surb);
+        }
+
+        return answer;
+    }
+
+    
+    public StudyUserRoleBean findTheRoleByUserNameAndStudyOid(String userName,String studyOid) {        
+        ArrayList roles = (ArrayList) this.findAllRolesByUserNameAndStudyOid(userName, studyOid);
+        if(roles.size() > 0) {
+        	return (StudyUserRoleBean) roles.get(0);
+        }else {
+        	return null;
+        }
+
+      }
     /**
      * Finds all user and roles in a study
      *

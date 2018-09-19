@@ -7,20 +7,6 @@
  */
 package org.akaza.openclinica.dao.managestudy;
 
-import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Comparator;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.Map;
-import java.util.Set;
-import java.util.SortedSet;
-import java.util.TreeSet;
-
-import javax.sql.DataSource;
-
 import org.akaza.openclinica.bean.core.EntityBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -33,6 +19,10 @@ import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.apache.commons.lang.StringUtils;
+
+import javax.sql.DataSource;
+import java.sql.Types;
+import java.util.*;
 
 /**
  * @author jxu
@@ -198,14 +188,21 @@ public class EventDefinitionCRFDAO extends AuditableEntityDAO {
 		return al;
 	}
 
-	public Collection findAllStudySiteFiltered(StudyBean studyBean) {
+	public Collection findAllStudySiteFiltered(StudyBean studyBean, String[] permissionTags) {
 		this.setTypesExpected();
 		HashMap variables = new HashMap();
-		variables.put(new Integer(1), new Integer(studyBean.getParentStudyId()));
-		variables.put(new Integer(2), new Integer(studyBean.getId()));
-		variables.put(new Integer(3), new Integer(studyBean.getId()));
+        variables.put(new Integer(1), new Integer(studyBean.getParentStudyId()));
+        variables.put(new Integer(2), new Integer(studyBean.getId()));
+        variables.put(new Integer(3), new Integer(studyBean.getId()));
 
-		String sql = digester.getQuery("findAllStudySiteFiltered");
+		String sql = "";
+		if(permissionTags ==null || permissionTags.length==0) {
+			 sql = digester.getQuery("findAllStudySiteFiltered");
+		}else{
+			variables.put(new Integer(4),  permissionTags);
+			variables.put(new Integer(5),  permissionTags);
+			 sql = digester.getQuery("findAllCrfsForStudySiteFilteredWithTagIds");
+		}
 		ArrayList alist = this.select(sql, variables);
 		ArrayList al = new ArrayList();
 		Iterator it = alist.iterator();

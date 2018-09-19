@@ -378,6 +378,26 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         return answer;
     }
 
+    public ArrayList findAllBySiteId(int siteId) {
+        ArrayList answer = new ArrayList();
+
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), new Integer(siteId));
+
+        String sql = digester.getQuery("findAllBySitetId");
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        while (it.hasNext()) {
+            StudySubjectBean ssb = (StudySubjectBean) this.getEntityFromHashMap((HashMap) it.next());
+            answer.add(ssb);
+        }
+
+        return answer;
+    }
+
     public EntityBean findAnotherBySameLabel(String label, int studyId, int studySubjectId) {
         StudySubjectBean eb = new StudySubjectBean();
         this.setTypesExpected();
@@ -435,6 +455,25 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         }
 
         return eb;
+    }
+
+    public StudySubjectBean findByLabel(String label) {
+        StudySubjectBean answer = new StudySubjectBean();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), label);
+
+        String sql = digester.getQuery("findByLabel");
+
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            answer = (StudySubjectBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+
+        return answer;
     }
 
     public StudySubjectBean findByLabelAndStudy(String label, StudyBean study) {
@@ -584,8 +623,15 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
             ind++;
         }
 
-        variables.put(new Integer(ind), sb.getSecondaryLabel());
-        ind++;
+        String secondLabel = sb.getSecondaryLabel();
+        if(secondLabel == null) {
+        	nullVars.put(new Integer(ind), new Integer(Types.VARCHAR));
+            variables.put(new Integer(ind), null);
+            ind++;
+        }else {
+        	 variables.put(new Integer(ind), sb.getSecondaryLabel());
+             ind++;
+        }
 
         variables.put(new Integer(ind), getValidOid(sb));
         ind++;
@@ -823,6 +869,24 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         variables.put(new Integer(1), currentStudy.getId());
         variables.put(new Integer(2), currentStudy.getId());
         String sql = digester.getQuery("getCountofStudySubjects");
+
+        ArrayList rows = this.select(sql, variables);
+        Iterator it = rows.iterator();
+
+        if (it.hasNext()) {
+            Integer count = (Integer) ((HashMap) it.next()).get("count");
+            return count;
+        } else {
+            return null;
+        }
+    }
+
+    public Integer getCountofActiveStudySubjects() {
+        StudySubjectBean studySubjectBean = new StudySubjectBean();
+        setTypesExpected();
+
+        HashMap variables = new HashMap();
+        String sql = digester.getQuery("getCountOfActiveStudySubjects");
 
         ArrayList rows = this.select(sql, variables);
         Iterator it = rows.iterator();

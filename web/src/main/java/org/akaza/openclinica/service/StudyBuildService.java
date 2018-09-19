@@ -9,6 +9,8 @@ import org.slf4j.LoggerFactory;
 import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+import java.util.Optional;
 
 /**
  * Created by yogi on 11/10/16.
@@ -20,10 +22,10 @@ public interface StudyBuildService {
 
     boolean saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub) throws Exception;
 
-    ResponseEntity getUserRoles(HttpServletRequest request);
+    ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request);
 
     ResponseEntity getUserDetails(HttpServletRequest request);
     void updateStudyUsername(UserAccountBean ub, Auth0User user);
-    boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId);
+    boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId, String altStudyEnvUuid);
     UserAccount getUserAccountObject(UserAccountBean ubIn);
 }

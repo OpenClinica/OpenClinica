@@ -88,6 +88,7 @@ public abstract class AbstractItemProcessor {
 
                 DiscrepancyNote itemParentNote = discrepancyNoteDao.findByDiscrepancyNoteId(dn.getParentDiscrepancyNote().getDiscrepancyNoteId());
                 itemParentNote.setResolutionStatus(resStatus);
+                itemParentNote.setDetailedNotes(detailedNotes);
                 itemParentNote.setUserAccount(container.getUser());
                 discrepancyNoteDao.saveOrUpdate(itemParentNote);
             }

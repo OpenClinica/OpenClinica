@@ -15,10 +15,12 @@ import java.util.LinkedHashMap;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.job.JobTerminationMonitor;
+import org.akaza.openclinica.service.PermissionService;
 
 /**
  * Populate ODM ClinicalData Element for a ODM XML file. It supports:
@@ -33,6 +35,7 @@ import org.akaza.openclinica.job.JobTerminationMonitor;
 
 public class ClinicalDataCollector extends OdmDataCollector {
     private LinkedHashMap<String, OdmClinicalDataBean> odmClinicalDataMap;
+    public static String datasetFiltered = "NO";
 
 
     /**
@@ -40,7 +43,7 @@ public class ClinicalDataCollector extends OdmDataCollector {
      * @param ds
      * @param dataset
      */
-    public ClinicalDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy) {
+    public ClinicalDataCollector(DataSource ds, DatasetBean dataset, StudyBean currentStudy ) {
         super(ds, dataset, currentStudy);
         this.odmClinicalDataMap = new LinkedHashMap<String, OdmClinicalDataBean>();
     }

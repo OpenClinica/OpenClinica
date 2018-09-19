@@ -26,10 +26,12 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.core.LockInfo;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -40,6 +42,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
+import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -73,13 +76,16 @@ public class RemoveEventCRFServlet extends SecureController {
     @Override
     public void processRequest() throws Exception {
         FormProcessor fp = new FormProcessor(request);
-        int eventCRFId = fp.getInt("id");// eventCRFId
+        int eventCRFId = fp.getInt("eventCrfId");// eventCRFId
         int studySubId = fp.getInt("studySubId");// studySubjectId
         checkStudyLocked("ViewStudySubject?id" + studySubId, respage.getString("current_study_locked"));
+        String originatingPage = request.getParameter(ORIGINATING_PAGE);
+        request.setAttribute(ORIGINATING_PAGE, originatingPage);
         StudyEventDAO sedao = new StudyEventDAO(sm.getDataSource());
         StudySubjectDAO subdao = new StudySubjectDAO(sm.getDataSource());
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
+        EventCrfDao eventCrfDao = (EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
 
         if (eventCRFId == 0) {
             addPageMessage(respage.getString("please_choose_an_event_CRF_to_remove"));
@@ -87,7 +93,12 @@ public class RemoveEventCRFServlet extends SecureController {
             forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
         } else {
             EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
+            final EventCrf ec = eventCrfDao.findById(eventCRFId);
 
+            if (hasFormAccess(ec) != true) {
+                forwardPage(Page.NO_ACCESS);
+                return;
+            }
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
             request.setAttribute("studySub", studySub);
 
@@ -140,7 +151,7 @@ public class RemoveEventCRFServlet extends SecureController {
                 UserAccountBean userAccountBean = (UserAccountBean) uDAO.findByPK(lockInfo.getUserId());
                 request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
                         "User " + userAccountBean.getName() +" is currently entering data.\\n " +
-                        "Once they leave the form, you will be allowed to perform this action.\\n");
+                        resword.getString("CRF_perform_action") +"\\n");
                 if ("confirm".equalsIgnoreCase(action)) {
                     request.setAttribute("id", new Integer(studySubId).toString());
                     forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
@@ -201,10 +212,12 @@ public class RemoveEventCRFServlet extends SecureController {
                             dnb.setEntityId(item.getId());
                             dnb.setColumn("value");
                             dnb.setCreatedDate(new Date());
-                            dnb.setDetailedNotes("The item has been removed, this Query has been Closed.");
+                            String detailedNotes="The item has been removed, this Query has been Closed.";
+                            dnb.setDetailedNotes(detailedNotes);
                             dnDao.create(dnb);
                             dnDao.createMapping(dnb);
                             itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED.getId());
+                            itemParentNote.setDetailedNotes(detailedNotes);
                             dnDao.update(itemParentNote);
                         }
                     }

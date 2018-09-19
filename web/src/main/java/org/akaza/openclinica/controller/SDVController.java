@@ -2,6 +2,7 @@ package org.akaza.openclinica.controller;
 
 import static org.jmesa.facade.TableFacadeFactory.createTableFacade;
 
+import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLEncoder;
 import java.text.ParseException;
@@ -15,6 +16,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -27,13 +29,18 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.controller.helper.SdvFilterDataBean;
 import org.akaza.openclinica.controller.helper.table.SubjectSDVContainer;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.view.StudyInfoPanel;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.akaza.openclinica.web.table.sdv.SubjectIdSDVFactory;
@@ -61,6 +68,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 @Controller("sdvController")
 public class SDVController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    public static final String ORIGINATING_PAGE = "originatingPage";
 
     public final static String SUBJECT_SDV_TABLE_ATTRIBUTE = "sdvTableAttribute";
     @Autowired
@@ -80,6 +88,12 @@ public class SDVController {
     @Autowired
     @Qualifier("sidebarInit")
     private SidebarInit sidebarInit;
+
+    @Autowired
+    private EventCrfDao eventCrfDao;
+
+    @Autowired
+    private PermissionService permissionService;
 
     public SDVController() {
     }
@@ -159,11 +173,13 @@ public class SDVController {
     @RequestMapping("/viewAllSubjectSDVtmp")
     public ModelMap viewAllSubjectHandler(HttpServletRequest request, @RequestParam("studyId") int studyId,
                                           @RequestParam(value = "sdv_restore", required = false) String restore,
-                                          HttpServletResponse response) {
+                                          HttpServletResponse response ) {
 
         request.setAttribute("studyId", studyId);
         HttpSession session = request.getSession();
 
+
+        String[] permissionTags = permissionService.getPermissionTagsStringArray(request);
         if(!mayProceed(request)){
             try{
                 response.sendRedirect(request.getContextPath() + "/MainMenu?message=authentication_failed");
@@ -227,7 +243,7 @@ public class SDVController {
             logger.error("Encoding exception:" + e);
         }
 
-        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "../");
+        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "../",permissionTags);
 
         gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
         return gridMap;
@@ -243,6 +259,7 @@ public class SDVController {
         String pattern = "MM/dd/yyyy";
         SimpleDateFormat sdf = new SimpleDateFormat(pattern);
 
+        String[] permissionTags = permissionService.getPermissionTagsStringArray(request);
         //  List<StudyEventBean> studyEventBeans = studyEventDAO.findAllByStudy(studyBean);
         //  List<EventCRFBean> eventCRFBeans = sdvUtil.getAllEventCRFs(studyEventBeans);
 
@@ -280,7 +297,7 @@ public class SDVController {
         }
 
         request.setAttribute("pageMessages", pageMessages);
-        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "");
+        String sdvMatrix = sdvUtil.renderEventCRFTableWithLimit(request, studyId, "",permissionTags);
         gridMap.addAttribute(SUBJECT_SDV_TABLE_ATTRIBUTE, sdvMatrix);
         return gridMap;
     }
@@ -324,11 +341,23 @@ public class SDVController {
         if (parameterMap.isEmpty()) {
             pageMessages.add("None of the Event CRFs were selected for SDV.");
             request.setAttribute("pageMessages", pageMessages);
-            sdvUtil.forwardRequestFromController(request, response, "/pages/" + redirection);
+            sdvUtil.forwardRequestFromController(request, response, redirection);
 
         }
         List<Integer> eventCRFIds = sdvUtil.getListOfSdvEventCRFIds(parameterMap.keySet());
-        boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), true);
+        List<Integer> filteredEventCRFIds = new ArrayList<>();
+        for (Integer eventCrfId : eventCRFIds) {
+            if (hasFormAccess(eventCrfId, request) == true) {
+                filteredEventCRFIds.add(eventCrfId);
+            }
+        }
+        if (filteredEventCRFIds.size() == 0) {
+            forwardToNoAccessPage(request, response, redirection, studyId);
+            return null;
+        }
+
+
+        boolean updateCRFs = sdvUtil.setSDVerified(filteredEventCRFIds, getCurrentUser(request).getId(), true);
 
         if (updateCRFs) {
             pageMessages.add("The Event CRFs have been source data verified.");
@@ -351,7 +380,7 @@ public class SDVController {
 
     @RequestMapping("/handleSDVGet")
     public String sdvOneCRFFormHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("crfId") int crfId,
-            @RequestParam("redirection") String redirection, ModelMap model) {
+            @RequestParam("redirection") String redirection, @RequestParam("studyId") int studyId, ModelMap model) {
 
 
 			 if(!mayProceed(request)){
@@ -362,8 +391,17 @@ public class SDVController {
             }
             return null;
         }
-        //For the messages that appear in the left column of the results page
+
         ArrayList<String> pageMessages = new ArrayList<String>();
+
+        if (hasFormAccess(crfId ,request) != true) {
+            forwardToNoAccessPage(request,response,redirection,studyId);
+            return null;
+        }
+
+
+
+        //For the messages that appear in the left column of the results page
 
         List<Integer> eventCRFIds = new ArrayList<Integer>();
         eventCRFIds.add(crfId);
@@ -371,6 +409,7 @@ public class SDVController {
 
         if (updateCRFs) {
             pageMessages.add("The Event CRFs have been source data verified.");
+            request.setAttribute("sdv_restore", "true");
         } else {
 
             pageMessages
@@ -379,7 +418,6 @@ public class SDVController {
         }
         request.setAttribute("pageMessages", pageMessages);
 
-        request.setAttribute("sdv_restore", "true");
 
         //model.addAttribute("allParams",parameterMap);
         //model.addAttribute("verified",updateCRFs);
@@ -392,11 +430,14 @@ public class SDVController {
 
     @RequestMapping("/handleSDVRemove")
     public String changeSDVHandler(HttpServletRequest request, HttpServletResponse response, @RequestParam("crfId") int crfId,
-            @RequestParam("redirection") String redirection, ModelMap model) {
+            @RequestParam("redirection") String redirection, @RequestParam("studyId") int studyId, ModelMap model) {
 
         //For the messages that appear in the left column of the results page
+        if (hasFormAccess(crfId ,request) != true) {
+            forwardToNoAccessPage(request,response,redirection,studyId);
+            return null;
+        }
         ArrayList<String> pageMessages = new ArrayList<String>();
-
         List<Integer> eventCRFIds = new ArrayList<Integer>();
         eventCRFIds.add(crfId);
         boolean updateCRFs = sdvUtil.setSDVerified(eventCRFIds, getCurrentUser(request).getId(), false);
@@ -630,4 +671,17 @@ public class SDVController {
 
         return false;
     }
+
+    public boolean hasFormAccess(int ecId,HttpServletRequest request) {
+        EventCrf ec = eventCrfDao.findById(ecId);
+        return permissionService.hasFormAccess(ec, ec.getFormLayout().getFormLayoutId(), ec.getStudyEvent().getStudyEventId(), request);
+    }
+
+private void forwardToNoAccessPage(HttpServletRequest request,HttpServletResponse response,String redirection,int studyId){
+    Page page1 = Page.valueOf(Page.NO_ACCESS.name());
+    String temp = page1.getFileName();
+    String originatingPage = request.getContextPath() + "/pages/" + redirection+ "?sdv_restore=true&studyId=" + studyId;
+    request.setAttribute(ORIGINATING_PAGE, originatingPage);
+    sdvUtil.forwardRequestFromController(request, response, temp);
+}
 }

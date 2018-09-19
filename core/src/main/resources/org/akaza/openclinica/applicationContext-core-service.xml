@@ -38,6 +38,10 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
+    <bean id="importCRFDataService" class="org.akaza.openclinica.web.crfdata.ImportCRFDataService">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
     <bean id="randomizeService" class="org.akaza.openclinica.service.RandomizeService">
         <constructor-arg ref="dataSource"/>
     </bean>
@@ -129,6 +133,7 @@
         <property name="studyUserRoleDao" ref="studyUserRoleDao"/>        
         <property name="itemGroupDao" ref="itemGroupDao"/>
         <property name="eventDefinitionCrfDao" ref="eventDefinitionCrfDao"/>
+        <property name="eventDefinitionCrfPermissionTagDao" ref="eventDefinitionCrfPermissionTagDao"/>
         <property name="itemDao" ref="itemDao"/>
     </bean>
 

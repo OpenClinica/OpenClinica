@@ -28,6 +28,10 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
+
+import javax.servlet.http.HttpServletRequest;
 
 public class EnketoAPI {
 
@@ -87,11 +91,11 @@ public class EnketoAPI {
         this.userPasswdCombo = new String(Base64.encodeBase64((CoreResources.getField("ocform.adminapikey") + ":").getBytes()));
     }
 
-    public FormUrlObject getOfflineFormURL(String crfOID) throws Exception {
+    public FormUrlObject getOfflineFormURL(String ecId, String crfOID) throws Exception {
         if (enketoURL == null)
             return null;
         URL eURL = new URL(enketoURL + SURVEY_OFFLINE_MODE);
-        EnketoFormResponse response = registerAndGetURL(eURL, crfOID, null);
+        EnketoFormResponse response = registerAndGetURL(eURL, ecId, crfOID, null);
         if (response != null) {
             String myUrl = response.getEnketoUrlResponse().getUrl();
             if (enketoURL.toLowerCase().startsWith("https") && !myUrl.toLowerCase().startsWith("https")) {
@@ -102,7 +106,7 @@ public class EnketoAPI {
             return null;
     }
 
-    public FormUrlObject getFormURL(String crfOID, String studyOid, Role role, Study parentStudy, StudyEvent studyEvent,
+    public FormUrlObject getFormURL(String subjectContextKey, String crfOID, String studyOid, Role role, Study parentStudy, StudyEvent studyEvent,
                                     String mode, String loadWarning, boolean isFormLocked) throws Exception {
         boolean lockOn = false;
         boolean shouldLock = false;
@@ -161,7 +165,7 @@ public class EnketoAPI {
         if (!isFormLocked || !shouldLock)
             finalLoadWarning = "";
 
-        EnketoFormResponse response = registerAndGetURL(eURL, crfOID, finalLoadWarning);
+        EnketoFormResponse response = registerAndGetURL(eURL, subjectContextKey, crfOID, finalLoadWarning);
         if (response != null) {
             if (response.getEnketoUrlResponse().getUrl() != null) {
                 myUrl = response.getEnketoUrlResponse().getUrl();
@@ -175,26 +179,26 @@ public class EnketoAPI {
             return null;
     }
 
-    public String getFormPreviewURL(String crfOID) throws Exception {
+    public String getFormPreviewURL(String ecId, String crfOID) throws Exception {
         if (enketoURL == null)
             return "";
         URL eURL = new URL(enketoURL + SURVEY_PREVIEW_MODE);
-        EnketoFormResponse response = registerAndGetURL(eURL, crfOID, "");
+        EnketoFormResponse response = registerAndGetURL(eURL, ecId, crfOID, "");
         if (response != null)
             return response.getEnketoUrlResponse().getUrl();
         else
             return "";
     }
 
-    public EnketoURLResponse registerAndDeleteCache(URL url, String crfOID) {
+    public EnketoURLResponse registerAndDeleteCache(URL url, String ecId,String crfOID) {
         EnketoURLResponse urlResponse = null;
         try {
-            deleteCache(url, crfOID);
+            deleteCache(url, ecId, crfOID);
         } catch (Exception e) {
             if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized") || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
                 savePformRegistration();
                 try {
-                    deleteCache(url, crfOID);
+                    deleteCache(url, ecId, crfOID);
                 } catch (Exception e1) {
                     logger.error(e.getMessage());
                     logger.error(ExceptionUtils.getStackTrace(e));
@@ -208,15 +212,15 @@ public class EnketoAPI {
         }
     }
 
-    private EnketoFormResponse registerAndGetURL(URL url, String crfOID, String loadWarning) {
+    private EnketoFormResponse registerAndGetURL(URL url, String ecId, String crfOID, String loadWarning) {
         EnketoFormResponse enketoFormResponse = null;
         try {
-            enketoFormResponse = getURL(url, crfOID, loadWarning);
+            enketoFormResponse = getURL(url, ecId, crfOID, loadWarning);
         } catch (Exception e) {
             if (StringUtils.equalsIgnoreCase(e.getMessage(), "401 Unauthorized") || StringUtils.equalsIgnoreCase(e.getMessage(), "403 Forbidden")) {
                 savePformRegistration();
                 try {
-                    enketoFormResponse = getURL(url, crfOID, loadWarning);
+                    enketoFormResponse = getURL(url, ecId, crfOID, loadWarning);
                 } catch (Exception e1) {
                     logger.error(e.getMessage());
                     logger.error(ExceptionUtils.getStackTrace(e));
@@ -252,23 +256,52 @@ public class EnketoAPI {
         return formResponse;
     }
 
-    private void deleteCache(URL url, String crfOID) throws Exception {
+    private void deleteCache(URL url, String ecId, String crfOID) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Authorization", "Basic " + new String(Base64.encodeBase64((token + ":").getBytes())));
         headers.add("Accept-Charset", "UTF-8");
-        EnketoURLRequest body = new EnketoURLRequest(ocURL, crfOID, null);
+        EnketoURLRequest body = new EnketoURLRequest(ocURL, ecId, crfOID, null, isJiniEnabled(), getParticipantId(), getParentWindowOrigin());
         HttpEntity<EnketoURLRequest> request = new HttpEntity<EnketoURLRequest>(body, headers);
         RestTemplate rest = new RestTemplate();
         ResponseEntity<String> result = rest.exchange(url.toString(), HttpMethod.DELETE, request, String.class);
     }
 
-    private EnketoFormResponse getURL(URL url, String crfOID, String loadWarning) throws Exception {
+    private String isJiniEnabled() {
+        String jini ="false";
+        String jiniEnabled =CoreResources.getField("jini.enabled");
+        if (!jiniEnabled.equals("") && jiniEnabled.equalsIgnoreCase("true")) {
+            jini = "true";
+        }
+        return jini;
+    }
+
+    private String getParentWindowOrigin() {
+        String origin = null;
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            origin = request.getScheme() + "://" + request.getServerName();
+        }
+        return origin;
+    }
+
+    private String getParticipantId() {
+        String pid = null;
+        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+        if (requestAttributes != null && requestAttributes.getRequest() != null) {
+            HttpServletRequest request = requestAttributes.getRequest();
+            pid = (String) request.getAttribute("studySubjectId");
+        }
+        return pid;
+    }
+
+    private EnketoFormResponse getURL(URL url, String ecId, String crfOID, String loadWarning) throws Exception {
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.add("Authorization", "Basic " + new String(Base64.encodeBase64((token + ":").getBytes())));
         headers.add("Accept-Charset", "UTF-8");
-        EnketoURLRequest body = new EnketoURLRequest(ocURL, crfOID, loadWarning);
+        EnketoURLRequest body = new EnketoURLRequest(ocURL, ecId, crfOID, loadWarning, isJiniEnabled(), getParticipantId(), getParentWindowOrigin());
         HttpEntity<EnketoURLRequest> request = new HttpEntity<EnketoURLRequest>(body, headers);
         RestTemplate rest = new RestTemplate();
         ResponseEntity<EnketoURLResponse> response = rest.postForEntity(url.toString(), request, EnketoURLResponse.class);
@@ -556,7 +589,12 @@ public class EnketoAPI {
 
             if (!actionUrlObject.formLocked || !shouldLock)
                 loadWarning = "";
-            EnketoEditURLRequest body = new EnketoEditURLRequest(ocURL, crfOid, instanceId, redirect, instance, String.valueOf(markComplete), attachment, goTo, loadWarning);
+            String subjectLabel = actionUrlObject.studyEvent.getStudySubject().getLabel();
+            if (flavor.equals(SINGLE_ITEM_FLAVOR) && mode.equals(EDIT_MODE))
+                subjectLabel = null;
+
+            EnketoEditURLRequest body = new EnketoEditURLRequest(ocURL, actionUrlObject.ecid, crfOid, instanceId, redirect, instance, String.valueOf(markComplete),
+                    attachment, goTo, loadWarning, isJiniEnabled(), subjectLabel, getParentWindowOrigin());
             HttpEntity<EnketoEditURLRequest> request = new HttpEntity<EnketoEditURLRequest>(body, headers);
             RestTemplate rest = new RestTemplate();
             ResponseEntity<EnketoURLResponse> response = rest.postForEntity(eURL.toString(), request, EnketoURLResponse.class);

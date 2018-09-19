@@ -99,6 +99,14 @@
                 site.unique_identifier = ?
          </sql>
     </query>
+    <query>
+        <name>findSiteByOid</name>
+        <sql>select site.* from study site, study study where
+                site.parent_study_id = study.study_id and
+                study.oc_oid = ? and   
+                site.oc_oid = ?
+         </sql>
+    </query>
 	<query>
 		<name>updateStepOne</name>
 		<sql>UPDATE STUDY SET PARENT_STUDY_ID=?, NAME=?, official_title=?, UNIQUE_IDENTIFIER=?,
@@ -135,7 +143,7 @@
 		SPONSOR=?, COLLABORATORS=?, MEDLINE_IDENTIFIER=?, results_reference=?,
 		URL=?,URL_DESCRIPTION=?, CONDITIONS=?, KEYWORDS=?, ELIGIBILITY=?,
 		GENDER=?, AGE_MAX=?, AGE_MIN=?, HEALTHY_VOLUNTEER_ACCEPTED=?,
-        SCHEMA_NAME=?, STUDY_ENV_UUID=?, STUDY_ENV_SITE_UUID=?, PUBLISHED=?, FILE_PATH=?
+        SCHEMA_NAME=?, STUDY_ENV_UUID=?, STUDY_ENV_SITE_UUID=?, PUBLISHED=?, FILE_PATH=?,SUBJECT_COUNT=?
 		WHERE STUDY_ID=?
       </sql>
 	</query>

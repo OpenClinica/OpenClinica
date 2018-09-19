@@ -20,7 +20,7 @@ public class SubjectBean extends AuditableEntityBean {
      * date_created, date_updated, update_id
      */
     private Date dateOfBirth;
-    private char gender = 'm';
+    private char gender = ' ';
     private String uniqueIdentifier = "";
     /*
      * tells that whether the dateOfBirth is a real birthday or only the year

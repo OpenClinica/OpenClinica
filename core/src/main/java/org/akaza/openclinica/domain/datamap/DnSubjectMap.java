@@ -18,7 +18,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "dn_subject_map")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class DnSubjectMap extends DataMapDomainObject{
 
 	private DnSubjectMapId dnSubjectMapId;

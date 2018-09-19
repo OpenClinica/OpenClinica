@@ -94,9 +94,10 @@ public class ListNotesTableFactory extends AbstractTableFactory {
     private final ResolutionStatusDroplistFilterEditor resolutionStatusDropdown = new ResolutionStatusDroplistFilterEditor();
     private static final String QUERY_FLAVOR = "-query";
     public static final String SINGLE_ITEM_FLAVOR = "-single_item";
-
-    public ListNotesTableFactory(boolean showMoreLink) {
+    private List<String> userTags = null;
+    public ListNotesTableFactory(boolean showMoreLink, List<String> userTags) {
         this.showMoreLink = showMoreLink;
+        this.userTags = userTags;
     }
 
     @Override
@@ -161,7 +162,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(), discrepancyNoteTypeDropdown.getDecoder(),
                 resolutionStatusDropdown.getDecoder());
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
-                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
+                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()), userTags);
         return items;
     }
 
@@ -189,8 +190,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         ViewNotesFilterCriteria filter = ViewNotesFilterCriteria.buildFilterCriteria(limit, getDateFormat(), discrepancyNoteTypeDropdown.getDecoder(),
                 resolutionStatusDropdown.getDecoder());
 
-        notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter, false);
-        notesSummaryOnlyForQuery = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter, true);
+        notesSummary = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter, false, userTags);
+        notesSummaryOnlyForQuery = getViewNotesService().calculateNotesSummary(getCurrentStudy(), filter, true, userTags);
 
         int pageSize = limit.getRowSelect().getMaxRows();
         int firstRecordShown = (limit.getRowSelect().getPage() - 1) * pageSize;
@@ -203,7 +204,7 @@ public class ListNotesTableFactory extends AbstractTableFactory {
         }
 
         List<DiscrepancyNoteBean> items = getViewNotesService().listNotes(getCurrentStudy(), filter,
-                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()));
+                ViewNotesSortCriteria.buildFilterCriteria(limit.getSortSet()), userTags);
 
         this.setAllNotes(items);
 

@@ -24,7 +24,6 @@ import org.hibernate.annotations.Parameter;
 @Table(name = "form_layout_media")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = {
         @Parameter(name = "sequence_name", value = "form_layout_media_form_layout_media_id_seq") })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class FormLayoutMedia extends DataMapDomainObject {
 
     private int formLayoutMediaId;

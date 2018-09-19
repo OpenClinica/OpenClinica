@@ -5,7 +5,10 @@ package org.akaza.openclinica.service;
 
 import javax.servlet.http.HttpServletRequest;
 
+import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
 import org.akaza.openclinica.controller.dto.ViewStudySubjectDTO;
+import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.user.UserAccount;
 
 /**
  * @author joekeremian
@@ -34,5 +37,17 @@ public interface ViewStudySubjectService {
 	 * @return
 	 */
 	Page getPage(HttpServletRequest request, String studyOid, String name);
+
+
+	/**
+	 *
+	 * @param studyEventDefinitionOid
+	 * @param crfOid
+	 * @param studySubjectOid
+	 * @param userAccount
+	 * @return
+	 */
+	public CommonEventContainerDTO addCommonForm(String studyEventDefinitionOid, String crfOid, String studySubjectOid,
+												 UserAccount userAccount,String studyOid);
 
 }

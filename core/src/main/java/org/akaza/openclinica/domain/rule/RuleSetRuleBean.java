@@ -26,7 +26,6 @@ import java.util.List;
 @Entity
 @Table(name = "rule_set_rule")
 @GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_set_rule_id_seq") })
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class RuleSetRuleBean extends AbstractAuditableMutableDomainObject implements Serializable {
 
     RuleSetBean ruleSetBean;

@@ -247,25 +247,25 @@
 						        		   <tr valign="top"><td class="table_cell_left"><a href="">
         								   <img src="images/bt_Lock.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="">Lock</a></td></tr>
 		        						   -->
-				        				   <tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>">
-						        		   <img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
+				        				   <tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&eventCrfId=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>">
+						        		   <img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&eventCrfId=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 	    							    </c:if>
                                         <c:if test="${userBean.sysAdmin && (study.status.available)}">
 			        					   <tr valign="top"><td class="table_cell_left">
-                                               <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>">
+                                               <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&eventCrfId=<c:out value="${eventCrfId}"/>">
                                                    <img src="images/bt_Delete.gif" border="0" align="left"></a>&nbsp;&nbsp;
-                                               <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>">
+                                               <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&eventCrfId=<c:out value="${eventCrfId}"/>">
                                                <fmt:message key="delete" bundle="${resword}"/></a></td></tr>
                                         </c:if>
                                     </c:if>
 							    </c:when>
 							    <c:when test="${crfStatus ==lockedi18n}">
-							        <tr valign="top"><td class="table_cell_left"><a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp; 
+							        <tr valign="top"><td class="table_cell_left"><a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><img src="images/bt_View.gif" border="0" align="left"></a>&nbsp;&nbsp;
 							         <a href="ViewSectionDataEntry?eventDefinitionCRFId=<c:out value="${edcId}"/>&ecId=<c:out value="${eventCrfId}"/>&tabId=1"><fmt:message key="view" bundle="${resword}"/></a></td></tr>
 								  
 									<tr valign="top"><td class="table_cell_left"><a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><img src="images/bt_Print.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="ViewEventCRFContent?id=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>&eventId=<c:out value="${eventId}"/>"><fmt:message key="print" bundle="${resword}"/></a></td></tr>
 							        <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
-							          <tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
+							          <tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&eventCrfId=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&eventCrfId=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 						 	        </c:if>
 						 	    </c:when>
 						 	    <c:when test="${crfStatus ==no_startedi18n }">
@@ -294,7 +294,7 @@
 								       <fmt:message key="print" bundle="${resword}"/></a></td></tr>
 								    <c:if test="${studySubjectjectStatusId != 5 && studySubjectjectStatusId != 7}">
 									    <c:if test="${userRole.director || userBean.sysAdmin}">
-										<tr valign="top"><td class="table_cell_left"><a href="RestoreEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${studySubjectjectId}"/>">
+										<tr valign="top"><td class="table_cell_left"><a href="RestoreEventCRF?action=confirm&eventCrfId=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${studySubjectjectId}"/>">
 										<img src="images/bt_Restore.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RestoreEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${studySubjectjectId}"/>"><fmt:message key="restore" bundle="${resword}"/></a></td></tr>
 									   </c:if>
 								   </c:if>
@@ -333,14 +333,14 @@
 									<fmt:message key="print" bundle="${resword}"/></a></td></tr>
 								  
 								   <c:if test="${(userRole.director || userBean.sysAdmin) && (study.status.available)}">
-									<tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>">
-									<img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&id=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
+									<tr valign="top"><td class="table_cell_left"><a href="RemoveEventCRF?action=confirm&eventCrfId=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>">
+									<img src="images/bt_Remove.gif" border="0" align="left"></a>&nbsp;&nbsp; <a href="RemoveEventCRF?action=confirm&eventCrfId=<c:out value="${eventCrfId}"/>&studySubjectId=<c:out value="${subjectId}"/>"><fmt:message key="remove" bundle="${resword}"/></a></td></tr>
 								   </c:if>
 								   
 								   <c:if test="${userBean.sysAdmin && (study.status.available)}">
-								    <tr valign="top"><td class="table_cell_left"><a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>">
+								    <tr valign="top"><td class="table_cell_left"><a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&eventCrfId=<c:out value="${eventCrfId}"/>">
 								    <img src="images/bt_Delete.gif" border="0" align="left"></a>&nbsp;&nbsp; 
-								    <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&ecId=<c:out value="${eventCrfId}"/>"><fmt:message key="delete" bundle="${resword}"/></a></td></tr>
+								    <a href="DeleteEventCRF?action=confirm&ssId=<c:out value="${subjectId}"/>&eventCrfId=<c:out value="${eventCrfId}"/>"><fmt:message key="delete" bundle="${resword}"/></a></td></tr>
                                   </c:if>
 						 	    
 								</c:otherwise>

@@ -30,10 +30,13 @@ import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.core.LockInfo;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemFormMetadataDao;
 import org.akaza.openclinica.dao.hibernate.DynamicsItemGroupMetadataDao;
+import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.DiscrepancyNoteDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -45,6 +48,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
@@ -58,7 +62,7 @@ import org.akaza.openclinica.web.InsufficientPermissionException;
 public class DeleteEventCRFServlet extends SecureController {
     public static String STUDY_SUB_ID = "ssId";
 
-    public static String EVENT_CRF_ID = "ecId";
+    public static String EVENT_CRF_ID = "eventCrfId";
     DiscrepancyNoteDAO dnDao;
     RuleActionRunLogDao ruleActionRunLogDao;
     DynamicsItemFormMetadataDao dynamicsItemFormMetadataDao;
@@ -95,6 +99,10 @@ public class DeleteEventCRFServlet extends SecureController {
         EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
         StudyDAO sdao = new StudyDAO(sm.getDataSource());
         request.setAttribute("errorData", null);
+        String originatingPage = request.getParameter(ORIGINATING_PAGE);
+        request.setAttribute(ORIGINATING_PAGE, originatingPage);
+        EventCrfDao eventCrfDao = (EventCrfDao) SpringServletAccess.getApplicationContext(context).getBean("eventCrfDao");
+
         if (eventCRFId == 0) {
             addPageMessage(respage.getString("please_choose_an_event_CRF_to_delete"));
             request.setAttribute("id", new Integer(studySubId).toString());
@@ -102,6 +110,12 @@ public class DeleteEventCRFServlet extends SecureController {
         } else {
 
             EventCRFBean eventCRF = (EventCRFBean) ecdao.findByPK(eventCRFId);
+            final EventCrf ec = eventCrfDao.findById(eventCRFId);
+
+            if (hasFormAccess(ec) != true) {
+                forwardPage(Page.NO_ACCESS);
+                return;
+            }
             StudySubjectBean studySub = (StudySubjectBean) subdao.findByPK(studySubId);
             request.setAttribute("studySub", studySub);
 
@@ -144,9 +158,16 @@ public class DeleteEventCRFServlet extends SecureController {
             request.setAttribute("items", itemData);
             if (getEventCrfLocker().isLocked(currentPublicStudy.getSchemaName()
                     + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId(), ub.getId(), request.getSession().getId())) {
-                request.setAttribute("errorData", "This form is currently unavailable for this action.\\n " +
-                        "User " + ub.getName() +" is currently entering data.\\n " +
-                        "Once they leave the form, you will be allowed to perform this action.\\n");
+                LockInfo lockInfo = getEventCrfLocker().getLockOwner(currentPublicStudy.getSchemaName()
+                        + eventCRF.getStudyEventId() + eventCRF.getFormLayoutId());
+                if (lockInfo != null) {
+                    UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
+                    UserAccountBean ubean = (UserAccountBean) udao.findByPK(lockInfo.getUserId());
+                    String errorData = "This form is currently unavailable for this action.\\n " +
+                            "User " + ubean.getName() +" is currently entering data.\\n " +
+                            resword.getString("CRF_perform_action") +"\\n";
+                    request.setAttribute("errorData", errorData);
+                }
                 if ("confirm".equalsIgnoreCase(action)) {
                     request.setAttribute("id", new Integer(studySubId).toString());
                     forwardPage(Page.VIEW_STUDY_SUBJECT_SERVLET);
@@ -265,6 +286,7 @@ public class DeleteEventCRFServlet extends SecureController {
         itemParentNote.setResolutionStatusId(ResolutionStatus.CLOSED_MODIFIED.getId()); // set to closed-modified
         itemParentNote.setAssignedUser(null);
         itemParentNote.setOwner(ub);
+        itemParentNote.setDetailedNotes(detailedNotes);
         getDnDao().update(itemParentNote); // update parent DN
         getDnDao().updateAssignedUserToNull(itemParentNote); // update parent DN assigned user
 

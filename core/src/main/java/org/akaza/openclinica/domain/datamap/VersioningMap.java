@@ -22,7 +22,6 @@ import org.hibernate.annotations.CacheConcurrencyStrategy;
  */
 @Entity
 @Table(name = "versioning_map")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class VersioningMap extends DataMapDomainObject {
 
     private VersioningMapId versionMapId;

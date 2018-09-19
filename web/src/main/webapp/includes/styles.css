@@ -838,7 +838,6 @@ div#subjectSDV table#sdv {
 }
 
 .alert.small {
-  line-height: 3px;
   margin-bottom: 10px;
   font-size: small;
   text-align: left;
@@ -876,4 +875,12 @@ form#searchByStudySubjectId {
   padding: 10px;
   background: #f1f1f1;
   border-radius: 5px;
+}
+
+.hide {
+  display: none;
+}
+
+.invisible {
+  visibility: hidden;
 }

@@ -75,9 +75,9 @@ public class PFormCache {
             studyURLs = new HashMap<String, String>();
             formUrlObject = null;
             if (isOffline)
-                formUrlObject = enketo.getOfflineFormURL(formLayoutOID);
+                formUrlObject = enketo.getOfflineFormURL(null, formLayoutOID);
             else
-                formUrlObject = enketo.getFormURL(formLayoutOID, studyOID, null, parentStudy, studyEvent, EDIT_MODE, null, false);
+                formUrlObject = enketo.getFormURL(null, formLayoutOID, studyOID, null, parentStudy, studyEvent, EDIT_MODE, null, false);
 
             if (formUrlObject.getFormUrl().equals("")) {
                 throw new Exception("Unable to get enketo form url.");
@@ -90,9 +90,9 @@ public class PFormCache {
             return formUrlObject.getFormUrl();
         } else if (studyURLs.get(formLayoutOID) == null) {
             if (isOffline)
-                formUrlObject = enketo.getOfflineFormURL(formLayoutOID);
+                formUrlObject = enketo.getOfflineFormURL(null, formLayoutOID);
             else
-                formUrlObject = enketo.getFormURL(formLayoutOID, studyOID,
+                formUrlObject = enketo.getFormURL(null, formLayoutOID, studyOID,
                         null, parentStudy, studyEvent, EDIT_MODE, null, false);
             studyURLs.put(formLayoutOID, formUrlObject.getFormUrl());
             return formUrlObject.getFormUrl();

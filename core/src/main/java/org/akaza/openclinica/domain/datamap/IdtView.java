@@ -21,7 +21,6 @@ import org.springframework.transaction.annotation.Transactional;
 
 @Entity
 @Table(name = "view_item_data_toolkit_filtered")
-@Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class IdtView extends DataMapDomainObject {
 
     private int itemDataId;

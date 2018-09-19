@@ -9,15 +9,26 @@
 
 package org.akaza.openclinica.logic.odmExport;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.extract.DatasetBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.odmbeans.ODMBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.OdmExtractDAO;
+import org.akaza.openclinica.service.PermissionService;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
 /**
  * A class for one ODM ClinicalData Element.
@@ -28,6 +39,8 @@ import org.akaza.openclinica.dao.extract.OdmExtractDAO;
 public class ClinicalDataUnit extends OdmUnit {
     private OdmClinicalDataBean odmClinicalData;
     private String studySubjectIds;
+    private String permissionTagsString;
+    private Set<Integer> edcSet;
 
     public ClinicalDataUnit() {
     }
@@ -39,13 +52,16 @@ public class ClinicalDataUnit extends OdmUnit {
 
     public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category) {
         super(ds, dataset, odmBean, study, category);
+
         this.odmClinicalData = new OdmClinicalDataBean();
     }
 
-    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, String studySubjectIds) {
+    public ClinicalDataUnit(DataSource ds, DatasetBean dataset, ODMBean odmBean, StudyBean study, int category, String studySubjectIds,String permissionTagsString , Set<Integer> edcSet) {
         super(ds, dataset, odmBean, study, category);
+        this.permissionTagsString=permissionTagsString;
         this.odmClinicalData = new OdmClinicalDataBean();
         this.studySubjectIds = studySubjectIds;
+        this.edcSet=edcSet;
     }
 
     public void collectOdmClinicalData() {
@@ -57,7 +73,8 @@ public class ClinicalDataUnit extends OdmUnit {
         }
         odmClinicalData.setStudyOID(studyOID);
 
-        OdmExtractDAO oedao = new OdmExtractDAO(this.ds);
+        OdmExtractDAO oedao = new OdmExtractDAO(this.ds,edcSet);
+
         if (this.getCategory() == 1 && study.isSite(study.getParentStudyId())) {
             String mvoid = "";
             if (this.dataset != null) {
@@ -76,7 +93,7 @@ public class ClinicalDataUnit extends OdmUnit {
                 odmClinicalData.setMetaDataVersionOID("v1.0.0");
             }
         }
-        oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds, this.odmBean.getOdmType());
+        oedao.getClinicalData(study, this.dataset, odmClinicalData, this.odmBean.getODMVersion(), studySubjectIds, this.odmBean.getOdmType(),permissionTagsString);
     }
 
     public OdmClinicalDataBean getOdmClinicalData() {
@@ -110,4 +127,6 @@ public class ClinicalDataUnit extends OdmUnit {
     public void setStudySubjectIds(String studySubjectIds) {
         this.studySubjectIds = studySubjectIds;
     }
+
+
 }

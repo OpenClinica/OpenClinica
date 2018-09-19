@@ -220,7 +220,7 @@ public class SDVUtil {
         return eventCRFDAO.countEventCRFsByStudySubject(studySubjectId, studyId, studyId);
     }
 
-    public void setDataAndLimitVariables(TableFacade tableFacade, int studyId, HttpServletRequest request) {
+    public void setDataAndLimitVariables(TableFacade tableFacade, int studyId, HttpServletRequest request,String[] permissionTags) {
 
         Limit limit = tableFacade.getLimit();
 
@@ -229,10 +229,10 @@ public class SDVUtil {
 
         String restore = request.getAttribute(limit.getId() + "_restore") + "";
         if (!limit.isComplete()) {
-            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
+            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId,permissionTags);
             tableFacade.setTotalRows(totalRows);
         } else if (restore != null && "true".equalsIgnoreCase(restore)) {
-            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId);
+            int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId,permissionTags);
             int pageNum = limit.getRowSelect().getPage();
             int maxRows = limit.getRowSelect().getMaxRows();
             tableFacade.setMaxRows(maxRows);
@@ -246,7 +246,7 @@ public class SDVUtil {
         int rowEnd = limit.getRowSelect().getRowEnd();
         // Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(),
         // studySubjectSDVFilter, subjectSort, rowStart, rowEnd);
-        Collection<SubjectSDVContainer> items = getFilteredItems(eventCRFSDVFilter, eventCRFSDVSort, rowStart, rowEnd, studyId, request);
+        Collection<SubjectSDVContainer> items = getFilteredItems(eventCRFSDVFilter, eventCRFSDVSort, rowStart, rowEnd, studyId, request,permissionTags);
         tableFacade.setItems(items);
         /*
          * Limit limit = tableFacade.getLimit();
@@ -270,10 +270,10 @@ public class SDVUtil {
         int pn = p != null && p.length() > 0 ? Integer.parseInt(p) : 1;
     }
 
-    public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId) {
+    public int getTotalRowCount(EventCRFSDVFilter eventCRFSDVFilter, Integer studyId , String[] permissionTags) {
 
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
-        return eventCRFDAO.getCountWithFilter(studyId, studyId, eventCRFSDVFilter);
+        return eventCRFDAO.getCountWithFilter(studyId, studyId, eventCRFSDVFilter,permissionTags);
 
     }
 
@@ -305,7 +305,7 @@ public class SDVUtil {
 
     @SuppressWarnings("unchecked")
     private Collection<SubjectSDVContainer> getFilteredItems(EventCRFSDVFilter filterSet, EventCRFSDVSort sortSet, int rowStart, int rowEnd, int studyId,
-            HttpServletRequest request) {
+            HttpServletRequest request , String[] permissionTags) {
 
         EventCRFDAO eventCRFDAO = new EventCRFDAO(dataSource);
         List<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
@@ -382,7 +382,7 @@ public class SDVUtil {
          * 
          * }
          */
-        eventCRFBeans = eventCRFDAO.getWithFilterAndSort(studyId, studyId, filterSet, sortSet, rowStart, rowEnd);
+        eventCRFBeans = eventCRFDAO.getWithFilterAndSort(studyId, studyId, filterSet, sortSet, rowStart, rowEnd ,permissionTags);
         return getSubjectRows(eventCRFBeans, request);
     }
 
@@ -615,7 +615,7 @@ public class SDVUtil {
      * }
      */
 
-    public String renderEventCRFTableWithLimit(HttpServletRequest request, int studyId, String pathPrefix) {
+    public String renderEventCRFTableWithLimit(HttpServletRequest request, int studyId, String pathPrefix , String[] permissionTags) {
 
         // boolean showMoreLink = Boolean.parseBoolean(request.getAttribute("showMoreLink").toString());//commented by
         // Jamuna, throwing null pointer exception
@@ -625,11 +625,11 @@ public class SDVUtil {
         resformat = ResourceBundleProvider.getFormatBundle(LocaleResolver.getLocale(request));
         this.pathPrefix = pathPrefix;
 
-        String[] allColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "personId", "secondaryId", "eventName", "eventDate",
-                "enrollmentDate", "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy",
+        String[] allColumns = new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "eventName", "eventDate",
+                "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy",
                 "studyEventStatus", "sdvStatusActions" };
 
-        tableFacade.setColumnProperties("sdvStatus", "studySubjectId", "studyIdentifier", "personId", "secondaryId", "eventName", "eventDate", "enrollmentDate",
+        tableFacade.setColumnProperties("sdvStatus", "studySubjectId", "studyIdentifier", "eventName", "eventDate",
                 "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
                 "sdvStatusActions");
 
@@ -641,7 +641,7 @@ public class SDVUtil {
 
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "sdvRequirementDefinition"), new SDVRequirementMatcher());
 
-        this.setDataAndLimitVariables(tableFacade, studyId, request);
+        this.setDataAndLimitVariables(tableFacade, studyId, request,permissionTags);
 
         // tableFacade.setItems(items);
 
@@ -665,11 +665,11 @@ public class SDVUtil {
         setHtmlCellEditors(tableFacade, allColumns, true);
 
         // temporarily disable some of the filters for now
-        turnOffFilters(tableFacade, new String[] { "personId", "secondaryId", "enrollmentDate", "studySubjectStatus", "crfNameVersion", "lastUpdatedDate",
+        turnOffFilters(tableFacade, new String[] { "studySubjectStatus", "crfNameVersion", "lastUpdatedDate",
                 "lastUpdatedBy", "eventDate", "studyEventStatus" });
 
         turnOffSorts(tableFacade,
-                new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "personId", "secondaryId", "eventName", "eventDate", "enrollmentDate",
+                new String[] { "sdvStatus", "studySubjectId", "studyIdentifier", "eventName", "eventDate",
                         "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
                         "sdvStatusActions" });
 
@@ -687,15 +687,15 @@ public class SDVUtil {
         ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
 
         String[] allTitles = { resword.getString("SDV_status"), resword.getString("study_subject_ID"), resword.getString("site_id"),
-                resword.getString("person_ID"), resword.getString("secondary_ID"), resword.getString("event_name"), resword.getString("event_date"),
-                resword.getString("enrollment_date"), resword.getString("subject_status"), resword.getString("CRF_name") + " / " + resword.getString("version"),
+                resword.getString("event_name"), resword.getString("event_date"),
+                resword.getString("subject_status"), resword.getString("CRF_name") + " / " + resword.getString("version"),
                 resword.getString("SDV_requirement"), resword.getString("CRF_status"), resword.getString("last_updated_date"),
                 resword.getString("last_updated_by"), resword.getString("study_event_status"), resword.getString("actions") };
 
         setTitles(allTitles, table);
 
         // format column dates
-        formatColumns(table, new String[] { "eventDate", "enrollmentDate", "lastUpdatedDate" }, request);
+        formatColumns(table, new String[] { "eventDate", "lastUpdatedDate" }, request);
 
         table.getTableRenderer().setWidth("800");
         return tableFacade.render();
@@ -711,13 +711,14 @@ public class SDVUtil {
          * StudySubjectBean subjectBean = (StudySubjectBean) studySubjectDAO.findByPK(studySubjectId);
          */
 
-        String[] allColumns = new String[] { "studySubjectId", "studyIdentifier", "personId", "secondaryId", "eventName", "eventDate", "enrollmentDate",
+        String[] allColumns = new String[] { "studySubjectId", "studyIdentifier", "eventName", "eventDate",
                 "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
                 "sdvStatusActions" };
 
-        tableFacade.setColumnProperties("studySubjectId", "studyIdentifier", "personId", "secondaryId", "eventName", "eventDate", "enrollmentDate",
+        tableFacade.setColumnProperties("studySubjectId", "studyIdentifier", "eventName", "eventDate",
                 "studySubjectStatus", "crfNameVersion", "sdvRequirementDefinition", "crfStatus", "lastUpdatedDate", "lastUpdatedBy", "studyEventStatus",
                 "sdvStatusActions");
+
 
         tableFacade.addFilterMatcher(new MatcherKey(String.class, "studySubjectStatus"), new SubjectStatusMatcher());
 
@@ -748,9 +749,8 @@ public class SDVUtil {
         // fix HTML in columns
         setHtmlCellEditors(tableFacade, allColumns, true);
 
-        // temporarily disable some of the filters for now
         turnOffFilters(tableFacade,
-                new String[] { "personId", "secondaryId", "enrollmentDate", "studySubjectStatus", "crfNameVersion", "lastUpdatedDate", "lastUpdatedBy" });
+                new String[] { "studySubjectStatus", "crfNameVersion", "lastUpdatedDate", "lastUpdatedBy" });
 
         // Create the custom toolbar
         SDVToolbar sDVToolbar = new SDVToolbar(true);
@@ -764,8 +764,8 @@ public class SDVUtil {
         // i18n caption; TODO: convert to Spring messages
         ResourceBundle resword = ResourceBundle.getBundle("org.akaza.openclinica.i18n.words", LocaleResolver.getLocale(request));
 
-        String[] allTitles = { resword.getString("study_subject_ID"), resword.getString("site_id"), resword.getString("person_ID"),
-                resword.getString("secondary_ID"), resword.getString("event_name"), resword.getString("event_date"), resword.getString("enrollment_date"),
+        String[] allTitles = { resword.getString("study_subject_ID"), resword.getString("site_id"),
+                resword.getString("event_name"), resword.getString("event_date"),
                 resword.getString("subject_status"), resword.getString("CRF_name") + " / " + resword.getString("version"), resword.getString("SDV_requirement"),
                 resword.getString("CRF_status"), resword.getString("last_updated_date"), resword.getString("last_updated_by"),
                 resword.getString("study_event_status"), resword.getString("SDV_status") + " / " + resword.getString("actions") };
@@ -773,7 +773,7 @@ public class SDVUtil {
         setTitles(allTitles, table);
 
         // format column dates
-        formatColumns(table, new String[] { "eventDate", "enrollmentDate", "lastUpdatedDate" }, request);
+        formatColumns(table, new String[] { "eventDate", "lastUpdatedDate" }, request);
 
         table.getTableRenderer().setWidth("800");
         return tableFacade.render();
@@ -1046,9 +1046,8 @@ public class SDVUtil {
         String href = request.getContextPath() + "/EnketoFormServlet?formLayoutId=" + formLayoutId + "&studyEventId=" + studyEventId + "&eventCrfId="
                 + eventDefinitionCRFId + "&originatingPage=pages/viewAllSubjectSDVtmp?sdv_restore=true%26studyId=" + studyId + "&mode=view";
         builder.append(
-                "<center><a title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + "' border='0' href='" + href + "' ></a></center>");
+                "<center><a title=\"View CRF\" alt=\"View CRF\" class='" + CRF_STATUS_ICONS.get(statusId) + " accessCheck' border='0' href='" + href + "' ></a></center>");
         // "<input type=\"hidden\" statusId=\"1\" />"
-        builder.append("</a>");
         builder.append(" ");
         builder.append(input.toString());
         return builder.toString();

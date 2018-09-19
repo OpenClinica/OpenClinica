@@ -16,9 +16,12 @@ import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
+import org.akaza.openclinica.service.PermissionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -30,6 +33,12 @@ import com.sun.jersey.api.view.Viewable;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
+
+import java.util.ArrayList;
+import java.util.HashSet;
+import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 /***
  * * Rest service for ODM clinical data usage
@@ -48,11 +57,15 @@ public class ODMClinicaDataResource {
     private static final int INDENT_LEVEL = 2;
 
     @Autowired
+    private EventDefinitionCrfPermissionTagDao eventDefinitionCrfPermissionTagDao;
+    @Autowired
     private ClinicalDataCollectorResource clinicalDataCollectorResource;
     @Autowired
     private MetadataCollectorResource metadataCollectorResource;
     @Autowired
     private DataSource dataSource;
+    @Autowired
+    private PermissionService permissionService;
 
     public MetadataCollectorResource getMetadataCollectorResource() {
         return metadataCollectorResource;
@@ -108,7 +121,7 @@ public class ODMClinicaDataResource {
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
-        boolean clinical = false;
+        boolean crossForm = false;
         boolean archived = false;
 
         if (showArchived != null && (showArchived.equalsIgnoreCase("no") || showArchived.equalsIgnoreCase("n")))
@@ -117,9 +130,9 @@ public class ODMClinicaDataResource {
             archived = true;
 
         if (clinicalData.equalsIgnoreCase("no") || clinicalData.equalsIgnoreCase("n"))
-            clinical = false;
+            crossForm = false;
         if (clinicalData.equalsIgnoreCase("yes") || clinicalData.equalsIgnoreCase("y"))
-            clinical = true;
+            crossForm = true;
         if (includeDns.equalsIgnoreCase("no") || includeDns.equalsIgnoreCase("n"))
             includeDN = false;
         if (includeAudits.equalsIgnoreCase("no") || includeAudits.equalsIgnoreCase("n"))
@@ -129,16 +142,30 @@ public class ODMClinicaDataResource {
         if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
             includeAudit = true;
         UserAccountBean userAccountBean = ((UserAccountBean) request.getSession().getAttribute("userBean"));
+        StudyDAO sdao = new StudyDAO(getDataSource());
+        StudyBean studyBean = sdao.findByOid(studyOID);
+        String permissionTagsString="";
+        String[] permissionTagsStringArray;
+
+        if(crossForm) {
+            permissionTagsString=loadPermissionTagsString();
+            permissionTagsStringArray=loadPermissionTagsStringArray();
+        }else {
+            permissionTagsString = permissionService.getPermissionTagsString(studyBean, request);
+            permissionTagsStringArray=permissionService.getPermissionTagsStringArray(studyBean,request);
+        }
 
         XMLSerializer xmlSerializer = new XMLSerializer();
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                        formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId()),
-                clinical, archived);
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId(),crossForm),
+                crossForm, archived ,permissionTagsString);
         if (report.getClinicalDataMap() == null)
             return null;
 
-        report.createOdmXml(true, clinical, getDataSource(), userAccountBean);
+
+
+        report.createOdmXml(true, crossForm, getDataSource(), userAccountBean,permissionTagsStringArray);
         // xmlSerializer.setForceTopLevelObject(true);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -228,7 +255,7 @@ public class ODMClinicaDataResource {
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
-        boolean clinical = false;
+        boolean crossForm = false;
         boolean archived = false;
 
         if (showArchived != null && (showArchived.equalsIgnoreCase("no") || showArchived.equalsIgnoreCase("n")))
@@ -246,9 +273,9 @@ public class ODMClinicaDataResource {
         }
 
         if (clinicalData.equalsIgnoreCase("no") || clinicalData.equalsIgnoreCase("n"))
-            clinical = false;
+            crossForm = false;
         if (clinicalData.equalsIgnoreCase("yes") || clinicalData.equalsIgnoreCase("y"))
-            clinical = true;
+            crossForm = true;
         if (includeDns.equalsIgnoreCase("no") || includeDns.equalsIgnoreCase("n"))
             includeDN = false;
         if (includeAudits.equalsIgnoreCase("no") || includeAudits.equalsIgnoreCase("n"))
@@ -257,12 +284,24 @@ public class ODMClinicaDataResource {
             includeDN = true;
         if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
             includeAudit = true;
+        StudyDAO sdao = new StudyDAO(getDataSource());
+        StudyBean studyBean = sdao.findByOid(studyOID);
+        String permissionTagsString="";
+        String[] permissionTagsStringArray;
+        if(crossForm) {
+            permissionTagsString=loadPermissionTagsString();
+            permissionTagsStringArray=loadPermissionTagsStringArray();
+        }else {
+            permissionTagsString = permissionService.getPermissionTagsString(studyBean, request);
+            permissionTagsStringArray=permissionService.getPermissionTagsStringArray(studyBean,request);
+        }
+
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId),
-                clinical, archived);
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId,crossForm),
+                crossForm, archived,permissionTagsString);
 
-        report.createOdmXml(true, clinical, getDataSource(), userBean);
+        report.createOdmXml(true, crossForm, getDataSource(), userBean, permissionTagsStringArray);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();
@@ -287,6 +326,27 @@ public class ODMClinicaDataResource {
             else
                 return subjectIdentifier;
         }
+    }
+
+    private String loadPermissionTagsString(){
+        List<EventDefinitionCrfPermissionTag> tags = eventDefinitionCrfPermissionTagDao.findAll();
+
+        List<String> tagsList = new ArrayList<>();
+        for (EventDefinitionCrfPermissionTag tag : tags) {
+            if(!tagsList.contains(tag.getPermissionTagId())) {
+                tagsList.add(tag.getPermissionTagId());
+            }
+        }
+        return  tagsList.stream().collect(Collectors.joining("','", "'", "'"));
+
+    }
+    private String[] loadPermissionTagsStringArray(){
+        List<EventDefinitionCrfPermissionTag> tags = eventDefinitionCrfPermissionTagDao.findAll();
+        Set<String> tagsSet = new HashSet<>();
+        for (EventDefinitionCrfPermissionTag tag : tags) {
+            tagsSet.add(tag.getPermissionTagId());
+        }
+        return tagsSet.toArray(new String[0]);
     }
 
 }
