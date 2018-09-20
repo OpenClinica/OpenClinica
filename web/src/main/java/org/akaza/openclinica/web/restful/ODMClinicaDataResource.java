@@ -1,17 +1,9 @@
 package org.akaza.openclinica.web.restful;
 
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.sql.DataSource;
-import javax.ws.rs.DefaultValue;
-import javax.ws.rs.GET;
-import javax.ws.rs.Path;
-import javax.ws.rs.PathParam;
-import javax.ws.rs.Produces;
-import javax.ws.rs.QueryParam;
-import javax.ws.rs.core.Context;
-import javax.ws.rs.core.MediaType;
-
+import com.sun.jersey.api.view.Viewable;
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
+import net.sf.json.xml.XMLSerializer;
 import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -28,12 +20,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
 import org.springframework.stereotype.Component;
 
-import com.sun.jersey.api.view.Viewable;
-
-import net.sf.json.JSON;
-import net.sf.json.JSONObject;
-import net.sf.json.xml.XMLSerializer;
-
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.sql.DataSource;
+import javax.ws.rs.*;
+import javax.ws.rs.core.Context;
+import javax.ws.rs.core.MediaType;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
@@ -114,10 +106,11 @@ public class ODMClinicaDataResource {
     @Path("/json/view/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}")
     @Produces(MediaType.APPLICATION_JSON)
     public String getODMClinicaldata(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
-            @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
-            @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
-            @Context HttpServletRequest request, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData,
-            @QueryParam("showArchived") String showArchived) {
+                                     @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
+                                     @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
+                                     @Context HttpServletRequest request, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData,
+                                     @QueryParam("showArchived") String showArchived) {
+
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
@@ -177,6 +170,7 @@ public class ODMClinicaDataResource {
         // JSONClinicalDataPostProcessor(LocaleResolver.getLocale(request));
         // processor.process(json);
 
+
         return json.toString(INDENT_LEVEL);
     }
 
@@ -207,9 +201,9 @@ public class ODMClinicaDataResource {
     @GET
     @Path("/html/print/{studyOID}/{studySubjectIdentifier}/{eventOID}/{formVersionOID}")
     public Viewable getPrintCRFController(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
-            @PathParam("studySubjectIdentifier") String studySubjectIdentifier, @PathParam("eventOID") String eventOID,
-            @PathParam("formVersionOID") String formVersionOID, @DefaultValue("n") @QueryParam("includeDNs") String includeDns,
-            @DefaultValue("n") @QueryParam("includeAudits") String includeAudits) throws Exception {
+                                          @PathParam("studySubjectIdentifier") String studySubjectIdentifier, @PathParam("eventOID") String eventOID,
+                                          @PathParam("formVersionOID") String formVersionOID, @DefaultValue("n") @QueryParam("includeDNs") String includeDns,
+                                          @DefaultValue("n") @QueryParam("includeAudits") String includeAudits) throws Exception {
         request.setCharacterEncoding("UTF-8");
         request.setAttribute("studyOID", studyOID);
         request.setAttribute("studySubjectOID", getStudySubjectOID(studySubjectIdentifier, studyOID));
@@ -219,8 +213,10 @@ public class ODMClinicaDataResource {
         request.setAttribute("includeDNs", includeDns);
         return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
     }
+/*
 
-    /**
+    */
+/**
      * @api {get} /rest/clinicaldata/xml/view/:study/:subject/:event/:form Retrieve case report forms - XML
      * @apiVersion 3.8.0
      * @apiName getODMMetadata
@@ -247,11 +243,12 @@ public class ODMClinicaDataResource {
     @GET
     @Path("/xml/view/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}")
     @Produces(MediaType.TEXT_XML)
-    public String getODMMetadata(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
-            @PathParam("studySubjectIdentifier") String studySubjectIdentifier, @PathParam("studyEventOID") String studyEventOID,
-            @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
-            @Context HttpServletRequest request, String userAccountID, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData,
-            @QueryParam("showArchived") String showArchived) {
+    public String getODMXMLClinicaldata(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
+                                        @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
+                                        @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
+                                        @Context HttpServletRequest request, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData,
+                                        @QueryParam("showArchived") String showArchived) {
+
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
         boolean includeAudit = false;
@@ -262,15 +259,6 @@ public class ODMClinicaDataResource {
             archived = false;
         if (showArchived != null && (showArchived.equalsIgnoreCase("yes") || showArchived.equalsIgnoreCase("y")))
             archived = true;
-
-        int userId = 0;
-        UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-        if (userBean != null) {
-            userId = userBean.getId();
-        } else {
-            userId = Integer.valueOf(userAccountID);
-            userBean = (UserAccountBean) new UserAccountDAO(dataSource).findByPK(userId);
-        }
 
         if (clinicalData.equalsIgnoreCase("no") || clinicalData.equalsIgnoreCase("n"))
             crossForm = false;
@@ -284,10 +272,20 @@ public class ODMClinicaDataResource {
             includeDN = true;
         if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
             includeAudit = true;
+
+        int userId = 0;
+        UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+        if (userBean != null) {
+            userId = userBean.getId();
+        } else {
+            userBean = (UserAccountBean) new UserAccountDAO(dataSource).findByPK(userId);
+            userId = userBean.getId();
+        }
         StudyDAO sdao = new StudyDAO(getDataSource());
         StudyBean studyBean = sdao.findByOid(studyOID);
         String permissionTagsString="";
         String[] permissionTagsStringArray;
+
         if(crossForm) {
             permissionTagsString=loadPermissionTagsString();
             permissionTagsStringArray=loadPermissionTagsStringArray();
@@ -298,10 +296,12 @@ public class ODMClinicaDataResource {
 
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId,crossForm),
-                crossForm, archived,permissionTagsString);
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId, crossForm),
+                crossForm, archived ,permissionTagsString);
+        if (report.getClinicalDataMap() == null)
+            return null;
 
-        report.createOdmXml(true, crossForm, getDataSource(), userBean, permissionTagsStringArray);
+        report.createOdmXml(true, crossForm, getDataSource(), userBean,permissionTagsStringArray);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();
