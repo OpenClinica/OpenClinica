@@ -45,6 +45,8 @@ public class StudyUserRoleBean extends AuditableEntityBean {
     // is authoritative
     // this is only provided as a convenience
     private int parentStudyId = 0;
+    // FR 2018-09-20: added for view ListUserAccounts
+    private String parentStudyName = "";
 
     private String lastName = ""; // not in the DB,not guaranteed to have a
     // value
@@ -180,8 +182,16 @@ public class StudyUserRoleBean extends AuditableEntityBean {
     public void setParentStudyId(int parentStudyId) {
         this.parentStudyId = parentStudyId;
     }
+    // FR 2018-09-20: added for view ListUserAccounts
+    public String getParentStudyName() {
+		return parentStudyName;
+	}
+    // FR 2018-09-20: added for view ListUserAccounts
+	public void setParentStudyName(String parentStudyName) {
+		this.parentStudyName = parentStudyName;
+	}
 
-    @Override
+	@Override
     public String getName() {
         if (role != null) {
             return role.getName();

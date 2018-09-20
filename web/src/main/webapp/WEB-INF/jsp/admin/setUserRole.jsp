@@ -67,21 +67,25 @@
            <c:choose>
            <c:when test="${userStudy.parentStudyId > 0}">
                 <c:choose>
-                <c:when test="${studyId==userStudy.id}">
-                   <option value="<c:out value="${userStudy.id}"/>" selected>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${userStudy.name}"/>
-                </c:when>
-                <c:otherwise>
-                   <option value="<c:out value="${userStudy.id}"/>">&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${userStudy.name}"/>
-                </c:otherwise>
+	                <c:when test="${studyId==userStudy.id}">
+    	               <% // -- FR 2018-09-20 add prefix 'parentStudyName' if study has parent   -- %>
+        	           <option value="<c:out value="${userStudy.id}"/>" selected>&nbsp;&nbsp;<c:out value="${userStudy.abbreviatedParentStudyName}"/>&nbsp;=&nbsp;<c:out value="${userStudy.name}"/><!-- (<c:out value="${userStudy.identifier}" />) -->
+            	    </c:when>
+                	<c:otherwise>
+	                   <% // -- FR 2018-09-20 add prefix 'parentStudyName' if study has parent   -- %>
+    	               <option value="<c:out value="${userStudy.id}"/>">&nbsp;&nbsp;<c:out value="${userStudy.abbreviatedParentStudyName}"/>&nbsp;=&nbsp;<c:out value="${userStudy.name}"/><!-- (<c:out value="${userStudy.identifier}" />) -->
+        	        </c:otherwise>
                 </c:choose>
            </c:when>
            <c:otherwise>
                 <c:choose>
                    <c:when test="${studyId==userStudy.id}">
-                       <option value="<c:out value="${userStudy.id}"/>" selected><c:out value="${userStudy.name}"/>
+            	       <% // -- FR 2018-09-20 add prefix 'parentStudyName' if study has parent   -- %>
+                       <option value="<c:out value="${userStudy.id}"/>" selected><c:out value="${userStudy.name}"/><!-- (<c:out value="${userStudy.identifier}" />) -->
                    </c:when>
                    <c:otherwise>
-                       <option value="<c:out value="${userStudy.id}"/>"><c:out value="${userStudy.name}"/>
+                	   <% // -- FR 2018-09-20 add prefix 'parentStudyName' if study has parent   -- %>
+                       <option value="<c:out value="${userStudy.id}"/>"><c:out value="${userStudy.name}"/><!-- (<c:out value="${userStudy.identifier}" />) -->
                    </c:otherwise>
                 </c:choose>
            </c:otherwise>

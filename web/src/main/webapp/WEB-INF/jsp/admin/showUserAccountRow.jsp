@@ -108,7 +108,15 @@
 		<c:forEach var="sur" items="${currRow.bean.roles}">
 			<c:choose>
 				<c:when test='${sur.studyName != ""}'>
-					<c:set var="study" value="${sur.studyName}" />
+				    <% // -- FR 2018-09-20 add prefix 'parentStudyName' if study has parent   -- %>
+				    <c:choose>
+					    <c:when test='${sur.parentStudyName != ""}'>
+						    <c:set var="study" value="${sur.parentStudyName} = ${sur.studyName}" />
+						</c:when>
+						<c:otherwise>
+						    <c:set var="study" value="${sur.studyName}" />
+						</c:otherwise>
+					</c:choose>
 				</c:when>
 				<c:otherwise>
 					<c:set var="study" value="Study ${sur.studyId}" />				
@@ -138,15 +146,28 @@
 			<c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
 			<tr valign="top">
 				<td class="table_cell_left">&nbsp;</td>
-				<td class="table_cell" colspan="3" >
+				<% // -- FR 2018-09-20 studyname and role in different columns  -- %>
+				<td class="table_cell" colspan="2" >
 					<c:if test='${sur.status.deleted}'>
 						<font color='gray'>
 					</c:if>
 					<c:choose>
-						<c:when test='${sur.studyName != ""}'><c:out value="${sur.studyName}" /></c:when>
+						<c:when test='${sur.studyName != ""}'>
+	                   <% // -- FR 2018-09-20 add prefix 'parentStudyName' if study has parent   -- %>
+						<c:choose>
+	                        <c:when test='${sur.parentStudyName != ""}'>
+					            &nbsp;&nbsp;<c:out value="${sur.parentStudyName}"/>&nbsp;=&nbsp;<c:out value="${sur.studyName}" />
+					        </c:when>
+					        <c:otherwise>
+					            <c:out value="${sur.studyName}" />
+					        </c:otherwise>
+					        </c:choose>
+						</c:when>
 						<c:otherwise>Study <c:out value="${sur.studyId}" /></c:otherwise>
 					</c:choose>
-					- 
+				<% // -- FR 2018-09-20 studyname and role in different columns  -- %>
+			    </td>
+				<td class="table_cell" > 
 					  <c:if test="${sur.parentStudyId > 0}">
                         <fmt:message key="${siteRoleMap[sur.role.id] }" bundle="${resterm}"></fmt:message>
                       </c:if>

@@ -113,6 +113,9 @@ public class CoreResources implements ResourceLoaderAware {
 
             String dataInfoPropFileName = filePath + "/datainfo.properties";
             String extractPropFileName = filePath + "/extract.properties";
+            // FR 2018-09-20: to determine correct config location; useful when working with different configs 
+            System.err.println(dataInfoPropFileName);
+            System.err.println(extractPropFileName);
 
             Properties OC_dataDataInfoProperties = getPropValues(dataInfoProp, dataInfoPropFileName);
             Properties OC_dataExtractProperties = getPropValues(extractProp, extractPropFileName);
