@@ -26,7 +26,7 @@ public class LoginController {
         if (port != 80 && port != 443) {
             portStr = ":" + port;
         }
-        String redirectUri = keycloakController.buildAuthorizeUrl(req, true);
+        String redirectUri = keycloakController.buildAuthorizeUrl(req);
         try {
             res.sendRedirect(redirectUri);
         } catch (IOException e) {

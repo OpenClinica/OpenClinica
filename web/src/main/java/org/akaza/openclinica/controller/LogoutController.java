@@ -45,7 +45,7 @@ public class LogoutController {
         if (port != 80 && port != 443) {
             portStr = ":" + port;
         }
-        String redirectUri = "https://cust1.build01.dev.openclinica.io//#/account-study";
+        String redirectUri = req.getScheme() + "://" + req.getServerName() + portStr + req.getContextPath() + "/MainMenu";
         String authUrl = coreAuthUrl + "/realms/" + authzClient.getConfiguration().getRealm()
                 + "/protocol/openid-connect/logout?&redirect_uri=" + redirectUri;
         HttpSession session = req.getSession();

@@ -1,10 +1,10 @@
 {
-  "realm": "cust1",
+  "realm": "cust1-aws-dev",
   "auth-server-url": "https://keycloak.dev.openclinica.io/auth",
   "ssl-required": "external",
   "resource": "bridge",
   "credentials": {
-    "secret": "619cb119-912b-4ce7-b92f-2eedf104dd36"
+    "secret": "599cbed3-fa29-471d-a2bf-6caa0fdab88e"
   },
   "confidential-port": 0,
   "policy-enforcer": {}

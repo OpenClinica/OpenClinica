@@ -18,7 +18,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.controller.Auth0Controller;
+import org.akaza.openclinica.controller.KeycloakController;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.core.SessionManager;
@@ -465,8 +465,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     SecurityContextHolder.clearContext();
                     ServletContext context = getServletContext();
                     WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-                    Auth0Controller controller = (Auth0Controller) webApplicationContext .getBean("auth0Controller");
-                    String authorizeUrl = controller.buildAuthorizeUrl(request, false/* don't do SSO, SSO already failed */);
+                    KeycloakController controller = (KeycloakController) webApplicationContext .getBean("keycloakController");
+                    String authorizeUrl = controller.buildAuthorizeUrl(request);
                     logger.info("Secure" +
                             "" +
                             "" +

@@ -18,6 +18,7 @@ import org.springframework.boot.web.servlet.FilterRegistrationBean;
 import org.springframework.context.annotation.*;
 import org.springframework.context.support.PropertySourcesPlaceholderConfigurer;
 import org.springframework.core.annotation.Order;
+import org.springframework.security.config.annotation.authentication.builders.AuthenticationManagerBuilder;
 import org.springframework.security.config.annotation.method.configuration.EnableGlobalMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.http.SessionCreationPolicy;
@@ -51,7 +52,8 @@ import java.net.URL;
 @KeycloakConfiguration
 @EnableGlobalMethodSecurity(prePostEnabled = true)
 @PropertySources({
-        @PropertySource("classpath:auth0.properties")
+        @PropertySource("classpath:auth0.properties"),
+        @PropertySource("classpath:datainfo.properties")
 })
 @Order(SecurityProperties.ACCESS_OVERRIDE_ORDER)
 
@@ -77,6 +79,8 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
     @Value(value = "${auth0.securedRoute}")
     private String securedRoute;
 
+    @Value(value = "${SBSUrl}")
+    private String sbsUrl;
 
     @Autowired
     public void configureGlobal(AuthenticationManagerBuilder auth) throws Exception {
@@ -85,48 +89,15 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         keycloakAuthenticationProvider.setGrantedAuthoritiesMapper(new SimpleAuthorityMapper());
         auth.authenticationProvider(keycloakAuthenticationProvider);
     }
-
-    @Autowired
-    public KeycloakClientRequestFactory keycloakClientRequestFactory;
-
-    @Bean
-    public FilterRegistrationBean keycloakAuthenticationProcessingFilterRegistrationBean(
-            KeycloakAuthenticationProcessingFilter filter) {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
-        registrationBean.setEnabled(false);
-        return registrationBean;
+/*
+    @Override
+    protected AuthenticationEntryPoint authenticationEntryPoint() throws Exception {
+        KeycloakAuthenticationEntryPoint authenticationEntryPoint = new KeycloakAuthenticationEntryPoint(this.adapterDeploymentContext());
+        authenticationEntryPoint.setLoginUri("/pages/ocLogin");
+        return authenticationEntryPoint;
     }
+*/
 
-    @Value(value = "${SBSUrl}")
-    private String sbsUrl;
-
-    @Bean
-    public FilterRegistrationBean keycloakPreAuthActionsFilterRegistrationBean(
-            KeycloakPreAuthActionsFilter filter) {
-        FilterRegistrationBean registrationBean = new FilterRegistrationBean(filter);
-        registrationBean.setEnabled(false);
-        return registrationBean;
-    }
-
-    @Bean
-    @Scope(ConfigurableBeanFactory.SCOPE_PROTOTYPE)
-    public KeycloakRestTemplate keycloakRestTemplate() {
-        return new KeycloakRestTemplate(keycloakClientRequestFactory);
-    }
-
-    @Bean
-    @Scope(scopeName = WebApplicationContext.SCOPE_REQUEST,
-            proxyMode = ScopedProxyMode.TARGET_CLASS)
-    public RefreshableKeycloakSecurityContext getKeycloakSecurityContext() {
-        HttpServletRequest request =
-                ((ServletRequestAttributes) RequestContextHolder
-                        .currentRequestAttributes()).getRequest();
-        if (request.getAttribute(KeycloakSecurityContext.class.getName()) != null) {
-            RefreshableKeycloakSecurityContext context = (RefreshableKeycloakSecurityContext) request.getAttribute(KeycloakSecurityContext.class.getName());
-            return context;
-        }
-        return null;
-    }
     @Bean
     @Override
     protected SessionAuthenticationStrategy sessionAuthenticationStrategy() {
@@ -146,21 +117,17 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
                         "/js/**",
                         "/callback", "/login",
                         "/pages/customer-service/**",
-                        "/pages/callback",
-                        "/pages/login",
-                        "/pages/resetOCAppTimeout"
-,                       "/pages/logout",
+                        "/pages/ocLogin",
+                        "/pages/resetOCAppTimeout",
+                        "/pages/logout",
                         "/pages/invalidateAuth0Token",
                         "/pages/auth/api/**",
                         "/pages/studyversion/**",
                         "/rest2/openrosa/**",
-                        "/sso/login",
-                        "/pages/sso/login",
                         "/pages/odmk/**",
                         "/pages/openrosa/**",
                         "/pages/accounts/**",
                         "/pages/itemdata/**",
-
                         "/pages/odmss/**",
                         "/pages/v2/api-docs",
                         "/pages/swagger-resources/**"

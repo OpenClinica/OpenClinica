@@ -3,9 +3,7 @@ package org.akaza.openclinica.controller;
 import net.sf.json.util.JSONUtils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.service.Auth0User;
 import org.akaza.openclinica.service.CallbackService;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.lang.StringUtils;
@@ -15,7 +13,6 @@ import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.keycloak.representations.AccessToken;
-import org.keycloak.representations.IDToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -26,13 +23,11 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
-import javax.inject.Inject;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
 import java.io.IOException;
 import java.security.Principal;
-import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.Map;
 import java.util.Set;
@@ -46,6 +41,8 @@ public class CallbackController {
 
     @Autowired
     CallbackService callbackService;
+    @Autowired
+    KeycloakController keycloakController;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -62,12 +59,12 @@ public class CallbackController {
         this.redirectOnSuccess = "/MainMenu";
     }
 
-    @RequestMapping(value = "/sso/login", method = RequestMethod.GET)
+    @RequestMapping(value = "/login", method = RequestMethod.GET)
     protected void getCallback(final HttpServletRequest req, final HttpServletResponse res) throws Exception {
         handle(req, res);
     }
 
-    @RequestMapping(value = "/sso/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
+    @RequestMapping(value = "/login", method = RequestMethod.POST, consumes = MediaType.APPLICATION_FORM_URLENCODED_VALUE)
     protected void postCallback(final HttpServletRequest req, final HttpServletResponse res) throws Exception {
         handle(req, res);
     }
@@ -75,7 +72,11 @@ public class CallbackController {
     private void handle(HttpServletRequest req, HttpServletResponse res) throws Exception {
         final Principal userPrincipal = req.getUserPrincipal();
 
-        if (userPrincipal instanceof KeycloakAuthenticationToken) {
+        if (userPrincipal == null) {
+            String authorizeUrl = keycloakController.buildAuthorizeUrl(req);
+            logger.info("CallbackController In login_required:%%%%%%%%" + authorizeUrl);
+            res.sendRedirect(authorizeUrl);
+        } else if (userPrincipal instanceof KeycloakAuthenticationToken) {
 
             KeycloakPrincipal<KeycloakSecurityContext> kp = (KeycloakPrincipal<KeycloakSecurityContext>) ((KeycloakAuthenticationToken) userPrincipal).getPrincipal();
             AccessToken token = kp.getKeycloakSecurityContext().getToken();

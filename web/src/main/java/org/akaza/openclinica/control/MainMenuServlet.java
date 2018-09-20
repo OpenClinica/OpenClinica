@@ -19,7 +19,6 @@ import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFact
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
-import org.akaza.openclinica.controller.Auth0Controller;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
