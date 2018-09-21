@@ -950,6 +950,8 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
 
 			int parentStudyId = study.getParentStudyId();
 			if (parentStudyId > 0) { // study is a child
+				// FR 2018-09-20: retrieve and set parentStudyName
+				study.setParentStudyName(findByPK(parentStudyId).getName());
 				answer = addChildToParent(answer, parentStudyId, study);
 			}
 		}

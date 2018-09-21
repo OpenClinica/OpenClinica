@@ -8,6 +8,17 @@
 <jsp:useBean scope="request" id="currRow" class="org.akaza.openclinica.web.bean.UserAccountRow" />
 
 <tr valign="top" bgcolor="#F5F5F5">
+	<% // -- FR 2018-09-21: colorize user status -- %> 
+	<c:set var="className" value=""/>
+	<c:choose>
+	  <c:when test="${currRow.bean.status.available}">
+    	<c:set var="className" value="aka_green_highlight"/>
+	  </c:when>
+	  <c:when test="${currRow.bean.status.deleted}">
+	    <c:set var="className" value="aka_red_highlight"/>
+	  </c:when>
+	</c:choose>
+
 	<td class="table_cell_left">
 		<c:choose>
 			<c:when test='${currRow.bean.status.deleted}'>
@@ -20,7 +31,8 @@
 	</td>
 	<td class="table_cell"><c:out value="${currRow.bean.firstName}" /></td>
 	<td class="table_cell"><c:out value="${currRow.bean.lastName}" /></td>
-	<td class="table_cell"><c:out value="${currRow.bean.status.name}" /></td>
+	<% // -- FR 2018-09-21: colorize user status -- %> 
+	<td class="table_cell <c:out value='${className}'/> "><c:out value="${currRow.bean.status.name}" /></td>
 	
 	<%-- ACTIONS --%>
 	<td class="table_cell">
@@ -106,6 +118,16 @@
 	</c:when>
 	<c:otherwise>
 		<c:forEach var="sur" items="${currRow.bean.roles}">
+		<% // -- FR 2018-09-21: colorize study status -- %> 
+		<c:set var="studyClassName" value=""/>
+		<c:choose>
+          <c:when test="${sur.studyStatus.available}">
+		    <c:set var="studyClassName" value="aka_green_highlight"/>
+		  </c:when>
+		  <c:when test="${sur.studyStatus.deleted}">
+		    <c:set var="studyClassName" value="aka_red_highlight"/>
+		  </c:when>
+		</c:choose>
 			<c:choose>
 				<c:when test='${sur.studyName != ""}'>
 				    <% // -- FR 2018-09-20 add prefix 'parentStudyName' if study has parent   -- %>
@@ -145,7 +167,8 @@
 			</c:set>
 			<c:set var="onClick" value="return confirm('${confirmQuestion}');"/>
 			<tr valign="top">
-				<td class="table_cell_left">&nbsp;</td>
+				<% // -- FR 2018-09-21 print and colorize studystatus -- %>
+				<td class="table_cell_left <c:out value='${sur.studyStatusCSS}'/> <c:out value='${studyClassName}'/>">&nbsp;&nbsp;&nbsp;&nbsp;<c:out value='${sur.studyStatus.name}'/></td>
 				<% // -- FR 2018-09-20 studyname and role in different columns  -- %>
 				<td class="table_cell" colspan="2" >
 					<c:if test='${sur.status.deleted}'>
@@ -156,7 +179,7 @@
 	                   <% // -- FR 2018-09-20 add prefix 'parentStudyName' if study has parent   -- %>
 						<c:choose>
 	                        <c:when test='${sur.parentStudyName != ""}'>
-					            &nbsp;&nbsp;<c:out value="${sur.parentStudyName}"/>&nbsp;=&nbsp;<c:out value="${sur.studyName}" />
+					            <c:out value="${sur.parentStudyName}"/>&nbsp;=&nbsp;<c:out value="${sur.studyName}" />
 					        </c:when>
 					        <c:otherwise>
 					            <c:out value="${sur.studyName}" />
@@ -167,16 +190,17 @@
 					</c:choose>
 				<% // -- FR 2018-09-20 studyname and role in different columns  -- %>
 			    </td>
-				<td class="table_cell" > 
+				<td class="table_cell" >
+					<% // -- FR 2018-09-21: colorize user red if deleted -- %> 
+					<c:if test='${sur.status.deleted}'>
+						<font color='red'>
+					</c:if>
 					  <c:if test="${sur.parentStudyId > 0}">
                         <fmt:message key="${siteRoleMap[sur.role.id] }" bundle="${resterm}"></fmt:message>
                       </c:if>
                       <c:if test="${sur.parentStudyId == 0}">
                         <fmt:message key="${studyRoleMap[sur.role.id] }" bundle="${resterm}"></fmt:message>
                       </c:if>
-					<c:if test='${sur.status.deleted}'>
-						</font>
-					</c:if>
 				</td>
 				<td class="table_cell">
 					<c:if test='${!sur.status.deleted}'>

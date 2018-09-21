@@ -47,6 +47,10 @@ public class StudyUserRoleBean extends AuditableEntityBean {
     private int parentStudyId = 0;
     // FR 2018-09-20: added for view ListUserAccounts
     private String parentStudyName = "";
+    // FR 2018-09-21: used for CSS 
+    private Status studyStatus;
+
+
 
     private String lastName = ""; // not in the DB,not guaranteed to have a
     // value
@@ -191,6 +195,30 @@ public class StudyUserRoleBean extends AuditableEntityBean {
 		this.parentStudyName = parentStudyName;
 	}
 
+    // FR 2018-09-21: used for css-formatting
+    public Status getStudyStatus() {
+		return studyStatus;
+	}
+
+    // FR 2018-09-21: used for css-formatting
+    public void setStudyStatus(Status studyStatus) {
+		this.studyStatus = studyStatus;
+	}
+
+    // FR 2018-09-21: used for css-formatting
+    public String getStudyStatusCSS(){
+    	String ret = "STUDY_StudyStatusMissing";
+    	try{
+    		ret ="STUDY_"+studyStatus.getName().replaceAll("\\W", "_");
+    	}catch (Exception e){
+    		// FR: if studyStatus is not set we have to find where it has to be set!!!
+    		System.err.println("StudyStatus:"+((studyStatus!=null)?(studyStatus.getId()+" - "+studyStatus.getName()):studyStatus));
+    		e.printStackTrace();
+    	}
+    	return ret;
+    }
+
+	
 	@Override
     public String getName() {
         if (role != null) {

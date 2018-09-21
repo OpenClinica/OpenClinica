@@ -105,6 +105,8 @@ public class ChangeStudyServlet extends SecureController {
             if (study != null && study.getStatus().equals(Status.PENDING)) {
                 sr.setStatus(study.getStatus());
             }
+            //FR: 2018-09-21 hold StudyStatus for CSS
+            sr.setStudyStatus(study.getStatus());
             validStudies.add(sr);
         }
 

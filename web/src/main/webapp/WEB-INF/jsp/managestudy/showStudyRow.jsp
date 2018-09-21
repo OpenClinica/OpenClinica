@@ -25,7 +25,8 @@
       <td class="table_cell"><c:out value="${currRow.bean.parent.principalInvestigator}"/></td>  
       <td class="table_cell"><c:out value="${currRow.bean.parent.facilityName}"/>&nbsp;</td> 
       <td class="table_cell"><fmt:formatDate value="${currRow.bean.parent.createdDate}" pattern="${dteFormat}"/></td>
-      <td class="table_cell <c:out value='${className}'/>"><c:out value="${currRow.bean.parent.status.name}"/></td> 
+      <% // -- FR 2018-09-21: colorize study status -- %> 
+      <td class="table_cell <c:out value='${className}'/> <c:out value='${currRow.bean.parent.studyStatusCSS}'/> "><c:out value="${currRow.bean.parent.status.name}"/></td> 
       <td class="table_cell">
        <table border="0" cellpadding="0" cellspacing="0">
 	    <tr>
@@ -71,7 +72,8 @@
       <td class="table_cell"><c:out value="${child.principalInvestigator}"/></td>  
       <td class="table_cell"><c:out value="${child.facilityName}"/>&nbsp;</td> 
       <td class="table_cell"><fmt:formatDate value="${child.createdDate}" pattern="${dteFormat}"/></td>
-      <td class="table_cell <c:out value='${className}'/>"><c:out value="${child.status.name}"/></td>
+      <% // -- FR 2018-09-21: if not colorize site status then don't print any output; instead put placeholder -- %> 
+      <td class="table_cell <c:out value='${className}'/> <c:out value='${child.studyStatusCSS}'/> "><c:out value="${child.status.name}"/></td>
       <td class="table_cell">
         <table border="0" cellpadding="0" cellspacing="0">
 	    <tr>

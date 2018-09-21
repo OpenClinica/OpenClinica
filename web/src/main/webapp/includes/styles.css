@@ -2133,3 +2133,30 @@ margin: 2px;;
 
 #excel_file_path{ width: 307px; 
 }
+
+/* FR 2018-09-21: added several classes to colorize study status  */
+.STUDY_available {
+	background-color: inherit;
+}
+
+.STUDY_pending {
+	background-color: #f9d2f9; /* violet 90% */
+}
+
+.STUDY_frozen {
+	background-color: #99ffff; /* cyan 80% */
+}
+
+.STUDY_locked {
+	background-color: #ffc966; /* orange 70 % */ 
+}
+
+.STUDY_removed {
+	background-color: inherit;
+}
+
+/* FR 2018-09-21: needed to beautify view study status at changestudy-view */
+.table_cell_cont {
+    border-left-width: 0;
+    vertical-align: bottom;
+}

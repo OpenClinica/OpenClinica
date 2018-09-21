@@ -655,6 +655,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
         this.setTypeExpected(3, TypeNames.STRING);
         HashMap allStudyUserRoleBeans = new HashMap();
 
+        //FR 2018-09-21: moved from below
+        StudyDAO sdao = new StudyDAO(ds);
+
         HashMap variables = new HashMap();
         variables.put(new Integer(1), userName);
         ArrayList alist = this.select(digester.getQuery("findStudyByUser"), variables);
@@ -669,6 +672,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
             sur.setRoleName(roleName);
             sur.setStudyId(studyId.intValue());
             sur.setStudyName(studyName);
+            // FR 2018-09-21: set StudyStatus for several views
+            sur.setStudyStatus(((StudyBean)sdao.findByPK(sur.getStudyId())).getStatus());
             allStudyUserRoleBeans.put(studyId, sur);
         }
 
@@ -685,8 +690,6 @@ public class UserAccountDAO extends AuditableEntityDAO {
         // add the user's role in C to the answer
 
         ArrayList answer = new ArrayList();
-
-        StudyDAO sdao = new StudyDAO(ds);
 
         HashMap childrenByParentId = sdao.getChildrenByParentIds(allStudies);
 
@@ -913,6 +916,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
         // order by ua.date_created asc
         this.unsetTypeExpected();
 
+        //FR 2018-09-21: needed to retrieve parentStudyName
+        StudyDAO sdao =  new StudyDAO(ds);
+        
         this.setTypeExpected(1, TypeNames.STRING);
         this.setTypeExpected(2, TypeNames.STRING);
         this.setTypeExpected(3, TypeNames.STRING);
@@ -946,6 +952,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
             Integer statusId = (Integer) hm.get("status_id");
             Date dateUpdated = (Date) hm.get("date_updated");
 
+            //FR 2018-09-21: retrieve parentStudyName
+            if (surb.getParentStudyId() > 0){
+              surb.setParentStudyName(sdao.findByPK(surb.getParentStudyId()).getName());
+            }
             surb.setUpdatedDate(dateUpdated);
             surb.setStatus(Status.get(statusId.intValue()));
             answer.add(surb);
@@ -962,7 +972,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
      */
     public ArrayList findAllAssignedUsersByStudy(int studyId) {
         this.unsetTypeExpected();
-
+        //FR 2018-09-21: needed to retrieve parentStudyName
+        StudyDAO sdao = new StudyDAO(ds);
+        
         this.setTypeExpected(1, TypeNames.STRING);
         this.setTypeExpected(2, TypeNames.STRING);
         this.setTypeExpected(3, TypeNames.STRING);
@@ -998,6 +1010,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
             surb.setUpdatedDate(dateUpdated);
             surb.setStatus(Status.get(statusId.intValue()));
+            //FR 2018-09-21: retrieve parentStudyName
+            if (surb.getParentStudyId() > 0){
+                surb.setParentStudyName(sdao.findByPK(surb.getParentStudyId()).getName());
+              }
             answer.add(surb);
         }
 
@@ -1022,6 +1038,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
         ArrayList answer = new ArrayList();
 
+        //FR 2018-09-21: needed to retrieve parentStudyName
+        StudyDAO sdao = new StudyDAO(ds);
+        
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studyId));
         variables.put(new Integer(2), new Integer(parentStudyId));
@@ -1042,6 +1061,10 @@ public class UserAccountDAO extends AuditableEntityDAO {
             Integer statusId = (Integer) hm.get("status_id");
             Date dateUpdated = (Date) hm.get("date_updated");
 
+            //FR 2018-09-21: retrieve parentStudyName
+            if (surb.getParentStudyId() > 0){
+                surb.setParentStudyName(sdao.findByPK(surb.getParentStudyId()).getName());
+              }
             surb.setUpdatedDate(dateUpdated);
             surb.setStatus(Status.get(statusId.intValue()));
             answer.add(surb);

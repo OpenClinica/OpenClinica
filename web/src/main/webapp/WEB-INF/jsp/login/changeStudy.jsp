@@ -71,7 +71,12 @@
      <table border="0" cellpadding="0" cellspacing="0" width="100%">
        <c:forEach var="studyRole" items="${studies}">
            <c:set var="statusId" value="${studyRole.status.id}"/>
-        <c:choose>
+           <% // -- FR 2018-09-21: colorize study status only for roles who can manage studies or monitor studies-- %> 
+           <c:set var="studyStatusCSS" value=""/>
+           <c:if test="${studyRole.manageStudy || studyRole.monitor}">
+               <c:set var="studyStatusCSS" value="${studyRole.studyStatusCSS}"/>
+           </c:if>
+         <c:choose>
          <c:when test="${study.id == studyRole.studyId}">
 
            <c:choose>
@@ -83,6 +88,12 @@
                    <c:out value="${studyRole.studyName}"/>
                        <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
                        (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>) </td>
+                       <% // -- FR 2018-09-21: if not colorize study status then don't print any output; instead put placeholder -- %> 
+                       <c:choose> 
+                          <c:when test="${studyStatusCSS!=''}"><td class="table_cell table_cell_cont <c:out value='${studyStatusCSS}'/>" >&nbsp;&nbsp;<c:out value='${studyRole.studyStatus.name}'/></td></c:when>
+                          <c:otherwise><td class=" "></td></c:otherwise>
+                       </c:choose>
+                       <td class="table_cell table_cell_cont">&nbsp;</td>
                  </tr>
                </c:if>
             </c:when>
@@ -92,10 +103,19 @@
                  <td class="table_cell">
                      <input type="radio" checked name="studyId" value="<c:out value="${studyRole.studyId}"/>">
                  <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
+                       <% // -- FR 2018-09-21: if not colorize study status then don't print any output; instead put placeholder -- %> 
+                       <c:choose> 
+                          <c:when test="${studyStatusCSS!=''}"><td class="table_cell table_cell_cont <c:out value='${studyStatusCSS}'/>" >&nbsp;&nbsp;<c:out value='${studyRole.studyStatus.name}'/></td></c:when>
+                          <c:otherwise><td class=" "></td></c:otherwise>
+                       </c:choose>
+                       <td class="table_cell table_cell_cont">&nbsp;</td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">
-                 <tr><td class="table_cell"><b>&nbsp;<c:out value="${studyRole.studyName}"/></b></td></tr>
+                 <tr><td class="table_cell"><b>&nbsp;<c:out value="${studyRole.studyName}"/></b></td>
+                 <% // -- FR 2018-09-21: put placeholder -- %> 
+                 <td class="table_cell table_cell_cont"></td><td class="table_cell table_cell_cont">&nbsp;</td>
+                 </tr>
                </c:if>
             </c:otherwise>
            </c:choose>
@@ -112,6 +132,12 @@
                       <c:out value="${studyRole.studyName}"/>
                       <c:if test="${statusId==4}">(Design)&nbsp;</c:if>
                       (<fmt:message key="${siteRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</td>
+                       <% // -- FR 2018-09-21: if not colorize study status then don't print any output; instead put placeholder -- %> 
+                       <c:choose> 
+                          <c:when test="${studyStatusCSS!=''}"><td class="table_cell table_cell_cont <c:out value='${studyStatusCSS}'/>" >&nbsp;&nbsp;<c:out value='${studyRole.studyStatus.name}'/></td></c:when>
+                          <c:otherwise><td class=" "></td></c:otherwise>
+                       </c:choose>
+                       <td class="table_cell table_cell_cont">&nbsp;</td>
                  </tr>
                </c:if>
             </c:when>
@@ -121,10 +147,19 @@
                   <td class="table_cell">
                       <input type="radio" name="studyId" value="<c:out value="${studyRole.studyId}"/>">
                   <b><c:out value="${studyRole.studyName}"/> (<fmt:message key="${studyRoleMap[studyRole.role.id] }" bundle="${resterm}"></fmt:message>)</b></td>
+                       <% // -- FR 2018-09-21: if not colorize study status then don't print any output; instead put placeholder -- %> 
+                       <c:choose> 
+                          <c:when test="${studyStatusCSS!=''}"><td class="table_cell table_cell_cont <c:out value='${studyStatusCSS}'/>" >&nbsp;&nbsp;<c:out value='${studyRole.studyStatus.name}'/></td></c:when>
+                          <c:otherwise><td class=" "></td></c:otherwise>
+                       </c:choose>
+                       <td class="table_cell table_cell_cont">&nbsp;</td>
                  </tr>
                </c:if>
                 <c:if test="${studyRole.invalid}">
-                 <tr><td class="table_cell"><b>&nbsp;<c:out value="${studyRole.studyName}"/></b></td></tr>
+                 <tr><td class="table_cell"><b>&nbsp;<c:out value="${studyRole.studyName}"/></b></td>
+                 <% // -- FR 2018-09-21: put placeholder -- %> 
+                 <td class="table_cell table_cell_cont"></td><td class="table_cell table_cell_cont">&nbsp;</td>
+                 </tr>
                </c:if>
             </c:otherwise>
            </c:choose>
