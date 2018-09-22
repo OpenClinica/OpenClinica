@@ -76,13 +76,18 @@ public class ViewStudyServlet extends SecureController {
             StudyParameterValueDAO spvdao = new StudyParameterValueDAO(sm.getDataSource());
             String randomizationStatusInOC = spvdao.findByHandleAndStudy(study.getId(), "randomization").getValue();
             String participantStatusInOC = spvdao.findByHandleAndStudy(study.getId(), "participantPortal").getValue();
-            if(participantStatusInOC=="") participantStatusInOC="disabled";
-            if(randomizationStatusInOC=="") randomizationStatusInOC="disabled";
+            // FR: You can't compare Strings with == (only literals); on objects You have to use .equals() 
+            if(participantStatusInOC.equals("")) participantStatusInOC="disabled";
+            if(randomizationStatusInOC.equals("")) randomizationStatusInOC="disabled";
 
-            RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
-            SeRandomizationDTO seRandomizationDTO = randomizationRegistrar.getCachedRandomizationDTOObject(study.getOid(), false);
-
-            if (seRandomizationDTO!=null && seRandomizationDTO.getStatus().equalsIgnoreCase("ACTIVE") && randomizationStatusInOC.equalsIgnoreCase("enabled")){
+            // FR: generate Registrar and DTO only if randomization is enabled
+            SeRandomizationDTO seRandomizationDTO = null;
+            if (randomizationStatusInOC.equalsIgnoreCase("enabled")){
+            	RandomizationRegistrar randomizationRegistrar = new RandomizationRegistrar();
+            	seRandomizationDTO=randomizationRegistrar.getCachedRandomizationDTOObject(study.getOid(), false);
+            }
+            
+            if (seRandomizationDTO!=null && seRandomizationDTO.getStatus().equalsIgnoreCase("ACTIVE")){
                 study.getStudyParameterConfig().setRandomization("enabled");
             }else{
                 study.getStudyParameterConfig().setRandomization("disabled");
