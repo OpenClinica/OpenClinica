@@ -324,23 +324,25 @@ function handleUserSource() {
                             <c:forEach var="study" items="${studies}">
 								<c:choose>
 									<c:when test="${activeStudy == study.id}">
+									    <% // -- FR 2018-09-20 add prefix 'parentStudyName' if study has parent   -- %>
 										<c:choose>
-										<c:when test="${study.parentStudyId>0}">
-											<option value='<c:out value="${study.id}" />' selected>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
-										</c:when>
-										<c:otherwise>
-											<option value='<c:out value="${study.id}" />' selected><c:out value="${study.name}" /></option>
-										</c:otherwise>
+							          		<c:when test="${study.parentStudyId>0}">
+												<option value='<c:out value="${study.id}" />' selected>&nbsp;&nbsp;<c:out value="${study.abbreviatedParentStudyName}"/>&nbsp;=&nbsp;<c:out value="${study.name}" /></option><!-- (<c:out value="${study.identifier}" />) -->
+											</c:when>
+											<c:otherwise>
+												<option value='<c:out value="${study.id}" />' selected><c:out value="${study.name}"  /></option><!-- (<c:out value="${study.identifier}" />) -->
+											</c:otherwise>
 										</c:choose>
 									</c:when>
 									<c:otherwise>
+									    <% // -- FR 2018-09-20 add prefix 'parentStudyName' if study has parent   -- %>
 										<c:choose>
-										<c:when test="${study.parentStudyId>0}">
-											<option value='<c:out value="${study.id}" />'>&nbsp;&nbsp;&nbsp;&nbsp;<c:out value="${study.name}" /></option>
-										</c:when>
-										<c:otherwise>
-											<option value='<c:out value="${study.id}" />'><c:out value="${study.name}" /></option>
-										</c:otherwise>
+											<c:when test="${study.parentStudyId>0}">
+												<option value='<c:out value="${study.id}" />'>&nbsp;&nbsp;<c:out value="${study.abbreviatedParentStudyName}"/>&nbsp;=&nbsp;<c:out value="${study.name}"  /></option><!-- (<c:out value="${study.identifier}" />) -->
+											</c:when>
+											<c:otherwise>
+												<option value='<c:out value="${study.id}" />'><c:out value="${study.name}"  /></option><!-- (<c:out value="${study.identifier}" />) -->
+											</c:otherwise>
 										</c:choose>
 									</c:otherwise>
 								</c:choose>

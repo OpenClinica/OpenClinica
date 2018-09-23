@@ -197,6 +197,8 @@ public class SetUserRoleServlet extends SecureController {
                 sur.setRole(Role.get(roleId));
                 sur.setStudyId(studyId);
                 sur.setStudyName(userStudy.getName());
+                // FR 2018-09-21: set studyStatus for several views
+                sur.setStudyStatus(userStudy.getStatus());
                 sur.setStatus(Status.AVAILABLE);
                 sur.setOwner(ub);
                 sur.setCreatedDate(new Date());

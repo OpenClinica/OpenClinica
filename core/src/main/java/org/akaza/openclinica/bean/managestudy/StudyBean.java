@@ -1089,4 +1089,11 @@ public class StudyBean extends AuditableEntityBean {
         return parentStudyId > 0 ? true : false;
     }
 
+    // FR 2018-09-21: used for css-formatting
+    public String getStudyStatusCSS(){
+    	String ret = "STUDY_"+status.getName().replaceAll("\\W", "_");
+    	return ret;
+    }
+
+
 }

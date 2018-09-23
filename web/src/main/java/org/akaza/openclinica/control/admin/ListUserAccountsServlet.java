@@ -112,6 +112,9 @@ public class ListUserAccountsServlet extends SecureController {
                 if (sb != null) {
                     surb.setStudyName(sb.getName());
                     surb.setParentStudyId(sb.getParentStudyId());
+                    // FR 2018-09-20: set parentStudyName  2018-09-21 and StudyStatus
+                    surb.setParentStudyName(sb.getParentStudyName());
+                    surb.setStudyStatus(sb.getStatus());
                 }
                 roles.set(j, surb);
             }
