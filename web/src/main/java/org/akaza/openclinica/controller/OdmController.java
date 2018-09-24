@@ -266,11 +266,7 @@ public class OdmController {
         String xmlString = sw.toString();
         JSON json = xmlSerializer.read(xmlString);
 
-        JSONClinicalDataPostProcessor processor = new JSONClinicalDataPostProcessor(request.getLocale());
-        processor.process((JSONObject) json);
-
         return json.toString(INDENT_LEVEL);
-
 
     }
 
