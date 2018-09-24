@@ -459,7 +459,8 @@ public class EnketoAPI {
                 // https://jira.openclinica.com/browse/OC-8266 Data Entry Person edits XForms.
                 // https://jira.openclinica.com/browse/OC-7572 Investigator edits XForms.
                 // https://jira.openclinica.com/browse/OC-7571 CRC edits XForms.
-            } else if (flavor.equals(QUERY_FLAVOR) && mode.equals(EDIT_MODE)
+            } else if ((flavor.equals(QUERY_FLAVOR) && mode.equals(EDIT_MODE)
+                    || flavor.equals(PARTICIPATE_FLAVOR) && mode.equals(PARTICIPATE_MODE))
                         && ((!parentStudy.getStatus().equals(Status.FROZEN)
                             || (site != null && !site.getStatus().equals(Status.FROZEN))))
                         && (role == Role.RESEARCHASSISTANT
@@ -494,8 +495,8 @@ public class EnketoAPI {
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
                 // https://jira.openclinica.com/browse/OC-8279 Study Director edits XForms.
                 // https://jira.openclinica.com/browse/OC-8278 Data Manager edits XForms.
-            } else if (((flavor.equals(QUERY_FLAVOR) && mode.equals(EDIT_MODE))
-          || (flavor.equals(PARTICIPATE_FLAVOR) && mode.equals(PARTICIPATE_MODE))  )
+            } else if ((flavor.equals(QUERY_FLAVOR) && mode.equals(EDIT_MODE)
+          || flavor.equals(PARTICIPATE_FLAVOR) && mode.equals(PARTICIPATE_MODE))
                         && ((!parentStudy.getStatus().equals(Status.FROZEN))
                             || (site != null && !site.getStatus().equals(Status.FROZEN)))
                         && (role == Role.STUDYDIRECTOR
@@ -527,8 +528,8 @@ public class EnketoAPI {
                 }
                 shouldLock = true;
                 // https://jira.openclinica.com/browse/OC-8276 Open Form when study is frozen
-            } else if (flavor.equals(QUERY_FLAVOR)
-                        && mode.equals(EDIT_MODE)
+            } else if ((flavor.equals(QUERY_FLAVOR) && mode.equals(EDIT_MODE)
+                     || flavor.equals(PARTICIPATE_FLAVOR) && mode.equals(PARTICIPATE_MODE)  )
                         && ((parentStudy.getStatus().equals(Status.FROZEN))
                                 || (site != null && site.getStatus().equals(Status.FROZEN)))
                         && (role == Role.RESEARCHASSISTANT
@@ -539,7 +540,11 @@ public class EnketoAPI {
                     eURL = new URL(enketoURL + INSTANCE_100_PERCENT_READONLY);
                     lockOn = false;
                 } else {
-                    eURL = new URL(enketoURL + INSTANCE_READONLY_DN);
+                    if(mode.equals(PARTICIPATE_MODE)) {
+                        eURL = new URL(enketoURL + INSTANCE_WRITABLE_PARTICIPATE);
+                    }else{
+                        eURL = new URL(enketoURL + INSTANCE_READONLY_DN);
+                    }
                     lockOn = true;
                 }
 
