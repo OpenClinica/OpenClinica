@@ -92,6 +92,7 @@ public class EnketoUrlService {
     public static final String INSTANCE_SUFFIX = "instance.tpl";
     public static final String FORM_SUFFIX = "form.xml";
     public static final String QUERY_FLAVOR = "-query";
+    public static final String PARTICIPATE_FLAVOR = "-participate";
     public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     public static final String NO_FLAVOR = "";
     public static final String QUERY = "comment";
@@ -239,12 +240,12 @@ public class EnketoUrlService {
         String populatedInstance = "";
         String crfFlavor = "";
         String crfOid = "";
-        if (flavor.equals(QUERY_FLAVOR)) {
+        if(flavor.equals(PARTICIPATE_FLAVOR) || flavor.equals(QUERY_FLAVOR)){
             populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor);
             crfFlavor = flavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
-            crfFlavor = flavor + "[" + idb.getId() + "]";
+            crfFlavor = SINGLE_ITEM_FLAVOR + "[" + idb.getId() + "]";
             markComplete = false;
         }
         crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
@@ -556,7 +557,7 @@ public class EnketoUrlService {
         if (directoryListing != null) {
             for (File child : directoryListing) {
                 if ((flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(INSTANCE_QUERIES_SUFFIX))
-                        || (flavor.equals(NO_FLAVOR) && child.getName().endsWith(INSTANCE_SUFFIX))) {
+                        || ((flavor.equals(NO_FLAVOR)|| flavor.equals(PARTICIPATE_FLAVOR)) && child.getName().endsWith(INSTANCE_SUFFIX))) {
                     templateStr = new String(Files.readAllBytes(Paths.get(child.getPath())));
                     break;
                 }
