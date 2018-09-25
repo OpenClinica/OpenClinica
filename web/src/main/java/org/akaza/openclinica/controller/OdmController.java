@@ -247,25 +247,26 @@ public class OdmController {
 
     @RequestMapping(value = "/auth/api/studies/{studyOid}/events", method = RequestMethod.GET)
     public @ResponseBody String getEvent(@PathVariable("studyOid") String studyOid, HttpServletRequest request) throws Exception {
-        if (!mayProceed(studyOid)) {
-    //        return null;
-        }
+        ODM odm = null;
+        getRestfulServiceHelper().setSchema(studyOid, request);StudyBean currentStudy =getStudy(studyOid);
+
+        if (mayProceed(studyOid)) {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         UserAccountBean ub = getRestfulServiceHelper().getUserAccount(request);
-        StudyBean currentStudy= getRestfulServiceHelper().setSchema(studyOid,request);
-
-        StudySubjectBean studySubject = studySubjectDAO.findByLabelAndStudy(ub.getName(),currentStudy);
-        ODM odm=null;
-        if(studySubject!=null){
-            odm = getODM(studyOid, studySubject.getOid(),ub);
+        StudySubjectBean studySubject = studySubjectDAO.findByLabelAndStudy(ub.getName(), currentStudy);
+        if (studySubject != null && studySubject.isActive() && studySubject.getStatus().isAvailable()) {
+            odm = getODM(studyOid, studySubject.getOid(), ub);
         }
+    }
+
         XMLSerializer xmlSerializer = new XMLSerializer();
         StringWriter sw = new StringWriter();
+        if(odm==null)
+            odm=new ODM();
         JAXB.marshal(odm, sw);
         String xmlString = sw.toString();
         JSON json = xmlSerializer.read(xmlString);
-
         return json.toString(INDENT_LEVEL);
 
     }
@@ -294,8 +295,7 @@ public class OdmController {
 
                 List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
                 StudyBean study = studyDAO.findByOid(studyOID);
-           //     if (!mayProceed(studyOID, studySubjectBean))
-           //         return odm;
+
 
                 List<EventDefinitionCRFBean> eventDefCrfs = participantEventService.getEventDefCrfsForStudyEvent(studySubjectBean, nextEvent);
                 for (EventDefinitionCRFBean eventDefCrf : eventDefCrfs) {
@@ -524,22 +524,32 @@ public class OdmController {
         return accessPermission;
     }
 
-    private boolean mayProceed(String studyOid) throws Exception {
+    private boolean mayProceed_Original(String studyOid) throws Exception {
         boolean accessPermission = false;
         StudyBean study = getParentStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
-  //      participantPortalRegistrar = new ParticipantPortalRegistrar();
-  //      String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
+        participantPortalRegistrar = new ParticipantPortalRegistrar();
+        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
                                                                                                       // PENDING ,
                                                                                                       // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
-   //     System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
-   //     logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
-   //     if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
-   //         accessPermission = true;
-   //     }
+        System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
+        logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
+        if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
+            accessPermission = true;
+        }
+        return accessPermission;
+    }
+
+
+    private boolean mayProceed(String studyOid) throws Exception {
+        boolean accessPermission = false;
+        StudyBean study = getStudy(studyOid);
+       if( study.getStatus().isAvailable()){
+           accessPermission = true;
+       }
         return accessPermission;
     }
 
