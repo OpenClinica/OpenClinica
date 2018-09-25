@@ -147,8 +147,8 @@ public class AnonymousFormControllerV2 {
     private String createAnonymousEnketoUrl(String studyOID, FormLayoutBean formLayout, EventDefinitionCRFBean edcBean, boolean isOffline) throws Exception {
         StudyBean parentStudyBean = getParentStudy(studyOID);
         PFormCache cache = PFormCache.getInstance(context);
-        String enketoURL = cache.getPFormURL(parentStudyBean.getOid(), formLayout.getOid(), isOffline, null);
         String contextHash = cache.putAnonymousFormContext(studyOID, formLayout.getOid(), edcBean.getStudyEventDefinitionId());
+        String enketoURL = cache.getPFormURL(parentStudyBean.getOid(), formLayout.getOid(),null, isOffline, contextHash);
         String url = null;
         if (isOffline)
             url = enketoURL.split("#", 2)[0] + "?" + FORM_CONTEXT + "=" + contextHash + "#" + enketoURL.split("#", 2)[1];
