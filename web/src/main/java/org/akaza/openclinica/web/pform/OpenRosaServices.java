@@ -806,49 +806,6 @@ public class OpenRosaServices {
         }
     }
 
-    @GET
-    @Path("/{studyOID}/getSchedule")
-    @Produces(MediaType.APPLICATION_XML)
-    public String getSchedule(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext context,
-            @PathParam("studyOID") String studyOID, @RequestHeader("Authorization") String authorization) throws Exception {
-
-        String ssoid = request.getParameter("studySubjectOID");
-        StudySubjectDAO ssdao = new StudySubjectDAO<String, ArrayList>(dataSource);
-        StudySubjectBean ssBean = ssdao.findByOid(ssoid);
-        if (!mayProceedSubmission(studyOID, ssBean))
-            return null;
-
-        HashMap<String, String> urlCache = (HashMap<String, String>) context.getAttribute("pformURLCache");
-        context.getAttribute("subjectContextCache");
-        if (ssoid == null) {
-            return "<error>studySubjectOID is null :(</error>";
-        }
-
-        try {
-            // Need to retrieve crf's for next event
-            StudyEventDAO eventDAO = new StudyEventDAO(getDataSource());
-            StudyEventBean nextEvent = (StudyEventBean) eventDAO.getNextScheduledEvent(ssoid);
-            CRFVersionDAO versionDAO = new CRFVersionDAO(getDataSource());
-            ArrayList<CRFVersionBean> crfs = versionDAO.findDefCRFVersionsByStudyEvent(nextEvent.getStudyEventDefinitionId());
-            PFormCache cache = PFormCache.getInstance(context);
-            StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
-            for (CRFVersionBean crfVersion : crfs) {
-                String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid(), studyEvent);
-                String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
-                        String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid(), null, studyOID, null);
-            }
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage());
-            LOGGER.debug(ExceptionUtils.getStackTrace(e));
-            return "<error>" + e.getMessage() + "</error>";
-        }
-
-        response.setHeader("Content-Type", "text/xml; charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=\"schedule.xml\";");
-        response.setContentType("text/xml; charset=utf-8");
-        return "<result>success</result>";
-
-    }
 
     public DataSource getDataSource() {
         return dataSource;
@@ -1091,7 +1048,11 @@ public class OpenRosaServices {
         } else if (formID.contains(SINGLE_ITEM_FLAVOR)) {
             formID = formID.substring(0, formID.indexOf(SINGLE_ITEM_FLAVOR));
         }
-        formID = formID.substring(0, formID.lastIndexOf(DASH));
+        int indexOfDash=formID.lastIndexOf(DASH);
+
+        if(indexOfDash!=-1){
+            formID = formID.substring(0, indexOfDash);
+        }
         return formID;
     }
 

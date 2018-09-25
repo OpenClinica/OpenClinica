@@ -11,13 +11,14 @@ import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import org.akaza.openclinica.domain.datamap.FormLayout;
 
 public class ParticipantEventService {
 
@@ -26,8 +27,8 @@ public class ParticipantEventService {
     private StudyEventDAO studyEventDAO = null;
     private EventCRFDAO eventCRFDAO = null;
     private EventDefinitionCRFDAO eventDefCRFDAO = null;
-    private CRFVersionDAO crfVersionDAO = null;
-    
+    private FormLayoutDAO formLayoutDAO = null;
+
     public ParticipantEventService(DataSource dataSource) { 
         this.dataSource = dataSource;
     }
@@ -47,11 +48,11 @@ public class ParticipantEventService {
                 boolean participantForm = eventDefCrf.isParticipantForm();
                 
                 if (participantForm) {
-                    List<CRFVersionBean> crfVersions = getAllCrfVersions(eventDefCrf);
+                    List<FormLayoutBean> formLayouts = getAllFormLayouts(eventDefCrf);
                     
                     boolean eventCrfExists = false;
-                    for (CRFVersionBean crfVersion:crfVersions) {
-                        EventCRFBean eventCRF = getEventCRFDAO().findByEventCrfVersion(studyEvent, crfVersion);
+                    for (FormLayoutBean formLayout:formLayouts) {
+                        EventCRFBean eventCRF = getEventCRFDAO().findByEventFormLayout(studyEvent, formLayout);
                         if (eventCRF != null && eventCRF.getStatus() == Status.AVAILABLE) return studyEvent;
                         else if (eventCRF != null) eventCrfExists = true;
                     }
@@ -68,26 +69,26 @@ public class ParticipantEventService {
     public EventCRFBean getExistingEventCRF(StudySubjectBean studySubject, StudyEventBean nextEvent,
             EventDefinitionCRFBean eventDefCrf) {
 
-        List<CRFVersionBean> crfVersions = getAllCrfVersions(eventDefCrf);
-        for (CRFVersionBean crfVersion:crfVersions) {
-            EventCRFBean eventCRF = (EventCRFBean) getEventCRFDAO().findByEventCrfVersion(nextEvent, crfVersion);
+        List<FormLayoutBean> formLayouts = getAllFormLayouts(eventDefCrf);
+        for (FormLayoutBean formLayout:formLayouts) {
+            EventCRFBean eventCRF = (EventCRFBean) getEventCRFDAO().findByEventFormLayout(nextEvent, formLayout);
             if (eventCRF != null) return eventCRF;
         }
         return null;
     }
 
-    public List<CRFVersionBean> getAllCrfVersions(EventDefinitionCRFBean eventDefCrf) {
 
-        List<CRFVersionBean> versions = new ArrayList<CRFVersionBean>();
-        
+    public List<FormLayoutBean> getAllFormLayouts(EventDefinitionCRFBean eventDefCrf) {
+
+        List<FormLayoutBean> versions = new ArrayList<FormLayoutBean>();
+
         EventDefinitionCRFBean selectedEventDefCrf = null;
         if (eventDefCrf.getParentId() > 0) selectedEventDefCrf = (EventDefinitionCRFBean)getEventDefCRFDAO().findByPK(eventDefCrf.getParentId());
         else selectedEventDefCrf = eventDefCrf;
-        versions = (ArrayList) getCRFVersionDAO().findAllByCRF(selectedEventDefCrf.getCrfId());
-        
-        return versions;
-       }
+        versions = (ArrayList) getFormLayoutDAO().findAllByCRF(selectedEventDefCrf.getCrfId());
 
+        return versions;
+    }
     public List<EventDefinitionCRFBean> getEventDefCrfsForStudyEvent(StudySubjectBean studySubject, StudyEventBean studyEvent) {
         Integer studyId = studySubject.getStudyId();
         StudyBean studyBean = (StudyBean) getStudyDAO().findByPK(studyId);
@@ -151,11 +152,12 @@ public class ParticipantEventService {
     }
 
     /**
-     * @return the CRFVersionDAO
+     * @return the FormLayoutDAO
      */
-    private CRFVersionDAO getCRFVersionDAO() {
-        crfVersionDAO = crfVersionDAO != null ? crfVersionDAO : new CRFVersionDAO(dataSource);
-        return crfVersionDAO;
+
+    private FormLayoutDAO getFormLayoutDAO() {
+        formLayoutDAO = formLayoutDAO != null ? formLayoutDAO : new FormLayoutDAO(dataSource);
+        return formLayoutDAO;
     }
 
 }

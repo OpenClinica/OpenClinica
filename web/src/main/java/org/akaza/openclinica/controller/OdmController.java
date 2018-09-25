@@ -2,21 +2,22 @@ package org.akaza.openclinica.controller;
 
 import java.io.StringWriter;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Comparator;
-import java.util.List;
-import java.util.Locale;
-import java.util.TimeZone;
+import java.util.*;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
+import javax.xml.bind.JAXB;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.Marshaller;
 
+import net.sf.json.JSON;
+import net.sf.json.JSONObject;
+import net.sf.json.xml.XMLSerializer;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
@@ -25,10 +26,14 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -37,11 +42,14 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.ParticipantEventService;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.PFormCache;
+import org.akaza.openclinica.web.restful.JSONClinicalDataPostProcessor;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130.ODM;
@@ -49,6 +57,9 @@ import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionClinicalData;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormData;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudyEventData;
 import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionSubjectData;
+import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLink;
+
+import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLinks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -62,7 +73,6 @@ import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
 
 @Controller
-@RequestMapping(value = "/odmk")
 public class OdmController {
 
     @Autowired
@@ -81,7 +91,21 @@ public class OdmController {
     @Autowired
     StudyEventDao studyEventDao;
 
+    @Autowired
+    StudySubjectDao studySubjectDao;
+
+    @Autowired
+    StudyDao studyDao;
+
+   private RestfulServiceHelper restfulServiceHelper;
+
     public static final String FORM_CONTEXT = "ecid";
+    public static final String DASH = "-";
+    public static final String PARTICIPATE_EDIT = "participate-edit";
+    public static final String PARTICIPATE_ADD_NEW = "participate-add-new";
+
+    private static final int INDENT_LEVEL = 2;
+
     ParticipantPortalRegistrar participantPortalRegistrar;
     StudyDAO sdao;
 
@@ -106,7 +130,7 @@ public class OdmController {
      *                    }
      */
 
-    @RequestMapping(value = "/studies/{study}/metadata", method = RequestMethod.GET)
+    @RequestMapping(value = "/odmk/studies/{study}/metadata", method = RequestMethod.GET)
     public ModelAndView getStudyMetadata(Model model, HttpSession session, @PathVariable("study") String studyOid, HttpServletResponse response)
             throws Exception {
         if (!mayProceed(studyOid))
@@ -221,14 +245,32 @@ public class OdmController {
      *                    }
      */
 
-    @RequestMapping(value = "/study/{studyOid}/studysubject/{studySubjectOid}/events", method = RequestMethod.GET)
-    public @ResponseBody ODM getEvent(@PathVariable("studyOid") String studyOid, @PathVariable("studySubjectOid") String studySubjectOid) throws Exception {
+    @RequestMapping(value = "/auth/api/studies/{studyOid}/events", method = RequestMethod.GET)
+    public @ResponseBody String getEvent(@PathVariable("studyOid") String studyOid, HttpServletRequest request) throws Exception {
+        if (!mayProceed(studyOid)) {
+    //        return null;
+        }
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
+        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
+        UserAccountBean ub = getRestfulServiceHelper().getUserAccount(request);
+        StudyBean currentStudy= getRestfulServiceHelper().setSchema(studyOid,request);
 
-        return getODM(studyOid, studySubjectOid);
+        StudySubjectBean studySubject = studySubjectDAO.findByLabelAndStudy(ub.getName(),currentStudy);
+        ODM odm=null;
+        if(studySubject!=null){
+            odm = getODM(studyOid, studySubject.getOid(),ub);
+        }
+        XMLSerializer xmlSerializer = new XMLSerializer();
+        StringWriter sw = new StringWriter();
+        JAXB.marshal(odm, sw);
+        String xmlString = sw.toString();
+        JSON json = xmlSerializer.read(xmlString);
+
+        return json.toString(INDENT_LEVEL);
+
     }
 
-    private ODM getODM(String studyOID, String subjectKey) {
+    private ODM getODM(String studyOID, String subjectKey,UserAccountBean ub) {
         ODM odm = new ODM();
         String ssoid = subjectKey;
         if (ssoid == null) {
@@ -252,8 +294,8 @@ public class OdmController {
 
                 List<EventCRFBean> eventCrfs = eventCRFDAO.findAllByStudyEvent(nextEvent);
                 StudyBean study = studyDAO.findByOid(studyOID);
-                if (!mayProceed(studyOID, studySubjectBean))
-                    return odm;
+           //     if (!mayProceed(studyOID, studySubjectBean))
+           //         return odm;
 
                 List<EventDefinitionCRFBean> eventDefCrfs = participantEventService.getEventDefCrfsForStudyEvent(studySubjectBean, nextEvent);
                 for (EventDefinitionCRFBean eventDefCrf : eventDefCrfs) {
@@ -273,10 +315,11 @@ public class OdmController {
 
                         if (validStatus) {
                             String formUrl = null;
-                            if (!itemDataExists)
-                                formUrl = createEnketoUrl(studyOID, formLayout, nextEvent, ssoid);
-                            else
-                                formUrl = createEditUrl(studyOID, formLayout, nextEvent, ssoid);
+                            if (!itemDataExists) {
+                                formUrl = createEnketoUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
+                            }else {
+                                formUrl = createEditUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
+                            }
                             formDatas.add(getFormDataPerCrf(formLayout, nextEvent, eventCrfs, crfDAO, formUrl, itemDataExists));
                         }
                     }
@@ -315,13 +358,13 @@ public class OdmController {
         return odm;
     }
 
-    private String createEnketoUrl(String studyOID, FormLayoutBean formLayout, StudyEventBean nextEvent, String ssoid) throws Exception {
+    private String createEnketoUrl(String studyOID, FormLayoutBean formLayout, StudyEventBean nextEvent, String ssoid ,String userAccountID) throws Exception {
         PFormCache cache = PFormCache.getInstance(context);
 
         StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
-        String enketoURL = cache.getPFormURL(studyOID, formLayout.getOid(), studyEvent);
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
-                formLayout.getOid(), String.valueOf(nextEvent.getId()), studyOID, null);
+                formLayout.getOid(),userAccountID, String.valueOf(nextEvent.getId()), studyOID, PFormCache.PARTICIPATE_MODE);
+        String enketoURL = cache.getPFormURL(studyOID, formLayout.getOid(), studyEvent,false,contextHash);
 
         String url = enketoURL + "?" + FORM_CONTEXT + "=" + contextHash;
         logger.debug("Enketo URL for " + formLayout.getName() + "= " + url);
@@ -329,11 +372,11 @@ public class OdmController {
 
     }
 
-    private String createEditUrl(String studyOID, FormLayoutBean formLayout, StudyEventBean nextEvent, String ssoid) throws Exception {
+    private String createEditUrl(String studyOID, FormLayoutBean formLayout, StudyEventBean nextEvent, String ssoid, String userAccountID) throws Exception {
         PFormCache cache = PFormCache.getInstance(context);
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
-                formLayout.getOid(), String.valueOf(nextEvent.getId()), studyOID, null);
-        String editURL = CoreResources.getField("sysURL.base") + "pages/api/v1/editform/" + studyOID + "/url";
+                formLayout.getOid(),userAccountID ,String.valueOf(nextEvent.getId()), studyOID, PFormCache.PARTICIPATE_MODE);
+        String editURL = CoreResources.getField("sysURL.base") + "pages/auth/api/editform/" + studyOID + "/url";
 
         String url = editURL + "?" + FORM_CONTEXT + "=" + contextHash;
         logger.debug("Edit URL for " + formLayout.getName() + "= " + url);
@@ -346,7 +389,7 @@ public class OdmController {
         EventCRFBean selectedEventCRFBean = null;
         CRFBean crfBean = (CRFBean) crfDAO.findByVersionId(formLayout.getId());
         for (EventCRFBean eventCRFBean : eventCrfs) {
-            if (eventCRFBean.getCRFVersionId() == formLayout.getId()) {
+            if (eventCRFBean.getFormLayoutId() == formLayout.getId()) {
                 selectedEventCRFBean = eventCRFBean;
                 break;
             }
@@ -387,7 +430,18 @@ public class OdmController {
         formData.setFormOID(formLayout.getOid());
         formData.setFormName(crfBean.getName());
         formData.setVersionDescription(formLayout.getDescription());
-        formData.setUrl(formUrl);
+        OCodmComplexTypeDefinitionLinks odmLinks = new OCodmComplexTypeDefinitionLinks();
+
+        OCodmComplexTypeDefinitionLink link = new OCodmComplexTypeDefinitionLink();
+        if(!itemDataExists) {
+            link.setRel(PARTICIPATE_ADD_NEW);
+        }else{
+            link.setRel(PARTICIPATE_EDIT);
+        }
+        link.setHref(formUrl);
+        odmLinks.getLink().add(link);
+        formData.getFormDataElementExtension().add(odmLinks);
+
         if (eventCRFBean == null) {
             formData.setStatus("Not Started");
         } else {
@@ -475,18 +529,25 @@ public class OdmController {
         StudyBean study = getParentStudy(studyOid);
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
-        participantPortalRegistrar = new ParticipantPortalRegistrar();
-        String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
+  //      participantPortalRegistrar = new ParticipantPortalRegistrar();
+  //      String pManageStatus = participantPortalRegistrar.getRegistrationStatus(studyOid).toString(); // ACTIVE ,
                                                                                                       // PENDING ,
                                                                                                       // INACTIVE
         String participateStatus = pStatus.getValue().toString(); // enabled , disabled
         String studyStatus = study.getStatus().getName().toString(); // available , pending , frozen , locked
-        System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
-        logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
-        if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
-            accessPermission = true;
-        }
+   //     System.out.println("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
+   //     logger.info("pManageStatus: " + pManageStatus + "  participantStatus: " + participateStatus + "   studyStatus: " + studyStatus);
+   //     if (participateStatus.equalsIgnoreCase("enabled") && studyStatus.equalsIgnoreCase("available") && pManageStatus.equalsIgnoreCase("ACTIVE")) {
+   //         accessPermission = true;
+   //     }
         return accessPermission;
     }
 
+    public RestfulServiceHelper getRestfulServiceHelper() {
+        if (restfulServiceHelper == null) {
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+        }
+
+        return restfulServiceHelper;
+    }
 }
