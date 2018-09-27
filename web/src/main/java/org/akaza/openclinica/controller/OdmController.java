@@ -16,6 +16,7 @@ import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
@@ -248,22 +249,29 @@ public class OdmController {
     @RequestMapping(value = "/auth/api/studies/{studyOid}/events", method = RequestMethod.GET)
     public @ResponseBody String getEvent(@PathVariable("studyOid") String studyOid, HttpServletRequest request) throws Exception {
         ODM odm = null;
-        getRestfulServiceHelper().setSchema(studyOid, request);StudyBean currentStudy =getStudy(studyOid);
-
-        if (mayProceed(studyOid)) {
+        getRestfulServiceHelper().setSchema(studyOid, request);
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         UserAccountBean ub = getRestfulServiceHelper().getUserAccount(request);
+        StudyBean currentStudy =getStudy(studyOid);
+        StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         StudySubjectBean studySubject = studySubjectDAO.findByLabelAndStudy(ub.getName(), currentStudy);
-        if (studySubject != null && studySubject.isActive() && studySubject.getStatus().isAvailable()) {
-            odm = getODM(studyOid, studySubject.getOid(), ub);
-        }
-    }
+
+            if (mayProceed(studyOid) && studySubject != null && studySubject.isActive() && studySubject.getStatus().isAvailable()) {
+                odm = getODM(studyOid, studySubject.getOid(), ub);
+            }
 
         XMLSerializer xmlSerializer = new XMLSerializer();
         StringWriter sw = new StringWriter();
-        if(odm==null)
-            odm=new ODM();
+        if(odm==null) {
+            odm = new ODM();
+            ODMcomplexTypeDefinitionClinicalData clinicalData = generateClinicalData(currentStudy);
+            ODMcomplexTypeDefinitionSubjectData subjectData = generateSubjectData(studySubject);
+            if(subjectData!=null)
+                 clinicalData.getSubjectData().add(subjectData);
+            odm.getClinicalData().add(clinicalData);
+
+        }
+
         JAXB.marshal(odm, sw);
         String xmlString = sw.toString();
         JSON json = xmlSerializer.read(xmlString);
@@ -272,7 +280,6 @@ public class OdmController {
     }
 
     private ODM getODM(String studyOID, String subjectKey,UserAccountBean ub) {
-        ODM odm = new ODM();
         String ssoid = subjectKey;
         if (ssoid == null) {
             return null;
@@ -333,7 +340,7 @@ public class OdmController {
             logger.error(ExceptionUtils.getStackTrace(e));
         }
 
-        return odm;
+        return null;
 
     }
 
@@ -449,7 +456,12 @@ public class OdmController {
             if (!itemDataExists) {
                 formData.setStatus("Not Started");
             } else {
-                formData.setStatus(eventCRFBean.getStatus().getName());
+                Status status = Status.get(eventCrf.getStatusId());
+                if (status.equals(Status.AVAILABLE)) {
+                    formData.setStatus(DataEntryStage.INITIAL_DATA_ENTRY.getName());
+                } else {
+                    formData.setStatus(eventCRFBean.getStatus().getName());
+                }
             }
 
             if (eventCrf.getDateUpdated() != null) {
@@ -547,7 +559,11 @@ public class OdmController {
     private boolean mayProceed(String studyOid) throws Exception {
         boolean accessPermission = false;
         StudyBean study = getStudy(studyOid);
-       if( study.getStatus().isAvailable()){
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        String participateStatus = pStatus.getValue().toString();
+
+        if( participateStatus.equalsIgnoreCase("enabled") && study.getStatus().isAvailable()){
            accessPermission = true;
        }
         return accessPermission;
