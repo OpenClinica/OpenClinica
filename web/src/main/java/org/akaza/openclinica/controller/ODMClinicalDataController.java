@@ -22,7 +22,7 @@ import java.util.Locale;
 @Controller
 
 
-@RequestMapping(value = "/auth/api/v1/clinicaldata")
+@RequestMapping(value = "/auth/api/clinicaldata")
 @Api(value = "Study", tags = {"Study"}, description = "REST API for Study")
 public class ODMClinicalDataController {
 
@@ -80,7 +80,7 @@ public class ODMClinicalDataController {
 
         getRestfulServiceHelper().setSchema(studyOID, request);
 
-        String result = odmClinicaDataResource.getODMXMLClinicaldata(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
+        String result = odmClinicaDataResource.getODMXMLData(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
                 request, clinicalData, showArchived);
 
         ResponseEntity<ODM> response = null;

@@ -89,18 +89,13 @@ public class ODMClinicaDataResource {
      * @apiName getODMClinicaldataJSON
      * @apiGroup Subject
      * @apiPermission user
-     *
      * @apiDescription Annotated case report forms in printable HTML format. Use asterisks in place of OIDs as wildcards
-     *
      * @apiParam {String} study Study or Site OID.
      * @apiParam {String} subject Subject Key or ID.
      * @apiParam {String} event Study Event Definition OID. Use '*' for all.
      * @apiParam {String} form Case Report Form Version OID. Use '*' for all.
-     *
-     *
      * @apiError NoAccessRight Only authenticated users can access the data.
      * @apiError NotFound The resource was not found.
-     *
      */
     @GET
     @Path("/json/view/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}")
@@ -137,28 +132,27 @@ public class ODMClinicaDataResource {
         UserAccountBean userAccountBean = ((UserAccountBean) request.getSession().getAttribute("userBean"));
         StudyDAO sdao = new StudyDAO(getDataSource());
         StudyBean studyBean = sdao.findByOid(studyOID);
-        String permissionTagsString="";
+        String permissionTagsString = "";
         String[] permissionTagsStringArray;
 
-        if(crossForm) {
-            permissionTagsString=loadPermissionTagsString();
-            permissionTagsStringArray=loadPermissionTagsStringArray();
-        }else {
+        if (crossForm) {
+            permissionTagsString = loadPermissionTagsString();
+            permissionTagsStringArray = loadPermissionTagsStringArray();
+        } else {
             permissionTagsString = permissionService.getPermissionTagsString(studyBean, request);
-            permissionTagsStringArray=permissionService.getPermissionTagsStringArray(studyBean,request);
+            permissionTagsStringArray = permissionService.getPermissionTagsStringArray(studyBean, request);
         }
 
         XMLSerializer xmlSerializer = new XMLSerializer();
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                        formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId(),crossForm),
-                crossForm, archived ,permissionTagsString);
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId(), crossForm),
+                crossForm, archived, permissionTagsString);
         if (report.getClinicalDataMap() == null)
             return null;
 
 
-
-        report.createOdmXml(true, crossForm, getDataSource(), userAccountBean,permissionTagsStringArray);
+        report.createOdmXml(true, crossForm, getDataSource(), userAccountBean, permissionTagsStringArray);
         // xmlSerializer.setForceTopLevelObject(true);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -180,23 +174,18 @@ public class ODMClinicaDataResource {
      * @apiName getPrintCRFController
      * @apiGroup Subject
      * @apiPermission user
-     *
      * @apiDescription Annotated case report forms in printable HTML format. Use asterisks in place of OIDs as wildcards
-     *
      * @apiParam {String} study Study or Site OID.
      * @apiParam {String} subject Subject Key or ID.
      * @apiParam {String} event Study Event Definition OID. Use '*' for all.
      * @apiParam {String} form Case Report Form Version OID. Use '*' for all.
-     *
-     *
      * @apiError NoAccessRight Only authenticated users can access the data.
      * @apiError NotFound The resource was not found.
-     *
      * @apiErrorExample Response (example):
-     *                  HTTP/1.1 401 Not Authenticated
-     *                  {
-     *                  "error": "NoAccessRight"
-     *                  }
+     * HTTP/1.1 401 Not Authenticated
+     * {
+     * "error": "NoAccessRight"
+     * }
      */
     @GET
     @Path("/html/print/{studyOID}/{studySubjectIdentifier}/{eventOID}/{formVersionOID}")
@@ -213,41 +202,94 @@ public class ODMClinicaDataResource {
         request.setAttribute("includeDNs", includeDns);
         return new Viewable("/WEB-INF/jsp/printcrf.jsp", null);
     }
-/*
 
-    */
-/**
+    /**
      * @api {get} /rest/clinicaldata/xml/view/:study/:subject/:event/:form Retrieve case report forms - XML
      * @apiVersion 3.8.0
      * @apiName getODMMetadata
      * @apiGroup Subject
      * @apiPermission user
-     *
      * @apiDescription Annotated case report forms in printable HTML format. Use asterisks in place of OIDs as wildcards
-     *
      * @apiParam {String} study Study or Site OID.
      * @apiParam {String} subject Subject Key or ID.
      * @apiParam {String} event Study Event Definition OID. Use '*' for all.
      * @apiParam {String} form Case Report Form Version OID. Use '*' for all.
-     *
-     *
      * @apiError NoAccessRight Only authenticated users can access the data.
      * @apiError NotFound The resource was not found.
-     *
      * @apiErrorExample Response (example):
-     *                  HTTP/1.1 401 Not Authenticated
-     *                  {
-     *                  "error": "NoAccessRight"
-     *                  }
+     * HTTP/1.1 401 Not Authenticated
+     * {
+     * "error": "NoAccessRight"
+     * }
      */
     @GET
     @Path("/xml/view/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}")
     @Produces(MediaType.TEXT_XML)
-    public String getODMXMLClinicaldata(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
-                                        @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
-                                        @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
-                                        @Context HttpServletRequest request, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData,
-                                        @QueryParam("showArchived") String showArchived) {
+    public String getODMMetadata(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
+                                 @PathParam("studySubjectIdentifier") String studySubjectIdentifier, @PathParam("studyEventOID") String studyEventOID,
+                                 @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
+                                 @Context HttpServletRequest request, String userAccountID, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData,
+                                 @QueryParam("showArchived") String showArchived) {
+        LOGGER.debug("Requesting clinical data resource");
+        boolean includeDN = false;
+        boolean includeAudit = false;
+        boolean crossForm = false;
+        boolean archived = false;
+
+        if (showArchived != null && (showArchived.equalsIgnoreCase("no") || showArchived.equalsIgnoreCase("n")))
+            archived = false;
+        if (showArchived != null && (showArchived.equalsIgnoreCase("yes") || showArchived.equalsIgnoreCase("y")))
+            archived = true;
+
+        int userId = 0;
+        UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+        if (userBean != null) {
+            userId = userBean.getId();
+        } else {
+            userId = Integer.valueOf(userAccountID);
+            userBean = (UserAccountBean) new UserAccountDAO(dataSource).findByPK(userId);
+        }
+
+        if (clinicalData.equalsIgnoreCase("no") || clinicalData.equalsIgnoreCase("n"))
+            crossForm = false;
+        if (clinicalData.equalsIgnoreCase("yes") || clinicalData.equalsIgnoreCase("y"))
+            crossForm = true;
+        if (includeDns.equalsIgnoreCase("no") || includeDns.equalsIgnoreCase("n"))
+            includeDN = false;
+        if (includeAudits.equalsIgnoreCase("no") || includeAudits.equalsIgnoreCase("n"))
+            includeAudit = false;
+        if (includeDns.equalsIgnoreCase("yes") || includeDns.equalsIgnoreCase("y"))
+            includeDN = true;
+        if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
+            includeAudit = true;
+        StudyDAO sdao = new StudyDAO(getDataSource());
+        StudyBean studyBean = sdao.findByOid(studyOID);
+        String permissionTagsString = "";
+        String[] permissionTagsStringArray;
+        if (crossForm) {
+            permissionTagsString = loadPermissionTagsString();
+            permissionTagsStringArray = loadPermissionTagsStringArray();
+        } else {
+            permissionTagsString = permissionService.getPermissionTagsString(studyBean, request);
+            permissionTagsStringArray = permissionService.getPermissionTagsStringArray(studyBean, request);
+        }
+
+        FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
+                getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
+                        formVersionOID, includeDN, includeAudit, request.getLocale(), userId, crossForm),
+                crossForm, archived, permissionTagsString);
+
+        report.createOdmXml(true, crossForm, getDataSource(), userBean, permissionTagsStringArray);
+        LOGGER.debug(report.getXmlOutput().toString().trim());
+
+        return report.getXmlOutput().toString().trim();
+    }
+
+    public String getODMXMLData(@PathParam("studyOID") String studyOID, @PathParam("formVersionOID") String formVersionOID,
+                                   @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
+                                   @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
+                                   @Context HttpServletRequest request, @DefaultValue("n") @QueryParam("clinicalData") String clinicalData,
+                                   @QueryParam("showArchived") String showArchived) {
 
         LOGGER.debug("Requesting clinical data resource");
         boolean includeDN = false;
@@ -283,25 +325,25 @@ public class ODMClinicaDataResource {
         }
         StudyDAO sdao = new StudyDAO(getDataSource());
         StudyBean studyBean = sdao.findByOid(studyOID);
-        String permissionTagsString="";
+        String permissionTagsString = "";
         String[] permissionTagsStringArray;
 
-        if(crossForm) {
-            permissionTagsString=loadPermissionTagsString();
-            permissionTagsStringArray=loadPermissionTagsStringArray();
-        }else {
+        if (crossForm) {
+            permissionTagsString = loadPermissionTagsString();
+            permissionTagsStringArray = loadPermissionTagsStringArray();
+        } else {
             permissionTagsString = permissionService.getPermissionTagsString(studyBean, request);
-            permissionTagsStringArray=permissionService.getPermissionTagsStringArray(studyBean,request);
+            permissionTagsStringArray = permissionService.getPermissionTagsStringArray(studyBean, request);
         }
 
         FullReportBean report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
                 getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                         formVersionOID, includeDN, includeAudit, request.getLocale(), userId, crossForm),
-                crossForm, archived ,permissionTagsString);
+                crossForm, archived, permissionTagsString);
         if (report.getClinicalDataMap() == null)
             return null;
 
-        report.createOdmXml(true, crossForm, getDataSource(), userBean,permissionTagsStringArray);
+        report.createOdmXml(true, crossForm, getDataSource(), userBean, permissionTagsStringArray);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();
@@ -328,19 +370,20 @@ public class ODMClinicaDataResource {
         }
     }
 
-    private String loadPermissionTagsString(){
+    private String loadPermissionTagsString() {
         List<EventDefinitionCrfPermissionTag> tags = eventDefinitionCrfPermissionTagDao.findAll();
 
         List<String> tagsList = new ArrayList<>();
         for (EventDefinitionCrfPermissionTag tag : tags) {
-            if(!tagsList.contains(tag.getPermissionTagId())) {
+            if (!tagsList.contains(tag.getPermissionTagId())) {
                 tagsList.add(tag.getPermissionTagId());
             }
         }
-        return  tagsList.stream().collect(Collectors.joining("','", "'", "'"));
+        return tagsList.stream().collect(Collectors.joining("','", "'", "'"));
 
     }
-    private String[] loadPermissionTagsStringArray(){
+
+    private String[] loadPermissionTagsStringArray() {
         List<EventDefinitionCrfPermissionTag> tags = eventDefinitionCrfPermissionTagDao.findAll();
         Set<String> tagsSet = new HashSet<>();
         for (EventDefinitionCrfPermissionTag tag : tags) {

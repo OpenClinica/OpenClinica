@@ -1113,7 +1113,7 @@ public class OpenRosaServices {
         String phraseToLookForInOdm = "<StudyEventData StudyEventOID=\"" + sed.getOc_oid() + "\" StudyEventRepeatKey=\"" + studyEventRepeat + "\"";
         String clinicalData = "yes";
         String userAccountID = subjectContext.get("userAccountID");
-        String result = odmClinicalDataRestResource.getODMXMLClinicaldata(studyOID, "*", studySubjectOID, "*", "no", "no", request, clinicalData, "no");
+        String result = odmClinicalDataRestResource.getODMMetadata(studyOID, "*", studySubjectOID, "*", "no", "no", request, userAccountID, clinicalData, "no");
         result = result.replaceAll("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"", "");
         result = result.replaceAll("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"", "xmlns:OpenClinica=\"http://openclinica.com/odm\"");
         int index = result.indexOf(phraseToLookForInOdm);
