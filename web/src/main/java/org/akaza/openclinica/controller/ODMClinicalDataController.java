@@ -15,8 +15,10 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
 
+import javax.mail.internet.ContentType;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+import javax.ws.rs.HeaderParam;
 import java.util.Locale;
 
 @Controller
@@ -35,31 +37,52 @@ public class ODMClinicalDataController {
     @Qualifier("dataSource")
     private DataSource dataSource;
 
-    @RequestMapping(value = "/json/view/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}", method = RequestMethod.GET)
+    @RequestMapping(value = "/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}", method = RequestMethod.GET, produces={MediaType.APPLICATION_JSON_VALUE}, headers = "Accept=application/json")
     public @ResponseBody
-    ResponseEntity<Object> getClinicalData(@PathVariable("studyOID") String studyOID, @PathVariable("formVersionOID") String formVersionOID,
+    ResponseEntity<Object> getMultiJsonClinicalData(@PathVariable("studyOID") String studyOID, @PathVariable("formVersionOID") String formVersionOID,
+                                                    @PathVariable("studyEventOID") String studyEventOID, @PathVariable("studySubjectIdentifier") String studySubjectIdentifier,
+                                                    @RequestParam(value = "includeDNs", defaultValue = "n", required = false) String includeDns,
+                                                    @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request,
+                                                    @RequestParam(value = "clinicalData", defaultValue = "n", required = false) String clinicalData,
+                                                    @RequestParam(value = "showArchived", defaultValue = "n", required = false) String showArchived) throws Exception {
+        getRestfulServiceHelper().setSchema(studyOID, request);
+
+        ResourceBundleProvider.updateLocale(new Locale("en_US"));
+
+        Object result = odmClinicaDataResource.getODMClinicaldata(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
+                request, clinicalData, showArchived);
+
+        ResponseEntity<Object> response = null;
+        if (result != null) {
+            response = new ResponseEntity(result, org.springframework.http.HttpStatus.OK);
+        }
+
+        return response;
+    }
+
+    @RequestMapping(value = "/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}", method = RequestMethod.GET, produces={MediaType.APPLICATION_XML_VALUE}, headers = "Accept=application/xml")
+    public @ResponseBody
+    ResponseEntity<Object> getMultiXMLClinicalData(@PathVariable("studyOID") String studyOID, @PathVariable("formVersionOID") String formVersionOID,
                                            @PathVariable("studyEventOID") String studyEventOID, @PathVariable("studySubjectIdentifier") String studySubjectIdentifier,
                                            @RequestParam(value = "includeDNs", defaultValue = "n", required = false) String includeDns,
                                            @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request,
                                            @RequestParam(value = "clinicalData", defaultValue = "n", required = false) String clinicalData,
                                            @RequestParam(value = "showArchived", defaultValue = "n", required = false) String showArchived) throws Exception {
-
         getRestfulServiceHelper().setSchema(studyOID, request);
 
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
-        String result = odmClinicaDataResource.getODMClinicaldata(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
+        Object result = odmClinicaDataResource.getODMXMLData(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
                 request, clinicalData, showArchived);
-        ObjectMapper objectMapper = new ObjectMapper();
+
         ResponseEntity<Object> response = null;
         if (result != null) {
-
-            response = new ResponseEntity(objectMapper.readTree(result), org.springframework.http.HttpStatus.OK);
+            response = new ResponseEntity(result, org.springframework.http.HttpStatus.OK);
         }
 
         return response;
-
     }
+
 
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (serviceHelper == null) {
@@ -68,28 +91,4 @@ public class ODMClinicalDataController {
 
         return serviceHelper;
     }
-
-    @RequestMapping(value = "/xml/view/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}", method = RequestMethod.GET, produces={MediaType.APPLICATION_XML_VALUE})
-    public @ResponseBody
-    ResponseEntity<ODM> getODMXMLClinicaldata(@PathVariable("studyOID") String studyOID, @PathVariable("formVersionOID") String formVersionOID,
-                                              @PathVariable("studyEventOID") String studyEventOID, @PathVariable("studySubjectIdentifier") String studySubjectIdentifier,
-                                              @RequestParam(value = "includeDNs", defaultValue = "n", required = false) String includeDns,
-                                              @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request,
-                                              @RequestParam(value = "clinicalData", defaultValue = "n", required = false) String clinicalData,
-                                              @RequestParam(value = "showArchived", defaultValue = "n", required = false) String showArchived) throws Exception {
-
-        getRestfulServiceHelper().setSchema(studyOID, request);
-
-        String result = odmClinicaDataResource.getODMXMLData(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
-                request, clinicalData, showArchived);
-
-        ResponseEntity<ODM> response = null;
-        if (result != null) {
-            response = new ResponseEntity(result, org.springframework.http.HttpStatus.OK);
-        }
-
-        return response;
-
-    }
-
 }
