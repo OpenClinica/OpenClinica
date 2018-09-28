@@ -39,7 +39,7 @@ public class ODMClinicalDataController {
 
     @RequestMapping(value = "/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}", method = RequestMethod.GET, produces={MediaType.APPLICATION_JSON_VALUE}, headers = "Accept=application/json")
     public @ResponseBody
-    ResponseEntity<Object> getMultiJsonClinicalData(@PathVariable("studyOID") String studyOID, @PathVariable("formVersionOID") String formVersionOID,
+    ResponseEntity<Object> getJsonClinicalData(@PathVariable("studyOID") String studyOID, @PathVariable("formVersionOID") String formVersionOID,
                                                     @PathVariable("studyEventOID") String studyEventOID, @PathVariable("studySubjectIdentifier") String studySubjectIdentifier,
                                                     @RequestParam(value = "includeDNs", defaultValue = "n", required = false) String includeDns,
                                                     @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request,
@@ -62,7 +62,7 @@ public class ODMClinicalDataController {
 
     @RequestMapping(value = "/{studyOID}/{studySubjectIdentifier}/{studyEventOID}/{formVersionOID}", method = RequestMethod.GET, produces={MediaType.APPLICATION_XML_VALUE}, headers = "Accept=application/xml")
     public @ResponseBody
-    ResponseEntity<Object> getMultiXMLClinicalData(@PathVariable("studyOID") String studyOID, @PathVariable("formVersionOID") String formVersionOID,
+    ResponseEntity<Object> getXMLClinicalData(@PathVariable("studyOID") String studyOID, @PathVariable("formVersionOID") String formVersionOID,
                                            @PathVariable("studyEventOID") String studyEventOID, @PathVariable("studySubjectIdentifier") String studySubjectIdentifier,
                                            @RequestParam(value = "includeDNs", defaultValue = "n", required = false) String includeDns,
                                            @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request,
