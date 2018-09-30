@@ -204,6 +204,10 @@
     margin-left: 30px;
     background: #cc6600 !important;
   }
+  .subnote {
+    font-size: 85%;
+    color: #618ebb;
+  }
   .full-width {
     width: 100%;
   }
@@ -296,9 +300,9 @@
                                     <td class="table_actions" valign="top">
                                      <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
                                         <c:if test="${!userRole.monitor}">
-                                        <a href="javascript:;" id="editParticipantID">
-                                          <fmt:message key="edit" bundle="${resword}"/>
-                                        </a>
+                                          <a href="javascript:;" id="editParticipantID">
+                                            <fmt:message key="edit" bundle="${resword}"/>
+                                          </a>
                                         </c:if>
                                       </c:if>
                                     </td>
@@ -371,9 +375,13 @@
                                     <td class="table_actions" valign="top">
                                      <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
                                         <c:if test="${!userRole.monitor}">
-                                        <a href="javascript:;" id="connectParticipant">
-                                          <fmt:message key="connect" bundle="${resword}"/>
-                                        </a>
+                                          <a href="javascript:;" id="contactInformation">
+                                            Contact Information
+                                          </a>
+                                          &nbsp;|&nbsp;
+                                          <a href="javascript:;" id="participateAccess">
+                                            Participate Access
+                                          </a>
                                         </c:if>
                                       </c:if>
                                     </td>
@@ -394,7 +402,7 @@
                                             </td>
 
                                             <td class="table_header_column">
-                                              <fmt:message key="phone_number" bundle="${resword}"/>
+                                              Mobile Number
                                             </td>
                                             <td class="table_cell">
                                               <c:out value=""/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
@@ -403,13 +411,13 @@
 
                                           <tr>
                                             <td class="table_header_column_top">
-                                              <fmt:message key="email_address" bundle="${resword}"/>
+                                              <fmt:message key="participate_status" bundle="${resword}"/>
                                             </td>
                                             <td class="table_cell">
                                               <c:out value=""/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
                                             </td>
                                             <td class="table_header_column">
-                                              <fmt:message key="participate_status" bundle="${resword}"/>
+                                              <fmt:message key="email" bundle="${resword}"/>
                                             </td>
                                             <td class="table_cell">
                                               <c:out value=""/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
@@ -1038,13 +1046,13 @@
     </form>
 </div>
 
-<div id="connectParticipantForm" class="hide">
-  <form name="connectParticipantForm" method="post">
+<div id="contactInformationForm" class="hide">
+  <form name="contactInformationForm" method="post">
     <table border="0" cellpadding="0" align="center" style="cursor:default;">
       <tr style="height:10px;">
         <td class="formlabel" align="left">
           <h3>
-            <fmt:message key="connect_participant" bundle="${resword}"/>
+            Update Contact Information
           </h3>
         </td>
       </tr>
@@ -1057,7 +1065,7 @@
             <table cellspacing="10">
               <tr valign="top">
                 <td class="formlabel" align="left">
-                  <fmt:message key="name" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
+                  <span><fmt:message key="first_name" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
                 </td>
                 <td valign="top">
                   <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
@@ -1065,7 +1073,7 @@
               </tr>
               <tr valign="top">
                 <td class="formlabel" align="left">
-                  <fmt:message key="email_address" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
+                  <span><fmt:message key="email" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
                 </td>
                 <td valign="top">
                   <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
@@ -1073,7 +1081,7 @@
               </tr>
               <tr valign="top">
                 <td class="formlabel" align="left">
-                  <fmt:message key="phone" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
+                  <span>Mobile</span>&nbsp;<small class="required">*</small>
                 </td>
                 <td valign="top">
                   <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
@@ -1081,12 +1089,65 @@
               </tr>
               <tr valign="top">
                 <td class="formlabel" align="left">
-                  <fmt:message key="notify_participants_now" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
+                  <span><fmt:message key="notify_participants_now" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
                 </td>
                 <td valign="top">
                   <label><input type="radio" name="notify" value="yes">Yes</label>
                   &emsp;
                   <label><input type="radio" name="notify" value="no">No</label>
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><div class="lines"></div></td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: center;">
+          <input type="submit" name="connectParticipant" value="Connect"/>
+          <input type="button" id="cancel" name="cancel" value="Cancel"/>
+        </td>
+      </tr>
+    </table>
+  </form>
+</div>
+
+<div id="participateAccessForm" class="hide">
+  <form name="participateAccessForm" method="post">
+    <table border="0" cellpadding="0" align="center" style="cursor:default;">
+      <tr style="height:10px;">
+        <td class="formlabel" align="left">
+          <h3>
+            View Participate Access
+          </h3>
+        </td>
+      </tr>
+      <tr>
+        <td><div class="lines"></div></td>
+      </tr>
+      <tr>
+        <td>
+          <div style="max-height: 550px; min-width:400px; background:#FFFFFF; overflow-y: auto;">
+            <table cellspacing="10">
+              <tr valign="top">
+                <td class="formlabel" align="left">
+                  <span>Access Link</span>
+                </td>
+                <td valign="top">
+                  <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                </td>
+              </tr>
+              <tr valign="top">
+                <td class="formlabel" align="left">
+                  <span>Access Code</span>
+                </td>
+                <td valign="top">
+                  <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                  <div class="subnote">
+                    Please note: viewing access code will be audited.
+                  </div>
                 </td>
               </tr>
             </table>
@@ -1124,8 +1185,12 @@
             return false;
         });
 
-        jQuery('#connectParticipant').click(function() {
-            jQuery.blockUI({ message: jQuery('#connectParticipantForm'), css:{left: "300px", top:"10px" } });
+        jQuery('#contactInformation').click(function() {
+            jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
+        });
+
+        jQuery('#participateAccess').click(function() {
+            jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
         });
      });
 
