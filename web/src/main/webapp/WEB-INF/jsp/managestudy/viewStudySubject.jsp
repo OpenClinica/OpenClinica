@@ -1052,7 +1052,7 @@
       <tr style="height:10px;">
         <td class="formlabel" align="left">
           <h3>
-            Update Contact Information
+            Contact Information
           </h3>
         </td>
       </tr>
@@ -1137,17 +1137,6 @@
                 </td>
                 <td valign="top">
                   <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
-                </td>
-              </tr>
-              <tr valign="top">
-                <td class="formlabel" align="left">
-                  <span>Access Code</span>
-                </td>
-                <td valign="top">
-                  <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
-                  <div class="subnote">
-                    Please note: viewing access code will be audited.
-                  </div>
                 </td>
               </tr>
             </table>
