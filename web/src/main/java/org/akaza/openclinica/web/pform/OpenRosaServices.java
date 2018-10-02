@@ -122,8 +122,10 @@ public class OpenRosaServices {
     OpenRosaXMLUtil openRosaXMLUtil;
 
     public static final String QUERY_SUFFIX = "form-queries.xml";
+    public static final String PARTICIPATE_SUFFIX = "form-participate.xml";
     public static final String NO_SUFFIX = "form.xml";
     public static final String QUERY_FLAVOR = "-query";
+    public static final String PARTICIPATE_FLAVOR = "-participate";
     public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     public static final String NO_FLAVOR = "";
     public static final String SVG = ".svg";
@@ -359,6 +361,14 @@ public class OpenRosaServices {
                 form.setManifestURL(manifestURL);
 
                 form.setFormID(formLayout.getOcOid() + DASH + formLayout.getXform() + QUERY_FLAVOR);
+            }else if (flavor.equals(PARTICIPATE_FLAVOR)) {
+                    downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formID=" + formLayout.getOcOid() + DASH + formLayout.getXform()
+                            + PARTICIPATE_FLAVOR;
+                    form.setDownloadURL(downloadURL);
+                    manifestURL = urlBase + "/rest2/openrosa/" + studyOID + "/manifest?ecid=" + ecid + "&formID=" + formLayout.getOcOid() + DASH
+                            + formLayout.getXform() + PARTICIPATE_FLAVOR;
+                    form.setManifestURL(manifestURL);
+                    form.setFormID(formLayout.getOcOid() + DASH + formLayout.getXform() + PARTICIPATE_FLAVOR);
             } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
                 downloadURL = urlBase + "/rest2/openrosa/" + studyOID + "/formXml?formID=" + formLayout.getOcOid() + DASH + formLayout.getXform() + attribute;
                 form.setDownloadURL(downloadURL);
@@ -464,7 +474,7 @@ public class OpenRosaServices {
             response.setHeader("Date", format.format(currentDate));
             response.setHeader("X-OpenRosa-Version", "1.0");
             String result = writer.toString();
-            System.out.println(result);
+            LOGGER.info(result);
             return result;
         } catch (Exception e) {
             LOGGER.error(e.getMessage());
@@ -796,49 +806,6 @@ public class OpenRosaServices {
         }
     }
 
-    @GET
-    @Path("/{studyOID}/getSchedule")
-    @Produces(MediaType.APPLICATION_XML)
-    public String getSchedule(@Context HttpServletRequest request, @Context HttpServletResponse response, @Context ServletContext context,
-            @PathParam("studyOID") String studyOID, @RequestHeader("Authorization") String authorization) throws Exception {
-
-        String ssoid = request.getParameter("studySubjectOID");
-        StudySubjectDAO ssdao = new StudySubjectDAO<String, ArrayList>(dataSource);
-        StudySubjectBean ssBean = ssdao.findByOid(ssoid);
-        if (!mayProceedSubmission(studyOID, ssBean))
-            return null;
-
-        HashMap<String, String> urlCache = (HashMap<String, String>) context.getAttribute("pformURLCache");
-        context.getAttribute("subjectContextCache");
-        if (ssoid == null) {
-            return "<error>studySubjectOID is null :(</error>";
-        }
-
-        try {
-            // Need to retrieve crf's for next event
-            StudyEventDAO eventDAO = new StudyEventDAO(getDataSource());
-            StudyEventBean nextEvent = (StudyEventBean) eventDAO.getNextScheduledEvent(ssoid);
-            CRFVersionDAO versionDAO = new CRFVersionDAO(getDataSource());
-            ArrayList<CRFVersionBean> crfs = versionDAO.findDefCRFVersionsByStudyEvent(nextEvent.getStudyEventDefinitionId());
-            PFormCache cache = PFormCache.getInstance(context);
-            StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
-            for (CRFVersionBean crfVersion : crfs) {
-                String enketoURL = cache.getPFormURL(studyOID, crfVersion.getOid(), studyEvent);
-                String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()),
-                        String.valueOf(nextEvent.getSampleOrdinal()), crfVersion.getOid(), null, studyOID, null);
-            }
-        } catch (Exception e) {
-            LOGGER.debug(e.getMessage());
-            LOGGER.debug(ExceptionUtils.getStackTrace(e));
-            return "<error>" + e.getMessage() + "</error>";
-        }
-
-        response.setHeader("Content-Type", "text/xml; charset=UTF-8");
-        response.setHeader("Content-Disposition", "attachment; filename=\"schedule.xml\";");
-        response.setContentType("text/xml; charset=utf-8");
-        return "<result>success</result>";
-
-    }
 
     public DataSource getDataSource() {
         return dataSource;
@@ -1076,10 +1043,16 @@ public class OpenRosaServices {
     private String getFormLayoutOid(String formID) {
         if (formID.endsWith(QUERY_FLAVOR)) {
             formID = formID.substring(0, formID.length() - QUERY_FLAVOR.length());
+        } else if (formID.endsWith(PARTICIPATE_FLAVOR)) {
+            formID = formID.substring(0, formID.length() - PARTICIPATE_FLAVOR.length());
         } else if (formID.contains(SINGLE_ITEM_FLAVOR)) {
             formID = formID.substring(0, formID.indexOf(SINGLE_ITEM_FLAVOR));
         }
-        formID = formID.substring(0, formID.lastIndexOf(DASH));
+        int indexOfDash=formID.lastIndexOf(DASH);
+
+        if(indexOfDash!=-1){
+            formID = formID.substring(0, indexOfDash);
+        }
         return formID;
     }
 
@@ -1088,6 +1061,8 @@ public class OpenRosaServices {
             return QUERY_FLAVOR;
         } else if (formID.contains(SINGLE_ITEM_FLAVOR)) {
             return SINGLE_ITEM_FLAVOR;
+        } else if (formID.contains(PARTICIPATE_FLAVOR)) {
+            return PARTICIPATE_FLAVOR;
         } else {
             return NO_FLAVOR;
         }
@@ -1176,6 +1151,7 @@ public class OpenRosaServices {
         if (directoryListing != null) {
             for (File child : directoryListing) {
                 if ((flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(QUERY_SUFFIX))
+                        || (flavor.equals(PARTICIPATE_FLAVOR) && child.getName().endsWith(PARTICIPATE_SUFFIX))
                         || (flavor.equals(NO_FLAVOR) && child.getName().endsWith(NO_SUFFIX))) {
                     xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
                     break;

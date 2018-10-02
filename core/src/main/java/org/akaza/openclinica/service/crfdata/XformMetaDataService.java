@@ -45,6 +45,7 @@ public class XformMetaDataService {
     public static final String INSTANCE_SUFFIX = "instance.tpl";
     public static final String INSTANCEQUERIES_SUFFIX = "instance-queries.tpl";
     public static final String FORMQUERIES_SUFFIX = "form-queries.xml";
+    public static final String FORMPARTICIPATE_SUFFIX = "form-participate.xml";
     public static final String FORMPREVIEW_SUFFIX = "form-preview.xml";
     public static final String XLS_SUFFIX = ".xls";
 
@@ -644,7 +645,7 @@ public class XformMetaDataService {
             if (startIndex != -1) {
                 fileName = fileLink.substring(startIndex + 1);
             }
-            if (!fileLink.endsWith(FORM_SUFFIX) && !fileLink.endsWith(INSTANCEQUERIES_SUFFIX) && !fileLink.endsWith(FORMQUERIES_SUFFIX)
+            if (!fileLink.endsWith(FORM_SUFFIX) && !fileLink.endsWith(INSTANCEQUERIES_SUFFIX) && !fileLink.endsWith(FORMQUERIES_SUFFIX) && !fileLink.endsWith(FORMPARTICIPATE_SUFFIX)
                     && !fileLink.endsWith(XLS_SUFFIX) && !fileLink.endsWith(INSTANCE_SUFFIX) && !fileLink.endsWith(VERSION)
                     && !fileLink.endsWith(FORMPREVIEW_SUFFIX)) {
 

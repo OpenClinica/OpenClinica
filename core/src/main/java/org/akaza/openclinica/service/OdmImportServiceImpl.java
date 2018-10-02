@@ -2,8 +2,10 @@ package org.akaza.openclinica.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.SourceDataVerification;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
@@ -134,6 +136,19 @@ public class OdmImportServiceImpl implements OdmImportService {
 		ODMcomplexTypeDefinitionStudy odmStudy = odm.getStudy().get(0);
 		Study study = retrieveStudy(odm, userAccount, odmStudy);
 		study.setFilePath(study.getFilePath() + 1);
+
+		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+		StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
+		if (!spv.isActive()) {
+			spv = new StudyParameterValueBean();
+			spv.setStudyId(study.getStudyId());
+			spv.setParameter("participantPortal");
+			spv.setValue("enabled");
+			spvdao.create(spv);
+		} else if (spv.isActive() && !spv.getValue().equals("enabled")) {
+			spv.setValue("enabled");
+			spvdao.create(spv);
+		}
 
 		String studyPath = Utils.getFilePath() + Utils.getStudyPath(study.getOc_oid(), study.getFilePath());
 		if (new File(studyPath).exists()) {
