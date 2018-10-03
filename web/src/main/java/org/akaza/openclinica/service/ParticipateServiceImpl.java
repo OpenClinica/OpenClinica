@@ -95,6 +95,7 @@ public class ParticipateServiceImpl implements ParticipateService {
     public static final String DASH = "-";
     public static final String PARTICIPATE_EDIT = "participate-edit";
     public static final String PARTICIPATE_ADD_NEW = "participate-add-new";
+    public static final String PARTICIPATE_FLAVOR = "-participate";
 
 
     StudyDAO sdao;
@@ -152,7 +153,10 @@ public class ParticipateServiceImpl implements ParticipateService {
         StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
                 formLayout.getOid(),userAccountID, String.valueOf(nextEvent.getId()), studyOID, PFormCache.PARTICIPATE_MODE);
-        String enketoURL = cache.getPFormURL(studyOID, formLayout.getOid(), studyEvent,false,contextHash);
+
+        String crfOID= formLayout.getOid()+DASH+formLayout.getXform()+PARTICIPATE_FLAVOR;
+
+        String enketoURL = cache.getPFormURL(studyOID, crfOID, studyEvent,false,contextHash);
 
         String url = enketoURL + "?" + FORM_CONTEXT + "=" + contextHash;
         logger.debug("Enketo URL for " + formLayout.getName() + "= " + url);
@@ -399,9 +403,10 @@ public class ParticipateServiceImpl implements ParticipateService {
     public ODM getOdmHeader(ODM odm , StudyBean currentStudy , StudySubjectBean studySubject){
             odm = new ODM();
             ODMcomplexTypeDefinitionClinicalData clinicalData = generateClinicalData(currentStudy);
-            ODMcomplexTypeDefinitionSubjectData subjectData = generateSubjectData(studySubject);
-            if(subjectData!=null)
+            if(studySubject!=null && studySubject.isActive()) {
+                ODMcomplexTypeDefinitionSubjectData subjectData = generateSubjectData(studySubject);
                 clinicalData.getSubjectData().add(subjectData);
+            }
             odm.getClinicalData().add(clinicalData);
         return odm;
     }
