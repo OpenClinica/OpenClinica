@@ -376,11 +376,11 @@
                                      <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
                                         <c:if test="${!userRole.monitor}">
                                           <a href="javascript:;" id="contactInformation">
-                                            Contact Information
+                                            Invite
                                           </a>
                                           &nbsp;|&nbsp;
                                           <a href="javascript:;" id="participateAccess">
-                                            Participate Access
+                                            View Access Details
                                           </a>
                                         </c:if>
                                       </c:if>
@@ -1089,7 +1089,7 @@
               </tr>
               <tr valign="top">
                 <td class="formlabel" align="left">
-                  <span><fmt:message key="notify_participants_now" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
+                  <span>Invite Participant</span>&nbsp;<small class="required">*</small>
                 </td>
                 <td valign="top">
                   <label><input type="radio" name="notify" value="yes">Yes</label>
@@ -1120,7 +1120,7 @@
       <tr style="height:10px;">
         <td class="formlabel" align="left">
           <h3>
-            View Participate Access
+            View Access Details
           </h3>
         </td>
       </tr>
@@ -1137,6 +1137,9 @@
                 </td>
                 <td valign="top">
                   <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                  <div class="subnote">
+                    Please note: viewing access code will be audited.
+                  </div>
                 </td>
               </tr>
             </table>
@@ -1148,8 +1151,7 @@
       </tr>
       <tr>
         <td colspan="2" style="text-align: center;">
-          <input type="submit" name="connectParticipant" value="Connect"/>
-          <input type="button" id="cancel" name="cancel" value="Cancel"/>
+          <input type="button" id="cancel" name="cancel" value="Close"/>
         </td>
       </tr>
     </table>
