@@ -3,6 +3,7 @@ package org.akaza.openclinica.controller;
 import java.util.HashMap;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -13,6 +14,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.FormLayout;
+import org.akaza.openclinica.service.ParticipateService;
 import org.akaza.openclinica.service.crfdata.EnketoUrlService;
 import org.akaza.openclinica.service.crfdata.FormUrlObject;
 import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry;
@@ -46,6 +48,9 @@ public class EditFormController {
 
     @Autowired
     EnketoUrlService urlService;
+
+    @Autowired
+    private ParticipateService participateService;
 
     public static final String FORM_CONTEXT = "ecid";
     ParticipantPortalRegistrar participantPortalRegistrar;
@@ -82,7 +87,8 @@ public class EditFormController {
      */
 
     @RequestMapping(value = "/{studyOid}/url", method = RequestMethod.GET)
-    public ResponseEntity<String> getEditUrl(@RequestParam(FORM_CONTEXT) String formContext, @PathVariable("studyOid") String studyOID) throws Exception {
+    public ResponseEntity<String> getEditUrl(@RequestParam(FORM_CONTEXT) String formContext, @PathVariable("studyOid") String studyOID , HttpServletRequest request) throws Exception {
+        participateService.getRestfulServiceHelper().setSchema(studyOID, request);
 
         FormUrlObject editURL = null;
     //    if (!mayProceed(studyOID))
