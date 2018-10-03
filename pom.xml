@@ -30,7 +30,7 @@
         <spring-security.version>4.2.2.RELEASE</spring-security.version>
         <spring-ws.version>2.4.0.RELEASE</spring-ws.version>
         <db.test>localhost</db.test>
-        <version.keycloak>4.0.0.Final</version.keycloak>
+        <version.keycloak>3.4.3.Final</version.keycloak>
     </properties>
     <profiles>
         <profile>
