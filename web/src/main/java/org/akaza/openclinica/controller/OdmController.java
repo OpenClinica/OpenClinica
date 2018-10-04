@@ -232,9 +232,13 @@ public class OdmController {
         participateService.getRestfulServiceHelper().setSchema(studyOid, request);
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         UserAccountBean ub = participateService.getRestfulServiceHelper().getUserAccount(request);
+        logger.info("UserAccount username: " +ub.getName());
         StudyBean currentStudy = participateService.getStudy(studyOid);
+        logger.info("Study OId: " +currentStudy.getOid());
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         StudySubjectBean studySubject = studySubjectDAO.findByLabelAndStudy(ub.getName(), currentStudy);
+        logger.info("StudySubject Id: " +studySubject.getLabel());
+
 
         if (participateService.mayProceed(studyOid) && studySubject != null && studySubject.isActive() && studySubject.getStatus().isAvailable()) {
             odm = participateService.getODM(studyOid, studySubject.getOid(), ub);
