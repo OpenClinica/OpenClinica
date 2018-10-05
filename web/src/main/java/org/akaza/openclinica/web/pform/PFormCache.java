@@ -60,48 +60,21 @@ public class PFormCache {
     }
 
     public String getPFormURL(String studyOID, String crfOID, StudyEvent studyEvent ,boolean isOffline,String contextHash) throws Exception {
-        return getPFormURL(studyOID, crfOID, isOffline, studyEvent,contextHash);
+        return getPFormURL(studyOID, crfOID, studyEvent,contextHash);
     }
 
-    public String getPFormURL(String studyOID, String crfOID, boolean isOffline, StudyEvent studyEvent,String contextHash) throws Exception {
+    public String getPFormURL(String studyOID, String crfOID, StudyEvent studyEvent,String contextHash) throws Exception {
         Study parentStudy = enketoCredentials.getParentStudy(studyOID);
         studyOID = parentStudy.getOc_oid();
-        FormUrlObject formUrlObject = null;
 
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOID));
         HashMap<String, String> studyURLs = null;
-        if (isOffline)
-            studyURLs = offlineUrlCache.get(studyOID);
-        else
-            studyURLs = urlCache.get(studyOID);
-        if (studyURLs == null) {
-            studyURLs = new HashMap<String, String>();
-            formUrlObject = null;
-            if (isOffline)
-                formUrlObject = enketo.getOfflineFormURL(contextHash, crfOID);
-            else
-                formUrlObject = enketo.getFormURL(contextHash, crfOID, studyOID, Role.RESEARCHASSISTANT, parentStudy, studyEvent, PARTICIPATE_MODE, null, false);
 
-            if (formUrlObject.getFormUrl().equals("")) {
-                throw new Exception("Unable to get enketo form url.");
-            }
-            studyURLs.put(crfOID, formUrlObject.getFormUrl());
-            if (isOffline)
-                offlineUrlCache.put(studyOID, studyURLs);
-            else
-                urlCache.put(studyOID, studyURLs);
-            return formUrlObject.getFormUrl();
-        } else if (studyURLs.get(crfOID) == null) {
-            if (isOffline)
-                formUrlObject = enketo.getOfflineFormURL(contextHash, crfOID);
-            else
-                formUrlObject = enketo.getFormURL( contextHash, crfOID, studyOID,
-                        Role.RESEARCHASSISTANT, parentStudy, studyEvent, PARTICIPATE_MODE, null, false);
-            studyURLs.put(crfOID, formUrlObject.getFormUrl());
-            return formUrlObject.getFormUrl();
-        } else
-            return studyURLs.get(crfOID);
+        FormUrlObject formUrlObject = enketo.getFormURL(contextHash, crfOID, studyOID,
+                Role.RESEARCHASSISTANT, parentStudy, studyEvent, PARTICIPATE_MODE, null, false);
+        return formUrlObject.getFormUrl();
     }
+
 
     public HashMap<String, String> getSubjectContext(String key) throws Exception {
         return subjectContextCache.get(key);
