@@ -52,6 +52,7 @@ public class StudySubject  extends DataMapDomainObject {
 	private List<StudyEvent> studyEvents ;
 	private List<EventCrf> eventCrfs;
 	private List<StudyEventDefinition> studyEventDefinitions;
+	private String participateUuid;
 	
 	public StudySubject() {
 	}
@@ -246,4 +247,12 @@ public class StudySubject  extends DataMapDomainObject {
 		this.eventCrfs = eventCrfs;
 	}
 
+	@Column(name = "participate_uuid")
+	public String getParticipateUuid() {
+		return participateUuid;
+	}
+
+	public void setParticipateUuid(String participateUuid) {
+		this.participateUuid = participateUuid;
+	}
 }
