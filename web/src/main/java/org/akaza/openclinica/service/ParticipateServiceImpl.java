@@ -150,11 +150,12 @@ public class ParticipateServiceImpl implements ParticipateService {
     private String createEnketoUrl(String studyOID, FormLayoutBean formLayout, StudyEventBean nextEvent, String ssoid ,String userAccountID) throws Exception {
         PFormCache cache = PFormCache.getInstance(context);
 
+        String crfOID= formLayout.getOid()+DASH+formLayout.getXform()+PARTICIPATE_FLAVOR;
+
         StudyEvent studyEvent = studyEventDao.findById(nextEvent.getId());
         String contextHash = cache.putSubjectContext(ssoid, String.valueOf(nextEvent.getStudyEventDefinitionId()), String.valueOf(nextEvent.getSampleOrdinal()),
-                formLayout.getOid(),userAccountID, String.valueOf(nextEvent.getId()), studyOID, PFormCache.PARTICIPATE_MODE);
+                crfOID,userAccountID, String.valueOf(nextEvent.getId()), studyOID, PFormCache.PARTICIPATE_MODE);
 
-        String crfOID= formLayout.getOid()+DASH+formLayout.getXform()+PARTICIPATE_FLAVOR;
 
         String enketoURL = cache.getPFormURL(studyOID, crfOID, studyEvent,false,contextHash);
 
