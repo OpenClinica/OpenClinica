@@ -10,7 +10,6 @@ import org.springframework.http.ResponseEntity;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
-import java.util.Optional;
 
 /**
  * Created by yogi on 11/10/16.
@@ -25,7 +24,7 @@ public interface StudyBuildService {
     ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request);
 
     ResponseEntity getUserDetails(HttpServletRequest request);
-    void updateStudyUsername(UserAccountBean ub, Auth0User user);
+    void updateStudyUsername(UserAccountBean ub, KeycloakUser user);
     boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId, String altStudyEnvUuid);
     UserAccount getUserAccountObject(UserAccountBean ubIn);
 }

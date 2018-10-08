@@ -56,7 +56,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
 
     @Autowired CreateUserCoreService userService;
 
-    private static final String PUBLIC_KEY_LOCATION = "oc4.cer";
+    private static final String PUBLIC_KEY_LOCATION = "keycloak.cer";
     private static final String X509_CERTFICATE = "X509";
     private static final String API_AUDIENCE = "https://www.openclinica.com";
 

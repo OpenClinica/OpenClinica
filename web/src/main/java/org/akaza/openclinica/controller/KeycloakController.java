@@ -22,4 +22,8 @@ public class KeycloakController {
 
         return authUrl;
     }
+    public String getReturnTo(HttpServletRequest req) {
+        return "/OpenClinica/MainMenu";
+    }
+
 }

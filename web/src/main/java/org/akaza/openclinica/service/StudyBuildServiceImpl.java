@@ -27,7 +27,6 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -40,7 +39,6 @@ import org.springframework.web.client.RestTemplate;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.util.*;
-import java.util.stream.Collectors;
 
 /**
  * Created by yogi on 11/10/16.
@@ -380,7 +378,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         ResponseEntity<OCUserDTO> response = restTemplate.exchange(uri, HttpMethod.GET, entity, OCUserDTO.class);
         return response;
     }
-    public void updateStudyUsername(UserAccountBean ub, Auth0User user) {
+    public void updateStudyUsername(UserAccountBean ub, KeycloakUser user) {
         int numUpdated = studyUserRoleDao.updateUsername(user.getNickname(), user.getUserId());
         logger.debug(numUpdated + " studyUserRoles updated for user:" + user.getNickname() + " and prevUser:" + user.getUserId());
     }

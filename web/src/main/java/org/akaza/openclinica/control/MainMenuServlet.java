@@ -307,6 +307,9 @@ public class MainMenuServlet extends SecureController {
             }
 
         }
+        logger.info("Current Role:" + currentRole.getRole().getName());
+        StudyUserRoleBean userRole = (StudyUserRoleBean) session.getAttribute("userRole");
+        logger.info("User Role:" + userRole.getName());
 
         forwardPage(Page.MENU);
     }

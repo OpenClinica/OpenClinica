@@ -1,10 +1,14 @@
 package org.akaza.openclinica.controller;
 
+import com.auth0.jwt.JWT;
+import com.auth0.jwt.interfaces.DecodedJWT;
 import net.sf.json.util.JSONUtils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.service.CallbackService;
+import org.akaza.openclinica.service.KeycloakUser;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
@@ -80,19 +84,23 @@ public class CallbackController {
 
             KeycloakPrincipal<KeycloakSecurityContext> kp = (KeycloakPrincipal<KeycloakSecurityContext>) ((KeycloakAuthenticationToken) userPrincipal).getPrincipal();
             AccessToken token = kp.getKeycloakSecurityContext().getToken();
-
-            Map<String, Object> otherClaims = token.getOtherClaims();
-
-            if (otherClaims.containsKey("https://www.openclinica.com/userContext") != true)
-                return;
-
-            LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) otherClaims.get("https://www.openclinica.com/userContext");
-            String ocUserUuid = (String) userContextMap.get("userUuid");
-
             req.getSession().setAttribute("accessToken", kp.getKeycloakSecurityContext().getTokenString());
+            KeycloakUser user = new KeycloakUser(token);
 
-            UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid(ocUserUuid);
+            String ocUserUuid = (String) user.getUserContext().get("userUuid");
+
+            UserAccountHelper userAccountHelper = null;
+            try {
+                userAccountHelper = callbackService.isCallbackSuccessful(req, user);
+            } catch (Exception e) {
+                logger.error("UserAccountHelper:", e);
+                throw e;
+            }
+            UserAccountBean ub = userAccountHelper.getUb();
             if (ub != null) {
+                if (userAccountHelper.isUpdated()) {
+                    ub = callbackService.getUpdatedUser(ub);
+                }
                 req.getSession().setAttribute(USER_BEAN_NAME, ub);
                 refreshUserRole(req, ub);
                 logger.info("Setting firstLoginCheck to true");
@@ -103,7 +111,7 @@ public class CallbackController {
                 unauthorized(res, "Bad credentials");
                 return;
             }
-            String returnTo = "/OpenClinica/MainMenu";
+            String returnTo = keycloakController.getReturnTo(req);
             String state = req.getParameter("state");
             String param = "";
             JSONObject jsonObject;

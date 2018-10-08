@@ -42,22 +42,10 @@ public class PermissionServiceImpl implements PermissionService {
     private EventCrfDao eventCrfDao;
     @Autowired
     private StudyDao studyDao;
-    @Value("${auth0.domain}")
-    private String domain;
+
     private static final String CREATE_TOKEN_API_PATH = "/oauth/token";
 
 
-    /**
-     * This is the client id of your auth0 application (see Settings page on auth0 dashboard)
-     */
-    @Value(value = "${auth0.apiClientId}")
-    private String clientId;
-
-    /**
-     * This is the client secret of your auth0 application (see Settings page on auth0 dashboard)
-     */
-    @Value(value = "${auth0.apiClientSecret}")
-    private String clientSecret;
 
     private boolean checkStudyUuid(String studyUuid, int parentStudyId) {
         if (parentStudyId == 0) return false;
@@ -224,20 +212,7 @@ public class PermissionServiceImpl implements PermissionService {
 
     public String getAccessToken() {
         logger.debug("Creating Auth0 Api Token");
-
-        TokenRequestDTO tokenRequestDTO = new TokenRequestDTO()
-                .grantType("client_credentials")
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .audience("https://www.openclinica.com");
-
-        HttpEntity requestEntity = new HttpEntity(tokenRequestDTO);
-        String createTokenUrl = "https://" + domain + CREATE_TOKEN_API_PATH;
-        RestTemplate restTemplate = new RestTemplate();
-
-        ResponseEntity<TokenResponseDTO> tokenResponse = restTemplate.exchange(createTokenUrl, HttpMethod.POST, requestEntity, TokenResponseDTO.class);
-        String accessToken = tokenResponse.getBody().getAccessToken();
-        return accessToken;
+        return null;
     }
 
 }

@@ -1,5 +1,5 @@
 package org.akaza.openclinica.service;
 
-public interface Auth0UserService {
+public interface KeycloakUserService {
     boolean authenticateAuth0User(String username, String password);
 }

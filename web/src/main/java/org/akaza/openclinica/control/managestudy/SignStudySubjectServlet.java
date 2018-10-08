@@ -50,8 +50,9 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import org.akaza.openclinica.service.Auth0UserService;
+import org.akaza.openclinica.service.KeycloakUserService;
 import org.akaza.openclinica.service.DiscrepancyNoteUtil;
+import org.akaza.openclinica.service.KeycloakUserServiceImpl;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.bean.DisplayStudyEventRow;
@@ -232,7 +233,9 @@ public class SignStudySubjectServlet extends SecureController {
             // org.akaza.openclinica.core.SecurityManager
             // .getInstance().encrytPassword(password);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
-            boolean isAuthenticated = true;
+            KeycloakUserService auth0UserService = ctx.getBean("auth0UserService", KeycloakUserServiceImpl.class);
+            boolean isAuthenticated = auth0UserService.authenticateAuth0User(username, password);
+
             if (isAuthenticated && ub.getName().equals(username)) {
                 if (signSubjectEvents(studySub, sm.getDataSource(), ub)) {
                     // Making the StudySubject signed as all the events have
