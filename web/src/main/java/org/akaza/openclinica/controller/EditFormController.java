@@ -1,9 +1,11 @@
 package org.akaza.openclinica.controller;
 
+import java.net.URI;
 import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -25,6 +27,8 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -87,7 +91,7 @@ public class EditFormController {
      */
 
     @RequestMapping(value = "/{studyOid}/url", method = RequestMethod.GET)
-    public ResponseEntity<String> getEditUrl(@RequestParam(FORM_CONTEXT) String formContext, @PathVariable("studyOid") String studyOID , HttpServletRequest request) throws Exception {
+    public ResponseEntity getEditUrl(@RequestParam(FORM_CONTEXT) String formContext, @PathVariable("studyOid") String studyOID , HttpServletRequest request) throws Exception {
         participateService.getRestfulServiceHelper().setSchema(studyOID, request);
 
         FormUrlObject editURL = null;
@@ -110,9 +114,9 @@ public class EditFormController {
         String mode = PFormCache.PARTICIPATE_MODE;
         editURL = urlService.getActionUrl(formContext, subjectContext, studyOID, formLayout, PARTICIPATE_FLAVOR, null, role, mode, null, false);
         logger.debug("Generating Enketo edit url for form: " + editURL);
-
-        return new ResponseEntity<String>(editURL.getFormUrl(), org.springframework.http.HttpStatus.ACCEPTED);
-
+        HttpHeaders headers = new HttpHeaders();
+        headers.setLocation(URI.create(editURL.getFormUrl()));
+        return new ResponseEntity<>(headers, HttpStatus.TEMPORARY_REDIRECT);
     }
 
     private StudyBean getParentStudy(String studyOid) {
