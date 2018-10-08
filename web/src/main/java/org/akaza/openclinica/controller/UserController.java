@@ -7,10 +7,13 @@ import javax.servlet.http.HttpSession;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.login.UserDTO;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLRequest;
 import org.apache.commons.codec.binary.Base64;
@@ -22,6 +25,7 @@ import org.springframework.http.converter.json.MappingJackson2HttpMessageConvert
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.ModelMap;
 import org.springframework.web.bind.annotation.*;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.servlet.ModelAndView;
 
@@ -35,25 +39,29 @@ public class UserController {
     //Autowire the class that handles the sidebar structure with a configured
     //bean named "sidebarInit"
     @Autowired
-    @Qualifier("sidebarInit")
+    @Qualifier( "sidebarInit" )
     private SidebarInit sidebarInit;
 
     @Autowired
     private UserService userService;
 
+    @Autowired
+    private ParticipateService participateService;
 
-    public UserController(){}
+    public UserController() {
+    }
 
     /**
      * The method is mapped to the URL /user.htm
-     * @param request  The HttpServletRequest for storing attributes.
-     * @param userId   The id of the user.
+     *
+     * @param request The HttpServletRequest for storing attributes.
+     * @param userId  The id of the user.
      * @return The return value is a ModelMap (instead of ModelAndView object),
      * because the view name automatically resolves to "user"
      */
-    @RequestMapping("/user")
+    @RequestMapping( "/user" )
     public ModelMap userHandler(HttpServletRequest request,
-                                @RequestParam("id") int userId) {
+                                @RequestParam( "id" ) int userId) {
         ModelMap map = new ModelMap();
         List<String> userList = new ArrayList<String>();
 
@@ -72,74 +80,50 @@ public class UserController {
         return map;
     }
 
-    @RequestMapping( value ="/createOCUser", method = RequestMethod.POST)
-    public ResponseEntity<UserDTO> createOCUser(HttpServletRequest request, @RequestBody OCUserDTO userDTO) {
-        String createUserUri = CoreResources.getField("SBSUrl");
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Accept-Charset", "UTF-8");
-        StudyBean studyBean = null;
-        HttpEntity<OCUserDTO> entity = new HttpEntity<OCUserDTO>(userDTO, headers);
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}/connect", method = RequestMethod.POST )
+    public ResponseEntity<Object> connectParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid, @RequestBody OCParticipantDTO participantDTO) {
+        participateService.getRestfulServiceHelper().setSchema(studyOid, request);
 
-        ResponseEntity<OCUserDTO> userResponse = restTemplate.exchange(createUserUri, HttpMethod.POST, entity, OCUserDTO.class);
-        if (userResponse == null) {
-            return new ResponseEntity(null, HttpStatus.NOT_FOUND);
-        }else{
-            userDTO=userResponse.getBody();
-            if(userDTO!=null) {
-                HttpSession session = request.getSession();
-                 studyBean = (StudyBean) session.getAttribute("study");
-
-                userService.updateParticipantUserInfo(userDTO,studyBean);
-            }
+        Object object = userService.connectParticipant(studyOid, ssid, participantDTO, request);
+        if (object instanceof HttpClientErrorException) {
+            return new ResponseEntity<Object>(((HttpClientErrorException) object).getResponseBodyAsString(), ((HttpClientErrorException) object).getStatusCode());
+        } else if (object instanceof OCUserDTO) {
+            return new ResponseEntity<Object>(object, HttpStatus.OK);
+        } else {
+            return null;
         }
-        StudyEnvironmentRoleDTO roleDTO=new StudyEnvironmentRoleDTO();
-         roleDTO.setRoleUuid("1234");
-         roleDTO.setStudyUuid(studyBean.getStudyEnvUuid());
-
-
-
-
-
-
-        String assignRoleUri = createUserUri+userDTO.getUuid()+ "/study-environments/"+studyBean.getStudyEnvUuid() +"/roles";
-        ResponseEntity<StudyEnvironmentRoleDTO> roleResponse = restTemplate.exchange(assignRoleUri, HttpMethod.POST, entity, StudyEnvironmentRoleDTO.class);
-        if (roleResponse == null) {
-            return new ResponseEntity(null, HttpStatus.NOT_FOUND);
-        }else{
-            roleDTO=roleResponse.getBody();
-        }
-
-        return new ResponseEntity(userDTO, org.springframework.http.HttpStatus.OK);
-
     }
 
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{sitesOID}/participants/{SSID}/connect", method = RequestMethod.POST )
+    public ResponseEntity<Object> connectSiteParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid,@PathVariable( "studyOID" ) String siteOid, @PathVariable( "SSID" ) String ssid, @RequestBody OCParticipantDTO participantDTO) {
+        participateService.getRestfulServiceHelper().setSchema(studyOid, request);
 
+        Object object = userService.connectParticipant(studyOid, ssid, participantDTO, request);
+        if (object instanceof HttpClientErrorException) {
+            return new ResponseEntity<Object>(((HttpClientErrorException) object).getResponseBodyAsString(), ((HttpClientErrorException) object).getStatusCode());
+        } else if (object instanceof OCUserDTO) {
+            return new ResponseEntity<Object>(object, HttpStatus.OK);
+        } else {
+            return null;
+        }
+    }
 
-
-
-
-    private void setUpSidebar(HttpServletRequest request){
-        if(sidebarInit.getAlertsBoxSetup() ==
-          SidebarEnumConstants.OPENALERTS){
-            request.setAttribute("alertsBoxSetup",true);
+    private void setUpSidebar(HttpServletRequest request) {
+        if (sidebarInit.getAlertsBoxSetup() ==
+                SidebarEnumConstants.OPENALERTS) {
+            request.setAttribute("alertsBoxSetup", true);
         }
 
-        if(sidebarInit.getInfoBoxSetup() == SidebarEnumConstants.OPENINFO){
-            request.setAttribute("infoBoxSetup",true);
+        if (sidebarInit.getInfoBoxSetup() == SidebarEnumConstants.OPENINFO) {
+            request.setAttribute("infoBoxSetup", true);
         }
-        if(sidebarInit.getInstructionsBoxSetup() == SidebarEnumConstants.OPENINSTRUCTIONS){
-            request.setAttribute("instructionsBoxSetup",true);
+        if (sidebarInit.getInstructionsBoxSetup() == SidebarEnumConstants.OPENINSTRUCTIONS) {
+            request.setAttribute("instructionsBoxSetup", true);
         }
 
-        if(! (sidebarInit.getEnableIconsBoxSetup() ==
-          SidebarEnumConstants.DISABLEICONS)){
-            request.setAttribute("enableIconsBoxSetup",true);
+        if (!(sidebarInit.getEnableIconsBoxSetup() ==
+                SidebarEnumConstants.DISABLEICONS)) {
+            request.setAttribute("enableIconsBoxSetup", true);
         }
 
 
@@ -152,9 +136,6 @@ public class UserController {
     public void setSidebarInit(SidebarInit sidebarInit) {
         this.sidebarInit = sidebarInit;
     }
-
-
-
 
 
 }
