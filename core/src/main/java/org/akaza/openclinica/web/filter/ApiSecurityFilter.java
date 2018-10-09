@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.service.user.CreateUserCoreService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -33,9 +34,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.*;
@@ -48,17 +47,14 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
 
     private String realm = "Protected";
 
-    private JsonParser objectMapper = JsonParserFactory.create();
-    final String EXP = "exp";
 
     @Autowired
     private DataSource dataSource;
 
     @Autowired CreateUserCoreService userService;
+    @Autowired
+    TokenService tokenService;
 
-    private static final String PUBLIC_KEY_LOCATION = "keycloak.cer";
-    private static final String X509_CERTFICATE = "X509";
-    private static final String API_AUDIENCE = "https://www.openclinica.com";
 
 
     @Override
@@ -99,7 +95,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                     // 2. create new user if doesn't exist and update roles
                     try {
                         String accessToken = st.nextToken();
-                        final Map<String, Object> decodedToken = decode(accessToken);
+                        final Map<String, Object> decodedToken = tokenService.decodeAndVerify(accessToken);
                         if (accessToken != null ) {
                             String _username = decodedToken.get("sub").toString();
                             LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
@@ -166,27 +162,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
     }
 
 
-    protected Map<String, Object> decode(String token) {
-        try {
-            final ClassLoader classLoader = getClass().getClassLoader();
-            InputStream inputStream = classLoader.getResourceAsStream(PUBLIC_KEY_LOCATION);
-            CertificateFactory certificateFactory = CertificateFactory.getInstance(X509_CERTFICATE);
-            Certificate certificate = certificateFactory.generateCertificate(inputStream);
-            RSAPublicKeyImpl publicKey = (RSAPublicKeyImpl) certificate.getPublicKey();
-            RsaVerifier verifier = new RsaVerifier(publicKey);
-            Jwt jwt = JwtHelper.decodeAndVerify(token, verifier);
-            String content = jwt.getClaims();
-            Map<String, Object> map = objectMapper.parseMap(content);
-            if (map.containsKey(EXP) && map.get(EXP) instanceof Integer) {
-                Integer intValue = (Integer) map.get(EXP);
-                map.put(EXP, new Long(intValue));
-            }
-            return map;
-        }
-        catch (Exception e) {
-            throw new InvalidTokenException("Cannot convert access token to JSON", e);
-        }
-    }
+
 
     public OCUserDTO getUserDetails (HttpServletRequest request) {
         Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
