@@ -367,7 +367,7 @@
                                   </tr>
                                 </tbody>
                               </table>
-                              <c:if test="${sessionScope.customUserRole == 'Clinical Research Coordinator' || sessionScope.customUserRole == 'Investigator'}">
+                              <c:if test="${!userRole.monitor}">
                                 <table width="600" border="0" cellpadding="0" cellspacing="0" class="left" style="margin-left:20px;">
                                   <!-- Table Actions row (pagination, search, tools) -->
                                   <tbody>
@@ -790,7 +790,7 @@
                                   </td>
                                   <td class="table_cell">
                                     <c:out value="${studySub.oid}"/>
-                                  </td>
+           ``                       </td>
                                   <td class="table_header_row">
                                     <fmt:message key="gender" bundle="${resword}"/>
                                     <%-- DN for Gender goes here --%>
@@ -1082,7 +1082,41 @@
                   <span>Mobile</span>&nbsp;<small class="required">*</small>
                 </td>
                 <td valign="top">
-                  <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                  <style>
+                    .country-select {
+                        background: url(../images/flags/all.png) no-repeat 0 0;
+                        width: 20px;
+                        height: 11px;
+                        overflow: hidden;
+                        margin-left: 11px;
+                    }
+                  </style>
+                  <table>
+                    <tbody class="mobile-phone-tbody"> 
+                      <tr> 
+                        <th class="country-select-div" onclick="select()" id="country-select-th"> 
+                          <table> 
+                            <tbody> 
+                              <tr> 
+                                <td> 
+                                  <div id="country-select" class="country-select" style="background-position: 0px -1716px;"></div> 
+                                </td> 
+                                <td> 
+                                  <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
+                                </td> 
+                              </tr> 
+                            </tbody> 
+                          </table> 
+                        </th> 
+                        <td> 
+                          <div id="country-code" class="country-code">+61</div> 
+                        </td> 
+                        <td> 
+                          <input id="mobile-phone-input" type="tel" class="form-control col-sm-4 mobile-phone-input ng-pristine ng-valid ng-valid-pattern ng-valid-minlength ng-valid-maxlength ng-valid-parse ng-touched" name="mobilePhone" \style="width: 100%; padding-left: 1px"> 
+                        </td> 
+                      </tr>
+                    </tbody>
+                  </table>
                 </td>
               </tr>
               <tr valign="top">
@@ -1164,7 +1198,7 @@
         jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
     }
 
-     jQuery(document).ready(function () {
+    jQuery(document).ready(function () {
         jQuery('#editParticipantID').click(function () {
             jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
         });
@@ -1181,6 +1215,180 @@
         jQuery('#participateAccess').click(function() {
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
         });
-     });
+    });
+
+    var select = function() {
+        $('#country-option').css('display', 'table');
+    }
+
+    var selectCountry = function(countryCode) {
+        var ctr = getCountryByCountryCode(countryCode);
+        if (ctr != null) {
+            $('#country-select').css('background-position', getBackgroundPositionValue(ctr.backgroundPositionLeft,
+                    ctr.backgroundPositionTop));
+
+            $('#country-code').html(ctr.phoneCode);
+        }
+        $('#country-option').css('display', 'none');
+    }
+
+    function getCountryByCountryCode(countryCode) {
+        for (var i = 0; i < countries.length; i++) {
+            if (countries[i].countryCode == countryCode)
+                return countries[i];
+        }
+        return null;
+    }
+
+    var countries = [
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1716,
+            name: 'Australia',
+            phoneCode: '+61',
+            countryCode: 'AU'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1331,
+            name: 'Austria',
+            phoneCode: '+43',
+            countryCode: 'AT'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: 0,
+            name: 'Belgium',
+            phoneCode: '+32',
+            countryCode: 'BE'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -770,
+            name: 'Brazil',
+            phoneCode: '+55',
+            countryCode: 'BR'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1375,
+            name: 'Canada',
+            phoneCode: '+1',
+            countryCode: 'CA'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1342,
+            name: 'Chile',
+            phoneCode: '+56',
+            countryCode: 'CL'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -825,
+            name: 'China',
+            phoneCode: '+86',
+            countryCode: 'CN'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1386,
+            name: 'Denmark',
+            phoneCode: '+45',
+            countryCode: 'DK'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1529,
+            name: 'Dominican Republic',
+            phoneCode: '+1',
+            countryCode: 'DO'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1012,
+            name: 'France',
+            phoneCode: '+33',
+            countryCode: 'FR'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -2509,
+            name: 'Germany',
+            phoneCode: '+49',
+            countryCode: 'DE'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1694,
+            name: 'India',
+            phoneCode: '+91',
+            countryCode: 'IN'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1969,
+            name: 'Ireland',
+            phoneCode: '+353',
+            countryCode: 'IE'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -143,
+            name: 'Italy',
+            phoneCode: '+39',
+            countryCode: 'IT'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -429,
+            name: 'Japan',
+            phoneCode: '+81',
+            countryCode: 'JP'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1441,
+            name: 'Netherlands',
+            phoneCode: '+31',
+            countryCode: 'NL'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1155,
+            name: 'Spain',
+            phoneCode: '+34',
+            countryCode: 'ES'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -385,
+            name: 'Sweden',
+            phoneCode: '+46',
+            countryCode: 'SE'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1320,
+            name: 'Switzerland',
+            phoneCode: '+41',
+            countryCode: 'CH'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -44,
+            name: 'United States',
+            phoneCode: '+1',
+            countryCode: 'US'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -55,
+            name: 'United Kingdom',
+            phoneCode: '+44',
+            countryCode: 'GB'
+        },
+    ];
+    var DEFAULT_COUNTRY = 19;
 
 </script>
