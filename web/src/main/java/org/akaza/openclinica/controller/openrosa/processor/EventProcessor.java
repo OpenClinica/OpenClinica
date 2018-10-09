@@ -120,7 +120,7 @@ public class EventProcessor implements Processor {
             container.setEventCrf(createEventCrf(container.getFormLayout(), container.getStudyEvent(), container.getSubject(), container.getUser()));
         } else {
             for (EventCrf existingEventCrf : existingEventCrfs) {
-                if (existingEventCrf.getCrfVersion().getOcOid().equals(container.getCrfVersion().getOcOid())) {
+                if (existingEventCrf.getFormLayout().getOcOid().equals(container.getFormLayout().getOcOid())) {
                     logger.info("***  Existing EventCrf with same CRF Version  ***");
                     // use existing event crf
                     container.setEventCrf(existingEventCrf);
