@@ -1254,10 +1254,18 @@ public class ImportCRFDataService {
 	                              
 	                                    // Do something probably not sure....
 	                               if (studyEvent == null || studyEvent.getId() == 0) {
-	                                    mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
-	                                    Object[] arguments = { sedOid, oid };
-	                                    errors.add(mf.format(arguments));
-	                                    logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
+	                            	    if(studyEventDefintionBean.isRepeating()) {
+	                            	    	mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
+		                                    Object[] arguments = { sedOid, oid };
+		                                    errors.add(mf.format(arguments));
+		                                    logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
+	                            	    }else {
+	                            	    	mf.applyPattern(respage.getString("your_study_non_repeating_event_oid_for_subject_oid_repeat_key"));
+		                                    Object[] arguments = { studyEventDataBean.getStudyEventRepeatKey(),sedOid, oid };
+		                                    errors.add(mf.format(arguments));
+		                                    logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid + "and repeat key " + studyEventDataBean.getStudyEventRepeatKey());
+	                            	    }
+	                                   
 	                                }
                             	}
                             } else if (studyEventDefintionBean == null) {
