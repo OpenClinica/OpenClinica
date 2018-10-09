@@ -8,10 +8,11 @@ import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.datamap.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.representations.AccessTokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -212,7 +213,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     public String getAccessToken() {
         logger.debug("Creating Auth0 Api Token");
+        AuthzClient authzClient = AuthzClient.create();
+        AccessTokenResponse accessTokenResponse = authzClient.obtainAccessToken();
+        if (accessTokenResponse != null)
+            return accessTokenResponse.getToken();
         return null;
+
     }
 
 }
