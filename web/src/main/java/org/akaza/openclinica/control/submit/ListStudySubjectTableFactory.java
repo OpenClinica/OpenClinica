@@ -122,11 +122,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         int index = 0;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("study_subject_ID"), new SubjectIdCellEditor(), null);
         ++index;
-        configureColumn(row.getColumn(columnNames[index]), resword.getString("subject_status"), new StatusCellEditor(), new StatusDroplistFilterEditor());
+        configureColumn(row.getColumn(columnNames[index]), resword.getString("status"), new StatusCellEditor(), new StatusDroplistFilterEditor());
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("site_id"), null, null);
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("rule_oid"), null, null);
+        ++index;
+        configureColumn(row.getColumn(columnNames[index]), resword.getString("participate_status"), null, null);
         ++index;
         // group class columns
         for (int i = index; i < index + studyGroupClasses.size(); i++) {
@@ -246,6 +248,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             theItem.put("studySubject.status", studySubjectBean.getStatus());
             theItem.put("enrolledAt", study.getIdentifier());
             theItem.put("studySubject.oid", studySubjectBean.getOid());
+            theItem.put("participate.status", participateStatus(studySubjectBean));
             theItem.put("studySubject.secondaryLabel", studySubjectBean.getSecondaryLabel());
 
             SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
@@ -371,6 +374,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("studySubject.status");
         columnNamesList.add("enrolledAt");
         columnNamesList.add("studySubject.oid");
+        columnNamesList.add("participate.status");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
         }

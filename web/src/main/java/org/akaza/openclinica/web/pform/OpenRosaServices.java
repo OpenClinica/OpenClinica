@@ -1059,10 +1059,10 @@ public class OpenRosaServices {
     private String getQuerySet(String formID) {
         if (formID.endsWith(QUERY_FLAVOR)) {
             return QUERY_FLAVOR;
+        } else if (formID.endsWith(PARTICIPATE_FLAVOR)) {
+            return PARTICIPATE_FLAVOR;
         } else if (formID.contains(SINGLE_ITEM_FLAVOR)) {
             return SINGLE_ITEM_FLAVOR;
-        } else if (formID.contains(PARTICIPATE_FLAVOR)) {
-            return PARTICIPATE_FLAVOR;
         } else {
             return NO_FLAVOR;
         }

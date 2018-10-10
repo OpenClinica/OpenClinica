@@ -21,8 +21,6 @@ import javax.persistence.UniqueConstraint;
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.hibernate.annotations.Cache;
-import org.hibernate.annotations.CacheConcurrencyStrategy;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -52,6 +50,7 @@ public class StudySubject  extends DataMapDomainObject {
 	private List<StudyEvent> studyEvents ;
 	private List<EventCrf> eventCrfs;
 	private List<StudyEventDefinition> studyEventDefinitions;
+	private String userUuid;
 	
 	public StudySubject() {
 	}
@@ -246,4 +245,12 @@ public class StudySubject  extends DataMapDomainObject {
 		this.eventCrfs = eventCrfs;
 	}
 
+	@Column(name = "user_uuid")
+	public String getUserUuid() {
+		return userUuid;
+	}
+
+	public void setUserUuid(String userUuid) {
+		this.userUuid = userUuid;
+	}
 }

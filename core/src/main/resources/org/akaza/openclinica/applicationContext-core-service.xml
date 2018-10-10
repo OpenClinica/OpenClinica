@@ -38,6 +38,14 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
+    <bean id="participateServiceImpl" class="org.akaza.openclinica.service.ParticipateServiceImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
+    <bean id="userServiceImpl" class="org.akaza.openclinica.service.UserServiceImpl">
+        <constructor-arg ref="dataSource"/>
+    </bean>
+
     <bean id="importCRFDataService" class="org.akaza.openclinica.web.crfdata.ImportCRFDataService">
         <constructor-arg ref="dataSource"/>
     </bean>
