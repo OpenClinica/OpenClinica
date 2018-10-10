@@ -1304,6 +1304,10 @@
                     }
                     #country-select-down-arrow {
                         position: absolute;
+                        background: url(images/down-arrow.png) no-repeat center center;
+                        width: 10px;
+                        margin-left: 0px;
+                        margin-right: 5px;
                     }
                     #country-select {
                         position: absolute;
