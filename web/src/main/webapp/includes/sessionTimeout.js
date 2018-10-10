@@ -113,7 +113,7 @@ function processUserData(inputPromise) {
             console.log("In processcurrentUser:" + thisUser);
             if (thisUser !== userName) {
                 console.log("another user:" + thisUser + "New user is:" + userName);
-                window.location.replace (myContextPath + '/pages/invalidateAuth0Token');
+                window.location.replace (myContextPath + '/pages/invalidateKeycloakToken');
 
             }
         }

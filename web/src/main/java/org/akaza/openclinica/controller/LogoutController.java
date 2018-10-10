@@ -21,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -36,23 +38,56 @@ public class LogoutController {
     EventCRFLocker eventCRFLocker;
 
     @RequestMapping(value="/logout", method = RequestMethod.GET)
-    protected String home(final Map<String, Object> model, final HttpServletRequest req) {
-        //https://keycloak.dev.openclinica.io/auth/realms/cust1/protocol/openid-connect/logout?redirect_uri=https%3A%2F%2Fcust1.build01.dev.openclinica.io%2F%23%2Faccount-study
-        AuthzClient authzClient = AuthzClient.create();
-        String coreAuthUrl = authzClient.getConfiguration().getAuthServerUrl();
+    protected void home(final Map<String, Object> model, final HttpServletRequest req, final HttpServletResponse response) {
+        String authUrl = getLogoutUri(req, false);
+        HttpSession session = req.getSession();
+        logger.debug("Logout page");
+        resetSession(session);
+        session.invalidate();
+        String redirectUri = getRedirectUri(req, false);
+        try {
+            req.logout();
+            response.sendRedirect(authUrl);
+        } catch (Exception e) {
+            logger.error("Error logging out:", e);
+        }
+    }
+
+    private String getRedirectUri(HttpServletRequest req, boolean callback) {
         int port = req.getServerPort();
         String portStr ="";
         if (port != 80 && port != 443) {
             portStr = ":" + port;
         }
-        String redirectUri = req.getScheme() + "://" + req.getServerName() + portStr + req.getContextPath() + "/MainMenu";
-        String authUrl = coreAuthUrl + "/realms/" + authzClient.getConfiguration().getRealm()
-                + "/protocol/openid-connect/logout?&redirect_uri=" + redirectUri;
-        HttpSession session = req.getSession();
-        logger.debug("Logout page");
-        resetSession(session);
-        session.invalidate();
-        return String.format("redirect:%s", authUrl);
+        String redirectUri = req.getScheme() + "://" + req.getServerName() + portStr + req.getContextPath();
+        if (callback) {
+            redirectUri += "/pages/login";
+        } else {
+            redirectUri += "/MainMenu";
+        }
+        return redirectUri;
+    }
+
+    private String getLogoutUri(HttpServletRequest req, boolean callback) {
+        AuthzClient authzClient = AuthzClient.create();
+        String coreAuthUrl = authzClient.getConfiguration().getAuthServerUrl();
+        String redirectUri = getRedirectUri(req, callback);
+        String authUrl = null;
+        String action = null;
+        if (callback)
+            action = "auth";
+        else
+            action = "logout";
+        try {
+            authUrl = coreAuthUrl + "/realms/" + authzClient.getConfiguration().getRealm()
+                    + "/protocol/openid-connect/" + action + "?redirect_uri=" + URLEncoder.encode(redirectUri, "UTF-8");
+            if (callback) {
+                authUrl += "&client_id=bridge";
+            }
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Encoding redirect URI:" + redirectUri, e);
+        }
+        return authUrl;
     }
 
     @RequestMapping(value="/logoutSuccess", method = RequestMethod.GET)
@@ -68,17 +103,17 @@ public class LogoutController {
         return "redirect:" + returnURL + param;
     }
 
-    @RequestMapping(value="/invalidateAuth0Token", method = RequestMethod.GET)
-    @ResponseStatus(value = HttpStatus.OK)
+    @RequestMapping(value="/invalidateKeycloakToken", method = RequestMethod.GET)
     public void invalidateAccessToken(final HttpServletRequest request,
                                       final HttpServletResponse response) throws IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
-            logger.info("Invalidating token");
+            logger.info("Invalidating Keycloak token");
             auth.setAuthenticated(false);
             final HttpSession session = request.getSession();
             resetSession(session);
-            response.sendRedirect("https://oc4.auth0.com/v2/logout");
+            String authUrl = getLogoutUri(request, true);
+            response.sendRedirect(authUrl);
         }
     }
 
