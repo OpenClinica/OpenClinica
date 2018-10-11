@@ -292,7 +292,7 @@
                         <div class="box_BL">
                           <div class="box_BR">
                             <div class="tablebox_center">
-                              <table width="440" border="0" cellpadding="0" cellspacing="0" class="left">
+                              <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:500px; padding-right:20px;">
                                 <!-- Table Actions row (pagination, search, tools) -->
                                 <tbody>
                                   <tr>
@@ -366,7 +366,7 @@
                                 </tbody>
                               </table>
                               <c:if test="${!userRole.monitor}">
-                                <table width="600" border="0" cellpadding="0" cellspacing="0" class="left" style="margin-left:20px;">
+                                <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:600px;">
                                   <!-- Table Actions row (pagination, search, tools) -->
                                   <tbody>
                                     <tr>
