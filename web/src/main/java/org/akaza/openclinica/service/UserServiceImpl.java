@@ -154,7 +154,7 @@ public class UserServiceImpl implements UserService {
 
     private Object getParticipantAccountFromUserService(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
             httpMethod) {
-        String getUserUri = CoreResources.getField("SBSUrl") + "/" + ocUserDTO.getUuid();
+        String getUserUri = CoreResources.getField("SBSUrl") + ocUserDTO.getUuid();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -202,4 +202,49 @@ public class UserServiceImpl implements UserService {
         }
         return object;
     }
+
+
+
+       private Object setUserRoleToUserAccount(HttpServletRequest request,OCUserDTO ocUserDTO,HttpMethod httpMethod,Study study){
+
+           String getUserUri = CoreResources.getField("SBSUrl")  + ocUserDTO.getUuid();
+           RestTemplate restTemplate = new RestTemplate();
+           HttpHeaders headers = new HttpHeaders();
+           headers.setContentType(MediaType.APPLICATION_JSON);
+           ObjectMapper objectMapper = new ObjectMapper();
+           objectMapper.registerModule(new JavaTimeModule());
+           String accessToken = (String) request.getSession().getAttribute("accessToken");
+           headers.add("Authorization", "Bearer " + accessToken);
+           headers.add("Accept-Charset", "UTF-8");
+           String envUuid="";
+           if(study.getStudyEnvUuid()!=null) {
+               envUuid =study.getStudyEnvUuid();
+           }else{
+               envUuid = study.getStudyEnvSiteUuid();
+           }
+           StudyEnvironmentRoleDTO studyEnvironmentRoleDTO = new StudyEnvironmentRoleDTO();
+           studyEnvironmentRoleDTO.setRoleUuid("Participant_Role");
+           studyEnvironmentRoleDTO.setDynamicRoleUuid("Dynamic_Role");
+           studyEnvironmentRoleDTO.setStudyUuid(envUuid);
+           HttpEntity<StudyEnvironmentRoleDTO> entity = new HttpEntity<StudyEnvironmentRoleDTO>(studyEnvironmentRoleDTO, headers);
+           ResponseEntity<StudyEnvironmentRoleDTO> userResponse = null;
+
+           String setUserRoleUri=getUserUri+"/study-environments/"+envUuid+"/roles";
+
+           try {
+               userResponse = restTemplate.exchange(setUserRoleUri, httpMethod, entity, StudyEnvironmentRoleDTO.class);
+           } catch (HttpClientErrorException e) {
+               logger.error("Auth0 error message: {}", e.getResponseBodyAsString());
+               return e;
+           }
+
+           if (userResponse == null) {
+               return null;
+           } else {
+               return studyEnvironmentRoleDTO = userResponse.getBody();
+           }
+   }
+
+
+
 }
