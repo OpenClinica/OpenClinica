@@ -365,7 +365,7 @@
                                   </tr>
                                 </tbody>
                               </table>
-                              <c:if test="${!userRole.monitor}">
+                              <c:if test="${sessionScope.customUserRole == 'Clinical Research Coordinator' || sessionScope.customUserRole == 'Investigator'}">
                                 <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:600px;">
                                   <!-- Table Actions row (pagination, search, tools) -->
                                   <tbody>
