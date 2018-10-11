@@ -298,12 +298,10 @@
                                   <tr>
                                     <!-- Table Tools/Actions cell -->
                                     <td class="table_actions" valign="top">
-                                     <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
-                                        <c:if test="${!userRole.monitor}">
-                                          <a href="javascript:;" id="editParticipantID">
-                                            <fmt:message key="edit" bundle="${resword}"/>
-                                          </a>
-                                        </c:if>
+                                     <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">                                        
+                                      <a href="javascript:;" id="editParticipantID" <c:if test="${userRole.monitor}">class="invisible"</c:if>>
+                                        <fmt:message key="edit" bundle="${resword}"/>
+                                      </a>
                                       </c:if>
                                     </td>
                                     <!-- End Table Tools/Actions cell -->
