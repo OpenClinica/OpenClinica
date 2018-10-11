@@ -93,9 +93,9 @@ public class UserServiceImpl implements UserService {
                 // update participant user Account  PUT
                 ocUserDTO.setUuid(studySubject.getUserUuid());
                 // Get participant
-                Object getParticipantObject = getParticipantAccount(request, ocUserDTO, HttpMethod.GET);
-                if (getParticipantObject instanceof OCUserDTO) {
-                    ocUserDTO.setStatus(((OCUserDTO) getParticipantObject).getStatus());
+                object = getParticipantAccountFromUserService(request, ocUserDTO, HttpMethod.GET);
+                if (object instanceof OCUserDTO) {
+                    ocUserDTO.setStatus(((OCUserDTO) object).getStatus());
                 }
                 object = createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
             }
@@ -109,7 +109,7 @@ public class UserServiceImpl implements UserService {
 
     private Object createOrUpdateParticipantAccount(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
             httpMethod) {
-        String createUserUri = CoreResources.getField("SBSUrl");
+        String createOrUpdateUserUri = CoreResources.getField("SBSUrl");
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -122,7 +122,7 @@ public class UserServiceImpl implements UserService {
         HttpEntity<OCUserDTO> entity = new HttpEntity<OCUserDTO>(ocUserDTO, headers);
         ResponseEntity<OCUserDTO> userResponse = null;
         try {
-            userResponse = restTemplate.exchange(createUserUri, httpMethod, entity, OCUserDTO.class);
+            userResponse = restTemplate.exchange(createOrUpdateUserUri, httpMethod, entity, OCUserDTO.class);
         } catch (HttpClientErrorException e) {
             logger.error("Auth0 error message: {}", e.getResponseBodyAsString());
             return e;
@@ -137,10 +137,13 @@ public class UserServiceImpl implements UserService {
 
     }
 
+
     private OCUserDTO buildOCUserDTO(String ssid, OCParticipantDTO participantDTO) {
         OCUserDTO ocUserDTO = new OCUserDTO();
-        ocUserDTO.setEmail(participantDTO.getEmail());
-        ocUserDTO.setFirstName(participantDTO.getFirstName());
+        if(participantDTO!=null) {
+            ocUserDTO.setEmail(participantDTO.getEmail());
+            ocUserDTO.setFirstName(participantDTO.getFirstName());
+        }
         ocUserDTO.setUserType(UserType.USER);
         ocUserDTO.setUsername(ssid);
         ocUserDTO.setLastName("ParticipateAccount");
@@ -149,7 +152,7 @@ public class UserServiceImpl implements UserService {
         return ocUserDTO;
     }
 
-    private Object getParticipantAccount(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
+    private Object getParticipantAccountFromUserService(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
             httpMethod) {
         String getUserUri = CoreResources.getField("SBSUrl") + "/" + ocUserDTO.getUuid();
         RestTemplate restTemplate = new RestTemplate();
@@ -178,4 +181,25 @@ public class UserServiceImpl implements UserService {
 
     }
 
+    public Object getParticipantAccount(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request) {
+        Study study = getStudy(studyOid);
+        StudySubject studySubject = getStudySubject(ssid, study);
+        OCUserDTO ocUserDTO = null;
+        Object object = null;
+
+        if (studySubject != null) {
+            ocUserDTO = buildOCUserDTO(ssid, participantDTO);
+            if(studySubject.getUserUuid()!=null) {
+                ocUserDTO.setUuid(studySubject.getUserUuid());
+                object = getParticipantAccountFromUserService(request, ocUserDTO, HttpMethod.GET);
+            }else{
+                logger.info("Participant has not been connected yet");
+                logger.info("userUuid of participant in OC runtime is null");
+
+            }
+        } else {
+            logger.info("Participant does not exists or not added yet in OC ");
+        }
+        return object;
+    }
 }

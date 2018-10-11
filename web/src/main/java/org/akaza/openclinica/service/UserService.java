@@ -24,6 +24,8 @@ public interface UserService {
 
 	Object connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO,HttpServletRequest request);
 
+	Object getParticipantAccount(String studyOid, String ssid, OCParticipantDTO participantDTO,HttpServletRequest request);
+
 	}
 
 
