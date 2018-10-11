@@ -1439,7 +1439,7 @@
             });
             jQuery.ajax({
                 type: 'post',
-                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.oid}/connect',
+                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function() {
