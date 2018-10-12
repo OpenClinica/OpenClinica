@@ -143,10 +143,11 @@ public class UserServiceImpl implements UserService {
         if(participantDTO!=null) {
             ocUserDTO.setEmail(participantDTO.getEmail());
             ocUserDTO.setFirstName(participantDTO.getFirstName());
+            ocUserDTO.setPhoneNumber(participantDTO.getMobilePhone());
         }
         ocUserDTO.setUserType(UserType.USER);
         ocUserDTO.setUsername(ssid);
-        ocUserDTO.setLastName("ParticipateAccount");
+        ocUserDTO.setLastName("Hard Coded - Required Field");
         ocUserDTO.setStatus(UserStatus.INVITED);
 
         return ocUserDTO;
