@@ -32,7 +32,7 @@
           jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
       });
   
-      jQuery('#cancel').click(function() {
+      jQuery('input.cancel').click(function() {
           jQuery.unblockUI();
           return false;
       });
@@ -167,6 +167,9 @@
     margin-top: 6px;
     font-size: .85rem;
   }
+  .table_cell {
+    padding-top: 6px;
+  }
   .section {
     margin-bottom: 3px;
   }
@@ -207,6 +210,8 @@
   .subnote {
     font-size: 85%;
     color: #618ebb;
+    margin-top: 5px;
+    margin-left: 5px;
   }
   .full-width {
     width: 100%;
@@ -214,14 +219,17 @@
   .left {
     float: left;
   }
+  .clear {
+    clear: both;
+  }
   .hide {
     display: none;
   }
   .invisible {
     visibility: hidden;
   }
-  .clear {
-    clear: both;
+  .error {
+    color: red;
   }
 </style>
 <!-- then instructions-->
@@ -394,15 +402,15 @@
                                               <td class="table_header_column_top">
                                                 <fmt:message key="first_name" bundle="${resword}"/>
                                               </td>
-                                              <td class="table_cell_top">
-                                                <c:out value=""/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                                              <td class="table_cell_top" id="info-first-name">
+                                                &emsp;&emsp;&emsp;&emsp;
                                               </td>
 
                                               <td class="table_header_column">
                                                 Mobile Number
                                               </td>
-                                              <td class="table_cell">
-                                                <c:out value=""/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                                              <td class="table_cell" id="info-phone-number">
+                                                &emsp;&emsp;&emsp;&emsp;
                                               </td>
                                             </tr>
 
@@ -410,14 +418,14 @@
                                               <td class="table_header_column_top">
                                                 <fmt:message key="participate_status" bundle="${resword}"/>
                                               </td>
-                                              <td class="table_cell">
-                                                <c:out value=""/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                                              <td class="table_cell" id="info-participate-status">
+                                                &emsp;&emsp;&emsp;&emsp;
                                               </td>
                                               <td class="table_header_column">
                                                 <fmt:message key="email" bundle="${resword}"/>
                                               </td>
-                                              <td class="table_cell">
-                                                <c:out value=""/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
+                                              <td class="table_cell" id="info-email">
+                                                &emsp;&emsp;&emsp;&emsp;
                                               </td>
                                             </tr>
                                           </tbody>
@@ -790,7 +798,7 @@
                                   </td>
                                   <td class="table_cell">
                                     <c:out value="${studySub.oid}"/>
-           ``                       </td>
+                                  </td>
                                   <td class="table_header_row">
                                     <fmt:message key="gender" bundle="${resword}"/>
                                     <%-- DN for Gender goes here --%>
@@ -1028,11 +1036,9 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align: center;">
-                    <a href="javascript:;" id="cancelEdit">
-                    <input type="button" id="cancel" name="cancel" value="Cancel"/>
-                    </a>
+                    <input type="button" class="cancel" value="Cancel"/>
                     &nbsp;
-                    <input type="submit" name="Submit" value="Update"/>
+                    <input type="submit" value="Update"/>
 
 
                     <div id="dvForCalander_${rand}" style="width:1px; height:1px;"></div>
@@ -1045,331 +1051,337 @@
 </div>
 
 <div id="contactInformationForm" class="hide">
-  <form id="connectForm">
-    <table border="0" cellpadding="0" align="center" style="cursor:default;">
-      <tr style="height:10px;">
-        <td class="formlabel" align="left">
-          <h3>
-            Contact Information
-          </h3>
-        </td>
-      </tr>
-      <tr>
-        <td><div class="lines"></div></td>
-      </tr>
-      <tr>
-        <td>
-          <div style="max-height: 550px; min-width:400px; background:#FFFFFF; overflow-y: auto;">
-            <table cellspacing="10">
-              <tr valign="top">
-                <td class="formlabel" align="left">
-                  <span><fmt:message key="first_name" bundle="${resword}"/></span>
-                </td>
-                <td valign="top">
-                  <input name="firstName" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
-                </td>
-              </tr>
-              <tr valign="top">
-                <td class="formlabel" align="left">
-                  <span><fmt:message key="email" bundle="${resword}"/></span>
-                </td>
-                <td valign="top">
-                  <input name="email" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
-                </td>
-              </tr>
-              <tr valign="top">
-                <td class="formlabel" align="left">
-                  <span>Mobile</span>
-                </td>
-                <td valign="top">
+  <table border="0" cellpadding="0" align="center" style="cursor:default;">
+    <tr style="height:10px;">
+      <td class="formlabel" align="left">
+        <h3>
+          Contact Information
+        </h3>
+      </td>
+    </tr>
+    <tr>
+      <td><div class="lines"></div></td>
+    </tr>
+    <tr>
+      <td>
+        <div style="max-height: 550px; min-width:400px; background:#FFFFFF; overflow-y: auto;">
+          <table cellspacing="10">
+            <tr valign="top">
+              <td class="formlabel" align="left">
+                <span><fmt:message key="first_name" bundle="${resword}"/></span>
+              </td>
+              <td valign="top">
+                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+              </td>
+            </tr>
+            <tr valign="top">
+              <td class="formlabel" align="left">
+                <span><fmt:message key="email" bundle="${resword}"/></span>
+              </td>
+              <td valign="top">
+                <input id="email-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                <div class="subnote hide error" id="email-input-error">
+                  Invalid e-mail address
+                </div>
+              </td>
+            </tr>
+            <tr valign="top">
+              <td class="formlabel" align="left">
+                <span>
+                  Mobile
+                </span>
+              </td>
+              <td valign="top">
+                <style>
+                  #phone-input {
+                    padding: 4px !important;
+                    padding-left: 100px !important;
+                  }
+                  #phone-widget {
+                    position: relative;
+                  }
+                  #country-code {
+                    position: absolute;
+                    top: 4px;
+                    left: 54px;
+                    width: 37px;
+                    text-align: center;
+                  }
+                  #country-select {
+                    position: absolute;
+                    height: 26px;
+                    top: 2px;
+                    left: 2px;                    
+                    padding-top: 2px;
+                  }
+                  #country-select:hover {
+                    background-color: #eee;
+                  }
+                  #country-select-down-arrow {
+                    background: url(images/down-arrow.png) no-repeat center center;
+                    width: 10px;
+                    margin-left: 0px;
+                    margin-right: 5px;
+                    display: inline-block;
+                  }
+                  #country-flag {
+                    top: 9px;
+                    background: url(images/flags.png) no-repeat 0 0;
+                    width: 20px;
+                    height: 11px;
+                    overflow: hidden;
+                    margin-left: 11px;
+                    display: inline-block;
+                    background-position: 0px -44px;
+                  }
+                </style>
+                <div id="phone-widget">
+                  <input id="phone-input" type="text" class="formfield form-control" onfocus="this.select()"> 
+                  <div id="country-select">
+                    <div id="country-flag" class="down-arrow">&nbsp;</div> 
+                    <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
+                  </div> 
+                  <div id="country-code">+1</div> 
+                </div>
+                <div id="country-options" style="display:none;">
                   <style>
-                    #mobile-phone-input {
-                      padding: 4px !important;
-                      padding-left: 85px !important;
-                    }
-                    #mobile-phone-widget {
-                      position: relative;
-                    }
-                    #country-code {
+                    #country-options {
                       position: absolute;
-                      top: 4px;
-                      left: 55px;
+                      border: 1px solid #d9d9d9;
+                      background-color: white;
+                      padding-left: 0px;
+                      padding-right: 0px;
+                      z-index: 100;
+                      overflow: auto;
+                      height: 200px;
                     }
-                    #country-select {
-                      position: absolute;
-                      height: 26px;
-                      top: 2px;
-                      left: 2px;                    
-                      padding-top: 2px;
+                    .country-option:hover {
+                      background-color: #618ebb;
+                      color: white;
                     }
-                    #country-select:hover {
-                      background-color: #eee;
+                    .country-option:hover .the-country-code {
+                      color: white;
                     }
-                    #country-select-down-arrow {
-                      background: url(images/down-arrow.png) no-repeat center center;
-                      width: 10px;
-                      margin-left: 0px;
-                      margin-right: 5px;
-                      display: inline-block;
+                    .the-country-code {
+                      color: #666;
+                      padding-right: 10px;
                     }
-                    #country-select-flag {
-                      top: 9px;
+                    .flag-holder {
+                      padding-left: 5px;
+                      padding-right: 5px;
+                      padding-top: 1px;
+                    }
+                    .the-flag {
                       background: url(images/flags.png) no-repeat 0 0;
-                      width: 20px;
                       height: 11px;
                       overflow: hidden;
                       margin-left: 11px;
-                      display: inline-block;
+                      width: 20px;
                     }
                   </style>
-                  <div id="mobile-phone-widget">
-                    <input name="mobilePhone" id="mobile-phone-input" type="tel" name="mobilePhone" class="formfield form-control" onfocus="this.select()"> 
-                    <div id="country-select">
-                      <div id="country-select-flag" class="down-arrow">&nbsp;</div> 
-                      <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
-                    </div> 
-                    <div id="country-code">+61</div> 
-                  </div>
-                  <div id="country-option" style="display:none;">
-                    <style>
-                      #country-option {
-                        position: absolute;
-                        border: 1px solid #d9d9d9;
-                        background-color: white;
-                        padding-left: 0px;
-                        padding-right: 0px;
-                        z-index: 100;
-                        overflow: auto;
-                        height: 200px;
-                      }
-                      .country-option:hover {
-                        background-color: #618ebb;
-                        color: white;
-                      }
-                      .country-option:hover .country-code-option {
-                        color: white;
-                      }
-                      .country-code-option {
-                        color: #666;
-                        padding-right: 10px;
-                      }
-                      .country-flag-option {
-                        padding-left: 5px;
-                        padding-right: 5px;
-                        padding-top: 1px;
-                      }
-                      .country-select-option {
-                        background: url(images/flags.png) no-repeat 0 0;
-                        height: 11px;
-                        overflow: hidden;
-                        margin-left: 11px;
-                        width: 20px;
-                      }
-                    </style>
-                    <table cellspacing="0">
-                      <tbody>
-                        <tr class="country-option" data-country="AU">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1716px;"></div>
-                            </td>
-                            <td>
-                                <span>Australia</span>&nbsp;&nbsp;<span class="country-code-option">+61</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="AT">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1331px;"></div>
-                            </td>
-                            <td>
-                                <span>Austria</span>&nbsp;&nbsp;<span class="country-code-option">+43</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="BE">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px 0px;"></div>
-                            </td>
-                            <td>
-                                <span>Belgium</span>&nbsp;&nbsp;<span class="country-code-option">+32</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="BR">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -770px;"></div>
-                            </td>
-                            <td>
-                                <span>Brazil</span>&nbsp;&nbsp;<span class="country-code-option">+55</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="CA">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1375px;"></div>
-                            </td>
-                            <td>
-                                <span>Canada</span>&nbsp;&nbsp;<span class="country-code-option">+1</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="CL">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1342px;"></div>
-                            </td>
-                            <td>
-                                <span>Chile</span>&nbsp;&nbsp;<span class="country-code-option">+56</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="CN">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -825px;"></div>
-                            </td>
-                            <td>
-                                <span>China</span>&nbsp;&nbsp;<span class="country-code-option">+86</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="DK">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1386px;"></div>
-                            </td>
-                            <td>
-                                <span>Denmark</span>&nbsp;&nbsp;<span class="country-code-option">+45</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="DO">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1529px;"></div>
-                            </td>
-                            <td>
-                                <span>Dominican Republic</span>&nbsp;&nbsp;<span class="country-code-option">+1</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="FR">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1012px;"></div>
-                            </td>
-                            <td>
-                                <span>France</span>&nbsp;&nbsp;<span class="country-code-option">+33</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="DE">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -2509px;"></div>
-                            </td>
-                            <td>
-                                <span>Germany</span>&nbsp;&nbsp;<span class="country-code-option">+49</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="IN">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1694px;"></div>
-                            </td>
-                            <td>
-                                <span>India</span>&nbsp;&nbsp;<span class="country-code-option">+91</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="IE">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1969px;"></div>
-                            </td>
-                            <td>
-                                <span>Ireland</span>&nbsp;&nbsp;<span class="country-code-option">+353</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="IT">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -143px;"></div>
-                            </td>
-                            <td>
-                                <span>Italy</span>&nbsp;&nbsp;<span class="country-code-option">+39</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="JP">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -429px;"></div>
-                            </td>
-                            <td>
-                                <span>Japan</span>&nbsp;&nbsp;<span class="country-code-option">+81</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="NL">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1441px;"></div>
-                            </td>
-                            <td>
-                                <span>Netherlands</span>&nbsp;&nbsp;<span class="country-code-option">+31</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="ES">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1155px;"></div>
-                            </td>
-                            <td>
-                                <span>Spain</span>&nbsp;&nbsp;<span class="country-code-option">+34</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="SE">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -385px;"></div>
-                            </td>
-                            <td>
-                                <span>Sweden</span>&nbsp;&nbsp;<span class="country-code-option">+46</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="CH">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -1320px;"></div>
-                            </td>
-                            <td>
-                                <span>Switzerland</span>&nbsp;&nbsp;<span class="country-code-option">+41</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="GB">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -55px;"></div>
-                            </td>
-                            <td>
-                                <span>United Kingdom</span>&nbsp;&nbsp;<span class="country-code-option">+44</span>
-                            </td>
-                        </tr>
-                        <tr class="country-option" data-country="US">
-                            <td class="country-flag-option">
-                                <div class="country-select-option" style="background-position: 0px -44px;"></div>
-                            </td>
-                            <td>
-                                <span>United States</span>&nbsp;&nbsp;<span class="country-code-option">+1</span>
-                            </td>
-                        </tr>
-                      </tbody>
-                    </table>
-                  </div>
-                </td>
-              </tr>
-              <tr valign="top">
-                <td class="formlabel" align="left">
-                  <span>Invite Participant</span>
-                </td>
-                <td valign="top">
-                  <label><input type="radio" name="inviteParticipant" value="true">Yes</label>
-                  &emsp;
-                  <label><input type="radio" name="inviteParticipant" value="false">No</label>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><div class="lines"></div></td>
-      </tr>
-      <tr>
-        <td colspan="2" style="text-align: center;">
-          <input type="submit" value="Connect"/>
-          <input type="button" id="cancel" name="cancel" value="Cancel"/>
-        </td>
-      </tr>
-    </table>
-  </form>
+                  <table cellspacing="0">
+                    <tbody>
+                      <tr class="country-option" data-country="AU">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1716px;"></div>
+                          </td>
+                          <td>
+                              <span>Australia</span>&nbsp;&nbsp;<span class="the-country-code">+61</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="AT">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1331px;"></div>
+                          </td>
+                          <td>
+                              <span>Austria</span>&nbsp;&nbsp;<span class="the-country-code">+43</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="BE">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px 0px;"></div>
+                          </td>
+                          <td>
+                              <span>Belgium</span>&nbsp;&nbsp;<span class="the-country-code">+32</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="BR">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -770px;"></div>
+                          </td>
+                          <td>
+                              <span>Brazil</span>&nbsp;&nbsp;<span class="the-country-code">+55</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="CA">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1375px;"></div>
+                          </td>
+                          <td>
+                              <span>Canada</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="CL">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1342px;"></div>
+                          </td>
+                          <td>
+                              <span>Chile</span>&nbsp;&nbsp;<span class="the-country-code">+56</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="CN">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -825px;"></div>
+                          </td>
+                          <td>
+                              <span>China</span>&nbsp;&nbsp;<span class="the-country-code">+86</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="DK">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1386px;"></div>
+                          </td>
+                          <td>
+                              <span>Denmark</span>&nbsp;&nbsp;<span class="the-country-code">+45</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="DO">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1529px;"></div>
+                          </td>
+                          <td>
+                              <span>Dominican Republic</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="FR">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1012px;"></div>
+                          </td>
+                          <td>
+                              <span>France</span>&nbsp;&nbsp;<span class="the-country-code">+33</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="DE">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -2509px;"></div>
+                          </td>
+                          <td>
+                              <span>Germany</span>&nbsp;&nbsp;<span class="the-country-code">+49</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="IN">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1694px;"></div>
+                          </td>
+                          <td>
+                              <span>India</span>&nbsp;&nbsp;<span class="the-country-code">+91</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="IE">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1969px;"></div>
+                          </td>
+                          <td>
+                              <span>Ireland</span>&nbsp;&nbsp;<span class="the-country-code">+353</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="IT">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -143px;"></div>
+                          </td>
+                          <td>
+                              <span>Italy</span>&nbsp;&nbsp;<span class="the-country-code">+39</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="JP">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -429px;"></div>
+                          </td>
+                          <td>
+                              <span>Japan</span>&nbsp;&nbsp;<span class="the-country-code">+81</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="NL">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1441px;"></div>
+                          </td>
+                          <td>
+                              <span>Netherlands</span>&nbsp;&nbsp;<span class="the-country-code">+31</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="ES">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1155px;"></div>
+                          </td>
+                          <td>
+                              <span>Spain</span>&nbsp;&nbsp;<span class="the-country-code">+34</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="SE">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -385px;"></div>
+                          </td>
+                          <td>
+                              <span>Sweden</span>&nbsp;&nbsp;<span class="the-country-code">+46</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="CH">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1320px;"></div>
+                          </td>
+                          <td>
+                              <span>Switzerland</span>&nbsp;&nbsp;<span class="the-country-code">+41</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="GB">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -55px;"></div>
+                          </td>
+                          <td>
+                              <span>United Kingdom</span>&nbsp;&nbsp;<span class="the-country-code">+44</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="US">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -44px;"></div>
+                          </td>
+                          <td>
+                              <span>United States</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
+                          </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+            <tr valign="top">
+              <td class="formlabel" align="left">
+                <span>Invite Participant</span>
+              </td>
+              <td valign="top" id="invite-option">
+                <label><input type="radio" name="invite-option" value="true">Yes</label>
+                &emsp;
+                <label><input type="radio" name="invite-option" value="false">No</label>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><div class="lines"></div></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align: center;">
+        <input type="button" id="connect-button" value="Connect"/>
+        <input type="button" class="cancel" value="Cancel"/>
+      </td>
+    </tr>
+  </table>
 </div>
 
 <div id="participateAccessForm" class="hide">
-  <form name="participateAccessForm" method="post">
+  <form method="post">
     <table border="0" cellpadding="0" align="center" style="cursor:default;">
       <tr style="height:10px;">
         <td class="formlabel" align="left">
@@ -1405,7 +1417,7 @@
       </tr>
       <tr>
         <td colspan="2" style="text-align: center;">
-          <input type="button" id="cancel" name="cancel" value="Close"/>
+          <input type="button" class="cancel" value="Close"/>
         </td>
       </tr>
     </table>
@@ -1420,23 +1432,44 @@
         jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
     }
 
-     jQuery(document).ready(function () {
+    jQuery(document).ready(function () {
+        jQuery.ajax({
+            type: 'get',
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}',
+            success: function(data) {
+                data.phoneNumber = data.phoneNumber || '';
+                console.log(data.phoneNumber);
+
+                $('#name-input').val(data.firstName)
+                $('#email-input').val(data.email)
+                var phoneParts = data.phoneNumber.split(' ');
+                var countryCode = phoneParts.shift();
+                var phoneNumber = phoneParts.join(' ');
+                $('#country-code').text(countryCode || '+1');
+                $('#phone-input').val(data.phoneNumber);
+
+                $('#info-first-name').text(data.firstName);
+                $('#info-email').text(data.email);
+                $('#info-phone-number').text(data.phoneNumber);
+                $('#info-participate-status').text(data.status[0] + data.status.substr(1).toLowerCase());
+            },
+            error: function() {
+                console.log(arguments);
+            }
+        });
+
         jQuery('#editParticipantID').click(function () {
             jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
         });
 
-        jQuery('#cancel, #cancelEdit').click(function () {
-            jQuery.unblockUI();
-            return false;
-        });
-
-        jQuery('#connectForm').submit(function () {
+        jQuery('#connect-button').click(function () {
             var data = {
-              inviteParticipant: false
+                firstName: $('#name-input').val(),
+                email: $('#email-input').val(),
+                phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
+                inviteParticipant: $('#invite-option input:checked').val()
             };
-            $('#connectForm').serializeArray().each(function (field) {
-              data[field.name] = field.value;
-            });
+            console.log(data);
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/connect',
@@ -1453,6 +1486,24 @@
             return false;
         });
 
+        jQuery('#email-input').blur(function() {
+          var emailPattern = /[^\s@]+@[^\s@]+\.[^\s@]+/;
+          var input = $(this).val();
+          var parts = input.split('@');
+          var hasSingleAt = parts.length === 2;
+          var afterAt = parts[1] || '';
+          var afterAtHasDot = afterAt.includes('.');
+          var dotRightAfterAt = afterAt[0] === '.';
+          var endsWithDot = afterAt[afterAt.length - 1] === '.';
+          var validEmail = emailPattern.test(input) && hasSingleAt && afterAtHasDot && !dotRightAfterAt && !endsWithDot;
+          if (validEmail) {
+            $('#email-input-error').hide();
+          }
+          else {
+            $('#email-input-error').show();
+          }
+        });
+
         jQuery('#contactInformation').click(function() {
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
         });
@@ -1461,21 +1512,21 @@
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
         });
 
-        jQuery('#mobile-phone-widget').on('click', 'div', function() {
-            $('#country-option').css('display', 'block');
+        jQuery('#phone-widget').on('click', 'div', function() {
+            $('#country-options').css('display', 'block');
         });
 
-        jQuery('#country-option').on('click', 'tr', function() {
+        jQuery('#country-options').on('click', 'tr', function() {
             var countryCode = $(this).data('country');
             var ctr = getCountryByCountryCode(countryCode);
             if (ctr != null) {
-                jQuery('#country-select-flag').css('background-position', getBackgroundPositionValue(
+                jQuery('#country-flag').css('background-position', getBackgroundPositionValue(
                     ctr.backgroundPositionLeft, ctr.backgroundPositionTop
                 ));
                 jQuery('#country-code').html(ctr.phoneCode);
             }
-            jQuery('#country-option').css('display', 'none');
-            $('#mobile-phone-input').focus();
+            jQuery('#country-options').css('display', 'none');
+            $('#phone-input').focus();
         });
      });
 
@@ -1638,6 +1689,5 @@
             countryCode: 'GB'
         },
     ];
-    var DEFAULT_COUNTRY = 19;
 
 </script>
