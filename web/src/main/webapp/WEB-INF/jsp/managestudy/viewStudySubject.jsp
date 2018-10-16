@@ -307,11 +307,9 @@
                                     <!-- Table Tools/Actions cell -->
                                     <td class="table_actions" valign="top">
                                      <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
-                                        <c:if test="${!userRole.monitor}">
-                                          <a href="javascript:;" id="editParticipantID">
-                                            <fmt:message key="edit" bundle="${resword}"/>
-                                          </a>
-                                        </c:if>
+                                        <a href="javascript:;" id="editParticipantID" <c:if test="${userRole.monitor}">class="invisible"</c:if>>
+                                          <fmt:message key="edit" bundle="${resword}"/>
+                                        </a>
                                       </c:if>
                                     </td>
                                     <!-- End Table Tools/Actions cell -->
@@ -375,67 +373,65 @@
                                   </tr>
                                 </tbody>
                               </table>
-                              <c:if test="${sessionScope.customUserRole == 'Clinical Research Coordinator' || sessionScope.customUserRole == 'Investigator'}">
-                                <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:600px;">
-                                  <!-- Table Actions row (pagination, search, tools) -->
-                                  <tbody>
-                                    <tr>
-                                      <!-- Table Tools/Actions cell -->
-                                      <td class="table_actions" valign="top">
-                                        <a href="javascript:;" id="contactInformation">
-                                          Invite
-                                        </a>
-                                        &nbsp;|&nbsp;
-                                        <a href="javascript:;" id="participateAccess">
-                                          View Access Details
-                                        </a>
-                                      </td>
-                                      <!-- End Table Tools/Actions cell -->
-                                    </tr>
-                                    <!-- end Table Actions row (pagination, search, tools) -->
-                                    <tr>
-                                      <td valign="top">
-                                        <!-- Table Contents -->
-                                        <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                                          <tbody>
-                                            <tr>
-                                              <td class="table_header_column_top">
-                                                <fmt:message key="first_name" bundle="${resword}"/>
-                                              </td>
-                                              <td class="table_cell_top" id="info-first-name">
-                                                &emsp;&emsp;&emsp;&emsp;
-                                              </td>
+                              <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:600px;">
+                                <tbody
+                                  <c:if test="${sessionScope.customUserRole != 'Clinical Research Coordinator' && sessionScope.customUserRole != 'Investigator'}">
+                                    class="invisible"
+                                  </c:if>
+                                >
+                                  <tr>
+                                    <td class="table_actions" valign="top">
+                                      <a href="javascript:;" id="contactInformation">
+                                        Invite
+                                      </a>
+                                      &nbsp;|&nbsp;
+                                      <a href="javascript:;" id="participateAccess">
+                                        View Access Details
+                                      </a>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td valign="top">
+                                      <!-- Table Contents -->
+                                      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                        <tbody>
+                                          <tr>
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="first_name" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell_top" id="info-first-name">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
 
-                                              <td class="table_header_column">
-                                                Mobile Number
-                                              </td>
-                                              <td class="table_cell" id="info-phone-number">
-                                                &emsp;&emsp;&emsp;&emsp;
-                                              </td>
-                                            </tr>
+                                            <td class="table_header_column">
+                                              Mobile Number
+                                            </td>
+                                            <td class="table_cell" id="info-phone-number">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+                                          </tr>
 
-                                            <tr>
-                                              <td class="table_header_column_top">
-                                                <fmt:message key="participate_status" bundle="${resword}"/>
-                                              </td>
-                                              <td class="table_cell" id="info-participate-status">
-                                                &emsp;&emsp;&emsp;&emsp;
-                                              </td>
-                                              <td class="table_header_column">
-                                                <fmt:message key="email" bundle="${resword}"/>
-                                              </td>
-                                              <td class="table_cell" id="info-email">
-                                                &emsp;&emsp;&emsp;&emsp;
-                                              </td>
-                                            </tr>
-                                          </tbody>
-                                        </table>
-                                        <!-- End Table Contents -->
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </c:if>
+                                          <tr>
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="participate_status" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell" id="info-participate-status">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+                                            <td class="table_header_column">
+                                              <fmt:message key="email" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell" id="info-email">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                      <!-- End Table Contents -->
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
                             </div>
                           </div>
                         </div>
