@@ -1462,8 +1462,7 @@
             var data = {
                 firstName: $('#name-input').val(),
                 email: $('#email-input').val(),
-                phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
-                inviteParticipant: $('#invite-option input:checked').val()
+                phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val()
             };
             console.log(data);
             jQuery.ajax({
