@@ -1434,7 +1434,6 @@
             url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}',
             success: function(data) {
                 data.phoneNumber = data.phoneNumber || '';
-                console.log(data.phoneNumber);
 
                 $('#name-input').val(data.firstName)
                 $('#email-input').val(data.email)
