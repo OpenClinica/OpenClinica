@@ -210,7 +210,7 @@
   .subnote {
     font-size: 85%;
     color: #618ebb;
-    margin-top: 5px;
+    margin-top: 35px;
     margin-left: 5px;
   }
   .full-width {
