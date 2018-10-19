@@ -26,6 +26,10 @@ public class FindSubjectsFilter implements CriteriaCommand {
         filters.add(new Filter(property, value));
     }
 
+    public void removeFilter(Filter filter) {
+        filters.remove(filter);
+    }
+
     public String execute(String criteria) {
         String theCriteria = "";
         for (Filter filter : filters) {
@@ -74,7 +78,7 @@ public class FindSubjectsFilter implements CriteriaCommand {
         return criteria;
     }
 
-    private static class Filter {
+    public static class Filter {
         private final String property;
         private final Object value;
 
@@ -92,4 +96,11 @@ public class FindSubjectsFilter implements CriteriaCommand {
         }
     }
 
+    public List<Filter> getFilters() {
+        return filters;
+    }
+
+    public void setFilters(List<Filter> filters) {
+        this.filters = filters;
+    }
 }

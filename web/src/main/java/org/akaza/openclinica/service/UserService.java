@@ -26,6 +26,8 @@ public interface UserService {
 
 	Object getParticipantAccount(String studyOid, String ssid, OCParticipantDTO participantDTO,HttpServletRequest request);
 
+	 List<OCUserDTO> getAllParticipantAccountsFromUserService(HttpServletRequest request);
+
 	}
 
 
