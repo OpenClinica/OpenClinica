@@ -1130,6 +1130,15 @@
                     display: inline-block;
                     background-position: 0px -44px;
                   }
+                  #access-code-td {
+                    position: relative;
+                  }
+                  #eye {
+                    position: absolute;
+                    top: 2px;
+                    right: 30px;
+                    font-size: 18pt;
+                  }
                 </style>
                 <div id="phone-widget">
                   <input id="phone-input" type="text" class="formfield form-control" onfocus="this.select()"> 
@@ -1397,11 +1406,12 @@
                 <td class="formlabel" align="left">
                   <span>Access Link</span>
                 </td>
-                <td valign="top">
-                  <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                <td valign="top" id="access-code-td">
+                  <input id="access-code-input" onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
                   <div class="subnote">
                     Please note: viewing access code will be audited.
                   </div>
+                  <i id="eye" class="fa fa-eye"></i>
                 </td>
               </tr>
             </table>
@@ -1520,6 +1530,17 @@
             }
             jQuery('#country-options').css('display', 'none');
             $('#phone-input').focus();
+        });
+
+        jQuery('#eye').click(function() {
+          var eye = $(this);
+          if (eye.hasClass('fa-eye')) {
+            $('#access-code-input').attr('type', 'text');
+          }
+          else {
+            $('#access-code-input').attr('type', 'password');
+          }
+          eye.toggleClass('fa-eye fa-eye-slash');
         });
      });
 
