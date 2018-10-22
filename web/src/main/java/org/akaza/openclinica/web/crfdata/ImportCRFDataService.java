@@ -281,6 +281,9 @@ public class ImportCRFDataService {
     	String commonEventFormRepeatKey = null;
     	HashMap<String,Integer> maxOrdinalbySubjectEvent = new HashMap<>();
     	String commonEventSubjectEventKey = null;
+    	
+    	HashMap<String,String> commonNonRepeatingEventSubjectKeys = new HashMap<>();
+    	String commonNonRepeatingEventSubjectKey = null;
                 
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
@@ -375,12 +378,22 @@ public class ImportCRFDataService {
                         		commonEventsFormRepeatKeys.add(commonEventFormRepeatKey);
                         	}else {
                         		
-                        		 errors.add("Import in different forms with same repeatKey: " + sampleOrdinal + " for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                             	
+                        		 errors.add("Import different forms with same repeatKey: " + sampleOrdinal + " for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                             	
                                  return errors;
                         	}
                         }
                         
-                      
+                        // OC-9756 fix
+                        if(!isRepeating) {
+                        	 commonNonRepeatingEventSubjectKey = studyOID+subjectDataBean.getSubjectOID()+studyEventDataBean.getStudyEventOID()+formOid;
+                        	 
+                        	 if(!(commonNonRepeatingEventSubjectKeys.containsKey(commonNonRepeatingEventSubjectKey))) {                                 
+                        		 commonNonRepeatingEventSubjectKeys.put(commonNonRepeatingEventSubjectKey, commonNonRepeatingEventSubjectKey);
+                         	 }else {                         		
+                         		 errors.add("Import same form " + formOid +" more than once with different repeatKeys: " + sampleOrdinal + " for NON repeating common event, StudyEventOID: " + studyEventDataBean.getStudyEventOID());                             	
+                                 return errors;
+                         	 }
+                        }                       
                         
                         //for common events, if not provided studyEventRepeatKey, then skip/reject
                         sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey();
