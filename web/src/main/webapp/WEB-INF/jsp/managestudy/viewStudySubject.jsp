@@ -210,7 +210,7 @@
   .subnote {
     font-size: 85%;
     color: #618ebb;
-    margin-top: 5px;
+    margin-top: 35px;
     margin-left: 5px;
   }
   .full-width {
@@ -1130,6 +1130,15 @@
                     display: inline-block;
                     background-position: 0px -44px;
                   }
+                  #access-code-td {
+                    position: relative;
+                  }
+                  #eye {
+                    position: absolute;
+                    top: 2px;
+                    right: 30px;
+                    font-size: 18pt;
+                  }
                 </style>
                 <div id="phone-widget">
                   <input id="phone-input" type="text" class="formfield form-control" onfocus="this.select()"> 
@@ -1397,11 +1406,12 @@
                 <td class="formlabel" align="left">
                   <span>Access Link</span>
                 </td>
-                <td valign="top">
-                  <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                <td valign="top" id="access-code-td">
+                  <input id="access-code-input" onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
                   <div class="subnote">
                     Please note: viewing access code will be audited.
                   </div>
+                  <i id="eye" class="fa fa-eye"></i>
                 </td>
               </tr>
             </table>
@@ -1428,27 +1438,28 @@
         jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
     }
 
+    function updatePartipateInfo(data) {
+        data.phoneNumber = data.phoneNumber || '';
+
+        $('#name-input').val(data.firstName)
+        $('#email-input').val(data.email)
+        var phoneParts = data.phoneNumber.split(' ');
+        var countryCode = phoneParts.shift();
+        var phoneNumber = phoneParts.join(' ');
+        $('#country-code').text(countryCode || '+1');
+        $('#phone-input').val(data.phoneNumber);
+
+        $('#info-first-name').text(data.firstName);
+        $('#info-email').text(data.email);
+        $('#info-phone-number').text(data.phoneNumber);
+        $('#info-participate-status').text(data.status[0] + data.status.substr(1).toLowerCase());
+    }
+
     jQuery(document).ready(function () {
         jQuery.ajax({
             type: 'get',
             url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}',
-            success: function(data) {
-                data.phoneNumber = data.phoneNumber || '';
-                console.log(data.phoneNumber);
-
-                $('#name-input').val(data.firstName)
-                $('#email-input').val(data.email)
-                var phoneParts = data.phoneNumber.split(' ');
-                var countryCode = phoneParts.shift();
-                var phoneNumber = phoneParts.join(' ');
-                $('#country-code').text(countryCode || '+1');
-                $('#phone-input').val(data.phoneNumber);
-
-                $('#info-first-name').text(data.firstName);
-                $('#info-email').text(data.email);
-                $('#info-phone-number').text(data.phoneNumber);
-                $('#info-participate-status').text(data.status[0] + data.status.substr(1).toLowerCase());
-            },
+            success: updatePartipateInfo,
             error: function() {
                 console.log(arguments);
             }
@@ -1462,18 +1473,14 @@
             var data = {
                 firstName: $('#name-input').val(),
                 email: $('#email-input').val(),
-                phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
-                inviteParticipant: $('#invite-option input:checked').val()
+                phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val()
             };
-            console.log(data);
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                success: function() {
-                    console.log(arguments);
-                },
+                success: updatePartipateInfo,
                 error: function() {
                     console.log(arguments);
                 }
@@ -1523,6 +1530,17 @@
             }
             jQuery('#country-options').css('display', 'none');
             $('#phone-input').focus();
+        });
+
+        jQuery('#eye').click(function() {
+          var eye = $(this);
+          if (eye.hasClass('fa-eye')) {
+            $('#access-code-input').attr('type', 'text');
+          }
+          else {
+            $('#access-code-input').attr('type', 'password');
+          }
+          eye.toggleClass('fa-eye fa-eye-slash');
         });
      });
 
