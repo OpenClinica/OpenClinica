@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
+import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -19,7 +20,12 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.UserServiceImpl;
+import org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.apache.commons.collections.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.jmesa.core.filter.FilterMatcher;
 import org.jmesa.core.filter.MatcherKey;
@@ -33,6 +39,7 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -66,8 +73,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private StudyParameterValueDAO studyParameterValueDAO;
     private ParticipantPortalRegistrar participantPortalRegistrar;
     private final String COMMON = "common";
+    private final String ENABLED = "enabled";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
+    private UserServiceImpl userServiceImpl;
+    private HttpServletRequest request;
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
@@ -128,8 +137,9 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("rule_oid"), null, null);
         ++index;
-        configureColumn(row.getColumn(columnNames[index]), resword.getString("participate_status"), null, null);
-        ++index;
+       if(getParticipateModuleStatus().equals(ENABLED)){
+        configureColumn(row.getColumn(columnNames[index]), resword.getString("participate_status"), null, new ParticipateStatusDroplistFilterEditor());
+        ++index;}
         // group class columns
         for (int i = index; i < index + studyGroupClasses.size(); i++) {
             StudyGroupClassBean studyGroupClass = studyGroupClasses.get(i - index);
@@ -162,11 +172,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         tableFacade.addFilterMatcher(new MatcherKey(Status.class), new StatusFilterMatcher());
         // tableFacade.addFilterMatcher(new MatcherKey(Integer.class), new
         // SubjectEventStatusFilterMatcher());
+        int colNumber = 4;
+        if(getParticipateModuleStatus().equals(ENABLED))
+            colNumber=5;
 
-        for (int i = 4; i < 4 + studyGroupClasses.size(); i++) {
+        for (int i = colNumber; i < colNumber + studyGroupClasses.size(); i++) {
             tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectGroupFilterMatcher());
         }
-        for (int i = 4 + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
+        for (int i = colNumber + studyGroupClasses.size(); i < columnNames.length - 1; i++) {
             tableFacade.addFilterMatcher(new MatcherKey(Integer.class, columnNames[i]), new SubjectEventStatusFilterMatcher());
         }
 
@@ -176,8 +189,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     public void configureTableFacadePostColumnConfiguration(TableFacade tableFacade) {
         Role r = currentRole.getRole();
         boolean addSubjectLinkShow = studyBean.getStatus().isAvailable() && !r.equals(Role.MONITOR) && !isEnrollmentCapped();
-
-        tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink));
+        tableFacade.setToolbar(new ListStudySubjectTableToolbar(getStudyEventDefinitions(), getStudyGroupClasses(), addSubjectLinkShow, showMoreLink,getParticipateModuleStatus()));
     }
 
     private boolean isEnrollmentCapEnforced(){
@@ -212,16 +224,27 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     }
 
 
-
-
     @Override
     public void setDataAndLimitVariables(TableFacade tableFacade) {
         Limit limit = tableFacade.getLimit();
 
         FindSubjectsFilter subjectFilter = getSubjectFilter(limit);
+        List<String> userUuidList = new ArrayList<>();
+        List<OCUserDTO> ocUserDTOS = null;
+        String participateStatusSetFilter = null;
+        if (getParticipateModuleStatus().equals(ENABLED)) {
+            participateStatusSetFilter = getParticipateStatusSetFilter(subjectFilter);
+            ocUserDTOS = userServiceImpl.getAllParticipantAccountsFromUserService(request);
+
+        for (OCUserDTO ocUserDTO : ocUserDTOS) {
+            if (participateStatusSetFilter == null || (participateStatusSetFilter != null && ocUserDTO.getStatus().getValue().equals(participateStatusSetFilter)))
+                userUuidList.add(ocUserDTO.getUuid());
+        }
+    }
+        String[] userUuidArray = getStringArray(userUuidList);
 
         if (!limit.isComplete()) {
-            int totalRows = getStudySubjectDAO().getCountWithFilter(subjectFilter, getStudyBean());
+            int totalRows = getStudySubjectDAO().getCountWithFilter(subjectFilter, getStudyBean() ,userUuidArray,participateStatusSetFilter);
             tableFacade.setTotalRows(totalRows);
         }
 
@@ -229,7 +252,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         int rowStart = limit.getRowSelect().getRowStart();
         int rowEnd = limit.getRowSelect().getRowEnd();
-        Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, subjectSort, rowStart, rowEnd);
+        Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, subjectSort, rowStart, rowEnd,userUuidArray,participateStatusSetFilter);
 
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
@@ -248,7 +271,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             theItem.put("studySubject.status", studySubjectBean.getStatus());
             theItem.put("enrolledAt", study.getIdentifier());
             theItem.put("studySubject.oid", studySubjectBean.getOid());
-            theItem.put("participate.status", participateStatus(studySubjectBean));
+            if(getParticipateModuleStatus().equals(ENABLED))
+                theItem.put("participate.status", getUserStatusByUserUuid(studySubjectBean.getUserUuid(),ocUserDTOS));
             theItem.put("studySubject.secondaryLabel", studySubjectBean.getSecondaryLabel());
 
             SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
@@ -358,6 +382,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("status");
         columnNamesList.add("enrolledAt");
         columnNamesList.add("oid");
+        if(getParticipateModuleStatus().equals(ENABLED))
+             columnNamesList.add("participate.status");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
         }
@@ -374,7 +400,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         columnNamesList.add("studySubject.status");
         columnNamesList.add("enrolledAt");
         columnNamesList.add("studySubject.oid");
-        columnNamesList.add("participate.status");
+        if(getParticipateModuleStatus().equals(ENABLED))
+            columnNamesList.add("participate.status");
         for (StudyGroupClassBean studyGroupClass : getStudyGroupClasses()) {
             columnNamesList.add("sgc_" + studyGroupClass.getId());
         }
@@ -645,6 +672,19 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         }
     }
 
+    private class ParticipateStatusDroplistFilterEditor extends DroplistFilterEditor {
+        List<UserStatus> userStatusList =
+                new ArrayList<UserStatus>(EnumSet.allOf(UserStatus.class));
+        @Override
+        protected List<Option> getOptions() {
+            List<Option> options = new ArrayList<Option>();
+            for (UserStatus status : userStatusList) {
+                options.add(new Option( status.getValue(), status.getValue()));
+            }
+            return options;
+        }
+    }
+
     private class SubjectEventStatusDroplistFilterEditor extends DroplistFilterEditor {
         @Override
         protected List<Option> getOptions() {
@@ -804,7 +844,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
                         if (getStudyBean().getStatus() == Status.AVAILABLE
                                 && (getCurrentRole().getRole() == Role.RESEARCHASSISTANT || getCurrentRole().getRole() == Role.RESEARCHASSISTANT2)
                                 && studySubjectBean.getStatus() == Status.AVAILABLE && pManageStatus(studySubjectBean).equalsIgnoreCase("ACTIVE")
-                                && participateStatus(studySubjectBean).equalsIgnoreCase("enabled")) {
+                                && participateStatus(studySubjectBean).equalsIgnoreCase(ENABLED)) {
                             url.append(viewParticipateBuilder(studySubjectBean));
                         }
                     } catch (Exception e) {
@@ -825,6 +865,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         StudyBean pStudy = getParentStudy(study.getOid());
         String participateFormStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getId(), "participantPortal").getValue();
         return participateFormStatus;
+    }
+
+    private String getParticipateModuleStatus() {
+        StudyBean pStudy = getParentStudy(studyBean.getOid());
+        String participatModuleStatus = getStudyParameterValueDAO().findByHandleAndStudy(pStudy.getId(), "participantPortal").getValue();
+        return participatModuleStatus;
     }
 
 
@@ -1453,5 +1499,51 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String format = resformat.getString("date_format_string");
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(date);
+    }
+
+    private String[] getStringArray(List<String> userUuidList) {
+        if (CollectionUtils.isEmpty(userUuidList))
+            return null;
+        String[] uuid = userUuidList.toArray(new String[userUuidList.size()]);
+        return uuid;
+    }
+
+    private String getUserStatusByUserUuid(String userUuid, List<OCUserDTO> ocUserDTOs) {
+        for (OCUserDTO ocUserDTO : ocUserDTOs) {
+            if (ocUserDTO.getUuid().equals(userUuid)) {
+                return ocUserDTO.getStatus().getValue();
+            }
+        }
+        return null;
+    }
+
+    public UserServiceImpl getUserServiceImpl() {
+        return userServiceImpl;
+    }
+
+    public void setUserServiceImpl(UserServiceImpl userServiceImpl) {
+        this.userServiceImpl = userServiceImpl;
+    }
+
+    public String getParticipateStatusSetFilter(FindSubjectsFilter subjectFilter) {
+        String participateStatusSetFilter = null;
+        if (subjectFilter.getFilters() != null && subjectFilter.getFilters().size() > 0) {
+            for (FindSubjectsFilter.Filter filter : subjectFilter.getFilters()) {
+                if (filter.getProperty().equals("participate.status")) {
+                    participateStatusSetFilter = (String) filter.getValue();
+                    subjectFilter.removeFilter(filter);
+                    break;
+                }
+            }
+        }
+        return participateStatusSetFilter;
+    }
+
+    public HttpServletRequest getRequest() {
+        return request;
+    }
+
+    public void setRequest(HttpServletRequest request) {
+        this.request = request;
     }
 }

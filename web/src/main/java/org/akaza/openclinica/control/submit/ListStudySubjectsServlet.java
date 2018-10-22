@@ -12,6 +12,7 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.FormProcessor;
+import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
@@ -20,6 +21,8 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.UserServiceImpl;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.web.context.WebApplicationContext;
@@ -49,6 +52,7 @@ public class ListStudySubjectsServlet extends SecureController {
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
     private StudyParameterValueDAO studyParameterValueDAO;
+    private UserServiceImpl userServiceImpl;
     Locale locale;
 
     /*
@@ -155,6 +159,8 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setStudyGroupDAO(getStudyGroupDAO());
         factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
+        factory.setUserServiceImpl(getUserServiceImpl());
+        factory.setRequest(request);
         String findSubjectsHtml = factory.createTable(request, response).render();
 
         request.setAttribute("findSubjectsHtml", findSubjectsHtml);
@@ -231,6 +237,10 @@ public class ListStudySubjectsServlet extends SecureController {
     public StudyGroupDAO getStudyGroupDAO() {
         studyGroupDAO = this.studyGroupDAO == null ? new StudyGroupDAO(sm.getDataSource()) : studyGroupDAO;
         return studyGroupDAO;
+    }
+
+    public UserServiceImpl getUserServiceImpl() {
+        return userServiceImpl= (UserServiceImpl) SpringServletAccess.getApplicationContext(context).getBean("userServiceImpl");
     }
 
 }

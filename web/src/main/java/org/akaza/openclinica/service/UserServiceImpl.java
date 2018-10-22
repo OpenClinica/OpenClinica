@@ -16,12 +16,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.List;
+
+import static java.util.Collections.*;
 
 /**
  * This Service class is used with View Study Subject Page
@@ -201,5 +207,39 @@ public class UserServiceImpl implements UserService {
             logger.info("Participant does not exists or not added yet in OC ");
         }
         return object;
+    }
+
+
+    public List<OCUserDTO> getAllParticipantAccountsFromUserService(HttpServletRequest request) {
+        String getUsersUri = CoreResources.getField("SBSUrl");
+        getUsersUri = getUsersUri.substring(0, getUsersUri.length() - 1) + "?page=0&size=250";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String accessToken = (String) request.getSession().getAttribute("accessToken");
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        StudyBean studyBean = null;
+        HttpEntity entity = new HttpEntity<OCUserDTO>(headers);
+        ResponseEntity<List<OCUserDTO>> userResponse = null;
+        try {
+            userResponse =
+                    restTemplate.exchange(getUsersUri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<OCUserDTO>>() {
+                    });
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Auth0 error message: {}", e.getResponseBodyAsString());
+            return null;
+        }
+
+        if (userResponse == null) {
+            return null;
+        } else {
+            return userResponse.getBody();
+        }
+
     }
 }
