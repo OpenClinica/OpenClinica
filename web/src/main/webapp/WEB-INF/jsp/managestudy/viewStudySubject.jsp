@@ -1378,8 +1378,8 @@
     </tr>
     <tr>
       <td colspan="2" style="text-align: center;">
-        <input type="button" id="connect-button" value="Connect"/>
         <input type="button" class="cancel" value="Cancel"/>
+        <input type="button" id="connect-button" value="Update"/>
       </td>
     </tr>
   </table>
