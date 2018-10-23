@@ -212,7 +212,7 @@ public class UserServiceImpl implements UserService {
 
     public List<OCUserDTO> getAllParticipantAccountsFromUserService(HttpServletRequest request) {
         String getUsersUri = CoreResources.getField("SBSUrl");
-        getUsersUri = getUsersUri.substring(0, getUsersUri.length() - 1) + "?page=0&size=250";
+        getUsersUri = getUsersUri.substring(0, getUsersUri.length() - 1) + "?page=0&size=1000";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();

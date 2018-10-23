@@ -137,6 +137,15 @@ public class UserController {
         }
     }
 
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participantUsers", method = RequestMethod.GET )
+    public ResponseEntity<List <OCUserDTO>> getAllParticipantFromUserService(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid) {
+        participateService.getRestfulServiceHelper().setSchema(studyOid, request);
+
+        List <OCUserDTO> ocUserDTOS = userService.getAllParticipantAccountsFromUserService(request);
+            return new ResponseEntity<List <OCUserDTO>>(ocUserDTOS, HttpStatus.OK);
+
+    }
+
     private void setUpSidebar(HttpServletRequest request) {
         if (sidebarInit.getAlertsBoxSetup() ==
                 SidebarEnumConstants.OPENALERTS) {
