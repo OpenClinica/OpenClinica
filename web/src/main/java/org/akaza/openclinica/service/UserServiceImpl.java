@@ -160,7 +160,7 @@ public class UserServiceImpl implements UserService {
 
     private Object getParticipantAccountFromUserService(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
             httpMethod) {
-        String getUserUri = CoreResources.getField("SBSUrl") + "/" + ocUserDTO.getUuid();
+        String getUserUri = CoreResources.getField("SBSUrl") + ocUserDTO.getUuid();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
