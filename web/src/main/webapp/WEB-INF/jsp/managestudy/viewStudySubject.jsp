@@ -306,11 +306,15 @@
                                   <tr>
                                     <!-- Table Tools/Actions cell -->
                                     <td class="table_actions" valign="top">
-                                     <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
-                                        <a href="javascript:;" id="editParticipantID" <c:if test="${userRole.monitor}">class="invisible"</c:if>>
-                                          <fmt:message key="edit" bundle="${resword}"/>
-                                        </a>
-                                      </c:if>
+                                      <a href="javascript:;" id="editParticipantID" 
+                                        <c:if test="${study.studyParameterConfig.subjectIdGeneration!='manual' || !study.status.available}">
+                                          <c:if test="${userRole.monitor}">
+                                            class="invisible"
+                                          </c:if>
+                                        </c:if>
+                                      >
+                                        <fmt:message key="edit" bundle="${resword}"/>
+                                      </a>
                                     </td>
                                     <!-- End Table Tools/Actions cell -->
                                   </tr>
