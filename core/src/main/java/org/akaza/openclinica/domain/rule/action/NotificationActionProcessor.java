@@ -43,6 +43,7 @@ import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.BulkEmailSenderService;
 import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.OCUserRoleDTO;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAccountRequest;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAccountResponse;
 import org.akaza.openclinica.service.participant.ParticipantServiceImpl;
@@ -388,16 +389,16 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
         jsonConverter.setObjectMapper(objectMapper);
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
-        ResponseEntity<List<OCUserDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<OCUserDTO>>() {
+        ResponseEntity<List<OCUserRoleDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<OCUserRoleDTO>>() {
         });
 
-        List<OCUserDTO> ocUserDTOS = null;
+        List<OCUserRoleDTO> oCUserRoleDTOs = null;
         if (response != null) {
-            ocUserDTOS = (List<OCUserDTO>) response.getBody();
+            oCUserRoleDTOs = (List<OCUserRoleDTO>) response.getBody();
         }
 
-        for (OCUserDTO ocUserDTO : ocUserDTOS) {
-            if (ssBean.getUserUuid().equals(ocUserDTO.getUuid())) {
+        for (OCUserRoleDTO oCUserRoleDTO : oCUserRoleDTOs) {
+            if (ssBean.getUserUuid().equals(oCUserRoleDTO.getUserInfo().getUuid())) {
                 return ocUserDTO;
             }
         }
