@@ -20,7 +20,6 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.OCUserDTO;
-import org.akaza.openclinica.service.OCUserRoleDTO;
 import org.akaza.openclinica.service.UserServiceImpl;
 import org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -228,17 +227,17 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         FindSubjectsFilter subjectFilter = getSubjectFilter(limit);
         List<String> userUuidList = new ArrayList<>();
-        List<OCUserRoleDTO> oCUserRoleDTOs = null;
+        List<OCUserDTO> oCUserDTOs = null;
 
         String participateStatusSetFilter = null;
         if (getParticipateModuleStatus().equals(ENABLED)) {
             participateStatusSetFilter = getParticipateStatusSetFilter(subjectFilter);
-            oCUserRoleDTOs = userServiceImpl.getParticipantsByStudyFromUserService(request,studyBean.getOid());
+            oCUserDTOs = userServiceImpl.getAllParticipantAccountsFromUserService(request);
 
-            for (OCUserRoleDTO oCUserRoleDTO : oCUserRoleDTOs) {
-
-                if (participateStatusSetFilter == null || (participateStatusSetFilter != null && oCUserRoleDTO.getUserInfo().getStatus().getValue().equals(participateStatusSetFilter)))
-                    userUuidList.add(oCUserRoleDTO.getUserInfo().getUuid());
+            for (OCUserDTO oCUserDTO : oCUserDTOs) {
+                logger.info("OCUserDTO object : " + oCUserDTO.toString());
+                if (participateStatusSetFilter == null || (participateStatusSetFilter != null && oCUserDTO.getStatus().getValue().equals(participateStatusSetFilter)))
+                    userUuidList.add(oCUserDTO.getUuid());
             }
 
     }
@@ -273,7 +272,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             theItem.put("enrolledAt", study.getIdentifier());
             theItem.put("studySubject.oid", studySubjectBean.getOid());
             if(getParticipateModuleStatus().equals(ENABLED))
-                theItem.put("participate.status", getUserStatusByUserUuid(studySubjectBean.getUserUuid(),oCUserRoleDTOs));
+                theItem.put("participate.status", getUserStatusByUserUuid(studySubjectBean,oCUserDTOs));
             theItem.put("studySubject.secondaryLabel", studySubjectBean.getSecondaryLabel());
 
             SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
@@ -1509,10 +1508,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         return uuid;
     }
 
-    private String getUserStatusByUserUuid(String userUuid, List<OCUserRoleDTO> ocUserRoleDTOs) {
-       for(OCUserRoleDTO ocUserRoleDTO:ocUserRoleDTOs){
-           if(ocUserRoleDTO.getUserInfo().getUuid().equals(userUuid)){
-               return ocUserRoleDTO.getUserInfo().getStatus().getValue();
+    private String getUserStatusByUserUuid(StudySubjectBean studySubjectBean, List<OCUserDTO> ocUserDTOs) {
+       for(OCUserDTO ocUserDTO:ocUserDTOs){
+           if(ocUserDTO.getUuid().equals(studySubjectBean.getUserUuid())){
+               logger.info("For study subject " +studySubjectBean.getLabel()+" of user_uuid : "+studySubjectBean.getUserUuid()+ " The participant status is : "+ocUserDTO.getStatus().getValue());
+               return ocUserDTO.getStatus().getValue();
            }
        }
         return null;
