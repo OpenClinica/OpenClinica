@@ -16,6 +16,16 @@ public class OCParticipantDTO extends AbstractAuditingDTO implements Serializabl
 
     private boolean inviteParticipant;
 
+    private String mobilePhone;
+
+    public String getMobilePhone() {
+        return mobilePhone;
+    }
+
+    public void setMobilePhone(String mobilePhone) {
+        this.mobilePhone = mobilePhone;
+    }
+
     public String getFirstName() {
         return firstName;
     }
@@ -40,4 +50,5 @@ public class OCParticipantDTO extends AbstractAuditingDTO implements Serializabl
     public void setInviteParticipant(boolean inviteParticipant) {
         this.inviteParticipant = inviteParticipant;
     }
+
 }

@@ -26,8 +26,8 @@
         <git.url>git://github.com/OpenClinica/OpenClinica.git</git.url>
 
         <!-- Library Versions -->
-        <spring.version>4.3.7.RELEASE</spring.version>
-        <spring-security.version>4.2.2.RELEASE</spring-security.version>
+        <spring.version>4.3.18.RELEASE</spring.version>
+        <spring-security.version>4.2.4.RELEASE</spring-security.version>
         <spring-ws.version>2.4.0.RELEASE</spring-ws.version>
         <db.test>localhost</db.test>
         <version.keycloak>3.4.3.Final</version.keycloak>
@@ -365,7 +365,7 @@
             <dependency>
                 <groupId>com.fasterxml.jackson.core</groupId>
                 <artifactId>jackson-databind</artifactId>
-                <version>2.8.0</version>
+                <version>2.8.11.1</version>
             </dependency>
             <dependency>
                 <groupId>${project.groupId}</groupId>
@@ -602,7 +602,7 @@
             <dependency>
                 <groupId>org.springframework.security.oauth</groupId>
                 <artifactId>spring-security-oauth2</artifactId>
-                <version>2.0.12.RELEASE</version>
+                <version>2.0.16.RELEASE</version>
             </dependency>
             <dependency>
                 <groupId>javax.validation</groupId>

@@ -2,7 +2,8 @@ package org.akaza.openclinica.bean.login;
 
 public class ResponseSuccessStudyParticipantDTO {
 	
-	private String subjectKey;		
+	private String subjectKey;
+	private String subjectOid;
 	private String status;
 	
 	public String getSubjectKey() {
@@ -11,6 +12,10 @@ public class ResponseSuccessStudyParticipantDTO {
 	public void setSubjectKey(String subjectKey) {
 		this.subjectKey = subjectKey;
 	}
+
+	public String getSubjectOid() { return subjectOid; }
+	public void setSubjectOid(String subjectOid) { this.subjectOid = subjectOid; }
+
 	public String getStatus() {
 		return status;
 	}
@@ -19,3 +24,4 @@ public class ResponseSuccessStudyParticipantDTO {
 	}	
 	
 }
+

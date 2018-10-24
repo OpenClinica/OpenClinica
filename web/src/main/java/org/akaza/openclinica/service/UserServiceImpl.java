@@ -16,12 +16,16 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
+import java.util.List;
+
+import org.apache.commons.lang.StringUtils;
 
 /**
  * This Service class is used with View Study Subject Page
@@ -57,7 +61,12 @@ public class UserServiceImpl implements UserService {
     public static final String DASH = "-";
     public static final String PARTICIPATE_EDIT = "participate-edit";
     public static final String PARTICIPATE_ADD_NEW = "participate-add-new";
-
+    public static final String PAGINATION = "?page=0&size=1000";
+    public static final String USERSERVICE = "user-service/api";
+    public static final String STUDYENVIRONMENT = "study-environments";
+    public static final String USERSWITHROLES = "users-with-roles";
+    public static final String FORWARDSLASH = "/";
+    private String sbsUrl = CoreResources.getField("SBSUrl");
 
     StudyDAO sdao;
 
@@ -93,10 +102,18 @@ public class UserServiceImpl implements UserService {
                 // update participant user Account  PUT
                 ocUserDTO.setUuid(studySubject.getUserUuid());
                 // Get participant
-                Object getParticipantObject = getParticipantAccount(request, ocUserDTO, HttpMethod.GET);
-                if (getParticipantObject instanceof OCUserDTO) {
-                    ocUserDTO.setStatus(((OCUserDTO) getParticipantObject).getStatus());
+                List<OCUserRoleDTO> ocUserRoleDTOs = getParticipantsByStudyFromUserService(request ,studyOid);
+                for(OCUserRoleDTO ocUserRoleDTO:ocUserRoleDTOs){
+                    if(ocUserRoleDTO.getUserInfo().getUuid().equals(ocUserDTO.getUuid())){
+                        ocUserDTO.setStatus(ocUserRoleDTO.getUserInfo().getStatus());
+                        break;
+                    }
                 }
+
+
+           //     if (object instanceof OCUserDTO) {
+           //         ocUserDTO.setStatus(((OCUserDTO) object).getStatus());
+           //     }
                 object = createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
             }
 
@@ -109,7 +126,7 @@ public class UserServiceImpl implements UserService {
 
     private Object createOrUpdateParticipantAccount(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
             httpMethod) {
-        String createUserUri = CoreResources.getField("SBSUrl");
+        String uri = sbsUrl;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -122,7 +139,7 @@ public class UserServiceImpl implements UserService {
         HttpEntity<OCUserDTO> entity = new HttpEntity<OCUserDTO>(ocUserDTO, headers);
         ResponseEntity<OCUserDTO> userResponse = null;
         try {
-            userResponse = restTemplate.exchange(createUserUri, httpMethod, entity, OCUserDTO.class);
+            userResponse = restTemplate.exchange(uri, httpMethod, entity, OCUserDTO.class);
         } catch (HttpClientErrorException e) {
             logger.error("Auth0 error message: {}", e.getResponseBodyAsString());
             return e;
@@ -137,10 +154,13 @@ public class UserServiceImpl implements UserService {
 
     }
 
+
     private OCUserDTO buildOCUserDTO(String ssid, OCParticipantDTO participantDTO) {
         OCUserDTO ocUserDTO = new OCUserDTO();
-        ocUserDTO.setEmail(participantDTO.getEmail());
-        ocUserDTO.setFirstName(participantDTO.getFirstName());
+        if(participantDTO!=null) {
+            ocUserDTO.setEmail(participantDTO.getEmail());
+            ocUserDTO.setFirstName(participantDTO.getFirstName());
+        }
         ocUserDTO.setUserType(UserType.USER);
         ocUserDTO.setUsername(ssid);
         ocUserDTO.setLastName("ParticipateAccount");
@@ -149,9 +169,35 @@ public class UserServiceImpl implements UserService {
         return ocUserDTO;
     }
 
-    private Object getParticipantAccount(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
-            httpMethod) {
-        String getUserUri = CoreResources.getField("SBSUrl") + "/" + ocUserDTO.getUuid();
+
+
+    public Object getParticipantAccount(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request) {
+        Study study = getStudy(studyOid);
+        StudySubject studySubject = getStudySubject(ssid, study);
+        OCUserDTO ocUserDTO = null;
+        Object object = null;
+
+        if (studySubject != null) {
+            ocUserDTO = buildOCUserDTO(ssid, participantDTO);
+            if(studySubject.getUserUuid()!=null) {
+                ocUserDTO.setUuid(studySubject.getUserUuid());
+                object = getParticipantsByStudyFromUserService(request, studyOid);
+            }else{
+                logger.info("Participant has not been connected yet");
+                logger.info("userUuid of participant in OC runtime is null");
+
+            }
+        } else {
+            logger.info("Participant does not exists or not added yet in OC ");
+        }
+        return object;
+    }
+
+
+    public List<OCUserRoleDTO> getParticipantsByStudyFromUserService(HttpServletRequest request, String studyOid) {
+
+        String uri = buildGetURI(studyOid);
+
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -162,20 +208,34 @@ public class UserServiceImpl implements UserService {
         headers.add("Accept-Charset", "UTF-8");
         StudyBean studyBean = null;
         HttpEntity entity = new HttpEntity<OCUserDTO>(headers);
-        ResponseEntity<OCUserDTO> userResponse = null;
+        ResponseEntity<List<OCUserRoleDTO>> userResponse = null;
         try {
-            userResponse = restTemplate.exchange(getUserUri, httpMethod, entity, OCUserDTO.class);
+            userResponse =
+                    restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<OCUserRoleDTO>>() {
+                    });
+
         } catch (HttpClientErrorException e) {
             logger.error("Auth0 error message: {}", e.getResponseBodyAsString());
-            return e;
+            return null;
         }
 
         if (userResponse == null) {
             return null;
         } else {
-            return ocUserDTO = userResponse.getBody();
+            return userResponse.getBody();
         }
 
     }
 
+    private String buildGetURI(String studyOid) {
+        Study study = studyDao.findByOcOID(studyOid);
+        if(study.getStudy()!=null){
+            study=studyDao.findById(study.getStudy().getStudyId());
+        }
+        String studyEnvironment = study.getStudyEnvUuid();
+
+
+        String uri = sbsUrl.substring(0, sbsUrl.indexOf(USERSERVICE)+17) + STUDYENVIRONMENT + FORWARDSLASH + studyEnvironment + FORWARDSLASH + USERSWITHROLES;
+        return uri;
+    }
 }

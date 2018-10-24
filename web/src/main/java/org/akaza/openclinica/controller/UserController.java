@@ -108,6 +108,44 @@ public class UserController {
         }
     }
 
+
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}", method = RequestMethod.GET )
+    public ResponseEntity<Object> getParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid) {
+        participateService.getRestfulServiceHelper().setSchema(studyOid, request);
+
+        Object object = userService.getParticipantAccount(studyOid, ssid, null, request);
+        if (object instanceof HttpClientErrorException) {
+            return new ResponseEntity<Object>(((HttpClientErrorException) object).getResponseBodyAsString(), ((HttpClientErrorException) object).getStatusCode());
+        } else if (object instanceof OCUserDTO) {
+            return new ResponseEntity<Object>(object, HttpStatus.OK);
+        } else {
+            return null;
+        }
+    }
+
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{sitesOID}/participants/{SSID}", method = RequestMethod.GET )
+    public ResponseEntity<Object> getSiteParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid,@PathVariable( "studyOID" ) String siteOid, @PathVariable( "SSID" ) String ssid) {
+        participateService.getRestfulServiceHelper().setSchema(studyOid, request);
+
+        Object object = userService.getParticipantAccount(studyOid, ssid, null, request);
+        if (object instanceof HttpClientErrorException) {
+            return new ResponseEntity<Object>(((HttpClientErrorException) object).getResponseBodyAsString(), ((HttpClientErrorException) object).getStatusCode());
+        } else if (object instanceof OCUserDTO) {
+            return new ResponseEntity<Object>(object, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Object>(object, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participantUsers", method = RequestMethod.GET )
+    public ResponseEntity<List <OCUserRoleDTO>> getAllParticipantFromUserService(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid) {
+        participateService.getRestfulServiceHelper().setSchema(studyOid, request);
+
+        List <OCUserRoleDTO> ocUserRoleDTOs = userService.getParticipantsByStudyFromUserService(request,studyOid);
+            return new ResponseEntity<List <OCUserRoleDTO>>(ocUserRoleDTOs, HttpStatus.OK);
+
+    }
+
     private void setUpSidebar(HttpServletRequest request) {
         if (sidebarInit.getAlertsBoxSetup() ==
                 SidebarEnumConstants.OPENALERTS) {

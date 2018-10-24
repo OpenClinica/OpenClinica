@@ -1303,6 +1303,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     protected void baseUrl() throws MalformedURLException {
+        /*
         String portalURL = CoreResources.getField("portalURL");
         URL pManageUrl = new URL(portalURL);
 
@@ -1313,7 +1314,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             url = pManageUrl.getProtocol() + "://" + pManageAuthorization.getStudy().getHost() + "." + pManageUrl.getHost()
                     + ((pManageUrl.getPort() > 0) ? ":" + String.valueOf(pManageUrl.getPort()) : "");
         System.out.println("the url :  " + url);
-        request.setAttribute("participantUrl", url + "/");
+        */
+        request.setAttribute("participantUrl","need_to_fix");
 
     }
 
