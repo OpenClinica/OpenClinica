@@ -12,7 +12,6 @@ import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
-import org.akaza.openclinica.dao.hibernate.ViewRuleAssignmentFilter;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -21,7 +20,7 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.OCUserDTO;
-import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.OCUserRoleDTO;
 import org.akaza.openclinica.service.UserServiceImpl;
 import org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
@@ -39,7 +38,6 @@ import org.jmesa.view.html.HtmlBuilder;
 import org.jmesa.view.html.editor.DroplistFilterEditor;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -230,16 +228,19 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         FindSubjectsFilter subjectFilter = getSubjectFilter(limit);
         List<String> userUuidList = new ArrayList<>();
-        List<OCUserDTO> ocUserDTOS = null;
+        List<OCUserRoleDTO> oCUserRoleDTOs = null;
+
         String participateStatusSetFilter = null;
         if (getParticipateModuleStatus().equals(ENABLED)) {
             participateStatusSetFilter = getParticipateStatusSetFilter(subjectFilter);
-            ocUserDTOS = userServiceImpl.getAllParticipantAccountsFromUserService(request);
+            oCUserRoleDTOs = userServiceImpl.getParticipantsByStudyFromUserService(request,studyBean.getOid());
 
-        for (OCUserDTO ocUserDTO : ocUserDTOS) {
-            if (participateStatusSetFilter == null || (participateStatusSetFilter != null && ocUserDTO.getStatus().getValue().equals(participateStatusSetFilter)))
-                userUuidList.add(ocUserDTO.getUuid());
-        }
+            for (OCUserRoleDTO oCUserRoleDTO : oCUserRoleDTOs) {
+
+                if (participateStatusSetFilter == null || (participateStatusSetFilter != null && oCUserRoleDTO.getUserInfo().getStatus().getValue().equals(participateStatusSetFilter)))
+                    userUuidList.add(oCUserRoleDTO.getUserInfo().getUuid());
+            }
+
     }
         String[] userUuidArray = getStringArray(userUuidList);
 
@@ -272,7 +273,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             theItem.put("enrolledAt", study.getIdentifier());
             theItem.put("studySubject.oid", studySubjectBean.getOid());
             if(getParticipateModuleStatus().equals(ENABLED))
-                theItem.put("participate.status", getUserStatusByUserUuid(studySubjectBean.getUserUuid(),ocUserDTOS));
+                theItem.put("participate.status", getUserStatusByUserUuid(studySubjectBean.getUserUuid(),oCUserRoleDTOs));
             theItem.put("studySubject.secondaryLabel", studySubjectBean.getSecondaryLabel());
 
             SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
@@ -1508,12 +1509,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         return uuid;
     }
 
-    private String getUserStatusByUserUuid(String userUuid, List<OCUserDTO> ocUserDTOs) {
-        for (OCUserDTO ocUserDTO : ocUserDTOs) {
-            if (ocUserDTO.getUuid().equals(userUuid)) {
-                return ocUserDTO.getStatus().getValue();
-            }
-        }
+    private String getUserStatusByUserUuid(String userUuid, List<OCUserRoleDTO> ocUserRoleDTOs) {
+       for(OCUserRoleDTO ocUserRoleDTO:ocUserRoleDTOs){
+           if(ocUserRoleDTO.getUserInfo().getUuid().equals(userUuid)){
+               return ocUserRoleDTO.getUserInfo().getStatus().getValue();
+           }
+       }
         return null;
     }
 
