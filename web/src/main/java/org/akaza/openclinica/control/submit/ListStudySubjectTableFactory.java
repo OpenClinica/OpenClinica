@@ -237,6 +237,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             ocUserDTOS = userServiceImpl.getAllParticipantAccountsFromUserService(request);
 
         for (OCUserDTO ocUserDTO : ocUserDTOS) {
+            logger.info("OCUserDTO object : " + ocUserDTO.toString());
             if (participateStatusSetFilter == null || (participateStatusSetFilter != null && ocUserDTO.getStatus().getValue().equals(participateStatusSetFilter)))
                 userUuidList.add(ocUserDTO.getUuid());
         }
@@ -272,7 +273,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             theItem.put("enrolledAt", study.getIdentifier());
             theItem.put("studySubject.oid", studySubjectBean.getOid());
             if(getParticipateModuleStatus().equals(ENABLED))
-                theItem.put("participate.status", getUserStatusByUserUuid(studySubjectBean.getUserUuid(),ocUserDTOS));
+                theItem.put("participate.status", getUserStatusByUserUuid(studySubjectBean,ocUserDTOS));
             theItem.put("studySubject.secondaryLabel", studySubjectBean.getSecondaryLabel());
 
             SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
@@ -1508,9 +1509,10 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         return uuid;
     }
 
-    private String getUserStatusByUserUuid(String userUuid, List<OCUserDTO> ocUserDTOs) {
+    private String getUserStatusByUserUuid(StudySubjectBean studySubjectBean , List<OCUserDTO> ocUserDTOs) {
         for (OCUserDTO ocUserDTO : ocUserDTOs) {
-            if (ocUserDTO.getUuid().equals(userUuid)) {
+            if (ocUserDTO.getUuid().equals(studySubjectBean.getUserUuid())) {
+                logger.info("For study subject " +studySubjectBean.getLabel()+" of user_uuid : "+studySubjectBean.getUserUuid()+ " The participant status is : "+ocUserDTO.getStatus().getValue());
                 return ocUserDTO.getStatus().getValue();
             }
         }

@@ -63,6 +63,8 @@ public class UserServiceImpl implements UserService {
     public static final String DASH = "-";
     public static final String PARTICIPATE_EDIT = "participate-edit";
     public static final String PARTICIPATE_ADD_NEW = "participate-add-new";
+    public static final String PAGINATION = "?page=0&size=1000";
+    private final String sbsUrl = CoreResources.getField("SBSUrl");
 
 
     StudyDAO sdao;
@@ -93,17 +95,20 @@ public class UserServiceImpl implements UserService {
                 object = createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.POST);
                 if (object instanceof OCUserDTO && object != null) {
                     studySubject.setUserUuid(((OCUserDTO) object).getUuid());
-                    studySubjectDao.saveOrUpdate(studySubject);
+                    studySubject=studySubjectDao.saveOrUpdate(studySubject);
+                    logger.info("Participate user_uuid added in db: "+studySubject.getUserUuid());
                 }
             } else {
                 // update participant user Account  PUT
                 ocUserDTO.setUuid(studySubject.getUserUuid());
                 // Get participant
                 object = getParticipantAccountFromUserService(request, ocUserDTO, HttpMethod.GET);
+
                 if (object instanceof OCUserDTO) {
                     ocUserDTO.setStatus(((OCUserDTO) object).getStatus());
                 }
                 object = createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
+                logger.info("Participate info with user_uuid is upaded in db : "+studySubject.getUserUuid());
             }
 
         } else {
@@ -115,7 +120,7 @@ public class UserServiceImpl implements UserService {
 
     private Object createOrUpdateParticipantAccount(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
             httpMethod) {
-        String createOrUpdateUserUri = CoreResources.getField("SBSUrl");
+        String uri = sbsUrl;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -128,7 +133,7 @@ public class UserServiceImpl implements UserService {
         HttpEntity<OCUserDTO> entity = new HttpEntity<OCUserDTO>(ocUserDTO, headers);
         ResponseEntity<OCUserDTO> userResponse = null;
         try {
-            userResponse = restTemplate.exchange(createOrUpdateUserUri, httpMethod, entity, OCUserDTO.class);
+            userResponse = restTemplate.exchange(uri, httpMethod, entity, OCUserDTO.class);
         } catch (HttpClientErrorException e) {
             logger.error("Auth0 error message: {}", e.getResponseBodyAsString());
             return e;
@@ -160,7 +165,7 @@ public class UserServiceImpl implements UserService {
 
     private Object getParticipantAccountFromUserService(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
             httpMethod) {
-        String getUserUri = CoreResources.getField("SBSUrl") + "/" + ocUserDTO.getUuid();
+        String uri = sbsUrl + ocUserDTO.getUuid();
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
@@ -173,7 +178,7 @@ public class UserServiceImpl implements UserService {
         HttpEntity entity = new HttpEntity<OCUserDTO>(headers);
         ResponseEntity<OCUserDTO> userResponse = null;
         try {
-            userResponse = restTemplate.exchange(getUserUri, httpMethod, entity, OCUserDTO.class);
+            userResponse = restTemplate.exchange(uri, httpMethod, entity, OCUserDTO.class);
         } catch (HttpClientErrorException e) {
             logger.error("Auth0 error message: {}", e.getResponseBodyAsString());
             return e;
@@ -182,6 +187,7 @@ public class UserServiceImpl implements UserService {
         if (userResponse == null) {
             return null;
         } else {
+            logger.info("Participate user_uuid got it from User Service : "+userResponse.getBody().getUuid());
             return ocUserDTO = userResponse.getBody();
         }
 
@@ -211,8 +217,7 @@ public class UserServiceImpl implements UserService {
 
 
     public List<OCUserDTO> getAllParticipantAccountsFromUserService(HttpServletRequest request) {
-        String getUsersUri = CoreResources.getField("SBSUrl");
-        getUsersUri = getUsersUri.substring(0, getUsersUri.length() - 1) + "?page=0&size=250";
+       String uri = sbsUrl.substring(0, sbsUrl.length() - 1) + PAGINATION;
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -227,7 +232,7 @@ public class UserServiceImpl implements UserService {
         ResponseEntity<List<OCUserDTO>> userResponse = null;
         try {
             userResponse =
-                    restTemplate.exchange(getUsersUri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<OCUserDTO>>() {
+                    restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<OCUserDTO>>() {
                     });
 
         } catch (HttpClientErrorException e) {
@@ -238,6 +243,7 @@ public class UserServiceImpl implements UserService {
         if (userResponse == null) {
             return null;
         } else {
+            logger.info("Total participate/user numbers: "+userResponse.getBody().size());
             return userResponse.getBody();
         }
 
