@@ -13,7 +13,7 @@ Updated: December 30, 2010 Paul Galvin pgalvin@akazaresearch.com
 OVERVIEW
 --------------------------------------------------------------
 
-This is a beta release of OpenClinica 3.1.  It should not be used in a production setting.  For more information on the features, please see https://www.openclinica.org/dokuwiki/doku.php?id=developerwiki:oc31beta.  
+This is a development version of OpenClinica. It should not be used in a production setting.
 
 The web application and the web services piece of OpenClinica are in separate war files. 
 
