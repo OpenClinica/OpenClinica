@@ -235,7 +235,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             oCUserDTOs = userServiceImpl.getAllParticipantAccountsFromUserService(request);
 
             for (OCUserDTO oCUserDTO : oCUserDTOs) {
-                logger.info("OCUserDTO object : " + oCUserDTO.toString());
                 if (participateStatusSetFilter == null || (participateStatusSetFilter != null && oCUserDTO.getStatus().getValue().equals(participateStatusSetFilter)))
                     userUuidList.add(oCUserDTO.getUuid());
             }
@@ -1511,7 +1510,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private String getUserStatusByUserUuid(StudySubjectBean studySubjectBean, List<OCUserDTO> ocUserDTOs) {
        for(OCUserDTO ocUserDTO:ocUserDTOs){
            if(ocUserDTO.getUuid().equals(studySubjectBean.getUserUuid())){
-               logger.info("For study subject " +studySubjectBean.getLabel()+" of user_uuid : "+studySubjectBean.getUserUuid()+ " The participant status is : "+ocUserDTO.getStatus().getValue());
                return ocUserDTO.getStatus().getValue();
            }
        }

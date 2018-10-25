@@ -106,7 +106,7 @@ public class UserServiceImpl implements UserService {
                     ocUserDTO.setStatus(((OCUserDTO) object).getStatus());
                 }
                 object = createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
-                logger.info("Participate info with user_uuid is upaded in db : "+studySubject.getUserUuid());
+                logger.info("Participate info with user_uuid is updated in db : "+studySubject.getUserUuid());
             }
 
         } else {
@@ -185,7 +185,7 @@ public class UserServiceImpl implements UserService {
         if (userResponse == null) {
             return null;
         } else {
-            logger.info("Participate user_uuid got it from User Service : "+userResponse.getBody().getUuid());
+            logger.info("Participate user_uuid from User Service : "+userResponse.getBody().getUuid());
             return ocUserDTO = userResponse.getBody();
         }
 
