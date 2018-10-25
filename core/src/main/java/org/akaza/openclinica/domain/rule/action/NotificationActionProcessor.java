@@ -43,7 +43,6 @@ import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.BulkEmailSenderService;
 import org.akaza.openclinica.service.OCUserDTO;
-import org.akaza.openclinica.service.OCUserRoleDTO;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAccountRequest;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAccountResponse;
 import org.akaza.openclinica.service.participant.ParticipantServiceImpl;
@@ -101,7 +100,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	String url;
 	String emailSubject;
 	String participateStatus;
-	private OCUserDTO ocUserDTO;
+    private OCUserDTO ocUserDTO;
 
 
     public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionBean ruleActionBean, ParticipantDTO pDTO,
@@ -226,7 +225,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
         if(!StringUtils.isEmpty(ssBean.getUserUuid())) {
             userDTO=getAllparticipantsFromUserService(ssBean,studyBean);
         }
-		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(studyBean.getId(), "participantPortal");
+		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(parentStudyBean.getId(), "participantPortal");
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
 
 		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, userDTO, studyBean, message, emailSubject, mailSender,participateStatus));
@@ -372,7 +371,6 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	private OCUserDTO getAllparticipantsFromUserService(StudySubjectBean ssBean,StudyBean studyBean){
         String baseUrl = CoreResources.getField("sysURL.base");
         String uri = baseUrl + "pages/auth/api/clinicaldata/studies/" + studyBean.getOid() + "/participantUsers";
-
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
 
@@ -389,17 +387,17 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
         jsonConverter.setObjectMapper(objectMapper);
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
-        ResponseEntity<List<OCUserRoleDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<OCUserRoleDTO>>() {
+        ResponseEntity<List<OCUserDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<OCUserDTO>>() {
         });
 
-        List<OCUserRoleDTO> oCUserRoleDTOs = null;
+        List<OCUserDTO> oCUserDTOs = null;
         if (response != null) {
-            oCUserRoleDTOs = (List<OCUserRoleDTO>) response.getBody();
+            oCUserDTOs = (List<OCUserDTO>) response.getBody();
         }
 
-        for (OCUserRoleDTO oCUserRoleDTO : oCUserRoleDTOs) {
-            if (ssBean.getUserUuid().equals(oCUserRoleDTO.getUserInfo().getUuid())) {
-                return ocUserDTO;
+        for (OCUserDTO userDTO : oCUserDTOs) {
+            if (ssBean.getUserUuid().equals(userDTO.getUuid())) {
+                return userDTO;
             }
         }
         return null;
