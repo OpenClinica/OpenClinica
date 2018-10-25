@@ -22,12 +22,9 @@ import java.util.List;
 public interface UserService {
 
 
-	Object connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO,HttpServletRequest request);
+	Object connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request);
 
-	Object getParticipantAccount(String studyOid, String ssid, OCParticipantDTO participantDTO,HttpServletRequest request);
+	Object getParticipantAccount(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request);
 
-	 List<OCUserDTO> getAllParticipantAccountsFromUserService(HttpServletRequest request);
-
-	}
-
-
+	List<OCUserRoleDTO> getParticipantsByStudyFromUserService(HttpServletRequest request, String studyOid);
+}
