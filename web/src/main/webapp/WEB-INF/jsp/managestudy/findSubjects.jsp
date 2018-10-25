@@ -46,6 +46,11 @@
             jQuery.unblockUI();
             return false;
         });
+
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('addNewSubject')) {
+            jQuery('#addSubject').click();
+        }
     });
 
     window.onload = function() {
