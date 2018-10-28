@@ -138,11 +138,11 @@ public class UserController {
     }
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participantUsers", method = RequestMethod.GET )
-    public ResponseEntity<List <OCUserRoleDTO>> getAllParticipantFromUserService(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid) {
+    public ResponseEntity<List <OCUserDTO>> getAllParticipantFromUserService(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid) {
         participateService.getRestfulServiceHelper().setSchema(studyOid, request);
 
-        List <OCUserRoleDTO> ocUserRoleDTOs = userService.getParticipantsByStudyFromUserService(request,studyOid);
-            return new ResponseEntity<List <OCUserRoleDTO>>(ocUserRoleDTOs, HttpStatus.OK);
+        List <OCUserDTO> ocUserDTOs = userService.getAllParticipantAccountsFromUserService(request);
+            return new ResponseEntity<List <OCUserDTO>>(ocUserDTOs, HttpStatus.OK);
 
     }
 
