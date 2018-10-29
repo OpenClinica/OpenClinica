@@ -388,6 +388,8 @@
                                       <a href="javascript:;" id="participateAccess">
                                         View Access Details
                                       </a>
+                                      &nbsp;|&nbsp;
+                                      Participate status: ${participateStatus}
                                     </td>
                                   </tr>
                                   <tr>
