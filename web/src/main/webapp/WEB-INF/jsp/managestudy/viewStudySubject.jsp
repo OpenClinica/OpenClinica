@@ -1473,8 +1473,10 @@
             var data = {
                 firstName: $('#name-input').val(),
                 email: $('#email-input').val(),
-                phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val()
+                mobilePhone: $('#country-code').text() + ' ' + $('#phone-input').val(),
+                inviteParticipate: $('#invite-option input:checked').val()
             };
+            console.log(data);
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/connect',
