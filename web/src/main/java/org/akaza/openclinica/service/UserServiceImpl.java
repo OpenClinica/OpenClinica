@@ -175,7 +175,7 @@ public class UserServiceImpl implements UserService {
         ocUserDTO.setUserType(UserType.USER);
         ocUserDTO.setUsername(ssid);
         ocUserDTO.setLastName("ParticipateAccount");
-
+        ocUserDTO.setStatus(UserStatus.INVITED);
 
         return ocUserDTO;
     }
