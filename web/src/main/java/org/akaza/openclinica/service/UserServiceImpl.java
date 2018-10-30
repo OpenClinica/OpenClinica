@@ -2,8 +2,10 @@ package org.akaza.openclinica.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
+import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -11,6 +13,8 @@ import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -18,14 +22,21 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
+import org.springframework.mail.MailException;
+import org.springframework.mail.javamail.JavaMailSenderImpl;
+import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
+import javax.mail.MessagingException;
+import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import java.util.ArrayList;
 import java.util.Collections;
+import java.util.Date;
 import java.util.List;
+
 
 import static java.util.Collections.*;
 
@@ -56,6 +67,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     StudyDao studyDao;
+
+    @Autowired
+    JavaMailSenderImpl mailSender;
 
     private RestfulServiceHelper restfulServiceHelper;
 
@@ -141,7 +155,10 @@ public class UserServiceImpl implements UserService {
         if (userResponse == null) {
             return null;
         } else {
-            return ocUserDTO = userResponse.getBody();
+            if(ocUserDTO.isInviteParticipant()){
+                sendEmailToParticipant(ocUserDTO);
+            }
+            return userResponse.getBody();
         }
 
     }
@@ -152,11 +169,13 @@ public class UserServiceImpl implements UserService {
         if(participantDTO!=null) {
             ocUserDTO.setEmail(participantDTO.getEmail());
             ocUserDTO.setFirstName(participantDTO.getFirstName());
+            ocUserDTO.setPhoneNumber(participantDTO.getMobilePhone());
+            ocUserDTO.setInviteParticipant(participantDTO.isInviteParticipant());
         }
         ocUserDTO.setUserType(UserType.USER);
         ocUserDTO.setUsername(ssid);
         ocUserDTO.setLastName("ParticipateAccount");
-        ocUserDTO.setStatus(UserStatus.INVITED);
+
 
         return ocUserDTO;
     }
@@ -245,4 +264,35 @@ public class UserServiceImpl implements UserService {
         }
 
     }
+
+    private void sendEmailToParticipant(OCUserDTO ocUserDTO) {
+        ParticipantDTO pDTO = new ParticipantDTO();
+        pDTO.setEmailAccount(ocUserDTO.getEmail());
+        pDTO.setEmailSubject("This is the email Subject");
+        pDTO.setMessage("This is the Email content message");
+        sendEmailToParticipant(pDTO) ;
+
+        }
+    private void sendEmailToParticipant( ParticipantDTO pDTO) throws OpenClinicaSystemException {
+
+        logger.info("Sending email...");
+        try {
+            MimeMessage mimeMessage = mailSender.createMimeMessage();
+            MimeMessageHelper helper = new MimeMessageHelper(mimeMessage);
+            helper.setFrom(EmailEngine.getAdminEmail());
+            helper.setTo(pDTO.getEmailAccount());
+            helper.setSubject(pDTO.getEmailSubject());
+            helper.setText(pDTO.getMessage());
+
+            mailSender.send(mimeMessage);
+            logger.debug("Email sent successfully on {}", new Date());
+        } catch (MailException me) {
+            logger.error("Email could not be sent");
+            throw new OpenClinicaSystemException(me.getMessage());
+        } catch (MessagingException me) {
+            logger.error("Email could not be sent");
+            throw new OpenClinicaSystemException(me.getMessage());
+        }
+    }
+
 }
