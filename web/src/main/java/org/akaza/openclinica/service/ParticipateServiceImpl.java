@@ -359,13 +359,19 @@ public class ParticipateServiceImpl implements ParticipateService {
         });
     }
 
+    public StudyBean getStudyById(int id) {
+        sdao = new StudyDAO(dataSource);
+        StudyBean studyBean = (StudyBean) sdao.findByPK(id);
+        return studyBean;
+    }
+
     public StudyBean getStudy(String oid) {
         sdao = new StudyDAO(dataSource);
         StudyBean studyBean = (StudyBean) sdao.findByOid(oid);
         return studyBean;
     }
 
-    private StudyBean getParentStudy(String studyOid) {
+    public StudyBean getParentStudy(String studyOid) {
         StudyBean study = getStudy(studyOid);
         if (study.getParentStudyId() == 0) {
             return study;
@@ -382,8 +388,10 @@ public class ParticipateServiceImpl implements ParticipateService {
     public boolean mayProceed(String studyOid) throws Exception {
         boolean accessPermission = false;
         StudyBean study = getStudy(studyOid);
+        StudyBean pStudy = getParentStudy(studyOid);
+
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(study.getId(), "participantPortal");
+        StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(pStudy.getId(), "participantPortal");
         String participateStatus = pStatus.getValue().toString();
 
         if( participateStatus.equalsIgnoreCase("enabled") && study.getStatus().isAvailable()){

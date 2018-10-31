@@ -375,7 +375,7 @@
                               </table>
                               <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:600px;">
                                 <tbody
-                                  <c:if test="${sessionScope.customUserRole != 'Clinical Research Coordinator' && sessionScope.customUserRole != 'Investigator'}">
+                                  <c:if test="${sessionScope.customUserRole!='Clinical Research Coordinator' && sessionScope.customUserRole!='Investigator' || participateStatus!='enabled'}">
                                     class="invisible"
                                   </c:if>
                                 >
@@ -1473,8 +1473,10 @@
             var data = {
                 firstName: $('#name-input').val(),
                 email: $('#email-input').val(),
-                phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val()
+                mobilePhone: $('#country-code').text() + ' ' + $('#phone-input').val(),
+                inviteParticipate: $('#invite-option input:checked').val()
             };
+            console.log(data);
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/connect',

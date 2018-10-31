@@ -239,8 +239,9 @@ public class OdmController {
         StudySubjectBean studySubject = studySubjectDAO.findByLabelAndStudy(ub.getName(), currentStudy);
         logger.info("StudySubject Id: " +studySubject.getLabel());
 
+        StudyBean siteBean = participateService.getStudyById(studySubject.getStudyId());
 
-        if (participateService.mayProceed(studyOid) && studySubject != null && studySubject.isActive() && studySubject.getStatus().isAvailable()) {
+        if (participateService.mayProceed(siteBean.getOid()) && studySubject != null && studySubject.isActive() && studySubject.getStatus().isAvailable()) {
             odm = participateService.getODM(studyOid, studySubject.getOid(), ub);
         }
 
