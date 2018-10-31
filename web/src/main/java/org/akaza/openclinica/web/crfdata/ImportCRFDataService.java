@@ -281,6 +281,9 @@ public class ImportCRFDataService {
     	String commonEventFormRepeatKey = null;
     	HashMap<String,Integer> maxOrdinalbySubjectEvent = new HashMap<>();
     	String commonEventSubjectEventKey = null;
+    	
+    	HashMap<String,String> commonNonRepeatingEventSubjectKeys = new HashMap<>();
+    	String commonNonRepeatingEventSubjectKey = null;
                 
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
@@ -375,12 +378,24 @@ public class ImportCRFDataService {
                         		commonEventsFormRepeatKeys.add(commonEventFormRepeatKey);
                         	}else {
                         		
-                        		 errors.add("Import in different forms with same repeatKey: " + sampleOrdinal + " for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                             	
+                        		 errors.add("Import different forms with same repeatKey: " + sampleOrdinal + " for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                             	
                                  return errors;
                         	}
                         }
                         
-                      
+                        // OC-9756 fix
+                        if(!isRepeating) {
+                        	 commonNonRepeatingEventSubjectKey = studyOID+subjectDataBean.getSubjectOID()+studyEventDataBean.getStudyEventOID()+formOid;
+                        	 
+                        	 if(!(commonNonRepeatingEventSubjectKeys.containsKey(commonNonRepeatingEventSubjectKey))) {                                 
+                        		 commonNonRepeatingEventSubjectKeys.put(commonNonRepeatingEventSubjectKey, commonNonRepeatingEventSubjectKey);
+                         	 }else {                         		
+                         		 errors.add("Import same form " + formOid +" more than once with different repeatKeys: " + sampleOrdinal + " for NON repeating common event, StudyEventOID: " + studyEventDataBean.getStudyEventOID());                             	
+                                 return errors;
+                         	 }
+                        	
+                        	 
+                        }                       
                         
                         //for common events, if not provided studyEventRepeatKey, then skip/reject
                         sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey();
@@ -390,12 +405,19 @@ public class ImportCRFDataService {
                         	
                             return errors;
                         }else {
-                        	//Non-Repeating - Data import with correct (1) repeatKey
+                        	// for same subject, same event, can't have same form more than once in NON repeating COMMON event -- found same formOID in database
                         	if(!isRepeating) {
-                        		if(!(sampleOrdinal.equals("1"))) {
-                        			/* errors.add("Non-Repeating - correct repeatKey should be 1, but found  repeatKey: " + sampleOrdinal + " for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
-                                 	 
-                                     return errors;*/
+                        		ArrayList seList = studyEventDAO.findAllByStudyEventDefinitionAndCrfOids(studyEventDefinitionBean.getOid(), crfBean.getOid());
+                        		for (int j = 0; j < seList.size(); j++) {
+                        			StudyEventBean seBean = (StudyEventBean) seList.get(j); 
+                        			if(seBean.getStudySubjectId() == studySubjectBean.getStudyId()) {
+                        				if(!((seBean.getSampleOrdinal()+"").equals(sampleOrdinal))) {
+                            				errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
+                                            return errors;	
+                            			}
+                        			}
+                        			
+                                 	
                         		}
                         	}
                         	
@@ -1242,7 +1264,7 @@ public class ImportCRFDataService {
                                     studyBean.getParentStudyId());
                             if (studyEventDefintionBean != null && studyEventDefintionBean.isTypeCommon()) {
                             	// Do nothing
-                            }else if (studyEventDataBean.getStudyEventRepeatKey() == null)
+                            }else if (studyEventDataBean.getStudyEventRepeatKey() == null || studyEventDataBean.getStudyEventRepeatKey().trim().isEmpty())
                                 studyEventDataBean.setStudyEventRepeatKey("1");
                            
 
@@ -1254,10 +1276,18 @@ public class ImportCRFDataService {
 	                              
 	                                    // Do something probably not sure....
 	                               if (studyEvent == null || studyEvent.getId() == 0) {
-	                                    mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
-	                                    Object[] arguments = { sedOid, oid };
-	                                    errors.add(mf.format(arguments));
-	                                    logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
+	                            	    if(studyEventDefintionBean.isRepeating()) {
+	                            	    	mf.applyPattern(respage.getString("your_study_event_oid_for_subject_oid"));
+		                                    Object[] arguments = { sedOid, oid };
+		                                    errors.add(mf.format(arguments));
+		                                    logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid);
+	                            	    }else {
+	                            	    	mf.applyPattern(respage.getString("your_study_non_repeating_event_oid_for_subject_oid_repeat_key"));
+		                                    Object[] arguments = { studyEventDataBean.getStudyEventRepeatKey(),sedOid, oid };
+		                                    errors.add(mf.format(arguments));
+		                                    logger.debug("logged an error with se oid " + sedOid + " and subject oid " + oid + "and repeat key " + studyEventDataBean.getStudyEventRepeatKey());
+	                            	    }
+	                                   
 	                                }
                             	}
                             } else if (studyEventDefintionBean == null) {

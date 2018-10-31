@@ -32,7 +32,7 @@
           jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
       });
   
-      jQuery('#cancel').click(function() {
+      jQuery('input.cancel').click(function() {
           jQuery.unblockUI();
           return false;
       });
@@ -167,6 +167,9 @@
     margin-top: 6px;
     font-size: .85rem;
   }
+  .table_cell {
+    padding-top: 6px;
+  }
   .section {
     margin-bottom: 3px;
   }
@@ -207,6 +210,8 @@
   .subnote {
     font-size: 85%;
     color: #618ebb;
+    margin-top: 35px;
+    margin-left: 5px;
   }
   .full-width {
     width: 100%;
@@ -214,14 +219,17 @@
   .left {
     float: left;
   }
+  .clear {
+    clear: both;
+  }
   .hide {
     display: none;
   }
   .invisible {
     visibility: hidden;
   }
-  .clear {
-    clear: both;
+  .error {
+    color: red;
   }
 </style>
 <!-- then instructions-->
@@ -250,7 +258,7 @@
 <input type="button" class="invisible" id="reset-all-filters" value='<fmt:message key="custom_view_on" bundle="${resword}"/> &nbsp; &times;' onclick="resetAllFilters();">
 <div class="header-links">
   <span>
-    <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
+    <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}')"/>">
       <c:out value="${studySub.label}"/> <fmt:message key="audit_log" bundle="${resword}"/>
     </a>
   </span>
@@ -292,18 +300,16 @@
                         <div class="box_BL">
                           <div class="box_BR">
                             <div class="tablebox_center">
-                              <table width="440" border="0" cellpadding="0" cellspacing="0" class="left">
+                              <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:500px; padding-right:20px;">
                                 <!-- Table Actions row (pagination, search, tools) -->
                                 <tbody>
                                   <tr>
                                     <!-- Table Tools/Actions cell -->
                                     <td class="table_actions" valign="top">
                                      <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
-                                        <c:if test="${!userRole.monitor}">
-                                          <a href="javascript:;" id="editParticipantID">
-                                            <fmt:message key="edit" bundle="${resword}"/>
-                                          </a>
-                                        </c:if>
+                                        <a href="javascript:;" id="editParticipantID" <c:if test="${userRole.monitor}">class="invisible"</c:if>>
+                                          <fmt:message key="edit" bundle="${resword}"/>
+                                        </a>
                                       </c:if>
                                     </td>
                                     <!-- End Table Tools/Actions cell -->
@@ -367,67 +373,65 @@
                                   </tr>
                                 </tbody>
                               </table>
-                              <c:if test="${sessionScope.customUserRole == 'Clinical Research Coordinator' || sessionScope.customUserRole == 'Investigator'}">
-                                <table width="600" border="0" cellpadding="0" cellspacing="0" class="left" style="margin-left:20px;">
-                                  <!-- Table Actions row (pagination, search, tools) -->
-                                  <tbody>
-                                    <tr>
-                                      <!-- Table Tools/Actions cell -->
-                                      <td class="table_actions" valign="top">
-                                        <a href="javascript:;" id="contactInformation">
-                                          Invite
-                                        </a>
-                                        &nbsp;|&nbsp;
-                                        <a href="javascript:;" id="participateAccess">
-                                          View Access Details
-                                        </a>
-                                      </td>
-                                      <!-- End Table Tools/Actions cell -->
-                                    </tr>
-                                    <!-- end Table Actions row (pagination, search, tools) -->
-                                    <tr>
-                                      <td valign="top">
-                                        <!-- Table Contents -->
-                                        <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                                          <tbody>
-                                            <tr>
-                                              <td class="table_header_column_top">
-                                                <fmt:message key="first_name" bundle="${resword}"/>
-                                              </td>
-                                              <td class="table_cell_top">
-                                                <c:out value=""/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-                                              </td>
+                              <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:600px;">
+                                <tbody
+                                  <c:if test="${sessionScope.customUserRole!='Clinical Research Coordinator' && sessionScope.customUserRole!='Investigator' || participateStatus!='enabled'}">
+                                    class="invisible"
+                                  </c:if>
+                                >
+                                  <tr>
+                                    <td class="table_actions" valign="top">
+                                      <a href="javascript:;" id="contactInformation">
+                                        Invite
+                                      </a>
+                                      &nbsp;|&nbsp;
+                                      <a href="javascript:;" id="participateAccess">
+                                        View Access Details
+                                      </a>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td valign="top">
+                                      <!-- Table Contents -->
+                                      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                        <tbody>
+                                          <tr>
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="first_name" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell_top" id="info-first-name">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
 
-                                              <td class="table_header_column">
-                                                Mobile Number
-                                              </td>
-                                              <td class="table_cell">
-                                                <c:out value=""/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-                                              </td>
-                                            </tr>
+                                            <td class="table_header_column">
+                                              Mobile Number
+                                            </td>
+                                            <td class="table_cell" id="info-phone-number">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+                                          </tr>
 
-                                            <tr>
-                                              <td class="table_header_column_top">
-                                                <fmt:message key="participate_status" bundle="${resword}"/>
-                                              </td>
-                                              <td class="table_cell">
-                                                <c:out value=""/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-                                              </td>
-                                              <td class="table_header_column">
-                                                <fmt:message key="email" bundle="${resword}"/>
-                                              </td>
-                                              <td class="table_cell">
-                                                <c:out value=""/>&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;&emsp;
-                                              </td>
-                                            </tr>
-                                          </tbody>
-                                        </table>
-                                        <!-- End Table Contents -->
-                                      </td>
-                                    </tr>
-                                  </tbody>
-                                </table>
-                              </c:if>
+                                          <tr>
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="participate_status" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell" id="info-participate-status">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+                                            <td class="table_header_column">
+                                              <fmt:message key="email" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell" id="info-email">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                      <!-- End Table Contents -->
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
                             </div>
                           </div>
                         </div>
@@ -983,7 +987,7 @@
                                 <td class="formlabel" align="left">
                                     <jsp:include page="../include/showSubmitted.jsp"/>
                                     <input class="form-control" type="hidden" name="addWithEvent" value="1"/><span class="addNewStudyLayout">
-                                <fmt:message key="study_subject_ID" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
+                                <fmt:message key="study_subject_ID" bundle="${resword}"/></span>
                                 </td>
                                 <td valign="top">
                                     <table border="0" cellpadding="0" cellspacing="0" class="full-width">
@@ -1028,11 +1032,9 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align: center;">
-                    <a href="javascript:;" id="cancelEdit">
-                    <input type="button" id="cancel" name="cancel" value="Cancel"/>
-                    </a>
+                    <input type="button" class="cancel" value="Cancel"/>
                     &nbsp;
-                    <input type="submit" name="Submit" value="Update"/>
+                    <input type="submit" value="Update"/>
 
 
                     <div id="dvForCalander_${rand}" style="width:1px; height:1px;"></div>
@@ -1045,75 +1047,346 @@
 </div>
 
 <div id="contactInformationForm" class="hide">
-  <form name="contactInformationForm" method="post">
-    <table border="0" cellpadding="0" align="center" style="cursor:default;">
-      <tr style="height:10px;">
-        <td class="formlabel" align="left">
-          <h3>
-            Contact Information
-          </h3>
-        </td>
-      </tr>
-      <tr>
-        <td><div class="lines"></div></td>
-      </tr>
-      <tr>
-        <td>
-          <div style="max-height: 550px; min-width:400px; background:#FFFFFF; overflow-y: auto;">
-            <table cellspacing="10">
-              <tr valign="top">
-                <td class="formlabel" align="left">
-                  <span><fmt:message key="first_name" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
-                </td>
-                <td valign="top">
-                  <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
-                </td>
-              </tr>
-              <tr valign="top">
-                <td class="formlabel" align="left">
-                  <span><fmt:message key="email" bundle="${resword}"/></span>&nbsp;<small class="required">*</small>
-                </td>
-                <td valign="top">
-                  <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
-                </td>
-              </tr>
-              <tr valign="top">
-                <td class="formlabel" align="left">
-                  <span>Mobile</span>&nbsp;<small class="required">*</small>
-                </td>
-                <td valign="top">
-                  <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
-                </td>
-              </tr>
-              <tr valign="top">
-                <td class="formlabel" align="left">
-                  <span>Invite Participant</span>&nbsp;<small class="required">*</small>
-                </td>
-                <td valign="top">
-                  <label><input type="radio" name="notify" value="yes">Yes</label>
-                  &emsp;
-                  <label><input type="radio" name="notify" value="no">No</label>
-                </td>
-              </tr>
-            </table>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><div class="lines"></div></td>
-      </tr>
-      <tr>
-        <td colspan="2" style="text-align: center;">
-          <input type="submit" name="connectParticipant" value="Connect"/>
-          <input type="button" id="cancel" name="cancel" value="Cancel"/>
-        </td>
-      </tr>
-    </table>
-  </form>
+  <table border="0" cellpadding="0" align="center" style="cursor:default;">
+    <tr style="height:10px;">
+      <td class="formlabel" align="left">
+        <h3>
+          Contact Information
+        </h3>
+      </td>
+    </tr>
+    <tr>
+      <td><div class="lines"></div></td>
+    </tr>
+    <tr>
+      <td>
+        <div style="max-height: 550px; min-width:400px; background:#FFFFFF; overflow-y: auto;">
+          <table cellspacing="10">
+            <tr valign="top">
+              <td class="formlabel" align="left">
+                <span><fmt:message key="first_name" bundle="${resword}"/></span>
+              </td>
+              <td valign="top">
+                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+              </td>
+            </tr>
+            <tr valign="top">
+              <td class="formlabel" align="left">
+                <span><fmt:message key="email" bundle="${resword}"/></span>
+              </td>
+              <td valign="top">
+                <input id="email-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                <div class="subnote hide error" id="email-input-error">
+                  Invalid e-mail address
+                </div>
+              </td>
+            </tr>
+            <tr valign="top">
+              <td class="formlabel" align="left">
+                <span>
+                  Mobile
+                </span>
+              </td>
+              <td valign="top">
+                <style>
+                  #phone-input {
+                    padding: 4px !important;
+                    padding-left: 100px !important;
+                  }
+                  #phone-widget {
+                    position: relative;
+                  }
+                  #country-code {
+                    position: absolute;
+                    top: 4px;
+                    left: 54px;
+                    width: 37px;
+                    text-align: center;
+                  }
+                  #country-select {
+                    position: absolute;
+                    height: 26px;
+                    top: 2px;
+                    left: 2px;                    
+                    padding-top: 2px;
+                  }
+                  #country-select:hover {
+                    background-color: #eee;
+                  }
+                  #country-select-down-arrow {
+                    background: url(images/down-arrow.png) no-repeat center center;
+                    width: 10px;
+                    margin-left: 0px;
+                    margin-right: 5px;
+                    display: inline-block;
+                  }
+                  #country-flag {
+                    top: 9px;
+                    background: url(images/flags.png) no-repeat 0 0;
+                    width: 20px;
+                    height: 11px;
+                    overflow: hidden;
+                    margin-left: 11px;
+                    display: inline-block;
+                    background-position: 0px -44px;
+                  }
+                  #access-code-td {
+                    position: relative;
+                  }
+                  #eye {
+                    position: absolute;
+                    top: 2px;
+                    right: 30px;
+                    font-size: 18pt;
+                  }
+                </style>
+                <div id="phone-widget">
+                  <input id="phone-input" type="text" class="formfield form-control" onfocus="this.select()"> 
+                  <div id="country-select">
+                    <div id="country-flag" class="down-arrow">&nbsp;</div> 
+                    <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
+                  </div> 
+                  <div id="country-code">+1</div> 
+                </div>
+                <div id="country-options" style="display:none;">
+                  <style>
+                    #country-options {
+                      position: absolute;
+                      border: 1px solid #d9d9d9;
+                      background-color: white;
+                      padding-left: 0px;
+                      padding-right: 0px;
+                      z-index: 100;
+                      overflow: auto;
+                      height: 200px;
+                    }
+                    .country-option:hover {
+                      background-color: #618ebb;
+                      color: white;
+                    }
+                    .country-option:hover .the-country-code {
+                      color: white;
+                    }
+                    .the-country-code {
+                      color: #666;
+                      padding-right: 10px;
+                    }
+                    .flag-holder {
+                      padding-left: 5px;
+                      padding-right: 5px;
+                      padding-top: 1px;
+                    }
+                    .the-flag {
+                      background: url(images/flags.png) no-repeat 0 0;
+                      height: 11px;
+                      overflow: hidden;
+                      margin-left: 11px;
+                      width: 20px;
+                    }
+                  </style>
+                  <table cellspacing="0">
+                    <tbody>
+                      <tr class="country-option" data-country="AU">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1716px;"></div>
+                          </td>
+                          <td>
+                              <span>Australia</span>&nbsp;&nbsp;<span class="the-country-code">+61</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="AT">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1331px;"></div>
+                          </td>
+                          <td>
+                              <span>Austria</span>&nbsp;&nbsp;<span class="the-country-code">+43</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="BE">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px 0px;"></div>
+                          </td>
+                          <td>
+                              <span>Belgium</span>&nbsp;&nbsp;<span class="the-country-code">+32</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="BR">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -770px;"></div>
+                          </td>
+                          <td>
+                              <span>Brazil</span>&nbsp;&nbsp;<span class="the-country-code">+55</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="CA">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1375px;"></div>
+                          </td>
+                          <td>
+                              <span>Canada</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="CL">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1342px;"></div>
+                          </td>
+                          <td>
+                              <span>Chile</span>&nbsp;&nbsp;<span class="the-country-code">+56</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="CN">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -825px;"></div>
+                          </td>
+                          <td>
+                              <span>China</span>&nbsp;&nbsp;<span class="the-country-code">+86</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="DK">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1386px;"></div>
+                          </td>
+                          <td>
+                              <span>Denmark</span>&nbsp;&nbsp;<span class="the-country-code">+45</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="DO">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1529px;"></div>
+                          </td>
+                          <td>
+                              <span>Dominican Republic</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="FR">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1012px;"></div>
+                          </td>
+                          <td>
+                              <span>France</span>&nbsp;&nbsp;<span class="the-country-code">+33</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="DE">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -2509px;"></div>
+                          </td>
+                          <td>
+                              <span>Germany</span>&nbsp;&nbsp;<span class="the-country-code">+49</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="IN">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1694px;"></div>
+                          </td>
+                          <td>
+                              <span>India</span>&nbsp;&nbsp;<span class="the-country-code">+91</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="IE">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1969px;"></div>
+                          </td>
+                          <td>
+                              <span>Ireland</span>&nbsp;&nbsp;<span class="the-country-code">+353</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="IT">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -143px;"></div>
+                          </td>
+                          <td>
+                              <span>Italy</span>&nbsp;&nbsp;<span class="the-country-code">+39</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="JP">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -429px;"></div>
+                          </td>
+                          <td>
+                              <span>Japan</span>&nbsp;&nbsp;<span class="the-country-code">+81</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="NL">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1441px;"></div>
+                          </td>
+                          <td>
+                              <span>Netherlands</span>&nbsp;&nbsp;<span class="the-country-code">+31</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="ES">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1155px;"></div>
+                          </td>
+                          <td>
+                              <span>Spain</span>&nbsp;&nbsp;<span class="the-country-code">+34</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="SE">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -385px;"></div>
+                          </td>
+                          <td>
+                              <span>Sweden</span>&nbsp;&nbsp;<span class="the-country-code">+46</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="CH">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -1320px;"></div>
+                          </td>
+                          <td>
+                              <span>Switzerland</span>&nbsp;&nbsp;<span class="the-country-code">+41</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="GB">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -55px;"></div>
+                          </td>
+                          <td>
+                              <span>United Kingdom</span>&nbsp;&nbsp;<span class="the-country-code">+44</span>
+                          </td>
+                      </tr>
+                      <tr class="country-option" data-country="US">
+                          <td class="flag-holder">
+                              <div class="the-flag" style="background-position: 0px -44px;"></div>
+                          </td>
+                          <td>
+                              <span>United States</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
+                          </td>
+                      </tr>
+                    </tbody>
+                  </table>
+                </div>
+              </td>
+            </tr>
+            <tr valign="top">
+              <td class="formlabel" align="left">
+                <span>Invite Participant</span>
+              </td>
+              <td valign="top" id="invite-option">
+                <label><input type="radio" name="invite-option" value="true">Yes</label>
+                &emsp;
+                <label><input type="radio" name="invite-option" value="false">No</label>
+              </td>
+            </tr>
+          </table>
+        </div>
+      </td>
+    </tr>
+    <tr>
+      <td><div class="lines"></div></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align: center;">
+        <input type="button" id="connect-button" value="Connect"/>
+        <input type="button" class="cancel" value="Cancel"/>
+      </td>
+    </tr>
+  </table>
 </div>
 
 <div id="participateAccessForm" class="hide">
-  <form name="participateAccessForm" method="post">
+  <form method="post">
     <table border="0" cellpadding="0" align="center" style="cursor:default;">
       <tr style="height:10px;">
         <td class="formlabel" align="left">
@@ -1133,11 +1406,12 @@
                 <td class="formlabel" align="left">
                   <span>Access Link</span>
                 </td>
-                <td valign="top">
-                  <input onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                <td valign="top" id="access-code-td">
+                  <input id="access-code-input" onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
                   <div class="subnote">
                     Please note: viewing access code will be audited.
                   </div>
+                  <i id="eye" class="fa fa-eye"></i>
                 </td>
               </tr>
             </table>
@@ -1149,7 +1423,7 @@
       </tr>
       <tr>
         <td colspan="2" style="text-align: center;">
-          <input type="button" id="cancel" name="cancel" value="Close"/>
+          <input type="button" class="cancel" value="Close"/>
         </td>
       </tr>
     </table>
@@ -1164,14 +1438,75 @@
         jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
     }
 
-     jQuery(document).ready(function () {
+    function updatePartipateInfo(data) {
+        data.phoneNumber = data.phoneNumber || '';
+
+        $('#name-input').val(data.firstName)
+        $('#email-input').val(data.email)
+        var phoneParts = data.phoneNumber.split(' ');
+        var countryCode = phoneParts.shift();
+        var phoneNumber = phoneParts.join(' ');
+        $('#country-code').text(countryCode || '+1');
+        $('#phone-input').val(data.phoneNumber);
+
+        $('#info-first-name').text(data.firstName);
+        $('#info-email').text(data.email);
+        $('#info-phone-number').text(data.phoneNumber);
+        $('#info-participate-status').text(data.status[0] + data.status.substr(1).toLowerCase());
+    }
+
+    jQuery(document).ready(function () {
+        jQuery.ajax({
+            type: 'get',
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}',
+            success: updatePartipateInfo,
+            error: function() {
+                console.log(arguments);
+            }
+        });
+
         jQuery('#editParticipantID').click(function () {
             jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
         });
 
-        jQuery('#cancel, #cancelEdit').click(function () {
+        jQuery('#connect-button').click(function () {
+            var data = {
+                firstName: $('#name-input').val(),
+                email: $('#email-input').val(),
+                mobilePhone: $('#country-code').text() + ' ' + $('#phone-input').val(),
+                inviteParticipate: $('#invite-option input:checked').val()
+            };
+            console.log(data);
+            jQuery.ajax({
+                type: 'post',
+                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/connect',
+                contentType: 'application/json',
+                data: JSON.stringify(data),
+                success: updatePartipateInfo,
+                error: function() {
+                    console.log(arguments);
+                }
+            });
             jQuery.unblockUI();
             return false;
+        });
+
+        jQuery('#email-input').blur(function() {
+          var emailPattern = /[^\s@]+@[^\s@]+\.[^\s@]+/;
+          var input = $(this).val();
+          var parts = input.split('@');
+          var hasSingleAt = parts.length === 2;
+          var afterAt = parts[1] || '';
+          var afterAtHasDot = afterAt.includes('.');
+          var dotRightAfterAt = afterAt[0] === '.';
+          var endsWithDot = afterAt[afterAt.length - 1] === '.';
+          var validEmail = emailPattern.test(input) && hasSingleAt && afterAtHasDot && !dotRightAfterAt && !endsWithDot;
+          if (validEmail) {
+            $('#email-input-error').hide();
+          }
+          else {
+            $('#email-input-error').show();
+          }
         });
 
         jQuery('#contactInformation').click(function() {
@@ -1181,6 +1516,194 @@
         jQuery('#participateAccess').click(function() {
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
         });
+
+        jQuery('#phone-widget').on('click', 'div', function() {
+            $('#country-options').css('display', 'block');
+        });
+
+        jQuery('#country-options').on('click', 'tr', function() {
+            var countryCode = $(this).data('country');
+            var ctr = getCountryByCountryCode(countryCode);
+            if (ctr != null) {
+                jQuery('#country-flag').css('background-position', getBackgroundPositionValue(
+                    ctr.backgroundPositionLeft, ctr.backgroundPositionTop
+                ));
+                jQuery('#country-code').html(ctr.phoneCode);
+            }
+            jQuery('#country-options').css('display', 'none');
+            $('#phone-input').focus();
+        });
+
+        jQuery('#eye').click(function() {
+          var eye = $(this);
+          if (eye.hasClass('fa-eye')) {
+            $('#access-code-input').attr('type', 'text');
+          }
+          else {
+            $('#access-code-input').attr('type', 'password');
+          }
+          eye.toggleClass('fa-eye fa-eye-slash');
+        });
      });
+
+    function getBackgroundPositionValue(left, top) {
+        return left.toString() + 'px ' + top.toString() + 'px';
+    }
+    function getCountryByCountryCode(countryCode) {
+        for (var i = 0; i < countries.length; i++) {
+            if (countries[i].countryCode == countryCode)
+                return countries[i];
+        }
+        return null;
+    }
+    var countries = [
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1716,
+            name: 'Australia',
+            phoneCode: '+61',
+            countryCode: 'AU'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1331,
+            name: 'Austria',
+            phoneCode: '+43',
+            countryCode: 'AT'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: 0,
+            name: 'Belgium',
+            phoneCode: '+32',
+            countryCode: 'BE'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -770,
+            name: 'Brazil',
+            phoneCode: '+55',
+            countryCode: 'BR'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1375,
+            name: 'Canada',
+            phoneCode: '+1',
+            countryCode: 'CA'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1342,
+            name: 'Chile',
+            phoneCode: '+56',
+            countryCode: 'CL'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -825,
+            name: 'China',
+            phoneCode: '+86',
+            countryCode: 'CN'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1386,
+            name: 'Denmark',
+            phoneCode: '+45',
+            countryCode: 'DK'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1529,
+            name: 'Dominican Republic',
+            phoneCode: '+1',
+            countryCode: 'DO'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1012,
+            name: 'France',
+            phoneCode: '+33',
+            countryCode: 'FR'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -2509,
+            name: 'Germany',
+            phoneCode: '+49',
+            countryCode: 'DE'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1694,
+            name: 'India',
+            phoneCode: '+91',
+            countryCode: 'IN'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1969,
+            name: 'Ireland',
+            phoneCode: '+353',
+            countryCode: 'IE'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -143,
+            name: 'Italy',
+            phoneCode: '+39',
+            countryCode: 'IT'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -429,
+            name: 'Japan',
+            phoneCode: '+81',
+            countryCode: 'JP'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1441,
+            name: 'Netherlands',
+            phoneCode: '+31',
+            countryCode: 'NL'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1155,
+            name: 'Spain',
+            phoneCode: '+34',
+            countryCode: 'ES'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -385,
+            name: 'Sweden',
+            phoneCode: '+46',
+            countryCode: 'SE'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -1320,
+            name: 'Switzerland',
+            phoneCode: '+41',
+            countryCode: 'CH'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -44,
+            name: 'United States',
+            phoneCode: '+1',
+            countryCode: 'US'
+        },
+        {
+            backgroundPositionLeft: 0,
+            backgroundPositionTop: -55,
+            name: 'United Kingdom',
+            phoneCode: '+44',
+            countryCode: 'GB'
+        },
+    ];
 
 </script>

@@ -23,6 +23,8 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
 
     private String phoneNumber;
 
+    private boolean inviteParticipant;
+
     @NotNull
     private String username;
 
@@ -120,6 +122,15 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
 
     public void setLastSuccessfulLogin(Instant lastSuccessfulLogin) {
         this.lastSuccessfulLogin = lastSuccessfulLogin;
+    }
+
+
+    public boolean isInviteParticipant() {
+        return inviteParticipant;
+    }
+
+    public void setInviteParticipant(boolean inviteParticipant) {
+        this.inviteParticipant = inviteParticipant;
     }
 
     @Override

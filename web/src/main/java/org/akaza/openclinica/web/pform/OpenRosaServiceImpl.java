@@ -87,7 +87,8 @@ public class OpenRosaServiceImpl implements OpenRosaService {
 
             String baseUrl = CoreResources.getField("SBSUrl");
 
-            String uri = baseUrl.replaceAll("/users/", "") + "/study-environments/" + studyEnvUuid + "/users-with-roles";
+            String uri = baseUrl.replaceAll("/users/", "")
+                    + "/study-environments/" + studyEnvUuid + "/users-with-roles" + "?page=0&size=1000";
 
             RestTemplate restTemplate = new RestTemplate();
             HttpHeaders headers = new HttpHeaders();

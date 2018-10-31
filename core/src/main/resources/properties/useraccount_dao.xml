@@ -108,7 +108,7 @@
 	</query>
 	<query>
 		<name>findAllRolesByUserNameAndStudyOid</name>
-		<sql>select r.* from public.study_user_role r,public.study s where s.study_id=r.study_id and r.user_name=? and s.oc_oid =?</sql>
+		<sql>select r.* from public.study_user_role r,public.study s where  (s.study_id=r.study_id OR s.parent_study_id = r.study_id) and r.user_name=? and s.oc_oid =?</sql>
 	</query>
 	<query>
 		<name>findRole</name>
