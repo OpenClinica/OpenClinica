@@ -85,7 +85,7 @@ public class EnketoUrlService {
 
     public static final String ENKETO_ORDINAL = "enk:ordinal";
     public static final String ENKETO_LAST_USED_ORDINAL = "enk:last-used-ordinal";
-    public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
+    public static final String FS_QUERY_ATTRIBUTE = ":queryParent";
     public static final String OC_QUERY_SUFFIX = "_OC_COMMENT";
     public static final String QUERY_SUFFIX = "_comment";
     public static final String INSTANCE_QUERIES_SUFFIX = "instance-queries.tpl";
@@ -523,7 +523,7 @@ public class EnketoUrlService {
         String itemValue = getItemValue(itemData, crfVersion);
 
         String queries = "";
-        if (itemData != null) {
+            if (itemData != null) {
             ObjectMapper mapper = new ObjectMapper();
             QueriesBean queriesBean = buildQueryElement(itemData);
             queries = queriesBean != null ? mapper.writeValueAsString(queriesBean) : "";
