@@ -410,7 +410,7 @@ public class ImportCRFDataService {
                         		ArrayList seList = studyEventDAO.findAllByStudyEventDefinitionAndCrfOids(studyEventDefinitionBean.getOid(), crfBean.getOid());
                         		for (int j = 0; j < seList.size(); j++) {
                         			StudyEventBean seBean = (StudyEventBean) seList.get(j); 
-                        			if(seBean.getStudySubjectId() == studySubjectBean.getStudyId()) {
+                        			if(seBean.getStudySubjectId() == studySubjectBean.getId()) {
                         				if(!((seBean.getSampleOrdinal()+"").equals(sampleOrdinal))) {
                             				errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
                                             return errors;	
