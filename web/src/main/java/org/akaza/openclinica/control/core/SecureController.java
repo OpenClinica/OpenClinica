@@ -29,6 +29,7 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.hibernate.ChangeStudyDTO;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
@@ -38,6 +39,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
@@ -45,6 +47,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
+import org.akaza.openclinica.service.UserServiceImpl;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -164,6 +167,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected HashMap errors = new HashMap();
     protected UserAccountDao userDaoDomain;
     private static String SCHEDULER = "schedulerFactoryBean";
+    protected UserServiceImpl userServiceImpl;
 
     private StdScheduler scheduler;
     /**
@@ -1410,5 +1414,18 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         List<ChangeStudyDTO> byUser = studyDao.findByUser(username);
         ResponseEntity<List<StudyEnvironmentRoleDTO>> userRoles = studyBuildService.getUserRoles(request);
         Set<CustomRole> customRoles = userRoles.getBody().stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
+    }
+
+    protected String getParticipateStatus(int parentStudyId) {
+        String participateStatus = "";
+        StudyParameterValueDao studyParameterValueDao = (StudyParameterValueDao) SpringServletAccess.getApplicationContext(context).getBean("studyParameterValueDao");
+        StudyParameterValue participantPortalStatus = studyParameterValueDao.findByStudyIdParameter(parentStudyId, "participantPortal");
+        if (participantPortalStatus != null)
+            participateStatus = participantPortalStatus.getValue();
+
+        return participateStatus;
+    }
+    protected UserServiceImpl getUserServiceImpl() {
+        return userServiceImpl= (UserServiceImpl) SpringServletAccess.getApplicationContext(context).getBean("userServiceImpl");
     }
 }
