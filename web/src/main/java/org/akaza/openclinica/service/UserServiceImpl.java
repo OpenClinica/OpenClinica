@@ -102,7 +102,7 @@ public class UserServiceImpl implements UserService {
         Object object = null;
 
         if (studySubject != null) {
-            ocUserDTO = buildOCUserDTO(ssid, participantDTO);
+            ocUserDTO = buildOCUserDTO(ssid, participantDTO,studySubject,studyOid);
             if (studySubject.getUserUuid() == null) {
                 // create participant user Account   POST
                 object = createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.POST);
@@ -164,7 +164,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private OCUserDTO buildOCUserDTO(String ssid, OCParticipantDTO participantDTO) {
+    private OCUserDTO buildOCUserDTO(String ssid, OCParticipantDTO participantDTO ,StudySubject studySubject,String studyOid) {
         OCUserDTO ocUserDTO = new OCUserDTO();
         if(participantDTO!=null) {
             ocUserDTO.setEmail(participantDTO.getEmail());
@@ -173,7 +173,9 @@ public class UserServiceImpl implements UserService {
             ocUserDTO.setInviteParticipant(participantDTO.isInviteParticipant());
         }
         ocUserDTO.setUserType(UserType.USER);
-        ocUserDTO.setUsername(ssid);
+        String username =studyOid+"."+studySubject.getOcOid();
+        username=username.replaceAll("\\(",".").replaceAll("\\)","");
+        ocUserDTO.setUsername(username);
         ocUserDTO.setLastName("ParticipateAccount");
         ocUserDTO.setStatus(UserStatus.INVITED);
 
@@ -217,7 +219,7 @@ public class UserServiceImpl implements UserService {
         Object object = null;
 
         if (studySubject != null) {
-            ocUserDTO = buildOCUserDTO(ssid, participantDTO);
+            ocUserDTO = buildOCUserDTO(ssid, participantDTO,studySubject,studyOid);
             if(studySubject.getUserUuid()!=null) {
                 ocUserDTO.setUuid(studySubject.getUserUuid());
                 object = getParticipantAccountFromUserService(request, ocUserDTO, HttpMethod.GET);

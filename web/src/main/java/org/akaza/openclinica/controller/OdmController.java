@@ -236,7 +236,13 @@ public class OdmController {
         StudyBean currentStudy = participateService.getStudy(studyOid);
         logger.info("Study OId: " +currentStudy.getOid());
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-        StudySubjectBean studySubject = studySubjectDAO.findByLabelAndStudy(ub.getName(), currentStudy);
+        String userName=ub.getName();
+        int lastIndexOfDot= userName.lastIndexOf(".");
+        String subjectOid=userName.substring(lastIndexOfDot+1);
+
+        StudySubjectBean studySubject= studySubjectDAO.findByOid(subjectOid);
+
+
         logger.info("StudySubject Id: " +studySubject.getLabel());
 
         StudyBean siteBean = participateService.getStudyById(studySubject.getStudyId());
