@@ -1438,7 +1438,7 @@
         jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
     }
 
-    function updatePartipateInfo(data) {
+    function updateParticipateInfo(data) {
         data.phoneNumber = data.phoneNumber || '';
 
         $('#name-input').val(data.firstName)
@@ -1447,19 +1447,21 @@
         var countryCode = phoneParts.shift();
         var phoneNumber = phoneParts.join(' ');
         $('#country-code').text(countryCode || '+1');
-        $('#phone-input').val(data.phoneNumber);
+        $('#phone-input').val(phoneNumber);
 
         $('#info-first-name').text(data.firstName);
         $('#info-email').text(data.email);
         $('#info-phone-number').text(data.phoneNumber);
         $('#info-participate-status').text(data.status[0] + data.status.substr(1).toLowerCase());
+
+        $('#invite-option input[value=' + data.inviteParticipant + ']').click();
     }
 
     jQuery(document).ready(function () {
         jQuery.ajax({
             type: 'get',
             url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}',
-            success: updatePartipateInfo,
+            success: updateParticipateInfo,
             error: function() {
                 console.log(arguments);
             }
@@ -1474,15 +1476,14 @@
                 firstName: $('#name-input').val(),
                 email: $('#email-input').val(),
                 mobilePhone: $('#country-code').text() + ' ' + $('#phone-input').val(),
-                inviteParticipate: $('#invite-option input:checked').val()
+                inviteParticipant: $('#invite-option input:checked').val()
             };
-            console.log(data);
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                success: updatePartipateInfo,
+                success: updateParticipateInfo,
                 error: function() {
                     console.log(arguments);
                 }
