@@ -24,7 +24,7 @@ public interface QueryService {
 
         NamedNodeMap attributes = itemNode.getAttributes();
         for (int attrIndex = 0; attrIndex < attributes.getLength(); attrIndex++) {
-            if (attributes.item(attrIndex).getNodeName().equals(FS_QUERY_ATTRIBUTE)) {
+            if (attributes.item(attrIndex).getNodeName().endsWith(FS_QUERY_ATTRIBUTE)) {
                 return attributes.item(attrIndex).getNodeValue();
             }
         }

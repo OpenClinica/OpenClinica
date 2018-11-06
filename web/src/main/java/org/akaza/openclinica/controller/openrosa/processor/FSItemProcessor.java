@@ -282,7 +282,10 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             } else {
                 logger.error("Failed to lookup item: '" + itemName + "'.  Continuing with submission.");
                 int lastIndexOf = itemName.lastIndexOf(REPEATCOUNT);
-                ItemGroup iGroup = itemGroupDao.findByCrfAndGroupLayout(formLayout.getCrf(), itemName.substring(0, lastIndexOf));
+                ItemGroup iGroup = null;
+                if(lastIndexOf!=-1) {
+                    iGroup = itemGroupDao.findByCrfAndGroupLayout(formLayout.getCrf(), itemName.substring(0, lastIndexOf));
+                }
                 if (iGroup != null) {
                     saveOrUpdateRepeatCount(container, itemName, itemValue);
                 }
