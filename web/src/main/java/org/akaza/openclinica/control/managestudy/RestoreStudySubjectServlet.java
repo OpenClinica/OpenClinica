@@ -25,6 +25,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 
@@ -108,6 +109,9 @@ public class RestoreStudySubjectServlet extends SecureController {
                 studySub.setUpdater(ub);
                 studySub.setUpdatedDate(new Date());
                 subdao.update(studySub);
+
+                // update Participant Status when subject is restored
+                changeParticipantAccountStatus(study,studySub,UserStatus.ACTIVE);
 
                 // restore all study events
                 // restore all event crfs
