@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private Object createOrUpdateParticipantAccount(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
+    public Object createOrUpdateParticipantAccount(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
             httpMethod) {
         String uri = sbsUrl;
         RestTemplate restTemplate = new RestTemplate();
@@ -182,7 +182,7 @@ public class UserServiceImpl implements UserService {
         return ocUserDTO;
     }
 
-    private Object getParticipantAccountFromUserService(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
+    public Object getParticipantAccountFromUserService(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
             httpMethod) {
         String uri =sbsUrl+ ocUserDTO.getUuid();
         RestTemplate restTemplate = new RestTemplate();
