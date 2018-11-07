@@ -47,7 +47,6 @@ import java.util.Date;
 public class RemoveStudySubjectServlet extends SecureController {
 
 
-    public static final String ENABLED = "enabled";
     /**
      *
      */
@@ -122,7 +121,7 @@ public class RemoveStudySubjectServlet extends SecureController {
                 studySub.setUpdatedDate(new Date());
                 subdao.update(studySub);
                // update Participant Status when subject is removed
-                changeParticipantStatusToInactive(study,studySub);
+                changeParticipantAccountStatus(study,studySub,UserStatus.INACTIVE);
 
                 // remove all study events
                 // remove all event crfs
@@ -197,24 +196,5 @@ public class RemoveStudySubjectServlet extends SecureController {
         logger.info("Sending email done..");
     }
 
-private void changeParticipantStatusToInactive(StudyBean study, StudySubjectBean studySub ){
-    // check if particiate module enable
-    int parentStudyId = (study.getParentStudyId()!=0)? study.getParentStudyId():study.getId();
-    String participateStatus=getParticipateStatus(parentStudyId);
-    if(participateStatus.equals(ENABLED)&& !StringUtils.isEmpty(studySub.getUserUuid())) {
-        OCUserDTO ocUserDTO = new OCUserDTO();
-        ocUserDTO.setUuid(studySub.getUserUuid());
-        // Get Participant user account in user_service using user_uuid
-        Object object=   getUserServiceImpl().getParticipantAccountFromUserService(request,ocUserDTO,HttpMethod.GET);
-        if (object != null && object instanceof OCUserDTO) {
-            ocUserDTO = (OCUserDTO) object;
-            ocUserDTO.setFirstName("");
-            ocUserDTO.setPhoneNumber("");
-            ocUserDTO.setStatus(UserStatus.INACTIVE);
-            // Update the status and clear firstname and phone from Participant user account in user_service
-            getUserServiceImpl().createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
-        }
-    }
-}
 
 }

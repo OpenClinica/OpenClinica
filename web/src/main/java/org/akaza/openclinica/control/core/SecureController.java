@@ -7,7 +7,6 @@
  */
 
 package org.akaza.openclinica.control.core;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
@@ -44,10 +43,7 @@ import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.PermissionService;
-import org.akaza.openclinica.service.StudyBuildService;
-import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
-import org.akaza.openclinica.service.UserServiceImpl;
+import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -66,6 +62,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -167,6 +164,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected HashMap errors = new HashMap();
     protected UserAccountDao userDaoDomain;
     private static String SCHEDULER = "schedulerFactoryBean";
+    public static final String ENABLED = "enabled";
     protected UserServiceImpl userServiceImpl;
 
     private StdScheduler scheduler;
@@ -1428,4 +1426,27 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected UserServiceImpl getUserServiceImpl() {
         return userServiceImpl= (UserServiceImpl) SpringServletAccess.getApplicationContext(context).getBean("userServiceImpl");
     }
+
+    protected void changeParticipantAccountStatus(StudyBean study, StudySubjectBean studySub, UserStatus userStatus ){
+        // check if particiate module enabled
+        int parentStudyId = (study.getParentStudyId()!=0)? study.getParentStudyId():study.getId();
+        String participateStatus=getParticipateStatus(parentStudyId);
+        if(participateStatus.equals(ENABLED)&& !StringUtils.isEmpty(studySub.getUserUuid())) {
+            OCUserDTO ocUserDTO = new OCUserDTO();
+            ocUserDTO.setUuid(studySub.getUserUuid());
+            // Get Participant user account in user_service using user_uuid
+            Object object=   getUserServiceImpl().getParticipantAccountFromUserService(request,ocUserDTO,HttpMethod.GET);
+            if (object != null && object instanceof OCUserDTO) {
+                ocUserDTO = (OCUserDTO) object;
+                if(userStatus.equals(UserStatus.INACTIVE)) {
+                    ocUserDTO.setFirstName("");
+                    ocUserDTO.setPhoneNumber("");
+                }
+                ocUserDTO.setStatus(userStatus);
+                // Update the status and clear firstname and phone from Participant user account in user_service
+                getUserServiceImpl().createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
+            }
+        }
+    }
+
 }
