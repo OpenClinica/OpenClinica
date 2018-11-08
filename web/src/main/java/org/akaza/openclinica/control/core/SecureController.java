@@ -1438,10 +1438,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             Object object=   getUserServiceImpl().getParticipantAccountFromUserService(request,ocUserDTO,HttpMethod.GET);
             if (object != null && object instanceof OCUserDTO) {
                 ocUserDTO = (OCUserDTO) object;
-                if(userStatus.equals(UserStatus.INACTIVE)) {
-                    ocUserDTO.setFirstName("");
-                    ocUserDTO.setPhoneNumber("");
-                }
                 ocUserDTO.setStatus(userStatus);
                 // Update the status and clear firstname and phone from Participant user account in user_service
                 getUserServiceImpl().createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
