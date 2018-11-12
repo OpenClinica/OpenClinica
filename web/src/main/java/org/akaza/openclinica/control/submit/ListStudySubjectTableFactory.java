@@ -20,7 +20,7 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.OCUserDTO;
-import org.akaza.openclinica.service.UserServiceImpl;
+import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.collections.CollectionUtils;
@@ -72,7 +72,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     private final String COMMON = "common";
     private final String ENABLED = "enabled";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-    private UserServiceImpl userServiceImpl;
+    private UserService userService;
     private HttpServletRequest request;
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
@@ -232,7 +232,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String participateStatusSetFilter = null;
         if (getParticipateModuleStatus().equals(ENABLED)) {
             participateStatusSetFilter = getParticipateStatusSetFilter(subjectFilter);
-            oCUserDTOs = userServiceImpl.getAllParticipantAccountsFromUserService(request);
+            oCUserDTOs = userService.getAllParticipantAccountsFromUserService(request);
 
             for (OCUserDTO oCUserDTO : oCUserDTOs) {
                 if (participateStatusSetFilter == null || (participateStatusSetFilter != null && oCUserDTO.getStatus().getValue().equals(participateStatusSetFilter)))
@@ -1517,12 +1517,12 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         return null;
     }
 
-    public UserServiceImpl getUserServiceImpl() {
-        return userServiceImpl;
+    public UserService getUserService() {
+        return userService;
     }
 
-    public void setUserServiceImpl(UserServiceImpl userServiceImpl) {
-        this.userServiceImpl = userServiceImpl;
+    public void setUserService(UserService userService) {
+        this.userService = userService;
     }
 
     public String getParticipateStatusSetFilter(FindSubjectsFilter subjectFilter) {

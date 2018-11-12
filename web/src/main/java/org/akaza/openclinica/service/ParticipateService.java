@@ -36,8 +36,6 @@ import java.util.List;
 public interface ParticipateService {
 
 
-	 RestfulServiceHelper getRestfulServiceHelper();
-
 	 boolean mayProceed(String studyOid) throws Exception ;
 
 	 ODM getODM(String studyOID, String subjectKey,UserAccountBean ub);

@@ -11,6 +11,7 @@ import io.swagger.annotations.Api;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
@@ -71,6 +72,7 @@ public class StudyEventController {
 
     @Autowired
     private EventDefinitionCrfDao eventDefinitionCrfDao;
+    private RestfulServiceHelper restfulServiceHelper;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -106,9 +108,9 @@ public class StudyEventController {
                                                  @PathVariable( "ordinal" ) Integer ordinal)
             throws Exception {
 
-        participateService.getRestfulServiceHelper().setSchema(studyOid, request);
+        getRestfulServiceHelper().setSchema(studyOid, request);
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        UserAccountBean ub = participateService.getRestfulServiceHelper().getUserAccount(request);
+        UserAccountBean ub = getRestfulServiceHelper().getUserAccount(request);
         StudyBean currentStudy = participateService.getStudy(studyOid);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
         StudySubjectBean studySubject = studySubjectDAO.findByLabelAndStudy(ub.getName(), currentStudy);
@@ -153,7 +155,12 @@ public class StudyEventController {
         //return new ResponseEntity<String>("<message>Success</message>", org.springframework.http.HttpStatus.OK);
 
     }
-
+    public RestfulServiceHelper getRestfulServiceHelper() {
+        if (restfulServiceHelper == null) {
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+        }
+        return restfulServiceHelper;
+    }
 
 }
 

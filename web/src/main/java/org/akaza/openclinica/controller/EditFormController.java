@@ -9,6 +9,7 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.hibernate.FormLayoutDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -49,8 +50,7 @@ public class EditFormController {
     @Autowired
     EnketoUrlService urlService;
 
-    @Autowired
-    private ParticipateService participateService;
+    private RestfulServiceHelper restfulServiceHelper;
 
     public static final String FORM_CONTEXT = "ecid";
     ParticipantPortalRegistrar participantPortalRegistrar;
@@ -88,7 +88,7 @@ public class EditFormController {
 
     @RequestMapping(value = "/{studyOid}/url", method = RequestMethod.GET)
     public ResponseEntity<String> getEditUrl(@RequestParam(FORM_CONTEXT) String formContext, @PathVariable("studyOid") String studyOID , HttpServletRequest request) throws Exception {
-        participateService.getRestfulServiceHelper().setSchema(studyOID, request);
+        getRestfulServiceHelper().setSchema(studyOID, request);
 
         FormUrlObject editURL = null;
     //    if (!mayProceed(studyOID))
@@ -154,5 +154,10 @@ public class EditFormController {
 
         return accessPermission;
     }
-
+    public RestfulServiceHelper getRestfulServiceHelper() {
+        if (restfulServiceHelper == null) {
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+        }
+        return restfulServiceHelper;
+    }
 }
