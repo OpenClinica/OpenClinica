@@ -375,8 +375,12 @@
                               </table>
                               <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:600px;">
                                 <tbody
-                                  <c:if test="${sessionScope.customUserRole!='Clinical Research Coordinator' && sessionScope.customUserRole!='Investigator' || participateStatus!='enabled'}">
-                                    class="invisible"
+                                  <c:if test="${
+                                    studySub.status.name=='removed' ||
+                                    sessionScope.customUserRole!='Clinical Research Coordinator' && sessionScope.customUserRole!='Investigator' || 
+                                    participateStatus!='enabled'
+                                  }">
+                                      class="invisible"
                                   </c:if>
                                 >
                                   <tr>
