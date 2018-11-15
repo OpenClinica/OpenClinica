@@ -41,6 +41,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -67,6 +68,7 @@ import java.util.Comparator;
  * @author joekeremian
  */
 
+@Service("participateService")
 public class ParticipateServiceImpl implements ParticipateService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -89,7 +91,6 @@ public class ParticipateServiceImpl implements ParticipateService {
     @Autowired
     StudyDao studyDao;
 
-    private RestfulServiceHelper restfulServiceHelper;
 
     public static final String FORM_CONTEXT = "ecid";
     public static final String DASH = "-";
@@ -99,10 +100,6 @@ public class ParticipateServiceImpl implements ParticipateService {
 
 
     StudyDAO sdao;
-
-    public ParticipateServiceImpl(BasicDataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
     /**
      * @api {get} /pages/odmk/studies/:studyOid/metadata Retrieve metadata
@@ -400,13 +397,6 @@ public class ParticipateServiceImpl implements ParticipateService {
         return accessPermission;
     }
 
-    public RestfulServiceHelper getRestfulServiceHelper() {
-        if (restfulServiceHelper == null) {
-            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
-        }
-
-        return restfulServiceHelper;
-    }
 
     public ODM getOdmHeader(ODM odm , StudyBean currentStudy , StudySubjectBean studySubject){
             odm = new ODM();

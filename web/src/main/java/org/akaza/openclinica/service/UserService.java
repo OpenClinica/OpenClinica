@@ -33,4 +33,6 @@ public interface UserService {
 			httpMethod);
      Object getParticipantAccountFromUserService(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod httpMethod);
 
+	 RestfulServiceHelper getRestfulServiceHelper();
+
 }

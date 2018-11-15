@@ -22,7 +22,6 @@ import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.UserService;
-import org.akaza.openclinica.service.UserServiceImpl;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.springframework.web.context.WebApplicationContext;
@@ -52,7 +51,7 @@ public class ListStudySubjectsServlet extends SecureController {
     private EventDefinitionCRFDAO eventDefintionCRFDAO;
     private StudyGroupDAO studyGroupDAO;
     private StudyParameterValueDAO studyParameterValueDAO;
-    private UserServiceImpl userServiceImpl;
+    private UserService userService;
     Locale locale;
 
     /*
@@ -159,7 +158,7 @@ public class ListStudySubjectsServlet extends SecureController {
         factory.setEventDefintionCRFDAO(getEventDefinitionCRFDAO());
         factory.setStudyGroupDAO(getStudyGroupDAO());
         factory.setStudyParameterValueDAO(getStudyParameterValueDAO());
-        factory.setUserServiceImpl(getUserServiceImpl());
+        factory.setUserService(getUserService());
         factory.setRequest(request);
         String findSubjectsHtml = factory.createTable(request, response).render();
 
@@ -239,8 +238,8 @@ public class ListStudySubjectsServlet extends SecureController {
         return studyGroupDAO;
     }
 
-    public UserServiceImpl getUserServiceImpl() {
-        return userServiceImpl= (UserServiceImpl) SpringServletAccess.getApplicationContext(context).getBean("userServiceImpl");
+    public UserService getUserService() {
+        return userService= (UserService) SpringServletAccess.getApplicationContext(context).getBean("userService");
     }
 
 }

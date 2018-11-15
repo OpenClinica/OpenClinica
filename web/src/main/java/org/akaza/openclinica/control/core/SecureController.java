@@ -165,7 +165,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected UserAccountDao userDaoDomain;
     private static String SCHEDULER = "schedulerFactoryBean";
     public static final String ENABLED = "enabled";
-    protected UserServiceImpl userServiceImpl;
+    protected UserService userService;
 
     private StdScheduler scheduler;
     /**
@@ -1423,8 +1423,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
         return participateStatus;
     }
-    protected UserServiceImpl getUserServiceImpl() {
-        return userServiceImpl= (UserServiceImpl) SpringServletAccess.getApplicationContext(context).getBean("userServiceImpl");
+    protected UserService getUserService() {
+        return userService= (UserService) SpringServletAccess.getApplicationContext(context).getBean("userService");
     }
 
     protected void changeParticipantAccountStatus(StudyBean study, StudySubjectBean studySub, UserStatus userStatus ){
@@ -1435,12 +1435,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             OCUserDTO ocUserDTO = new OCUserDTO();
             ocUserDTO.setUuid(studySub.getUserUuid());
             // Get Participant user account in user_service using user_uuid
-            Object object=   getUserServiceImpl().getParticipantAccountFromUserService(request,ocUserDTO,HttpMethod.GET);
+            Object object=   getUserService().getParticipantAccountFromUserService(request,ocUserDTO,HttpMethod.GET);
             if (object != null && object instanceof OCUserDTO) {
                 ocUserDTO = (OCUserDTO) object;
                 ocUserDTO.setStatus(userStatus);
                 // Update the status and clear firstname and phone from Participant user account in user_service
-                getUserServiceImpl().createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
+                getUserService().createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
             }
         }
     }

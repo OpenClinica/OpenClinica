@@ -25,6 +25,7 @@ import org.springframework.http.*;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -46,6 +47,7 @@ import static java.util.Collections.*;
  * @author joekeremian
  */
 
+@Service("userService")
 public class UserServiceImpl implements UserService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -81,10 +83,6 @@ public class UserServiceImpl implements UserService {
     private String sbsUrl = CoreResources.getField("SBSUrl");
 
     StudyDAO sdao;
-
-    public UserServiceImpl(BasicDataSource dataSource) {
-        this.dataSource = dataSource;
-    }
 
 
     public StudySubject getStudySubject(String ssid, Study study) {
@@ -296,5 +294,10 @@ public class UserServiceImpl implements UserService {
             throw new OpenClinicaSystemException(me.getMessage());
         }
     }
-
+    public RestfulServiceHelper getRestfulServiceHelper() {
+        if (restfulServiceHelper == null) {
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+        }
+        return restfulServiceHelper;
+    }
 }
