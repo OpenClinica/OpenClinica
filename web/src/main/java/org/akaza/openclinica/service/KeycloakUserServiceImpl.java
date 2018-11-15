@@ -12,13 +12,13 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-@Service("auth0UserService")
+@Service("keycloakUserService")
 public class KeycloakUserServiceImpl implements KeycloakUserService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired
     private AppConfig appConfig;
 
-    public boolean authenticateAuth0User(String username, String password) {
+    public boolean authenticateKeycloakUser(String username, String password) {
         boolean authenticated = false;
         HttpResponse<String> response = null;
         try {

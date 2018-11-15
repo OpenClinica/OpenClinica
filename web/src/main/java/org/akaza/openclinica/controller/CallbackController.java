@@ -6,6 +6,7 @@ import net.sf.json.util.JSONUtils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.service.CallbackService;
 import org.akaza.openclinica.service.KeycloakUser;
@@ -52,7 +53,6 @@ public class CallbackController {
 
     private final String redirectOnFail;
     private final String redirectOnSuccess;
-    private String realm = "Protected";
     @Autowired private DataSource dataSource;
     @Autowired private UserAccountController userAccountController;
     @Autowired private StudyBuildService studyBuildService;
@@ -74,6 +74,15 @@ public class CallbackController {
     }
 
     private void handle(HttpServletRequest req, HttpServletResponse res) throws Exception {
+        String error = req.getParameter("error");
+        if (error != null && error.equals("unauthorized")) {
+            logger.info("CallbackController In unauthorized:%%%%%%%%");
+            String smURL = CoreResources.getField("smURL");
+            int lastIndex = smURL.lastIndexOf('/');
+            String unauthURl = smURL.substring(0, lastIndex) + "/error-user-deactivated";
+            res.sendRedirect(unauthURl);
+            return;
+        }
         final Principal userPrincipal = req.getUserPrincipal();
 
         if (userPrincipal == null) {
@@ -81,36 +90,7 @@ public class CallbackController {
             logger.info("CallbackController In login_required:%%%%%%%%" + authorizeUrl);
             res.sendRedirect(authorizeUrl);
         } else if (userPrincipal instanceof KeycloakAuthenticationToken) {
-
-            KeycloakPrincipal<KeycloakSecurityContext> kp = (KeycloakPrincipal<KeycloakSecurityContext>) ((KeycloakAuthenticationToken) userPrincipal).getPrincipal();
-            AccessToken token = kp.getKeycloakSecurityContext().getToken();
-            req.getSession().setAttribute("accessToken", kp.getKeycloakSecurityContext().getTokenString());
-            KeycloakUser user = new KeycloakUser(token);
-
-            String ocUserUuid = (String) user.getUserContext().get("userUuid");
-
-            UserAccountHelper userAccountHelper = null;
-            try {
-                userAccountHelper = callbackService.isCallbackSuccessful(req, user);
-            } catch (Exception e) {
-                logger.error("UserAccountHelper:", e);
-                throw e;
-            }
-            UserAccountBean ub = userAccountHelper.getUb();
-            if (ub != null) {
-                if (userAccountHelper.isUpdated()) {
-                    ub = callbackService.getUpdatedUser(ub);
-                }
-                req.getSession().setAttribute(USER_BEAN_NAME, ub);
-                refreshUserRole(req, ub);
-                logger.info("Setting firstLoginCheck to true");
-                req.getSession().setAttribute("firstLoginCheck", "true");
-                logger.info("CallbackController set firstLoginCheck to true:%%%%%%%%");
-            } else {
-                logger.error("UserAccountBean ub ");
-                unauthorized(res, "Bad credentials");
-                return;
-            }
+            String ocUserUuid = keycloakController.getOcUserUuid(req);
             String returnTo = keycloakController.getReturnTo(req);
             String state = req.getParameter("state");
             String param = "";
@@ -152,18 +132,4 @@ public class CallbackController {
         }
         return null;
     }
-    private void refreshUserRole(HttpServletRequest req, UserAccountBean ub) {
-        StudyUserRoleBean roleByStudy = ub.getRoleByStudy(ub.getActiveStudyId());
-        req.getSession().setAttribute("userRole", roleByStudy);
-
-    }
-    private void unauthorized(HttpServletResponse response, String message) throws IOException {
-        response.setHeader("WWW-Authenticate", "Basic realm=\"" + realm + "\"");
-        response.sendError(401, message);
-    }
-
-    private void unauthorized(HttpServletResponse response) throws IOException {
-        unauthorized(response, "Unauthorized");
-    }
-
 }

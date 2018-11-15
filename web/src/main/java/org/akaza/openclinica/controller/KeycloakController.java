@@ -1,7 +1,10 @@
 package org.akaza.openclinica.controller;
 
 import net.sf.json.util.JSONUtils;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.controller.helper.UserAccountHelper;
+import org.akaza.openclinica.service.CallbackService;
 import org.akaza.openclinica.service.KeycloakUser;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
@@ -13,6 +16,7 @@ import org.keycloak.common.util.KeycloakUriBuilder;
 import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -21,9 +25,13 @@ import java.net.URLEncoder;
 import java.security.Principal;
 import java.util.Map;
 
+import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
+
 @Component
 public class KeycloakController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    @Autowired
+    CallbackService callbackService;
 
     public String buildAuthorizeUrl(HttpServletRequest request) {
         AuthzClient authzClient = AuthzClient.create();
@@ -80,7 +88,7 @@ public class KeycloakController {
         return "/OpenClinica/MainMenu";
     }
 
-    public String getOcUserUuid(HttpServletRequest req) {
+    public String getOcUserUuid(HttpServletRequest req) throws Exception {
         String ocUserUuid = null;
         final Principal userPrincipal = req.getUserPrincipal();
         if (userPrincipal == null)
@@ -91,7 +99,34 @@ public class KeycloakController {
         KeycloakUser user = new KeycloakUser(token);
 
         ocUserUuid = (String) user.getUserContext().get("userUuid");
+        UserAccountHelper userAccountHelper = null;
+        try {
+            userAccountHelper = callbackService.isCallbackSuccessful(req, user);
+        } catch (Exception e) {
+            logger.error("UserAccountHelper:", e);
+            throw e;
+        }
+        UserAccountBean ub = userAccountHelper.getUb();
+        if (ub != null) {
+            if (userAccountHelper.isUpdated()) {
+                ub = callbackService.getUpdatedUser(ub);
+            }
+            req.getSession().setAttribute(USER_BEAN_NAME, ub);
+            refreshUserRole(req, ub);
+            logger.info("Setting firstLoginCheck to true");
+            req.getSession().setAttribute("firstLoginCheck", "true");
+            logger.info("CallbackController set firstLoginCheck to true:%%%%%%%%");
+        } else {
+            logger.error("UserAccountBean ub ");
+
+        }
         return ocUserUuid;
+
+    }
+
+    private void refreshUserRole(HttpServletRequest req, UserAccountBean ub) {
+        StudyUserRoleBean roleByStudy = ub.getRoleByStudy(ub.getActiveStudyId());
+        req.getSession().setAttribute("userRole", roleByStudy);
 
     }
 

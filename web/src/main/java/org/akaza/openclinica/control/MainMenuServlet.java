@@ -325,6 +325,7 @@ public class MainMenuServlet extends SecureController {
         factory.setStudySubjectDao(getStudySubjectDAO());
         factory.setCurrentStudy(currentStudy);
         factory.setStudyDao(getStudyDAO());
+
         String studySubjectStatusStatistics = factory.createTable(request, response).render();
         request.setAttribute("studySubjectStatusStatistics", studySubjectStatusStatistics);
     }

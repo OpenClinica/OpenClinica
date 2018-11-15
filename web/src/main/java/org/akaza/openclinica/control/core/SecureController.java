@@ -467,7 +467,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 KeycloakController controller = (KeycloakController) webApplicationContext .getBean("keycloakController");
                 String ocUserUuid = controller.getOcUserUuid(request);
                 if (ocUserUuid != null)
-                    ub = (UserAccountBean) uDAO.findByUserUuid(ocUserUuid);
+                    ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+
                 if (ub == null || StringUtils.isEmpty(ub.getName())) {
                     session.invalidate();
                     SecurityContextHolder.clearContext();

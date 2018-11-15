@@ -234,7 +234,7 @@ public class SignStudySubjectServlet extends SecureController {
             // .getInstance().encrytPassword(password);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             KeycloakUserService auth0UserService = ctx.getBean("auth0UserService", KeycloakUserServiceImpl.class);
-            boolean isAuthenticated = auth0UserService.authenticateAuth0User(username, password);
+            boolean isAuthenticated = auth0UserService.authenticateKeycloakUser(username, password);
 
             if (isAuthenticated && ub.getName().equals(username)) {
                 if (signSubjectEvents(studySub, sm.getDataSource(), ub)) {
