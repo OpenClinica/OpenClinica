@@ -501,6 +501,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 		EventDefinitionCrf eventDefinitionCrf = edcObj.getEventDefinitionCrf();
 		eventDefinitionCrf = populateEventDefinitionCrf(new EventDefinitionCrfDTO(edcObj));
 		eventDefinitionCrf.setUpdateId(edcObj.getUserAccount().getUserId());
+		eventDefinitionCrf.setOrdinal(edcObj.getOrdinal());
 		eventDefinitionCrf.setDateUpdated(new Date());
 
 		return eventDefinitionCrf;
