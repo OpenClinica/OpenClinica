@@ -1370,7 +1370,7 @@
               <td valign="top" id="invite-option">
                 <label><input type="radio" name="invite-option" value="true">Yes</label>
                 &emsp;
-                <label><input type="radio" name="invite-option" value="false">No</label>
+                <label><input type="radio" name="invite-option" value="false" checked="checked">No</label>
               </td>
             </tr>
           </table>
@@ -1382,8 +1382,8 @@
     </tr>
     <tr>
       <td colspan="2" style="text-align: center;">
-        <input type="button" id="connect-button" value="Connect"/>
         <input type="button" class="cancel" value="Cancel"/>
+        <input type="button" id="connect-button" value="Update"/>
       </td>
     </tr>
   </table>
