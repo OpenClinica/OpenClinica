@@ -7,7 +7,6 @@
  */
 
 package org.akaza.openclinica.control.core;
-
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.*;
 import org.akaza.openclinica.bean.extract.ArchivedDatasetFileBean;
@@ -29,6 +28,7 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
 import org.akaza.openclinica.dao.hibernate.ChangeStudyDTO;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
@@ -38,13 +38,12 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.PermissionService;
-import org.akaza.openclinica.service.StudyBuildService;
-import org.akaza.openclinica.service.StudyEnvironmentRoleDTO;
+import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -63,6 +62,7 @@ import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.http.HttpMethod;
 import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
@@ -164,6 +164,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected HashMap errors = new HashMap();
     protected UserAccountDao userDaoDomain;
     private static String SCHEDULER = "schedulerFactoryBean";
+    public static final String ENABLED = "enabled";
+    protected UserService userService;
 
     private StdScheduler scheduler;
     /**
@@ -1414,4 +1416,36 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         ResponseEntity<List<StudyEnvironmentRoleDTO>> userRoles = studyBuildService.getUserRoles(request);
         Set<CustomRole> customRoles = userRoles.getBody().stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
     }
+
+    protected String getParticipateStatus(int parentStudyId) {
+        String participateStatus = "";
+        StudyParameterValueDao studyParameterValueDao = (StudyParameterValueDao) SpringServletAccess.getApplicationContext(context).getBean("studyParameterValueDao");
+        StudyParameterValue participantPortalStatus = studyParameterValueDao.findByStudyIdParameter(parentStudyId, "participantPortal");
+        if (participantPortalStatus != null)
+            participateStatus = participantPortalStatus.getValue();
+
+        return participateStatus;
+    }
+    protected UserService getUserService() {
+        return userService= (UserService) SpringServletAccess.getApplicationContext(context).getBean("userService");
+    }
+
+    protected void changeParticipantAccountStatus(StudyBean study, StudySubjectBean studySub, UserStatus userStatus ){
+        // check if particiate module enabled
+        int parentStudyId = (study.getParentStudyId()!=0)? study.getParentStudyId():study.getId();
+        String participateStatus=getParticipateStatus(parentStudyId);
+        if(participateStatus.equals(ENABLED)&& !StringUtils.isEmpty(studySub.getUserUuid())) {
+            OCUserDTO ocUserDTO = new OCUserDTO();
+            ocUserDTO.setUuid(studySub.getUserUuid());
+            // Get Participant user account in user_service using user_uuid
+            Object object=   getUserService().getParticipantAccountFromUserService(request,ocUserDTO,HttpMethod.GET);
+            if (object != null && object instanceof OCUserDTO) {
+                ocUserDTO = (OCUserDTO) object;
+                ocUserDTO.setStatus(userStatus);
+                // Update the status and clear firstname and phone from Participant user account in user_service
+                getUserService().createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
+            }
+        }
+    }
+
 }

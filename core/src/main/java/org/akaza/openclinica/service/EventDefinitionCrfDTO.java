@@ -35,6 +35,7 @@ public class EventDefinitionCrfDTO {
         this.odmFormRef = edcObj.odmFormRef;
         this.formLayout = edcObj.formLayout;
         this.errors = edcObj.errors;
+        this.ordinal= edcObj.ordinal;
     }
 
     public EventDefinitionCrfDTO() {

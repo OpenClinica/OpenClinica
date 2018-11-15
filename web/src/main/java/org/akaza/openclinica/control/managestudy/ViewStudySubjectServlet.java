@@ -367,10 +367,7 @@ public class ViewStudySubjectServlet extends SecureController {
             if (StringUtils.isNotEmpty(errorData))
                 request.setAttribute("errorData", errorData);
 
-            String participateStatus = "";
-            StudyParameterValue participantPortalStatus = studyParameterValueDao.findByStudyIdParameter(parentStudyId, "participantPortal");
-            if (participantPortalStatus != null)
-                participateStatus = participantPortalStatus.getValue();
+            String participateStatus = getParticipateStatus(parentStudyId);
             request.setAttribute("participateStatus", participateStatus);
 
             forwardPage(Page.VIEW_STUDY_SUBJECT);

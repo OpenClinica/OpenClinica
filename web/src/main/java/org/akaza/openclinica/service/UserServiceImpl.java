@@ -25,6 +25,7 @@ import org.springframework.http.*;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 
@@ -46,6 +47,7 @@ import static java.util.Collections.*;
  * @author joekeremian
  */
 
+@Service("userService")
 public class UserServiceImpl implements UserService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -82,10 +84,6 @@ public class UserServiceImpl implements UserService {
 
     StudyDAO sdao;
 
-    public UserServiceImpl(BasicDataSource dataSource) {
-        this.dataSource = dataSource;
-    }
-
 
     public StudySubject getStudySubject(String ssid, Study study) {
         return studySubjectDao.findByLabelAndStudyOrParentStudy(ssid, study);
@@ -102,7 +100,7 @@ public class UserServiceImpl implements UserService {
         Object object = null;
 
         if (studySubject != null) {
-            ocUserDTO = buildOCUserDTO(ssid, participantDTO);
+            ocUserDTO = buildOCUserDTO(ssid, participantDTO,studySubject,studyOid);
             if (studySubject.getUserUuid() == null) {
                 // create participant user Account   POST
                 object = createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.POST);
@@ -130,7 +128,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private Object createOrUpdateParticipantAccount(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
+    public Object createOrUpdateParticipantAccount(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
             httpMethod) {
         String uri = sbsUrl;
         RestTemplate restTemplate = new RestTemplate();
@@ -164,7 +162,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private OCUserDTO buildOCUserDTO(String ssid, OCParticipantDTO participantDTO) {
+    private OCUserDTO buildOCUserDTO(String ssid, OCParticipantDTO participantDTO ,StudySubject studySubject,String studyOid) {
         OCUserDTO ocUserDTO = new OCUserDTO();
         if(participantDTO!=null) {
             ocUserDTO.setEmail(participantDTO.getEmail());
@@ -173,14 +171,16 @@ public class UserServiceImpl implements UserService {
             ocUserDTO.setInviteParticipant(participantDTO.isInviteParticipant());
         }
         ocUserDTO.setUserType(UserType.USER);
-        ocUserDTO.setUsername(ssid);
+        String username =studyOid+"."+studySubject.getOcOid();
+        username=username.replaceAll("\\(",".").replaceAll("\\)","");
+        ocUserDTO.setUsername(username);
         ocUserDTO.setLastName("ParticipateAccount");
         ocUserDTO.setStatus(UserStatus.INVITED);
 
         return ocUserDTO;
     }
 
-    private Object getParticipantAccountFromUserService(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
+    public Object getParticipantAccountFromUserService(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
             httpMethod) {
         String uri =sbsUrl+ ocUserDTO.getUuid();
         RestTemplate restTemplate = new RestTemplate();
@@ -217,7 +217,7 @@ public class UserServiceImpl implements UserService {
         Object object = null;
 
         if (studySubject != null) {
-            ocUserDTO = buildOCUserDTO(ssid, participantDTO);
+            ocUserDTO = buildOCUserDTO(ssid, participantDTO,studySubject,studyOid);
             if(studySubject.getUserUuid()!=null) {
                 ocUserDTO.setUuid(studySubject.getUserUuid());
                 object = getParticipantAccountFromUserService(request, ocUserDTO, HttpMethod.GET);
@@ -294,5 +294,10 @@ public class UserServiceImpl implements UserService {
             throw new OpenClinicaSystemException(me.getMessage());
         }
     }
-
+    public RestfulServiceHelper getRestfulServiceHelper() {
+        if (restfulServiceHelper == null) {
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+        }
+        return restfulServiceHelper;
+    }
 }

@@ -88,6 +88,8 @@ public class OdmController {
     @Qualifier( "dataSource" )
     private BasicDataSource dataSource;
 
+    private RestfulServiceHelper restfulServiceHelper;
+
     private static final int INDENT_LEVEL = 2;
 
     /**
@@ -229,14 +231,20 @@ public class OdmController {
     public @ResponseBody
     String getEvent(@PathVariable( "studyOid" ) String studyOid, HttpServletRequest request) throws Exception {
         ODM odm = null;
-        participateService.getRestfulServiceHelper().setSchema(studyOid, request);
+        getRestfulServiceHelper().setSchema(studyOid, request);
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        UserAccountBean ub = participateService.getRestfulServiceHelper().getUserAccount(request);
+        UserAccountBean ub = getRestfulServiceHelper().getUserAccount(request);
         logger.info("UserAccount username: " +ub.getName());
         StudyBean currentStudy = participateService.getStudy(studyOid);
         logger.info("Study OId: " +currentStudy.getOid());
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-        StudySubjectBean studySubject = studySubjectDAO.findByLabelAndStudy(ub.getName(), currentStudy);
+        String userName=ub.getName();
+        int lastIndexOfDot= userName.lastIndexOf(".");
+        String subjectOid=userName.substring(lastIndexOfDot+1);
+
+        StudySubjectBean studySubject= studySubjectDAO.findByOid(subjectOid);
+
+
         logger.info("StudySubject Id: " +studySubject.getLabel());
 
         StudyBean siteBean = participateService.getStudyById(studySubject.getStudyId());
@@ -257,5 +265,10 @@ public class OdmController {
         return json.toString(INDENT_LEVEL);
 
     }
-
+    public RestfulServiceHelper getRestfulServiceHelper() {
+        if (restfulServiceHelper == null) {
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+        }
+        return restfulServiceHelper;
+    }
 }
