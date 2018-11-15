@@ -190,7 +190,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             //
             for (ExportStudyEventDataBean se : ses) {
 
-                if ((!crossForm || (crossForm && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) && se.getExportFormData().size()!=0) {
+                if (!crossForm || (crossForm && !se.getStatus().equals(SubjectEventStatus.INVALID.getI18nDescription(getLocale())))) {
                     // For developers, please do not change order of properties sorted, it will break OpenRosaService
                     // Manifest Call for odm file
                     xml.append(indent + indent + indent + "<StudyEventData StudyEventOID=\"" + StringEscapeUtils.escapeXml(se.getStudyEventOID()));
@@ -227,11 +227,10 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                     StudyEvent studyEvent = se.getStudyEvent();
 
                     // ***************** OpenClinica: Event Links Start **************
-                    if (role != null && !role.getName().equals("invalid")) {
+                    if (role != null && !role.getName().equals("invalid") && se.getExportFormData().size() != 0) {
                         xml.append(indent + indent + indent + indent + "<OpenClinica:Links>");
                         xml.append(nls);
 
-                        if (se.getExportFormData().size() != 0) {
                             if (se.getStudyEventDefinition().getType().equals(COMMON)
                                     && se.getExportFormData().get(0).getEventDefinitionCrf().getStatusId() != Status.AUTO_DELETED.getCode()
                                     && se.getExportFormData().get(0).getEventDefinitionCrf().getStatusId() != Status.DELETED.getCode()) {
@@ -299,7 +298,7 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
                                     }
                                 }
                             }
-                        }
+
                         xml.append(indent + indent + indent + indent + "</OpenClinica:Links>");
                         xml.append(nls);
                     }
