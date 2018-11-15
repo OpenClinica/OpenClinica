@@ -233,8 +233,8 @@ public class SignStudySubjectServlet extends SecureController {
             // org.akaza.openclinica.core.SecurityManager
             // .getInstance().encrytPassword(password);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
-            KeycloakUserService auth0UserService = ctx.getBean("auth0UserService", KeycloakUserServiceImpl.class);
-            boolean isAuthenticated = auth0UserService.authenticateKeycloakUser(username, password);
+            KeycloakUserService keycloakUserService = ctx.getBean("keycloakUserService", KeycloakUserServiceImpl.class);
+            boolean isAuthenticated = keycloakUserService.authenticateKeycloakUser(username, password);
 
             if (isAuthenticated && ub.getName().equals(username)) {
                 if (signSubjectEvents(studySub, sm.getDataSource(), ub)) {
