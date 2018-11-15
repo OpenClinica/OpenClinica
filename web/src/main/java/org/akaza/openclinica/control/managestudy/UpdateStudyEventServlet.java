@@ -63,6 +63,8 @@ import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.apache.commons.lang.StringUtils;
+import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.util.HttpResponseException;
 import org.springframework.web.context.WebApplicationContext;
 import org.springframework.web.context.support.WebApplicationContextUtils;
 
@@ -545,7 +547,14 @@ public class UpdateStudyEventServlet extends SecureController {
             // org.akaza.openclinica.core.SecurityManager.getInstance().encrytPassword(password);
             UserAccountBean ub = (UserAccountBean) session.getAttribute("userBean");
             StudyEventBean seb = (StudyEventBean) session.getAttribute("eventSigned");
-            boolean isAuthenticated = true;
+            boolean isAuthenticated = false;
+            AuthzClient authzClient = AuthzClient.create();
+            try {
+                authzClient.obtainAccessToken(username, password);
+                isAuthenticated = true;
+            } catch (HttpResponseException e) {
+                logger.error("Authorization:" + e);
+            }
             if (isAuthenticated && ub.getName().equals(username)) {
                 Date date = new Date();
                 seb.setUpdater(ub);

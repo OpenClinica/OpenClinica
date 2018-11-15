@@ -5,8 +5,10 @@ import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.akaza.openclinica.config.AppConfig;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.apache.commons.lang.StringUtils;
 import org.keycloak.authorization.client.AuthzClient;
-import org.keycloak.authorization.client.resource.AuthorizationResource;
+import org.keycloak.authorization.client.util.HttpResponseException;
+import org.keycloak.representations.AccessTokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -19,7 +21,6 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
     private AppConfig appConfig;
 
     public boolean authenticateKeycloakUser(String username, String password) {
-        boolean authenticated = false;
         HttpResponse<String> response = null;
         try {
             String SBSUrl = CoreResources.getField("SBSUrl");
@@ -35,11 +36,14 @@ public class KeycloakUserServiceImpl implements KeycloakUserService {
         }
 
         if (response == null || response.getBody() == null)
-            return authenticated;
+            return false;
         AuthzClient authzClient = AuthzClient.create();
-        final AuthorizationResource authRequest = authzClient.authorization(username, password);
-        if (authRequest == null)
-            return authenticated;
+        try {
+             authzClient.obtainAccessToken(username, password);
+        } catch (HttpResponseException e) {
+            logger.error("Authorization:" + e);
+            return false;
+        }
         return true;
     }
 }

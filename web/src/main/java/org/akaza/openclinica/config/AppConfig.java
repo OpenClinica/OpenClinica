@@ -79,7 +79,6 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
                 .antMatchers("/css/**","/includes/**","/images/**", "/fonts/**",
                         "/js/**",
                         "/callback", "/sso/login",
-                        "/pages/login",
                         "/pages/customer-service/**",
                         "/pages/ocLogin",
                         "/pages/resetOCAppTimeout",
