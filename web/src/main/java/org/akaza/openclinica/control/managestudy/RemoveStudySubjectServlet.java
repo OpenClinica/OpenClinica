@@ -7,6 +7,7 @@
  */
 package org.akaza.openclinica.control.managestudy;
 
+import liquibase.util.StringUtils;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -25,8 +26,15 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.UserStatus;
+import org.akaza.openclinica.service.UserType;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpMethod;
 
 import java.util.ArrayList;
 import java.util.Date;
@@ -37,6 +45,8 @@ import java.util.Date;
  * Removes a study subject and all the related data
  */
 public class RemoveStudySubjectServlet extends SecureController {
+
+
     /**
      *
      */
@@ -110,6 +120,8 @@ public class RemoveStudySubjectServlet extends SecureController {
                 studySub.setUpdater(ub);
                 studySub.setUpdatedDate(new Date());
                 subdao.update(studySub);
+               // update Participant Status when subject is removed
+                changeParticipantAccountStatus(study,studySub,UserStatus.INACTIVE);
 
                 // remove all study events
                 // remove all event crfs
@@ -183,5 +195,6 @@ public class RemoveStudySubjectServlet extends SecureController {
 
         logger.info("Sending email done..");
     }
+
 
 }

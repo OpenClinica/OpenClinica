@@ -6,7 +6,8 @@ package org.akaza.openclinica.service;
 public enum UserType {
     USER("User"),
     BUSINESS_ADMIN("Business Admin"),
-    TECH_ADMIN("Tech Admin");
+    TECH_ADMIN("Tech Admin"),
+    PARTICIPATE("Participate");
 
     String name;
 

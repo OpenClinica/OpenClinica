@@ -82,7 +82,7 @@ public class LogoutController {
             authUrl = coreAuthUrl + "/realms/" + authzClient.getConfiguration().getRealm()
                     + "/protocol/openid-connect/" + action + "?redirect_uri=" + URLEncoder.encode(redirectUri, "UTF-8");
             if (callback) {
-                authUrl += "&client_id=bridge";
+                authUrl += "&client_id=bridge&response_type=code";
             }
         } catch (UnsupportedEncodingException e) {
             logger.error("Encoding redirect URI:" + redirectUri, e);

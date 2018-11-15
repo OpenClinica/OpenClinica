@@ -1086,6 +1086,12 @@
 			<column name="name" value="event_crf_started"/>
 		</insert>
 	</changeSet>
+	<changeSet author="jkeremian" id="2018-11-08-OC-9695-1">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="42"/>
+			<column name="name" value="participant_access_link_viewed"/>
+		</insert>
+	</changeSet>
 	<changeSet author="jkeremian" id="2015-12-08-OC-6847">
 		<comment>Insert a new record in the studyParameter table</comment>
 		<insert tableName="study_parameter">

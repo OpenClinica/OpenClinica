@@ -36,8 +36,6 @@ import java.util.List;
 public interface ParticipateService {
 
 
-	 RestfulServiceHelper getRestfulServiceHelper();
-
 	 boolean mayProceed(String studyOid) throws Exception ;
 
 	 ODM getODM(String studyOID, String subjectKey,UserAccountBean ub);
@@ -45,6 +43,10 @@ public interface ParticipateService {
 	 ODM getOdmHeader(ODM odm , StudyBean currentStudy, StudySubjectBean subjectBean);
 
 	 StudyBean getStudy(String oid);
+	 StudyBean getStudyById(int id);
+
+
+	StudyBean getParentStudy(String oid);
 
 	 void completeData(StudyEvent studyEvent, List<EventDefinitionCrf> eventDefCrfs, List<EventCrf> eventCrfs) throws Exception;
 

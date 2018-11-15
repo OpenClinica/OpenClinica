@@ -78,7 +78,8 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/css/**","/includes/**","/images/**", "/fonts/**",
                         "/js/**",
-                        "/callback", "/login",
+                        "/callback", "/sso/login",
+                        "/pages/login",
                         "/pages/customer-service/**",
                         "/pages/ocLogin",
                         "/pages/resetOCAppTimeout",
@@ -127,6 +128,7 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         CorsConfiguration restApiCorsConfiguration = new CorsConfiguration();
         // Allow requests originated from Study Manager
         restApiCorsConfiguration.addAllowedOrigin(studyManagerHost);
+        restApiCorsConfiguration.addAllowedOrigin("https://participate.dev.openclinica.io");
         restApiCorsConfiguration.setAllowCredentials(true);
         restApiCorsConfiguration.addAllowedHeader(CorsConfiguration.ALL);
         restApiCorsConfiguration.addAllowedMethod(CorsConfiguration.ALL);

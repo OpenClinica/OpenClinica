@@ -61,6 +61,8 @@ public class StudySubjectBean extends AuditableEntityBean {
      * The OID, used for export and import of data.
      */
     private String oid;
+    private String userUuid;
+
 
     private OidGenerator oidGenerator = new StudySubjectOidGenerator();
     private String time_zone;
@@ -281,6 +283,12 @@ public class StudySubjectBean extends AuditableEntityBean {
 	public void setTime_zone(String time_zone) {
 		this.time_zone = time_zone;
 	}
-    
 
+    public String getUserUuid() {
+        return userUuid;
+    }
+
+    public void setUserUuid(String userUuid) {
+        this.userUuid = userUuid;
+    }
 }

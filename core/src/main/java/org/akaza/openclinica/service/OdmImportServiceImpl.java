@@ -44,11 +44,13 @@ import javax.sql.DataSource;
 import javax.xml.bind.JAXBContext;
 import javax.xml.bind.JAXBException;
 import javax.xml.bind.Marshaller;
+import java.awt.*;
 import java.io.File;
 import java.io.IOException;
 import java.io.Serializable;
 import java.text.MessageFormat;
 import java.util.*;
+import java.util.List;
 
 @Service
 @Transactional
@@ -479,6 +481,14 @@ public class OdmImportServiceImpl implements OdmImportService {
 		edcObj.getEventDefinitionCrf().setElectronicSignature(false);
 		edcObj.getEventDefinitionCrf().setOrdinal(edcObj.getOrdinal());
 		setConfigurationProperties(edcObj.getConf(), edcObj.getEventDefinitionCrf());
+
+		List <EventDefinitionCrf> eventDefinitionCrfs=eventDefinitionCrfDao.findAllSiteDefinitionsByParentDefinition(edcObj.getEventDefinitionCrf().getEventDefinitionCrfId());
+	    if(eventDefinitionCrfs!=null && eventDefinitionCrfs.size()>0) {
+			for (EventDefinitionCrf eventDefinitionCrf : eventDefinitionCrfs) {
+				setParticipateConfPropOnlyForAllSites(edcObj.getConf(), eventDefinitionCrf);
+			}
+		}
+
 		if (edcObj.getOdmFormRef().getMandatory().equals(YesOrNo.YES)) {
 			edcObj.getEventDefinitionCrf().setRequiredCrf(true);
 		} else {
@@ -491,6 +501,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 		EventDefinitionCrf eventDefinitionCrf = edcObj.getEventDefinitionCrf();
 		eventDefinitionCrf = populateEventDefinitionCrf(new EventDefinitionCrfDTO(edcObj));
 		eventDefinitionCrf.setUpdateId(edcObj.getUserAccount().getUserId());
+		eventDefinitionCrf.setOrdinal(edcObj.getOrdinal());
 		eventDefinitionCrf.setDateUpdated(new Date());
 
 		return eventDefinitionCrf;
@@ -520,6 +531,15 @@ public class OdmImportServiceImpl implements OdmImportService {
 		}
 		eventDefinitionCrf.setSubmissionUrl(conf.getSubmissionUrl());
 
+		return eventDefinitionCrf;
+	}
+
+	private EventDefinitionCrf setParticipateConfPropOnlyForAllSites(OCodmComplexTypeDefinitionConfigurationParameters conf, EventDefinitionCrf eventDefinitionCrf) {
+		if (conf.getParticipantForm().equalsIgnoreCase("Yes")) {
+			eventDefinitionCrf.setParicipantForm(true);
+		} else {
+			eventDefinitionCrf.setParicipantForm(false);
+		}
 		return eventDefinitionCrf;
 	}
 

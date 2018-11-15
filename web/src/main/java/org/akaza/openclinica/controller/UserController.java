@@ -10,6 +10,7 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.login.UserDTO;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
@@ -45,9 +46,6 @@ public class UserController {
     @Autowired
     private UserService userService;
 
-    @Autowired
-    private ParticipateService participateService;
-
     public UserController() {
     }
 
@@ -82,7 +80,7 @@ public class UserController {
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}/connect", method = RequestMethod.POST )
     public ResponseEntity<Object> connectParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid, @RequestBody OCParticipantDTO participantDTO) {
-        participateService.getRestfulServiceHelper().setSchema(studyOid, request);
+        userService.getRestfulServiceHelper().setSchema(studyOid, request);
 
         Object object = userService.connectParticipant(studyOid, ssid, participantDTO, request);
         if (object instanceof HttpClientErrorException) {
@@ -96,7 +94,7 @@ public class UserController {
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{sitesOID}/participants/{SSID}/connect", method = RequestMethod.POST )
     public ResponseEntity<Object> connectSiteParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid,@PathVariable( "studyOID" ) String siteOid, @PathVariable( "SSID" ) String ssid, @RequestBody OCParticipantDTO participantDTO) {
-        participateService.getRestfulServiceHelper().setSchema(studyOid, request);
+        userService.getRestfulServiceHelper().setSchema(studyOid, request);
 
         Object object = userService.connectParticipant(studyOid, ssid, participantDTO, request);
         if (object instanceof HttpClientErrorException) {
@@ -106,6 +104,44 @@ public class UserController {
         } else {
             return null;
         }
+    }
+
+
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}", method = RequestMethod.GET )
+    public ResponseEntity<Object> getParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid) {
+        userService.getRestfulServiceHelper().setSchema(studyOid, request);
+
+        Object object = userService.getParticipantAccount(studyOid, ssid, null, request);
+        if (object instanceof HttpClientErrorException) {
+            return new ResponseEntity<Object>(((HttpClientErrorException) object).getResponseBodyAsString(), ((HttpClientErrorException) object).getStatusCode());
+        } else if (object instanceof OCUserDTO) {
+            return new ResponseEntity<Object>(object, HttpStatus.OK);
+        } else {
+            return null;
+        }
+    }
+
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{sitesOID}/participants/{SSID}", method = RequestMethod.GET )
+    public ResponseEntity<Object> getSiteParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid,@PathVariable( "studyOID" ) String siteOid, @PathVariable( "SSID" ) String ssid) {
+        userService.getRestfulServiceHelper().setSchema(studyOid, request);
+
+        Object object = userService.getParticipantAccount(studyOid, ssid, null, request);
+        if (object instanceof HttpClientErrorException) {
+            return new ResponseEntity<Object>(((HttpClientErrorException) object).getResponseBodyAsString(), ((HttpClientErrorException) object).getStatusCode());
+        } else if (object instanceof OCUserDTO) {
+            return new ResponseEntity<Object>(object, HttpStatus.OK);
+        } else {
+            return new ResponseEntity<Object>(object, HttpStatus.NOT_FOUND);
+        }
+    }
+
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participantUsers", method = RequestMethod.GET )
+    public ResponseEntity<List <OCUserDTO>> getAllParticipantFromUserService(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid) {
+        userService.getRestfulServiceHelper().setSchema(studyOid, request);
+
+        List <OCUserDTO> ocUserDTOs = userService.getAllParticipantAccountsFromUserService(request);
+            return new ResponseEntity<List <OCUserDTO>>(ocUserDTOs, HttpStatus.OK);
+
     }
 
     private void setUpSidebar(HttpServletRequest request) {
