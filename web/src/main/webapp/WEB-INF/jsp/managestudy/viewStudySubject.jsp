@@ -1366,7 +1366,7 @@
               <td valign="top" id="invite-option">
                 <label><input type="radio" name="invite-option" value="true">Yes</label>
                 &emsp;
-                <label><input type="radio" name="invite-option" value="false">No</label>
+                <label><input type="radio" name="invite-option" value="false" checked="checked">No</label>
               </td>
             </tr>
           </table>
