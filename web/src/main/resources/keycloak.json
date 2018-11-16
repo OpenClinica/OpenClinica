@@ -6,6 +6,5 @@
   "credentials": {
     "secret": "3b5fc969-2cf9-4ac8-9638-21fa7214db7b"
   },
-  "confidential-port": 0,
-  "policy-enforcer": {}
+  "confidential-port": 0
 }
