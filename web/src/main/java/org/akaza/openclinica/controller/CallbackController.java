@@ -1,23 +1,15 @@
 package org.akaza.openclinica.controller;
 
-import com.auth0.jwt.JWT;
-import com.auth0.jwt.interfaces.DecodedJWT;
 import net.sf.json.util.JSONUtils;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.service.CallbackService;
-import org.akaza.openclinica.service.KeycloakUser;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
-import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.RefreshableKeycloakSecurityContext;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
-import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -31,13 +23,8 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import java.io.IOException;
 import java.security.Principal;
-import java.util.LinkedHashMap;
-import java.util.Map;
 import java.util.Set;
-
-import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
 
 @SuppressWarnings("unused")
 @Controller

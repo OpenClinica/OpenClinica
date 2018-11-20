@@ -264,6 +264,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 siteFlag = true;
             } else
                 uuidToFind = role.getStudyEnvironmentUuid();
+            CoreResources.setRequestSchema(request, "public");
             Study study = studyDao.findByStudyEnvUuid(uuidToFind);
             if (study == null)
                 continue;

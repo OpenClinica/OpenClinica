@@ -122,8 +122,8 @@ public class LogoutController {
     public void resetFirstLogin(final HttpServletRequest request,
                                       final HttpServletResponse response) throws IOException {
         final HttpSession session = request.getSession();
-        logger.debug("**********Resetting first time to false**********");
-        session.setAttribute("firstLoginCheck", false);
+        logger.error("**********Resetting first time to false**********");
+        session.setAttribute("firstLoginCheck", "false");
     }
 
     private void resetSession(HttpSession session) {
