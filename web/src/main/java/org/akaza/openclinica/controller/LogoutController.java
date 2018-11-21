@@ -43,7 +43,6 @@ public class LogoutController {
         HttpSession session = req.getSession();
         logger.debug("Logout page");
         resetSession(session);
-        session.invalidate();
         String redirectUri = getRedirectUri(req, false);
         try {
             req.logout();
@@ -132,6 +131,7 @@ public class LogoutController {
         if (ub != null) {
             eventCRFLocker.unlockAllForUser(ub.getId());
         }
+        session.invalidate();
         SecurityContextHolder.clearContext();
     }
 }

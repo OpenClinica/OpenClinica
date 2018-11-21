@@ -236,7 +236,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
     private boolean checkIfParentExists(HttpServletRequest request, Study study, List<StudyEnvironmentRoleDTO> roles) {
-        StudyEnvironmentRoleDTO role = roles.stream().filter(s -> s.getStudyEnvironmentUuid().equals(study.getStudy().getStudyEnvSiteUuid())).findAny()
+        StudyEnvironmentRoleDTO role = roles.stream().filter(s -> s.getStudyEnvironmentUuid().equals(study.getStudy().getStudyEnvUuid())).findAny()
                 .orElse(null);
         if (role != null) {
             request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
@@ -247,6 +247,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
     public boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId, String altStudyEnvUuid) {
+        CoreResources.setRequestSchema(request, "public");
         boolean studyUserRoleUpdated = false;
         ResponseEntity<List<StudyEnvironmentRoleDTO>> userRoles = getUserRoles(request);
 
@@ -256,6 +257,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         ArrayList<StudyUserRole> modifiedSURArray = new ArrayList<>();
         boolean currentActiveStudyValid = false;
         Study placeHolderStudy = null;
+        Study activeStudy = null;
+        if (userActiveStudyId > 0) {
+            activeStudy = studyDao.findById(userActiveStudyId);
+        }
         for (StudyEnvironmentRoleDTO role: userRoles.getBody()) {
             String uuidToFind = null;
             boolean siteFlag = false;
@@ -264,7 +269,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 siteFlag = true;
             } else
                 uuidToFind = role.getStudyEnvironmentUuid();
-            CoreResources.setRequestSchema(request, "public");
             Study study = studyDao.findByStudyEnvUuid(uuidToFind);
             if (study == null)
                 continue;
@@ -272,16 +276,17 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             if (siteFlag) {
                 // see if the parent is in this list. If found, assign the custom role of the parent
                 parentExists = checkIfParentExists(request, study, userRoles.getBody());
+            } else if (activeStudy.getStudy() != null && activeStudy.getStudy().getStudyId() > 0) {
+                parentExists = activeStudy.getStudy().getStudyId() == study.getStudyId();
             }
             if (StringUtils.isNotEmpty(altStudyEnvUuid)) {
                 if (uuidToFind.equals(altStudyEnvUuid)) {
                     request.getSession().setAttribute("altCustomUserRole", role.getDynamicRoleName());
                 }
             }
-            if (study.getStudyId() == userActiveStudyId) {
+            if ((study.getStudyId() == userActiveStudyId) || parentExists) {
                 currentActiveStudyValid = true;
-                if (!parentExists)
-                    request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
+                request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
             }
 
             Study parentStudy = study.getStudy();

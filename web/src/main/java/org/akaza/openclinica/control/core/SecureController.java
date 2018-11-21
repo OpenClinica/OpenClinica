@@ -470,8 +470,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 }
             }
             if (ub == null || StringUtils.isEmpty(ub.getName())) {
-                session.invalidate();
-                SecurityContextHolder.clearContext();
+                if(session != null || request.isRequestedSessionIdValid() ) {
+                    session.invalidate();
+                    SecurityContextHolder.clearContext();
+                }
                 String authorizeUrl = controller.buildAuthorizeUrl(request);
                 logger.info("Secure" +
                         "" +
