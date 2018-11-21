@@ -254,6 +254,7 @@ public class OpenRosaSubmissionController {
             eventCrf.setStatusId(org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode());
             eventCrf.setUserAccount(userAccount);
             eventCrf.setUpdateId(userAccount.getUserId());
+            eventCrf.setDateCompleted(new Date());
             eventCrf.setDateUpdated(new Date());
             eventCrfDao.saveOrUpdate(eventCrf);
         }
