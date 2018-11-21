@@ -1035,7 +1035,7 @@
                 </td>
             </tr>
             <tr>
-                <td colspan="2" style="text-align: center;">
+                <td colspan="2" style="text-align:center;">
                     <input type="button" class="cancel" value="Cancel"/>
                     &nbsp;
                     <input type="submit" value="Update"/>
@@ -1442,24 +1442,18 @@
         jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
     }
 
+    var participateInfo;
     function updateParticipateInfo(data) {
-        data.phoneNumber = data.phoneNumber || '';
-
-        $('#name-input').val(data.firstName)
-        $('#email-input').val(data.email)
-        var phoneParts = data.phoneNumber.split(' ');
-        var countryCode = phoneParts.shift();
-        var phoneNumber = phoneParts.join(' ');
-        $('#country-code').text(countryCode || '+1');
-        $('#phone-input').val(phoneNumber);
-
-        $('#info-first-name').text(data.firstName);
-        $('#info-email').text(data.email);
-        $('#info-phone-number').text(data.phoneNumber);
-        $('#info-participate-status').text(data.status[0] + data.status.substr(1).toLowerCase());
-
-        $('#invite-option input[value=' + data.inviteParticipant + ']').click();
+        participateInfo = data || {
+            phoneNumber: '',
+            status: ' '
+        };
+        $('#info-first-name').text(participateInfo.firstName);
+        $('#info-email').text(participateInfo.email);
+        $('#info-phone-number').text(participateInfo.phoneNumber);
+        $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
     }
+    updateParticipateInfo();
 
     jQuery(document).ready(function () {
         jQuery.ajax({
@@ -1515,6 +1509,18 @@
         });
 
         jQuery('#contactInformation').click(function() {
+            $('#name-input').val(participateInfo.firstName);
+            $('#email-input').val(participateInfo.email);
+
+            var phoneParts = participateInfo.phoneNumber.split(' ');
+            var countryCode = phoneParts.shift();
+            var phoneNumber = phoneParts.join(' ');
+            $('#country-code').text(countryCode || '+1');
+            $('#phone-input').val(phoneNumber);
+
+            $('#email-input-error').hide();
+            $('#invite-option input[value=' + participateInfo.inviteParticipant + ']').click();
+
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
         });
 
