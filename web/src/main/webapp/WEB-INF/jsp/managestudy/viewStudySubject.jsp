@@ -1540,14 +1540,32 @@
         });
 
         jQuery('#eye').click(function() {
-          var eye = $(this);
-          if (eye.hasClass('fa-eye')) {
-            $('#access-code-input').attr('type', 'text');
-          }
-          else {
-            $('#access-code-input').attr('type', 'password');
-          }
-          eye.toggleClass('fa-eye fa-eye-slash');
+            var eye = $(this);
+            if (eye.hasClass('fa-eye')) {
+              jQuery.ajax({
+                  type: 'post',
+                  url: '${pageContext.request.contextPath}/pages/auth/api/studies/${study.oid}/auditEvents',
+                  contentType: 'application/json',
+                  data: JSON.stringify({
+                      auditTable: 'study_subject',
+                      entityId: '${studySub.id}',
+                      entityName: 'Participant ID',
+                      auditLogEventTypId: '42'                
+                  }),
+                  success: function(data) {
+                      console.log(arguments);
+                      alert(data);
+                  },
+                  error: function() {
+                      console.log(arguments);
+                  }
+              });
+              $('#access-code-input').attr('type', 'text');
+            }
+            else {
+              $('#access-code-input').attr('type', 'password');
+            }
+            eye.toggleClass('fa-eye fa-eye-slash');
         });
      });
 
