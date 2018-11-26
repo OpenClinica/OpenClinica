@@ -1,19 +1,34 @@
 package org.akaza.openclinica.controller;
 
 
+import java.io.BufferedReader;
 import java.io.ByteArrayInputStream;
 import java.io.File;
 import java.io.InputStream;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
+import java.net.HttpURLConnection;
+import java.net.URL;
+import java.security.KeyManagementException;
+import java.security.NoSuchAlgorithmException;
+import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.ResourceBundle;
 
+import javax.net.ssl.HostnameVerifier;
+import javax.net.ssl.HttpsURLConnection;
+import javax.net.ssl.SSLContext;
+import javax.net.ssl.SSLSession;
+import javax.net.ssl.TrustManager;
+import javax.net.ssl.X509TrustManager;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+import javax.ws.rs.Consumes;
 
 import org.akaza.openclinica.bean.login.ErrorMessage;
 import org.akaza.openclinica.bean.login.ImportDataResponseFailureDTO;
@@ -33,25 +48,43 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.service.DataImportService;
+import org.akaza.openclinica.service.OCUserDTO;
 import org.akaza.openclinica.service.rule.RuleSetServiceInterface;
 
 import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
 import org.akaza.openclinica.web.restful.data.bean.BaseStudyDefinitionBean;
 import org.akaza.openclinica.web.restful.data.validator.CRFDataImportValidator;
+import org.apache.http.conn.ssl.NoopHostnameVerifier;
+import org.apache.http.impl.client.CloseableHttpClient;
+import org.apache.http.impl.client.HttpClients;
 import org.exolab.castor.mapping.Mapping;
 import org.exolab.castor.xml.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
+import org.springframework.http.converter.HttpMessageConverter;
+import org.springframework.http.converter.StringHttpMessageConverter;
+import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.databind.SerializationFeature;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -70,6 +103,9 @@ public class DataController {
     private final Locale locale = new Locale("en_US");
     public static final String USER_BEAN_NAME = "userBean";
 
+    static {
+        disableSslVerification();
+    }
 
     @Autowired
     @Qualifier("dataSource")
@@ -107,15 +143,42 @@ public class DataController {
         String importXml = null;
         responseSuccessDTO = new ImportDataResponseSuccessDTO();
 
-        try {
-            String fileNm = file.getOriginalFilename();
-            //only support XML file
-            if (!(fileNm.endsWith(".xml"))) {
-                throw new OpenClinicaSystemException("errorCode.notXMLfile", "The file format is not supported, please send correct XML file, like *.xml ");
+        try {       	         	  
+              //only support XML file
+              if (file !=null) {
+            	  String fileNm = file.getOriginalFilename();
+            	  
+            	  if (fileNm!=null && fileNm.endsWith(".xml")) {
+            		   importXml = RestfulServiceHelper.readFileToString(file);	
+            	  }else {
+            		  throw new OpenClinicaSystemException("errorCode.notXMLfile", "The file format is not supported, please send correct XML file, like *.xml ");
 
-            }
-
-            importXml = RestfulServiceHelper.readFileToString(file);
+            	  }
+            	 
+              }else {
+            	  
+            	 /**
+              	 *  if call is from the mirth server, then may have no attached file in the request
+              	 *  
+              	 */
+              	String mirthTicket = request.getHeader("OC_Mirth");
+              	if(mirthTicket!= null && mirthTicket.trim().equals("OC_Mirth_2018")) {
+              		  // Read from request content
+              	    StringBuilder buffer = new StringBuilder();
+              	    BufferedReader reader = request.getReader();
+              	    String line;
+              	    while ((line = reader.readLine()) != null) {
+              	        buffer.append(line);
+              	    }
+              	    importXml = buffer.toString();
+              	    
+              	}else {
+              		 throw new OpenClinicaSystemException("errorCode.noFileOrContent", "Please send correct XML file or content in your request ");
+              	}
+            	  
+            	 
+              }        	
+          
             errorMsgs = importDataInTransaction(importXml, request);
         } catch (OpenClinicaSystemException e) {
 
@@ -394,5 +457,173 @@ public class DataController {
 
         return serviceHelper;
     }
+    
+    /**
+     *  start upload file to mirth
+     */
 
+    @ApiOperation(value = "To create data channel", notes = "Will read the data in channel XML configuration file and set up  data channel ")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful operation"),
+            @ApiResponse(code = 400, message = "Bad Request -- for detail please see the error message")})
+    @RequestMapping(value = "/createChannel", method = RequestMethod.POST)
+    public ResponseEntity<String> createChanelwithXMLConfigurationFile(HttpServletRequest request, MultipartFile file) throws Exception {
+
+        ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
+        ResponseEntity<String> response = null;
+        String createChannelUrl = CoreResources.getField("MirthCreateChannelUrl");
+        String validation_failed_message = "VALIDATION FAILED";
+        String validation_passed_message = "SUCCESS";
+      
+        if(createChannelUrl == null || createChannelUrl.trim().length()==0) {
+        	createChannelUrl = "https://10.0.11.149:8443/api/#!/Channels/createChannel";
+        } 
+        
+        URL url = new URL(createChannelUrl);
+        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
+		conn.setDoOutput(true);
+		conn.setRequestMethod("POST");
+		conn.setRequestProperty("Content-Type", "multipart/form-data");
+		//Authorization
+ 		String loginPassword = "root:password";
+ 		String encoded = new sun.misc.BASE64Encoder().encode (loginPassword.getBytes()); 		
+ 		conn.setRequestProperty ("Authorization", "Basic " + encoded);
+
+		
+		OutputStream os = conn.getOutputStream();
+		os.write(file.getBytes());
+		
+		os.flush();
+		os.close();
+	
+
+		BufferedReader br = null;
+		try {
+			br = new BufferedReader(new InputStreamReader(
+					(conn.getInputStream())));
+		}catch(Exception e) {
+			e.printStackTrace();
+			try {
+				br = new BufferedReader(new InputStreamReader(
+						(conn.getErrorStream())));
+			}catch(Exception e2) {
+				System.out.println("===================================================================");
+				e2.printStackTrace();
+			}	
+			
+		}
+		
+
+		String output;
+		StringBuffer fromMirthcall = new StringBuffer();
+		System.out.println("Output from Server .... \n");
+		while ((output = br.readLine()) != null) {
+			fromMirthcall.append(output);
+			System.out.println(output);
+		}
+
+		
+		response = new ResponseEntity(conn.getResponseCode(), org.springframework.http.HttpStatus.OK);
+		br.close();
+		conn.disconnect();
+		
+        return response;
+       
+       
+        
+       
+    
+    }
+    
+    private static void disableSslVerification() {
+        try{
+            // Create a trust manager that does not validate certificate chains
+            TrustManager[] trustAllCerts = new TrustManager[] {new X509TrustManager() {
+                public X509Certificate[] getAcceptedIssuers() {
+                    return null;
+                }
+                public void checkClientTrusted(X509Certificate[] certs, String authType) {
+                }
+                public void checkServerTrusted(X509Certificate[] certs, String authType) {
+                }
+            }
+            };
+
+            // Install the all-trusting trust manager
+            SSLContext sc = SSLContext.getInstance("SSL");
+            sc.init(null, trustAllCerts, new java.security.SecureRandom());
+            HttpsURLConnection.setDefaultSSLSocketFactory(sc.getSocketFactory());
+
+            // Create all-trusting host name verifier
+            HostnameVerifier allHostsValid = new HostnameVerifier() {
+                public boolean verify(String hostname, SSLSession session) {
+                    return true;
+                }
+            };
+
+            // Install the all-trusting host verifier
+            HttpsURLConnection.setDefaultHostnameVerifier(allHostsValid);
+        } catch (NoSuchAlgorithmException e) {
+            e.printStackTrace();
+        } catch (KeyManagementException e) {
+            e.printStackTrace();
+        }
+    }
+    
+    public ResponseEntity<String> createChanelwithXMLConfigurationFileBAK(HttpServletRequest request, MultipartFile file) throws Exception {
+
+        ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
+        ResponseEntity<String> response = null;
+        String createChannelUrl = CoreResources.getField("MirthCreateChannelUrl");
+        String validation_failed_message = "VALIDATION FAILED";
+        String validation_passed_message = "SUCCESS";
+      
+        CloseableHttpClient httpClient = 
+	    HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
+	    HttpComponentsClientHttpRequestFactory reqFactory = new HttpComponentsClientHttpRequestFactory();
+	    reqFactory.setHttpClient(httpClient);
+
+        RestTemplate restTemplate = new RestTemplate(reqFactory);
+         
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
+             
+        //Authorization        
+        String accessToken = (String) request.getSession().getAttribute("accessToken");
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        
+        HashMap<String, Object> map = new HashMap<String, Object>();
+        map.put("username", "user1");
+        map.put("password", "password");
+        map.put("file", file);
+        HttpEntity requestEntity = new HttpEntity<>(map, headers);
+ 		      
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        jsonConverter.setObjectMapper(objectMapper);                
+        converters.add(jsonConverter);        
+        restTemplate.setMessageConverters(converters);
+               
+        if(createChannelUrl == null || createChannelUrl.trim().length()==0) {
+        	createChannelUrl = "https://10.0.11.149:8443/api/#!/Channels/createChannel";
+        } 
+        try {                
+        	  
+        	 response = restTemplate.postForEntity(createChannelUrl, requestEntity, String.class);
+        }catch(Exception e){
+        	e.printStackTrace();
+        }
+       
+        return response;
+       
+       
+        
+       
+    
+    }
 }

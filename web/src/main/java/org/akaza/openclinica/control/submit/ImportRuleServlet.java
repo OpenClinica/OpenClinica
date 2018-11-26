@@ -87,6 +87,18 @@ public class ImportRuleServlet extends SecureController {
             File file = getCoreResources().getFile("import_template.xml",  "rules"+File.separator);
             dowloadFile(file, "text/xml");
         }
+        
+        //upload
+        if ("downloadUploadDataTemplate".equalsIgnoreCase(action)) {
+            // File file = new File(SpringServletAccess.getPropertiesDir(context) + "import_template.xml");
+            File file = getCoreResources().getFile("pipe_delimitedSimpleTabularFormat.txt",  "rules"+File.separator);
+            dowloadFile(file, "text/xml");
+        }
+        if ("downloadUploadMappingTemplate".equalsIgnoreCase(action)) {
+            // File file = new File(SpringServletAccess.getPropertiesDir(context) + "import_template.xml");
+            File file = getCoreResources().getFile("upload_mapping.txt",  "rules"+File.separator);
+            dowloadFile(file, "text/xml");
+        }
         if ("confirm".equalsIgnoreCase(action)) {
 
             try {

@@ -1,0 +1,13 @@
+StudyOID=S_MY_2NDST(PROD)
+StudyEventOID=SE_SCREENVISIT
+FormOID=F_VITALSIGN
+FormVersion=1.2
+Repeatingkey=StudyEventRepeatKey.true
+#list all item group OID
+ItemGroupOID=IG_VITAL_GROUP1
+ItemGroupOID=IG_VITAL_GROUP2
+Height=IG_VITAL_GROUP1.HeightOID
+Height Units=IG_VITAL_GROUP1.HeightUnitsOID
+Weight=IG_VITAL_GROUP1.WeightOID
+Weight Units=IG_VITAL_GROUP1.WeightUnitsOID
+Enrollment Date=IG_VITAL_GROUP2.EnrollDateOID
