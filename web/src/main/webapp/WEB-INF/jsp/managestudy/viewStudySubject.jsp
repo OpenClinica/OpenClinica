@@ -1382,7 +1382,7 @@
     </tr>
     <tr>
       <td colspan="2" style="text-align: center;">
-        <input type="button" class="cancel" value="Cancel" id="cancel-invite-button"/>
+        <input type="button" class="cancel" value="Cancel"/>
         <input type="button" id="connect-button" value="Update"/>
       </td>
     </tr>
@@ -1502,11 +1502,9 @@
           var validEmail = emailPattern.test(input) && hasSingleAt && afterAtHasDot && !dotRightAfterAt && !endsWithDot;
           if (validEmail) {
             $('#email-input-error').hide();
-            $('#cancel-invite-button, #connect-button').removeAttr('disabled');
           }
           else {
             $('#email-input-error').show();
-            $('#cancel-invite-button, #connect-button').attr('disabled', 'disabled');
           }
         });
 
