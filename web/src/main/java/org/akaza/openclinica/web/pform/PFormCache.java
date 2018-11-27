@@ -5,8 +5,10 @@ import java.util.LinkedHashMap;
 
 import javax.servlet.ServletContext;
 
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.service.crfdata.FormUrlObject;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAPI;
 import org.akaza.openclinica.service.crfdata.xform.EnketoCredentials;
@@ -17,6 +19,7 @@ import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
 public class PFormCache {
     public static final String VIEW_MODE = "view";
     public static final String EDIT_MODE = "edit";
+    public static final String PARTICIPATE_MODE = "participate";
 
     // HashMap of study, HashMap of crfVersionOID, pFormURL
     HashMap<String, HashMap<String, String>> urlCache = null;
@@ -56,49 +59,22 @@ public class PFormCache {
         return new PFormCache(context);
     }
 
-    public String getPFormURL(String studyOID, String formLayoutOID, StudyEvent studyEvent) throws Exception {
-        return getPFormURL(studyOID, formLayoutOID, false, studyEvent);
+    public String getPFormURL(String studyOID, String crfOID, StudyEvent studyEvent ,boolean isOffline,String contextHash) throws Exception {
+        return getPFormURL(studyOID, crfOID, studyEvent,contextHash);
     }
 
-    public String getPFormURL(String studyOID, String formLayoutOID, boolean isOffline, StudyEvent studyEvent) throws Exception {
+    public String getPFormURL(String studyOID, String crfOID, StudyEvent studyEvent,String contextHash) throws Exception {
         Study parentStudy = enketoCredentials.getParentStudy(studyOID);
         studyOID = parentStudy.getOc_oid();
-        FormUrlObject formUrlObject = null;
 
         EnketoAPI enketo = new EnketoAPI(EnketoCredentials.getInstance(studyOID));
         HashMap<String, String> studyURLs = null;
-        if (isOffline)
-            studyURLs = offlineUrlCache.get(studyOID);
-        else
-            studyURLs = urlCache.get(studyOID);
-        if (studyURLs == null) {
-            studyURLs = new HashMap<String, String>();
-            formUrlObject = null;
-            if (isOffline)
-                formUrlObject = enketo.getOfflineFormURL(null, formLayoutOID);
-            else
-                formUrlObject = enketo.getFormURL(null, formLayoutOID, studyOID, null, parentStudy, studyEvent, EDIT_MODE, null, false);
 
-            if (formUrlObject.getFormUrl().equals("")) {
-                throw new Exception("Unable to get enketo form url.");
-            }
-            studyURLs.put(formLayoutOID, formUrlObject.getFormUrl());
-            if (isOffline)
-                offlineUrlCache.put(studyOID, studyURLs);
-            else
-                urlCache.put(studyOID, studyURLs);
-            return formUrlObject.getFormUrl();
-        } else if (studyURLs.get(formLayoutOID) == null) {
-            if (isOffline)
-                formUrlObject = enketo.getOfflineFormURL(null, formLayoutOID);
-            else
-                formUrlObject = enketo.getFormURL(null, formLayoutOID, studyOID,
-                        null, parentStudy, studyEvent, EDIT_MODE, null, false);
-            studyURLs.put(formLayoutOID, formUrlObject.getFormUrl());
-            return formUrlObject.getFormUrl();
-        } else
-            return studyURLs.get(formLayoutOID);
+        FormUrlObject formUrlObject = enketo.getFormURL(contextHash, crfOID, studyOID,
+                Role.RESEARCHASSISTANT, parentStudy, studyEvent, PARTICIPATE_MODE, null, false);
+        return formUrlObject.getFormUrl();
     }
+
 
     public HashMap<String, String> getSubjectContext(String key) throws Exception {
         return subjectContextCache.get(key);
@@ -109,10 +85,6 @@ public class PFormCache {
                 entry.getUserAccountId(), entry.getStudyEventId(), entry.getStudyOid(), entry.getFormLoadMode());
     }
 
-    public String putSubjectContext(String studySubjectOID, String studyEventDefinitionID, String studyEventOrdinal, String formLayoutOID, String studyEventID,
-            String studyOid, String formLoadMode) {
-        return putSubjectContext(studySubjectOID, studyEventDefinitionID, studyEventOrdinal, formLayoutOID, null, studyEventID, studyOid, formLoadMode);
-    }
 
     public String putSubjectContext(String studySubjectOID, String studyEventDefinitionID, String studyEventOrdinal, String formLayoutOID, String userAccountID,
             String studyEventID, String studyOid, String formLoadMode) {

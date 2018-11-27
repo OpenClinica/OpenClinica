@@ -209,8 +209,8 @@ $(function() {
     var linksOrder = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign', 'lock'];
     function collectLinks(studyEventData, formData) {
         var links = [];
-        $.merge(links, collection(studyEventData['OpenClinica:links']['OpenClinica:link']));
-        $.merge(links, collection(formData['OpenClinica:links']['OpenClinica:link']));
+        $.merge(links, collection(studyEventData['OpenClinica:Links']['OpenClinica:Link']));
+        $.merge(links, collection(formData['OpenClinica:Links']['OpenClinica:Link']));
         links.sort(function(a, b) {
             return linksOrder.indexOf(a['@rel']) - linksOrder.indexOf(b['@rel']);
         });
@@ -315,7 +315,7 @@ $(function() {
             studyEvents[studyEvent['@OID']] = studyEvent;
         });
 
-        collection(odm.ClinicalData.SubjectData['OpenClinica:links']['OpenClinica:link']).forEach(function(link) {
+        collection(odm.ClinicalData.SubjectData['OpenClinica:Links']['OpenClinica:Link']).forEach(function(link) {
             if (link['@rel'] !== 'common-add-new')
                 return;
 

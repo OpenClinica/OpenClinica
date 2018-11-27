@@ -17,6 +17,7 @@ import org.akaza.openclinica.bean.core.SubjectEventStatus;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.service.*;
 import org.akaza.openclinica.bean.submit.*;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
@@ -365,6 +366,10 @@ public class ViewStudySubjectServlet extends SecureController {
             String errorData = request.getParameter("errorData");
             if (StringUtils.isNotEmpty(errorData))
                 request.setAttribute("errorData", errorData);
+
+            String participateStatus = getParticipateStatus(parentStudyId);
+            request.setAttribute("participateStatus", participateStatus);
+
             forwardPage(Page.VIEW_STUDY_SUBJECT);
         }
     }

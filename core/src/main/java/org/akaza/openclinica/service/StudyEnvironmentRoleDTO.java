@@ -31,6 +31,8 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
 
     private String uuid;
 
+    private String studyUuid;
+
     private String siteUuid;
 
     private String studyEnvironmentUuid;
@@ -74,6 +76,14 @@ public class StudyEnvironmentRoleDTO extends AbstractAuditingDTO implements Seri
 
     public void setSiteUuid(String siteUuid) {
         this.siteUuid = siteUuid;
+    }
+
+    public String getStudyUuid() {
+        return studyUuid;
+    }
+
+    public void setStudyUuid(String studyUuid) {
+        this.studyUuid = studyUuid;
     }
 
     public String getRoleUuid() {

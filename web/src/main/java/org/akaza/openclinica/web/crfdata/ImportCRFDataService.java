@@ -393,6 +393,8 @@ public class ImportCRFDataService {
                          		 errors.add("Import same form " + formOid +" more than once with different repeatKeys: " + sampleOrdinal + " for NON repeating common event, StudyEventOID: " + studyEventDataBean.getStudyEventOID());                             	
                                  return errors;
                          	 }
+                        	
+                        	 
                         }                       
                         
                         //for common events, if not provided studyEventRepeatKey, then skip/reject
@@ -403,12 +405,19 @@ public class ImportCRFDataService {
                         	
                             return errors;
                         }else {
-                        	//Non-Repeating - Data import with correct (1) repeatKey
+                        	// for same subject, same event, can't have same form more than once in NON repeating COMMON event -- found same formOID in database
                         	if(!isRepeating) {
-                        		if(!(sampleOrdinal.equals("1"))) {
-                        			/* errors.add("Non-Repeating - correct repeatKey should be 1, but found  repeatKey: " + sampleOrdinal + " for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
-                                 	 
-                                     return errors;*/
+                        		ArrayList seList = studyEventDAO.findAllByStudyEventDefinitionAndCrfOids(studyEventDefinitionBean.getOid(), crfBean.getOid());
+                        		for (int j = 0; j < seList.size(); j++) {
+                        			StudyEventBean seBean = (StudyEventBean) seList.get(j); 
+                        			if(seBean.getStudySubjectId() == studySubjectBean.getId()) {
+                        				if(!((seBean.getSampleOrdinal()+"").equals(sampleOrdinal))) {
+                            				errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
+                                            return errors;	
+                            			}
+                        			}
+                        			
+                                 	
                         		}
                         	}
                         	

@@ -9,11 +9,7 @@ package org.akaza.openclinica.dao.managestudy;
 
 import java.sql.Connection;
 import java.sql.Types;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
+import java.util.*;
 
 import javax.sql.DataSource;
 
@@ -109,6 +105,9 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         ind++; // oc oid
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // time_zone
+        this.setTypeExpected(ind, TypeNames.STRING);
+        ind++; // user_uuid
+
         // this.setTypeExpected(ind, TypeNames.INT);
         // ind++; //
     }
@@ -211,6 +210,7 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         // eb.setEventStartDate((Date) hm.get("date_start"));
         // eb.setActive(true);
         eb.setTime_zone((String) hm.get("time_zone"));
+        eb.setUserUuid((String) hm.get("user_uuid"));
         return eb;
     }
 
@@ -729,14 +729,31 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
     }
 
     public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, FindSubjectsFilter filter, FindSubjectsSort sort, int rowStart,
-            int rowEnd) {
+            int rowEnd , String [] userUuid ,String participateStatusSetFilter) {
         ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
         setTypesExpected();
         String partialSql;
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), currentStudy.getId());
-        variables.put(new Integer(2), currentStudy.getId());
         String sql = digester.getQuery("getWithFilterAndSort");
+
+
+        if(participateStatusSetFilter ==null) {
+            variables.put(new Integer(1), currentStudy.getId());
+            variables.put(new Integer(2), currentStudy.getId());
+        }else{
+            if(userUuid==null || userUuid.length==0) {
+                userUuid= new String[1];
+                userUuid[0]="dummy value";
+            }
+            sql = sql + " AND ss.user_uuid = ANY (?)";
+
+            variables.put(new Integer(1), currentStudy.getId());
+            variables.put(new Integer(2), currentStudy.getId());
+            variables.put(new Integer(3), userUuid);
+
+        }
+
+
         sql = sql + filter.execute("");
         // Order by Clause for the defect id 0005480
 
@@ -1020,14 +1037,26 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         return studySubjects;
     }
 
-    public Integer getCountWithFilter(FindSubjectsFilter filter, StudyBean currentStudy) {
+    public Integer getCountWithFilter(FindSubjectsFilter filter, StudyBean currentStudy , String [] userUuid ,String participateStatusSetFilter) {
         StudySubjectBean studySubjectBean = new StudySubjectBean();
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(new Integer(1), currentStudy.getId());
-        variables.put(new Integer(2), currentStudy.getId());
         String sql = digester.getQuery("getCountWithFilter");
+        if(participateStatusSetFilter ==null) {
+            variables.put(new Integer(1), currentStudy.getId());
+            variables.put(new Integer(2), currentStudy.getId());
+        }else{
+            if(userUuid==null || userUuid.length==0) {
+                userUuid= new String[1];
+                userUuid[0]="dummy value";
+            }
+            sql=sql + " AND ss.user_uuid=ANY(?)";
+            variables.put(new Integer(1), currentStudy.getId());
+            variables.put(new Integer(2), currentStudy.getId());
+            variables.put(new Integer(3), userUuid);
+        }
+
         sql += filter.execute("");
 
         ArrayList rows = this.select(sql, variables);
@@ -1190,6 +1219,13 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
             variables.put(new Integer(ind), "");
         } else {
             variables.put(new Integer(ind), sb.getTime_zone());
+        }
+        ind++;
+        if (sb.getUserUuid() == null || sb.getUserUuid().equals("")) {
+            nullVars.put(new Integer(ind), new Integer(TypeNames.STRING));
+            variables.put(new Integer(ind), "");
+        } else {
+            variables.put(new Integer(ind), sb.getUserUuid());
         }
         ind++;
         variables.put(new Integer(ind), new Integer(sb.getId()));

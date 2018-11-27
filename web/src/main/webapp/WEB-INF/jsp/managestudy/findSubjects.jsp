@@ -46,8 +46,21 @@
             jQuery.unblockUI();
             return false;
         });
+
+        var params = new URLSearchParams(window.location.search);
+        if (params.get('addNewSubject')) {
+            jQuery('#addSubject').click();
+        }
     });
-    </script>
+
+    window.onload = function() {
+        document.getElementById("btn").focus();
+    };
+
+    <c:if test="${showOverlay}">
+        jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
+    </c:if>
+</script>
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -102,11 +115,6 @@
     </div>
 </div>
 
-<script type="text/javascript">
-    window.onload = function() {
-        document.getElementById("btn").focus();
-    };
-</script>
 <div id="findSubjectsDiv">
     <form  action="${pageContext.request.contextPath}/ListStudySubjects">
         <input type="hidden" name="module" value="admin">
@@ -124,9 +132,3 @@
 
 <br>
 <jsp:include page="../include/footer.jsp"/>
-
-<script type="text/javascript">
-    <c:if test="${showOverlay}">
-        jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
-    </c:if>
-</script>

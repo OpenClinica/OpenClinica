@@ -35,9 +35,12 @@ public class EnketoFormServlet extends SecureController {
     public static final String STUDY_EVENT_ID = "studyEventId";
     public static final String EVENT_CRF_ID = "eventCrfId";
     public static final String QUERY_FLAVOR = "-query";
+    public static final String PARTICIPATE_FLAVOR = "-participate";
     public static final String NO_FLAVOR = "";
     public static final String VIEW_MODE = "view";
     public static final String EDIT_MODE = "edit";
+    public static final String PARTICIPATE_MODE = "participate";
+    public static final String PREVIEW_MODE = "preview";
     public static final String JINI = "jini";
 
     @Override
@@ -103,15 +106,23 @@ public class EnketoFormServlet extends SecureController {
         }
         String loadWarning = generateErrorMessage(studyEvent, formLayout);
         boolean isFormLocked = determineCRFLock(studyEvent, formLayout);
+
+        String flavor = "";
+        if (mode.equals(PARTICIPATE_MODE)) {
+            flavor = PARTICIPATE_FLAVOR;
+        } else {
+            flavor = QUERY_FLAVOR;
+        }
+
         if (Integer.valueOf(eventCrfId) > 0) {
             logger.info("eventCrfId:" + eventCrfId + " user:" + ub.getName());
             formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, parentStudy.getOc_oid(), formLayout,
-                    QUERY_FLAVOR, null, role, mode, loadWarning, isFormLocked);
+                    flavor, null, role, mode, loadWarning, isFormLocked);
         } else if (Integer.valueOf(eventCrfId) == 0) {
             logger.info("eventCrfId is zero user:" + ub.getName());
             String hash = formLayout.getXform();
             formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, parentStudy.getOc_oid(),
-                    QUERY_FLAVOR, role, mode, hash, loadWarning, isFormLocked);
+                    flavor, role, mode, hash, loadWarning, isFormLocked);
         }
         logger.info("isFormLocked: " + isFormLocked + ": formUrlObject.isLockOn()" + formUrlObject.isLockOn() + " for user:" + ub.getName());
         if (!isFormLocked && formUrlObject.isLockOn()) {

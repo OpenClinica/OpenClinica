@@ -34,10 +34,6 @@
         <constructor-arg ref="dataSource"/>
     </bean>
 
-    <bean id="viewStudySubjectServiceImpl" class="org.akaza.openclinica.service.ViewStudySubjectServiceImpl">
-        <constructor-arg ref="dataSource"/>
-    </bean>
-
     <bean id="importCRFDataService" class="org.akaza.openclinica.web.crfdata.ImportCRFDataService">
         <constructor-arg ref="dataSource"/>
     </bean>

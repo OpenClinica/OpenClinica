@@ -10,6 +10,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Service;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
@@ -22,6 +23,8 @@ import java.util.List;
  * @author joekeremian
  */
 
+
+@Service("viewStudySubjectService")
 public class ViewStudySubjectServiceImpl implements ViewStudySubjectService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private StudyDao studyDao;

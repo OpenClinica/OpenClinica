@@ -1,45 +1,22 @@
 package org.akaza.openclinica.controller;
 
-import java.io.BufferedReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Calendar;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.Iterator;
-import java.util.List;
-import java.util.ResourceBundle;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
+import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.bean.login.ErrorObject;
-import org.akaza.openclinica.bean.login.ResponseDTO;
-import org.akaza.openclinica.bean.login.ResponseFailureStudyParticipantDTO;
-import org.akaza.openclinica.bean.login.ResponseFailureStudyParticipantSingleDTO;
-import org.akaza.openclinica.bean.login.ResponseStudyParticipantsBulkDTO;
-import org.akaza.openclinica.bean.login.ResponseSuccessListAllParticipantsByStudyDTO;
-import org.akaza.openclinica.bean.login.ResponseSuccessStudyParticipantDTO;
-import org.akaza.openclinica.bean.login.StudyParticipantDTO;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.login.*;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
 import org.akaza.openclinica.controller.dto.ParticipantRestfulRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
-import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.participant.ParticipantService;
@@ -50,23 +27,18 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Controller;
 import org.springframework.validation.DataBinder;
 import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RequestParam;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
-import io.swagger.annotations.Api;
-import io.swagger.annotations.ApiOperation;
-import io.swagger.annotations.ApiResponses;
-import io.swagger.annotations.ApiResponse;
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
+import java.util.*;
 
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
@@ -79,10 +51,13 @@ public class StudyParticipantController {
 		
 		@Autowired
 		private UserAccountDAO udao;
+
+		@Autowired
+		private StudySubjectDao studySubjectDao;
 		
 		@Autowired
 		private ParticipantService participantService;
-	   
+
 		private StudyDAO studyDao;
 		private StudySubjectDAO ssDao;
 		private UserAccountDAO userAccountDao;
@@ -315,9 +290,15 @@ public class StudyParticipantController {
 	        } else {        				
 			  	String label = create(subjectTransferBean,study);	           
 			  	studyParticipantDTO.setSubjectKey(label);
+
+				StudySubjectBean subject = this.getStudySubjectDAO().findByLabel(label);
+
+				studyParticipantDTO.setSubjectOid(subject.getOid());
+
 	            ResponseSuccessStudyParticipantDTO responseSuccess = new ResponseSuccessStudyParticipantDTO();
 	            
-	            responseSuccess.setSubjectKey(studyParticipantDTO.getSubjectKey());	            
+	            responseSuccess.setSubjectKey(studyParticipantDTO.getSubjectKey());
+	            responseSuccess.setSubjectOid(studyParticipantDTO.getSubjectOid());
 	            responseSuccess.setStatus("Available");
 
 				response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);

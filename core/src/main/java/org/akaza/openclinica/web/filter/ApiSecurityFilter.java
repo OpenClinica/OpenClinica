@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.UserType;
 import org.akaza.openclinica.service.user.CreateUserCoreService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -65,10 +66,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
     protected void doFilterInternal(HttpServletRequest request, HttpServletResponse response, FilterChain filterChain) throws ServletException, IOException {
 
         String authHeader = request.getHeader("Authorization");
-        if (request.getSession().getAttribute("userBean") != null ) {
-            UserAccountBean userAccountBean = (UserAccountBean)request.getSession().getAttribute("userBean");
-            logger.debug("This user is already logged in {}",userAccountBean.getName());
-        } else if (authHeader != null) {
+         if (authHeader != null) {
             StringTokenizer st = new StringTokenizer(authHeader);
             if (st.hasMoreTokens()) {
                 String basic = st.nextToken();
@@ -145,7 +143,11 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
 
                 }
             }
-        } else {
+        } else if (request.getSession().getAttribute("userBean") != null ) {
+            UserAccountBean userAccountBean = (UserAccountBean)
+                    request.getSession().getAttribute("userBean");
+            logger.debug("This user is already logged in {}", userAccountBean.getName());
+        }else {
             unauthorized(response);
         }
 
@@ -215,22 +217,31 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
     private HashMap<String, String>  createUserAccount(HttpServletRequest request, OCUserDTO user) throws Exception {
         HashMap<String, String> map = new HashMap<>();
         map.put("username", user.getUsername());
-        if (StringUtils.isNotEmpty(user.getFirstName()))
-            map.put("fName", user.getFirstName());
-        else
-            map.put("fName", "first");
-        if (StringUtils.isNotEmpty(user.getLastName()))
-            map.put("lName", user.getLastName());
-        else
-            map.put("lName", "last");
+        UserType userType = user.getUserType();
+        if (userType.equals(UserType.PARTICIPATE)) {
+            map.put("fName", "*****");
+            map.put("lName", "*****");
+            map.put("email", "*****");
+        } else {
+            if (StringUtils.isNotEmpty(user.getFirstName()))
+                map.put("fName", user.getFirstName());
+            else
+                map.put("fName", "first");
 
+            if (StringUtils.isNotEmpty(user.getLastName()))
+                map.put("lName", user.getLastName());
+            else
+                map.put("lName", "last");
+
+            map.put("email", user.getEmail());
+        }
         map.put("role_name", "Data Manager");
         map.put("user_uuid", user.getUuid());
-        org.akaza.openclinica.service.UserType userType = user.getUserType();
 
         map.put("user_type", userType.getName());
         map.put("authorize_soap", "true");
-        map.put("email", user.getEmail());
+
+
         map.put("institution", "OC");
         return map;
     }

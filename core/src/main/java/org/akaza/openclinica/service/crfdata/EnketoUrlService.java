@@ -85,13 +85,14 @@ public class EnketoUrlService {
 
     public static final String ENKETO_ORDINAL = "enk:ordinal";
     public static final String ENKETO_LAST_USED_ORDINAL = "enk:last-used-ordinal";
-    public static final String FS_QUERY_ATTRIBUTE = "oc:queryParent";
+    public static final String FS_QUERY_ATTRIBUTE = ":queryParent";
     public static final String OC_QUERY_SUFFIX = "_OC_COMMENT";
     public static final String QUERY_SUFFIX = "_comment";
     public static final String INSTANCE_QUERIES_SUFFIX = "instance-queries.tpl";
     public static final String INSTANCE_SUFFIX = "instance.tpl";
     public static final String FORM_SUFFIX = "form.xml";
     public static final String QUERY_FLAVOR = "-query";
+    public static final String PARTICIPATE_FLAVOR = "-participate";
     public static final String SINGLE_ITEM_FLAVOR = "-single_item";
     public static final String NO_FLAVOR = "";
     public static final String QUERY = "comment";
@@ -239,12 +240,12 @@ public class EnketoUrlService {
         String populatedInstance = "";
         String crfFlavor = "";
         String crfOid = "";
-        if (flavor.equals(QUERY_FLAVOR)) {
-            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor);
+        if(flavor.equals(PARTICIPATE_FLAVOR) || flavor.equals(QUERY_FLAVOR)){
+            populatedInstance = populateInstance(crfVersion, formLayout, eventCrf, studyOid, filePath, flavor,!markComplete);
             crfFlavor = flavor;
         } else if (flavor.equals(SINGLE_ITEM_FLAVOR)) {
             populatedInstance = populateInstanceSingleItem(subjectContext, eventCrf, studyEvent, subject, crfVersion);
-            crfFlavor = flavor + "[" + idb.getId() + "]";
+            crfFlavor = SINGLE_ITEM_FLAVOR + "[" + idb.getId() + "]";
             markComplete = false;
         }
         crfOid = formLayout.getOcOid() + DASH + formLayout.getXform() + crfFlavor;
@@ -342,7 +343,7 @@ public class EnketoUrlService {
         return dt;
     }
 
-    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor)
+    private String populateInstance(CrfVersion crfVersion, FormLayout formLayout, EventCrf eventCrf, String studyOid, int filePath, String flavor , boolean complete)
             throws Exception {
 
         Map<String, Object> data = new HashMap<String, Object>();
@@ -443,6 +444,8 @@ public class EnketoUrlService {
             templateStr = getTemplate(studyOid, studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
             studyFilePath--;
         } while (templateStr.equals("") && studyFilePath > 0);
+       if(complete)
+        templateStr = templateStr.replaceAll("xmlns:oc=\"http://openclinica.org/xforms\"","xmlns:oc=\"http://openclinica.org/xforms\" oc:complete=\""+complete+"\" ");
 
         data.put("instanceID", "uuid:1234");
         List<RepeatCount> repeatCounts = repeatCountDao.findAllByEventCrfId(eventCrf.getEventCrfId());
@@ -522,7 +525,7 @@ public class EnketoUrlService {
         String itemValue = getItemValue(itemData, crfVersion);
 
         String queries = "";
-        if (itemData != null) {
+            if (itemData != null) {
             ObjectMapper mapper = new ObjectMapper();
             QueriesBean queriesBean = buildQueryElement(itemData);
             queries = queriesBean != null ? mapper.writeValueAsString(queriesBean) : "";
@@ -556,7 +559,7 @@ public class EnketoUrlService {
         if (directoryListing != null) {
             for (File child : directoryListing) {
                 if ((flavor.equals(QUERY_FLAVOR) && child.getName().endsWith(INSTANCE_QUERIES_SUFFIX))
-                        || (flavor.equals(NO_FLAVOR) && child.getName().endsWith(INSTANCE_SUFFIX))) {
+                        || ((flavor.equals(NO_FLAVOR)|| flavor.equals(PARTICIPATE_FLAVOR)) && child.getName().endsWith(INSTANCE_SUFFIX))) {
                     templateStr = new String(Files.readAllBytes(Paths.get(child.getPath())));
                     break;
                 }

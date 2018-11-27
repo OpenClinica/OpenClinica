@@ -1,0 +1,13 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="jkeremian" id="2018-10-03-OC-9665-01">
+		<comment>Adding a column user_uuid to Study Subject table</comment>
+		<addColumn tableName="study_subject">
+			<column name="user_uuid" type="varchar(255)"></column>
+		</addColumn>
+	</changeSet>
+
+</databaseChangeLog>
