@@ -161,22 +161,17 @@ public class DataController {
               	 *  if call is from the mirth server, then may have no attached file in the request
               	 *  
               	 */
-              	String mirthTicket = request.getHeader("OC_Mirth");
-              	logger.info("==============mirthTicket====="+ mirthTicket);
-              	if(mirthTicket!= null && mirthTicket.trim().equals("OC_Mirth_2018")) {
-              		  // Read from request content
-              	    StringBuilder buffer = new StringBuilder();
-              	    BufferedReader reader = request.getReader();
-              	    String line;
-              	    while ((line = reader.readLine()) != null) {
-              	        buffer.append(line);
-              	    }
-              	    importXml = buffer.toString();
-              	    
-              	}else {
-              		 throw new OpenClinicaSystemException("errorCode.noFileOrContent", "Please send correct XML file or content in your request ");
-              	}
-            	  
+              
+          		  // Read from request content
+          	    StringBuilder buffer = new StringBuilder();
+          	    BufferedReader reader = request.getReader();
+          	    String line;
+          	    while ((line = reader.readLine()) != null) {
+          	        buffer.append(line);
+          	    }
+          	    importXml = buffer.toString();
+          	    
+                
             	 
               }        	
           
