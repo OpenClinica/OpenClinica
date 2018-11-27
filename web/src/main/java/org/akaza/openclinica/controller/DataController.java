@@ -162,6 +162,7 @@ public class DataController {
               	 *  
               	 */
               	String mirthTicket = request.getHeader("OC_Mirth");
+              	logger.info("==============mirthTicket====="+ mirthTicket);
               	if(mirthTicket!= null && mirthTicket.trim().equals("OC_Mirth_2018")) {
               		  // Read from request content
               	    StringBuilder buffer = new StringBuilder();
