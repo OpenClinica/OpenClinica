@@ -186,10 +186,11 @@ public class OpenRosaSubmissionController {
             // Load user context from ecid
             PFormCache cache = PFormCache.getInstance(context);
             subjectContext = cache.getSubjectContext(ecid);
+            UserAccount userAccount = getUserAccount(subjectContext);
 
             // Execute save as Hibernate transaction to avoid partial imports
             openRosaSubmissionService.processRequest(study, subjectContext, requestBody, errors, locale, listOfUploadFilePaths,
-                    SubmissionContainer.FieldRequestTypeEnum.FORM_FIELD);
+                    SubmissionContainer.FieldRequestTypeEnum.FORM_FIELD,userAccount);
 
         } catch (Exception e) {
             logger.error("Exception while processing xform submission.");
@@ -253,6 +254,7 @@ public class OpenRosaSubmissionController {
             eventCrf.setStatusId(org.akaza.openclinica.domain.Status.UNAVAILABLE.getCode());
             eventCrf.setUserAccount(userAccount);
             eventCrf.setUpdateId(userAccount.getUserId());
+            eventCrf.setDateCompleted(new Date());
             eventCrf.setDateUpdated(new Date());
             eventCrfDao.saveOrUpdate(eventCrf);
         }
@@ -356,10 +358,11 @@ public class OpenRosaSubmissionController {
             // Load user context from ecid
             PFormCache cache = PFormCache.getInstance(context);
             subjectContext = cache.getSubjectContext(ecid);
+            UserAccount userAccount = getUserAccount(subjectContext);
 
             // Execute save as Hibernate transaction to avoid partial imports
             openRosaSubmissionService.processFieldSubmissionRequest(study, subjectContext, instanceId, requestBody, errors, locale, listOfUploadFilePaths,
-                    SubmissionContainer.FieldRequestTypeEnum.FORM_FIELD);
+                    SubmissionContainer.FieldRequestTypeEnum.FORM_FIELD,userAccount);
         } catch (Exception e) {
             logger.error("Exception while processing xform submission.");
             logger.error(e.getMessage());
@@ -452,10 +455,11 @@ public class OpenRosaSubmissionController {
             // Load user context from ecid
             PFormCache cache = PFormCache.getInstance(context);
             subjectContext = cache.getSubjectContext(ecid);
+            UserAccount userAccount = getUserAccount(subjectContext);
 
             // Execute save as Hibernate transaction to avoid partial imports
             openRosaSubmissionService.processFieldSubmissionRequest(study, subjectContext, instanceId, requestBody, errors, locale, listOfUploadFilePaths,
-                    SubmissionContainer.FieldRequestTypeEnum.DELETE_FIELD);
+                    SubmissionContainer.FieldRequestTypeEnum.DELETE_FIELD,userAccount);
 
         } catch (Exception e) {
             logger.error("Exception while processing xform submission.");
@@ -607,4 +611,13 @@ public class OpenRosaSubmissionController {
         studyEventDao.saveOrUpdateTransactional(container);
     }
 
+private UserAccount getUserAccount(HashMap<String, String> subjectContext) {
+    String userAccountId = subjectContext.get("userAccountID");
+    if (StringUtils.isNotEmpty(userAccountId)) {
+        UserAccount user = userAccountDao.findByUserId(Integer.valueOf(userAccountId));
+        return user;
+    }
+    return null;
+
+}
 }

@@ -85,6 +85,7 @@ public class QueryServiceImpl implements QueryService {
         helperBean.setContainer(container);
         helperBean.setItemOrdinal(itemOrdinal);
         helperBean.setItemNode(itemNode);
+        helperBean.setUserAccount(container.getUser());
         ItemData id = getItemData(helperBean);
         if (id == null) {
             helperBean.setItemData(createBlankItemData(helperBean));
