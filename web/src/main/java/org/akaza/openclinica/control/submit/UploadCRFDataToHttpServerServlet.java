@@ -140,7 +140,10 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
             	
                // here process all uploaded files	
                files = uploadFiles(theDir);
+               // here process all files in one request 
                sendRequestByHttpClient(files);
+               
+              // sendOneFilePerRequestByHttpClient(files);
 
             } catch (Exception e) {
                 logger.warn("*** Found exception during file upload***");
@@ -158,14 +161,15 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  // HTTP POST request
  	private void sendPost(File file) throws Exception {
 
- 		String url = "http://10.0.11.149:80/oc_file_process/";
+ 		//String url = "http://10.0.11.149:80/oc_file_process/";
  		// for dev
  		//String url = "http://mirth.dev.openclinica.io:81/oc_file_process/";
+ 		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
  		String USER_AGENT = "Mozilla/5.0";
  		String login ="user1";
  		String password = "password";
 
- 		URL obj = new URL(url);
+ 		URL obj = new URL(uploadMirthUrl);
  		HttpURLConnection con = (HttpURLConnection) obj.openConnection();
 
  		//add request header
@@ -227,7 +231,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  		con.connect();
  		////////////////////////////////////////////////////
  		int responseCode = con.getResponseCode();
- 		System.out.println("\nSending 'POST' request to URL : " + url);
+ 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl);
  		//System.out.println("Post parameters : " + urlParameters);
  		System.out.println("Response Code : " + responseCode);
 
@@ -345,8 +349,9 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  // HTTP POST request
   	private void sendRequestByHttpClient(File file) throws Exception {
 
-  		String url = "http://10.0.11.149:80/oc_file_process/";
-  		String hostNm = "10.0.11.149";
+  		//String url = "http://10.0.11.149:80/oc_file_process/";
+  		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
+  	/*	String hostNm = "10.0.11.149";
   		int portNum = 80;
   		String searchPath = "/oc_file_process/";
   		
@@ -354,15 +359,16 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   		String password = "password";
   		
   		 URIBuilder uriBuilder = new URIBuilder();
-  	    uriBuilder.setScheme("http")
+  	    uriBuilder..setScheme("http")
   	            .setHost(hostNm)
   	            .setPort(portNum)
   	            .setPath(searchPath)
   	            .addParameter("action", "UploadFile");
   	    java.net.URI uri = uriBuilder.build();
 
-  	    
-  		HttpPost post = new HttpPost(uri);
+*/  	
+  		
+  		HttpPost post = new HttpPost(uploadMirthUrl);
   		/**
   		 *  add header
   		 */
@@ -388,7 +394,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   	    //print result	
  		int responseCode = response.getStatusLine().getStatusCode();
 
- 		System.out.println("\nSending 'POST' request to URL : " + url); 	
+ 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
  		System.out.println("Response Code : " + responseCode);
 
  		BufferedReader rd = new BufferedReader(
@@ -407,8 +413,9 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 
   	private void sendRequestByHttpClient(List<File> files) throws Exception {
 
-  		String url = "http://10.0.11.149:80/oc_file_process/";
-  		String hostNm = "10.0.11.149";
+  		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
+  		//String url = "http://10.0.11.149:80/oc_file_process/";
+  		/*String hostNm = "10.0.11.149";
   		int portNum = 80;
   		String searchPath = "/oc_file_process/";
   		
@@ -421,10 +428,10 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   	            .setPort(portNum)
   	            .setPath(searchPath)
   	            .addParameter("action", "UploadFile");
-  	    java.net.URI uri = uriBuilder.build();
+  	    java.net.URI uri = uriBuilder.build();*/
 
   	    
-  		HttpPost post = new HttpPost(uri);
+  		HttpPost post = new HttpPost(uploadMirthUrl);
   		/**
   		 *  add header
   		 */
@@ -462,7 +469,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   	    //print result	
  		int responseCode = response.getStatusLine().getStatusCode();
 
- 		System.out.println("\nSending 'POST' request to URL : " + url); 	
+ 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
  		System.out.println("Response Code : " + responseCode);
 
  		BufferedReader rd = new BufferedReader(
@@ -474,11 +481,71 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  			result.append(line);
  		}
         
+ 		System.out.println(result.toString());
  		String responseStr = processResponse(result.toString());
  		addPageMessage(responseStr);
  		 
- 		System.out.println(responseStr);
+ 		
 
+  
+  }
+  	
+	private void sendOneFilePerRequestByHttpClient(List<File> files) throws Exception {
+
+  		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");  		  	    
+  		
+	  	int i = 1;	  		
+ 		for (File file : files) {
+ 			HttpPost post = new HttpPost(uploadMirthUrl);
+ 	  		/**
+ 	  		 *  add header Authorization
+ 	  		 */
+ 	 		String accessToken = (String) request.getSession().getAttribute("accessToken");
+ 	  		post.setHeader("Authorization", "Bearer " + accessToken);
+ 	  		
+ 	  		String basePath = getBasePath(request);
+ 	  		post.setHeader("OCBasePath", basePath);
+
+ 	 		post.setHeader("Accept", 
+ 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+ 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		
+ 	 		post.setHeader("Connection", "keep-alive"); 		
+ 			
+ 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+ 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+ 		  	String partNm = null;
+ 			FileBody fileBody = new FileBody(file, ContentType.TEXT_PLAIN);
+ 			partNm = "uploadedData" + i;
+ 	  		builder.addPart(partNm, fileBody);
+ 	  		
+ 	  		HttpEntity entity = builder.build();   		
+ 	  		post.setEntity(entity);
+ 	  		
+ 	  		CloseableHttpClient httpClient = HttpClients.createDefault();
+ 	  		HttpResponse response = httpClient.execute(post);
+ 	  		
+ 	  	    //print result	
+ 	 		int responseCode = response.getStatusLine().getStatusCode();
+
+ 	 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
+ 	 		System.out.println("Response Code : " + responseCode);
+
+ 	 		BufferedReader rd = new BufferedReader(
+ 	 	                new InputStreamReader(response.getEntity().getContent()));
+
+ 	 		StringBuffer result = new StringBuffer();
+ 	 		String line = "";
+ 	 		while ((line = rd.readLine()) != null) {
+ 	 			result.append(line);
+ 	 		}
+ 	        
+ 	 		String responseStr = processResponse(result.toString());
+ 	 		addPageMessage(responseStr);
+ 	 		 
+ 	 		System.out.println(responseStr);
+ 	  		
+ 	  		i++;
+ 		}
   
   }
 
