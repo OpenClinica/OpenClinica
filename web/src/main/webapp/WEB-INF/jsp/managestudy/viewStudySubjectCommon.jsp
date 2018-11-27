@@ -90,8 +90,9 @@
     .button_search {
         margin-top: 2px !important;
     }
-    input[type=button][disabled] {
-        visibility: hidden;
+    input[type=button][disabled], input[type=button][disabled]:hover {
+        background: #618ebb;
+        color: lightgray;
     }
     .actions .icon:before {
         content: "\f1234";
