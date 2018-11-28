@@ -78,6 +78,7 @@ public class StudyBean extends AuditableEntityBean {
     private StudyEnvEnum envType;
     private String studyEnvSiteUuid;
     private String studyEnvUuid;
+    private String studyUuid;
     private boolean published;
     public int filePath;
     private int subjectCount;
@@ -1160,5 +1161,13 @@ public class StudyBean extends AuditableEntityBean {
 
     public void setSubjectCount(int subjectCount) {
         this.subjectCount = subjectCount;
+    }
+
+    public String getStudyUuid() {
+        return studyUuid;
+    }
+
+    public void setStudyUuid(String studyUuid) {
+        this.studyUuid = studyUuid;
     }
 }

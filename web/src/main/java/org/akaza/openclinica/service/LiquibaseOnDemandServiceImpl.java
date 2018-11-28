@@ -75,6 +75,7 @@ public class LiquibaseOnDemandServiceImpl implements LiquibaseOnDemandService {
             schemaStudy.setDateCreated(new Date());
             schemaStudy.setEnvType(studyInfoObject.getStudy().getEnvType());
             schemaStudy.setStudyEnvSiteUuid(studyInfoObject.getStudy().getStudyEnvSiteUuid());
+            schemaStudy.setStudyUuid(studyInfoObject.getStudy().getStudyUuid());
             schemaStudy.setStudyEnvUuid(studyInfoObject.getStudy().getStudyEnvUuid());
             schemaStudy.setDatePlannedStart(studyInfoObject.getStudy().getDatePlannedStart());
             schemaStudy.setDatePlannedEnd(studyInfoObject.getStudy().getDatePlannedEnd());

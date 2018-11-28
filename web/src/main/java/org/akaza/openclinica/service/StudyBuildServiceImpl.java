@@ -4,10 +4,15 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import net.sf.json.util.JSONUtils;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
+import org.akaza.openclinica.controller.dto.StudyEnvironmentDTO;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.SchemaServiceDao;
@@ -16,9 +21,11 @@ import org.akaza.openclinica.dao.hibernate.StudyUserRoleDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyUserRole;
 import org.akaza.openclinica.domain.datamap.StudyUserRoleId;
+import org.akaza.openclinica.domain.enumsupport.ModuleStatus;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.StringUtils;
@@ -49,6 +56,9 @@ import java.util.stream.Collectors;
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
 public class StudyBuildServiceImpl implements StudyBuildService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    public static final String ENABLED = "enabled";
+    public static final String DISABLED = "disabled";
+    public static final String ACTIVE = "active";
 
     PermissionService permissionService;
     @Autowired
@@ -64,6 +74,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     @Autowired
     private UserAccountDao userAccountDao;
 
+    @Autowired
+    private RestfulServiceHelper serviceHelper;
     public StudyBuildServiceImpl(PermissionService permissionService) {
         this.permissionService = permissionService;
     }
@@ -383,5 +395,124 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     public void updateStudyUsername(UserAccountBean ub, Auth0User user) {
         int numUpdated = studyUserRoleDao.updateUsername(user.getNickname(), user.getUserId());
         logger.debug(numUpdated + " studyUserRoles updated for user:" + user.getNickname() + " and prevUser:" + user.getUserId());
+    }
+
+    public void updateParticipateModuleStatusInOC(HttpServletRequest request, String studyOid) {
+        getRestfulServiceHelper().setSchema(studyOid, request);
+        Study study = studyDao.findByOcOID(studyOid);
+        if (study.getStudy()!=null)
+            study = study.getStudy();
+        persistparticipateModuleStatus(request,study);
+   }
+
+
+
+   public void persistparticipateModuleStatus(HttpServletRequest request, Study study){
+       List<ModuleConfigDTO> moduleConfigDTOs = getParticipateModuleStatusFromStudyService(request, study);
+           persistparticipateModuleStatus( moduleConfigDTOs,study);
+   }
+
+
+    public void persistparticipateModuleStatus(List<ModuleConfigDTO> moduleConfigDTOs,Study study){
+        StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
+        StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
+        String statusValue= DISABLED;
+        if(moduleConfigDTOs.size()!=0) {
+             statusValue = getModuleStatus(moduleConfigDTOs,study);
+        }
+        if (!spv.isActive()) {
+            spv = new StudyParameterValueBean();
+            spv.setStudyId(study.getStudyId());
+            spv.setParameter("participantPortal");
+            spv.setValue(statusValue);
+            spvdao.create(spv);
+        } else if (spv.isActive() && !spv.getValue().equals(statusValue)) {
+            spv.setValue(statusValue);
+            spvdao.update(spv);
+        }
+    }
+
+    public String getModuleStatus(List<ModuleConfigDTO> moduleConfigDTOs, Study study) {
+        for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
+            if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid())) {
+                ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
+                if (moduleStatus.name().equalsIgnoreCase(ACTIVE)) {
+                    return ENABLED;
+                }
+                break;
+            }
+        }
+
+        return DISABLED;
+    }
+
+    public List<ModuleConfigDTO> getParticipateModuleStatusFromStudyService (HttpServletRequest request , Study study) {
+        if(StringUtils.isEmpty(study.getStudyUuid())) {
+            // make call to study service to get study servie
+            StudyEnvironmentDTO studyEnvironmentDTO = getStudyUuidFromStudyService(request,study);
+            study.setStudyUuid(studyEnvironmentDTO.getStudyUuid());
+            // save in study table in public and tenant
+            studyDao.saveOrUpdate(study);
+        }
+
+        String SBSUrl = CoreResources.getField("SBSUrl");
+        int index = SBSUrl.indexOf("//");
+        String protocol = SBSUrl.substring(0, index) + "//";
+        String appendUrl= "/study-service/api/studies/"+study.getStudyUuid()+"/module-configs";
+        String uri = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + appendUrl;
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String accessToken = (String) request.getSession().getAttribute("accessToken");
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        jsonConverter.setObjectMapper(objectMapper);
+        converters.add(jsonConverter);
+        restTemplate.setMessageConverters(converters);
+        ResponseEntity<List<ModuleConfigDTO>> response = restTemplate.exchange(uri, HttpMethod.GET,entity,new ParameterizedTypeReference<List<ModuleConfigDTO>>(){});
+        if(response==null)
+            return null;
+
+        return response.getBody();
+    }
+
+    public StudyEnvironmentDTO getStudyUuidFromStudyService (HttpServletRequest request , Study study) {
+
+        String SBSUrl = CoreResources.getField("SBSUrl");
+        int index = SBSUrl.indexOf("//");
+        String protocol = SBSUrl.substring(0, index) + "//";
+        String appendUrl= "/study-service/api/study-environments/"+study.getStudyEnvUuid();
+
+        String uri = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + appendUrl;
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        String accessToken = (String) request.getSession().getAttribute("accessToken");
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity<String> entity = new HttpEntity<String>(headers);
+        List<HttpMessageConverter<?>> converters = new ArrayList<>();
+        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+        jsonConverter.setObjectMapper(objectMapper);
+        converters.add(jsonConverter);
+        restTemplate.setMessageConverters(converters);
+           ResponseEntity<StudyEnvironmentDTO> response = restTemplate.exchange(uri, HttpMethod.GET,entity,StudyEnvironmentDTO.class);
+        return response.getBody();
+    }
+
+    public RestfulServiceHelper getRestfulServiceHelper() {
+        if (serviceHelper == null) {
+            serviceHelper = new RestfulServiceHelper(this.dataSource);
+        }
+        return serviceHelper;
     }
 }
