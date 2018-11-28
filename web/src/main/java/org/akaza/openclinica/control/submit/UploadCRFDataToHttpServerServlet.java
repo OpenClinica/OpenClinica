@@ -141,9 +141,9 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
                // here process all uploaded files	
                files = uploadFiles(theDir);
                // here process all files in one request 
-               sendRequestByHttpClient(files);
+               //sendRequestByHttpClient(files);
                
-              // sendOneFilePerRequestByHttpClient(files);
+              sendOneFilePerRequestByHttpClient(files);
 
             } catch (Exception e) {
                 logger.warn("*** Found exception during file upload***");
@@ -492,58 +492,83 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   	
 	private void sendOneFilePerRequestByHttpClient(List<File> files) throws Exception {
 
-  		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");  		  	    
+  		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
+  		
+  		/**
+  		 *  prepare mapping file
+  		 */
+  		FileBody mappingFileBody = null;
+  		String  mappingpartNm = null;
+  		for (File file : files) {
+  			
+  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+  				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
+  				mappingpartNm = "uploadedData";  	 	  		
+  	 	  		
+  	 	  		break;
+  			}
+ 			
+ 		}
   		
 	  	int i = 1;	  		
  		for (File file : files) {
- 			HttpPost post = new HttpPost(uploadMirthUrl);
- 	  		/**
- 	  		 *  add header Authorization
- 	  		 */
- 	 		String accessToken = (String) request.getSession().getAttribute("accessToken");
- 	  		post.setHeader("Authorization", "Bearer " + accessToken);
- 	  		
- 	  		String basePath = getBasePath(request);
- 	  		post.setHeader("OCBasePath", basePath);
+ 			// skip mapping file
+ 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+ 				;
+ 			}else {
+ 				HttpPost post = new HttpPost(uploadMirthUrl);
+ 	 	  		/**
+ 	 	  		 *  add header Authorization
+ 	 	  		 */
+ 	 	 		String accessToken = (String) request.getSession().getAttribute("accessToken");
+ 	 	  		post.setHeader("Authorization", "Bearer " + accessToken);
+ 	 	  		
+ 	 	  		String basePath = getBasePath(request);
+ 	 	  		post.setHeader("OCBasePath", basePath);
 
- 	 		post.setHeader("Accept", 
- 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
- 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		
- 	 		post.setHeader("Connection", "keep-alive"); 		
+ 	 	 		post.setHeader("Accept", 
+ 	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+ 	 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		
+ 	 	 		post.setHeader("Connection", "keep-alive"); 		
+ 	 			
+ 	 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+ 	 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+ 	 		  	String partNm = null;
+ 	 			FileBody fileBody = new FileBody(file, ContentType.TEXT_PLAIN);
+ 	 			partNm = "uploadedData" + i;
+ 	 	  		builder.addPart(partNm, fileBody);
+ 	 	  		
+ 	 	  		// add mapping file
+ 	 	  		builder.addPart(mappingpartNm, mappingFileBody);
+ 	 	  		
+ 	 	  		HttpEntity entity = builder.build();   		
+ 	 	  		post.setEntity(entity);
+ 	 	  		
+ 	 	  		CloseableHttpClient httpClient = HttpClients.createDefault();
+ 	 	  		HttpResponse response = httpClient.execute(post);
+ 	 	  		
+ 	 	  	    //print result	
+ 	 	 		int responseCode = response.getStatusLine().getStatusCode();
+
+ 	 	 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
+ 	 	 		System.out.println("Response Code : " + responseCode);
+
+ 	 	 		BufferedReader rd = new BufferedReader(
+ 	 	 	                new InputStreamReader(response.getEntity().getContent()));
+
+ 	 	 		StringBuffer result = new StringBuffer();
+ 	 	 		String line = "";
+ 	 	 		while ((line = rd.readLine()) != null) {
+ 	 	 			result.append(line);
+ 	 	 		}
+ 	 	        
+ 	 	 		String responseStr = processResponse(result.toString());
+ 	 	 		addPageMessage(responseStr);
+ 	 	 		 
+ 	 	 		System.out.println(responseStr);
+ 	 	  		
+ 			}
  			
- 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
- 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
- 		  	String partNm = null;
- 			FileBody fileBody = new FileBody(file, ContentType.TEXT_PLAIN);
- 			partNm = "uploadedData" + i;
- 	  		builder.addPart(partNm, fileBody);
- 	  		
- 	  		HttpEntity entity = builder.build();   		
- 	  		post.setEntity(entity);
- 	  		
- 	  		CloseableHttpClient httpClient = HttpClients.createDefault();
- 	  		HttpResponse response = httpClient.execute(post);
- 	  		
- 	  	    //print result	
- 	 		int responseCode = response.getStatusLine().getStatusCode();
-
- 	 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
- 	 		System.out.println("Response Code : " + responseCode);
-
- 	 		BufferedReader rd = new BufferedReader(
- 	 	                new InputStreamReader(response.getEntity().getContent()));
-
- 	 		StringBuffer result = new StringBuffer();
- 	 		String line = "";
- 	 		while ((line = rd.readLine()) != null) {
- 	 			result.append(line);
- 	 		}
- 	        
- 	 		String responseStr = processResponse(result.toString());
- 	 		addPageMessage(responseStr);
- 	 		 
- 	 		System.out.println(responseStr);
- 	  		
  	  		i++;
  		}
   
