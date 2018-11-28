@@ -2,6 +2,7 @@ var dupeFirstUserCheck;
 function setCurrentUser(thisUser) {
     storage.onConnect()
         .then(function() {
+            console.log("setting current user to:" + thisUser);
             return storage.set(currentUser, thisUser);
         })['catch'](function(err) {
         console.log(err);
@@ -27,7 +28,7 @@ function getPromise(value) {
 function processCurrentUser(currentTime, newExpiration) {
     storage.onConnect()
     .then(function() {
-        return storage.get(currentUser);
+        return storage.get(CURRENT_USER);
     }).then(function(res) {
         console.log("Current user in processCurrentUser****************" + res);
         // working around for bug title on edge(https://jira.openclinica.com/browse/OC-8814)
@@ -47,13 +48,14 @@ function processCurrentUser(currentTime, newExpiration) {
                     if (prevTimeout < currentTime) {
                         console.log("prevTimeout: " +  prevTimeout
                             + " is less than currentTime:" + currentTime);
-                        storage.set(currentUser, "").then(function() {
+                        storage.set(CURRENT_USER, "").then(function() {
                             processUserData(getPromise(""));
                         });
                     } else {
                         console.log("prevTimeout: " +  prevTimeout
                             + " is greater than currentTime:" + currentTime);
-                        storage.set(currentUser, userName).then(function() {
+                        console.log("setting current user to:" + userName);
+                        storage.set(CURRENT_USER, userName).then(function() {
                             storage.set(ocAppTimeoutKey, newExpiration).then(function() {
                                 processUserData(getPromise("-1"));
                             });
@@ -63,7 +65,8 @@ function processCurrentUser(currentTime, newExpiration) {
                     }
                 });
             } else {
-                storage.set(currentUser, userName).then(function() {
+                console.log("setting current user to:" + userName);
+                storage.set(CURRENT_USER, userName).then(function() {
                     console.log("current user:" + userName
                         + " setting new expiration:" + newExpiration);
                     storage.set(ocAppTimeoutKey, newExpiration).then(function() {
@@ -74,7 +77,7 @@ function processCurrentUser(currentTime, newExpiration) {
                 });
             }
         } else {
-            storage.get(currentUser).then(function(res1) {
+            storage.get(CURRENT_USER).then(function(res1) {
                 processUserData(getPromise(res1));
             });
         }
@@ -88,11 +91,12 @@ function processUserData(inputPromise) {
         console.log("Result:" + res);
         if (res === null) {
             console.log("result is null");
-            storage.set(currentUser, userName).then(function(res1) {
-                console.log("set user when currentUser was null:" + res1);
+            console.log("setting current user to:" + userName);
+            storage.set(CURRENT_USER, userName).then(function(res1) {
+                console.log("set user when CURRENT_USER was null:" + res1);
             });
         } else if (res === "") {
-            firstLoginCheck = false;
+            firstLoginCheck = "false";
             console.log(" returning to Login screen");
             var params = "";
             if ((typeof prevPageParams != 'undefined')  && (prevPageParams != null))
@@ -101,8 +105,10 @@ function processUserData(inputPromise) {
             sessionStorage && sessionStorage.clear();
             window.location.replace(myContextPath + '/pages/logout' + params);
         } else if (res === "-1") {
-            firstLoginCheck = false;
-            storage.set(currentUser, userName).then(function() {
+            firstLoginCheck = "false";
+            console.log("setting current user to:" + userName);
+            console.log("resetting firstTimeLogin to false");
+            storage.set(CURRENT_USER, userName).then(function() {
                 jQuery.get(myContextPath + '/pages/resetFirstLogin')
                     .error(function (jqXHR, textStatus, errorThrown) {
                         "Error calling :" + myContextPath + '/pages/resetFirstLogin' + " " + textStatus + " " + errorThrown
@@ -110,11 +116,16 @@ function processUserData(inputPromise) {
             });
         } else {
             var thisUser = res;
-            console.log("In processcurrentUser:" + thisUser);
+            console.log("In processcurrentUser:" + thisUser + " firstLoginCheck:" + firstLoginCheck);
             if (thisUser !== userName) {
                 console.log("another user:" + thisUser + "New user is:" + userName);
                 window.location.replace (myContextPath + '/pages/invalidateKeycloakToken');
 
+            } else if (firstLoginCheck === "true") {
+                jQuery.get(myContextPath + '/pages/resetFirstLogin')
+                    .error(function (jqXHR, textStatus, errorThrown) {
+                        "Error calling :" + myContextPath + '/pages/resetFirstLogin' + " " + textStatus + " " + errorThrown
+                    });
             }
         }
     }).then(function(res) {

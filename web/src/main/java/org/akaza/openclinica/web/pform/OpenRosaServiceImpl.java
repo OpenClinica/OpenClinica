@@ -95,6 +95,8 @@ public class OpenRosaServiceImpl implements OpenRosaService {
             headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
             ObjectMapper objectMapper = new ObjectMapper();
             objectMapper.registerModule(new JavaTimeModule());
+            if (StringUtils.isEmpty(accessToken))
+                accessToken = permissionService.getAccessToken();
             headers.add("Authorization", "Bearer " + accessToken);
             headers.add("Accept-Charset", "UTF-8");
             HttpEntity<String> entity = new HttpEntity<String>(headers);
@@ -194,12 +196,13 @@ public class OpenRosaServiceImpl implements OpenRosaService {
             return null;
         } catch (Exception e) {
             Throwable t = e.getCause();
+            logger.error("Exception:" + t);
             if (t instanceof HttpClientErrorException) {
                 HttpClientErrorException ex = (HttpClientErrorException) t;
                 if (ex.getStatusCode().equals(HttpStatus.UNAUTHORIZED)) {
-                    logger.debug("Auth0 access token expired. Creating a new one.");
+                    logger.error("**********Auth0 access token expired. Creating a new one.");
                     accessToken = permissionService.getAccessToken();
-                    logger.debug("Calling the api again with the new token.");
+                    logger.error("*********Calling the api again with the new token.");
                     response = supplier.get();
                 } else {
                     // for all other 4xx errors, extract the error message from Auth0 and throw a 400 error

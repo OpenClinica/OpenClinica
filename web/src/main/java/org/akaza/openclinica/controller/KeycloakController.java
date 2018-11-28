@@ -99,7 +99,8 @@ public class KeycloakController {
         KeycloakUser user = new KeycloakUser(token);
 
         ocUserUuid = (String) user.getUserContext().get("userUuid");
-        UserAccountHelper userAccountHelper = null;
+        UserAccountHelper userAccountHelper;
+        UserAccountBean prevUser = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
         try {
             userAccountHelper = callbackService.isCallbackSuccessful(req, user);
         } catch (Exception e) {
@@ -113,9 +114,11 @@ public class KeycloakController {
             }
             req.getSession().setAttribute(USER_BEAN_NAME, ub);
             refreshUserRole(req, ub);
-            logger.info("Setting firstLoginCheck to true");
-            req.getSession().setAttribute("firstLoginCheck", "true");
-            logger.info("CallbackController set firstLoginCheck to true:%%%%%%%%");
+            if (prevUser == null || StringUtils.isEmpty(prevUser.getName())) {
+                logger.info("Setting firstLoginCheck to true");
+                req.getSession().setAttribute("firstLoginCheck", "true");
+                logger.info("CallbackController set firstLoginCheck to true:%%%%%%%%");
+            }
         } else {
             logger.error("UserAccountBean ub ");
 

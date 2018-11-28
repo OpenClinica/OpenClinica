@@ -28,7 +28,7 @@
     var ocAppTimeoutKey = "OCAppTimeout";
     var firstLoginCheck = '<%= session.getAttribute("firstLoginCheck")%>';
     console.log("First time value of firstLoginCheck:" + firstLoginCheck);
-    var currentUser = "currentUser";
+    var CURRENT_USER = "currentUser";
     var appName = "RT";
 </script>
 

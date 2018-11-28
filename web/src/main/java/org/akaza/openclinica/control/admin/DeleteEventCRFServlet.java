@@ -193,6 +193,7 @@ public class DeleteEventCRFServlet extends SecureController {
                 eventCRF.setOldStatus(eventCRF.getStatus());
                 eventCRF.setStatus(Status.RESET);
                 eventCRF.setUpdater(ub);
+                eventCRF.setDateCompleted(null);
                 ecdao.update(eventCRF);
 
                 for (ItemDataBean itemdata : itemData) {

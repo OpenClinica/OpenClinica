@@ -43,7 +43,6 @@ public class LogoutController {
         HttpSession session = req.getSession();
         logger.debug("Logout page");
         resetSession(session);
-        session.invalidate();
         String redirectUri = getRedirectUri(req, false);
         try {
             req.logout();
@@ -122,8 +121,8 @@ public class LogoutController {
     public void resetFirstLogin(final HttpServletRequest request,
                                       final HttpServletResponse response) throws IOException {
         final HttpSession session = request.getSession();
-        logger.debug("**********Resetting first time to false**********");
-        session.setAttribute("firstLoginCheck", false);
+        logger.error("**********Resetting first time to false**********");
+        session.setAttribute("firstLoginCheck", "false");
     }
 
     private void resetSession(HttpSession session) {
@@ -132,6 +131,7 @@ public class LogoutController {
         if (ub != null) {
             eventCRFLocker.unlockAllForUser(ub.getId());
         }
+        session.invalidate();
         SecurityContextHolder.clearContext();
     }
 }
