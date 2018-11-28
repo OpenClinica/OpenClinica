@@ -247,12 +247,16 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
     public boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId, String altStudyEnvUuid) {
-        CoreResources.setRequestSchema(request, "public");
         boolean studyUserRoleUpdated = false;
+        String currentSchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema(request, "public");
+
         ResponseEntity<List<StudyEnvironmentRoleDTO>> userRoles = getUserRoles(request);
 
-        if (userRoles == null)
+        if (userRoles == null) {
+            CoreResources.setRequestSchema(currentSchema);
             return studyUserRoleUpdated;
+        }
         Collection<StudyUserRole> existingStudyUserRoles = studyUserRoleDao.findAllUserRolesByUserAccount(ub);
         ArrayList<StudyUserRole> modifiedSURArray = new ArrayList<>();
         boolean currentActiveStudyValid = false;
@@ -269,14 +273,16 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 siteFlag = true;
             } else
                 uuidToFind = role.getStudyEnvironmentUuid();
+
             Study study = studyDao.findByStudyEnvUuid(uuidToFind);
+
             if (study == null)
                 continue;
             boolean parentExists = false;
             if (siteFlag) {
                 // see if the parent is in this list. If found, assign the custom role of the parent
                 parentExists = checkIfParentExists(request, study, userRoles.getBody());
-            } else if (activeStudy.getStudy() != null && activeStudy.getStudy().getStudyId() > 0) {
+            } else if (activeStudy != null && activeStudy.getStudy() != null && activeStudy.getStudy().getStudyId() > 0) {
                 parentExists = activeStudy.getStudy().getStudyId() == study.getStudyId();
             }
             if (StringUtils.isNotEmpty(altStudyEnvUuid)) {
@@ -343,6 +349,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             ub.setActiveStudy(placeHolderStudy);
             userAccountDao.saveOrUpdate(ub);
         }
+        CoreResources.setRequestSchema(currentSchema);
         return studyUserRoleUpdated;
     }
 
