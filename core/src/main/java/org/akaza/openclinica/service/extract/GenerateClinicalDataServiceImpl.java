@@ -333,6 +333,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			StudyBean studyBean = new StudyBean();
 			studyBean.setId(study.getStudyId());
 			studyBean.setStudyEnvUuid(study.getStudyEnvUuid());
+			studyBean.setStudyUuid(study.getStudyUuid());
 			studyBean.setStudyEnvSiteUuid(study.getStudyEnvSiteUuid());
 			studyBean.setParentStudyId(study.getStudy()!=null?study.getStudy().getStudyId():0);
 

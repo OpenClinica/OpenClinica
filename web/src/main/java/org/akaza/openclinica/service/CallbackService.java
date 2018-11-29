@@ -11,5 +11,6 @@ import javax.servlet.http.HttpServletRequest;
 public interface CallbackService {
     UserAccountHelper isCallbackSuccessful(HttpServletRequest request, Auth0User user) throws Exception;
     UserAccountBean getUpdatedUser(UserAccountBean ub);
-}
+    void updateParticipateModuleStatus(HttpServletRequest req, String studyOid);
+    }
 

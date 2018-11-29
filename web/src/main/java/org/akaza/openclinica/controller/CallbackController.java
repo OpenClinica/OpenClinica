@@ -8,11 +8,16 @@ import com.auth0.jwt.interfaces.DecodedJWT;
 import net.sf.json.util.JSONUtils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.config.TokenAuthentication;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.service.Auth0User;
 import org.akaza.openclinica.service.CallbackService;
+import org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
 import org.slf4j.Logger;
@@ -39,6 +44,9 @@ public class CallbackController {
     private Auth0Controller controller;
     @Autowired
     CallbackService callbackService;
+    @Autowired
+    StudyDao studyDao;
+
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     private final String redirectOnFail;
@@ -93,6 +101,7 @@ public class CallbackController {
                     throw e;
                 }
                 UserAccountBean ub = userAccountHelper.getUb();
+
                 if (ub != null) {
                     if (userAccountHelper.isUpdated()) {
                         ub = callbackService.getUpdatedUser(ub);
@@ -133,6 +142,8 @@ public class CallbackController {
                 logger.info("CallbackController returnTo URL:%%%%%%%%" + returnTo);
                 logger.info("param:" + param);
 
+                Study publicStudy = studyDao.findPublicStudyById(ub.getActiveStudyId());
+                callbackService.updateParticipateModuleStatus(req,publicStudy.getOc_oid());
                 res.sendRedirect(returnTo + param);
             }
         } catch (InvalidRequestException e) {
