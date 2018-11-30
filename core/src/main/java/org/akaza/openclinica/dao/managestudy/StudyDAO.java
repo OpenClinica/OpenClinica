@@ -122,11 +122,11 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
         this.setTypeExpected(53, TypeNames.STRING);// official_title
         this.setTypeExpected(54, TypeNames.BOOL);// results_reference
         this.setTypeExpected(55, TypeNames.STRING);// oc oid
-        this.setTypeExpected(56, TypeNames.INT);
-        this.setTypeExpected(57, TypeNames.STRING);// schema name
+        this.setTypeExpected(56, TypeNames.INT); //old status id
+        this.setTypeExpected(57, TypeNames.STRING);// study env uuid
         this.setTypeExpected(58, TypeNames.STRING);// studyEnvSiteUuid
         this.setTypeExpected(59, TypeNames.STRING);// env type
-        this.setTypeExpected(60, TypeNames.STRING);// study env uuid
+        this.setTypeExpected(60, TypeNames.STRING);// schema name
         this.setTypeExpected(61, TypeNames.BOOL);// published
         this.setTypeExpected(62, TypeNames.INT);// file path
         this.setTypeExpected(63, TypeNames.INT);// subject count
@@ -535,7 +535,7 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
         variables.put(new Integer(23), sb.isPublished());
         variables.put(new Integer(24), sb.getFilePath());
         variables.put(new Integer(25), sb.getSubjectCount());
-        variables.put(new Integer(26), sb.getStudyUuid());
+        variables.put(new Integer(26), (sb.getStudyUuid() == null ? "" : sb.getStudyUuid()));
         variables.put(new Integer(27), new Integer(sb.getId()));
         this.execute(digester.getQuery("createStepTwo"), variables, nullVars);
         return sb;
@@ -674,10 +674,10 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
             eb.setEnvType(StudyEnvEnum.valueOf(envTypeStr.toUpperCase()));
         eb.setStudyEnvSiteUuid((String) hm.get("study_env_site_uuid"));
         eb.setStudyEnvUuid((String) hm.get("study_env_uuid"));
-        eb.setStudyUuid((String) hm.get("study_uuid"));
         eb.setPublished(((Boolean) hm.get("published")).booleanValue());
         eb.setFilePath((Integer) hm.get("file_path"));
         eb.setSubjectCount((Integer) hm.get("subject_count"));
+        eb.setStudyUuid((String) hm.get("study_uuid"));
         return eb;
     }
 
