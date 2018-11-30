@@ -1491,21 +1491,23 @@
         });
 
         jQuery('#email-input').blur(function() {
-          var emailPattern = /[^\s@]+@[^\s@]+\.[^\s@]+/;
-          var input = $(this).val();
-          var parts = input.split('@');
-          var hasSingleAt = parts.length === 2;
-          var afterAt = parts[1] || '';
-          var afterAtHasDot = afterAt.includes('.');
-          var dotRightAfterAt = afterAt[0] === '.';
-          var endsWithDot = afterAt[afterAt.length - 1] === '.';
-          var validEmail = emailPattern.test(input) && hasSingleAt && afterAtHasDot && !dotRightAfterAt && !endsWithDot;
-          if (validEmail) {
-            $('#email-input-error').hide();
-          }
-          else {
-            $('#email-input-error').show();
-          }
+            var emailPattern = /[^\s@]+@[^\s@]+\.[^\s@]+/;
+            var input = $(this).val();
+            var parts = input.split('@');
+            var hasSingleAt = parts.length === 2;
+            var afterAt = parts[1] || '';
+            var afterAtHasDot = afterAt.includes('.');
+            var dotRightAfterAt = afterAt[0] === '.';
+            var endsWithDot = afterAt[afterAt.length - 1] === '.';
+            var validEmail = emailPattern.test(input) && hasSingleAt && afterAtHasDot && !dotRightAfterAt && !endsWithDot;
+            if (validEmail) {
+                $('#email-input-error').hide();
+                $('#connect-button').removeAttr('disabled');
+            }
+            else {
+                $('#email-input-error').show();
+                $('#connect-button').attr('disabled', 'disabled');
+            }
         });
 
         jQuery('#contactInformation').click(function() {

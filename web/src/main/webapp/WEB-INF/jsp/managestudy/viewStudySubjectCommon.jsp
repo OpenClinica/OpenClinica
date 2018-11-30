@@ -91,7 +91,8 @@
         margin-top: 2px !important;
     }
     input[type=button][disabled] {
-        visibility: hidden;
+        background: #618ebb !important;
+        color: #a2bbd4;
     }
     .actions .icon:before {
         content: "\f1234";
