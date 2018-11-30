@@ -130,6 +130,7 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
         this.setTypeExpected(61, TypeNames.BOOL);// published
         this.setTypeExpected(62, TypeNames.INT);// file path
         this.setTypeExpected(63, TypeNames.INT);// subject count
+        this.setTypeExpected(64, TypeNames.STRING);// study_uuid
     }
 
     /**
