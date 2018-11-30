@@ -3,6 +3,7 @@ package org.akaza.openclinica.core;
 import liquibase.exception.LiquibaseException;
 import liquibase.logging.LogFactory;
 import liquibase.logging.Logger;
+import org.apache.commons.lang.StringUtils;
 import org.springframework.beans.factory.InitializingBean;
 import org.springframework.context.ResourceLoaderAware;
 import org.springframework.core.io.ResourceLoader;
@@ -112,6 +113,8 @@ public class CustomMultiTenantSpringLiquibase implements InitializingBean, Resou
 
         while(i$.hasNext()) {
             String schema = (String)i$.next();
+            if (StringUtils.isEmpty(schema))
+                continue;
             if (schema.equals("default")) {
                 schema = null;
             }
