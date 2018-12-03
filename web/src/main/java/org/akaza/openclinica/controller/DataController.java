@@ -222,6 +222,15 @@ public class DataController {
 
                 return errorMsgs;
             }
+            
+            if(importXml.trim().equals("errorCode.noParticipantIDinDataFile")) {
+            	  String err_msg = "Participant ID data not found in the data file.";
+                  ErrorMessage errorOBject = createErrorMessage("errorCode.noParticipantIDinDataFile", err_msg);
+                  errorMsgs.add(errorOBject);
+
+                  return errorMsgs;
+            }
+            
             // check more xml format--  must put  the xml content in <ODM> tag
             int beginIndex = importXml.indexOf("<ODM>");
             if (beginIndex < 0) {
