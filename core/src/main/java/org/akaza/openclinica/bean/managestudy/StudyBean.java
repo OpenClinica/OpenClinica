@@ -78,10 +78,10 @@ public class StudyBean extends AuditableEntityBean {
     private StudyEnvEnum envType;
     private String studyEnvSiteUuid;
     private String studyEnvUuid;
-    private String studyUuid;
     private boolean published;
     public int filePath;
     private int subjectCount;
+    private String studyUuid;
 
     public boolean isPublished() {
         return published;

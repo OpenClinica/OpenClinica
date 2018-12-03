@@ -1,0 +1,28 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+	xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+	xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="jkeremian" id="2018-10-03-OC-9423-01">
+		<comment>Adding a column user_id to Study Subject table</comment>
+		<addColumn tableName="study_subject">
+			<column name="user_id" type="INT"></column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2018-11-29-OC-9423-02">
+		<comment>Adding a column user_status_id to Study Subject table</comment>
+		<addColumn tableName="study_subject">
+			<column name="user_status_id" type="INT"></column>
+		</addColumn>
+	</changeSet>
+
+	<changeSet author="jkeremian" id="2018-11-29-OC-9423-03">
+		<addForeignKeyConstraint baseColumnNames="user_id"
+								 baseTableName="study_subject" constraintName="study_subject_user_id_fk"
+								 deferrable="false" initiallyDeferred="false"
+								 referencedColumnNames="user_id"
+								 referencedTableName="user_account" referencedTableSchemaName="public"/>
+	</changeSet>
+
+</databaseChangeLog>

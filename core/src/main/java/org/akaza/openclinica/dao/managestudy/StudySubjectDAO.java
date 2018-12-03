@@ -27,6 +27,7 @@ import org.akaza.openclinica.dao.core.DAODigester;
 import org.akaza.openclinica.dao.core.SQLFactory;
 import org.akaza.openclinica.dao.core.TypeNames;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.service.UserStatus;
 import org.apache.commons.lang.StringUtils;
 
 /**
@@ -105,9 +106,10 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         ind++; // oc oid
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // time_zone
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // user_uuid
-
+        this.setTypeExpected(ind, TypeNames.INT);
+        ind++; // user_id
+        this.setTypeExpected(ind, TypeNames.INT);
+        ind++; // user_status_id
         // this.setTypeExpected(ind, TypeNames.INT);
         // ind++; //
     }
@@ -210,7 +212,14 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         // eb.setEventStartDate((Date) hm.get("date_start"));
         // eb.setActive(true);
         eb.setTime_zone((String) hm.get("time_zone"));
-        eb.setUserUuid((String) hm.get("user_uuid"));
+        eb.setUserId((Integer) hm.get("user_id"));
+
+        for(UserStatus us:UserStatus.values()){
+            if(us.getCode()==(Integer) hm.get("user_status_id")){
+                eb.setUserStatus(us);
+                break;
+            }
+        }
         return eb;
     }
 
@@ -729,28 +738,21 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
     }
 
     public ArrayList<StudySubjectBean> getWithFilterAndSort(StudyBean currentStudy, FindSubjectsFilter filter, FindSubjectsSort sort, int rowStart,
-            int rowEnd , String [] userUuid ,String participateStatusSetFilter) {
+            int rowEnd ,UserStatus participateStatusSetFilter) {
         ArrayList<StudySubjectBean> studySubjects = new ArrayList<StudySubjectBean>();
         setTypesExpected();
         String partialSql;
         HashMap variables = new HashMap();
         String sql = digester.getQuery("getWithFilterAndSort");
 
-
         if(participateStatusSetFilter ==null) {
             variables.put(new Integer(1), currentStudy.getId());
             variables.put(new Integer(2), currentStudy.getId());
         }else{
-            if(userUuid==null || userUuid.length==0) {
-                userUuid= new String[1];
-                userUuid[0]="dummy value";
-            }
-            sql = sql + " AND ss.user_uuid = ANY (?)";
-
+            sql = sql + " AND ss.user_status_id = ?";
             variables.put(new Integer(1), currentStudy.getId());
             variables.put(new Integer(2), currentStudy.getId());
-            variables.put(new Integer(3), userUuid);
-
+            variables.put(new Integer(3), participateStatusSetFilter.getCode());
         }
 
 
@@ -1037,7 +1039,7 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         return studySubjects;
     }
 
-    public Integer getCountWithFilter(FindSubjectsFilter filter, StudyBean currentStudy , String [] userUuid ,String participateStatusSetFilter) {
+    public Integer getCountWithFilter(FindSubjectsFilter filter, StudyBean currentStudy ,UserStatus participateStatusSetFilter) {
         StudySubjectBean studySubjectBean = new StudySubjectBean();
         setTypesExpected();
 
@@ -1047,14 +1049,10 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
             variables.put(new Integer(1), currentStudy.getId());
             variables.put(new Integer(2), currentStudy.getId());
         }else{
-            if(userUuid==null || userUuid.length==0) {
-                userUuid= new String[1];
-                userUuid[0]="dummy value";
-            }
-            sql=sql + " AND ss.user_uuid=ANY(?)";
+            sql=sql + " AND ss.user_status_id=?";
             variables.put(new Integer(1), currentStudy.getId());
             variables.put(new Integer(2), currentStudy.getId());
-            variables.put(new Integer(3), userUuid);
+            variables.put(new Integer(3), participateStatusSetFilter.getCode());
         }
 
         sql += filter.execute("");
@@ -1221,12 +1219,14 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
             variables.put(new Integer(ind), sb.getTime_zone());
         }
         ind++;
-        if (sb.getUserUuid() == null || sb.getUserUuid().equals("")) {
+        if (sb.getUserId() == 0 ) {
             nullVars.put(new Integer(ind), new Integer(TypeNames.STRING));
             variables.put(new Integer(ind), "");
         } else {
-            variables.put(new Integer(ind), sb.getUserUuid());
+            variables.put(new Integer(ind), sb.getUserId());
         }
+        ind++;
+        variables.put(new Integer(ind), new Integer(sb.getUserStatus().getValue()));
         ind++;
         variables.put(new Integer(ind), new Integer(sb.getId()));
         ind++;

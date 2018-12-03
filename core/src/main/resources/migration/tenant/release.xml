@@ -20,6 +20,6 @@
        <include file="migration/tenant/4.0-2018-08-28-OC-9374.xml"/>
        <include file="migration/tenant/4.0-2018-08-28-OC-9374-1.xml"/>
        <include file="migration/tenant/4.0-2018-08-24-OC-9383.xml"/>
-       <include file="migration/tenant/4.0-2018-10-03-OC-9665.xml"/>
        <include file="migration/tenant/4.0-2018-11-21-OC-9664.xml"/>
+       <include file="migration/tenant/4.0-2018-11-29-OC-9423.xml"/>
 </databaseChangeLog>

@@ -17,6 +17,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
+import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.OCUserDTO;
@@ -226,24 +227,15 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         Limit limit = tableFacade.getLimit();
 
         FindSubjectsFilter subjectFilter = getSubjectFilter(limit);
-        List<String> userUuidList = new ArrayList<>();
-        List<OCUserDTO> oCUserDTOs = null;
+        List<String> userStatuses = new ArrayList<>();
 
-        String participateStatusSetFilter = null;
+        UserStatus participateStatusSetFilter = null;
         if (getParticipateModuleStatus().equals(ENABLED)) {
             participateStatusSetFilter = getParticipateStatusSetFilter(subjectFilter);
-            oCUserDTOs = userService.getAllParticipantAccountsFromUserService(request);
-
-            for (OCUserDTO oCUserDTO : oCUserDTOs) {
-                if (participateStatusSetFilter == null || (participateStatusSetFilter != null && oCUserDTO.getStatus().getValue().equals(participateStatusSetFilter)))
-                    userUuidList.add(oCUserDTO.getUuid());
-            }
-
-    }
-        String[] userUuidArray = getStringArray(userUuidList);
+        }
 
         if (!limit.isComplete()) {
-            int totalRows = getStudySubjectDAO().getCountWithFilter(subjectFilter, getStudyBean() ,userUuidArray,participateStatusSetFilter);
+            int totalRows = getStudySubjectDAO().getCountWithFilter(subjectFilter, getStudyBean() ,participateStatusSetFilter);
             tableFacade.setTotalRows(totalRows);
         }
 
@@ -251,7 +243,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
         int rowStart = limit.getRowSelect().getRowStart();
         int rowEnd = limit.getRowSelect().getRowEnd();
-        Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, subjectSort, rowStart, rowEnd,userUuidArray,participateStatusSetFilter);
+        Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, subjectSort, rowStart, rowEnd,participateStatusSetFilter);
 
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
 
@@ -271,7 +263,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             theItem.put("enrolledAt", study.getIdentifier());
             theItem.put("studySubject.oid", studySubjectBean.getOid());
             if(getParticipateModuleStatus().equals(ENABLED))
-                theItem.put("participate.status", getUserStatusByUserUuid(studySubjectBean,oCUserDTOs));
+                theItem.put("participate.status", (studySubjectBean.getUserStatus()==null?"":studySubjectBean.getUserStatus().getValue()));
             theItem.put("studySubject.secondaryLabel", studySubjectBean.getSecondaryLabel());
 
             SubjectBean subjectBean = (SubjectBean) getSubjectDAO().findByPK(studySubjectBean.getSubjectId());
@@ -1501,20 +1493,11 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         return sdf.format(date);
     }
 
-    private String[] getStringArray(List<String> userUuidList) {
-        if (CollectionUtils.isEmpty(userUuidList))
+    private String[] getStringArray(List<String> userStatuses) {
+        if (CollectionUtils.isEmpty(userStatuses))
             return null;
-        String[] uuid = userUuidList.toArray(new String[userUuidList.size()]);
-        return uuid;
-    }
-
-    private String getUserStatusByUserUuid(StudySubjectBean studySubjectBean, List<OCUserDTO> ocUserDTOs) {
-       for(OCUserDTO ocUserDTO:ocUserDTOs){
-           if(ocUserDTO.getUuid().equals(studySubjectBean.getUserUuid())){
-               return ocUserDTO.getStatus().getValue();
-           }
-       }
-        return null;
+        String[] userStatusArray = userStatuses.toArray(new String[userStatuses.size()]);
+        return userStatusArray;
     }
 
     public UserService getUserService() {
@@ -1525,12 +1508,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         this.userService = userService;
     }
 
-    public String getParticipateStatusSetFilter(FindSubjectsFilter subjectFilter) {
-        String participateStatusSetFilter = null;
+    public UserStatus getParticipateStatusSetFilter(FindSubjectsFilter subjectFilter) {
+        UserStatus participateStatusSetFilter = null;
         if (subjectFilter.getFilters() != null && subjectFilter.getFilters().size() > 0) {
             for (FindSubjectsFilter.Filter filter : subjectFilter.getFilters()) {
                 if (filter.getProperty().equals("participate.status")) {
-                    participateStatusSetFilter = (String) filter.getValue();
+                    String filteredValue=(String)filter.getValue();
+                    participateStatusSetFilter = UserStatus.valueOf(filteredValue.toUpperCase());
                     subjectFilter.removeFilter(filter);
                     break;
                 }
