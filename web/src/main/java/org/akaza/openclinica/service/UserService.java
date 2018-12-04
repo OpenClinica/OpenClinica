@@ -23,15 +23,12 @@ import java.util.List;
 public interface UserService {
 
 
-	Object connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request);
+	OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO,HttpServletRequest request);
 
-	Object getParticipantAccount(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request);
+	OCUserDTO getParticipantAccount(String studyOid, String ssid,HttpServletRequest request);
 
 	List<OCUserDTO> getAllParticipantAccountsFromUserService(HttpServletRequest request);
 
-	 Object createOrUpdateParticipantAccount(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
-			httpMethod);
-     Object getParticipantAccountFromUserService(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod httpMethod);
 
 	 RestfulServiceHelper getRestfulServiceHelper();
 

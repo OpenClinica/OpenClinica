@@ -1,19 +1,21 @@
 package org.akaza.openclinica.service;
 
+import com.auth0.json.mgmt.users.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -47,7 +49,7 @@ import static java.util.Collections.*;
  * @author joekeremian
  */
 
-@Service("userService")
+@Service( "userService" )
 public class UserServiceImpl implements UserService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -57,6 +59,9 @@ public class UserServiceImpl implements UserService {
 
     @Autowired
     ServletContext context;
+
+    @Autowired
+    UserAccountDao userAccountDao;
 
     @Autowired
     EventCrfDao eventCrfDao;
@@ -93,143 +98,124 @@ public class UserServiceImpl implements UserService {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public Object connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request) {
+    public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request) {
+        getRestfulServiceHelper().setSchema(studyOid, request);
+        OCUserDTO ocUserDTO = null;
         Study study = getStudy(studyOid);
         StudySubject studySubject = getStudySubject(ssid, study);
-        OCUserDTO ocUserDTO = null;
-        Object object = null;
+        UserAccount userAccount = null;
+        UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 
         if (studySubject != null) {
-            ocUserDTO = buildOCUserDTO(ssid, participantDTO,studySubject,studyOid);
-            if (studySubject.getUserUuid() == null) {
-                // create participant user Account   POST
-                object = createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.POST);
-                if (object instanceof OCUserDTO && object != null) {
-                    studySubject.setUserUuid(((OCUserDTO) object).getUuid());
-                    studySubjectDao.saveOrUpdate(studySubject);
-                    logger.info("Participate user_uuid added in db: "+studySubject.getUserUuid());
+            if (studySubject.getUserId() == null) {
+                logger.info("Participate has not registered yet");
+                // create participant user Account In Runtime
+                userAccount = createUserAccount(participantDTO, studyOid, studySubject, userAccountBean);
+
+                if (userAccount != null) {
+                    studySubject.setUserId(userAccount.getUserId());
+                    studySubject.setUserStatus(UserStatus.CREATED);
+                    studySubject = studySubjectDao.saveOrUpdate(studySubject);
+                    logger.info("Participate user_id: {} and user_status: {} are added in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
                 }
             } else {
-                // update participant user Account  PUT
-                ocUserDTO.setUuid(studySubject.getUserUuid());
-                // Get participant
-                object = getParticipantAccountFromUserService(request, ocUserDTO, HttpMethod.GET);
-                if (object instanceof OCUserDTO) {
-                    ocUserDTO.setStatus(((OCUserDTO) object).getStatus());
+                // Update participant user Account In Runtime
+                userAccount = updateUserAccount(participantDTO, userAccount, studyOid, studySubject,userAccountBean);
+                if (userAccount != null) {
+                    studySubject = studySubjectDao.saveOrUpdate(studySubject);
+                    logger.info("Participate with user_id: {} ,it's user_status: {} is updated in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
                 }
-                object = createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
-                logger.info("Participate info with user_uuid is updated in db : "+studySubject.getUserUuid());
             }
-
         } else {
             logger.info("Participant does not exists or not added yet in OC ");
         }
-        return object;
-    }
+        if (participantDTO.isInviteParticipant()) {
+            sendEmailToParticipant(participantDTO);
+            studySubject.setUserStatus(UserStatus.INVITED);
+            studySubject = studySubjectDao.saveOrUpdate(studySubject);
 
-
-    public Object createOrUpdateParticipantAccount(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
-            httpMethod) {
-        String uri = sbsUrl;
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Accept-Charset", "UTF-8");
-        StudyBean studyBean = null;
-        HttpEntity<OCUserDTO> entity = new HttpEntity<OCUserDTO>(ocUserDTO, headers);
-        ResponseEntity<OCUserDTO> userResponse = null;
-        try {
-            userResponse = restTemplate.exchange(uri, httpMethod, entity, OCUserDTO.class);
-        } catch (HttpClientErrorException e) {
-            logger.error("Auth0 error message: {}", e.getResponseBodyAsString());
-            return e;
         }
-
-
-        if (userResponse == null) {
-            return null;
-        } else {
-            if(ocUserDTO.isInviteParticipant()){
-                sendEmailToParticipant(ocUserDTO);
-            }
-            return userResponse.getBody();
-        }
-
-    }
-
-
-    private OCUserDTO buildOCUserDTO(String ssid, OCParticipantDTO participantDTO ,StudySubject studySubject,String studyOid) {
-        OCUserDTO ocUserDTO = new OCUserDTO();
-        if(participantDTO!=null) {
-            ocUserDTO.setEmail(participantDTO.getEmail());
-            ocUserDTO.setFirstName(participantDTO.getFirstName());
-            ocUserDTO.setPhoneNumber(participantDTO.getMobilePhone());
-            ocUserDTO.setInviteParticipant(participantDTO.isInviteParticipant());
-        }
-        ocUserDTO.setUserType(UserType.USER);
-        String username =studyOid+"."+studySubject.getOcOid();
-        username=username.replaceAll("\\(",".").replaceAll("\\)","");
-        ocUserDTO.setUsername(username);
-        ocUserDTO.setLastName("ParticipateAccount");
-        ocUserDTO.setStatus(UserStatus.INVITED);
+        if (userAccount != null || userAccount.getId() != 0)
+            ocUserDTO = buildOcUserDTO(userAccount, studySubject);
 
         return ocUserDTO;
     }
 
-    public Object getParticipantAccountFromUserService(HttpServletRequest request, OCUserDTO ocUserDTO, HttpMethod
-            httpMethod) {
-        String uri =sbsUrl+ ocUserDTO.getUuid();
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Accept-Charset", "UTF-8");
-        StudyBean studyBean = null;
-        HttpEntity entity = new HttpEntity<OCUserDTO>(headers);
-        ResponseEntity<OCUserDTO> userResponse = null;
-        try {
-            userResponse = restTemplate.exchange(uri, httpMethod, entity, OCUserDTO.class);
-        } catch (HttpClientErrorException e) {
-            logger.error("Auth0 error message: {}", e.getResponseBodyAsString());
-            return e;
-        }
 
-        if (userResponse == null) {
-            return null;
-        } else {
-            logger.info("Participate user_uuid from User Service : "+userResponse.getBody().getUuid());
-            return ocUserDTO = userResponse.getBody();
-        }
+    public OCUserDTO getParticipantAccount(String studyOid, String ssid, HttpServletRequest request) {
 
-    }
+        getRestfulServiceHelper().setSchema(studyOid, request);
+        OCUserDTO ocUserDTO = null;
 
-    public Object getParticipantAccount(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request) {
         Study study = getStudy(studyOid);
         StudySubject studySubject = getStudySubject(ssid, study);
-        OCUserDTO ocUserDTO = null;
-        Object object = null;
 
-        if (studySubject != null) {
-            ocUserDTO = buildOCUserDTO(ssid, participantDTO,studySubject,studyOid);
-            if(studySubject.getUserUuid()!=null) {
-                ocUserDTO.setUuid(studySubject.getUserUuid());
-                object = getParticipantAccountFromUserService(request, ocUserDTO, HttpMethod.GET);
-            }else{
-                logger.info("Participant has not been connected yet");
-                logger.info("userUuid of participant in OC runtime is null");
-
-            }
-        } else {
-            logger.info("Participant does not exists or not added yet in OC ");
+        if (studySubject!= null && studySubject.getUserId() != null) {
+            String studySchema = CoreResources.getRequestSchema();
+            CoreResources.setRequestSchema("public");
+            UserAccount userAccount = userAccountDao.findByUserId(studySubject.getUserId());
+            CoreResources.setRequestSchema(studySchema);
+            if (userAccount != null)
+                ocUserDTO = buildOcUserDTO(userAccount, studySubject);
         }
-        return object;
+        return ocUserDTO;
+    }
+
+
+    private UserAccount createUserAccount(OCParticipantDTO participantDTO, String studyOid, StudySubject studySubject,UserAccountBean userAccountBean) {
+        if (participantDTO == null)
+            return null;
+       UserAccount userAccount = new UserAccount();
+
+        userAccount.setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
+        userAccount.setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
+        userAccount.setPhone(participantDTO.getMobilePhone() == null ? "" : participantDTO.getMobilePhone());
+        userAccount.setUserType(new org.akaza.openclinica.domain.user.UserType(4));
+
+        String username = studyOid + "." + studySubject.getOcOid();
+        username = username.replaceAll("\\(", ".").replaceAll("\\)", "");
+        userAccount.setUserName(username);
+
+        Study publicStudy = studyDao.findPublicStudy(studySubject.getStudy().getOc_oid());
+        userAccount.setActiveStudy(publicStudy);
+
+
+        userAccount.setStatus(Status.AVAILABLE);
+
+        userAccount.setDateCreated(new Date());
+
+        String studySchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
+        UserAccount ownerUserAccount=userAccountDao.findByUserId(userAccountBean.getId());
+        userAccount.setUserAccount(ownerUserAccount);
+
+        userAccount = userAccountDao.saveOrUpdate(userAccount);
+        CoreResources.setRequestSchema(studySchema);
+
+        logger.info("UserAccount has been created for Participate");
+        return userAccount;
+    }
+
+    private UserAccount updateUserAccount(OCParticipantDTO participantDTO, UserAccount userAccount, String studyOid, StudySubject studySubject,UserAccountBean userAccountBean) {
+        if (participantDTO == null)
+            return userAccount;
+
+        String studySchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
+        userAccount = userAccountDao.findByUserId(studySubject.getUserId());
+
+        userAccount.setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
+        userAccount.setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
+        userAccount.setPhone(participantDTO.getMobilePhone() == null ? "" : participantDTO.getMobilePhone());
+
+        userAccount.setDateUpdated(new Date());
+        userAccount.setUpdateId(userAccountBean.getId());
+
+        userAccount = userAccountDao.saveOrUpdate(userAccount);
+        CoreResources.setRequestSchema(studySchema);
+
+        logger.info("UserAccount has been Updated for Participate");
+        return userAccount;
     }
 
 
@@ -259,21 +245,22 @@ public class UserServiceImpl implements UserService {
         if (userResponse == null) {
             return null;
         } else {
-            logger.info("Total participate/user numbers: "+userResponse.getBody().size());
+            logger.info("Total participate/user numbers: " + userResponse.getBody().size());
             return userResponse.getBody();
         }
 
     }
 
-    private void sendEmailToParticipant(OCUserDTO ocUserDTO) {
+    private void sendEmailToParticipant(OCParticipantDTO participantDTO) {
         ParticipantDTO pDTO = new ParticipantDTO();
-        pDTO.setEmailAccount(ocUserDTO.getEmail());
+        pDTO.setEmailAccount(participantDTO.getEmail());
         pDTO.setEmailSubject("This is the email Subject");
         pDTO.setMessage("This is the Email content message");
-        sendEmailToParticipant(pDTO) ;
+        sendEmailToParticipant(pDTO);
 
-        }
-    private void sendEmailToParticipant( ParticipantDTO pDTO) throws OpenClinicaSystemException {
+    }
+
+    private void sendEmailToParticipant(ParticipantDTO pDTO) throws OpenClinicaSystemException {
 
         logger.info("Sending email...");
         try {
@@ -294,10 +281,22 @@ public class UserServiceImpl implements UserService {
             throw new OpenClinicaSystemException(me.getMessage());
         }
     }
+
     public RestfulServiceHelper getRestfulServiceHelper() {
         if (restfulServiceHelper == null) {
             restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
         }
         return restfulServiceHelper;
     }
+
+
+    private OCUserDTO buildOcUserDTO(UserAccount userAccount, StudySubject studySubject) {
+        OCUserDTO ocUserDTO = new OCUserDTO();
+        ocUserDTO.setEmail(userAccount.getEmail());
+        ocUserDTO.setFirstName(userAccount.getFirstName());
+        ocUserDTO.setPhoneNumber(userAccount.getPhone());
+        ocUserDTO.setStatus(studySubject.getUserStatus());
+        return ocUserDTO;
+    }
+
 }

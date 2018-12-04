@@ -44,6 +44,7 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.*;
+import org.akaza.openclinica.service.UserType;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -1427,21 +1428,14 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return userService= (UserService) SpringServletAccess.getApplicationContext(context).getBean("userService");
     }
 
-    protected void changeParticipantAccountStatus(StudyBean study, StudySubjectBean studySub, UserStatus userStatus ){
+    protected void changeParticipantAccountStatus(StudyBean study, StudySubjectBean studySub, UserStatus userStatus) {
         // check if particiate module enabled
-        int parentStudyId = (study.getParentStudyId()!=0)? study.getParentStudyId():study.getId();
-        String participateStatus=getParticipateStatus(parentStudyId);
-        if(participateStatus.equals(ENABLED)&& !StringUtils.isEmpty(studySub.getUserUuid())) {
-            OCUserDTO ocUserDTO = new OCUserDTO();
-            ocUserDTO.setUuid(studySub.getUserUuid());
-            // Get Participant user account in user_service using user_uuid
-            Object object=   getUserService().getParticipantAccountFromUserService(request,ocUserDTO,HttpMethod.GET);
-            if (object != null && object instanceof OCUserDTO) {
-                ocUserDTO = (OCUserDTO) object;
-                ocUserDTO.setStatus(userStatus);
-                // Update the status and clear firstname and phone from Participant user account in user_service
-                getUserService().createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
-            }
+        int parentStudyId = (study.getParentStudyId() != 0) ? study.getParentStudyId() : study.getId();
+        String participateStatus = getParticipateStatus(parentStudyId);
+        if (participateStatus.equals(ENABLED) && studySub.getUserId() != 0) {
+            studySub.setUserStatus(userStatus);
+            StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
+            sdao.update(studySub);
         }
     }
 

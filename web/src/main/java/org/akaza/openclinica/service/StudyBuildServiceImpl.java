@@ -59,6 +59,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     public static final String ENABLED = "enabled";
     public static final String DISABLED = "disabled";
     public static final String ACTIVE = "active";
+    public static final String PARTICIPATE = "participate";
+
 
     PermissionService permissionService;
     @Autowired
@@ -434,15 +436,15 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     public String getModuleStatus(List<ModuleConfigDTO> moduleConfigDTOs, Study study) {
         for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
-            if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid())) {
+            if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid())&& moduleConfigDTO.getModuleName().equalsIgnoreCase(PARTICIPATE)) {
                 ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
                 if (moduleStatus.name().equalsIgnoreCase(ACTIVE)) {
+                    logger.info("Module Status is Enabled");
                     return ENABLED;
                 }
-                break;
             }
         }
-
+        logger.info("Module Status is Disabled");
         return DISABLED;
     }
 
