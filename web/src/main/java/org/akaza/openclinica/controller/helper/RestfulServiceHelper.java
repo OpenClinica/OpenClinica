@@ -262,8 +262,13 @@ public class RestfulServiceHelper {
     	        } else {
     	            username = principal.toString();
     	        }
+
+			String schema = CoreResources.getRequestSchema();
+			CoreResources.setRequestSchema("public");
     	        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
     	        userBean = (UserAccountBean) userAccountDao.findByUserName(username);
+			CoreResources.setRequestSchema(schema);
+
     	}
     	
     	return userBean;

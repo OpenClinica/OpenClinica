@@ -20,8 +20,9 @@ public class UserType extends Term {
     public static final UserType SYSADMIN = new UserType(1, "business_administrator");
     public static final UserType USER = new UserType(2, "user");
     public static final UserType TECHADMIN = new UserType(3, "technical_administrator");
+    public static final UserType PARTICIPATE = new UserType(4, "participate_user");
 
-    private static final UserType[] members = { INVALID, USER, SYSADMIN, TECHADMIN };
+    private static final UserType[] members = { INVALID, USER, SYSADMIN, TECHADMIN ,PARTICIPATE };
     public static final List list = Arrays.asList(members);
 
     private UserType(int id, String name) {
