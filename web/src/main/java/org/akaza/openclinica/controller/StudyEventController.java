@@ -113,8 +113,11 @@ public class StudyEventController {
         UserAccountBean ub = getRestfulServiceHelper().getUserAccount(request);
         StudyBean currentStudy = participateService.getStudy(studyOid);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
-        StudySubjectBean studySubject = studySubjectDAO.findByLabelAndStudy(ub.getName(), currentStudy);
 
+        String userName=ub.getName();
+        int lastIndexOfDot= userName.lastIndexOf(".");
+        String subjectOid=userName.substring(lastIndexOfDot+1);
+        StudySubjectBean studySubject= studySubjectDAO.findByOid(subjectOid);
 
         StudyEvent studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDefOid, ordinal, studySubject.getId());
         StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByStudyEventDefinitionId(studyEvent.getStudyEventDefinition().getStudyEventDefinitionId());
