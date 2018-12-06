@@ -110,7 +110,7 @@ public class UserServiceImpl implements UserService {
             if (studySubject.getUserId() == null) {
                 logger.info("Participate has not registered yet");
                 // create participant user Account In Runtime
-                userAccount = createUserAccount(participantDTO, studyOid, studySubject, userAccountBean);
+                userAccount = createUserAccount(participantDTO, study, studySubject, userAccountBean);
 
                 if (userAccount != null) {
                     studySubject.setUserId(userAccount.getUserId());
@@ -120,7 +120,7 @@ public class UserServiceImpl implements UserService {
                 }
             } else {
                 // Update participant user Account In Runtime
-                userAccount = updateUserAccount(participantDTO, userAccount, studyOid, studySubject,userAccountBean);
+                userAccount = updateUserAccount(participantDTO, userAccount, studySubject,userAccountBean);
                 if (userAccount != null) {
                     studySubject = studySubjectDao.saveOrUpdate(studySubject);
                     logger.info("Participate with user_id: {} ,it's user_status: {} is updated in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
@@ -162,17 +162,19 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private UserAccount createUserAccount(OCParticipantDTO participantDTO, String studyOid, StudySubject studySubject,UserAccountBean userAccountBean) {
+    private UserAccount createUserAccount(OCParticipantDTO participantDTO, Study study, StudySubject studySubject,UserAccountBean userAccountBean) {
         if (participantDTO == null)
             return null;
        UserAccount userAccount = new UserAccount();
+       if(study.getStudy()!=null)
+           study=study.getStudy();
 
         userAccount.setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
         userAccount.setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
         userAccount.setPhone(participantDTO.getMobilePhone() == null ? "" : participantDTO.getMobilePhone());
         userAccount.setUserType(new org.akaza.openclinica.domain.user.UserType(4));
 
-        String username = studyOid + "." + studySubject.getOcOid();
+        String username = study.getOc_oid() + "." + studySubject.getOcOid();
         username = username.replaceAll("\\(", ".").replaceAll("\\)", "");
         userAccount.setUserName(username);
 
@@ -196,7 +198,7 @@ public class UserServiceImpl implements UserService {
         return userAccount;
     }
 
-    private UserAccount updateUserAccount(OCParticipantDTO participantDTO, UserAccount userAccount, String studyOid, StudySubject studySubject,UserAccountBean userAccountBean) {
+    private UserAccount updateUserAccount(OCParticipantDTO participantDTO, UserAccount userAccount, StudySubject studySubject,UserAccountBean userAccountBean) {
         if (participantDTO == null)
             return userAccount;
 
