@@ -604,6 +604,11 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   	 */
   	
 	public static String processResponse(String reponseStr) {
+		
+		if(reponseStr == null || reponseStr.trim().length()==0) {
+			return "";
+		}
+		
 		StringBuffer response = new StringBuffer();
   		JSONObject obj = new JSONObject(reponseStr);
   		String message = obj.getString("message");
@@ -611,16 +616,23 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   		response.append(message);
   		response.append("\n");
 
-  		JSONArray errorsArr = obj.getJSONArray("errors");
-  		for (int i = 0; i < errorsArr.length(); i++)
-  		{
-  		    String code = errorsArr.getJSONObject(i).getString("code");
-  		    String errorMsg = errorsArr.getJSONObject(i).getString("message");
-  		    response.append(code);
-  		    response.append(":");
-  		    response.append(errorMsg);
-  		    response.append("\n");
+  		try {
+  			JSONArray errorsArr = obj.getJSONArray("errors");
+  	  		for (int i = 0; i < errorsArr.length(); i++)
+  	  		{
+  	  		    String code = errorsArr.getJSONObject(i).getString("code");
+  	  		    String errorMsg = errorsArr.getJSONObject(i).getString("message");
+  	  		    response.append(code);
+  	  		    response.append(":");
+  	  		    response.append(errorMsg);
+  	  		    response.append("\n");
+  	  		}
+  		}catch(org.json.JSONException e) {
+  			Object msg = obj.get("detailMessages");  	  		
+  		    response.append(msg.toString());  	  		   
+  		    response.append("\n");  	  		
   		}
+  		
   		return response.toString();
   	}
 }

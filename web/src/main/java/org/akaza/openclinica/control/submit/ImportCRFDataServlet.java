@@ -16,6 +16,8 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
@@ -289,7 +291,7 @@ public class ImportCRFDataServlet extends SecureController {
                 addPageMessage(respage.getString("passed_common_events_check"));
             }
            
-        	 List<EventCRFBean> eventCRFBeans =  getImportCRFDataService().fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE);
+        	 List<EventCRFBean> eventCRFBeans =  getImportCRFDataService().fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE,request);
              
             
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();

@@ -15,6 +15,7 @@ import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
@@ -212,6 +213,16 @@ public class DataController {
     protected ArrayList<ErrorMessage> importDataInTransaction(String importXml, HttpServletRequest request) throws Exception {
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
         ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
+        
+        Enumeration<String> headerNames = request.getHeaderNames();
+
+        if (headerNames != null) {
+                while (headerNames.hasMoreElements()) {
+                        System.out.println("Header: " + request.getHeader(headerNames.nextElement()));
+                }
+        }
+        
+       
 
         try {
             // check more xml format--  can't be blank
@@ -339,7 +350,7 @@ public class DataController {
                 }
 
                 errorMessagesFromValidation = dataImportService.validateData(odmContainer, dataSource, coreResources, studyBean, userBean,
-                        displayItemBeanWrappers, importedCRFStatuses);
+                        displayItemBeanWrappers, importedCRFStatuses,request);
 
                 if (errorMessagesFromValidation.size() > 0) {
                     String err_msg = convertToErrorString(errorMessagesFromValidation);

@@ -430,7 +430,11 @@ public class ImportSpringJob extends QuartzJobBean {
             }
             ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
             // validation errors, the same as in the ImportCRFDataServlet. DRY?
-            List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE);
+            // create a 'fake' request to generate the validation errors
+            // here, tbh 05/2009
+
+            MockHttpServletRequest request = new MockHttpServletRequest();
+            List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE,request);
             List<EventCRFBean> permittedEventCRFs = new ArrayList<EventCRFBean>();
             Boolean eventCRFStatusesValid = getImportCRFDataService(dataSource).eventCRFStatusesValid(odmContainer, ub);
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
@@ -490,10 +494,7 @@ public class ImportSpringJob extends QuartzJobBean {
                     auditMsg.append(respage.getString("the_event_crf_not_correct_status") + "<br/>");
                 }
 
-                // create a 'fake' request to generate the validation errors
-                // here, tbh 05/2009
-
-                MockHttpServletRequest request = new MockHttpServletRequest();
+               
                 // Locale locale = new Locale("en-US");
                 request.addPreferredLocale(locale);
                 try {
