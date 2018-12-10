@@ -212,7 +212,7 @@
 				AND ua.status_id=1
 				AND sur.status_id=1
 				AND (s.study_id=? OR s.parent_study_id=?)
-				AND  ua.user_name NOT LIKE '%.SS_%'
+    			AND ua.user_type_id !=4
 			ORDER BY ua.date_created ASC
 		</sql>
 	</query>
@@ -240,7 +240,7 @@
                 AND ua.status_id=1
                 AND sur.status_id=1
                 AND (s.study_id=? OR s.study_id=?
-               	AND  ua.user_name NOT LIKE '%.SS_%'
+    			AND ua.user_type_id !=4
 			        OR s.study_id in (select ss.study_id from study_subject ss WHERE ss.study_subject_id=?)
                 )
                 ORDER BY ua.last_name ASC

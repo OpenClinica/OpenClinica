@@ -365,6 +365,7 @@ public class CoreResources implements ResourceLoaderAware {
 
         DATAINFO.setProperty("ra", "Data_Entry_Person");
         DATAINFO.setProperty("ra2", "site_Data_Entry_Person2");
+        DATAINFO.setProperty("participate", "site_Data_Entry_Participant");
         DATAINFO.setProperty("investigator", "Investigator");
         DATAINFO.setProperty("director", "Study_Director");
 
