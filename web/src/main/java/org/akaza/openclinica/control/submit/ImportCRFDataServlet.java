@@ -272,7 +272,7 @@ public class ImportCRFDataServlet extends SecureController {
             // The eventCRFBeans list omits EventCRFs that don't match UpsertOn rules. If EventCRF did not exist and
             // doesn't match upsert, it won't be created.
           
-            errors.addAll((ArrayList<String>) getImportCRFDataService().validateEventCRFBeans(odmContainer, ub));
+            errors.addAll((ArrayList<String>) getImportCRFDataService().validateEventCRFBeans(odmContainer, ub,request));
            
         	if (CollectionUtils.isNotEmpty(errors)) {
                 // add to session

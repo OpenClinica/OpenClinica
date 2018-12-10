@@ -142,7 +142,7 @@ public class DataImportService {
         // validation errors, the same as in the ImportCRFDataServlet. DRY?
         Boolean eventCRFStatusesValid = getImportCRFDataService().eventCRFStatusesValid(odmContainer, userBean);
         
-        errors.addAll((ArrayList<String>) getImportCRFDataService().validateEventCRFBeans(odmContainer, userBean));        
+        errors.addAll((ArrayList<String>) getImportCRFDataService().validateEventCRFBeans(odmContainer, userBean,request));        
         if(!(errors.isEmpty())) {
         	return errors;
         }

@@ -869,21 +869,34 @@ public class ItemDataDAO extends AuditableEntityDAO {
         	return null;
         }
         
-        ArrayList alist = this.select(sqlStr);       
+        ArrayList alist = this.select(sqlStr);
+        int listSize = alist.size();
+        int i = 0;
+        
         Iterator it = alist.iterator();       
         
         Integer currentStudyEventId = null;
         HashMap rowhm = new HashMap();
         while (it.hasNext()) {
         	HashMap hm = (HashMap) it.next();
+        	i++;
+        	
         	studyEventId = (Integer) hm.get("study_event_id");
         	itemOID = (String) hm.get("oc_oid");
         	itemValue = (String) hm.get("value");
         	// build  row  hash map to match data file line
         	if(currentStudyEventId == null) {
         		rowhm.put(itemOID, itemValue);
+        		
+        		if(i == listSize) {
+        			matchCriterias.add(rowhm);
+        		}
         	}else if(currentStudyEventId.intValue()==studyEventId.intValue()) {
         		rowhm.put(itemOID, itemValue);
+        		
+        		if(i == listSize) {
+        			matchCriterias.add(rowhm);
+        		}
         	}else {
         		matchCriterias.add(rowhm);
         		

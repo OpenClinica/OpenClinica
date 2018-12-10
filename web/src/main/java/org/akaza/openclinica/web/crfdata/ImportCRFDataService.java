@@ -311,7 +311,7 @@ public class ImportCRFDataService {
      * @return
      */
     @SuppressWarnings("rawtypes")
-	public ArrayList<String> validateEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub) {
+	public ArrayList<String> validateEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub,HttpServletRequest request) {
     	
     	ArrayList<String> errors = new ArrayList<String>(); 
     	ArrayList<String> commonEventsFormRepeatKeys = new ArrayList<String>(); 
@@ -384,6 +384,14 @@ public class ImportCRFDataService {
 
                     if (studyEventDefinitionBean.isTypeCommon()){
                     	
+                    	 /**
+                         *  Data form the Mirth will skip this repeat key check, because it has no repeat key
+                         */
+                        String skipMatchCriteria = request.getHeader("SkipMatchCriteria");
+                        if(skipMatchCriteria != null) {
+                        	continue;
+                        }
+                    	
                     	Boolean isRepeating = studyEventDefinitionBean.isRepeating();
 
                         String formOid = formDataBean.getFormOID();
@@ -407,8 +415,8 @@ public class ImportCRFDataService {
                         	maxOrdinalbySubjectEvent.put(commonEventSubjectEventKey, maxOrdinalSimulation);
                         	
                         }
-                        
-                        commonEventFormRepeatKey = studyOID+subjectDataBean.getSubjectOID()+studyEventDataBean.getStudyEventOID()+studyEventDataBean.getStudyEventRepeatKey();                        
+                      
+                    	commonEventFormRepeatKey = studyOID+subjectDataBean.getSubjectOID()+studyEventDataBean.getStudyEventOID()+studyEventDataBean.getStudyEventRepeatKey();                        
                         if(commonEventFormRepeatKey!=null) {
                         	if(!(commonEventsFormRepeatKeys.contains(commonEventFormRepeatKey))) {
                         
@@ -419,6 +427,7 @@ public class ImportCRFDataService {
                                  return errors;
                         	}
                         }
+                       
                         
                         // OC-9756 fix
                         if(!isRepeating) {
@@ -438,11 +447,9 @@ public class ImportCRFDataService {
                         sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey();
                        
                         if(sampleOrdinal == null || sampleOrdinal.trim().isEmpty()) {
-                        	/*errors.add("Missing studyEventRepeatKey for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
+                        	errors.add("Missing studyEventRepeatKey for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
                         	
-                            return errors;*/
-                            // not provide repeat key in the data file, then get the next available one
-                            sampleOrdinal = commonEventContainerDTO.getMaxOrdinal()+1 +"";
+                            return errors;                            
                         }
                        
                     	// for same subject, same event, can't have same form more than once in NON repeating COMMON event -- found same formOID in database
