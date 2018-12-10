@@ -668,11 +668,13 @@ public class CoreResources implements ResourceLoaderAware {
         String[] fileNames = { "rules.xsd", "rules_template.xml", "rules_template_with_notes.xml" };
         Resource[] resources = null;
         Resource[] resourcesTemplate = null;
+        Resource[] resourcesPipeDelimitedTemplate = null;
         FileOutputStream out = null;
 
         resources = resolver.getResources("classpath*:properties/rules_template*.xml");
         resourcesTemplate = resolver.getResources("classpath*:properties/import_template*.xml");
-
+        resourcesPipeDelimitedTemplate =resolver.getResources("classpath*:properties/template_pipe*.txt");
+        
         File dest = new File(getField("filePath") + "rules");
         if (!dest.exists()) {
             if (!dest.mkdirs()) {
@@ -688,6 +690,15 @@ public class CoreResources implements ResourceLoaderAware {
 
         }
         for (Resource r : resourcesTemplate) {
+            File f = new File(dest, r.getFilename());
+
+            out = new FileOutputStream(f);
+            IOUtils.copy(r.getInputStream(), out);
+            out.close();
+
+        }
+        
+        for (Resource r : resourcesPipeDelimitedTemplate) {
             File f = new File(dest, r.getFilename());
 
             out = new FileOutputStream(f);
