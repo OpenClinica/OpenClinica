@@ -377,7 +377,7 @@
                                 <tbody
                                   <c:if test="${
                                     studySub.status.name=='removed' ||
-                                    sessionScope.customUserRole!='Clinical Research Coordinator' && sessionScope.customUserRole!='Investigator' || 
+                                    sessionScope.baseUserRole!='Clinical Research Coordinator' && sessionScope.baseUserRole!='Investigator' ||
                                     participateStatus!='enabled'
                                   }">
                                       class="invisible"
