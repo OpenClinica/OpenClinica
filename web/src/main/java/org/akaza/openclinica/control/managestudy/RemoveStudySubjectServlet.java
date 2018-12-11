@@ -119,9 +119,8 @@ public class RemoveStudySubjectServlet extends SecureController {
                 studySub.setStatus(Status.DELETED);
                 studySub.setUpdater(ub);
                 studySub.setUpdatedDate(new Date());
+                studySub.setUserStatus(UserStatus.INACTIVE);
                 subdao.update(studySub);
-               // update Participant Status when subject is removed
-                changeParticipantAccountStatus(study,studySub,UserStatus.INACTIVE);
 
                 // remove all study events
                 // remove all event crfs

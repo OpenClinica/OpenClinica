@@ -144,7 +144,11 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // oc oid
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++;
+        ind++; //time_zone
+        this.setTypeExpected(ind, TypeNames.INT);
+        ind++; // user_id
+        this.setTypeExpected(ind, TypeNames.INT);
+        ind++; // user_status_id
 
     }
 

@@ -2045,6 +2045,8 @@ public class StudyController {
             return Role.MONITOR;
         } else if (roleName.equalsIgnoreCase(resterm.getString("site_Data_Entry_Person2").trim())) {
             return Role.RESEARCHASSISTANT2;
+        } else if (roleName.equalsIgnoreCase(resterm.getString("site_Data_Entry_Participant").trim())) {
+            return Role.PARTICIPATE;
         } else
             return null;
     }

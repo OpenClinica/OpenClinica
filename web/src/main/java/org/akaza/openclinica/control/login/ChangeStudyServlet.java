@@ -281,6 +281,9 @@ public class ChangeStudyServlet extends SecureController {
                     case 7:
                         role.setDescription("site_Data_Entry_Person2");
                         break;
+                    case 8:
+                        role.setDescription("site_Data_Entry_Participant");
+                        break;
                     default:
                         // logger.info("No role matched when setting role description");
                     }

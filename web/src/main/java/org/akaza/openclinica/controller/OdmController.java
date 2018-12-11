@@ -49,6 +49,7 @@ import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.ParticipantEventService;
 import org.akaza.openclinica.service.ParticipateService;
+import org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.akaza.openclinica.web.restful.JSONClinicalDataPostProcessor;
@@ -262,6 +263,12 @@ public class OdmController {
         JAXB.marshal(odm, sw);
         String xmlString = sw.toString();
         JSON json = xmlSerializer.read(xmlString);
+
+        if(studySubject.getUserStatus().equals(UserStatus.CREATED) ||studySubject.getUserStatus().equals(UserStatus.INVITED)){
+            studySubject.setUserStatus(UserStatus.ACTIVE);
+            studySubjectDAO.update(studySubject);
+        }
+
         return json.toString(INDENT_LEVEL);
 
     }
