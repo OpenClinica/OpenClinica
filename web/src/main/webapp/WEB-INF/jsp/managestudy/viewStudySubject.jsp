@@ -1453,6 +1453,7 @@
             phoneNumber: '',
             status: ' '
         };
+        participateInfo.phoneNumber = participateInfo.phoneNumber || '';
         $('#info-first-name').text(participateInfo.firstName);
         $('#info-email').text(participateInfo.email);
         $('#info-phone-number').text(participateInfo.phoneNumber);
@@ -1498,6 +1499,7 @@
         jQuery('#email-input').blur(function() {
             var emailPattern = /[^\s@]+@[^\s@]+\.[^\s@]+/;
             var input = $(this).val();
+            var isEmpty = input.length === 0;
             var parts = input.split('@');
             var hasSingleAt = parts.length === 2;
             var afterAt = parts[1] || '';
@@ -1505,7 +1507,7 @@
             var dotRightAfterAt = afterAt[0] === '.';
             var endsWithDot = afterAt[afterAt.length - 1] === '.';
             var validEmail = emailPattern.test(input) && hasSingleAt && afterAtHasDot && !dotRightAfterAt && !endsWithDot;
-            if (validEmail) {
+            if (validEmail || isEmpty) {
                 $('#email-input-error').hide();
                 $('#connect-button').removeAttr('disabled');
             }
