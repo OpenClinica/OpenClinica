@@ -295,8 +295,11 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             }
             if (study.getStudyId() == userActiveStudyId) {
                 currentActiveStudyValid = true;
-                if (!parentExists)
-                    request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
+                if (!parentExists) {
+                    HttpSession session = request.getSession();
+                    session.setAttribute("customUserRole", role.getDynamicRoleName());
+                    session.setAttribute("baseUserRole", role.getRoleName());
+                }
             }
 
             Study parentStudy = study.getStudy();

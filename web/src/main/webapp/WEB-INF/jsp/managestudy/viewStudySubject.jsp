@@ -375,13 +375,18 @@
                               </table>
                               <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:600px;">
                                 <tbody
-                                  <c:if test="${
-                                    studySub.status.name=='removed' ||
-                                    sessionScope.customUserRole!='Clinical Research Coordinator' && sessionScope.customUserRole!='Investigator' || 
-                                    participateStatus!='enabled'
-                                  }">
+                                  <c:choose>
+                                    <c:when test="${
+                                      studySub.status.name!='removed' &&
+                                      sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator' &&
+                                      participateStatus=='enabled'
+                                    }">
+                                      style="visibility:visible;"
+                                    </c:when>
+                                    <c:otherwise>
                                       class="invisible"
-                                  </c:if>
+                                    </c:otherwise>
+                                  </c:choose>
                                 >
                                   <tr>
                                     <td class="table_actions" valign="top">
