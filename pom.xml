@@ -11,7 +11,7 @@
     <modules>
         <module>core</module>
         <module>web</module>
-        <module>ws</module>
+        <!--<module>ws</module>-->
     </modules>
 
     <properties>
@@ -472,7 +472,11 @@
                 <artifactId>jaxb-impl</artifactId>
                 <version>2.1.5</version>
             </dependency>
-
+            <dependency>
+                <groupId>org.apache.commons</groupId>
+                <artifactId>commons-lang3</artifactId>
+                <version>3.4</version>
+            </dependency>
             <dependency>
                 <groupId>com.sun.xml.wss</groupId>
                 <artifactId>xws-security</artifactId>
@@ -847,6 +851,7 @@
                 </configuration>
             </plugin>
 
+            <!--
             <plugin>
                 <groupId>org.apache.maven.plugins</groupId>
                 <artifactId>maven-dependency-plugin</artifactId>
@@ -870,6 +875,7 @@
                     </execution>
                 </executions>
             </plugin>
+            -->
         </plugins>
 
 

@@ -1,6 +1,5 @@
 package org.akaza.openclinica.service;
 
-import com.auth0.json.mgmt.users.User;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.core.Role;
