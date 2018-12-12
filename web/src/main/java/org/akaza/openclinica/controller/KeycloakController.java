@@ -4,6 +4,8 @@ import net.sf.json.util.JSONUtils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.service.CallbackService;
 import org.akaza.openclinica.service.KeycloakUser;
 import org.apache.commons.lang.StringUtils;
@@ -12,7 +14,6 @@ import org.keycloak.KeycloakPrincipal;
 import org.keycloak.KeycloakSecurityContext;
 import org.keycloak.adapters.springsecurity.token.KeycloakAuthenticationToken;
 import org.keycloak.authorization.client.AuthzClient;
-import org.keycloak.common.util.KeycloakUriBuilder;
 import org.keycloak.representations.AccessToken;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -32,6 +33,8 @@ public class KeycloakController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired
     CallbackService callbackService;
+    @Autowired
+    StudyDao studyDao;
 
     public String buildAuthorizeUrl(HttpServletRequest request) {
         AuthzClient authzClient = AuthzClient.create();
@@ -119,6 +122,8 @@ public class KeycloakController {
                 req.getSession().setAttribute("firstLoginCheck", "true");
                 logger.info("CallbackController set firstLoginCheck to true:%%%%%%%%");
             }
+            Study publicStudy = studyDao.findPublicStudyById(ub.getActiveStudyId());
+            callbackService.updateParticipateModuleStatus(req, publicStudy.getOc_oid());
         } else {
             logger.error("UserAccountBean ub ");
 
