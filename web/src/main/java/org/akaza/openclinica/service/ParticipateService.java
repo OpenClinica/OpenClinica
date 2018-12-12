@@ -43,10 +43,10 @@ public interface ParticipateService {
 	 ODM getOdmHeader(ODM odm , StudyBean currentStudy, StudySubjectBean subjectBean);
 
 	 StudyBean getStudy(String oid);
+
 	 StudyBean getStudyById(int id);
 
-
-	StudyBean getParentStudy(String oid);
+	 StudyBean getParentStudy(String oid);
 
 	 void completeData(StudyEvent studyEvent, List<EventDefinitionCrf> eventDefCrfs, List<EventCrf> eventCrfs) throws Exception;
 

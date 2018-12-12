@@ -15,9 +15,12 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLRequest;
 import org.apache.commons.codec.binary.Base64;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.*;
@@ -45,6 +48,7 @@ public class UserController {
 
     @Autowired
     private UserService userService;
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     public UserController() {
     }
@@ -79,68 +83,35 @@ public class UserController {
     }
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}/connect", method = RequestMethod.POST )
-    public ResponseEntity<Object> connectParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid, @RequestBody OCParticipantDTO participantDTO) {
-        userService.getRestfulServiceHelper().setSchema(studyOid, request);
+    public ResponseEntity<OCUserDTO> connectParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid, @RequestBody OCParticipantDTO participantDTO) {
 
-        Object object = userService.connectParticipant(studyOid, ssid, participantDTO, request);
-        if (object instanceof HttpClientErrorException) {
-            return new ResponseEntity<Object>(((HttpClientErrorException) object).getResponseBodyAsString(), ((HttpClientErrorException) object).getStatusCode());
-        } else if (object instanceof OCUserDTO) {
-            return new ResponseEntity<Object>(object, HttpStatus.OK);
-        } else {
-            return null;
-        }
-    }
-
-    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{sitesOID}/participants/{SSID}/connect", method = RequestMethod.POST )
-    public ResponseEntity<Object> connectSiteParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid,@PathVariable( "studyOID" ) String siteOid, @PathVariable( "SSID" ) String ssid, @RequestBody OCParticipantDTO participantDTO) {
-        userService.getRestfulServiceHelper().setSchema(studyOid, request);
-
-        Object object = userService.connectParticipant(studyOid, ssid, participantDTO, request);
-        if (object instanceof HttpClientErrorException) {
-            return new ResponseEntity<Object>(((HttpClientErrorException) object).getResponseBodyAsString(), ((HttpClientErrorException) object).getStatusCode());
-        } else if (object instanceof OCUserDTO) {
-            return new ResponseEntity<Object>(object, HttpStatus.OK);
-        } else {
-            return null;
-        }
+        OCUserDTO ocUserDTO= userService.connectParticipant(studyOid, ssid, participantDTO ,request);
+        logger.info("REST request to POST OCUserDTO : {}", ocUserDTO);
+        return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.OK);
     }
 
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}", method = RequestMethod.GET )
-    public ResponseEntity<Object> getParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid) {
-        userService.getRestfulServiceHelper().setSchema(studyOid, request);
+    public ResponseEntity<OCUserDTO> getParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid) {
 
-        Object object = userService.getParticipantAccount(studyOid, ssid, null, request);
-        if (object instanceof HttpClientErrorException) {
-            return new ResponseEntity<Object>(((HttpClientErrorException) object).getResponseBodyAsString(), ((HttpClientErrorException) object).getStatusCode());
-        } else if (object instanceof OCUserDTO) {
-            return new ResponseEntity<Object>(object, HttpStatus.OK);
+        OCUserDTO ocUserDTO = userService.getParticipantAccount(studyOid, ssid, request);
+        logger.info("REST request to GET OCUserDTO : {}", ocUserDTO);
+        if (ocUserDTO == null) {
+            return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.NOT_FOUND);
         } else {
-            return null;
+            return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.OK);
         }
     }
 
-    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{sitesOID}/participants/{SSID}", method = RequestMethod.GET )
-    public ResponseEntity<Object> getSiteParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid,@PathVariable( "studyOID" ) String siteOid, @PathVariable( "SSID" ) String ssid) {
-        userService.getRestfulServiceHelper().setSchema(studyOid, request);
-
-        Object object = userService.getParticipantAccount(studyOid, ssid, null, request);
-        if (object instanceof HttpClientErrorException) {
-            return new ResponseEntity<Object>(((HttpClientErrorException) object).getResponseBodyAsString(), ((HttpClientErrorException) object).getStatusCode());
-        } else if (object instanceof OCUserDTO) {
-            return new ResponseEntity<Object>(object, HttpStatus.OK);
-        } else {
-            return new ResponseEntity<Object>(object, HttpStatus.NOT_FOUND);
-        }
-    }
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participantUsers", method = RequestMethod.GET )
     public ResponseEntity<List <OCUserDTO>> getAllParticipantFromUserService(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid) {
         userService.getRestfulServiceHelper().setSchema(studyOid, request);
 
         List <OCUserDTO> ocUserDTOs = userService.getAllParticipantAccountsFromUserService(request);
-            return new ResponseEntity<List <OCUserDTO>>(ocUserDTOs, HttpStatus.OK);
+        logger.info("REST request to GET List of OCUserDTO : {}", ocUserDTOs);
+
+        return new ResponseEntity<List <OCUserDTO>>(ocUserDTOs, HttpStatus.OK);
 
     }
 

@@ -36,6 +36,8 @@ import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
 import org.apache.commons.lang.StringUtils;
+import org.springframework.web.context.WebApplicationContext;
+import org.springframework.web.context.support.WebApplicationContextUtils;
 
 import java.util.ArrayList;
 import java.util.Iterator;
@@ -244,6 +246,7 @@ public class ChangeStudyServlet extends SecureController {
             ub.setUpdater(ub);
             ub.setUpdatedDate(new java.util.Date());
             udao.update(ub);
+            getStudyBuildService().updateParticipateModuleStatusInOC(request,newPublicStudy.getOid());
             request.setAttribute("changeStudySchema", newStudySchema);
             StudyDAO sdaoStudy = new StudyDAO(sm.getDataSource());
             StudyBean study = sdaoStudy.findByStudyEnvUuid(studyEnvUuid);
@@ -277,6 +280,9 @@ public class ChangeStudyServlet extends SecureController {
                         break;
                     case 7:
                         role.setDescription("site_Data_Entry_Person2");
+                        break;
+                    case 8:
+                        role.setDescription("site_Data_Entry_Participant");
                         break;
                     default:
                         // logger.info("No role matched when setting role description");
@@ -493,5 +499,11 @@ public class ChangeStudyServlet extends SecureController {
 		this.studyParameterValueDAO = studyParameterValueDAO;
 	}
 
-    
+    public StudyBuildService getStudyBuildService() {
+        WebApplicationContext ctx =
+                WebApplicationContextUtils
+                        .getWebApplicationContext(context);
+        return ctx.getBean("studyBuildService", StudyBuildService.class);
+    }
+
 }

@@ -12,5 +12,6 @@ import java.util.LinkedHashMap;
 public interface CallbackService {
     UserAccountHelper isCallbackSuccessful(HttpServletRequest request, KeycloakUser user) throws Exception;
     UserAccountBean getUpdatedUser(UserAccountBean ub);
-}
+    void updateParticipateModuleStatus(HttpServletRequest req, String studyOid);
+    }
 

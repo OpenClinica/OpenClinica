@@ -108,10 +108,9 @@ public class RestoreStudySubjectServlet extends SecureController {
                 studySub.setStatus(Status.AVAILABLE);
                 studySub.setUpdater(ub);
                 studySub.setUpdatedDate(new Date());
+                studySub.setUserStatus(UserStatus.ACTIVE);
                 subdao.update(studySub);
 
-                // update Participant Status when subject is restored
-                changeParticipantAccountStatus(study,studySub,UserStatus.ACTIVE);
 
                 // restore all study events
                 // restore all event crfs

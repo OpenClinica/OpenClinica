@@ -21,6 +21,7 @@ public class Role extends Term {
     public static final Role RESEARCHASSISTANT = new Role(5, "ra", "Data_Entry_Person", null);
     public static final Role MONITOR = new Role(6, "monitor", "Monitor", null);
     public static final Role RESEARCHASSISTANT2 = new Role(7, "ra2", "site_Data_Entry_Person2", null);
+    public static final Role PARTICIPATE = new Role(8, "participate", "site_Data_Entry_Participant", null);
 
 
     public static final Role STUDY_COORDINATOR = new Role(2, "coordinator", "Study_Coordinator", null);
@@ -53,6 +54,8 @@ public class Role extends Term {
         siteRoleMap.put(5, "site_Data_Entry_Person");
         siteRoleMap.put(6, "site_monitor");
         siteRoleMap.put(7, "site_Data_Entry_Person2");
+        siteRoleMap.put(8, "site_Data_Entry_Participant");
+
     }
 
     public static final Map sbsSiteRoleMap = new LinkedHashMap();

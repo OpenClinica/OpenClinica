@@ -27,4 +27,7 @@ public interface StudyBuildService {
     void updateStudyUsername(UserAccountBean ub, KeycloakUser user);
     boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId, String altStudyEnvUuid);
     UserAccount getUserAccountObject(UserAccountBean ubIn);
-}
+
+    void updateParticipateModuleStatusInOC(HttpServletRequest request,String studyOid);
+
+    }

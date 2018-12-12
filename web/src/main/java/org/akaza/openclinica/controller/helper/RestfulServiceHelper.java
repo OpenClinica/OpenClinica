@@ -18,6 +18,7 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.stereotype.Service;
 import org.springframework.validation.Errors;
 import org.springframework.web.multipart.MultipartFile;
 
@@ -42,7 +43,7 @@ import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
-
+@Service("serviceHelper")
 public class RestfulServiceHelper {
 	
 	private final static Logger log = LoggerFactory.getLogger("RestfulServiceHelper");
@@ -261,8 +262,13 @@ public class RestfulServiceHelper {
     	        } else {
     	            username = principal.toString();
     	        }
+
+			String schema = CoreResources.getRequestSchema();
+			CoreResources.setRequestSchema("public");
     	        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
     	        userBean = (UserAccountBean) userAccountDao.findByUserName(username);
+			CoreResources.setRequestSchema(schema);
+
     	}
     	
     	return userBean;

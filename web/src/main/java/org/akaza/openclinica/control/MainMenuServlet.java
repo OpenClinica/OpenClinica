@@ -142,7 +142,7 @@ public class MainMenuServlet extends SecureController {
                         .getWebApplicationContext(context);
         String currentSchema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, "public");
-        StudyBuildService studyService = ctx.getBean("studyBuildService", StudyBuildServiceImpl.class);
+        StudyBuildService studyService = ctx.getBean("studyBuildService", StudyBuildService.class);
 
         studyService.updateStudyUserRoles(request, studyService.getUserAccountObject(ub), ub.getActiveStudyId(), studyEnvUuid);
         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());

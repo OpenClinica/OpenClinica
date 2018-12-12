@@ -1,8 +1,16 @@
 package org.akaza.openclinica.controller;
 
 import net.sf.json.util.JSONUtils;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.config.TokenAuthentication;
+import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.service.CallbackService;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.lang.StringUtils;
@@ -35,6 +43,9 @@ public class CallbackController {
     CallbackService callbackService;
     @Autowired
     KeycloakController keycloakController;
+
+    @Autowired
+    StudyDao studyDao;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -101,11 +112,20 @@ public class CallbackController {
             }
             if (StringUtils.isEmpty(returnTo) || StringUtils.equals(returnTo, "/OpenClinica"))
                 returnTo = this.redirectOnSuccess;
-            logger.info("CallbackController returnTo URL:%%%%%%%%" + returnTo);
-            logger.info("param:" + param);
+                logger.info("CallbackController returnTo URL:%%%%%%%%" + returnTo);
+                logger.info("param:" + param);
 
-            res.sendRedirect(returnTo + param);
-        }
+
+                //TODO: Get user account bean
+                //UserAccountBean ub = userAccountHelper.getUb();
+                UserAccountBean ub = null;
+                if (ub != null) {
+                    Study publicStudy = studyDao.findPublicStudyById(ub.getActiveStudyId());
+                    callbackService.updateParticipateModuleStatus(req, publicStudy.getOc_oid());
+                }
+
+                res.sendRedirect(returnTo + param);
+            }
 
     }
 
