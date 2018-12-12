@@ -385,8 +385,9 @@ public class ImportCRFDataService {
                     if (studyEventDefinitionBean.isTypeCommon()){
                     	
                     	 /**
-                         *  Data form the Mirth will skip this repeat key check, because it has no repeat key
-                         */
+                    	  * "skipMatchCriteria != null" means this data flow come from Mirth,
+                          *  Data from the Mirth will skip this repeat key check, because it has no repeat key
+                          */
                         String skipMatchCriteria = request.getHeader("SkipMatchCriteria");
                         if(skipMatchCriteria != null) {
                         	continue;
@@ -1883,6 +1884,10 @@ public class ImportCRFDataService {
     }
     
     /**
+     * when skipMatchCriteria.equals("${SkipMatchCriteria}", this means in the mapping file, there is no 
+     * skipMatchCriteria configuration
+     * 
+     * Sample sql:
      *  select i.oc_oid, id.value 
             from  s_study3prod.study_subject ss, 
 		    s_study3prod.study s,
@@ -1980,6 +1985,7 @@ public class ImportCRFDataService {
     		finalSqlStr = baseSqlStr + " " + itemGroupOIDSmt.toString() + " "+ itemOIDSmt.toString() + " order by se.study_event_id";
     	}
 		
+    	logger.info("buildSkipMatchCriteriaSql============"+ finalSqlStr);
 		return finalSqlStr;
     	
     }
@@ -2076,8 +2082,9 @@ public class ImportCRFDataService {
 	    	}
 		    
 	    }//outer- while loop
-	    	
-	    	return matched;
+	    logger.info(matched+"matchCriterias============"+ matchCriterias);
+	    
+	    return matched;
 	    }
 
 	public String getSkipMatchCriteriaSql() {

@@ -2,6 +2,8 @@ package org.akaza.openclinica.control.submit;
 
 import java.io.File;
 import java.io.FileInputStream;
+import java.io.FileOutputStream;
+import java.io.FileReader;
 import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
@@ -9,13 +11,16 @@ import java.net.URL;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.BufferedReader;
+import java.io.BufferedWriter;
 import java.io.DataOutputStream;
 import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
@@ -68,6 +73,7 @@ import org.json.JSONObject;
 public class UploadCRFDataToHttpServerServlet extends SecureController {
 
     Locale locale;
+    static private String importFileDir;
 
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
     FileUploadHelper uploadHelper = new FileUploadHelper();
@@ -143,7 +149,8 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
                // here process all files in one request 
                //sendRequestByHttpClient(files);
                
-              sendOneFilePerRequestByHttpClient(files);
+              //sendOneFilePerRequestByHttpClient(files);
+               sendOneDataRowPerRequestByHttpClient(files);
 
             } catch (Exception e) {
                 logger.warn("*** Found exception during file upload***");
@@ -635,4 +642,173 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   		
   		return response.toString();
   	}
+	
+	public ArrayList<File> splitDataFileAndProcesDataRowbyRow(File file) {
+		ArrayList<File> fileList = new ArrayList<>();
+	    BufferedReader reader;
+	    
+	    try {
+            int count =1;	    	
+	    		    	
+	    	File splitFile;
+	    	String importFileDir = this.getImportFileDir();
+	    	
+	    	reader = new BufferedReader(new FileReader(file));
+	    	
+	    	String orginalFileName = file.getName();
+	    	int pos = orginalFileName.indexOf(".");
+	    	orginalFileName = orginalFileName.substring(0,pos);
+	    	
+	    	String columnLine = reader.readLine();
+	    	String line = columnLine;	    
+	    	
+	    	while (line != null) {
+				//System.out.println(line);
+				// read next line
+				line = reader.readLine();
+				
+				splitFile = new File(importFileDir + orginalFileName +"_"+ count + ".txt");				
+				FileOutputStream fos = new FileOutputStream(splitFile);			 
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+			 
+				bw.write(columnLine);				
+				bw.write("\n\r");
+				if(line != null) {
+					bw.write(line);	
+					fileList.add(splitFile);
+				}
+				
+			 
+				bw.close();
+				
+				count++;
+				
+			}
+			reader.close();
+	        
+	       
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    
+		return fileList;
+	}
+	
+	
+	private void sendOneDataRowPerRequestByHttpClient(List<File> files) throws Exception {
+
+  		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
+  		
+  		/**
+  		 *  prepare mapping file
+  		 */
+  		FileBody mappingFileBody = null;
+  		String  mappingpartNm = null;
+  		for (File file : files) {
+  			
+  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+  				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
+  				mappingpartNm = "uploadedData";  	 	  		
+  	 	  		
+  	 	  		break;
+  			}
+ 			
+ 		}
+  		
+	  	int i = 1;	  		
+ 		for (File file : files) {
+ 			// skip mapping file
+ 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+ 				;
+ 			}else {
+ 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
+ 				
+ 				Iterator dataFilesIt = dataFileList.iterator();
+ 				
+ 				while(dataFilesIt.hasNext()) {
+ 					File rowFile = (File) dataFilesIt.next();
+ 					
+ 					HttpPost post = new HttpPost(uploadMirthUrl);
+ 	 	 	  		/**
+ 	 	 	  		 *  add header Authorization
+ 	 	 	  		 */
+ 	 	 	 		String accessToken = (String) request.getSession().getAttribute("accessToken");
+ 	 	 	  		post.setHeader("Authorization", "Bearer " + accessToken);
+ 	 	 	  		
+ 	 	 	  		String basePath = getBasePath(request);
+ 	 	 	  		post.setHeader("OCBasePath", basePath);
+
+ 	 	 	 		post.setHeader("Accept", 
+ 	 	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+ 	 	 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		
+ 	 	 	 		post.setHeader("Connection", "keep-alive"); 		
+ 	 	 			
+ 	 	 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+ 	 	 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+ 	 	 		  	String partNm = null;
+ 	 	 			FileBody fileBody = new FileBody(rowFile, ContentType.TEXT_PLAIN);
+ 	 	 			partNm = "uploadedData" + i;
+ 	 	 	  		builder.addPart(partNm, fileBody);
+ 	 	 	  		
+ 	 	 	  		// add mapping file
+ 	 	 	  		builder.addPart(mappingpartNm, mappingFileBody);
+ 	 	 	  		
+ 	 	 	  		HttpEntity entity = builder.build();   		
+ 	 	 	  		post.setEntity(entity);
+ 	 	 	  		
+ 	 	 	  		CloseableHttpClient httpClient = HttpClients.createDefault();
+ 	 	 	  		HttpResponse response = httpClient.execute(post);
+ 	 	 	  		
+ 	 	 	  	    //print result	
+ 	 	 	 		int responseCode = response.getStatusLine().getStatusCode();
+
+ 	 	 	 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
+ 	 	 	 		System.out.println("Response Code : " + responseCode);
+
+ 	 	 	 		BufferedReader rd = new BufferedReader(
+ 	 	 	 	                new InputStreamReader(response.getEntity().getContent()));
+
+ 	 	 	 		StringBuffer result = new StringBuffer();
+ 	 	 	 		String line = "";
+ 	 	 	 		while ((line = rd.readLine()) != null) {
+ 	 	 	 			result.append(line);
+ 	 	 	 		}
+ 	 	 	        
+ 	 	 	 		String responseStr = processResponse(result.toString());
+ 	 	 	 		addPageMessage(responseStr);
+ 	 	 	 		 
+ 	 	 	 		System.out.println(responseStr);
+ 	 	 	 		
+ 	 	 	 	    TimeUnit.MILLISECONDS.sleep(10);
+ 				}
+ 				
+ 	 	  		
+ 			}
+ 			
+ 	  		i++;
+ 		}
+  
+  }
+	
+	
+	public String getImportFileDir() {
+		  if (importFileDir != null) {
+			  return importFileDir;
+		  }else {
+			  String dir = SQLInitServlet.getField("filePath");
+	          if (!new File(dir).exists()) {
+	              logger.info("The filePath in datainfo.properties is invalid " + dir);             
+	          }
+	          // All the uploaded files will be saved in filePath/crf/original/
+	          String theDir = dir + "import" + File.separator + "original" + File.separator;
+	          if (!new File(theDir).isDirectory()) {
+	              new File(theDir).mkdirs();
+	              logger.info("Made the directory " + theDir);
+	          }
+	        
+	         importFileDir = theDir;
+		  }
+		 
+		return importFileDir;
+	}
 }
