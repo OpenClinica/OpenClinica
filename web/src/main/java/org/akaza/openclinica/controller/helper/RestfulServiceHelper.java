@@ -1,6 +1,7 @@
 package org.akaza.openclinica.controller.helper;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -9,6 +10,7 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.UserStatus;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -34,10 +36,7 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.List;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
@@ -265,8 +264,8 @@ public class RestfulServiceHelper {
 
 			String schema = CoreResources.getRequestSchema();
 			CoreResources.setRequestSchema("public");
-    	        UserAccountDAO userAccountDao = new UserAccountDAO(dataSource);
-    	        userBean = (UserAccountBean) userAccountDao.findByUserName(username);
+    	        UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+    	        userBean = (UserAccountBean) userAccountDAO.findByUserName(username);
 			CoreResources.setRequestSchema(schema);
 
     	}
@@ -295,4 +294,27 @@ public class RestfulServiceHelper {
     	userAccountDAO = userAccountDAO != null ? userAccountDAO : new UserAccountDAO(dataSource);
         return userAccountDAO;
     }
+
+
+	public UserAccountBean getParticipantUserAccount(HttpServletRequest request) {
+		Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
+		String userType = (String) userContextMap.get("userType");
+
+		if (userType.equals(org.akaza.openclinica.service.UserType.PARTICIPATE.getName())) {
+			String keycloakId = (String) userContextMap.get("username");
+
+			String schema = CoreResources.getRequestSchema();
+			CoreResources.setRequestSchema("public");
+			UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+			UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserUuid(keycloakId);
+			CoreResources.setRequestSchema(schema);
+			return userAccountBean;
+		} else {
+			return null;
+		}
+
+
+
+	}
+
 }

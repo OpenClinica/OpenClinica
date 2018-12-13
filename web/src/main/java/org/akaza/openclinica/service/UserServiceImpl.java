@@ -17,7 +17,9 @@ import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -81,6 +83,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     JavaMailSenderImpl mailSender;
 
+    @Autowired
+    KeycloakClientImpl keycloakClient;
+
     private RestfulServiceHelper restfulServiceHelper;
 
     public static final String FORM_CONTEXT = "ecid";
@@ -88,6 +93,8 @@ public class UserServiceImpl implements UserService {
     public static final String PARTICIPATE_EDIT = "participate-edit";
     public static final String PARTICIPATE_ADD_NEW = "participate-add-new";
     public static final String PAGINATION = "?page=0&size=1000";
+    public static final String PASSWORD_LENGTH = "6";
+
     private String sbsUrl = CoreResources.getField("SBSUrl");
 
     StudyDAO sdao;
@@ -107,11 +114,12 @@ public class UserServiceImpl implements UserService {
 
         Study tenantStudy = getStudy(studyOid);
         StudySubject studySubject = getStudySubject(ssid, tenantStudy);
-
         String username = tenantStudy.getOc_oid() + "." + studySubject.getOcOid();
         username = username.replaceAll("\\(", ".").replaceAll("\\)", "");
 
         UserAccountBean ownerUserAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+
+        String accessCode  = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
 
         Study publicStudy = studyDao.findPublicStudy(tenantStudy.getOc_oid());
 
@@ -120,8 +128,10 @@ public class UserServiceImpl implements UserService {
         if (studySubject != null) {
             if (studySubject.getUserId() == null) {
                 logger.info("Participate has not registered yet");
+                // create participant user Account In Keycloak
+               String keycloakUserId= keycloakClient.createParticipateUser(request,null ,username,accessCode);
                 // create participant user Account In Runtime
-                userAccount = createUserAccount(participantDTO, studySubject, ownerUserAccountBean,username,publicStudy);
+                userAccount = createUserAccount(participantDTO, studySubject, ownerUserAccountBean,username,publicStudy,keycloakUserId);
 
                 if (userAccount != null) {
                     studySubject.setUserId(userAccount.getUserId());
@@ -173,7 +183,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private UserAccount createUserAccount(OCParticipantDTO participantDTO, StudySubject studySubject,UserAccountBean ownerUserAccountBean,String username ,Study publicStudy) {
+    private UserAccount createUserAccount(OCParticipantDTO participantDTO, StudySubject studySubject,UserAccountBean ownerUserAccountBean,String username ,Study publicStudy,String keycloakUserId) {
         if (participantDTO == null)
             return null;
        UserAccount userAccount = new UserAccount();
@@ -185,6 +195,7 @@ public class UserServiceImpl implements UserService {
         userAccount.setActiveStudy(publicStudy);
         userAccount.setStatus(Status.AVAILABLE);
         userAccount.setDateCreated(new Date());
+        userAccount.setUserUuid(keycloakUserId);
 
         String studySchema = CoreResources.getRequestSchema();
         CoreResources.setRequestSchema("public");
