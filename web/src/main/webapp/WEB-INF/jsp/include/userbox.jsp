@@ -89,7 +89,12 @@
 
 				<div style="position: absolute; z-index: 3;">
 				<span class="logout"><a href="ChangeStudy"><fmt:message key="change_study_site" bundle="${resworkflow}"/></a></span>
-				<span class="logout"><a href="${pageContext.request.contextPath}/pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></span>
+				<%
+					String logoutPath = pageContext.getRequest().getServletContext().getContextPath();
+					if (pageContext.getRequest().getServletContext().getContextPath().contains("pages/logout") != true)
+						logoutPath += "/pages/logout";
+				%>
+				<span class="logout"><a href="<%=logoutPath%>"><fmt:message key="log_out" bundle="${resword}"/></a></span>
 	          	</div>
 	          	<br>
 				</div>
