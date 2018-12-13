@@ -387,6 +387,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
 
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
+        this.request = request;
+        this.response = response;
         request.setCharacterEncoding("UTF-8");
 //        checkPermissions();
         session = request.getSession();
@@ -463,7 +465,16 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
             KeycloakController controller = (KeycloakController) webApplicationContext .getBean("keycloakController");
 
-            String ocUserUuid = controller.getOcUserUuid(request);
+            String ocUserUuid = null;
+
+            try {
+                ocUserUuid = controller.getOcUserUuid(request);
+            } catch (CustomRuntimeException e) {
+                forwardPage(Page.ERROR);
+                return;
+            }
+
+            controller.getOcUserUuid(request);
             if (ocUserUuid != null) {
                 if (ub == null || StringUtils.isEmpty(ub.getName())) {
                     UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
@@ -787,7 +798,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         // YW >>
 
         // to load all available event based on currentStudy for Task > Add Subject
-        request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
+        if (currentPublicStudy != null)
+            request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
         request.setAttribute("allDefsArray", this.getEventDefinitionsByCurrentStudy());
         try {
             String paramsString = Utils.getParamsString(request.getParameterMap());

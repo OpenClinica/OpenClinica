@@ -4,6 +4,7 @@ import net.sf.json.util.JSONUtils;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.service.CallbackService;
+import org.akaza.openclinica.service.CustomRuntimeException;
 import org.akaza.openclinica.service.StudyBuildService;
 import org.apache.commons.lang.StringUtils;
 import org.json.JSONObject;
@@ -77,7 +78,13 @@ public class CallbackController {
             logger.info("CallbackController In login_required:%%%%%%%%" + authorizeUrl);
             res.sendRedirect(authorizeUrl);
         } else if (userPrincipal instanceof KeycloakAuthenticationToken) {
-            String ocUserUuid = keycloakController.getOcUserUuid(req);
+            String ocUserUuid = null;
+            try {
+                ocUserUuid = keycloakController.getOcUserUuid(req);
+            } catch (CustomRuntimeException e) {
+                res.sendError(401, e.getMessage());
+                return;
+            }
             String returnTo = keycloakController.getReturnTo(req);
             String state = req.getParameter("state");
             String param = "";
