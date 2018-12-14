@@ -2,6 +2,7 @@ package org.akaza.openclinica.web.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -106,7 +107,17 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             CoreResources.setRootUserAccountBean(request, dataSource);
                             request.getSession().setAttribute("userContextMap", userContextMap);
                             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-                            UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid((String) userContextMap.get("userUuid"));
+
+                            String ocUserUuid = null;
+                            String userType = (String) userContextMap.get("userType");
+                            if (userType.equals(org.akaza.openclinica.service.UserType.PARTICIPATE.getName())) {
+                                ocUserUuid = (String) userContextMap.get("username");
+                            } else {
+                                ocUserUuid = (String) userContextMap.get("userUuid");
+                            }
+
+                            UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid((ocUserUuid));
+
                             if (StringUtils.isNotEmpty(_username) && ub.getId() != 0) {
                                 Authentication authentication = new UsernamePasswordAuthenticationToken(_username, null,
                                         AuthorityUtils.createAuthorityList("ROLE_USER"));
