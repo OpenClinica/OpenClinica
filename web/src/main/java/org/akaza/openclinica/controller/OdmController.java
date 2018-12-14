@@ -234,7 +234,11 @@ public class OdmController {
         ODM odm = null;
         getRestfulServiceHelper().setSchema(studyOid, request);
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        UserAccountBean ub = getRestfulServiceHelper().getUserAccount(request);
+        UserAccountBean ub = getRestfulServiceHelper().getParticipantUserAccount(request);
+        if(ub==null){
+            logger.info("userAccount is null");
+            return null;
+        }
         logger.info("UserAccount username: " +ub.getName());
         StudyBean currentStudy = participateService.getStudy(studyOid);
         logger.info("Study OId: " +currentStudy.getOid());
@@ -265,6 +269,8 @@ public class OdmController {
         JSON json = xmlSerializer.read(xmlString);
 
         if(studySubject.getUserStatus().equals(UserStatus.CREATED) ||studySubject.getUserStatus().equals(UserStatus.INVITED)){
+            studySubject.setUpdater(ub);
+            studySubject.setUpdatedDate(new Date());
             studySubject.setUserStatus(UserStatus.ACTIVE);
             studySubjectDAO.update(studySubject);
         }

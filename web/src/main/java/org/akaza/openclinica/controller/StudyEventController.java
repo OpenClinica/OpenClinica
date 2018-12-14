@@ -110,7 +110,11 @@ public class StudyEventController {
 
         getRestfulServiceHelper().setSchema(studyOid, request);
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        UserAccountBean ub = getRestfulServiceHelper().getUserAccount(request);
+        UserAccountBean ub = getRestfulServiceHelper().getParticipantUserAccount(request);
+        if(ub==null){
+            logger.info("userAccount is null");
+            return null;
+        }
         StudyBean currentStudy = participateService.getStudy(studyOid);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(dataSource);
 
