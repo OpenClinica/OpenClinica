@@ -474,7 +474,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 return;
             }
 
-            controller.getOcUserUuid(request);
             if (ocUserUuid != null) {
                 if (ub == null || StringUtils.isEmpty(ub.getName())) {
                     UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
