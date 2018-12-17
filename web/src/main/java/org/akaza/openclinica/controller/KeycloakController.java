@@ -111,7 +111,7 @@ public class KeycloakController {
             throw e;
         }
         UserAccountBean ub = userAccountHelper.getUb();
-        if (ub != null) {
+        if (ub != null && StringUtils.isNotEmpty(ub.getName())) {
             if (userAccountHelper.isUpdated()) {
                 ub = callbackService.getUpdatedUser(ub);
             }
@@ -122,8 +122,11 @@ public class KeycloakController {
                 req.getSession().setAttribute("firstLoginCheck", "true");
                 logger.info("CallbackController set firstLoginCheck to true:%%%%%%%%");
             }
-            Study publicStudy = studyDao.findPublicStudyById(ub.getActiveStudyId());
-            callbackService.updateParticipateModuleStatus(req, publicStudy.getOc_oid());
+            // Public study will be null if there is no active study for this user
+            if (ub.getActiveStudyId() != 0) {
+                Study publicStudy = studyDao.findPublicStudyById(ub.getActiveStudyId());
+                callbackService.updateParticipateModuleStatus(req, publicStudy.getOc_oid());
+            }
         } else {
             logger.error("UserAccountBean ub ");
 
