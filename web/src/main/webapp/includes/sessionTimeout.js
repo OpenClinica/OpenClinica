@@ -3,7 +3,7 @@ function setCurrentUser(thisUser) {
     storage.onConnect()
         .then(function() {
             console.log("setting current user to:" + thisUser);
-            return storage.set(currentUser, thisUser);
+            return storage.set(CURRENT_USER, thisUser);
         })['catch'](function(err) {
         console.log(err);
     });
@@ -155,7 +155,7 @@ function processTimedOuts(checkCurrentUser, storageFlag) {
                 var existingTimeout = res;
                 console.log("processTimedOuts: currentTime: " + currentTime + " existingTimeout: " + existingTimeout);
                 if (currentTime > existingTimeout) {
-                    storage.set(currentUser, "").then(function(res1) {
+                    storage.set(CURRENT_USER, "").then(function(res1) {
                         if (dupeFirstUserCheck !== "true" || !checkCurrentUser) {
                             console.log("currentTime: " + currentTime + " > existingTimeout: " + existingTimeout + " returning to Login screen");
                             sessionStorage && sessionStorage.clear();

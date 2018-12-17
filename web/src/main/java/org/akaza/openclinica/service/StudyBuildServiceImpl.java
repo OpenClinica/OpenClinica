@@ -235,7 +235,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         studyUserRoleUpdated = updateStudyUserRoles(request, ub, userActiveStudyId, null);
         if (ub.getActiveStudy() == null) {
             logger.error("There are no studies or this user has no studies avaiable");
-            return false;
+            throw new CustomRuntimeException("There are no studies or this user has no studies avaiable", null);
         } else if (ub.getActiveStudy().getStudyId() == 0) {
             throw new Exception("You have no roles for this study.");
         }

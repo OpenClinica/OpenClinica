@@ -50,7 +50,12 @@
 					<img src="images/UserBox_line.gif" width="161" height="1" vspace="4"><br>
 					<span class="logout"><fmt:message key="change_study_site" bundle="${resworkflow}"/></span>
 				</c:if>
-	  			<span class="logout"><a href="${pageContext.request.contextPath}/pages/logout"><fmt:message key="log_out" bundle="${resword}"/></a></span>			
+				<%
+					String logoutPath = pageContext.getRequest().getServletContext().getContextPath();
+					if (pageContext.getRequest().getServletContext().getContextPath().contains("pages/logout") != true)
+					    logoutPath += "/pages/logout";
+				%>
+	  			<span class="logout"><a href="<%=logoutPath%>"><fmt:message key="log_out" bundle="${resword}"/></a></span>
 	          
 				</div>
 
