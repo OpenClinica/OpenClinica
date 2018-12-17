@@ -464,7 +464,7 @@ public class CoreResources implements ResourceLoaderAware {
         schema = handleMultiSchemaConnection(conn);
 
         logger.debug("Using schema in CoreResources:schema:" + schema);
-        if (conn.getSchema().equalsIgnoreCase(schema))
+        if (StringUtils.isEmpty(schema) || conn.getSchema().equalsIgnoreCase(schema))
             return;
         try {
             statement.execute("set search_path to '" + schema + "'");
