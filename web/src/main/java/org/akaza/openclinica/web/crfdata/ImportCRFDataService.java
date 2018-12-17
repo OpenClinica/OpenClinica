@@ -65,6 +65,7 @@ import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.logic.importdata.ImportDataHelper;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -78,6 +79,7 @@ public class ImportCRFDataService {
     private final DataSource ds;
     private ItemDataDAO itemDataDao;
     private String skipMatchCriteriaSql;
+    private ImportDataHelper importDataHelper;
 
 
     @Autowired
@@ -1568,8 +1570,25 @@ public class ImportCRFDataService {
                 ArrayList matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr); 
                 boolean matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
                 
+                /** log message:
+    	    	 * RowNo | ParticipantID | Status | Message
+    				1 | SS_SUB510 | SUCCESS | InsertU
+    				2 | SS_SUB511 | FAILED  | errorCode.participantNotFound
+    				3 | SS_SUB512 | SUCCESS | Update
+    				4 | SS_SUB512 | SUCCESS | Skip
+    	    	 */
                 if(matchedAndSkip) {
                 	System.out.println("===============================matchedAndSkip========================");
+                	String originalFileName = request.getHeader("originalFileName");
+                	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
+                	String recordNum = null;
+                	if(originalFileName !=null) {
+                		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
+                		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
+                	}
+                	String msg;
+                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";
+    	    		getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg);
                 	continue;
                 }
                 
@@ -1969,7 +1988,7 @@ public class ImportCRFDataService {
         	StringBuffer itemOIDSmt = new StringBuffer(" and i.oc_oid in (");
         	
         	for(int  i= 0; i< skipMatchCriteriaArray.length; i++) {
-        		int k = skipMatchCriteriaArray[i].indexOf(".");
+        		int k = skipMatchCriteriaArray[i].trim().indexOf(".");
         		itemGroupOID = skipMatchCriteriaArray[i].substring(0, k);
         		itemOID =  skipMatchCriteriaArray[i].substring(k+1, skipMatchCriteriaArray[i].trim().length());
         		
@@ -2024,7 +2043,7 @@ public class ImportCRFDataService {
 	    if(matchCriterias == null || matchCriterias.size() == 0) {
 	    	return false;
 	    }
-	    
+ 	    
 	    Iterator it = matchCriterias.iterator();
 	    
 	    while(it.hasNext()) {
@@ -2080,7 +2099,7 @@ public class ImportCRFDataService {
 	    	if(matched) {
 	    		break;
 	    	}
-		    
+    			    
 	    }//outer- while loop
 	    logger.info(matched+"matchCriterias============"+ matchCriterias);
 	    
@@ -2093,5 +2112,16 @@ public class ImportCRFDataService {
 
 	public void setSkipMatchCriteriaSql(String skipMatchCriteriaSql) {
 		this.skipMatchCriteriaSql = skipMatchCriteriaSql;
+	}
+
+	public ImportDataHelper getImportDataHelper() {
+		if(importDataHelper == null) {
+			importDataHelper = new ImportDataHelper();
+		}
+		return importDataHelper;
+	}
+
+	public void setImportDataHelper(ImportDataHelper importDataHelper) {
+		this.importDataHelper = importDataHelper;
 	}
 }

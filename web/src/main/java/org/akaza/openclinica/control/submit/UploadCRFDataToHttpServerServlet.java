@@ -44,6 +44,7 @@ import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.logic.importdata.ImportDataHelper;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -77,6 +78,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
     FileUploadHelper uploadHelper = new FileUploadHelper();
+    ImportDataHelper importDataHelper;
 
     // < ResourceBundleresword,resexception,respage;
 
@@ -680,7 +682,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 				
 			 
 				bw.close();
-				
+							
 				count++;
 				
 			}
@@ -741,7 +743,10 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	 	 	 		post.setHeader("Accept", 
  	 	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
  	 	 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		
- 	 	 	 		post.setHeader("Connection", "keep-alive"); 		
+ 	 	 	 		post.setHeader("Connection", "keep-alive");
+ 	 	 	 		
+ 	 	 	 		String originalFileName = rowFile.getName();
+ 	 	 	 	    post.setHeader("originalFileName", originalFileName);
  	 	 			
  	 	 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
  	 	 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
@@ -782,12 +787,20 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	 	 	 	    TimeUnit.MILLISECONDS.sleep(10);
  				}
  				
- 	 	  		
+ 			   // after sent, then delete from disk
+ 				dataFilesIt = dataFileList.iterator();
+ 				while(dataFilesIt.hasNext()) {
+ 					File rowFile = (File) dataFilesIt.next();					 					
+	 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile);
+	 	 	  		
+ 				}
+	 	 	  		
  			}
  			
  	  		i++;
  		}
   
+ 		this.getImportDataHelper().saveFileToImportFolder(files);
   }
 	
 	
@@ -810,5 +823,16 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 		  }
 		 
 		return importFileDir;
+	}
+
+	public ImportDataHelper getImportDataHelper() {
+		if(importDataHelper == null) {
+			importDataHelper = new ImportDataHelper();
+		}
+		return importDataHelper;
+	}
+
+	public void setImportDataHelper(ImportDataHelper importDataHelper) {
+		this.importDataHelper = importDataHelper;
 	}
 }

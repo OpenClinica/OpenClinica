@@ -1,9 +1,20 @@
 package org.akaza.openclinica.logic.importdata;
 
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.FileReader;
+import java.io.FileWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
+import java.util.concurrent.TimeUnit;
 
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
@@ -21,6 +32,7 @@ import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -29,6 +41,7 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -45,6 +58,7 @@ public class ImportDataHelper {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     protected SessionManager sm;
     protected UserAccountBean ub;
+    static private String importFileDir;
 
     public void setSessionManager(SessionManager sm) {
         this.sm = sm;
@@ -248,4 +262,190 @@ public class ImportDataHelper {
         // repeating?
         return eventCrfBean;
     }
+    
+    
+    public String getImportFileDir() {
+		  if (importFileDir != null) {
+			  return importFileDir;
+		  }else {
+			  String dir = CoreResources.getField("filePath");
+	          if (!new File(dir).exists()) {
+	              logger.info("The filePath in datainfo.properties is invalid " + dir);             
+	          }
+	          // All the uploaded files will be saved in filePath/crf/original/
+	          String theDir = dir + "import" + File.separator + "original" + File.separator;
+	          if (!new File(theDir).isDirectory()) {
+	              new File(theDir).mkdirs();
+	              logger.info("Made the directory " + theDir);
+	          }
+	        
+	         importFileDir = theDir;
+		  }
+		 
+		return importFileDir;
+	}
+    
+    public void deleteTempImportFile(File file) {
+    	String fileName = file.getName();
+    	String importFileDir = this.getImportFileDir();
+    	
+    	File tempFile = new File(importFileDir + fileName);
+    	
+    	if(tempFile.exists()) {
+    		tempFile.delete();
+    	}
+    }
+    
+    public ArrayList<File> splitDataFileAndProcesDataRowbyRow(File file) {
+		ArrayList<File> fileList = new ArrayList<>();
+	    BufferedReader reader;
+	    
+	    try {
+            int count =1;	    	
+	    		    	
+	    	File splitFile;
+	    	String importFileDir = this.getImportFileDir();
+	    	
+	    	reader = new BufferedReader(new FileReader(file));
+	    	
+	    	String orginalFileName = file.getName();
+	    	int pos = orginalFileName.indexOf(".");
+	    	orginalFileName = orginalFileName.substring(0,pos);
+	    	
+	    	String columnLine = reader.readLine();
+	    	String line = columnLine;	    
+	    	
+	    	while (line != null) {
+				//System.out.println(line);
+				// read next line
+				line = reader.readLine();
+				
+				splitFile = new File(importFileDir + orginalFileName +"_"+ count + ".txt");				
+				FileOutputStream fos = new FileOutputStream(splitFile);			 
+				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+			 
+				bw.write(columnLine);				
+				bw.write("\n\r");
+				if(line != null) {
+					bw.write(line);	
+					fileList.add(splitFile);
+				}
+				
+			 
+				bw.close();
+							
+				count++;
+				
+			}
+			reader.close();
+	        
+	       
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    
+		return fileList;
+	}
+	
+	/**
+	 * 
+	 * @param files
+	 * @throws Exception
+	 */
+	public void saveFileToImportFolder(List<File> files) throws Exception {
+
+  		
+	  	File uplodedFile;
+	  	String 	orginalFileName;
+	  	BufferedReader reader;
+	  	String line;
+	  	
+ 		for (File file : files) {
+ 			reader = new BufferedReader(new FileReader(file));
+	    	
+ 			orginalFileName = file.getName();
+ 			uplodedFile = new File(importFileDir + orginalFileName);				
+			FileOutputStream fos = new FileOutputStream(uplodedFile);			 
+			BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
+		 
+			line = reader.readLine();
+			while(line != null) {
+				bw.write(line);
+				bw.write("\n\r");
+				line = reader.readLine();
+			}
+			
+		 
+			bw.close();
+						
+ 	 	 	 		
+ 				
+ 				
+ 		}
+  
+  }
+	
+    /**
+     * 
+     * @param orginalFileName
+     * @param msg
+     */
+    public void writeToMatchAndSkipLog(String orginalFileName, String msg) {
+		
+    	BufferedWriter bw = null;
+		FileWriter fw = null;
+		boolean isNewFile = false;
+
+	    String logFileName;
+	    
+	    try {
+            int count =1;	    	
+	    		    	
+	    	File logFile;
+	    	String importFileDir = this.getImportFileDir();
+    	    
+	    	//orginalFileName like: pipe_delimited_local_skip
+	    	
+	    	logFileName = importFileDir + orginalFileName + "_log.txt";
+			logFile = new File(logFileName);
+			/**
+			 *  create new file and add first line
+			 *  RowNo | ParticipantID | Status | Message
+			 */
+			if(!logFile.exists()) {
+				logFile.createNewFile();
+				isNewFile = true;				
+			}
+			
+			// true = append file
+			fw = new FileWriter(logFile.getAbsoluteFile(), true);
+			bw = new BufferedWriter(fw);
+            
+			if(isNewFile) {				
+				bw.write("RowNo|ParticipantID|Status|Message");	
+				bw.write("\n\r");
+			}
+			
+			if(msg != null) {
+				bw.write(msg);	
+				bw.write("\n\r");
+			}	
+			
+			bw.close();						
+	       
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }finally {
+			try {
+				if (bw != null)
+					bw.close();
+				if (fw != null)
+					fw.close();
+			} catch (IOException ex) {
+				ex.printStackTrace();
+			}
+		}	    
+	}  
+    
+    
 }
