@@ -16,6 +16,8 @@ import java.util.Iterator;
 import java.util.List;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.http.HttpServletRequest;
+
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.core.AuditableEntityBean;
 import org.akaza.openclinica.bean.core.EntityBean;
@@ -30,9 +32,11 @@ import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
+
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
@@ -44,6 +48,8 @@ import org.akaza.openclinica.dao.submit.SubjectDAO;
 
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 
 /**
  * ImportDataHelper the entire focus of this piece of code is to generate the
@@ -58,7 +64,9 @@ public class ImportDataHelper {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     protected SessionManager sm;
     protected UserAccountBean ub;
+    
     static private String importFileDir;
+    private String personalImportFileDir;
 
     public void setSessionManager(SessionManager sm) {
         this.sm = sm;
@@ -285,6 +293,40 @@ public class ImportDataHelper {
 		return importFileDir;
 	}
     
+    public String getPersonalImportFileDir(HttpServletRequest request) {
+    	  String userName = "";
+    	  
+		  if (personalImportFileDir != null) {
+			  return personalImportFileDir;
+		  }else {
+			  String dir = CoreResources.getField("filePath");
+	          if (!new File(dir).exists()) {
+	              logger.info("The filePath in datainfo.properties is invalid " + dir);             
+	          }
+	          // All the uploaded files will be saved in filePath/import/userName/
+	          UserAccountBean userBean = this.getUserAccount(request);
+
+	          if (userBean == null) {
+	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
+	                return err_msg;
+	          }else {
+	        	  userName = (userBean.getName()+"_" +userBean.getId()).toLowerCase().replace(" ","");
+	          }
+	          
+	          
+	          String theDir = dir + "import" + File.separator + userName + File.separator;
+	          
+	          if (!new File(theDir).isDirectory()) {
+	              new File(theDir).mkdirs();
+	              logger.info("Made the directory " + theDir);
+	          }
+	        
+	          personalImportFileDir = theDir;
+		  }
+		 
+		return personalImportFileDir;
+	}
+    
     public void deleteTempImportFile(File file) {
     	String fileName = file.getName();
     	String importFileDir = this.getImportFileDir();
@@ -296,7 +338,18 @@ public class ImportDataHelper {
     	}
     }
     
-    public ArrayList<File> splitDataFileAndProcesDataRowbyRow(File file) {
+    public void deletePersonalTempImportFile(File file,HttpServletRequest request) {
+    	String fileName = file.getName();
+    	String importFileDir = this.getPersonalImportFileDir(request);
+    	
+    	File tempFile = new File(importFileDir + fileName);
+    	
+    	if(tempFile.exists()) {
+    		tempFile.delete();
+    	}
+    }
+    
+    public ArrayList<File> splitDataFileAndProcesDataRowbyRow(File file,HttpServletRequest request) {
 		ArrayList<File> fileList = new ArrayList<>();
 	    BufferedReader reader;
 	    
@@ -304,7 +357,7 @@ public class ImportDataHelper {
             int count =1;	    	
 	    		    	
 	    	File splitFile;
-	    	String importFileDir = this.getImportFileDir();
+	    	String importFileDir = this.getPersonalImportFileDir(request);
 	    	
 	    	reader = new BufferedReader(new FileReader(file));
 	    	
@@ -325,7 +378,7 @@ public class ImportDataHelper {
 				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
 			 
 				bw.write(columnLine);				
-				bw.write("\n\r");
+				bw.write("\n");
 				if(line != null) {
 					bw.write(line);	
 					fileList.add(splitFile);
@@ -390,7 +443,7 @@ public class ImportDataHelper {
      * @param orginalFileName
      * @param msg
      */
-    public void writeToMatchAndSkipLog(String orginalFileName, String msg) {
+    public void writeToMatchAndSkipLog(String orginalFileName, String msg,HttpServletRequest request) {
 		
     	BufferedWriter bw = null;
 		FileWriter fw = null;
@@ -402,7 +455,7 @@ public class ImportDataHelper {
             int count =1;	    	
 	    		    	
 	    	File logFile;
-	    	String importFileDir = this.getImportFileDir();
+	    	String importFileDir = this.getPersonalImportFileDir(request);
     	    
 	    	//orginalFileName like: pipe_delimited_local_skip
 	    	
@@ -423,12 +476,12 @@ public class ImportDataHelper {
             
 			if(isNewFile) {				
 				bw.write("RowNo|ParticipantID|Status|Message");	
-				bw.write("\n\r");
+				bw.write("\n");
 			}
 			
 			if(msg != null) {
 				bw.write(msg);	
-				bw.write("\n\r");
+				bw.write("\n");
 			}	
 			
 			bw.close();						
@@ -447,5 +500,31 @@ public class ImportDataHelper {
 		}	    
 	}  
     
-    
+    /**
+     * Helper Method to get the user account
+     * 
+     * @return UserAccountBean
+     */
+    public UserAccountBean getUserAccount(HttpServletRequest request) {
+    	UserAccountBean userBean;    
+    	
+    	if(request.getSession().getAttribute("userBean") != null) {
+    		userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+    		
+    	}else {
+    		 Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	        String username = null;
+    	        if (principal instanceof UserDetails) {
+    	            username = ((UserDetails) principal).getUsername();
+    	        } else {
+    	            username = principal.toString();
+    	        }
+    	        UserAccountDAO userAccountDao = new UserAccountDAO(sm.getDataSource());
+    	        userBean = (UserAccountBean) userAccountDao.findByUserName(username);
+    	}
+    	
+    	return userBean;
+       
+	}
+   
 }

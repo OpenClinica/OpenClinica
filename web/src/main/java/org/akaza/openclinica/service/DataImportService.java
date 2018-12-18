@@ -412,7 +412,7 @@ public class DataImportService {
         return messages;
     }
 
-    private ImportCRFDataService getImportCRFDataService() {
+    public ImportCRFDataService getImportCRFDataService() {
         /*
          * if (locale == null) {locale = new Locale("en-US");} dataService = this.dataService != null? dataService : new
          * ImportCRFDataService(dataSource, locale);

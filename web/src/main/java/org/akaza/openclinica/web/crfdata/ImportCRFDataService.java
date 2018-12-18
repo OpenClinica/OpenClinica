@@ -194,6 +194,24 @@ public class ImportCRFDataService {
     		                		sampleOrdinal =	 "1";
     		                	}
     		                	
+    		                	/** log message:
+    		        	    	 * RowNo | ParticipantID | Status | Message
+    		        				1 | SS_SUB510 | SUCCESS | InsertU
+    		        				2 | SS_SUB511 | FAILED  | errorCode.participantNotFound
+    		        				3 | SS_SUB512 | SUCCESS | Update
+    		        				4 | SS_SUB512 | SUCCESS | Skip
+    		        	    	 */
+    		                	String originalFileName = request.getHeader("originalFileName");
+    		                	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
+    		                	String recordNum = null;
+    		                	if(originalFileName !=null) {
+    		                		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
+    		                		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
+    		                	}
+    		                	String msg;
+    		                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Insert";
+    		    	    		getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
+    		    	    		
     		                }
     					} catch (OpenClinicaException e) {
     						// TODO Auto-generated catch block
@@ -1570,15 +1588,16 @@ public class ImportCRFDataService {
                 ArrayList matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr); 
                 boolean matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
                 
-                /** log message:
-    	    	 * RowNo | ParticipantID | Status | Message
-    				1 | SS_SUB510 | SUCCESS | InsertU
-    				2 | SS_SUB511 | FAILED  | errorCode.participantNotFound
-    				3 | SS_SUB512 | SUCCESS | Update
-    				4 | SS_SUB512 | SUCCESS | Skip
-    	    	 */
+                
                 if(matchedAndSkip) {
                 	System.out.println("===============================matchedAndSkip========================");
+                	/** log message:
+        	    	 * RowNo | ParticipantID | Status | Message
+        				1 | SS_SUB510 | SUCCESS | InsertU
+        				2 | SS_SUB511 | FAILED  | errorCode.participantNotFound
+        				3 | SS_SUB512 | SUCCESS | Update
+        				4 | SS_SUB512 | SUCCESS | Skip
+        	    	 */
                 	String originalFileName = request.getHeader("originalFileName");
                 	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
                 	String recordNum = null;
@@ -1588,7 +1607,7 @@ public class ImportCRFDataService {
                 	}
                 	String msg;
                 	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";
-    	    		getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg);
+    	    		getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
                 	continue;
                 }
                 

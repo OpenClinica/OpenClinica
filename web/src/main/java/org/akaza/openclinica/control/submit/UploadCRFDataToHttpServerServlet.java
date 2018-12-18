@@ -662,26 +662,32 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	    	orginalFileName = orginalFileName.substring(0,pos);
 	    	
 	    	String columnLine = reader.readLine();
-	    	String line = columnLine;	    
+	    	String line = columnLine;
+	    	
+	    	BufferedWriter bw = null;
+	    	FileOutputStream fos = null;
 	    	
 	    	while (line != null) {
-				//System.out.println(line);
+				
 				// read next line
 				line = reader.readLine();
 				
-				splitFile = new File(importFileDir + orginalFileName +"_"+ count + ".txt");				
-				FileOutputStream fos = new FileOutputStream(splitFile);			 
-				BufferedWriter bw = new BufferedWriter(new OutputStreamWriter(fos));
-			 
-				bw.write(columnLine);				
-				bw.write("\n\r");
 				if(line != null) {
+					splitFile = new File(importFileDir + orginalFileName +"_"+ count + ".txt");				
+					fos = new FileOutputStream(splitFile);			 
+					bw = new BufferedWriter(new OutputStreamWriter(fos));
+				 
+					bw.write(columnLine);				
+					bw.write("\n\r");
+				
 					bw.write(line);	
 					fileList.add(splitFile);
 				}
 				
-			 
-				bw.close();
+			    if(bw !=null) {
+			    	bw.close();
+			    }
+				
 							
 				count++;
 				
