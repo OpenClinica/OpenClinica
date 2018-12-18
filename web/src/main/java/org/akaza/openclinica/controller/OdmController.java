@@ -228,13 +228,15 @@ public class OdmController {
      * }
      */
 
-    @RequestMapping( value = "/auth/api/studies/{studyOid}/events", method = RequestMethod.GET )
+    @RequestMapping( value = "/auth/api/events", method = RequestMethod.GET )
     public @ResponseBody
-    String getEvent(@PathVariable( "studyOid" ) String studyOid, HttpServletRequest request) throws Exception {
+    String getEvent(HttpServletRequest request) throws Exception {
         ODM odm = null;
+        String studyOid=(String)request.getSession().getAttribute("studyOid");
+        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute("userBean");
         getRestfulServiceHelper().setSchema(studyOid, request);
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        UserAccountBean ub = getRestfulServiceHelper().getParticipantUserAccount(request);
+
         if(ub==null){
             logger.info("userAccount is null");
             return null;
