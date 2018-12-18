@@ -10,6 +10,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.core.SecureController;
+import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
 import org.akaza.openclinica.controller.dto.StudyEnvironmentDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
@@ -425,7 +426,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
 
    public void persistparticipateModuleStatus(HttpServletRequest request, Study study){
-       List<ModuleConfigDTO> moduleConfigDTOs = getParticipateModuleStatusFromStudyService(request, study);
+       List<ModuleConfigDTO> moduleConfigDTOs = getParticipateModuleFromStudyService(request, study);
            persistparticipateModuleStatus( moduleConfigDTOs,study);
    }
 
@@ -463,7 +464,31 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return DISABLED;
     }
 
-    public List<ModuleConfigDTO> getParticipateModuleStatusFromStudyService (HttpServletRequest request , Study study) {
+
+    public ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study study) {
+        for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
+            if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid()) && moduleConfigDTO.getModuleName().equalsIgnoreCase(PARTICIPATE)) {
+                logger.info("ModuleConfigDTO  is :" + moduleConfigDTO);
+                return moduleConfigDTO;
+            }
+        }
+        logger.info("ModuleConfigDTO  is null");
+        return null;
+    }
+
+    public ModuleConfigAttributeDTO getModuleConfigAttribute(Set<ModuleConfigAttributeDTO> moduleConfigAttributeDTOs, Study study ,String attr) {
+        for (ModuleConfigAttributeDTO moduleConfigAttributeDTO : moduleConfigAttributeDTOs) {
+            if (moduleConfigAttributeDTO.getKey().equals(attr)) {
+                logger.info("ModuleConfigAttributeDTO  is :" + moduleConfigAttributeDTO);
+                return moduleConfigAttributeDTO;
+            }
+        }
+        logger.info("ModuleConfigAttributeDTO  is null");
+        return null;
+    }
+
+
+    public List<ModuleConfigDTO> getParticipateModuleFromStudyService (HttpServletRequest request , Study study) {
         if(StringUtils.isEmpty(study.getStudyUuid())) {
             // make call to study service to get study servie
             StudyEnvironmentDTO studyEnvironmentDTO = getStudyUuidFromStudyService(request,study);

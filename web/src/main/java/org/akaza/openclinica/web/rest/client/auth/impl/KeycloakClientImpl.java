@@ -12,6 +12,7 @@ import org.akaza.openclinica.web.rest.client.cs.impl.CustomerServiceClientImpl;
 import org.apache.commons.lang.StringUtils;
 import org.javers.common.collections.Lists;
 import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -80,6 +81,25 @@ public class KeycloakClientImpl {
         logger.debug("Create user call to Keycloak has failed");
         return handleKeycloakError(createUserResponse);
     }
+
+
+    public String getAccessCode(HttpServletRequest request, String userUuid) {
+        logger.debug("Calling Keycloak to get participate UserPresentation object");
+        Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
+        String customerUuid = (String) userContextMap.get("customerUuid");
+        String realm = getRealmName(request, customerUuid);
+        UserResource userResource = keycloak
+                .realm(realm)
+                .users()
+                .get(userUuid);
+
+        UserRepresentation userRepresentation = userResource.toRepresentation();
+        Map<String, List<String>> attributes =  userRepresentation.getAttributes();
+        List<String> accessCodes = attributes.get(ACCESS_CODE_ATTRIBUTE);
+        logger.info("Access Code : {}",accessCodes.get(0));
+        return accessCodes.get(0);
+    }
+
 
     public String getRealmName(HttpServletRequest request, String customerUuid) {
         CustomerDTO customerDTO = customerServiceClient.getCustomer(request, customerUuid);
