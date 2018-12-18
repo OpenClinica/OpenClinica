@@ -224,6 +224,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         boolean studyUserRoleUpdated = false;
         int userActiveStudyId;
 
+        if (ubIn.getActiveStudyId() != 0) {
+            ub.setActiveStudy(studyDao.findPublicStudyById(ubIn.getActiveStudyId()));
+        }
         if (ub.getActiveStudy() == null)
             userActiveStudyId = 0;
         else
