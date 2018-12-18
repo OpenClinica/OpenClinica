@@ -5,6 +5,7 @@ import org.akaza.openclinica.config.AppConfig;
 import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.service.LogoutService;
 import org.akaza.openclinica.view.Page;
+import org.keycloak.authorization.client.AuthzClient;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -20,6 +21,8 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import java.io.IOException;
+import java.io.UnsupportedEncodingException;
+import java.net.URLEncoder;
 import java.util.Map;
 
 /**
@@ -29,24 +32,61 @@ import java.util.Map;
 public class LogoutController {
 
     private final Logger logger = LoggerFactory.getLogger(this.getClass());
-    @Autowired
-    private Auth0Controller controller;
     @Autowired LogoutService logoutService;
     @Autowired AppConfig config;
     @Autowired
     EventCRFLocker eventCRFLocker;
 
     @RequestMapping(value="/logout", method = RequestMethod.GET)
-    protected String home(final Map<String, Object> model, final HttpServletRequest req) {
+    protected void home(final Map<String, Object> model, final HttpServletRequest req, final HttpServletResponse response) {
+        String authUrl = getLogoutUri(req, false);
         HttpSession session = req.getSession();
         logger.debug("Logout page");
         resetSession(session);
-        session.invalidate();
-        String urlPrefix = req.getRequestURL().substring(0, req.getRequestURL().lastIndexOf("/"));
-        int index = urlPrefix.indexOf(req.getContextPath());
-        String returnURL = urlPrefix.substring(0, index).concat(req.getContextPath()).concat("/pages/logoutSuccess");
-        String logoutURL = controller.buildLogoutURL(req, returnURL);
-        return String.format("redirect:%s", logoutURL);
+        String redirectUri = getRedirectUri(req, false);
+        try {
+            req.logout();
+            response.sendRedirect(authUrl);
+        } catch (Exception e) {
+            logger.error("Error logging out:", e);
+        }
+    }
+
+    private String getRedirectUri(HttpServletRequest req, boolean callback) {
+        int port = req.getServerPort();
+        String portStr ="";
+        if (port != 80 && port != 443) {
+            portStr = ":" + port;
+        }
+        String redirectUri = req.getScheme() + "://" + req.getServerName() + portStr + req.getContextPath();
+        if (callback) {
+            redirectUri += "/pages/login";
+        } else {
+            redirectUri += "/MainMenu";
+        }
+        return redirectUri;
+    }
+
+    private String getLogoutUri(HttpServletRequest req, boolean callback) {
+        AuthzClient authzClient = AuthzClient.create();
+        String coreAuthUrl = authzClient.getConfiguration().getAuthServerUrl();
+        String redirectUri = getRedirectUri(req, callback);
+        String authUrl = null;
+        String action = null;
+        if (callback)
+            action = "auth";
+        else
+            action = "logout";
+        try {
+            authUrl = coreAuthUrl + "/realms/" + authzClient.getConfiguration().getRealm()
+                    + "/protocol/openid-connect/" + action + "?redirect_uri=" + URLEncoder.encode(redirectUri, "UTF-8");
+            if (callback) {
+                authUrl += "&client_id=bridge&response_type=code";
+            }
+        } catch (UnsupportedEncodingException e) {
+            logger.error("Encoding redirect URI:" + redirectUri, e);
+        }
+        return authUrl;
     }
 
     @RequestMapping(value="/logoutSuccess", method = RequestMethod.GET)
@@ -62,17 +102,17 @@ public class LogoutController {
         return "redirect:" + returnURL + param;
     }
 
-    @RequestMapping(value="/invalidateAuth0Token", method = RequestMethod.GET)
-    @ResponseStatus(value = HttpStatus.OK)
+    @RequestMapping(value="/invalidateKeycloakToken", method = RequestMethod.GET)
     public void invalidateAccessToken(final HttpServletRequest request,
                                       final HttpServletResponse response) throws IOException {
         Authentication auth = SecurityContextHolder.getContext().getAuthentication();
         if (auth != null) {
-            logger.info("Invalidating token");
+            logger.info("Invalidating Keycloak token");
             auth.setAuthenticated(false);
             final HttpSession session = request.getSession();
             resetSession(session);
-            response.sendRedirect(controller.buildAuthorizeUrl(request, true));
+            String authUrl = getLogoutUri(request, true);
+            response.sendRedirect(authUrl);
         }
     }
 
@@ -81,8 +121,8 @@ public class LogoutController {
     public void resetFirstLogin(final HttpServletRequest request,
                                       final HttpServletResponse response) throws IOException {
         final HttpSession session = request.getSession();
-        logger.debug("**********Resetting first time to false**********");
-        session.setAttribute("firstLoginCheck", false);
+        logger.error("**********Resetting first time to false**********");
+        session.setAttribute("firstLoginCheck", "false");
     }
 
     private void resetSession(HttpSession session) {
@@ -91,6 +131,7 @@ public class LogoutController {
         if (ub != null) {
             eventCRFLocker.unlockAllForUser(ub.getId());
         }
+        session.invalidate();
         SecurityContextHolder.clearContext();
     }
 }

@@ -1,29 +1,26 @@
 package org.akaza.openclinica.service;
 
-import com.auth0.client.auth.AuthAPI;
-import com.auth0.exception.Auth0Exception;
-import com.auth0.json.auth.TokenHolder;
-import com.auth0.net.AuthRequest;
 import com.mashape.unirest.http.HttpResponse;
-import com.mashape.unirest.http.JsonNode;
 import com.mashape.unirest.http.Unirest;
 import com.mashape.unirest.http.exceptions.UnirestException;
 import org.akaza.openclinica.config.AppConfig;
 import org.akaza.openclinica.dao.core.CoreResources;
+import org.apache.commons.lang.StringUtils;
+import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.util.HttpResponseException;
+import org.keycloak.representations.AccessTokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.ResourceBundle;
-
-@Service("auth0UserService")
-public class Auth0UserServiceImpl implements Auth0UserService {
+@Service("keycloakUserService")
+public class KeycloakUserServiceImpl implements KeycloakUserService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     @Autowired
     private AppConfig appConfig;
-    public boolean authenticateAuth0User(String username, String password) {
-        boolean authenticated = false;
+
+    public boolean authenticateKeycloakUser(String username, String password) {
         HttpResponse<String> response = null;
         try {
             String SBSUrl = CoreResources.getField("SBSUrl");
@@ -39,22 +36,13 @@ public class Auth0UserServiceImpl implements Auth0UserService {
         }
 
         if (response == null || response.getBody() == null)
-            return authenticated;
-        String connection = (String) new JsonNode(response.getBody()).getArray().get(0);
-        ResourceBundle rb = ResourceBundle.getBundle("auth0");
-
-        AuthAPI authAPI = new AuthAPI(appConfig.getDomain(), appConfig.getClientId(),
-                appConfig.getClientSecret());
-        authAPI.setLoggingEnabled(true);
-        AuthRequest authRequest = authAPI.login(username, password, connection);
-        if (authRequest == null)
-            return authenticated;
-
+            return false;
+        AuthzClient authzClient = AuthzClient.create();
         try {
-            TokenHolder tokenHolder = authRequest.execute();
-        } catch (Auth0Exception e) {
-            logger.error("Error authenticating auth0 user:" + e);
-            return authenticated;
+             authzClient.obtainAccessToken(username, password);
+        } catch (HttpResponseException e) {
+            logger.error("Authorization:" + e);
+            return false;
         }
         return true;
     }

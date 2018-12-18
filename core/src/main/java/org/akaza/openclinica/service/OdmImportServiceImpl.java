@@ -139,19 +139,6 @@ public class OdmImportServiceImpl implements OdmImportService {
 		Study study = retrieveStudy(odm, userAccount, odmStudy);
 		study.setFilePath(study.getFilePath() + 1);
 
-		StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-		StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
-		if (!spv.isActive()) {
-			spv = new StudyParameterValueBean();
-			spv.setStudyId(study.getStudyId());
-			spv.setParameter("participantPortal");
-			spv.setValue("enabled");
-			spvdao.create(spv);
-		} else if (spv.isActive() && !spv.getValue().equals("enabled")) {
-			spv.setValue("enabled");
-			spvdao.create(spv);
-		}
-
 		String studyPath = Utils.getFilePath() + Utils.getStudyPath(study.getOc_oid(), study.getFilePath());
 		if (new File(studyPath).exists()) {
 			try {

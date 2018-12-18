@@ -23,6 +23,7 @@ import org.springframework.transaction.annotation.Transactional;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.util.HashMap;
+import java.util.LinkedHashMap;
 import java.util.Map;
 
 /**
@@ -41,11 +42,10 @@ public class CallbackServiceImpl implements CallbackService {
 
     private JsonParser objectMapper = JsonParserFactory.create();
     @Override
-    public UserAccountHelper isCallbackSuccessful(HttpServletRequest request, Auth0User user) throws Exception {
+    public UserAccountHelper isCallbackSuccessful(HttpServletRequest request,  KeycloakUser user) throws Exception {
         UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-        UserContext userContext = user.getUserContext();
 
-        Map<String, Object> userContextMap = userContext.contextClaim.asMap();
+        Map<String, Object> userContextMap = user.getUserContext();
         request.getSession().setAttribute("userContextMap", userContextMap);
         String userUuid = (String) userContextMap.get("userUuid");
         getUserDetails(request, user);
@@ -72,7 +72,7 @@ public class CallbackServiceImpl implements CallbackService {
     }
 
     private void updateUser(HttpServletRequest request, UserAccountBean ub,
-                            Auth0User user, Map<String, Object> userContextMap) throws Exception {
+                            KeycloakUser user, Map<String, Object> userContextMap) throws Exception {
         boolean isUpdated = false;
         UserType updatedUserType = null;
         switch ((String) userContextMap.get("userType")) {
@@ -110,7 +110,7 @@ public class CallbackServiceImpl implements CallbackService {
         }
 
     }
-    public void getUserDetails(HttpServletRequest request, Auth0User user) {
+    public void getUserDetails(HttpServletRequest request, KeycloakUser user) {
         ResponseEntity<OCUserDTO> userDetails = studyBuildService.getUserDetails(request);
         OCUserDTO userDTO = userDetails.getBody();
         user.setEmail(userDTO.getEmail());
@@ -123,8 +123,8 @@ public class CallbackServiceImpl implements CallbackService {
     }
 
 
-    public UserContext getUserContextMap(Auth0User user)  throws Exception {
-        UserContext userContext = user.getUserContext();
+    public LinkedHashMap<String, Object> getUserContextMap(KeycloakUser user)  throws Exception {
+        LinkedHashMap<String, Object> userContext = user.getUserContext();
         return userContext;
     }
     @Modifying
@@ -132,7 +132,7 @@ public class CallbackServiceImpl implements CallbackService {
         return studyBuildService.saveStudyEnvRoles(request, ub);
     }
 
-    private UserAccountBean createUserAccount(HttpServletRequest request, Auth0User user, Map<String, Object> userContextMap ) throws Exception {
+    private UserAccountBean createUserAccount(HttpServletRequest request, KeycloakUser user, Map<String, Object> userContextMap ) throws Exception {
         HashMap<String, String> map = new HashMap<>();
         map.put("username", user.getNickname());
         if (StringUtils.isNotEmpty(user.getGivenName()))
@@ -155,5 +155,10 @@ public class CallbackServiceImpl implements CallbackService {
         userAccountController.createOrUpdateAccount(request, map);
         return (UserAccountBean) request.getAttribute("createdUaBean");
     }
+
+    public void updateParticipateModuleStatus(HttpServletRequest request,String studyOid){
+        studyBuildService.updateParticipateModuleStatusInOC(request, studyOid);
+    }
+
 }
 

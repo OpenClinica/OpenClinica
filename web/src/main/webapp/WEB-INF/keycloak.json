@@ -1,0 +1,10 @@
+{
+  "realm": "${keycloak.realm}",
+  "auth-server-url": "${keycloak.auth-server-url}",
+  "ssl-required": "external",
+  "resource": "bridge",
+  "credentials": {
+    "secret": "${keycloak.client.secret}"
+  },
+  "confidential-port": 0
+}

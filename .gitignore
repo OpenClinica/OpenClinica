@@ -10,6 +10,8 @@ release.properties
 web/src/main/resources/sso.properties
 web/src/main/resources/datainfo.properties
 web/src/main/resources/sso.properties
+web/src/main/resources/keycloak.json
+web/src/main/webapp/WEB-INF/keycloak.json
 .DS_Store
 core/.DS_Store
 web/.DS_Store

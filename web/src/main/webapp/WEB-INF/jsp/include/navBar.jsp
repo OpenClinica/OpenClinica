@@ -26,8 +26,8 @@
     console.log("***********************************Getting crossStorage:"+ crossStorageURL);
     var ocAppTimeoutKey = "OCAppTimeout";
     var firstLoginCheck = '<%= session.getAttribute("firstLoginCheck")%>';
-    console.log("Firstr time first:" + firstLoginCheck);
-    var currentUser = "currentUser";
+    console.log("First time flag value:" + firstLoginCheck);
+    var CURRENT_USER = "currentUser";
     var appName = "RT";
 </script>
 
@@ -345,8 +345,7 @@
                                                                         <tr>
                                                                             <td>
                                                                                 <form METHOD="GET" action="${urlPrefix}ListStudySubjects"
-                                                                                      onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == '
-                                                                                      <fmt:message key="study_subject_ID"
+                                                                                      onSubmit=" if (document.forms[0]['findSubjects_f_studySubject.label'].value == '<fmt:message key="study_subject_ID"
                                                                                                    bundle="${resword}"/>') { document.forms[0]['findSubjects_f_studySubject.label'].value=''}">
                                                                                     <!--<a href="javascript:reportBug()">Report Issue</a>|-->
                                                                                     <input type="text" name="findSubjects_f_studySubject.label"

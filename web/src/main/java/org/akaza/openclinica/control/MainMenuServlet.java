@@ -19,7 +19,6 @@ import org.akaza.openclinica.control.admin.StudySubjectStatusStatisticsTableFact
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
-import org.akaza.openclinica.controller.Auth0Controller;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
@@ -128,7 +127,7 @@ public class MainMenuServlet extends SecureController {
         return queryStr;
     }
 
-    public boolean processSpecificStudyEnvUuid(HttpServletRequest request, UserAccountBean ub) throws Exception {
+    public boolean processSpecificStudyEnvUuid() throws Exception {
         logger.info("MainMenuServlet processSpecificStudyEnvUuid:%%%%%%%%" + session.getAttribute("firstLoginCheck"));
         boolean isRenewAuth = false;
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
@@ -143,7 +142,7 @@ public class MainMenuServlet extends SecureController {
                         .getWebApplicationContext(context);
         String currentSchema = CoreResources.getRequestSchema(request);
         CoreResources.setRequestSchema(request, "public");
-        StudyBuildService studyService = ctx.getBean("studyBuildService", StudyBuildServiceImpl.class);
+        StudyBuildService studyService = ctx.getBean("studyBuildService", StudyBuildService.class);
 
         studyService.updateStudyUserRoles(request, studyService.getUserAccountObject(ub), ub.getActiveStudyId(), studyEnvUuid);
         UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
@@ -230,8 +229,7 @@ public class MainMenuServlet extends SecureController {
         // time log in or pwd expired
         // update last visit date to current date
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-        UserAccountBean ub1 = (UserAccountBean) udao.findByPK(ub.getId());
-        if (processSpecificStudyEnvUuid(request, ub1)) {
+        if (processSpecificStudyEnvUuid()) {
             Map<String, String[]> targetMap = new ConcurrentHashMap<>(request.getParameterMap());
             targetMap.remove("forceRenewAuth");
             String paramStr = Utils.getParamsString(targetMap);
@@ -241,11 +239,9 @@ public class MainMenuServlet extends SecureController {
             return;
         }
 
-        ub1.setLastVisitDate(new Date(System.currentTimeMillis()));
+        ub.setLastVisitDate(new Date(System.currentTimeMillis()));
         // have to actually set the above to a timestamp? tbh
-        ub1.setOwner(ub1);
-        ub1.setUpdater(ub1);
-        udao.update(ub1);
+        udao.update(ub);
 
         if (!currentRole.isActive()) {
             String paramStr = Utils.getParamsString(request.getParameterMap());
@@ -308,6 +304,9 @@ public class MainMenuServlet extends SecureController {
             }
 
         }
+        logger.info("Current Role:" + currentRole.getRole().getName());
+        StudyUserRoleBean userRole = (StudyUserRoleBean) session.getAttribute("userRole");
+        logger.info("User Role:" + userRole.getName());
 
         forwardPage(Page.MENU);
     }
@@ -326,6 +325,7 @@ public class MainMenuServlet extends SecureController {
         factory.setStudySubjectDao(getStudySubjectDAO());
         factory.setCurrentStudy(currentStudy);
         factory.setStudyDao(getStudyDAO());
+
         String studySubjectStatusStatistics = factory.createTable(request, response).render();
         request.setAttribute("studySubjectStatusStatistics", studySubjectStatusStatistics);
     }

@@ -3646,7 +3646,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
     protected String getStudyUsersSql(String studyId) {
         return "select distinct ua.user_id, ua.first_name, ua.last_name, ua.institutional_affiliation" + " from user_account ua, study_user_role sur"
-                + " where sur.study_id = " + studyId + " and sur.user_name = ua.user_name order by ua.user_id";
+                + " where sur.study_id = " + studyId + " and sur.user_name = ua.user_name and ua.user_type_id !=4 order by ua.user_id";
     }
 
     protected String getOCSubjectDataAuditsSql(String studySubjectOids) {

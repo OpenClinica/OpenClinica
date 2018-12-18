@@ -114,6 +114,7 @@ public class Study extends DataMapDomainObject {
     private StudyEnvEnum envType;
     private boolean published;
     private int filePath;
+    private String studyUuid;
 
     @Column(name = "study_env_uuid", unique = false, nullable = false)
     public String getStudyEnvUuid() {
@@ -245,7 +246,7 @@ public class Study extends DataMapDomainObject {
     // this.studyType = studyType;
     // }
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_study_id")
 	public Study getStudy() {
 		return this.study;
@@ -858,4 +859,12 @@ public class Study extends DataMapDomainObject {
         this.filePath = filePath;
     }
 
+    @Column(name = "study_uuid", unique = false)
+    public String getStudyUuid() {
+        return studyUuid;
+    }
+
+    public void setStudyUuid(String studyUuid) {
+        this.studyUuid = studyUuid;
+    }
 }

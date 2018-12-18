@@ -2,13 +2,18 @@ package org.akaza.openclinica.service;
 
 import com.auth0.jwt.interfaces.Claim;
 import com.auth0.jwt.interfaces.DecodedJWT;
+import org.keycloak.KeycloakSecurityContext;
+import org.keycloak.representations.AccessToken;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+
+import java.util.LinkedHashMap;
+import java.util.Map;
 
 /**
  * Created by yogi on 9/6/17.
  */
-public class Auth0User {
+public class KeycloakUser {
     public void setNickname(String nickname) {
         this.nickname = nickname;
     }
@@ -29,18 +34,16 @@ public class Auth0User {
         this.email = email;
     }
 
-    private UserContext userContext;
-    public Auth0User(DecodedJWT jwt) {
-        this.jwt = jwt;
-        this.userId = jwt.getSubject();
-        Claim contextClaim = jwt.getClaim("https://www.openclinica.com/userContext");
-        email = jwt.getClaim("email").asString();
-        userContext = new UserContext(contextClaim);
-        nickname = jwt.getClaim("nickname").asString();
-        givenName = jwt.getClaim("given_name").asString();
-        familyName = jwt.getClaim("family_name").asString();
+    private LinkedHashMap<String, Object> userContext;
+    public KeycloakUser(AccessToken token) {
+        this.userId = token.getSubject();
+        Map<String, Object> otherClaims = token.getOtherClaims();
+        userContext = (LinkedHashMap<String, Object>) otherClaims.get("https://www.openclinica.com/userContext");
+        email = token.getEmail();
+        nickname = token.getNickName();
+        givenName = token.getGivenName();
+        familyName = token.getFamilyName();
     }
-    private DecodedJWT jwt;
     private String nickname;
     private String userId;
     private String givenName;
@@ -62,7 +65,7 @@ public class Auth0User {
         return familyName;
     }
 
-    public UserContext getUserContext() {
+    public LinkedHashMap<String, Object> getUserContext() {
         return userContext;
     }
 

@@ -21,6 +21,7 @@ import javax.persistence.UniqueConstraint;
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.service.UserStatus;
 import org.hibernate.annotations.GenericGenerator;
 import org.hibernate.annotations.Parameter;
 import org.hibernate.annotations.Type;
@@ -50,7 +51,8 @@ public class StudySubject  extends DataMapDomainObject {
 	private List<StudyEvent> studyEvents ;
 	private List<EventCrf> eventCrfs;
 	private List<StudyEventDefinition> studyEventDefinitions;
-	private String userUuid;
+	private Integer userId;
+	private UserStatus userStatus;
 	
 	public StudySubject() {
 	}
@@ -106,7 +108,7 @@ public class StudySubject  extends DataMapDomainObject {
 		this.userAccount = userAccount;
 	}
 
-	@ManyToOne(fetch = FetchType.LAZY)
+	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "study_id")
 	public Study getStudy() {
 		return this.study;
@@ -245,12 +247,21 @@ public class StudySubject  extends DataMapDomainObject {
 		this.eventCrfs = eventCrfs;
 	}
 
-	@Column(name = "user_uuid")
-	public String getUserUuid() {
-		return userUuid;
+	@Column(name = "user_id")
+	public Integer getUserId() {
+		return userId;
 	}
 
-	public void setUserUuid(String userUuid) {
-		this.userUuid = userUuid;
+	public void setUserId(Integer userId) {
+		this.userId = userId;
+	}
+
+	@Column(name = "user_status_id")
+	public UserStatus getUserStatus() {
+		return userStatus;
+	}
+
+	public void setUserStatus(UserStatus userStatus) {
+		this.userStatus = userStatus;
 	}
 }

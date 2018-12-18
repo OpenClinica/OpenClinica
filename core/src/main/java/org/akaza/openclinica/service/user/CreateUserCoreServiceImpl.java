@@ -208,6 +208,9 @@ public class CreateUserCoreServiceImpl implements CreateUserCoreService {
                 case 7:
                     roleMap.put(role.getId(), resterm.getString("site_Data_Entry_Person2").trim());
                     break;
+                case 8:
+                    roleMap.put(role.getId(), resterm.getString("site_Data_Entry_Participant").trim());
+                    break;
                 default:
                     // logger.info("No role matched when setting role description");
                 }

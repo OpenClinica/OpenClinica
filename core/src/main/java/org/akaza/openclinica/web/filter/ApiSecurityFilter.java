@@ -2,11 +2,14 @@ package org.akaza.openclinica.web.filter;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.service.OCUserDTO;
-import org.akaza.openclinica.service.UserType;
+import org.akaza.openclinica.service.auth.TokenService;
 import org.akaza.openclinica.service.user.CreateUserCoreService;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.lang.StringUtils;
@@ -34,9 +37,7 @@ import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.sql.DataSource;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.UnsupportedEncodingException;
+import java.io.*;
 import java.security.cert.Certificate;
 import java.security.cert.CertificateFactory;
 import java.util.*;
@@ -49,17 +50,14 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
 
     private String realm = "Protected";
 
-    private JsonParser objectMapper = JsonParserFactory.create();
-    final String EXP = "exp";
 
     @Autowired
     private DataSource dataSource;
 
     @Autowired CreateUserCoreService userService;
+    @Autowired
+    TokenService tokenService;
 
-    private static final String PUBLIC_KEY_LOCATION = "oc4.cer";
-    private static final String X509_CERTFICATE = "X509";
-    private static final String API_AUDIENCE = "https://www.openclinica.com";
 
 
     @Override
@@ -100,7 +98,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                     // 2. create new user if doesn't exist and update roles
                     try {
                         String accessToken = st.nextToken();
-                        final Map<String, Object> decodedToken = decode(accessToken);
+                        final Map<String, Object> decodedToken = tokenService.decodeAndVerify(accessToken);
                         if (accessToken != null ) {
                             String _username = decodedToken.get("sub").toString();
                             LinkedHashMap<String, Object> userContextMap = (LinkedHashMap<String, Object>) decodedToken.get("https://www.openclinica.com/userContext");
@@ -111,12 +109,24 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                             CoreResources.setRootUserAccountBean(request, dataSource);
                             request.getSession().setAttribute("userContextMap", userContextMap);
                             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-                            UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid((String) userContextMap.get("userUuid"));
+                            StudyDAO studyDAO = new StudyDAO(dataSource);
+
+                            String ocUserUuid = null;
+                            String userType = (String) userContextMap.get("userType");
+                            if (userType.equals(org.akaza.openclinica.service.UserType.PARTICIPATE.getName())) {
+                                ocUserUuid = (String) userContextMap.get("username");
+                            } else {
+                                ocUserUuid = (String) userContextMap.get("userUuid");
+                            }
+
+                            UserAccountBean ub = (UserAccountBean) userAccountDAO.findByUserUuid((ocUserUuid));
+                            StudyBean publicStudyBean= (StudyBean) studyDAO.findByPK(ub.getActiveStudyId());
+
                             if (StringUtils.isNotEmpty(_username) && ub.getId() != 0) {
                                 Authentication authentication = new UsernamePasswordAuthenticationToken(_username, null,
                                         AuthorityUtils.createAuthorityList("ROLE_USER"));
                                 SecurityContextHolder.getContext().setAuthentication(authentication);
-                                request.getSession().setAttribute("userBean",ub);
+
                             } else {
                                 OCUserDTO userDTO = getUserDetails(request);
                                 if (userDTO.getUsername().equalsIgnoreCase("root")) {
@@ -126,13 +136,14 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
                                 } else {
                                     try {
                                         HashMap<String, String> userAccount = createUserAccount(request, userDTO);
-                                        UserAccountBean user = userService.createUser(request, userAccount);
-                                        request.getSession().setAttribute("userBean",user);
+                                          ub = userService.createUser(request, userAccount);
                                     } catch (Exception e) {
                                         logger.error("Failed user creation:" + e.getMessage());
                                     }
                                 }
                             }
+                            request.getSession().setAttribute("userBean",ub);
+                            request.getSession().setAttribute("studyOid",publicStudyBean.getOid());
                         } else {
                             unauthorized(response, "Invalid authentication token");
                             return;
@@ -167,27 +178,7 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
     }
 
 
-    protected Map<String, Object> decode(String token) {
-        try {
-            final ClassLoader classLoader = getClass().getClassLoader();
-            InputStream inputStream = classLoader.getResourceAsStream(PUBLIC_KEY_LOCATION);
-            CertificateFactory certificateFactory = CertificateFactory.getInstance(X509_CERTFICATE);
-            Certificate certificate = certificateFactory.generateCertificate(inputStream);
-            RSAPublicKeyImpl publicKey = (RSAPublicKeyImpl) certificate.getPublicKey();
-            RsaVerifier verifier = new RsaVerifier(publicKey);
-            Jwt jwt = JwtHelper.decodeAndVerify(token, verifier);
-            String content = jwt.getClaims();
-            Map<String, Object> map = objectMapper.parseMap(content);
-            if (map.containsKey(EXP) && map.get(EXP) instanceof Integer) {
-                Integer intValue = (Integer) map.get(EXP);
-                map.put(EXP, new Long(intValue));
-            }
-            return map;
-        }
-        catch (Exception e) {
-            throw new InvalidTokenException("Cannot convert access token to JSON", e);
-        }
-    }
+
 
     public OCUserDTO getUserDetails (HttpServletRequest request) {
         Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
@@ -217,31 +208,22 @@ public class ApiSecurityFilter extends OncePerRequestFilter {
     private HashMap<String, String>  createUserAccount(HttpServletRequest request, OCUserDTO user) throws Exception {
         HashMap<String, String> map = new HashMap<>();
         map.put("username", user.getUsername());
-        UserType userType = user.getUserType();
-        if (userType.equals(UserType.PARTICIPATE)) {
-            map.put("fName", "*****");
-            map.put("lName", "*****");
-            map.put("email", "*****");
-        } else {
-            if (StringUtils.isNotEmpty(user.getFirstName()))
-                map.put("fName", user.getFirstName());
-            else
-                map.put("fName", "first");
+        if (StringUtils.isNotEmpty(user.getFirstName()))
+            map.put("fName", user.getFirstName());
+        else
+            map.put("fName", "first");
+        if (StringUtils.isNotEmpty(user.getLastName()))
+            map.put("lName", user.getLastName());
+        else
+            map.put("lName", "last");
 
-            if (StringUtils.isNotEmpty(user.getLastName()))
-                map.put("lName", user.getLastName());
-            else
-                map.put("lName", "last");
-
-            map.put("email", user.getEmail());
-        }
         map.put("role_name", "Data Manager");
         map.put("user_uuid", user.getUuid());
+        org.akaza.openclinica.service.UserType userType = user.getUserType();
 
         map.put("user_type", userType.getName());
         map.put("authorize_soap", "true");
-
-
+        map.put("email", user.getEmail());
         map.put("institution", "OC");
         return map;
     }

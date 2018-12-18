@@ -17,7 +17,7 @@ import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
-import org.akaza.openclinica.controller.Auth0Controller;
+import org.akaza.openclinica.controller.KeycloakController;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.EventCRFLocker;
 import org.akaza.openclinica.core.SessionManager;
@@ -44,6 +44,7 @@ import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.*;
+import org.akaza.openclinica.service.UserType;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.view.BreadcrumbTrail;
@@ -386,6 +387,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
 
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
+        this.request = request;
+        this.response = response;
         request.setCharacterEncoding("UTF-8");
 //        checkPermissions();
         session = request.getSession();
@@ -459,24 +462,36 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // BWP 01/08 >>
             // sm = new SessionManager(ub, userName);
             sm = new SessionManager(ub, userName, SpringServletAccess.getApplicationContext(context));
-            if (ub == null || StringUtils.isEmpty(ub.getName())) {
-                UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
-                ub = (UserAccountBean) uDAO.findByEmail(userName);
+            WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
+            KeycloakController controller = (KeycloakController) webApplicationContext .getBean("keycloakController");
+
+            String ocUserUuid = null;
+
+            try {
+                ocUserUuid = controller.getOcUserUuid(request);
+            } catch (CustomRuntimeException e) {
+                forwardPage(Page.ERROR);
+                return;
+            }
+
+            if (ocUserUuid != null) {
                 if (ub == null || StringUtils.isEmpty(ub.getName())) {
+                    UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
+                    ub = (UserAccountBean) uDAO.findByUserUuid(ocUserUuid);
+                }
+            }
+            if (ub == null || StringUtils.isEmpty(ub.getName())) {
+                if(session != null || request.isRequestedSessionIdValid() ) {
                     session.invalidate();
                     SecurityContextHolder.clearContext();
-                    ServletContext context = getServletContext();
-                    WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
-                    Auth0Controller controller = (Auth0Controller) webApplicationContext .getBean("auth0Controller");
-                    String authorizeUrl = controller.buildAuthorizeUrl(request, false/* don't do SSO, SSO already failed */);
-                    logger.info("Secure" +
-                            "" +
-                            "" +
-                            "Controller In login_required:%%%%%%%%" + authorizeUrl);
-                    response.sendRedirect(authorizeUrl);
-                    return;
                 }
-                session.setAttribute("userBean", ub);
+                String authorizeUrl = controller.buildAuthorizeUrl(request);
+                logger.info("Secure" +
+                        "" +
+                        "" +
+                        "Controller In login_required:%%%%%%%%" + authorizeUrl);
+                response.sendRedirect(authorizeUrl);
+                return;
             }
             request.setAttribute("userBean", ub);
             StudyDAO sdao = new StudyDAO(sm.getDataSource());
@@ -509,8 +524,11 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 }
                 session.setAttribute("publicStudy", currentPublicStudy);
                 request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
-                if (StringUtils.isEmpty(currentPublicStudy.getIdentifier()))
-                    throw new Exception("No study assigned to this user:" + ub.getName() + " uuid:" + ub.getUserUuid());
+                if (StringUtils.isEmpty(currentPublicStudy.getIdentifier())) {
+                    logger.error("No study assigned to this user:" + ub.getName() + " uuid:" + ub.getUserUuid());
+                    forwardPage(Page.ERROR);
+                    return;
+                }
                 currentStudy = (StudyBean) sdao.findByUniqueIdentifier(currentPublicStudy.getIdentifier());
                 if (currentStudy != null) {
                     currentStudy.setParentStudyName(currentPublicStudy.getParentStudyName());
@@ -565,6 +583,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         break;
                     case 7:
                         role.setDescription("site_Data_Entry_Person2");
+                        break;
+                    case 8:
+                        role.setDescription("site_Data_Entry_Participant");
                         break;
                     default:
                         // logger.info("No role matched when setting role description");
@@ -776,7 +797,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         // YW >>
 
         // to load all available event based on currentStudy for Task > Add Subject
-        request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
+        if (currentPublicStudy != null)
+            request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
         request.setAttribute("allDefsArray", this.getEventDefinitionsByCurrentStudy());
         try {
             String paramsString = Utils.getParamsString(request.getParameterMap());
@@ -1427,21 +1449,14 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         return userService= (UserService) SpringServletAccess.getApplicationContext(context).getBean("userService");
     }
 
-    protected void changeParticipantAccountStatus(StudyBean study, StudySubjectBean studySub, UserStatus userStatus ){
+    protected void changeParticipantAccountStatus(StudyBean study, StudySubjectBean studySub, UserStatus userStatus) {
         // check if particiate module enabled
-        int parentStudyId = (study.getParentStudyId()!=0)? study.getParentStudyId():study.getId();
-        String participateStatus=getParticipateStatus(parentStudyId);
-        if(participateStatus.equals(ENABLED)&& !StringUtils.isEmpty(studySub.getUserUuid())) {
-            OCUserDTO ocUserDTO = new OCUserDTO();
-            ocUserDTO.setUuid(studySub.getUserUuid());
-            // Get Participant user account in user_service using user_uuid
-            Object object=   getUserService().getParticipantAccountFromUserService(request,ocUserDTO,HttpMethod.GET);
-            if (object != null && object instanceof OCUserDTO) {
-                ocUserDTO = (OCUserDTO) object;
-                ocUserDTO.setStatus(userStatus);
-                // Update the status and clear firstname and phone from Participant user account in user_service
-                getUserService().createOrUpdateParticipantAccount(request, ocUserDTO, HttpMethod.PUT);
-            }
+        int parentStudyId = (study.getParentStudyId() != 0) ? study.getParentStudyId() : study.getId();
+        String participateStatus = getParticipateStatus(parentStudyId);
+        if (participateStatus.equals(ENABLED) && studySub.getUserId() != 0) {
+            studySub.setUserStatus(userStatus);
+            StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
+            sdao.update(studySub);
         }
     }
 

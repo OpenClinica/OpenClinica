@@ -386,6 +386,7 @@ public class StudyController {
         org.akaza.openclinica.domain.Status status;
         String templateID;
         Boolean enrollmentCap;
+        String studyUuid;
 
 
         public StudyParameters(HashMap<String, Object> map) {
@@ -406,7 +407,7 @@ public class StudyController {
             status = setStatus((String) map.get("status"));
             templateID = (String) map.get("participantIdTemplate");
             enrollmentCap = (Boolean) map.get("enforceEnrollmentCap");
-
+            studyUuid = (String) map.get("uuid");
         }
 
         org.akaza.openclinica.domain.Status setStatus(String myStatus) {
@@ -486,6 +487,13 @@ public class StudyController {
                 studyEnvUuid = studyEnvUuid.trim();
             }
 
+            if (StringUtils.isEmpty(studyUuid)) {
+                ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "studyUuid");
+                errorObjects.add(errorObject);
+            } else {
+                studyUuid = studyUuid.trim();
+            }
+
             if (status == null ) {
                 ErrorObj errorObject = createErrorObject("Study Object", "Missing Field", "status");
                 errorObjects.add(errorObject);
@@ -507,6 +515,8 @@ public class StudyController {
             request.setAttribute("name", name); // Brief Title
             request.setAttribute("oid", studyOid);
             request.setAttribute("studyEnvUuid", studyEnvUuid);
+            request.setAttribute("studyUuid", studyUuid);
+
             Validator v0 = new Validator(request);
             v0.addValidation("name", Validator.NO_BLANKS);
 
@@ -637,6 +647,7 @@ public class StudyController {
             study.setOldStatusId(study.getStatus().getCode());
         }
         study.setStatus(parameters.status);
+        study.setStudyUuid(parameters.studyUuid);
     }
 
     private Study createSchemaStudy(HttpServletRequest request, Study study, UserAccountBean ownerUserAccount) throws Exception {
@@ -2034,6 +2045,8 @@ public class StudyController {
             return Role.MONITOR;
         } else if (roleName.equalsIgnoreCase(resterm.getString("site_Data_Entry_Person2").trim())) {
             return Role.RESEARCHASSISTANT2;
+        } else if (roleName.equalsIgnoreCase(resterm.getString("site_Data_Entry_Participant").trim())) {
+            return Role.PARTICIPATE;
         } else
             return null;
     }

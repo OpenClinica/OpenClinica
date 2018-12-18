@@ -22,7 +22,8 @@ public class OCSpringLiquibase extends SpringLiquibase {
     @Override
     public void afterPropertiesSet() throws LiquibaseException {
         HashMap<String,String> parameters = new HashMap<>();
-        parameters.put("mappingServer", "mapping_server_" + CoreResources.getField("db"));
+        String dbName = CoreResources.getField("db").replaceAll("-", "_");
+        parameters.put("mappingServer", "mapping_server_" + dbName);
         super.setChangeLogParameters(parameters);
 
     }

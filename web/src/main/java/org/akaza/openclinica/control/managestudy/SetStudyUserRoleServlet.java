@@ -101,6 +101,10 @@ public class SetStudyUserRoleServlet extends SecureController {
                     roles.remove(Role.RESEARCHASSISTANT2);
                     roles.add(r2);
 
+                    Role r3 = Role.PARTICIPATE;
+                    r3.setDescription("site_Data_Entry_Participant");
+                    roles.remove(Role.PARTICIPATE);
+                    roles.add(r3);
                 }
                 request.setAttribute("roles", roles);
 

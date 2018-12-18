@@ -8,10 +8,11 @@ import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.domain.datamap.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
+import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.representations.AccessTokenResponse;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Value;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -42,22 +43,10 @@ public class PermissionServiceImpl implements PermissionService {
     private EventCrfDao eventCrfDao;
     @Autowired
     private StudyDao studyDao;
-    @Value("${auth0.domain}")
-    private String domain;
+
     private static final String CREATE_TOKEN_API_PATH = "/oauth/token";
 
 
-    /**
-     * This is the client id of your auth0 application (see Settings page on auth0 dashboard)
-     */
-    @Value(value = "${auth0.apiClientId}")
-    private String clientId;
-
-    /**
-     * This is the client secret of your auth0 application (see Settings page on auth0 dashboard)
-     */
-    @Value(value = "${auth0.apiClientSecret}")
-    private String clientSecret;
 
     private boolean checkStudyUuid(String studyUuid, int parentStudyId) {
         if (parentStudyId == 0) return false;
@@ -224,20 +213,12 @@ public class PermissionServiceImpl implements PermissionService {
 
     public String getAccessToken() {
         logger.debug("Creating Auth0 Api Token");
+        AuthzClient authzClient = AuthzClient.create();
+        AccessTokenResponse accessTokenResponse = authzClient.obtainAccessToken();
+        if (accessTokenResponse != null)
+            return accessTokenResponse.getToken();
+        return null;
 
-        TokenRequestDTO tokenRequestDTO = new TokenRequestDTO()
-                .grantType("client_credentials")
-                .clientId(clientId)
-                .clientSecret(clientSecret)
-                .audience("https://www.openclinica.com");
-
-        HttpEntity requestEntity = new HttpEntity(tokenRequestDTO);
-        String createTokenUrl = "https://" + domain + CREATE_TOKEN_API_PATH;
-        RestTemplate restTemplate = new RestTemplate();
-
-        ResponseEntity<TokenResponseDTO> tokenResponse = restTemplate.exchange(createTokenUrl, HttpMethod.POST, requestEntity, TokenResponseDTO.class);
-        String accessToken = tokenResponse.getBody().getAccessToken();
-        return accessToken;
     }
 
 }

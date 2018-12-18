@@ -90,7 +90,7 @@ public class StudySubjectStatusStatisticsTableFactory extends AbstractTableFacto
         for (Status status : statuses) {
             Integer totalStudySubjectsByStatus = studySubjectDao.getCountofStudySubjectsBasedOnStatus(currentStudy, status);
 
-            Long percentage = totalStudySubjects == 0 ? 0 : Math.round((totalStudySubjectsByStatus.doubleValue() / totalStudySubjects.doubleValue()) * 100);
+            Long percentage = (totalStudySubjects == 0 || totalStudySubjectsByStatus == null) ? 0 : Math.round((totalStudySubjectsByStatus.doubleValue() / totalStudySubjects.doubleValue()) * 100);
 
             HashMap<Object, Object> theItem = new HashMap<Object, Object>();
             theItem.put("status", status.getName());

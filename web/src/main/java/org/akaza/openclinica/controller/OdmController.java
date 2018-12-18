@@ -49,6 +49,7 @@ import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.ParticipantEventService;
 import org.akaza.openclinica.service.ParticipateService;
+import org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.akaza.openclinica.web.restful.JSONClinicalDataPostProcessor;
@@ -227,13 +228,19 @@ public class OdmController {
      * }
      */
 
-    @RequestMapping( value = "/auth/api/studies/{studyOid}/events", method = RequestMethod.GET )
+    @RequestMapping( value = "/auth/api/events", method = RequestMethod.GET )
     public @ResponseBody
-    String getEvent(@PathVariable( "studyOid" ) String studyOid, HttpServletRequest request) throws Exception {
+    String getEvent(HttpServletRequest request) throws Exception {
         ODM odm = null;
+        String studyOid=(String)request.getSession().getAttribute("studyOid");
+        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute("userBean");
         getRestfulServiceHelper().setSchema(studyOid, request);
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        UserAccountBean ub = getRestfulServiceHelper().getUserAccount(request);
+
+        if(ub==null){
+            logger.info("userAccount is null");
+            return null;
+        }
         logger.info("UserAccount username: " +ub.getName());
         StudyBean currentStudy = participateService.getStudy(studyOid);
         logger.info("Study OId: " +currentStudy.getOid());
@@ -262,6 +269,14 @@ public class OdmController {
         JAXB.marshal(odm, sw);
         String xmlString = sw.toString();
         JSON json = xmlSerializer.read(xmlString);
+
+        if(studySubject.getUserStatus().equals(UserStatus.CREATED) ||studySubject.getUserStatus().equals(UserStatus.INVITED)){
+            studySubject.setUpdater(ub);
+            studySubject.setUpdatedDate(new Date());
+            studySubject.setUserStatus(UserStatus.ACTIVE);
+            studySubjectDAO.update(studySubject);
+        }
+
         return json.toString(INDENT_LEVEL);
 
     }
