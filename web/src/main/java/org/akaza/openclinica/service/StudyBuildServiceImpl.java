@@ -224,6 +224,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         boolean studyUserRoleUpdated = false;
         int userActiveStudyId;
 
+        // because JDB transaction is not seen right away by Hibernate, active Study in UserAccountBean may not be the same as UserAccount
         if (ubIn.getActiveStudyId() != 0) {
             ub.setActiveStudy(studyDao.findPublicStudyById(ubIn.getActiveStudyId()));
         }
