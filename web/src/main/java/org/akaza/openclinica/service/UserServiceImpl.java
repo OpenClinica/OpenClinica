@@ -120,13 +120,12 @@ public class UserServiceImpl implements UserService {
     public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request) {
         getRestfulServiceHelper().setSchema(studyOid, request);
         OCUserDTO ocUserDTO = null;
-        Study parentTenantStudy= null;
         Study tenantStudy = getStudy(studyOid);
-        if(tenantStudy.getStudy()!=null)
-             parentTenantStudy = tenantStudy.getStudy();
+
+        String oid = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getOc_oid() : tenantStudy.getOc_oid());
 
         StudySubject studySubject = getStudySubject(ssid, tenantStudy);
-        String username = parentTenantStudy.getOc_oid() + "." + studySubject.getOcOid();
+        String username = oid + "." + studySubject.getOcOid();
         username = username.replaceAll("\\(", ".").replaceAll("\\)", "");
 
         UserAccountBean ownerUserAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -171,7 +170,7 @@ public class UserServiceImpl implements UserService {
 
             ParticipantAccessDTO accessDTO= getAccessInfo(request,studyOid,ssid);
 
-            sendEmailToParticipant(userAccount,parentTenantStudy, accessDTO);
+            sendEmailToParticipant(userAccount,tenantStudy, accessDTO);
             studySubject.setUserStatus(UserStatus.INVITED);
             studySubject = studySubjectDao.saveOrUpdate(studySubject);
 
@@ -294,10 +293,13 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private void sendEmailToParticipant(UserAccount userAccount, Study parentTenantStudy,ParticipantAccessDTO accessDTO) {
+    private void sendEmailToParticipant(UserAccount userAccount, Study tenantStudy,ParticipantAccessDTO accessDTO) {
         ParticipantDTO pDTO = new ParticipantDTO();
         pDTO.setEmailAccount(userAccount.getEmail());
         pDTO.setEmailSubject("You've been connected! We're looking forward to your participation.");
+
+        String studyName = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getName() : tenantStudy.getName());
+
 
         String accessLink="";
         String host="";
@@ -312,7 +314,7 @@ public class UserServiceImpl implements UserService {
 
         pDTO.setMessage("Hi "+userAccount.getFirstName()+",\n" +
                 "\n" +
-                "Thanks for participating in "+parentTenantStudy.getName()+"!\n" +
+                "Thanks for participating in "+studyName+"!\n" +
                 "\n" +
                 "Click here to begin " + accessLink + "\n" +
                 "\n" +
