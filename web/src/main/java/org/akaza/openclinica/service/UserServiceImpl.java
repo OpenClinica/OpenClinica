@@ -120,15 +120,23 @@ public class UserServiceImpl implements UserService {
     public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request) {
         getRestfulServiceHelper().setSchema(studyOid, request);
         OCUserDTO ocUserDTO = null;
-
+        Study parentTenantStudy= null;
         Study tenantStudy = getStudy(studyOid);
+        if(tenantStudy.getStudy()!=null)
+             parentTenantStudy = tenantStudy.getStudy();
+
         StudySubject studySubject = getStudySubject(ssid, tenantStudy);
-        String username = tenantStudy.getOc_oid() + "." + studySubject.getOcOid();
+        String username = parentTenantStudy.getOc_oid() + "." + studySubject.getOcOid();
         username = username.replaceAll("\\(", ".").replaceAll("\\)", "");
 
         UserAccountBean ownerUserAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 
-        String accessCode  = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+
+        String accessCode = "";
+        do {
+            accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+        } while (keycloakClient.searchAccessCodeExists(request, accessCode));
+
 
         Study publicStudy = studyDao.findPublicStudy(tenantStudy.getOc_oid());
 
@@ -163,7 +171,7 @@ public class UserServiceImpl implements UserService {
 
             ParticipantAccessDTO accessDTO= getAccessInfo(request,studyOid,ssid);
 
-            sendEmailToParticipant(userAccount,tenantStudy, accessDTO);
+            sendEmailToParticipant(userAccount,parentTenantStudy, accessDTO);
             studySubject.setUserStatus(UserStatus.INVITED);
             studySubject = studySubjectDao.saveOrUpdate(studySubject);
 
@@ -286,12 +294,10 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private void sendEmailToParticipant(UserAccount userAccount, Study tenantStudy,ParticipantAccessDTO accessDTO) {
+    private void sendEmailToParticipant(UserAccount userAccount, Study parentTenantStudy,ParticipantAccessDTO accessDTO) {
         ParticipantDTO pDTO = new ParticipantDTO();
         pDTO.setEmailAccount(userAccount.getEmail());
         pDTO.setEmailSubject("You've been connected! We're looking forward to your participation.");
-        if(tenantStudy.getStudy()!=null)
-            tenantStudy=tenantStudy.getStudy();
 
         String accessLink="";
         String host="";
@@ -306,7 +312,7 @@ public class UserServiceImpl implements UserService {
 
         pDTO.setMessage("Hi "+userAccount.getFirstName()+",\n" +
                 "\n" +
-                "Thanks for participating in "+tenantStudy.getName()+"!\n" +
+                "Thanks for participating in "+parentTenantStudy.getName()+"!\n" +
                 "\n" +
                 "Click here to begin " + accessLink + "\n" +
                 "\n" +
