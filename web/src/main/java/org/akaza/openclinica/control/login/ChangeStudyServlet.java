@@ -343,6 +343,7 @@ public class ChangeStudyServlet extends SecureController {
 
         if (currentRole.isInvestigator() || currentRole.isResearchAssistant()|| currentRole.isResearchAssistant2()) {
             forwardPage(Page.LIST_STUDY_SUBJECTS_SERVLET);
+            return;
         }
         if (currentRole.isMonitor()) {
             response.sendRedirect(request.getContextPath() + "/pages/viewAllSubjectSDVtmp?sdv_restore=true&studyId=" + currentStudy.getId() + "&studyJustChanged=yes");
