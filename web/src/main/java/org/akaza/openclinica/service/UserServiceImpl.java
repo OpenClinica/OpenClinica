@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
     public static final String PARTICIPATE_EDIT = "participate-edit";
     public static final String PARTICIPATE_ADD_NEW = "participate-add-new";
     public static final String PAGINATION = "?page=0&size=1000";
-    public static final String PASSWORD_LENGTH = "6";
+    public static final String PASSWORD_LENGTH = "9";
     public static final String ACCESS_LINK = "accessLink";
     public static final String ACCESS_LINK_PART_URL = "?accessCode=";
 
