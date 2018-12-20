@@ -13,19 +13,23 @@ import org.apache.commons.lang.StringUtils;
 import org.javers.common.collections.Lists;
 import org.keycloak.admin.client.Keycloak;
 import org.keycloak.admin.client.resource.UserResource;
+import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.representations.idm.UserRepresentation;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.http.*;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
+import org.springframework.web.util.UriComponentsBuilder;
 import org.terracotta.modules.ehcache.async.exceptions.ProcessingException;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.ws.rs.core.Response;
 
+import java.text.MessageFormat;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
@@ -42,6 +46,8 @@ public class KeycloakClientImpl {
     String DB_CONNECTION_KEY = "dbConnection";
     public static final String IDENTITY_SERVER_CALL_FAILED = "errorCode.identityServerCallFailed";
     private static final String PATH_SEPARATOR = "/";
+    private static final MessageFormat USERS_PATH = new MessageFormat("/realms/{0}/oc-rest/users");
+    private static final String ACCESS_CODE = "access_code";
 
     @Autowired
     CustomerServiceClientImpl customerServiceClient;
@@ -82,6 +88,24 @@ public class KeycloakClientImpl {
         return handleKeycloakError(createUserResponse);
     }
 
+    public boolean searchAccessCodeExistsOrig(HttpServletRequest request, String accessCode) {
+        logger.debug("Calling Keycloak to search for AccessCode uniqueness");
+        Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
+        String customerUuid = (String) userContextMap.get("customerUuid");
+        String realm = getRealmName(request, customerUuid);
+        List<UserRepresentation> response = keycloak
+                .realm(realm)
+                .users()
+                .search(null, accessCode, null, null, 0, 100);
+
+        if (response.size() != 0) {
+            return true;
+        } else {
+            logger.debug(" AccessCode is Unique");
+            return false;
+        }
+
+    }
 
     public String getAccessCode(HttpServletRequest request, String userUuid) {
         logger.debug("Calling Keycloak to get participate UserPresentation object");
@@ -120,5 +144,52 @@ public class KeycloakClientImpl {
         }
         throw new CustomParameterizedException(IDENTITY_SERVER_CALL_FAILED, errorMessage);
     }
+
+
+    public boolean searchAccessCodeExists(HttpServletRequest request, String accessCode) {
+        logger.debug("Calling Keycloak to search for AccessCode uniqueness");
+        RestTemplate restTemplate = new RestTemplate();
+
+        Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
+        String customerUuid = (String) userContextMap.get("customerUuid");
+        String realm = getRealmName(request, customerUuid);
+
+        AuthzClient authzClient = AuthzClient.create();
+        String keycloakBaseUrl = authzClient.getConfiguration().getAuthServerUrl();
+
+        String usersUrlPath = USERS_PATH.format(new String[]{realm});
+        UriComponentsBuilder uriComponentsBuilder = UriComponentsBuilder.fromHttpUrl(keycloakBaseUrl)
+                .path(usersUrlPath)
+                .queryParam(ACCESS_CODE, accessCode);
+
+        String uri = uriComponentsBuilder.toUriString();
+        logger.debug("Get User Access Code search : {}", uri);
+
+        String accessToken = (String) request.getSession().getAttribute("accessToken");
+        HttpHeaders headers = new HttpHeaders();
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        HttpEntity entity = new HttpEntity<OCUserDTO>(headers);
+        ResponseEntity<List<UserRepresentation>> response = null;
+        try {
+            response =
+                    restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<UserRepresentation>>() {
+                    });
+
+        } catch (HttpClientErrorException e) {
+            logger.error("Auth0 error message: {}", e.getResponseBodyAsString());
+        }
+
+        if (response != null && response.getBody().size() != 0) {
+            return true;
+        } else {
+            logger.debug(" AccessCode is Unique");
+            return false;
+        }
+
+    }
+
+
+
 
 }

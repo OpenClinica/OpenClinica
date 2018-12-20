@@ -99,7 +99,7 @@ public class UserServiceImpl implements UserService {
     public static final String PARTICIPATE_EDIT = "participate-edit";
     public static final String PARTICIPATE_ADD_NEW = "participate-add-new";
     public static final String PAGINATION = "?page=0&size=1000";
-    public static final String PASSWORD_LENGTH = "6";
+    public static final String PASSWORD_LENGTH = "9";
     public static final String ACCESS_LINK = "accessLink";
     public static final String ACCESS_LINK_PART_URL = "?accessCode=";
 
@@ -120,15 +120,22 @@ public class UserServiceImpl implements UserService {
     public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request) {
         getRestfulServiceHelper().setSchema(studyOid, request);
         OCUserDTO ocUserDTO = null;
-
         Study tenantStudy = getStudy(studyOid);
+
+        String oid = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getOc_oid() : tenantStudy.getOc_oid());
+
         StudySubject studySubject = getStudySubject(ssid, tenantStudy);
-        String username = tenantStudy.getOc_oid() + "." + studySubject.getOcOid();
+        String username = oid + "." + studySubject.getOcOid();
         username = username.replaceAll("\\(", ".").replaceAll("\\)", "");
 
         UserAccountBean ownerUserAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 
-        String accessCode  = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+
+        String accessCode = "";
+        do {
+            accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+        } while (keycloakClient.searchAccessCodeExists(request, accessCode));
+
 
         Study publicStudy = studyDao.findPublicStudy(tenantStudy.getOc_oid());
 
@@ -290,8 +297,9 @@ public class UserServiceImpl implements UserService {
         ParticipantDTO pDTO = new ParticipantDTO();
         pDTO.setEmailAccount(userAccount.getEmail());
         pDTO.setEmailSubject("You've been connected! We're looking forward to your participation.");
-        if(tenantStudy.getStudy()!=null)
-            tenantStudy=tenantStudy.getStudy();
+
+        String studyName = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getName() : tenantStudy.getName());
+
 
         String accessLink="";
         String host="";
@@ -306,7 +314,7 @@ public class UserServiceImpl implements UserService {
 
         pDTO.setMessage("Hi "+userAccount.getFirstName()+",\n" +
                 "\n" +
-                "Thanks for participating in "+tenantStudy.getName()+"!\n" +
+                "Thanks for participating in "+studyName+"!\n" +
                 "\n" +
                 "Click here to begin " + accessLink + "\n" +
                 "\n" +
