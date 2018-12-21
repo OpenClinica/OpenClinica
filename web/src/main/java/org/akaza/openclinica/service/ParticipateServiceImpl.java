@@ -254,7 +254,7 @@ public class ParticipateServiceImpl implements ParticipateService {
 
     private ODMcomplexTypeDefinitionClinicalData generateClinicalData(StudyBean study) {
         ODMcomplexTypeDefinitionClinicalData clinicalData = new ODMcomplexTypeDefinitionClinicalData();
-        clinicalData.setStudyName(study.getName());
+        clinicalData.setStudyName(getParentStudy(study.getOid()).getName());
         clinicalData.setStudyOID(study.getOid());
         return clinicalData;
     }

@@ -346,7 +346,7 @@ public class UpdateStudyEventServlet extends SecureController {
             studyEvent.setSubjectEventStatus(ses);
             EventCRFDAO ecdao = new EventCRFDAO(sm.getDataSource());
             ArrayList<EventCRFBean> eventCRFs = ecdao.findAllByStudyEvent(studyEvent);
-            if (ses.equals(SubjectEventStatus.SKIPPED) ) {
+            if (ses.equals(SubjectEventStatus.SKIPPED) || ses.equals(SubjectEventStatus.STOPPED) ) {
                 studyEvent.setStatus(Status.UNAVAILABLE);
                 for (int i = 0; i < eventCRFs.size(); i++) {
                     EventCRFBean ecb = eventCRFs.get(i);
@@ -357,8 +357,11 @@ public class UpdateStudyEventServlet extends SecureController {
                     ecdao.update(ecb);
                 }
             } else {
+                studyEvent.setStatus(Status.AVAILABLE);
                 for (int i = 0; i < eventCRFs.size(); i++) {
                     EventCRFBean ecb = eventCRFs.get(i);
+                    ecb.setOldStatus(ecb.getStatus());
+                    ecb.setStatus(Status.AVAILABLE);
                     ecb.setUpdater(ub);
                     ecb.setUpdatedDate(new Date());
                     ecdao.update(ecb);
