@@ -29,7 +29,8 @@ public interface UserService {
 
 	List<OCUserDTO> getAllParticipantAccountsFromUserService(HttpServletRequest request);
 
-
 	 RestfulServiceHelper getRestfulServiceHelper();
 
-}
+    ParticipantAccessDTO getAccessInfo(HttpServletRequest request,String studyOid, String ssid);
+
+	}

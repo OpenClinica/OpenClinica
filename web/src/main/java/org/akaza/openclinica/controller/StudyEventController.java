@@ -101,16 +101,16 @@ public class StudyEventController {
      * "message": "Success."
      * }
      */
-    @RequestMapping( value = "/studies/{studyOid}/studyevent/{studyEventDefOid}/ordinal/{ordinal}/complete", method = RequestMethod.PUT )
+    @RequestMapping( value = "/studyevent/{studyEventDefOid}/ordinal/{ordinal}/complete", method = RequestMethod.PUT )
     public @ResponseBody
     Map<String, String> completeParticipantEvent(HttpServletRequest request, @PathVariable( "studyEventDefOid" ) String studyEventDefOid,
-                                                 @PathVariable( "studyOid" ) String studyOid,
                                                  @PathVariable( "ordinal" ) Integer ordinal)
             throws Exception {
+        String studyOid=(String)request.getSession().getAttribute("studyOid");
+        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute("userBean");
 
         getRestfulServiceHelper().setSchema(studyOid, request);
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
-        UserAccountBean ub = getRestfulServiceHelper().getParticipantUserAccount(request);
         if(ub==null){
             logger.info("userAccount is null");
             return null;

@@ -6,6 +6,8 @@ import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
+import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.core.CoreResources;
@@ -41,6 +43,7 @@ import java.util.ArrayList;
 import java.util.Collections;
 import java.util.Date;
 import java.util.List;
+import java.util.Set;
 
 
 import static java.util.Collections.*;
@@ -86,6 +89,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     KeycloakClientImpl keycloakClient;
 
+    @Autowired
+    StudyBuildService studyBuildService;
+
     private RestfulServiceHelper restfulServiceHelper;
 
     public static final String FORM_CONTEXT = "ecid";
@@ -93,7 +99,10 @@ public class UserServiceImpl implements UserService {
     public static final String PARTICIPATE_EDIT = "participate-edit";
     public static final String PARTICIPATE_ADD_NEW = "participate-add-new";
     public static final String PAGINATION = "?page=0&size=1000";
-    public static final String PASSWORD_LENGTH = "6";
+    public static final String PASSWORD_LENGTH = "9";
+    public static final String ACCESS_LINK = "accessLink";
+    public static final String ACCESS_LINK_PART_URL = "?accessCode=";
+
 
     private String sbsUrl = CoreResources.getField("SBSUrl");
 
@@ -111,15 +120,22 @@ public class UserServiceImpl implements UserService {
     public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request) {
         getRestfulServiceHelper().setSchema(studyOid, request);
         OCUserDTO ocUserDTO = null;
-
         Study tenantStudy = getStudy(studyOid);
+
+        String oid = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getOc_oid() : tenantStudy.getOc_oid());
+
         StudySubject studySubject = getStudySubject(ssid, tenantStudy);
-        String username = tenantStudy.getOc_oid() + "." + studySubject.getOcOid();
+        String username = oid + "." + studySubject.getOcOid();
         username = username.replaceAll("\\(", ".").replaceAll("\\)", "");
 
         UserAccountBean ownerUserAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 
-        String accessCode  = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+
+        String accessCode = "";
+        do {
+            accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+        } while (keycloakClient.searchAccessCodeExists(request, accessCode));
+
 
         Study publicStudy = studyDao.findPublicStudy(tenantStudy.getOc_oid());
 
@@ -151,7 +167,10 @@ public class UserServiceImpl implements UserService {
             logger.info("Participant does not exists or not added yet in OC ");
         }
         if (participantDTO.isInviteParticipant()) {
-            sendEmailToParticipant(userAccount,tenantStudy);
+
+            ParticipantAccessDTO accessDTO= getAccessInfo(request,studyOid,ssid);
+
+            sendEmailToParticipant(userAccount,tenantStudy, accessDTO);
             studySubject.setUserStatus(UserStatus.INVITED);
             studySubject = studySubjectDao.saveOrUpdate(studySubject);
 
@@ -274,21 +293,37 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private void sendEmailToParticipant(UserAccount userAccount,Study tenantStudy) {
+    private void sendEmailToParticipant(UserAccount userAccount, Study tenantStudy,ParticipantAccessDTO accessDTO) {
         ParticipantDTO pDTO = new ParticipantDTO();
         pDTO.setEmailAccount(userAccount.getEmail());
-        pDTO.setEmailSubject("This is the email Subject");
-        pDTO.setMessage("Hi "+userAccount.getFirstName()+" ,\n" +
+        pDTO.setEmailSubject("You've been connected! We're looking forward to your participation.");
+
+        String studyName = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getName() : tenantStudy.getName());
+
+
+        String accessLink="";
+        String host="";
+        String accessCode="";
+
+        if (accessDTO != null) {
+            accessLink = (accessDTO.getAccessLink() == null ? "" : accessDTO.getAccessLink());
+            host = (accessDTO.getHost() == null ? "" : accessDTO.getHost());
+            accessCode = (accessDTO.getAccessCode() == null ? "" : accessDTO.getAccessCode());
+        }
+
+
+        pDTO.setMessage("Hi "+userAccount.getFirstName()+",\n" +
                 "\n" +
-                "Thanks for participating in "+tenantStudy.getName()+"!\n" +
+                "Thanks for participating in "+studyName+"!\n" +
                 "\n" +
-                "${participant.loginurl}\n" +
+                "Click here to begin " + accessLink + "\n" +
                 "\n" +
-                "Or, you may go to: ${participate.url}\n" +
-                "and enter access code "+userAccount.getAccessCode()+"\n" +
+                "Or, you may go to: " + host + "\n" +
+                "and enter access code " + accessCode + "\n" +
                 "\n" +
                 "Thank you,\n" +
                 "The Study Team");
+
         sendEmailToParticipant(pDTO);
 
     }
@@ -320,6 +355,51 @@ public class UserServiceImpl implements UserService {
             restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
         }
         return restfulServiceHelper;
+    }
+
+
+    public ParticipantAccessDTO getAccessInfo( HttpServletRequest request,String studyOid, String ssid) {
+        Study tenantStudy = getStudy(studyOid);
+        StudySubject studySubject = getStudySubject(ssid, tenantStudy);
+        if(studySubject==null || studySubject.getUserId()==null) {
+         logger.error("Participant account not found");
+            return null;
+        }
+        String tenantSchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
+        UserAccount pUserAccount = userAccountDao.findByUserId(studySubject.getUserId());
+        CoreResources.setRequestSchema(tenantSchema);
+        if(pUserAccount==null || pUserAccount.getUserUuid()==null) {
+            logger.error("Participant account not found");
+            return null;
+        }
+        String accessCode = keycloakClient.getAccessCode(request,pUserAccount.getUserUuid());
+
+        if(accessCode==null) {
+            logger.error(" Access code from Keycloack returned null ");
+            return null;
+        }
+        if (tenantStudy.getStudy()!=null)
+            tenantStudy = tenantStudy.getStudy();
+
+        List<ModuleConfigDTO> moduleConfigDTOs = studyBuildService.getParticipateModuleFromStudyService(request, tenantStudy);
+        if (moduleConfigDTOs != null && moduleConfigDTOs.size() != 0) {
+            ModuleConfigDTO moduleConfigDTO = studyBuildService.getModuleConfig(moduleConfigDTOs, tenantStudy);
+            if (moduleConfigDTO != null) {
+                ModuleConfigAttributeDTO moduleConfigAttributeDTO = studyBuildService.getModuleConfigAttribute(moduleConfigDTO.getAttributes(), tenantStudy, ACCESS_LINK);
+                if (moduleConfigAttributeDTO != null) {
+                    logger.info("Participant Access Link is :{}",moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
+                    ParticipantAccessDTO participantAccessDTO = new ParticipantAccessDTO();
+                    participantAccessDTO.setAccessCode(accessCode);
+                    participantAccessDTO.setHost(moduleConfigAttributeDTO.getValue());
+                    participantAccessDTO.setAccessLink(moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
+
+                    return participantAccessDTO;
+                }
+            }
+        }
+        logger.error("Participant Access Link is not found");
+        return null;
     }
 
 

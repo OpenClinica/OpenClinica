@@ -115,6 +115,21 @@ public class UserController {
 
     }
 
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}/accessLink", method = RequestMethod.GET )
+    public ResponseEntity<ParticipantAccessDTO> getAccessLink(HttpServletRequest request,@PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid) {
+        userService.getRestfulServiceHelper().setSchema(studyOid, request);
+        ParticipantAccessDTO participantAccessDTO= userService.getAccessInfo(request,studyOid, ssid);
+        if(participantAccessDTO==null){
+            logger.error("REST request to GET AccessLink Object for Participant not found ");
+            return new ResponseEntity<ParticipantAccessDTO>(participantAccessDTO, HttpStatus.NOT_FOUND);
+        }
+
+        logger.info("REST request to GET AccessLink Object : {}", participantAccessDTO);
+        return new ResponseEntity<ParticipantAccessDTO>(participantAccessDTO, HttpStatus.OK);
+    }
+
+
+
     private void setUpSidebar(HttpServletRequest request) {
         if (sidebarInit.getAlertsBoxSetup() ==
                 SidebarEnumConstants.OPENALERTS) {

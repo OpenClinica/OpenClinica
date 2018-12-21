@@ -101,7 +101,14 @@ public class KeycloakController {
         req.getSession().setAttribute("accessToken", kp.getKeycloakSecurityContext().getTokenString());
         KeycloakUser user = new KeycloakUser(token);
 
-        ocUserUuid = (String) user.getUserContext().get("userUuid");
+        String userType = (String) user.getUserContext().get("userType");
+        if (userType.equals(org.akaza.openclinica.service.UserType.PARTICIPATE.getName())) {
+            ocUserUuid = (String) user.getUserContext().get("username");
+        } else {
+            ocUserUuid = (String) user.getUserContext().get("userUuid");
+        }
+
+
         UserAccountHelper userAccountHelper;
         UserAccountBean prevUser = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
         try {
