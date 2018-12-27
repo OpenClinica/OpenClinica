@@ -313,26 +313,6 @@ public class RestfulServiceHelper {
     }
 
 
-	public UserAccountBean getParticipantUserAccount(HttpServletRequest request) {
-		Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
-		String userType = (String) userContextMap.get("userType");
-
-		if (userType.equals(org.akaza.openclinica.service.UserType.PARTICIPATE.getName())) {
-			String keycloakId = (String) userContextMap.get("username");
-
-			String schema = CoreResources.getRequestSchema();
-			CoreResources.setRequestSchema("public");
-			UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-			UserAccountBean userAccountBean = (UserAccountBean) userAccountDAO.findByUserUuid(keycloakId);
-			CoreResources.setRequestSchema(schema);
-			return userAccountBean;
-		} else {
-			return null;
-		}
-
-
-
-	}
 	
 	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request) throws Exception {
 

@@ -1144,9 +1144,11 @@
                   }
                   #eye {
                     position: absolute;
-                    top: 2px;
-                    right: 30px;
+                    top: 1px;
+                    right: 27px;
                     font-size: 18pt;
+                    background-color: white;
+                    padding: 2px 6px;
                   }
                 </style>
                 <div id="phone-widget">
@@ -1470,6 +1472,16 @@
                 console.log(arguments);
             }
         });
+        jQuery.ajax({
+            type: 'get',
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/accessLink',
+            success: function(data) {
+                $('#access-code-input').val(data.accessLink);
+            },
+            error: function() {
+                console.log(arguments);
+            }
+        });
 
         jQuery('#editParticipantID').click(function () {
             jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
@@ -1567,10 +1579,6 @@
                       entityName: 'Participant ID',
                       auditLogEventTypId: '42'                
                   }),
-                  success: function(data) {
-                      console.log(arguments);
-                      alert(data);
-                  },
                   error: function() {
                       console.log(arguments);
                   }
