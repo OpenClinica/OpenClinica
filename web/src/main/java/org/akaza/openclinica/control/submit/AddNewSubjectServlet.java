@@ -222,7 +222,7 @@ public class AddNewSubjectServlet extends SecureController {
 
             HashMap errors = v.validate();
 
-            if (label.contains("<") || label.contains(">")) {
+            if (label.contains("<") || label.contains(">") || label.contains("'") || label.contains("\"")) {
                 Validator.addError(errors, INPUT_LABEL, resexception
                         .getString("study_subject_id_can_not_contain_html_lessthan_or_greaterthan_elements"));
             }
