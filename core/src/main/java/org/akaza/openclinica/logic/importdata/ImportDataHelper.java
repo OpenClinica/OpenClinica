@@ -14,6 +14,7 @@ import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
+import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
@@ -45,11 +46,12 @@ import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.FormLayoutDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.web.multipart.MultipartFile;
 
 /**
  * ImportDataHelper the entire focus of this piece of code is to generate the
@@ -338,8 +340,8 @@ public class ImportDataHelper {
     	}
     }
     
-    public void deletePersonalTempImportFile(File file,HttpServletRequest request) {
-    	String fileName = file.getName();
+    public void deletePersonalTempImportFile(String fileName,HttpServletRequest request) {
+    	
     	String importFileDir = this.getPersonalImportFileDir(request);
     	
     	File tempFile = new File(importFileDir + fileName);
@@ -501,6 +503,57 @@ public class ImportDataHelper {
 	}  
     
     /**
+     * 
+     * @param request
+     * @return
+     */
+    public ArrayList<File> getPersonalImportLogFile(HttpServletRequest request) {
+    
+    	ArrayList<File> fileList = new ArrayList<>();
+    	String importFileDir = this.getPersonalImportFileDir(request);    	
+    	File fileFolder = new File(importFileDir);
+    	
+    	for (final File fileEntry : fileFolder.listFiles()) {
+    	      if (fileEntry.isDirectory()) {
+    	       ;
+    	      } else {
+    	        if (fileEntry.isFile()) {
+    	          String fileName = fileEntry.getName();
+    	          if (fileName.endsWith(".log")) {
+    	        	  fileList.add(fileEntry);
+    	          }
+    	            
+    	        }
+
+    	      }
+    	    }
+    	
+    	return fileList;
+    }
+    
+    public File getPersonalImportLogFile(String fileNm,HttpServletRequest request) {
+        
+    	String importFileDir = this.getPersonalImportFileDir(request);    	
+    	File fileFolder = new File(importFileDir);
+    	
+    	for (final File fileEntry : fileFolder.listFiles()) {
+    	      if (fileEntry.isDirectory()) {
+    	       ;
+    	      } else {
+    	        if (fileEntry.isFile()) {
+    	          String fileName = fileEntry.getName();
+    	          if (fileName.equals(fileNm)) {
+    	        	  return fileEntry;
+    	          }
+    	            
+    	        }
+
+    	      }
+    	    }
+    	
+    	return null;
+    }
+    /**
      * Helper Method to get the user account
      * 
      * @return UserAccountBean
@@ -526,5 +579,100 @@ public class ImportDataHelper {
     	return userBean;
        
 	}
-   
-}
+    
+    public File[] convert(MultipartFile[] files)
+    {    
+        int size =  files.length;
+        
+        File[]  fileArray = new File[size];
+        
+        int i = 0;
+        for(MultipartFile file :files) {
+        	File convFile = new File(this.getImportFileDir() + file.getOriginalFilename());
+            try {
+				convFile.createNewFile();
+				FileOutputStream fos = new FileOutputStream(convFile); 
+	            fos.write(file.getBytes());
+	            fos.close(); 
+	            fileArray[i]= convFile;
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			} 
+           
+            i++;
+        }
+    	
+        
+        return fileArray;
+    }  
+    
+    /**
+     *  FormOID=F_DEMOGRAPHICS
+		FormVersion=1
+		StudyOID=S_TEST_STU(TEST)
+		StudyEventOID=SE_COMMON
+
+     * @param file
+     * @throws IOException
+     */
+    public void validateMappingFile(File file) throws IOException,OpenClinicaSystemException{
+       
+    	boolean foundFormOID=false;
+    	boolean foundFormVersion=false;
+    	boolean foundStudyOID=false;
+    	boolean foundStudyEventOID=false;
+    			
+        try(Scanner sc = new Scanner(file)){
+       	
+         String currentLine;
+		
+       	 while (sc.hasNextLine()) {
+       		 currentLine = sc.nextLine();
+       		 String[] mappingRow = currentLine.split("=");
+       		 
+       		 if(mappingRow.length == 2) {
+       			 String keyWord = mappingRow[0];
+           		 String value = mappingRow[1];
+           		 if(keyWord != null && keyWord.trim().startsWith("FormOID") && value != null && value.trim().length() >0) {
+           			foundFormOID=true;
+           		 }
+           		 
+           		 if(keyWord != null && keyWord.trim().startsWith("FormVersion") && value != null && value.trim().length() >0) {
+           			foundFormVersion=true;
+                 }
+           		 
+           		 if(keyWord != null && keyWord.trim().startsWith("StudyOID") && value != null && value.trim().length() >0) {
+           			foundStudyOID=true;
+            	 }
+           		 
+           		 if(keyWord != null && keyWord.trim().startsWith("StudyEventOID") && value != null && value.trim().length() >0) {
+           			foundStudyEventOID=true;
+            	 } 
+       		 }
+       		
+       		 
+		    
+		     }
+		
+		 }
+		
+        if(!foundFormOID) {
+        	 throw new OpenClinicaSystemException("errorCode.noFormOID", "Please check mapping file, named like *mapping.txt -- make sure that it has correct FormOID configuration.  ");
+        }
+        
+        if(!foundFormVersion) {
+       	 	throw new OpenClinicaSystemException("errorCode.noFormVersion", "Please check mapping file, named like *mapping.txt -- make sure that it has correct FormVersion configuration.  ");
+        }
+        
+        if(!foundStudyOID) {
+       	 	throw new OpenClinicaSystemException("errorCode.noStudyOID", "Please check mapping file, named like *mapping.txt -- make sure that it has correct StudyOID configuration.  ");
+        }
+        
+        if(!foundStudyEventOID) {
+       	 	throw new OpenClinicaSystemException("errorCode.noStudyEventOID", "Please check mapping file, named like *mapping.txt -- make sure that it has correct StudyEventOID configuration.  ");
+        }
+        
+    	
+	 }
+   }

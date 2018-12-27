@@ -17,8 +17,10 @@ import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Enumeration;
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
+import java.util.Map;
 import java.util.ResourceBundle;
 
 import javax.net.ssl.HostnameVerifier;
@@ -42,10 +44,13 @@ import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.control.submit.ImportCRFInfo;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
+import org.akaza.openclinica.control.submit.ImportCRFInfoSummary;
+import org.akaza.openclinica.control.submit.UploadCRFDataToHttpServerServlet;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.logic.importdata.ImportDataHelper;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
 import org.akaza.openclinica.logic.rulerunner.ImportDataRuleRunnerContainer;
 import org.akaza.openclinica.service.DataImportService;
@@ -79,9 +84,11 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.web.multipart.MultipartFile;
+import org.springframework.web.multipart.MultipartHttpServletRequest;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.databind.SerializationFeature;
@@ -103,6 +110,7 @@ public class DataController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private final Locale locale = new Locale("en_US");
     public static final String USER_BEAN_NAME = "userBean";
+  
 
     static {
         disableSslVerification();
@@ -216,11 +224,11 @@ public class DataController {
         
         Enumeration<String> headerNames = request.getHeaderNames();
 
-        if (headerNames != null) {
+     /*   if (headerNames != null) {
                 while (headerNames.hasMoreElements()) {
                         System.out.println("Header: " + request.getHeader(headerNames.nextElement()));
                 }
-        }
+        }*/
         
        
 
@@ -339,7 +347,7 @@ public class DataController {
 
             // if no error then continue to validate
             if (!errors.hasErrors()) {
-                crfDataImportValidator.validate(crfDataImportBean, errors);
+                crfDataImportValidator.validate(crfDataImportBean, errors,request);
             }
 
 
@@ -687,4 +695,100 @@ public class DataController {
        
     
     }
+    
+    @ApiOperation(value = "To import study data in Pipe Delimited Text File", notes = "Will read both the data text files and  one mapping text file, then validate study,event and participant against the  setup first, for more detail please refer to OpenClinica online document  ")
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful operation"),
+            @ApiResponse(code = 400, message = "Bad Request -- Normally means found validation errors, for detail please see the error message")})
+
+    @RequestMapping(value = "/pipe", method = RequestMethod.POST)
+    public ResponseEntity<Object> importDataPipeDelimitedFile(HttpServletRequest request, MultipartFile dataFile,MultipartFile mappingFile) throws Exception {
+
+        ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
+        ResponseEntity<Object> response = null;
+
+        String validation_failed_message = "VALIDATION FAILED";
+        String validation_passed_message = "SUCCESS";
+
+        String importXml = null;
+        ImportDataResponseSuccessDTO responseSuccessDTO = new ImportDataResponseSuccessDTO();
+        ImportCRFInfoSummary importCRFInfoSummary = null;
+      
+        MultipartFile[] mFiles = new MultipartFile[2];
+        mFiles[0] = mappingFile;
+        mFiles[1] = dataFile;
+        
+        
+        
+        try {       	         	  
+              //only support text file
+              if (mFiles[0] !=null) {
+            	  boolean foundMappingFile = false;
+            	  
+            	 File[] files = this.dataImportService.getImportCRFDataService().getImportDataHelper().convert(mFiles);
+            	  
+            	  for (File file : files) {           
+                      
+                      if (file == null || file.getName() == null) {
+                          logger.info("file is empty.");
+                 
+                      }else {
+                      	if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+                      		foundMappingFile = true;
+                      		logger.info("Found mapping.txt uploaded");
+                      		
+                      		this.dataImportService.getImportCRFDataService().getImportDataHelper().validateMappingFile(file);
+                      		break;
+                      	}
+                      }
+                  }
+            	 
+            	  if(files.length < 2) {
+            		  throw new OpenClinicaSystemException("errorCode.notCorrectFileNumber", "When send files, Please send at least one data text files and  one mapping text file in correct format ");
+            	  }
+            	  if (!foundMappingFile) {            		
+            		  throw new OpenClinicaSystemException("errorCode.noMappingfile", "When send files, please include one correct mapping file, named like *mapping.txt ");
+            	  }
+            	 
+            	  importCRFInfoSummary = this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(Arrays.asList(files), request);
+              }else {
+            	  
+            	  throw new OpenClinicaSystemException("errorCode.notCorrectFileNumber", "Please send at least one data text files and  one mapping text file in correct format ");
+              }	  	
+        } catch (OpenClinicaSystemException e) {
+
+            String err_msg = e.getMessage();
+            ErrorMessage error = createErrorMessage(e.getErrorCode(), err_msg);
+            errorMsgs.add(error);
+
+        } catch (Exception e) {
+            e.printStackTrace();
+            String err_msg = "Error processing data import request.";
+            ErrorMessage error = createErrorMessage("errorCode.Exception", err_msg);
+            errorMsgs.add(error);
+
+        }
+
+        if (errorMsgs != null && errorMsgs.size() != 0) {
+            ImportDataResponseFailureDTO responseDTO = new ImportDataResponseFailureDTO();
+            responseDTO.setMessage(validation_failed_message);
+            responseDTO.setErrors(errorMsgs);
+            response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+        } else {
+        	String msg = validation_passed_message;
+        	if(importCRFInfoSummary != null) {
+        		msg = validation_passed_message + "\n" + importCRFInfoSummary.getSummaryMsg();
+        	}
+        	responseSuccessDTO.setMessage(msg);
+            response = new ResponseEntity(responseSuccessDTO, org.springframework.http.HttpStatus.OK);
+        }
+
+        return response;
+    }
+
+	
+
+	
+        
+          
 }

@@ -123,8 +123,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
             logger.info("action is blank");
           
             forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
-        }
-        if ("confirm".equalsIgnoreCase(action)) {
+        }else if ("confirm".equalsIgnoreCase(action)) {
             String dir = SQLInitServlet.getField("filePath");
             if (!new File(dir).exists()) {
                 logger.info("The filePath in datainfo.properties is invalid " + dir);
@@ -162,7 +161,18 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
             
             forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
                     	 
+        } else if ("download".equalsIgnoreCase(action)) {
+            String fileName= request.getParameter("fileId");
+            File file = this.getImportDataHelper().getPersonalImportLogFile(fileName,  request);
+            dowloadFile(file, "text/xml");
+            
+        } else if ("delete".equalsIgnoreCase(action)) {
+            String fileName= request.getParameter("fileId");
+            this.getImportDataHelper().deletePersonalTempImportFile(fileName,request);
+            
+            forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
         }
+        
         
 
     }
@@ -703,7 +713,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	}
 	
 	
-	private void sendOneDataRowPerRequestByHttpClient(List<File> files) throws Exception {
+	public void sendOneDataRowPerRequestByHttpClient(List<File> files) throws Exception {
 
   		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
   		
@@ -840,5 +850,9 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 
 	public void setImportDataHelper(ImportDataHelper importDataHelper) {
 		this.importDataHelper = importDataHelper;
+	}
+	
+	public void setHttpServletRequest(HttpServletRequest request) {
+		this.request = request;
 	}
 }

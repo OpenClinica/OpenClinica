@@ -1,6 +1,8 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<%@ page import="org.akaza.openclinica.logic.importdata.*" %>
+<%@ page import="java.io.*" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -103,6 +105,74 @@
 <br/>
 <div class="homebox_bullets"><a href="ImportRule?action=downloadUploadDataTemplate"><b><fmt:message key="download_upload_data_template" bundle="${resword}"/></b></a></div>
 <div class="homebox_bullets"><a href="ImportRule?action=downloadUploadMappingTemplate"><b><fmt:message key="download_upload_mapping_template" bundle="${resword}"/></b></a></div>
+
+<% 
+    ImportDataHelper importDataHelper = new ImportDataHelper();
+    String fileDir = importDataHelper.getPersonalImportFileDir(request);
+	System.out.println("\nfileDir=============: " + fileDir);
+    File f = new File(fileDir);
+    String [] fileNames = f.list();
+    int i = 0;
+    String fname=null;
+    File [] fileObjects= f.listFiles();
+    BufferedReader readReport;
+    int num=0;
+
+    {
+        %>
+        <table name="reports">
+        <th width=12.5% align="center" bgcolor="gray">Log File Name</th>
+        <th width=12.5% align="center" bgcolor="gray">File Size</th>
+        <th width=12.5% align="center" bgcolor="gray">Updated Time</th>        
+        <th width=12.5% align="center" bgcolor="gray">Action</th>
+        <%
+    }
+
+    for (i=0; i < fileObjects.length; i++)
+    {
+
+        if(!fileObjects[i].isDirectory())
+            {
+            fname = fileDir+fileNames[i];
+
+            if(fname.endsWith("_log.txt"))
+            {
+                
+                    { 
+                        %>
+                        <tr bgcolor="lightgray">
+                            <td width=12.5% align="center">
+                                <%=fileNames[i]%>
+                            </td>
+
+                            <td width=12.5% align="center">
+									<%=fileObjects[i].length()%>
+                            </td>
+
+                            <td width=12.5%  align="center">
+									<%=new java.util.Date(fileObjects[i].lastModified())%>
+                            </td>
+                            
+                            <td width=12.5%  align="center">
+                                <a target="_new" href="UploadCRFData?action=download&fileId=<%=fileNames[i]%>">
+									<span name="bt_Download1" class="icon icon-download" border="0" align="left" hspace="6"
+										 alt="<fmt:message key="download" bundle="${resword}"/>" title="<fmt:message key="download" bundle="${resword}"/>">
+								</a>
+								<a href="UploadCRFData?action=delete&fileId=<%=fileNames[i]%>">
+									<span name="bt_Delete1" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>"
+										 title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"
+										 onClick='return confirm("Please confirm that you want to delete log file <%=fileNames[i]%>");'>
+								</a>
+                            </td>
+                        </tr>
+
+                        <%
+                    }
+                }
+        }
+    }
+    {%></table> <%}
+%>
 
 
 <jsp:include page="../include/footer.jsp"/>
