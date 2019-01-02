@@ -222,12 +222,14 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
     public boolean saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ubIn) throws Exception {
         UserAccount ub = userAccountDao.findByUserId(ubIn.getId());
-        boolean studyUserRoleUpdated = false;
+        boolean studyUserRoleUpdated;
         int userActiveStudyId;
 
         // because JDB transaction is not seen right away by Hibernate, active Study in UserAccountBean may not be the same as UserAccount
         if (ubIn.getActiveStudyId() != 0) {
-            ub.setActiveStudy(studyDao.findPublicStudyById(ubIn.getActiveStudyId()));
+            if ((ub.getActiveStudy() != null && ub.getActiveStudy().getStudyId() != ubIn.getActiveStudyId())
+                || ub.getActiveStudy() == null)
+                ub.setActiveStudy(studyDao.findPublicStudyById(ubIn.getActiveStudyId()));
         }
         if (ub.getActiveStudy() == null)
             userActiveStudyId = 0;

@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<jsp:useBean class="org.apache.commons.lang.StringEscapeUtils" id="esc" />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
@@ -1144,9 +1145,11 @@
                   }
                   #eye {
                     position: absolute;
-                    top: 2px;
-                    right: 30px;
+                    top: 1px;
+                    right: 27px;
                     font-size: 18pt;
+                    background-color: white;
+                    padding: 2px 6px;
                   }
                 </style>
                 <div id="phone-widget">
@@ -1464,8 +1467,18 @@
     jQuery(document).ready(function () {
         jQuery.ajax({
             type: 'get',
-            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}',
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
             success: updateParticipateInfo,
+            error: function() {
+                console.log(arguments);
+            }
+        });
+        jQuery.ajax({
+            type: 'get',
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink',
+            success: function(data) {
+                $('#access-code-input').val(data.accessLink);
+            },
             error: function() {
                 console.log(arguments);
             }
@@ -1484,7 +1497,7 @@
             };
             jQuery.ajax({
                 type: 'post',
-                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/connect',
+                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: updateParticipateInfo,
@@ -1567,10 +1580,6 @@
                       entityName: 'Participant ID',
                       auditLogEventTypId: '42'                
                   }),
-                  success: function(data) {
-                      console.log(arguments);
-                      alert(data);
-                  },
                   error: function() {
                       console.log(arguments);
                   }
