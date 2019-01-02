@@ -600,6 +600,7 @@ public class CoreResources implements ResourceLoaderAware {
         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
         DATAINFO.setProperty("archiveUsername", DATAINFO.getProperty("archiveDbUser"));
         DATAINFO.setProperty("archivePassword", DATAINFO.getProperty("archiveDbPass"));
+        String dbSSLsetting = String.valueOf(DATAINFO.getOrDefault("dbSSL", "false"));
 
         String url = null, driver = null, hibernateDialect = null;
         String archiveUrl = null;
@@ -609,6 +610,9 @@ public class CoreResources implements ResourceLoaderAware {
             hibernateDialect = "org.hibernate.dialect.PostgreSQL94Dialect";
             archiveUrl = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("archiveDbHost") + ":" + DATAINFO.getProperty("archiveDbPort") + "/"
                     + DATAINFO.getProperty("archiveDb");
+            if (dbSSLsetting.equals("true")){
+                url = url + "?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
+            }
         } else if (database.equalsIgnoreCase("oracle")) {
             url = "jdbc:oracle:thin:" + "@" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + ":" + DATAINFO.getProperty("db");
             driver = "oracle.jdbc.driver.OracleDriver";
