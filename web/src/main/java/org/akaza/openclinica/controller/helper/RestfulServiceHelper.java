@@ -12,6 +12,7 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.importdata.ImportDataHelper;
+import org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
 import org.akaza.openclinica.service.UserStatus;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
@@ -71,7 +72,7 @@ public class RestfulServiceHelper {
 	private DataSource dataSource;	
 	private StudyDAO studyDao; 
 	private UserAccountDAO userAccountDAO;
-	private ImportDataHelper importDataHelper;
+	private PipeDelimitedDataHelper importDataHelper;
 
 	
 	public RestfulServiceHelper(DataSource dataSource2) {
@@ -220,6 +221,8 @@ public class RestfulServiceHelper {
 	       return sb.toString();
 	 }
 	 
+	 
+	 
 	 public boolean verifyRole(String userName,  String study_oid,
 				String site_oid, Errors e) {
 			
@@ -314,7 +317,7 @@ public class RestfulServiceHelper {
 
 
 	
-	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request) throws Exception {
+	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClientToMirth(List<File> files,HttpServletRequest request) throws Exception {
 
 	  		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
 	  		ImportCRFInfoSummary importCRFInfoSummary  = new ImportCRFInfoSummary();
@@ -427,7 +430,145 @@ public class RestfulServiceHelper {
 			
 	 		return importCRFInfoSummary;
 	  }
+	 
+	 /**
+	  *  this will call OC Restful API directly:
+	  *  ${remoteAddress}/OpenClinica/pages/auth/api/clinicaldata/
+	  *  
+	  * @param files
+	  * @param request
+	  * @return
+	  * @throws Exception
+	  */
+	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request) throws Exception {
+		    String remoteAddress = this.getBasePath(request);
+	  		
+	  		String importDataWSUrl = remoteAddress + "/OpenClinica/pages/auth/api/clinicaldata/";
+	  		ImportCRFInfoSummary importCRFInfoSummary  = new ImportCRFInfoSummary();
+	  		ArrayList<File> tempODMFileList = new ArrayList<>();
+	  		
+	  		/**
+	  		 *  prepare mapping file
+	  		 */
+	  		File mappingFile = null;
+	  		String  mappingpartNm = null;
+	  		for (File file : files) {
+	  			
+	  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	  				mappingFile = file;
+	  				mappingpartNm = "uploadedData";  	 	  		
+	  	 	  		
+	  	 	  		break;
+	  			}
+	 			
+	 		}
+	  		
+		  	int i = 1;	  		
+	 		for (File file : files) {
+	 			// skip mapping file
+	 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	 				;
+	 			}else {
+	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
+	 				
+	 				Iterator dataFilesIt = dataFileList.iterator();
+	 				
+	 				while(dataFilesIt.hasNext()) {
+	 					File rowFile = (File) dataFilesIt.next();
+	 					
+	 					HttpPost post = new HttpPost(importDataWSUrl);
+	 	 	 	  		/**
+	 	 	 	  		 *  add header Authorization
+	 	 	 	  		 */
+	 	 	 	 		String accessToken = (String) request.getSession().getAttribute("accessToken");
+	 	 	 	  		post.setHeader("Authorization", "Bearer " + accessToken);
+	 	 	 	  		
+	 	 	 	  		String basePath = getBasePath(request);
+	 	 	 	  		post.setHeader("OCBasePath", basePath);
+
+	 	 	 	 		post.setHeader("Accept", 
+	 	 	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+	 	 	 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		
+	 	 	 	 		post.setHeader("Connection", "keep-alive");
+	 	 	 	 		
+	 	 	 	 		String originalFileName = rowFile.getName();
+	 	 	 	 	    post.setHeader("originalFileName", originalFileName);
+	 	 	 			
+	 	 	 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+	 	 	 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+	 	 	 		  	String partNm = null;
+	 	 	 		  	/**
+	 	 	 		  	 *  Here will only send ODM XML to OC API
+	 	 	 		  	 *  
+	 	 	 		  	 */
+	 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile);
+	 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName);
+	 	 	 		    tempODMFileList.add(odmXmlFile);
+	 	 	 		 
+	 	 	 			FileBody fileBody = new FileBody(odmXmlFile, ContentType.TEXT_PLAIN);
+	 	 	 			partNm = "uploadedData" + i;
+	 	 	 	  		builder.addPart(partNm, fileBody);
+	 	 	 	  	    builder.addBinaryBody("file", odmXmlFile);
+	 	 	 	  		
+	 	 	 	  		
+	 	 	 	  		HttpEntity entity = builder.build();   		
+	 	 	 	  		post.setEntity(entity);
+	 	 	 	  		
+	 	 	 	  		CloseableHttpClient httpClient = HttpClients.createDefault();
+	 	 	 	  		HttpResponse response = httpClient.execute(post);
+	 	 	 	  		
+	 	 	 	  	    //print result	
+	 	 	 	 		int responseCode = response.getStatusLine().getStatusCode();
+
+	 	 	 	 		System.out.println("\nSending 'POST' request to URL : " + importDataWSUrl); 	
+	 	 	 	 		System.out.println("Response Code : " + responseCode);
+
+	 	 	 	 		BufferedReader rd = new BufferedReader(
+	 	 	 	 	                new InputStreamReader(response.getEntity().getContent()));
+
+	 	 	 	 		StringBuffer result = new StringBuffer();
+	 	 	 	 		String line = "";
+	 	 	 	 		while ((line = rd.readLine()) != null) {
+	 	 	 	 			result.append(line);
+	 	 	 	 		}
+	 	 	 	        
+	 	 	 	 		String responseStr = result.toString();
+	 	 	 	 		if(responseStr!=null && responseStr.toLowerCase().indexOf("error")>-1) {
+	 	 	 	 			importCRFInfoSummary.setFailCnt(importCRFInfoSummary.getFailCnt()+1);
+	 	 	 	 		}else {
+	 	 	 	 			importCRFInfoSummary.setPassCnt(importCRFInfoSummary.getPassCnt() +1);
+	 	 	 	 		}
+	 	 	 	 
+	 	 	 	 	    importCRFInfoSummary.getDetailMessages().add(responseStr);
+	 	 	 	 		//System.out.println(responseStr);
+	 	 	 	 		
+	 	 	 	 	    TimeUnit.MILLISECONDS.sleep(10);
+	 				}
+	 				
+	 			   // after sent, then delete from disk
+	 				dataFilesIt = dataFileList.iterator();
+	 				while(dataFilesIt.hasNext()) {
+	 					File rowFile = (File) dataFilesIt.next();					 					
+		 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile);
+		 	 	  		
+	 				}
+	 				
+	 				dataFilesIt = tempODMFileList.iterator();
+	 				while(dataFilesIt.hasNext()) {
+	 					File tempODMFile = (File) dataFilesIt.next();					 					
+		 	 	  		this.getImportDataHelper().deleteTempImportFile(tempODMFile);
+		 	 	  		
+	 				}
+		 	 	  		
+	 			}
+	 			
+	 	  		i++;
+	 		}
 	  
+	 		this.getImportDataHelper().saveFileToImportFolder(files);
+			
+	 		return importCRFInfoSummary;
+	  }
 	    public ArrayList<File> splitDataFileAndProcesDataRowbyRow(File file) {
 			ArrayList<File> fileList = new ArrayList<>();
 		    BufferedReader reader;
@@ -502,14 +643,14 @@ public class RestfulServiceHelper {
 	  	}
 
 
-	    public ImportDataHelper getImportDataHelper() {
+	    public PipeDelimitedDataHelper getImportDataHelper() {
 			if(importDataHelper == null) {
-				importDataHelper = new ImportDataHelper();
+				importDataHelper = new PipeDelimitedDataHelper();
 			}
 			return importDataHelper;
 		}
 
-		public void setImportDataHelper(ImportDataHelper importDataHelper) {
+		public void setImportDataHelper(PipeDelimitedDataHelper importDataHelper) {
 			this.importDataHelper = importDataHelper;
 		}
 }

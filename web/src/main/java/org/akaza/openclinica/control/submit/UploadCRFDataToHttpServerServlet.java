@@ -8,6 +8,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
+import java.sql.SQLException;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.HashMap;
@@ -29,6 +30,7 @@ import java.net.HttpURLConnection;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -40,6 +42,8 @@ import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
+import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaException;
@@ -78,9 +82,9 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 
     XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
     FileUploadHelper uploadHelper = new FileUploadHelper();
-    ImportDataHelper importDataHelper;
+    RestfulServiceHelper restfulServiceHelper;
 
-    // < ResourceBundleresword,resexception,respage;
+    
 
     /**
      *
@@ -151,7 +155,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
                //sendRequestByHttpClient(files);
                
               //sendOneFilePerRequestByHttpClient(files);
-               sendOneDataRowPerRequestByHttpClient(files);
+               sendOneDataRowPerRequestByHttpClient(files,request);
 
             } catch (Exception e) {
                 logger.warn("*** Found exception during file upload***");
@@ -163,12 +167,12 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
                     	 
         } else if ("download".equalsIgnoreCase(action)) {
             String fileName= request.getParameter("fileId");
-            File file = this.getImportDataHelper().getPersonalImportLogFile(fileName,  request);
+            File file = this.getRestfulServiceHelper().getImportDataHelper().getPersonalImportLogFile(fileName,  request);
             dowloadFile(file, "text/xml");
             
         } else if ("delete".equalsIgnoreCase(action)) {
             String fileName= request.getParameter("fileId");
-            this.getImportDataHelper().deletePersonalTempImportFile(fileName,request);
+            this.getRestfulServiceHelper().getImportDataHelper().deletePersonalTempImportFile(fileName,request);
             
             forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
         }
@@ -713,7 +717,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	}
 	
 	
-	public void sendOneDataRowPerRequestByHttpClient(List<File> files) throws Exception {
+	public void sendOneDataRowPerRequestByHttpClientToMirth(List<File> files) throws Exception {
 
   		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
   		
@@ -807,7 +811,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  				dataFilesIt = dataFileList.iterator();
  				while(dataFilesIt.hasNext()) {
  					File rowFile = (File) dataFilesIt.next();					 					
-	 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile);
+ 					this.getRestfulServiceHelper().getImportDataHelper().deleteTempImportFile(rowFile);
 	 	 	  		
  				}
 	 	 	  		
@@ -816,8 +820,17 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	  		i++;
  		}
   
- 		this.getImportDataHelper().saveFileToImportFolder(files);
+ 		this.getRestfulServiceHelper().getImportDataHelper().saveFileToImportFolder(files);
   }
+
+/**
+ *  This method will call OC Restful API directly
+ * @param files
+ * @throws Exception
+ */
+	public void sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request) throws Exception {
+		this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(files, request);
+	}
 	
 	
 	public String getImportFileDir() {
@@ -840,19 +853,35 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 		 
 		return importFileDir;
 	}
-
-	public ImportDataHelper getImportDataHelper() {
-		if(importDataHelper == null) {
-			importDataHelper = new ImportDataHelper();
-		}
-		return importDataHelper;
-	}
-
-	public void setImportDataHelper(ImportDataHelper importDataHelper) {
-		this.importDataHelper = importDataHelper;
-	}
 	
 	public void setHttpServletRequest(HttpServletRequest request) {
 		this.request = request;
+	}
+
+	public RestfulServiceHelper getRestfulServiceHelper() {
+		if(restfulServiceHelper == null) {
+			restfulServiceHelper = new RestfulServiceHelper(this.getSM().getDataSource());
+		}
+		return restfulServiceHelper;
+	}
+
+	public void setRestfulServiceHelper(RestfulServiceHelper restfulServiceHelper) {
+		this.restfulServiceHelper = restfulServiceHelper;
+	}
+	
+	public SessionManager getSM() {
+		UserAccountBean ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
+		String userName = request.getRemoteUser();
+		
+		if(this.sm == null) {
+			 try {
+				sm = new SessionManager(ub, userName, SpringServletAccess.getApplicationContext(context));
+			} catch (SQLException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}	
+		}
+		
+		return sm;
 	}
 }

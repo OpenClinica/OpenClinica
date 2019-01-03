@@ -359,7 +359,7 @@
                                                                                     <input type="submit" value="View &#8594;" class="navSearchButton"/>
                                                                                 </form>
                                                                             </td>
-                                                                            <td align="right" style="font-weight: normal;">
+                                                                            <td align="right" style="font-weight: normal;" class="oc-menu-bar">
                                                                                 <ul>
                                                                                     <c:if test="${userRole.coordinator || userRole.director}">
                                                                                         <li><a href="${urlPrefix}MainMenu"><fmt:message key="nav_home"

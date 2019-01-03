@@ -186,13 +186,13 @@ public class DataController {
           
             errorMsgs = importDataInTransaction(importXml, request);
         } catch (OpenClinicaSystemException e) {
-
+        	e.printStackTrace();
             String err_msg = e.getMessage();
             ErrorMessage error = createErrorMessage(e.getErrorCode(), err_msg);
             errorMsgs.add(error);
 
         } catch (Exception e) {
-
+            e.printStackTrace();
             String err_msg = "Error processing data import request.";
             ErrorMessage error = createErrorMessage("errorCode.Exception", err_msg);
             errorMsgs.add(error);
@@ -778,6 +778,9 @@ public class DataController {
         	String msg = validation_passed_message;
         	if(importCRFInfoSummary != null) {
         		msg = validation_passed_message + "\n" + importCRFInfoSummary.getSummaryMsg();
+        		ArrayList<String> detailMessages = new ArrayList();
+        		detailMessages.add("Please see import log file");
+        		responseSuccessDTO.setDetailMessages(detailMessages);
         	}
         	responseSuccessDTO.setMessage(msg);
             response = new ResponseEntity(responseSuccessDTO, org.springframework.http.HttpStatus.OK);

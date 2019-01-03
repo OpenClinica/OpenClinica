@@ -675,4 +675,43 @@ public class ImportDataHelper {
         
     	
 	 }
+   /**
+    * 
+    * @param dataStr
+    * @param orginalFileName
+    * @return
+    */
+    public File saveDataToFile(String  dataStr,String orginalFileName) {
+		
+    	File dataFile = null;
+    	
+	    try {	    		    	
+	    	String importFileDir = this.getImportFileDir();	    	
+	    	
+	    	int pos = orginalFileName.indexOf(".");
+	    	orginalFileName = orginalFileName.substring(0,pos);	    	
+	    
+	    	BufferedWriter bw = null;
+	    	FileOutputStream fos = null;		
+				
+			if(dataStr != null) {
+				dataFile = new File(importFileDir + orginalFileName + ".xml");				
+				fos = new FileOutputStream(dataFile);			 
+				bw = new BufferedWriter(new OutputStreamWriter(fos));
+			 
+				bw.write(dataStr);				
+				
+			}
+			
+		    if(bw !=null) {
+		    	bw.close();
+		    }
+				    
+	       
+	    } catch (Exception e) {
+	        e.printStackTrace();
+	    }
+	    
+		return dataFile;
+	}
    }
