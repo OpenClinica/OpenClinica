@@ -98,7 +98,7 @@
 </div>
 
 <br clear="all">
-<input type="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long">
+<input type="submit" value="<fmt:message key="submit" bundle="${resword}"/>" class="button_long" onclick="javascript:alert('After submit,you can come back later to check the status and details in log file')">
 <input type="button" onclick="goBack()"  name="cancel" value="<fmt:message key="cancel" bundle="${resword}"/>" class="button_medium"/>
 
 </form>

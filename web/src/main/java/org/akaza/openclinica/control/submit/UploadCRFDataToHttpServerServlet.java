@@ -47,6 +47,7 @@ import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.logic.importdata.ImportDataHelper;
 import org.akaza.openclinica.view.Page;
@@ -151,12 +152,61 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
             	
                // here process all uploaded files	
                files = uploadFiles(theDir);
+               File mappingFile = null;
+               boolean foundMappingFile = false;
+               
+         	   for (File file : files) {           
+                   
+                   if (file == null || file.getName() == null) {
+                       logger.info("file is empty.");
+              
+                   }else {
+                   	if(file.getName().toLowerCase().lastIndexOf(".properties") > -1) {
+                   		mappingFile = file;
+                   		foundMappingFile = true;
+                   		logger.info("Found mapping file *.properties uploaded");
+                  		                   		
+                   		break;
+                   	}
+                   }
+               }
+         	 
+         	  if(files.size() < 2) {
+         		 String message = "errorCode.notCorrectFileNumber - When upload files, please select at least one data text files and one mapping file named like *.properties"; 
+         		 this.addPageMessage(message);
+                 
+         		 forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
+                 return;  
+         	  }
+         	  
+         	  if (!foundMappingFile) {            		         		
+         		 String message = "errorCode.noMappingfileFound - When upload files, please include one correct mapping file and named it like *.properties "; 
+         		 this.addPageMessage(message);
+                 
+         		 forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
+                 return;
+         	  }
+         	  else {
+         		 try {
+         			 this.getRestfulServiceHelper().getImportDataHelper().validateMappingFile(mappingFile); 
+         		 }catch(Exception e) {
+         			 String message = e.getMessage(); 
+             		 this.addPageMessage(message);
+                     
+             		 forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
+                     return;
+         		 }
+         		
+         	  }
+               
                // here process all files in one request 
                //sendRequestByHttpClient(files);
                
               //sendOneFilePerRequestByHttpClient(files);
                sendOneDataRowPerRequestByHttpClient(files,request);
 
+               String message = "The Application is processing your files, you can come back later to check the status and with detail in log file";
+               this.addPageMessage(message);
             } catch (Exception e) {
                 logger.warn("*** Found exception during file upload***");
                 e.printStackTrace();
@@ -254,9 +304,9 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  		con.connect();
  		////////////////////////////////////////////////////
  		int responseCode = con.getResponseCode();
- 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl);
+ 		//System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl);
  		//System.out.println("Post parameters : " + urlParameters);
- 		System.out.println("Response Code : " + responseCode);
+ 		//System.out.println("Response Code : " + responseCode);
 
  		if(responseCode == 200) {
  			 addPageMessage("Upload and import file sucessfully!");
@@ -274,7 +324,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  		in.close();
  		
  		//print result
- 		System.out.println(response.toString());
+ 		//System.out.println(response.toString());
 
  
  }

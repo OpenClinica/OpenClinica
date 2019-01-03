@@ -658,19 +658,19 @@ public class ImportDataHelper {
 		 }
 		
         if(!foundFormOID) {
-        	 throw new OpenClinicaSystemException("errorCode.noFormOID", "Please check mapping file, named like *mapping.txt -- make sure that it has correct FormOID configuration.  ");
+        	 throw new OpenClinicaSystemException("errorCode.noFormOID", "Please check mapping file, make sure that it has correct FormOID configuration.  ");
         }
         
         if(!foundFormVersion) {
-       	 	throw new OpenClinicaSystemException("errorCode.noFormVersion", "Please check mapping file, named like *mapping.txt -- make sure that it has correct FormVersion configuration.  ");
+       	 	throw new OpenClinicaSystemException("errorCode.noFormVersion", "Please check mapping file, make sure that it has correct FormVersion configuration.  ");
         }
         
         if(!foundStudyOID) {
-       	 	throw new OpenClinicaSystemException("errorCode.noStudyOID", "Please check mapping file, named like *mapping.txt -- make sure that it has correct StudyOID configuration.  ");
+       	 	throw new OpenClinicaSystemException("errorCode.noStudyOID", "Please check mapping file, make sure that it has correct StudyOID configuration.  ");
         }
         
         if(!foundStudyEventOID) {
-       	 	throw new OpenClinicaSystemException("errorCode.noStudyEventOID", "Please check mapping file, named like *mapping.txt -- make sure that it has correct StudyEventOID configuration.  ");
+       	 	throw new OpenClinicaSystemException("errorCode.noStudyEventOID", "Please check mapping file, make sure that it has correct StudyEventOID configuration.  ");
         }
         
     	
