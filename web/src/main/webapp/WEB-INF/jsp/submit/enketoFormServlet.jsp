@@ -92,7 +92,7 @@
     updateOCAppTimeout();
     processTimedOuts(true, false);
 </script>
-<div style="overflow:auto;-webkit-overflow-scrolling:touch">
+<div style="-webkit-overflow-scrolling:touch">
     <iframe id="enketo" style="z-index:1011;width:100vw;height:100vh;">
 </div>
 </body>
