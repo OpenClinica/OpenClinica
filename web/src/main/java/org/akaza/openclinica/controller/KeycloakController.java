@@ -143,7 +143,9 @@ public class KeycloakController {
     }
 
     private void refreshUserRole(HttpServletRequest req, UserAccountBean ub) {
-        StudyUserRoleBean roleByStudy = ub.getRoleByStudy(ub.getActiveStudyId());
+        Study study = studyDao.findPublicStudyById(ub.getActiveStudyId());
+        int parentStudyId = study.getStudy() == null ? study.getStudyId() : study.getStudy().getStudyId();
+        StudyUserRoleBean roleByStudy = ub.getRoleByStudy(parentStudyId);
         req.getSession().setAttribute("userRole", roleByStudy);
 
     }
