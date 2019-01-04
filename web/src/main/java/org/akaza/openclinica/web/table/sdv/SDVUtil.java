@@ -234,8 +234,9 @@ public class SDVUtil {
         } else if (restore != null && "true".equalsIgnoreCase(restore)) {
             int totalRows = getTotalRowCount(eventCRFSDVFilter, studyId,permissionTags);
             int pageNum = limit.getRowSelect().getPage();
-            int maxRows = limit.getRowSelect().getMaxRows();
-            tableFacade.setMaxRows(maxRows);
+            // https://jira.openclinica.com/browse/OC-9952
+//            int maxRows = limit.getRowSelect().getMaxRows();
+            tableFacade.setMaxRows(50);
             tableFacade.setTotalRows(totalRows);
             limit.getRowSelect().setPage(pageNum);
         }
