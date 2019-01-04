@@ -85,6 +85,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         session = request.getSession();
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
+        // https://jira.openclinica.com/browse/OC-9952
+        tableFacade.setMaxRows(50);
         setDataAndLimitVariables(tableFacade);
         configureTableFacade(response, tableFacade);
         if (!tableFacade.getLimit().isExported()) {

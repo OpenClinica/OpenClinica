@@ -82,6 +82,8 @@ public class StudyAuditLogTableFactory extends AbstractTableFactory {
         resword = ResourceBundleProvider.getWordsBundle(getLocale());
         resformat = ResourceBundleProvider.getFormatBundle(getLocale());
 
+        // https://jira.openclinica.com/browse/OC-9952
+        tableFacade.setMaxRows(50);
         Limit limit = tableFacade.getLimit();
         StudyAuditLogFilter auditLogStudyFilter = getAuditLogStudyFilter(limit);
 
