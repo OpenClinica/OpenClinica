@@ -1,13 +1,16 @@
-StudyOID=S_MY_2NDST(PROD)
+SkipMatchCriteria=IG_PHYSI_GRP2.I_PHYSI_FNAME
+
+# Study, Study Event and Form OIDs
+StudyOID=S_STUDY33(TEST)
 StudyEventOID=SE_SCREENVISIT
-FormOID=F_VITALSIGN
-FormVersion=1.2
-Repeatingkey=StudyEventRepeatKey.true
-#list all item group OID
-ItemGroupOID=IG_VITAL_GROUP1
-ItemGroupOID=IG_VITAL_GROUP2
-Height=IG_VITAL_GROUP1.HeightOID
-Height Units=IG_VITAL_GROUP1.HeightUnitsOID
-Weight=IG_VITAL_GROUP1.WeightOID
-Weight Units=IG_VITAL_GROUP1.WeightUnitsOID
-Enrollment Date=IG_VITAL_GROUP2.EnrollDateOID
+FormOID=F_PHYSICAL
+FormVersion=1
+
+# Data file OIDs
+Gender=IG_PHYSI_GRP3.I_PHYSI_PGENDER
+Ethnicity=IG_PHYSI_GRP3.I_PHYSI_PETHNIC
+
+firstName=IG_PHYSI_GRP2.I_PHYSI_FNAME
+lastName=IG_PHYSI_GRP2.I_PHYSI_LNAME
+birthDate=IG_PHYSI_GRP2.I_PHYSI_BDATE
+MRN=IG_PHYSI_GRP2.I_PHYSI_MRN

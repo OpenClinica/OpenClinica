@@ -1,4 +1,4 @@
-Participant ID|Height|Height Units|Weight |Weight Units|Enrollment Date|Age|Ethnicity|Race
-WAL-001|66|in|200|lbs|2018-09-01|77|Hispanic or Latino|Caucasian
-WAL-002|155|cm|88|kg|2018-10-01|64|Non-hispanic or latino|African American
-WAL-003|55|in|140|lbs|2018-10-11|55|Non-hispanic or latino|Caucasian
+ParticipantID|firstName|lastName|birthDate|MRN|Ethnicity|Gender
+SS_PID001|Renuka|Bhatnagar|1982-01-07|RB0107|0|F
+SS_PID002|Iryna|Galchuk|1985-01-08|RB0108|1|F
+SS_PID003|Iryna|Gupta|1990-01-07|SG0107|0|M

@@ -467,8 +467,8 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   	    //print result	
  		int responseCode = response.getStatusLine().getStatusCode();
 
- 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
- 		System.out.println("Response Code : " + responseCode);
+ 		//System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
+ 		//System.out.println("Response Code : " + responseCode);
 
  		BufferedReader rd = new BufferedReader(
  	                new InputStreamReader(response.getEntity().getContent()));
@@ -479,7 +479,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  			result.append(line);
  		}
 
- 		System.out.println(result.toString());
+ 		//System.out.println(result.toString());
 
   
   }
@@ -542,8 +542,8 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   	    //print result	
  		int responseCode = response.getStatusLine().getStatusCode();
 
- 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
- 		System.out.println("Response Code : " + responseCode);
+ 		//System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
+ 		//System.out.println("Response Code : " + responseCode);
 
  		BufferedReader rd = new BufferedReader(
  	                new InputStreamReader(response.getEntity().getContent()));
@@ -554,7 +554,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  			result.append(line);
  		}
         
- 		System.out.println(result.toString());
+ 		//System.out.println(result.toString());
  		String responseStr = processResponse(result.toString());
  		addPageMessage(responseStr);
  		 
@@ -623,8 +623,8 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	 	  	    //print result	
  	 	 		int responseCode = response.getStatusLine().getStatusCode();
 
- 	 	 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
- 	 	 		System.out.println("Response Code : " + responseCode);
+ 	 	 		//System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
+ 	 	 		//System.out.println("Response Code : " + responseCode);
 
  	 	 		BufferedReader rd = new BufferedReader(
  	 	 	                new InputStreamReader(response.getEntity().getContent()));
@@ -638,7 +638,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	 	 		String responseStr = processResponse(result.toString());
  	 	 		addPageMessage(responseStr);
  	 	 		 
- 	 	 		System.out.println(responseStr);
+ 	 	 		//System.out.println(responseStr);
  	 	  		
  			}
  			
@@ -837,8 +837,8 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	 	 	  	    //print result	
  	 	 	 		int responseCode = response.getStatusLine().getStatusCode();
 
- 	 	 	 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
- 	 	 	 		System.out.println("Response Code : " + responseCode);
+ 	 	 	 		//System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
+ 	 	 	 		//System.out.println("Response Code : " + responseCode);
 
  	 	 	 		BufferedReader rd = new BufferedReader(
  	 	 	 	                new InputStreamReader(response.getEntity().getContent()));
@@ -852,7 +852,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	 	 	 		String responseStr = processResponse(result.toString());
  	 	 	 		addPageMessage(responseStr);
  	 	 	 		 
- 	 	 	 		System.out.println(responseStr);
+ 	 	 	 		//System.out.println(responseStr);
  	 	 	 		
  	 	 	 	    TimeUnit.MILLISECONDS.sleep(10);
  				}

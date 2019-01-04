@@ -485,7 +485,11 @@ public class RestfulServiceHelper {
 	 	 	 	  		
 	 	 	 	  		String basePath = getBasePath(request);
 	 	 	 	  		post.setHeader("OCBasePath", basePath);
-
+	 	 	 	  		
+	 	 	 	  		//SkipMatchCriteria
+	 	 	 	  		String skipMatchCriteria = this.getImportDataHelper().getSkipMatchCriteria(rowFile, mappingFile); 
+	 	 	 	  	    post.setHeader("SkipMatchCriteria", skipMatchCriteria);
+	 	 	 	  	
 	 	 	 	 		post.setHeader("Accept", 
 	 	 	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
 	 	 	 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		

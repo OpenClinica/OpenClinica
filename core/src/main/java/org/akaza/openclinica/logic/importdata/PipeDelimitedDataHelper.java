@@ -513,9 +513,44 @@ public String readFileToString(File file) throws IOException{
 		return false;
 	}
 	
-    public  String getSkipMatchCriteria() {		
-		
+    public  String getSkipMatchCriteria() {			
+    	
+		return (String) this.mappedValues.get("SkipMatchCriteria");
+	}
+    
+    public  String getSkipMatchCriteria(String rawItemData, String rawMappingStr ) {		
+		if(mappedValues == null) {
+			columnNms = getDataColumnNames(rawItemData);								
+			mappedValues = getDataMappedValues(rawMappingStr,columnNms);
+		}
+    	
 		return (String) this.mappedValues.get("SkipMatchCriteria");
 	}
 
+    /**
+     * 
+     * @param rawItemDataFile
+     * @param mappingFile
+     * @return
+     */
+    public  String getSkipMatchCriteria(File rawItemDataFile, File mappingFile ) {		
+		if(mappedValues == null) {
+			 String rawMappingStr = null;
+			 String rawItemData = null;
+			
+			try {
+				rawMappingStr = this.readFileToString(mappingFile);
+				rawItemData = this.readFileToString(rawItemDataFile);
+			} catch (IOException e) {
+				// TODO Auto-generated catch block
+				e.printStackTrace();
+			}
+			
+			columnNms = getDataColumnNames(rawItemData);								
+			mappedValues = getDataMappedValues(rawMappingStr,columnNms);
+		}
+    	
+		return (String) this.mappedValues.get("SkipMatchCriteria");
+	}
+   
 }
