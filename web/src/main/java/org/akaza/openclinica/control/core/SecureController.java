@@ -387,6 +387,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
 
     private void process(HttpServletRequest request, HttpServletResponse response) throws OpenClinicaException, UnsupportedEncodingException {
+
+        System.out.println("Metric0" + new Date());
         this.request = request;
         this.response = response;
         request.setCharacterEncoding("UTF-8");
@@ -466,6 +468,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             KeycloakController controller = (KeycloakController) webApplicationContext .getBean("keycloakController");
 
             String ocUserUuid = null;
+            System.out.println("Metric1" + new Date());
 
             try {
                 ocUserUuid = controller.getOcUserUuid(request);
@@ -473,6 +476,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 forwardPage(Page.ERROR);
                 return;
             }
+            System.out.println("Metric2" + new Date());
 
             if (ocUserUuid != null) {
                 if (ub == null || StringUtils.isEmpty(ub.getName())) {
@@ -622,24 +626,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
 
             if (currentRole == null || currentRole.getId() <= 0) {
-                // if (ub.getId() > 0 && currentPublicStudy.getId() > 0) {
-                // if current study has been "removed", current role will be
-                // kept as "invalid" -- YW 06-21-2007
-                if (ub.getId() > 0 && currentPublicStudy.getId() > 0 && !currentPublicStudy.getStatus().getName().equals("removed")) {
-                    currentRole = ub.getRoleByStudy(currentPublicStudy.getId());
-                    if (currentPublicStudy.getParentStudyId() > 0) {
-                        // Checking if currentPublicStudy has been removed or not will
-                        // ge good enough -- YW 10-17-2007
-                        StudyUserRoleBean roleInParent = ub.getRoleByStudy(currentPublicStudy.getParentStudyId());
-                        // inherited role from parent study, pick the higher
-                        // role
-                        currentRole.setRole(Role.max(currentRole.getRole(), roleInParent.getRole()));
-                    }
-                    // logger.info("currentRole:" + currentRole.getRoleName());
-                } else {
-                    currentRole = new StudyUserRoleBean();
-                }
-                session.setAttribute("userRole", currentRole);
+                refreshUserRole(request,ub,currentPublicStudy);
+                currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
             }
             // YW << For the case that current role is not "invalid" but current
             // active study has been removed.
@@ -706,6 +694,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             forwardPage(Page.ERROR);
         }
+        System.out.println("Metric4" + new Date());
     }
 
     public String getRequestSchema(HttpServletRequest request) {
@@ -1458,6 +1447,19 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
             sdao.update(studySub);
         }
+    }
+
+    public static void refreshUserRole(HttpServletRequest req, UserAccountBean ub, StudyBean currentPublicStudy) {
+        StudyUserRoleBean currentRole = new StudyUserRoleBean();
+        if (ub.getId() > 0 && currentPublicStudy.getId() > 0 && !currentPublicStudy.getStatus().getName().equals("removed")) {
+            currentRole = ub.getRoleByStudy(currentPublicStudy.getId());
+            if (currentPublicStudy.getParentStudyId() > 0) {
+                StudyUserRoleBean roleInParent = ub.getRoleByStudy(currentPublicStudy.getParentStudyId());
+                currentRole.setRole(Role.max(currentRole.getRole(), roleInParent.getRole()));
+            }
+        }
+        System.out.println("Setting this role in session: {}" + currentRole.getRoleName());
+        req.getSession().setAttribute("userRole", currentRole);
     }
 
 }
