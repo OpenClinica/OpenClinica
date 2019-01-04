@@ -55,11 +55,12 @@
 
     window.onload = function() {
         document.getElementById("btn").focus();
+            <c:if test="${showOverlay}">
+                jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
+            </c:if>
     };
 
-    <c:if test="${showOverlay}">
-        jQuery.blockUI({ message: jQuery('#addSubjectForm'), css:{left: "300px", top:"10px" } });
-    </c:if>
+
 </script>
 
 <!-- then instructions-->

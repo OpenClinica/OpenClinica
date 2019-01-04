@@ -379,7 +379,7 @@
                                   <c:choose>
                                     <c:when test="${
                                       studySub.status.name!='removed' &&
-                                      sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator' &&
+                                      (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
                                       participateStatus=='enabled'
                                     }">
                                       style="visibility:visible;"

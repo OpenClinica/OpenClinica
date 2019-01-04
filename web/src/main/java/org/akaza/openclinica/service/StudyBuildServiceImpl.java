@@ -482,9 +482,9 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return null;
     }
 
-    public ModuleConfigAttributeDTO getModuleConfigAttribute(Set<ModuleConfigAttributeDTO> moduleConfigAttributeDTOs, Study study ,String attr) {
+    public ModuleConfigAttributeDTO getModuleConfigAttribute(Set<ModuleConfigAttributeDTO> moduleConfigAttributeDTOs, Study study) {
         for (ModuleConfigAttributeDTO moduleConfigAttributeDTO : moduleConfigAttributeDTOs) {
-            if (moduleConfigAttributeDTO.getKey().equals(attr)) {
+            if (moduleConfigAttributeDTO.getStudyEnvironmentUuid().equals(study.getStudyEnvUuid())) {
                 logger.info("ModuleConfigAttributeDTO  is :" + moduleConfigAttributeDTO);
                 return moduleConfigAttributeDTO;
             }

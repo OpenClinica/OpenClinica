@@ -258,12 +258,8 @@ public class AddNewSubjectServlet extends SecureController {
                     if (studySubjectBean != null && !studySubjectBean.isActive())
                         studySubjectBean = null;
                 }
-
-
                 errors.clear();
-
             }
-
 
             if (!errors.isEmpty()) {
 
