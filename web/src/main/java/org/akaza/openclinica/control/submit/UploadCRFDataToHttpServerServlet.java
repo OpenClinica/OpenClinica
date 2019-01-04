@@ -742,7 +742,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 					bw = new BufferedWriter(new OutputStreamWriter(fos));
 				 
 					bw.write(columnLine);				
-					bw.write("\n\r");
+					bw.write("\r");
 				
 					bw.write(line);	
 					fileList.add(splitFile);

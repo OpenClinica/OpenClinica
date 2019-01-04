@@ -468,9 +468,8 @@ public class ImportCRFDataService {
                         sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey();
                        
                         if(sampleOrdinal == null || sampleOrdinal.trim().isEmpty()) {
-                        	errors.add("Missing studyEventRepeatKey for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
-                        	
-                            return errors;                            
+                        	// not provide repeat key in the data file, then get the next available one
+                            sampleOrdinal = commonEventContainerDTO.getMaxOrdinal()+1 +"";                           
                         }
                        
                     	// for same subject, same event, can't have same form more than once in NON repeating COMMON event -- found same formOID in database
