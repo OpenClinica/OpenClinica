@@ -107,7 +107,8 @@ public class ListNotesTableFactory extends AbstractTableFactory {
 
     @Override
     protected void configureColumns(TableFacade tableFacade, Locale locale) {
-
+        // https://jira.openclinica.com/browse/OC-9952
+        tableFacade.setMaxRows(50);
         tableFacade.setColumnProperties("studySubject.label", "siteId", "discrepancyNoteBean.disType","discrepancyNoteBean.resolutionStatus",
                 "discrepancyNoteBean.createdDate", "discrepancyNoteBean.updatedDate", "age", "days", "eventName", "eventStartDate", "crfName", "crfStatus",
                 "entityName", "entityValue", "discrepancyNoteBean.entityType", "discrepancyNoteBean.detailedNotes", "numberOfNotes", "discrepancyNoteBean.user",
