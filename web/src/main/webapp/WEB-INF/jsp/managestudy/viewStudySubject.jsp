@@ -1465,7 +1465,6 @@
         $('#info-phone-number').text(participateInfo.phoneNumber);
         $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
     }
-    updateParticipateInfo();
 
     function getAccessCode() {
         jQuery.ajax({
@@ -1479,6 +1478,9 @@
     }
 
     jQuery(document).ready(function () {
+        updateParticipateInfo();
+        getAccessCode();
+        
         jQuery.ajax({
             type: 'get',
             url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
