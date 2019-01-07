@@ -598,7 +598,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                         .orElse(null);
             }
         } else {
-            // User doesn't have a site based role it is inheriting from study
+            // Active study is a study not a site
             role = roles.stream()
                     .filter(s -> s.getStudyEnvironmentUuid() != null && s.getStudyEnvironmentUuid().equals(study.getStudyEnvUuid()))
                     .findAny()
