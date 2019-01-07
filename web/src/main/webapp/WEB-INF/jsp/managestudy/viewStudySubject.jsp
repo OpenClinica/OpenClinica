@@ -1445,9 +1445,12 @@
 <script type="text/javascript">
 
     var jsAtt = '${showOverlay}';
-
     if (jsAtt === "true"){
         jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
+    }
+
+    function logDump() {
+        console.log(arguments);
     }
 
     var participateInfo;
@@ -1462,26 +1465,27 @@
         $('#info-phone-number').text(participateInfo.phoneNumber);
         $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
     }
-    updateParticipateInfo();
 
-    jQuery(document).ready(function () {
-        jQuery.ajax({
-            type: 'get',
-            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
-            success: updateParticipateInfo,
-            error: function() {
-                console.log(arguments);
-            }
-        });
+    function getAccessCode() {
         jQuery.ajax({
             type: 'get',
             url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink',
             success: function(data) {
                 $('#access-code-input').val(data.accessLink);
             },
-            error: function() {
-                console.log(arguments);
-            }
+            error: logDump
+        });
+    }
+
+    jQuery(document).ready(function () {
+        updateParticipateInfo();
+        getAccessCode();
+        
+        jQuery.ajax({
+            type: 'get',
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
+            success: updateParticipateInfo,
+            error: logDump
         });
 
         jQuery('#editParticipantID').click(function () {
@@ -1500,10 +1504,11 @@
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                success: updateParticipateInfo,
-                error: function() {
-                    console.log(arguments);
-                }
+                success: function(data) {
+                    updateParticipateInfo(data);
+                    getAccessCode();
+                },
+                error: logDump
             });
             jQuery.unblockUI();
             return false;
@@ -1580,9 +1585,7 @@
                       entityName: 'Participant ID',
                       auditLogEventTypId: '42'                
                   }),
-                  error: function() {
-                      console.log(arguments);
-                  }
+                  error: logDump
               });
               $('#access-code-input').attr('type', 'text');
             }
