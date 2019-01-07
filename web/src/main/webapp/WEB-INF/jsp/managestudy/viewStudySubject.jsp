@@ -1445,12 +1445,9 @@
 <script type="text/javascript">
 
     var jsAtt = '${showOverlay}';
+
     if (jsAtt === "true"){
         jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
-    }
-
-    function logDump() {
-        console.log(arguments);
     }
 
     var participateInfo;
@@ -1467,23 +1464,24 @@
     }
     updateParticipateInfo();
 
-    function getAccessCode() {
+    jQuery(document).ready(function () {
+        jQuery.ajax({
+            type: 'get',
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
+            success: updateParticipateInfo,
+            error: function() {
+                console.log(arguments);
+            }
+        });
         jQuery.ajax({
             type: 'get',
             url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink',
             success: function(data) {
                 $('#access-code-input').val(data.accessLink);
             },
-            error: logDump
-        });
-    }
-
-    jQuery(document).ready(function () {
-        jQuery.ajax({
-            type: 'get',
-            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
-            success: updateParticipateInfo,
-            error: logDump
+            error: function() {
+                console.log(arguments);
+            }
         });
 
         jQuery('#editParticipantID').click(function () {
@@ -1502,11 +1500,10 @@
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                success: function(data) {
-                    updateParticipateInfo(data);
-                    getAccessCode();
-                },
-                error: logDump
+                success: updateParticipateInfo,
+                error: function() {
+                    console.log(arguments);
+                }
             });
             jQuery.unblockUI();
             return false;
@@ -1583,7 +1580,9 @@
                       entityName: 'Participant ID',
                       auditLogEventTypId: '42'                
                   }),
-                  error: logDump
+                  error: function() {
+                      console.log(arguments);
+                  }
               });
               $('#access-code-input').attr('type', 'text');
             }
