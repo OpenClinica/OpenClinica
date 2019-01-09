@@ -22,6 +22,7 @@
         </property>
         <property name="annotatedClasses">
             <list>
+                <value>org.akaza.openclinica.dao.hibernate.CryptoConverter</value>
                 <value>org.akaza.openclinica.domain.rule.RuleSetBean</value>
                 <value>org.akaza.openclinica.domain.rule.RuleSetAuditBean</value>
                 <value>org.akaza.openclinica.domain.rule.expression.ExpressionBean</value>
@@ -107,6 +108,7 @@
                 <value>org.akaza.openclinica.domain.datamap.StudyEventDefinition</value>
                 <value>org.akaza.openclinica.domain.datamap.StudySubject</value>
                 <value>org.akaza.openclinica.domain.datamap.Subject</value>
+                <value>org.akaza.openclinica.domain.datamap.StudySubjectDetail</value>
 
                 <!-- the following were not tested, to be remain commented as of now -->
                 <!--         <value>org.akaza.openclinica.domain.datamap.AuditEvent    </value>       -->
