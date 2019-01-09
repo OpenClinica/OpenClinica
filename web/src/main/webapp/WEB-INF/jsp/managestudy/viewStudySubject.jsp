@@ -1471,7 +1471,7 @@
             type: 'get',
             url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink',
             success: function(data) {
-                $('#access-code-input').val(data.accessLink);
+                $('#access-code-input').val(data.accessCode);
             },
             error: logDump
         });
