@@ -1143,10 +1143,19 @@
                   #access-code-td {
                     position: relative;
                   }
+                  #access-code-input {
+                    width: 150px;
+                  }
+                  #access-note {
+                    color: #777;
+                  }
+                  #access-url {
+                    text-decoration: underline;
+                  }
                   #eye {
                     position: absolute;
                     top: 1px;
-                    right: 27px;
+                    left: 111px;
                     font-size: 18pt;
                     background-color: white;
                     padding: 2px 6px;
@@ -1419,11 +1428,17 @@
                   <span>Access Link</span>
                 </td>
                 <td valign="top" id="access-code-td">
-                  <input id="access-code-input" onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
-                  <div class="subnote">
-                    Please note: viewing access code will be audited.
-                  </div>
+                  <input id="access-code-input" readonly onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
                   <i id="eye" class="fa fa-eye"></i>
+                </td>
+                <td valign="top" id="access-note">
+                  <span>Viewing access code will be audited.</span>
+                </td>
+              </tr>
+              <tr valign="top">
+                <td></td>
+                <td valign="top" colspan="2">
+                  Participate URL: <a id="access-url" href=""></a>
                 </td>
               </tr>
             </table>
@@ -1472,6 +1487,7 @@
             url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink',
             success: function(data) {
                 $('#access-code-input').val(data.accessCode);
+                $('#access-url').text(data.host);
             },
             error: logDump
         });
