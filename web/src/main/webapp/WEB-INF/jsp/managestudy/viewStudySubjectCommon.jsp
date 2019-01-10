@@ -397,10 +397,6 @@ $(function() {
         var i = 2; // Section 0 = General Information, 1 = Visits
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
-            console.log("studyEventID:" + studyEventId);
-            console.log("eventType:" + studyEvent['@OpenClinica:EventType']);
-            console.log("eventType:" + studyEvent.showMe);
-            console.log("====================");
             if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent.showMe) {
                 $('#commonEvents').append(sectionTmpl({
                     sectionNumber: i,
