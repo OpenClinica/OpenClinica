@@ -1162,7 +1162,7 @@
                   }
                 </style>
                 <div id="phone-widget">
-                  <input id="phone-input" type="text" class="formfield form-control" onfocus="this.select()"> 
+                  <input id="phone-input" type="tel" class="formfield form-control" onfocus="this.select()"> 
                   <div id="country-select">
                     <div id="country-flag" class="down-arrow">&nbsp;</div> 
                     <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
@@ -1480,6 +1480,17 @@
         $('#info-phone-number').text(participateInfo.phoneNumber);
         $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
     }
+    function enableDisableInviteRadios() {
+        var validEmail = $('#email-input-error').is(':hidden');
+        var hasEmail = !!$('#email-input').val().trim() && validEmail;
+        var hasPhone = !!$('#phone-input').val().trim();
+        if (hasEmail || hasPhone) {
+            $('#invite-option input').removeAttr("disabled");
+        }
+        else {
+            $('#invite-option input').attr("disabled", "disabled");
+        }
+    }
 
     function getAccessCode() {
         jQuery.ajax({
@@ -1549,7 +1560,9 @@
                 $('#email-input-error').show();
                 $('#connect-button').attr('disabled', 'disabled');
             }
+            enableDisableInviteRadios();
         });
+        jQuery('#phone-input').blur(enableDisableInviteRadios);
 
         jQuery('#contactInformation').click(function() {
             $('#name-input').val(participateInfo.firstName);
@@ -1564,6 +1577,7 @@
             $('#email-input-error').hide();
             $('#invite-option input[value=' + participateInfo.inviteParticipant + ']').click();
 
+            enableDisableInviteRadios();
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
         });
 
