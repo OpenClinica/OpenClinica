@@ -73,7 +73,7 @@ public String readFileToString(File file) throws IOException{
    	 while (sc.hasNextLine()) {
    		 currentLine = sc.nextLine();        		 
 	         sb.append(currentLine);
-	         sb.append("\n\r");
+	         sb.append("\r");
 	     }
 	
 	 }
