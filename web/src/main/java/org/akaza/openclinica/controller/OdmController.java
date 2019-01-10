@@ -1,72 +1,24 @@
 package org.akaza.openclinica.controller;
 
-import java.io.StringWriter;
-import java.text.SimpleDateFormat;
-import java.util.*;
-
-import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
-import javax.servlet.http.HttpSession;
-import javax.xml.bind.JAXB;
-import javax.xml.bind.JAXBContext;
-import javax.xml.bind.Marshaller;
-
 import net.sf.json.JSON;
-import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
-import org.akaza.openclinica.bean.admin.CRFBean;
-import org.akaza.openclinica.bean.core.DataEntryStage;
-import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventBean;
-import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
-import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.FormLayoutDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.ParticipantEventService;
 import org.akaza.openclinica.service.ParticipateService;
 import org.akaza.openclinica.service.UserStatus;
-import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
-import org.akaza.openclinica.web.pform.PFormCache;
-import org.akaza.openclinica.web.restful.JSONClinicalDataPostProcessor;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.cdisc.ns.odm.v130.ODM;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionClinicalData;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionFormData;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionStudyEventData;
-import org.cdisc.ns.odm.v130.ODMcomplexTypeDefinitionSubjectData;
-import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLink;
-
-import org.openclinica.ns.odm_ext_v130.v31.OCodmComplexTypeDefinitionLinks;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.ui.Model;
 import org.springframework.web.bind.annotation.PathVariable;
@@ -74,6 +26,14 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.servlet.ModelAndView;
+
+import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
+import javax.servlet.http.HttpSession;
+import javax.xml.bind.JAXB;
+import java.io.StringWriter;
+import java.util.Date;
+import java.util.Locale;
 
 @Controller
 public class OdmController {
@@ -230,17 +190,18 @@ public class OdmController {
 
     @RequestMapping( value = "/auth/api/events", method = RequestMethod.GET )
     public @ResponseBody
-    String getEvent(HttpServletRequest request) throws Exception {
+    ResponseEntity getEvent(HttpServletRequest request) throws Exception {
         ODM odm = null;
         String studyOid=(String)request.getSession().getAttribute("studyOid");
         UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute("userBean");
         getRestfulServiceHelper().setSchema(studyOid, request);
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
-        if(ub==null){
-            logger.info("userAccount is null");
-            return null;
+        if(ub==null || !ub.hasUserType(UserType.PARTICIPATE)){
+            logger.info("Responding with HttpStatus.FORBIDDEN because the user is either null or not of type participate");
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).body(null);
         }
+
         logger.info("UserAccount username: " +ub.getName());
         StudyBean currentStudy = participateService.getStudy(studyOid);
         logger.info("Study OId: " +currentStudy.getOid());
@@ -277,7 +238,7 @@ public class OdmController {
             studySubjectDAO.update(studySubject);
         }
 
-        return json.toString(INDENT_LEVEL);
+        return ResponseEntity.ok(json.toString(INDENT_LEVEL));
 
     }
     public RestfulServiceHelper getRestfulServiceHelper() {

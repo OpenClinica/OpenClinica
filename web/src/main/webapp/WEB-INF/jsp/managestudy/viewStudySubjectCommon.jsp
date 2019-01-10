@@ -405,7 +405,7 @@ $(function() {
                 }));
                 i++;
             }
-            else {
+            else if (studyEvent['@OpenClinica:EventType'] != 'Common') {
                 numVisitBaseds++;
             }
         }

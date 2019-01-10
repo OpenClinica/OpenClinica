@@ -78,11 +78,12 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     @Autowired
     private RestfulServiceHelper serviceHelper;
+
     public StudyBuildServiceImpl(PermissionService permissionService) {
         this.permissionService = permissionService;
     }
 
-    public StudyInfoObject process(HttpServletRequest request, Study study, UserAccountBean ub) throws Exception  {
+    public StudyInfoObject process(HttpServletRequest request, Study study, UserAccountBean ub) throws Exception {
         boolean isUserUpdated;
 
         /***************************************** BEWARE***************************************************************
@@ -125,24 +126,24 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             for (Iterator it = getRoles().iterator(); it.hasNext(); ) {
                 Role role = (Role) it.next();
                 switch (role.getId()) {
-                case 2:
-                    key = "Study_Coordinator";
-                    break;
-                case 3:
-                    key = "Study_Director";
-                    break;
-                case 4:
-                    key = "Investigator";
-                    break;
-                case 5:
-                    key = "Data_Entry_Person";
-                    break;
-                case 6:
-                    key = "Monitor";
-                    break;
-                default:
-                    break;
-                // logger.info("No role matched when setting role description");
+                    case 2:
+                        key = "Study_Coordinator";
+                        break;
+                    case 3:
+                        key = "Study_Director";
+                        break;
+                    case 4:
+                        key = "Investigator";
+                        break;
+                    case 5:
+                        key = "Data_Entry_Person";
+                        break;
+                    case 6:
+                        key = "Monitor";
+                        break;
+                    default:
+                        break;
+                    // logger.info("No role matched when setting role description");
                 }
                 String value = resterm.getString(key).trim();
                 if (StringUtils.equals(givenRole, value))
@@ -166,13 +167,14 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 newJSON = jsonObject.get(key);
 
                 if (StringUtils.equals(key, "studyEnvUuid"))
-                   return newJSON.toString();
+                    return newJSON.toString();
             }
         }
         return null;
     }
+
     public boolean processSpecificStudyEnvUuid(HttpServletRequest request, int userActiveStudyId, UserAccount ub) {
-        boolean studyEnvUuidProcessed =false;
+        boolean studyEnvUuidProcessed = false;
         HttpSession session = request.getSession();
         String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
         if (StringUtils.isEmpty(studyEnvUuid)) {
@@ -190,7 +192,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         }
 
         int parentStudyId = currentPublicStudy.getParentStudyId() > 0 ? currentPublicStudy.getParentStudyId() : currentPublicStudy.getId();
-        if (ub.getActiveStudy() != null  && ub.getActiveStudy().getStudyId() == parentStudyId)
+        if (ub.getActiveStudy() != null && ub.getActiveStudy().getStudyId() == parentStudyId)
             return studyEnvUuidProcessed;
 
         // check to see if the user has a role for this study
@@ -215,11 +217,13 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         studyEnvUuidProcessed = true;
         return studyEnvUuidProcessed;
     }
-    @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
+
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
     public UserAccount getUserAccountObject(UserAccountBean ubIn) {
         UserAccount byUserId = userAccountDao.findByUserId(ubIn.getId());
         return byUserId;
     }
+
     public boolean saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ubIn) throws Exception {
         UserAccount ub = userAccountDao.findByUserId(ubIn.getId());
         boolean studyUserRoleUpdated;
@@ -228,7 +232,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         // because JDB transaction is not seen right away by Hibernate, active Study in UserAccountBean may not be the same as UserAccount
         if (ubIn.getActiveStudyId() != 0) {
             if ((ub.getActiveStudy() != null && ub.getActiveStudy().getStudyId() != ubIn.getActiveStudyId())
-                || ub.getActiveStudy() == null)
+                    || ub.getActiveStudy() == null)
                 ub.setActiveStudy(studyDao.findPublicStudyById(ubIn.getActiveStudyId()));
         }
         if (ub.getActiveStudy() == null)
@@ -237,7 +241,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             userActiveStudyId = ub.getActiveStudy().getStudyId();
         boolean studyEnvUuidProcessed = processSpecificStudyEnvUuid(request, userActiveStudyId, ub);
 
-        if(studyEnvUuidProcessed)
+        if (studyEnvUuidProcessed)
             return true;
         studyUserRoleUpdated = updateStudyUserRoles(request, ub, userActiveStudyId, null);
         if (ub.getActiveStudy() == null) {
@@ -251,6 +255,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         } else
             return false;
     }
+
     private void removeDeletedUserRoles(ArrayList<StudyUserRole> modifiedStudyUserRoles, Collection<StudyUserRole> existingStudyUserRoles) {
         existingStudyUserRoles.removeIf(existingStudyUserRole -> modifiedStudyUserRoles.stream().anyMatch(
                 modifiedStudyUserRole -> existingStudyUserRole.getId().getStudyId().equals(modifiedStudyUserRole.getId().getStudyId())));
@@ -261,13 +266,13 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         StudyEnvironmentRoleDTO role = roles.stream().filter(s -> s.getStudyEnvironmentUuid().equals(study.getStudy().getStudyEnvUuid())).findAny()
                 .orElse(null);
         if (role != null) {
-            request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
+            //request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
             return true;
         }
         return false;
     }
 
-    @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
+    @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
     public boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId, String altStudyEnvUuid) {
         boolean studyUserRoleUpdated = false;
         HttpSession session = request.getSession();
@@ -287,8 +292,11 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         Study activeStudy = null;
         if (userActiveStudyId > 0) {
             activeStudy = studyDao.findById(userActiveStudyId);
+            getRoleAssociatedWithActiveStudy(activeStudy,userRoles.getBody(),request);
         }
-        for (StudyEnvironmentRoleDTO role: userRoles.getBody()) {
+
+        // TODO: refactor this loop seems complex and error-prone & seems to break SRP.
+        for (StudyEnvironmentRoleDTO role : userRoles.getBody()) {
             String uuidToFind = null;
             boolean siteFlag = false;
             if (StringUtils.isNotEmpty(role.getSiteUuid())) {
@@ -310,13 +318,14 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             }
             if (StringUtils.isNotEmpty(altStudyEnvUuid)) {
                 if (uuidToFind.equals(altStudyEnvUuid)) {
-                    request.getSession().setAttribute("altCustomUserRole", role.getDynamicRoleName());
+                    logger.info("Commented out setting altCustomUserRole - does it have any adverse effects ??");
+                    //request.getSession().setAttribute("altCustomUserRole", role.getDynamicRoleName());
                 }
             }
             if ((study.getStudyId() == userActiveStudyId) || parentExists) {
                 currentActiveStudyValid = true;
-                session.setAttribute("customUserRole", role.getDynamicRoleName());
-                session.setAttribute("baseUserRole", role.getRoleName());
+                //session.setAttribute("customUserRole", role.getDynamicRoleName());
+                //session.setAttribute("baseUserRole", role.getRoleName());
 
             }
 
@@ -327,15 +336,15 @@ public class StudyBuildServiceImpl implements StudyBuildService {
                 ub.setActiveStudy(toUpdate);
                 userAccountDao.saveOrUpdate(ub);
                 currentActiveStudyValid = true;
-                if (!parentExists)
-                    request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
+                //if (!parentExists)
+                    //request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
             }
             placeHolderStudy = study;
             UserAccount userAccount = new UserAccount();
             userAccount.setUserName(ub.getUserName());
             ArrayList<StudyUserRole> byUserAccount = studyUserRoleDao.findAllUserRolesByUserAccountAndStudy(userAccount, study.getStudyId());
             String rolename = role.getRoleName();
-            String ocRole = getOCRole(rolename, parentStudy != null ? true: false);
+            String ocRole = getOCRole(rolename, parentStudy != null ? true : false);
             if (byUserAccount.isEmpty()) {
                 StudyUserRole studyUserRole = new StudyUserRole();
                 StudyUserRoleId userRoleId = new StudyUserRoleId();
@@ -393,7 +402,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return permissionService.getUserRoles(request);
     }
 
-    public ResponseEntity getUserDetails (HttpServletRequest request) {
+    public ResponseEntity getUserDetails(HttpServletRequest request) {
         Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
         if (userContextMap == null)
             return null;
@@ -416,6 +425,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         ResponseEntity<OCUserDTO> response = restTemplate.exchange(uri, HttpMethod.GET, entity, OCUserDTO.class);
         return response;
     }
+
     public void updateStudyUsername(UserAccountBean ub, KeycloakUser user) {
         int numUpdated = studyUserRoleDao.updateUsername(user.getNickname(), user.getUserId());
         logger.debug(numUpdated + " studyUserRoles updated for user:" + user.getNickname() + " and prevUser:" + user.getUserId());
@@ -424,25 +434,24 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     public void updateParticipateModuleStatusInOC(HttpServletRequest request, String studyOid) {
         getRestfulServiceHelper().setSchema(studyOid, request);
         Study study = studyDao.findByOcOID(studyOid);
-        if (study.getStudy()!=null)
+        if (study.getStudy() != null)
             study = study.getStudy();
-        persistparticipateModuleStatus(request,study);
-   }
+        persistparticipateModuleStatus(request, study);
+    }
 
 
+    public void persistparticipateModuleStatus(HttpServletRequest request, Study study) {
+        List<ModuleConfigDTO> moduleConfigDTOs = getParticipateModuleFromStudyService(request, study);
+        persistparticipateModuleStatus(moduleConfigDTOs, study);
+    }
 
-   public void persistparticipateModuleStatus(HttpServletRequest request, Study study){
-       List<ModuleConfigDTO> moduleConfigDTOs = getParticipateModuleFromStudyService(request, study);
-           persistparticipateModuleStatus( moduleConfigDTOs,study);
-   }
 
-
-    public void persistparticipateModuleStatus(List<ModuleConfigDTO> moduleConfigDTOs,Study study){
+    public void persistparticipateModuleStatus(List<ModuleConfigDTO> moduleConfigDTOs, Study study) {
         StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
         StudyParameterValueBean spv = spvdao.findByHandleAndStudy(study.getStudyId(), "participantPortal");
-        String statusValue= DISABLED;
-        if(moduleConfigDTOs.size()!=0) {
-             statusValue = getModuleStatus(moduleConfigDTOs,study);
+        String statusValue = DISABLED;
+        if (moduleConfigDTOs.size() != 0) {
+            statusValue = getModuleStatus(moduleConfigDTOs, study);
         }
         if (!spv.isActive()) {
             spv = new StudyParameterValueBean();
@@ -458,7 +467,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
     public String getModuleStatus(List<ModuleConfigDTO> moduleConfigDTOs, Study study) {
         for (ModuleConfigDTO moduleConfigDTO : moduleConfigDTOs) {
-            if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid())&& moduleConfigDTO.getModuleName().equalsIgnoreCase(PARTICIPATE)) {
+            if (moduleConfigDTO.getStudyUuid().equals(study.getStudyUuid()) && moduleConfigDTO.getModuleName().equalsIgnoreCase(PARTICIPATE)) {
                 ModuleStatus moduleStatus = moduleConfigDTO.getStatus();
                 if (moduleStatus.name().equalsIgnoreCase(ACTIVE)) {
                     logger.info("Module Status is Enabled");
@@ -494,10 +503,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
 
-    public List<ModuleConfigDTO> getParticipateModuleFromStudyService (HttpServletRequest request , Study study) {
-        if(StringUtils.isEmpty(study.getStudyUuid())) {
+    public List<ModuleConfigDTO> getParticipateModuleFromStudyService(HttpServletRequest request, Study study) {
+        if (StringUtils.isEmpty(study.getStudyUuid())) {
             // make call to study service to get study servie
-            StudyEnvironmentDTO studyEnvironmentDTO = getStudyUuidFromStudyService(request,study);
+            StudyEnvironmentDTO studyEnvironmentDTO = getStudyUuidFromStudyService(request, study);
             study.setStudyUuid(studyEnvironmentDTO.getStudyUuid());
             // save in study table in public and tenant
             studyDao.saveOrUpdate(study);
@@ -506,7 +515,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         String SBSUrl = CoreResources.getField("SBSUrl");
         int index = SBSUrl.indexOf("//");
         String protocol = SBSUrl.substring(0, index) + "//";
-        String appendUrl= "/study-service/api/studies/"+study.getStudyUuid()+"/module-configs";
+        String appendUrl = "/study-service/api/studies/" + study.getStudyUuid() + "/module-configs";
         String uri = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + appendUrl;
 
         RestTemplate restTemplate = new RestTemplate();
@@ -523,19 +532,20 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         jsonConverter.setObjectMapper(objectMapper);
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
-        ResponseEntity<List<ModuleConfigDTO>> response = restTemplate.exchange(uri, HttpMethod.GET,entity,new ParameterizedTypeReference<List<ModuleConfigDTO>>(){});
-        if(response==null)
+        ResponseEntity<List<ModuleConfigDTO>> response = restTemplate.exchange(uri, HttpMethod.GET, entity, new ParameterizedTypeReference<List<ModuleConfigDTO>>() {
+        });
+        if (response == null)
             return null;
 
         return response.getBody();
     }
 
-    public StudyEnvironmentDTO getStudyUuidFromStudyService (HttpServletRequest request , Study study) {
+    public StudyEnvironmentDTO getStudyUuidFromStudyService(HttpServletRequest request, Study study) {
 
         String SBSUrl = CoreResources.getField("SBSUrl");
         int index = SBSUrl.indexOf("//");
         String protocol = SBSUrl.substring(0, index) + "//";
-        String appendUrl= "/study-service/api/study-environments/"+study.getStudyEnvUuid();
+        String appendUrl = "/study-service/api/study-environments/" + study.getStudyEnvUuid();
 
         String uri = protocol + SBSUrl.substring(index + 2, SBSUrl.indexOf("/", index + 2)) + appendUrl;
 
@@ -553,7 +563,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         jsonConverter.setObjectMapper(objectMapper);
         converters.add(jsonConverter);
         restTemplate.setMessageConverters(converters);
-           ResponseEntity<StudyEnvironmentDTO> response = restTemplate.exchange(uri, HttpMethod.GET,entity,StudyEnvironmentDTO.class);
+        ResponseEntity<StudyEnvironmentDTO> response = restTemplate.exchange(uri, HttpMethod.GET, entity, StudyEnvironmentDTO.class);
         return response.getBody();
     }
 
@@ -563,4 +573,41 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         }
         return serviceHelper;
     }
+
+    private void getRoleAssociatedWithActiveStudy(Study study,
+                                                  List<StudyEnvironmentRoleDTO> roles,
+                                                  HttpServletRequest request) {
+
+        StudyEnvironmentRoleDTO role;
+
+        if (study.getStudyEnvSiteUuid() != null) {
+            // Active study is a site level study
+            // Active study is a site level hence it's parent is the study
+            String studyEnvUuid = study.getStudy().getStudyEnvUuid();
+            // Look for a site based role
+            role = roles.stream()
+                    .filter(s -> s.getStudyEnvironmentUuid() != null && s.getStudyEnvironmentUuid().equals(studyEnvUuid))
+                    .filter(s -> s.getSiteUuid() != null && s.getSiteUuid().equals(study.getStudyEnvSiteUuid()))
+                    .findAny()
+                    .orElse(null);
+            if (role == null) {
+                // The user does not have a site based role so checking to see if they inherit a study level role
+                role = roles.stream()
+                        .filter(s -> s.getStudyEnvironmentUuid() != null && s.getStudyEnvironmentUuid().equals(studyEnvUuid))
+                        .findAny()
+                        .orElse(null);
+            }
+        } else {
+            // Active study is a study not a site
+            role = roles.stream()
+                    .filter(s -> s.getStudyEnvironmentUuid() != null && s.getStudyEnvironmentUuid().equals(study.getStudyEnvUuid()))
+                    .findAny()
+                    .orElse(null);
+        }
+        if (role != null) {
+            request.getSession().setAttribute("customUserRole", role.getDynamicRoleName());
+            request.getSession().setAttribute("baseUserRole", role.getRoleName());
+        }
+    }
+
 }
