@@ -1425,7 +1425,7 @@
             <table cellspacing="10">
               <tr valign="top">
                 <td class="formlabel" align="left">
-                  <span>Access Link</span>
+                  <span>Access Code</span>
                 </td>
                 <td valign="top" id="access-code-td">
                   <input id="access-code-input" readonly onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
