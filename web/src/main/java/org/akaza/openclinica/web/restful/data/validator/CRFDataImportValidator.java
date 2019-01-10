@@ -9,8 +9,10 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.web.restful.data.bean.BaseStudyDefinitionBean;
 import org.springframework.validation.Errors;
+
 import org.springframework.validation.Validator;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 public class CRFDataImportValidator implements Validator {
@@ -40,7 +42,7 @@ public class CRFDataImportValidator implements Validator {
     	
     }
 
-    public void validate(Object obj, Errors e) {
+    public void validate(Object obj, Errors e, HttpServletRequest request) {
     	//CRFDataImportBean crfDataImportBean = (CRFDataImportBean) obj;
     	BaseStudyDefinitionBean crfDataImportBean = (BaseStudyDefinitionBean) obj;
     	
@@ -55,7 +57,25 @@ public class CRFDataImportValidator implements Validator {
         String userName = crfDataImportBean.getUser().getName();
         String study_oid = study.getOid();
         boolean isRoleVerified = this.getRestfulServiceHelper().verifyRole(userName, study_oid, null, e);
-        if ( !isRoleVerified ) return;
+        if ( !isRoleVerified ) {
+        	 /**
+             * log error into log file 
+             */ 
+            String studySubjectOID = study_oid;
+            String originalFileName = request.getHeader("originalFileName");
+        	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
+        	String recordNum = null;
+        	if(originalFileName !=null) {
+        		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
+        		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
+        	}
+        	String msg = e.getAllErrors().get(0).getCode() +":" + e.getAllErrors().get(0).getDefaultMessage();
+        	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
+    		this.getRestfulServiceHelper().getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
+    		
+        	
+        	return;
+        }
 //        StudyBean study = getStudyDAO().findByOid(crfDataImportBean.getStudyUniqueId());
 //        if (study == null) {
 //        	  e.reject("subjectTransferValidator.study_does_not_exist", new Object[] { crfDataImportBean.getStudyUniqueId() }, "Study identifier you specified "
@@ -90,4 +110,28 @@ public class CRFDataImportValidator implements Validator {
         return this.userAccountDAO != null ? userAccountDAO : new UserAccountDAO(dataSource);
     }
 
+    public void validate(Object obj, Errors e) {
+    	//CRFDataImportBean crfDataImportBean = (CRFDataImportBean) obj;
+    	BaseStudyDefinitionBean crfDataImportBean = (BaseStudyDefinitionBean) obj;
+    	
+        if (crfDataImportBean.getStudyUniqueId() == null ) {
+        	 e.reject("studyEventDefinitionRequestValidator.study_does_not_exist");
+             return;
+        }
+        Status[] included_status= new Status[]{Status.AVAILABLE ,  Status.PENDING};
+        StudyBean study = helper.verifyStudyByOID( getStudyDAO(), crfDataImportBean.getStudyUniqueId(), included_status, e);
+        if (study == null) return; 
+      
+        String userName = crfDataImportBean.getUser().getName();
+        String study_oid = study.getOid();
+        boolean isRoleVerified = this.getRestfulServiceHelper().verifyRole(userName, study_oid, null, e);
+        if ( !isRoleVerified ) {
+        	
+        	
+        	return;
+        }
+
+        crfDataImportBean.setStudy(study);
+
+    }
 }

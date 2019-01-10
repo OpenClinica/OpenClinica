@@ -468,6 +468,8 @@ public class StudyParticipantController {
 		    			ParameterizedErrorVM responseDTO =new ParameterizedErrorVM(errorMsg, map);
 		    			
 		        		response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+		        		
+		        		return response;
 		            }
 		            
 		            if(study != null) {

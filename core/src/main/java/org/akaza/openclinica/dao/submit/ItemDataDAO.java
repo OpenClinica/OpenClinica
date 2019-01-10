@@ -852,4 +852,63 @@ public class ItemDataDAO extends AuditableEntityDAO {
         return;
 
 	}
+	
+	public ArrayList findSkipMatchCriterias(String sqlStr) {
+        setTypesExpected();
+
+        ArrayList matchCriterias = new ArrayList<>();
+        this.setTypeExpected(1, TypeNames.INT);
+        this.setTypeExpected(2, TypeNames.STRING);
+        this.setTypeExpected(3, TypeNames.STRING);
+       
+        Integer studyEventId;
+        String itemOID;
+        String itemValue;
+        
+        if(sqlStr == null || sqlStr.trim().length()==0) {
+        	return null;
+        }
+        
+        ArrayList alist = this.select(sqlStr);
+        int listSize = alist.size();
+        int i = 0;
+        
+        Iterator it = alist.iterator();       
+        
+        Integer currentStudyEventId = null;
+        HashMap rowhm = new HashMap();
+        while (it.hasNext()) {
+        	HashMap hm = (HashMap) it.next();
+        	i++;
+        	
+        	studyEventId = (Integer) hm.get("study_event_id");
+        	itemOID = (String) hm.get("oc_oid");
+        	itemValue = (String) hm.get("value");
+        	// build  row  hash map to match data file line
+        	if(currentStudyEventId == null) {
+        		rowhm.put(itemOID, itemValue);
+        		
+        		if(i == listSize) {
+        			matchCriterias.add(rowhm);
+        		}
+        	}else if(currentStudyEventId.intValue()==studyEventId.intValue()) {
+        		rowhm.put(itemOID, itemValue);
+        		
+        		if(i == listSize) {
+        			matchCriterias.add(rowhm);
+        		}
+        	}else {
+        		matchCriterias.add(rowhm);
+        		
+        		rowhm = new HashMap();
+        		rowhm.put(itemOID, itemValue);
+        	}
+        	
+        	
+        	currentStudyEventId = studyEventId;
+        	
+        }
+        
+        return matchCriterias;
+    }
 }
