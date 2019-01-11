@@ -15,6 +15,7 @@ import java.security.cert.X509Certificate;
 import java.text.MessageFormat;
 import java.util.ArrayList;
 import java.util.Arrays;
+import java.util.Base64;
 import java.util.Enumeration;
 import java.util.HashMap;
 import java.util.Iterator;
@@ -555,7 +556,7 @@ public class DataController {
 		conn.setRequestProperty("Content-Type", "multipart/form-data");
 		//Authorization
  		String loginPassword = "root:password";
- 		String encoded = new sun.misc.BASE64Encoder().encode (loginPassword.getBytes()); 		
+ 		String encoded = Base64.getEncoder().encodeToString(loginPassword.getBytes()); 		
  		conn.setRequestProperty ("Authorization", "Basic " + encoded);
 
 		
