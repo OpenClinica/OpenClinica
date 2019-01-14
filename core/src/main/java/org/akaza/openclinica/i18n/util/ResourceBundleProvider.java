@@ -130,15 +130,18 @@ public class ResourceBundleProvider {
      * @return
      */
     private static ResourceBundle getResBundle(String name) {
+    	ResourceBundle resourceBundle = null;
         HashMap<String, ResourceBundle> stringResourceBundleHashMap = resBundleSetMap.get(localeMap.get(Thread.currentThread()));
         if (stringResourceBundleHashMap == null) {
             localeMap.forEach((k, v) -> logger.error("Key:" + k + " value:" + v));
             logger.error("Thread:" + Thread.currentThread());
             logger.error("name = :" + name);
-        }
-        ResourceBundle resourceBundle = stringResourceBundleHashMap.get(name);
+        }else {
+        	resourceBundle = stringResourceBundleHashMap.get(name);
 
-        return resBundleSetMap.get(localeMap.get(Thread.currentThread())).get(name);
+        }
+        
+        return resourceBundle;
     }
 
     /**

@@ -109,9 +109,6 @@ public class OpenRosaSubmissionController {
     private StudyEventDefinitionDao studyEventDefinitionDao;
 
     @Autowired
-    PformSubmissionNotificationService notifier;
-
-    @Autowired
     CompletionStatusDao completionStatusDao;
 
     @Autowired
@@ -206,8 +203,6 @@ public class OpenRosaSubmissionController {
 
         if (!errors.hasErrors()) {
             // JsonLog submission with Participate
-            if (isParticipantSubmission(subjectContext))
-                notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
             return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
@@ -402,8 +397,6 @@ public class OpenRosaSubmissionController {
 
         if (!errors.hasErrors()) {
             // JsonLog submission with Participate
-            if (isParticipantSubmission(subjectContext))
-                notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform field submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
             long endMillis = System.currentTimeMillis();
@@ -500,8 +493,6 @@ public class OpenRosaSubmissionController {
 
         if (!errors.hasErrors()) {
             // JsonLog submission with Participate
-            if (isParticipantSubmission(subjectContext))
-                notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform field submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
             return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);

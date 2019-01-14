@@ -8,6 +8,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.ResourceBundle;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.core.DataEntryStage;
@@ -126,7 +127,7 @@ public class DataImportService {
      * @return list of errors
      */
     public List<String> validateData(ODMContainer odmContainer, DataSource dataSource, CoreResources resources, StudyBean studyBean, UserAccountBean userBean,
-            List<DisplayItemBeanWrapper> displayItemBeanWrappers, HashMap<Integer, String> importedCRFStatuses) {
+            List<DisplayItemBeanWrapper> displayItemBeanWrappers, HashMap<Integer, String> importedCRFStatuses,HttpServletRequest request) {
         ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
         setRespage(respage);
         TriggerService triggerService = new TriggerService();
@@ -141,12 +142,12 @@ public class DataImportService {
         // validation errors, the same as in the ImportCRFDataServlet. DRY?
         Boolean eventCRFStatusesValid = getImportCRFDataService().eventCRFStatusesValid(odmContainer, userBean);
         
-        errors.addAll((ArrayList<String>) getImportCRFDataService().validateEventCRFBeans(odmContainer, userBean));        
+        errors.addAll((ArrayList<String>) getImportCRFDataService().validateEventCRFBeans(odmContainer, userBean,request));        
         if(!(errors.isEmpty())) {
         	return errors;
         }
         
-        List<EventCRFBean> eventCRFBeans =  getImportCRFDataService().fetchEventCRFBeans(odmContainer, userBean, Boolean.TRUE);
+        List<EventCRFBean> eventCRFBeans =  getImportCRFDataService().fetchEventCRFBeans(odmContainer, userBean, Boolean.TRUE,request);
         
        
         // The following line updates a map that is used for setting the EventCRF status post import
@@ -196,8 +197,8 @@ public class DataImportService {
         try {
             List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             // htaycher: this should be rewritten with validator not to use request to store data
-            MockHttpServletRequest request = new MockHttpServletRequest();
-            request.addPreferredLocale(getLocale());
+           // MockHttpServletRequest request = new MockHttpServletRequest();
+            //request.addPreferredLocale(getLocale());
 
             tempDisplayItemBeanWrappers = getImportCRFDataService().lookupValidationErrors(request, odmContainer, userBean, totalValidationErrors,
                     hardValidationErrors, permittedEventCRFIds, getLocale() );
@@ -411,7 +412,7 @@ public class DataImportService {
         return messages;
     }
 
-    private ImportCRFDataService getImportCRFDataService() {
+    public ImportCRFDataService getImportCRFDataService() {
         /*
          * if (locale == null) {locale = new Locale("en-US");} dataService = this.dataService != null? dataService : new
          * ImportCRFDataService(dataSource, locale);

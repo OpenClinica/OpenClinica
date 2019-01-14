@@ -1192,6 +1192,12 @@
         <servlet-name>ImportCRFDataServlet</servlet-name>
         <servlet-class>org.akaza.openclinica.control.submit.ImportCRFDataServlet</servlet-class>
     </servlet>
+    
+    <servlet>
+        <display-name>uploadCRFData</display-name>
+        <servlet-name>uploadCRFDataToHttpServerServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.submit.UploadCRFDataToHttpServerServlet</servlet-class>
+    </servlet>
 
     <servlet>
         <display-name>VerifyImportedCRFData</display-name>
@@ -1508,6 +1514,11 @@
     <servlet-mapping>
         <servlet-name>ImportCRFDataServlet</servlet-name>
         <url-pattern>/ImportCRFData</url-pattern>
+    </servlet-mapping>
+    
+      <servlet-mapping>
+        <servlet-name>uploadCRFDataToHttpServerServlet</servlet-name>
+        <url-pattern>/UploadCRFData</url-pattern>
     </servlet-mapping>
 
     <servlet-mapping>
