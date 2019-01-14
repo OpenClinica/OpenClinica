@@ -2,6 +2,7 @@ package org.akaza.openclinica.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import com.sun.syndication.feed.rss.Content;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -173,7 +174,7 @@ public class UserServiceImpl implements UserService {
 
             ParticipantAccessDTO accessDTO= getAccessInfo(request,studyOid,ssid);
 
-            sendEmailToParticipant(userAccount,tenantStudy, accessDTO);
+            sendEmailToParticipant(studySubject,tenantStudy, accessDTO);
             //studySubject.setUserStatus(UserStatus.INVITED);
             //studySubject = studySubjectDao.saveOrUpdate(studySubject);
             studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null);
@@ -217,10 +218,8 @@ public class UserServiceImpl implements UserService {
         StudySubject studySubject = getStudySubject(ssid, study);
 
         if (studySubject!= null && studySubject.getUserId() != null) {
-            String studySchema = CoreResources.getRequestSchema();
-            CoreResources.setRequestSchema("public");
+
             UserAccount userAccount = userAccountDao.findByUserId(studySubject.getUserId());
-            CoreResources.setRequestSchema(studySchema);
             if (userAccount != null)
                 ocUserDTO = buildOcUserDTO(userAccount, studySubject);
         }
@@ -232,9 +231,6 @@ public class UserServiceImpl implements UserService {
         if (participantDTO == null)
             return null;
        UserAccount userAccount = new UserAccount();
-        userAccount.setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
-        userAccount.setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
-        userAccount.setPhone(participantDTO.getMobilePhone() == null ? "" : participantDTO.getMobilePhone());
         userAccount.setUserType(new org.akaza.openclinica.domain.user.UserType(4));
         userAccount.setUserName(username);
         userAccount.setActiveStudy(publicStudy);
@@ -242,14 +238,15 @@ public class UserServiceImpl implements UserService {
         userAccount.setDateCreated(new Date());
         userAccount.setUserUuid(keycloakUserId);
 
-        String studySchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+
         UserAccount ownerUserAccount=userAccountDao.findByUserId(ownerUserAccountBean.getId());
         userAccount.setUserAccount(ownerUserAccount);
         StudyUserRole studyUserRole = buildStudyUserRole(username,publicStudy,ownerUserAccount.getUserId());
         studyUserRole = studyUserRoleDao.saveOrUpdate(studyUserRole);
+        String tenantSchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
         userAccount = userAccountDao.saveOrUpdate(userAccount);
-        CoreResources.setRequestSchema(studySchema);
+        CoreResources.setRequestSchema(tenantSchema);
 
         logger.info("UserAccount has been created for Participate");
         return userAccount;
@@ -259,8 +256,7 @@ public class UserServiceImpl implements UserService {
         if (participantDTO == null)
             return userAccount;
 
-        String tenantSchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+
         userAccount = userAccountDao.findByUserId(studySubject.getUserId());
         List<StudyUserRole> studyUserRoles = studyUserRoleDao.findAllUserRolesByUserAccountAndStudy(userAccount,publicStudy.getStudyId());
         if(studyUserRoles.size()==0) {
@@ -272,13 +268,10 @@ public class UserServiceImpl implements UserService {
             }
         }
 
-        userAccount.setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
-        userAccount.setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
-        userAccount.setPhone(participantDTO.getMobilePhone() == null ? "" : participantDTO.getMobilePhone());
-
         userAccount.setDateUpdated(new Date());
         userAccount.setUpdateId(ownerUserAccountBean.getId());
-
+        String tenantSchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
         userAccount = userAccountDao.saveOrUpdate(userAccount);
         CoreResources.setRequestSchema(tenantSchema);
 
@@ -319,9 +312,9 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private void sendEmailToParticipant(UserAccount userAccount, Study tenantStudy,ParticipantAccessDTO accessDTO) {
+    private void sendEmailToParticipant(StudySubject studySubject, Study tenantStudy,ParticipantAccessDTO accessDTO) {
         ParticipantDTO pDTO = new ParticipantDTO();
-        pDTO.setEmailAccount(userAccount.getEmail());
+        pDTO.setEmailAccount(studySubject.getStudySubjectDetail().getEmail());
         pDTO.setEmailSubject("You've been connected! We're looking forward to your participation.");
 
         String studyName = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getName() : tenantStudy.getName());
@@ -337,18 +330,38 @@ public class UserServiceImpl implements UserService {
             accessCode = (accessDTO.getAccessCode() == null ? "" : accessDTO.getAccessCode());
         }
 
+        StringBuffer sb = new StringBuffer();
+        sb.append("Hi ");
+        sb.append(studySubject.getStudySubjectDetail().getFirstName());
+        sb.append(",");
+        sb.append("<br>");
+        sb.append("<br>");
 
-        pDTO.setMessage("Hi "+userAccount.getFirstName()+",\n" +
-                "\n" +
-                "Thanks for participating in "+studyName+"!\n" +
-                "\n" +
-                "Click here to begin " + accessLink + "\n" +
-                "\n" +
-                "Or, you may go to: " + host + "\n" +
-                "and enter access code " + accessCode + "\n" +
-                "\n" +
-                "Thank you,\n" +
-                "The Study Team");
+        sb.append("Thanks for participating in ");
+        sb.append(studyName);
+        sb.append("!");
+        sb.append("<br>");
+        sb.append("<br>");
+
+        sb.append("<a href=\""+accessLink+"\">Click here to begin</a>");
+        sb.append("<br>");
+        sb.append("<br>");
+
+        sb.append("Or, you may go to: ");
+        sb.append(host);
+        sb.append("<br>");
+
+        sb.append("and enter access code ");
+        sb.append(accessCode);
+        sb.append("<br>");
+        sb.append("<br>");
+
+        sb.append("Thank you");
+        sb.append("<br>");
+
+        sb.append("The Study Team");
+
+        pDTO.setMessage(sb.toString());
 
         sendEmailToParticipant(pDTO);
 
@@ -363,7 +376,7 @@ public class UserServiceImpl implements UserService {
             helper.setFrom(EmailEngine.getAdminEmail());
             helper.setTo(pDTO.getEmailAccount());
             helper.setSubject(pDTO.getEmailSubject());
-            helper.setText(pDTO.getMessage());
+            helper.setText(pDTO.getMessage(),true);
 
             mailSender.send(mimeMessage);
             logger.debug("Email sent successfully on {}", new Date());
@@ -391,10 +404,8 @@ public class UserServiceImpl implements UserService {
          logger.error("Participant account not found");
             return null;
         }
-        String tenantSchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
+
         UserAccount pUserAccount = userAccountDao.findByUserId(studySubject.getUserId());
-        CoreResources.setRequestSchema(tenantSchema);
         if(pUserAccount==null || pUserAccount.getUserUuid()==null) {
             logger.error("Participant account not found");
             return null;
@@ -431,9 +442,9 @@ public class UserServiceImpl implements UserService {
 
     private OCUserDTO buildOcUserDTO(UserAccount userAccount, StudySubject studySubject) {
         OCUserDTO ocUserDTO = new OCUserDTO();
-        ocUserDTO.setEmail(userAccount.getEmail());
-        ocUserDTO.setFirstName(userAccount.getFirstName());
-        ocUserDTO.setPhoneNumber(userAccount.getPhone());
+        ocUserDTO.setEmail(studySubject.getStudySubjectDetail().getEmail());
+        ocUserDTO.setFirstName(studySubject.getStudySubjectDetail().getFirstName());
+        ocUserDTO.setPhoneNumber(studySubject.getStudySubjectDetail().getPhone());
         ocUserDTO.setStatus(studySubject.getUserStatus());
         return ocUserDTO;
     }

@@ -110,7 +110,6 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         ind++; // user_id
         this.setTypeExpected(ind, TypeNames.INT);
         ind++; // user_status_id
-        // this.setTypeExpected(ind, TypeNames.INT);
         // ind++; //
     }
 
@@ -1294,6 +1293,10 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         ind++; // unique_identifier
         this.setTypeExpected(ind, TypeNames.CHAR);
         ind++; // gender
+
+
+
+
         this.setTypeExpected(ind, TypeNames.INT);
         ind++; // study_subject_id
         this.setTypeExpected(ind, TypeNames.STRING);
@@ -1321,6 +1324,10 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         ind++; // secondary_label
         this.setTypeExpected(ind, TypeNames.STRING);
         ind++; // studyName
+        this.setTypeExpected(ind, TypeNames.INT);
+        ind++; // user_id
+        this.setTypeExpected(ind, TypeNames.INT);
+        ind++; // user_status_id
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studyId));
