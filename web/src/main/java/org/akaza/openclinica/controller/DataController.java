@@ -452,7 +452,8 @@ public class DataController {
             return errorMsgs;
 
         } catch (Exception e) {
-            logger.error("Error processing data import request", e);
+            logger.error("Error processing data import request");
+            e.printStackTrace();
             throw new Exception(e);
         }
     }
@@ -738,9 +739,9 @@ public class DataController {
                           logger.info("file is empty.");
                  
                       }else {
-                      	if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+                      	if(file.getName().toLowerCase().endsWith(".properties")) {
                       		foundMappingFile = true;
-                      		logger.info("Found mapping.txt uploaded");
+                      		logger.info("Found mapping property file and uploaded");
                       		
                       		this.dataImportService.getImportCRFDataService().getImportDataHelper().validateMappingFile(file);
                       		break;

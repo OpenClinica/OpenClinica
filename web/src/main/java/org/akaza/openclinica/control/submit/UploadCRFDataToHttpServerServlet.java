@@ -628,7 +628,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   		String  mappingpartNm = null;
   		for (File file : files) {
   			
-  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+  			if(file.getName().toLowerCase().endsWith(".properties")) {
   				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
   				mappingpartNm = "uploadedData";  	 	  		
   	 	  		
@@ -640,7 +640,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	  	int i = 1;	  		
  		for (File file : files) {
  			// skip mapping file
- 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+ 			if(file.getName().toLowerCase().endsWith(".properties")) {
  				;
  			}else {
  				HttpPost post = new HttpPost(uploadMirthUrl);
@@ -832,7 +832,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   		String  mappingpartNm = null;
   		for (File file : files) {
   			
-  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+  			if(file.getName().toLowerCase().endsWith(".properties")) {
   				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
   				mappingpartNm = "uploadedData";  	 	  		
   	 	  		
@@ -844,7 +844,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	  	int i = 1;	  		
  		for (File file : files) {
  			// skip mapping file
- 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+ 			if(file.getName().toLowerCase().endsWith(".properties")) {
  				;
  			}else {
  				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);

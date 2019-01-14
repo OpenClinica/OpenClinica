@@ -330,7 +330,7 @@ public class RestfulServiceHelper {
 	  		String  mappingpartNm = null;
 	  		for (File file : files) {
 	  			
-	  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	  			if(file.getName().toLowerCase().endsWith(".properties")) {
 	  				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
 	  				mappingpartNm = "uploadedData";  	 	  		
 	  	 	  		
@@ -342,7 +342,7 @@ public class RestfulServiceHelper {
 		  	int i = 1;	  		
 	 		for (File file : files) {
 	 			// skip mapping file
-	 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	 			if(file.getName().toLowerCase().endsWith(".properties")) {
 	 				;
 	 			}else {
 	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
@@ -455,7 +455,7 @@ public class RestfulServiceHelper {
 	  		String  mappingpartNm = null;
 	  		for (File file : files) {
 	  			
-	  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	  			if(file.getName().toLowerCase().endsWith(".properties")) {
 	  				mappingFile = file;
 	  				mappingpartNm = "uploadedData";  	 	  		
 	  	 	  		
@@ -467,7 +467,7 @@ public class RestfulServiceHelper {
 		  	int i = 1;	  		
 	 		for (File file : files) {
 	 			// skip mapping file
-	 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	 			if(file.getName().toLowerCase().endsWith(".properties")) {
 	 				;
 	 			}else {
 	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
@@ -591,7 +591,7 @@ public class RestfulServiceHelper {
 	  		String  mappingpartNm = null;
 	  		for (File file : files) {
 	  			
-	  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	  			if(file.getName().toLowerCase().endsWith(".properties")) {
 	  				mappingFile = file;
 	  				mappingpartNm = "uploadedData";  	 	  		
 	  	 	  		
@@ -603,7 +603,7 @@ public class RestfulServiceHelper {
 		  	int i = 1;	  		
 	 		for (File file : files) {
 	 			// skip mapping file
-	 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	 			if(file.getName().toLowerCase().endsWith(".properties")) {
 	 				;
 	 			}else {
 	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
