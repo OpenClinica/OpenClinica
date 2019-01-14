@@ -3,6 +3,7 @@
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
 <%@ page import="org.akaza.openclinica.logic.importdata.*" %>
 <%@ page import="java.io.*" %>
+<%@ page import="java.util.ArrayList" %>
 
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
@@ -108,14 +109,25 @@
 
 <% 
     ImportDataHelper importDataHelper = new ImportDataHelper();
+	File [] fileObjects = null;
+	String [] fileNames = null;
+	String fname=null;
+	
     String fileDir = importDataHelper.getPersonalImportFileDir(request);
-	//System.out.println("\nfileDir=============: " + fileDir);
-    File f = new File(fileDir);
-    String [] fileNames = f.list();
-    int i = 0;
-    String fname=null;
-    File [] fileObjects= f.listFiles();
-    BufferedReader readReport;
+	if(importDataHelper.hasDMrole(request)) {
+    		ArrayList<File> fileList = importDataHelper.getPersonalImportLogFile(request,null);
+			fileObjects = new File[fileList.size()];
+			fileObjects = fileList.toArray(fileObjects);
+	}else{
+	   //System.out.println("\nfileDir=============: " + fileDir);
+		File f = new File(fileDir);
+		fileNames = f.list();				
+		fileObjects= f.listFiles();
+	}	
+	
+    
+	BufferedReader readReport;
+	int i = 0;
     int num=0;
 
     {

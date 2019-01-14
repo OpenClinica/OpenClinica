@@ -824,6 +824,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	public void sendOneDataRowPerRequestByHttpClientToMirth(List<File> files) throws Exception {
 
   		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
+  		String studyOID = null;
   		
   		/**
   		 *  prepare mapping file
@@ -835,7 +836,8 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   			if(file.getName().toLowerCase().endsWith(".properties")) {
   				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
   				mappingpartNm = "uploadedData";  	 	  		
-  	 	  		
+  				studyOID=this.getRestfulServiceHelper().getImportDataHelper().getStudyOidFromMappingFile(file);
+  				
   	 	  		break;
   			}
  			
@@ -915,7 +917,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  				dataFilesIt = dataFileList.iterator();
  				while(dataFilesIt.hasNext()) {
  					File rowFile = (File) dataFilesIt.next();					 					
- 					this.getRestfulServiceHelper().getImportDataHelper().deleteTempImportFile(rowFile);
+ 					this.getRestfulServiceHelper().getImportDataHelper().deleteTempImportFile(rowFile,studyOID);
 	 	 	  		
  				}
 	 	 	  		
@@ -924,7 +926,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	  		i++;
  		}
   
- 		this.getRestfulServiceHelper().getImportDataHelper().saveFileToImportFolder(files);
+ 		this.getRestfulServiceHelper().getImportDataHelper().saveFileToImportFolder(files,studyOID);
   }
 
 /**

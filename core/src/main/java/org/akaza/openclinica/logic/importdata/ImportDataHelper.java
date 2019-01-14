@@ -275,7 +275,7 @@ public class ImportDataHelper {
     }
     
     
-    public String getImportFileDir() {
+    public String getImportFileDir(String studyOID) {
 		  if (importFileDir != null) {
 			  return importFileDir;
 		  }else {
@@ -284,7 +284,7 @@ public class ImportDataHelper {
 	              logger.info("The filePath in datainfo.properties is invalid " + dir);             
 	          }
 	          // All the uploaded files will be saved in filePath/crf/original/
-	          String theDir = dir + "import" + File.separator + "original" + File.separator;
+	          String theDir = dir + "import" + File.separator + studyOID + File.separator + "original" + File.separator;
 	          if (!new File(theDir).isDirectory()) {
 	              new File(theDir).mkdirs();
 	              logger.info("Made the directory " + theDir);
@@ -299,10 +299,12 @@ public class ImportDataHelper {
     public String getPersonalImportFileDir(HttpServletRequest request) {
     	  String userName = "";
     	  boolean prepareNewDir = false; 
+    	  UserAccountBean userBean = null;
+    	  int activeStudyId=-999;
     	  
 		  if (personalImportFileDir != null) {
 			  // All the uploaded files will be saved in filePath/import/userName/
-	          UserAccountBean userBean = this.getUserAccount(request);
+	          userBean = this.getUserAccount(request);
 
 	          if (userBean == null) {
 	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
@@ -313,6 +315,7 @@ public class ImportDataHelper {
 	        		  return personalImportFileDir;
 	        	  }else {
 	        		  prepareNewDir = true;
+	        		  activeStudyId = userBean.getActiveStudyId();
 	        	  }
 	          }	  
 			  
@@ -326,7 +329,7 @@ public class ImportDataHelper {
 	              logger.info("The filePath in datainfo.properties is invalid " + dir);             
 	          }
 	          // All the uploaded files will be saved in filePath/import/userName/
-	          UserAccountBean userBean = this.getUserAccount(request);
+	          userBean = this.getUserAccount(request);
 
 	          if (userBean == null) {
 	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
@@ -334,11 +337,12 @@ public class ImportDataHelper {
 	          }else {
 	        	  this.setCurrentUserName(userName);
 	        	  userName = (userBean.getName()+"_" +userBean.getId()).toLowerCase().replace(" ","");
+	        	  activeStudyId = userBean.getActiveStudyId();
 	          }
 	          
 	          
-	          String theDir = dir + "import" + File.separator + userName + File.separator;
-	          
+	          String theDir = dir + "import" + File.separator + activeStudyId+ File.separator + userName + File.separator;
+          	         
 	          if (!new File(theDir).isDirectory()) {
 	              new File(theDir).mkdirs();
 	              logger.info("Made the directory " + theDir);
@@ -349,10 +353,73 @@ public class ImportDataHelper {
 		 
 		return personalImportFileDir;
 	}
-    
-    public void deleteTempImportFile(File file) {
+   
+    /**
+     *  get data manager log file folder 
+     * @param request
+     * @return
+     */
+    public String getDMImportFileDir(HttpServletRequest request) {
+  	  String userName = "";
+  	  boolean prepareNewDir = false; 
+  	  UserAccountBean userBean = null;
+  	  int activeStudyId=-999;
+  	  
+		  if (personalImportFileDir != null) {
+			  // All the uploaded files will be saved in filePath/import/userName/
+	          userBean = this.getUserAccount(request);
+
+	          if (userBean == null) {
+	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
+	                return err_msg;
+	          }else {	        	  
+	        	  userName = userBean.getName();
+	        	  if(this.getCurrentUserName().equals(userName)) {
+	        		  return personalImportFileDir;
+	        	  }else {
+	        		  prepareNewDir = true;
+	        		  activeStudyId = userBean.getActiveStudyId();
+	        	  }
+	          }	  
+			  
+		  }else {
+			  prepareNewDir = true;  
+		  }	 
+		  
+		  if(prepareNewDir) {
+			  String dir = CoreResources.getField("filePath");
+	          if (!new File(dir).exists()) {
+	              logger.info("The filePath in datainfo.properties is invalid " + dir);             
+	          }
+	          // All the uploaded files will be saved in filePath/import/userName/
+	          userBean = this.getUserAccount(request);
+
+	          if (userBean == null) {
+	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
+	                return err_msg;
+	          }else {
+	        	  this.setCurrentUserName(userName);
+	        	  userName = (userBean.getName()+"_" +userBean.getId()).toLowerCase().replace(" ","");
+	        	  activeStudyId = userBean.getActiveStudyId();
+	          }
+	          
+	          
+	          String theDir = dir + "import" + File.separator + activeStudyId+ File.separator;
+        	         
+	          if (!new File(theDir).isDirectory()) {
+	              new File(theDir).mkdirs();
+	              logger.info("Made the directory " + theDir);
+	          }
+	        
+	          personalImportFileDir = theDir;
+		  }
+		 
+		return personalImportFileDir;
+	}
+
+    public void deleteTempImportFile(File file,String studyOID) {
     	String fileName = file.getName();
-    	String importFileDir = this.getImportFileDir();
+    	String importFileDir = this.getImportFileDir(studyOID);
     	
     	File tempFile = new File(importFileDir + fileName);
     	
@@ -428,13 +495,14 @@ public class ImportDataHelper {
 	 * @param files
 	 * @throws Exception
 	 */
-	public void saveFileToImportFolder(List<File> files) throws Exception {
+	public void saveFileToImportFolder(List<File> files,String studyOID) throws Exception {
 
   		
 	  	File uplodedFile;
 	  	String 	orginalFileName;
 	  	BufferedReader reader;
 	  	String line;
+	  	String importFileDir = this.getImportFileDir(studyOID);
 	  	
  		for (File file : files) {
  			reader = new BufferedReader(new FileReader(file));
@@ -484,6 +552,7 @@ public class ImportDataHelper {
 	    	
 	    	logFileName = importFileDir + orginalFileName + "_log.txt";
 			logFile = new File(logFileName);
+			
 			/**
 			 *  create new file and add first line
 			 *  RowNo | ParticipantID | Status | Message
@@ -528,19 +597,56 @@ public class ImportDataHelper {
      * @param request
      * @return
      */
-    public ArrayList<File> getPersonalImportLogFile(HttpServletRequest request) {
+    public boolean hasDMrole(HttpServletRequest request) {			
+	 UserAccountBean userBean = this.getUserAccount(request);
+	 
+	 String activeStudyRoleName = userBean.getActiveStudyRoleName();
+	 
+	 if(activeStudyRoleName != null && activeStudyRoleName.toLowerCase().equals("coordinator")) {
+		 return true;
+	 }else{
+		 return false;
+	 }
+	
+		
+    }
+    
+    /**
+     * 
+     * @param request
+     * @return
+     */
+    public ArrayList<File> getPersonalImportLogFile(HttpServletRequest request,File fileDir) {
     
     	ArrayList<File> fileList = new ArrayList<>();
-    	String importFileDir = this.getPersonalImportFileDir(request);    	
-    	File fileFolder = new File(importFileDir);
+    	String importFileDir = null;
+    	File fileFolder = null;
     	
+    	if(fileDir != null) {
+    		fileFolder = fileDir;
+    	}else {
+	    	 // check user role
+	    	if(this.hasDMrole(request)) {
+	    		importFileDir = this.getDMImportFileDir(request);
+	    	}else {
+	    		importFileDir = this.getPersonalImportFileDir(request);
+	    	}
+	    	
+	    	fileFolder = new File(importFileDir);
+    	}
+    	
+    	// recursive call
     	for (final File fileEntry : fileFolder.listFiles()) {
     	      if (fileEntry.isDirectory()) {
-    	       ;
+    	    	  ArrayList<File> fileListFromSubDir = getPersonalImportLogFile(null,fileEntry);
+    	    	  if(fileListFromSubDir!=null && fileListFromSubDir.size() > 0) {
+    	    		  fileList.addAll(fileListFromSubDir);
+    	    	  }
+    	    	  
     	      } else {
     	        if (fileEntry.isFile()) {
     	          String fileName = fileEntry.getName();
-    	          if (fileName.endsWith(".log")) {
+    	          if (fileName.endsWith("_log.txt")) {
     	        	  fileList.add(fileEntry);
     	          }
     	            
@@ -601,7 +707,7 @@ public class ImportDataHelper {
        
 	}
     
-    public File[] convert(MultipartFile[] files)
+    public File[] convert(MultipartFile[] files,String studyOID)
     {    
         int size =  files.length;
         
@@ -609,7 +715,7 @@ public class ImportDataHelper {
         
         int i = 0;
         for(MultipartFile file :files) {
-        	File convFile = new File(this.getImportFileDir() + file.getOriginalFilename());
+        	File convFile = new File(this.getImportFileDir(studyOID) + file.getOriginalFilename());
             try {
 				convFile.createNewFile();
 				FileOutputStream fos = new FileOutputStream(convFile); 
@@ -702,12 +808,12 @@ public class ImportDataHelper {
     * @param orginalFileName
     * @return
     */
-    public File saveDataToFile(String  dataStr,String orginalFileName) {
+    public File saveDataToFile(String  dataStr,String orginalFileName,String studyOID) {
 		
     	File dataFile = null;
     	
 	    try {	    		    	
-	    	String importFileDir = this.getImportFileDir();	    	
+	    	String importFileDir = this.getImportFileDir(studyOID);	    	
 	    	
 	    	int pos = orginalFileName.indexOf(".");
 	    	orginalFileName = orginalFileName.substring(0,pos);	    	

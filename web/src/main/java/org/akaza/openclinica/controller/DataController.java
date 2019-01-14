@@ -724,6 +724,7 @@ public class DataController {
         mFiles[0] = mappingFile;
         mFiles[1] = dataFile;
         
+        String studyOID = this.getRestfulServiceHelper().getImportDataHelper().getStudyOidFromMappingFile(mappingFile);
         
         
         try {       	         	  
@@ -731,7 +732,7 @@ public class DataController {
               if (mFiles[0] !=null) {
             	  boolean foundMappingFile = false;
             	  
-            	 File[] files = this.dataImportService.getImportCRFDataService().getImportDataHelper().convert(mFiles);
+            	 File[] files = this.dataImportService.getImportCRFDataService().getImportDataHelper().convert(mFiles,studyOID);
             	  
             	  for (File file : files) {           
                       

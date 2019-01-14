@@ -1,7 +1,10 @@
 package org.akaza.openclinica.logic.importdata;
 
+import java.io.BufferedReader;
 import java.io.File;
 import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
@@ -25,6 +28,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
 import org.w3c.dom.Element;
@@ -569,4 +573,57 @@ public String readFileToString(File file) throws IOException{
 		return (String) this.mappedValues.get("SkipMatchCriteria");
 	}
    
+    /**
+     * 
+     * @param mappingFile
+     * @return
+     * @throws IOException
+     */
+    public String getStudyOidFromMappingFile(File mappingFile) throws IOException{
+        String studyOID = null;
+        
+        try(Scanner sc = new Scanner(mappingFile)){
+	       	 String currentLine;
+	    	
+	       	 while (sc.hasNextLine()) {
+	       		 currentLine = sc.nextLine(); 
+	       		 
+	       		 if(currentLine.indexOf("StudyOID=") >= 0) {
+	       			String[] tempArray = currentLine.split("=");
+	       			
+	       			studyOID = tempArray[1].trim();
+	       		 }
+    	         
+    	     }
+    	
+    	 }
+    	
+         return studyOID;
+    } 
+    
+    /**
+     * 
+     * @param mappingFile
+     * @return
+     * @throws IOException
+     */
+    public String getStudyOidFromMappingFile(final MultipartFile mappingFile) throws IOException{
+        String studyOID = null;
+        String currentLine;
+        
+        BufferedReader reader = new BufferedReader(new InputStreamReader(mappingFile.getInputStream()));            	
+    	
+       	 while (reader.ready()) {
+       		 currentLine = reader.readLine(); 
+       		 
+       		 if(currentLine.indexOf("StudyOID=") > 0) {
+       			String[] tempArray = currentLine.split("=");
+       			
+       			studyOID = tempArray[1].trim();
+       		 }
+	         
+	     }
+    	
+         return studyOID;
+    } 
 }
