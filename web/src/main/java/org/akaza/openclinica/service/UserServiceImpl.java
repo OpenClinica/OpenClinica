@@ -180,9 +180,8 @@ public class UserServiceImpl implements UserService {
             studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null);
 
         }
-        if (userAccount != null || userAccount.getId() != 0)
-            ocUserDTO = buildOcUserDTO(userAccount, studySubject);
-
+        if ((userAccount != null || userAccount.getId() != 0)&&studySubject.getStudySubjectDetail()!=null)
+                ocUserDTO = buildOcUserDTO(userAccount, studySubject);
         return ocUserDTO;
     }
 
@@ -220,7 +219,7 @@ public class UserServiceImpl implements UserService {
         if (studySubject!= null && studySubject.getUserId() != null) {
 
             UserAccount userAccount = userAccountDao.findByUserId(studySubject.getUserId());
-            if (userAccount != null)
+            if (userAccount != null && studySubject.getStudySubjectDetail()!=null)
                 ocUserDTO = buildOcUserDTO(userAccount, studySubject);
         }
         return ocUserDTO;
@@ -442,10 +441,10 @@ public class UserServiceImpl implements UserService {
 
     private OCUserDTO buildOcUserDTO(UserAccount userAccount, StudySubject studySubject) {
         OCUserDTO ocUserDTO = new OCUserDTO();
-        ocUserDTO.setEmail(studySubject.getStudySubjectDetail().getEmail());
-        ocUserDTO.setFirstName(studySubject.getStudySubjectDetail().getFirstName());
-        ocUserDTO.setPhoneNumber(studySubject.getStudySubjectDetail().getPhone());
-        ocUserDTO.setStatus(studySubject.getUserStatus());
+            ocUserDTO.setEmail(studySubject.getStudySubjectDetail().getEmail());
+            ocUserDTO.setFirstName(studySubject.getStudySubjectDetail().getFirstName());
+            ocUserDTO.setPhoneNumber(studySubject.getStudySubjectDetail().getPhone());
+            ocUserDTO.setStatus(studySubject.getUserStatus());
         return ocUserDTO;
     }
 
