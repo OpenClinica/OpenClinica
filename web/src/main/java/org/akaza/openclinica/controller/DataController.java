@@ -330,10 +330,15 @@ public class DataController {
             } catch (OpenClinicaSystemException e) {
                 errors.reject(e.getErrorCode(), e.getMessage());
                 
-                // log error into file
-                String studySubjectOID = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getSubjectOID();
-                String originalFileName = request.getHeader("originalFileName");
-            	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
+                // log error into file             
+                String studySubjectOID = null;
+                try {
+                	studySubjectOID = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getSubjectOID();	
+                }catch(java.lang.NullPointerException e2) {
+                	;
+                }
+                
+                String originalFileName = request.getHeader("originalFileName");            	
             	String recordNum = null;
             	if(originalFileName !=null) {
             		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
@@ -448,7 +453,8 @@ public class DataController {
             return errorMsgs;
 
         } catch (Exception e) {
-            logger.error("Error processing data import request", e);
+            logger.error("Error processing data import request");
+            e.printStackTrace();
             throw new Exception(e);
         }
     }
@@ -734,9 +740,9 @@ public class DataController {
                           logger.info("file is empty.");
                  
                       }else {
-                      	if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+                      	if(file.getName().toLowerCase().endsWith(".properties")) {
                       		foundMappingFile = true;
-                      		logger.info("Found mapping.txt uploaded");
+                      		logger.info("Found mapping property file and uploaded");
                       		
                       		this.dataImportService.getImportCRFDataService().getImportDataHelper().validateMappingFile(file);
                       		break;

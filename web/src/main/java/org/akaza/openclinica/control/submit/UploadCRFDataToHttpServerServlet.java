@@ -9,71 +9,48 @@ import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.net.URL;
 import java.sql.SQLException;
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
 import java.util.Iterator;
 import java.util.List;
 import java.util.Locale;
 import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
+import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
 
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
-import java.io.DataOutputStream;
-import java.io.InputStreamReader;
 import java.net.HttpURLConnection;
 
 
-import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
-import org.akaza.openclinica.bean.submit.crfdata.SummaryStatsBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
-import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.exception.OpenClinicaException;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
-import org.akaza.openclinica.logic.importdata.ImportDataHelper;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.SQLInitServlet;
-import org.akaza.openclinica.web.crfdata.ImportCRFDataService;
-import org.apache.commons.collections.CollectionUtils;
-import org.apache.commons.httpclient.HttpClient;
-import org.apache.commons.httpclient.URI;
-import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
-import org.apache.http.client.utils.URIBuilder;
 import org.apache.http.entity.ContentType;
 import org.apache.http.entity.mime.HttpMultipartMode;
 import org.apache.http.entity.mime.MultipartEntityBuilder;
 import org.apache.http.entity.mime.content.FileBody;
-import org.apache.http.entity.mime.content.StringBody;
 import org.apache.http.impl.client.CloseableHttpClient;
-import org.apache.http.impl.client.HttpClientBuilder;
 import org.apache.http.impl.client.HttpClients;
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.xml.Unmarshaller;
 import org.json.JSONArray;
 import org.json.JSONObject;
+import org.springframework.mock.web.MockHttpServletRequest;
 
 
 public class UploadCRFDataToHttpServerServlet extends SecureController {
@@ -81,9 +58,9 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
     Locale locale;
     static private String importFileDir;
 
-    XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
-    FileUploadHelper uploadHelper = new FileUploadHelper();
-    RestfulServiceHelper restfulServiceHelper;
+    private XmlSchemaValidationHelper schemaValidator = new XmlSchemaValidationHelper();
+    private FileUploadHelper uploadHelper = new FileUploadHelper();
+    private RestfulServiceHelper restfulServiceHelper;
 
     
 
@@ -123,6 +100,17 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
         session.setAttribute(MODULE, module);
 
         String action = request.getParameter("action");
+        
+        String submitted =  (String) request.getParameter("submitted");
+        if(submitted!=null && submitted.equals("true")) {
+        	 request.removeAttribute("submitted");
+        	 
+        	 String message = "The Application is processing your files, you can come back later to check the status and with detail in log file";	          
+	         this.addPageMessage(message);
+        	 forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
+        	 
+        	 return;
+        }
        
         if (StringUtil.isBlank(action)) {
             logger.info("action is blank");
@@ -136,7 +124,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
                 forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
             }
             // All the uploaded files will be saved in filePath/crf/original/
-            String theDir = dir + "crf" + File.separator + "original" + File.separator;
+            String theDir = dir + "import" + File.separator + "original" + File.separator;
             if (!new File(theDir).isDirectory()) {
                 new File(theDir).mkdirs();
                 logger.info("Made the directory " + theDir);
@@ -203,17 +191,65 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
                //sendRequestByHttpClient(files);
                
               //sendOneFilePerRequestByHttpClient(files);
-               sendOneDataRowPerRequestByHttpClient(files,request);
+         	  
+	          // Async
+       	 	          	          
+         	 /* MockHttpServletRequest requestMock = getMockRequest(request);
+     		
+	          AsyncContext asyncContext = request.startAsync();
+	          asyncContext.addListener(new UploadDataAsyncListener());
 
-               String message = "The Application is processing your files, you can come back later to check the status and with detail in log file";
-               this.addPageMessage(message);
+	          AsyncContext finalAsyncContext = asyncContext;
+	          asyncContext.start(new Runnable() {
+	              @Override
+	              public void run () {
+	            	  try {
+						sendOneDataRowPerRequestByHttpClient(files,requestMock);
+	            		
+					} catch (Exception e) {						
+						// TODO Auto-generated catch block
+						e.printStackTrace();
+						
+						//finalAsyncContext.complete();
+					}
+	                  
+	              }
+	          });*/
+	          
+	          MockHttpServletRequest requestMock = getMockRequest(request);
+	          
+	          // redirect first
+	          this.response.sendRedirect("/OpenClinica/UploadCRFData?submitted=true");	          
+	         
+	          //////////////// Start of heavy thread run/////////////////////
+	          //sendOneDataRowPerRequestByHttpClient(files,requestMock);
+	          new Thread(new Runnable() {
+	              public void run(){
+	               try {
+					sendOneDataRowPerRequestByHttpClient(files, requestMock);
+				} catch (Exception e) {
+					// TODO Auto-generated catch block
+					e.printStackTrace();
+				} ;
+	              }
+	          }).start();
+	         
+      		///////////////// end of heavy thread run/////////////////////
+	          
+	          return;
+
+              
             } catch (Exception e) {
-                logger.warn("*** Found exception during file upload***");
-                e.printStackTrace();
+                logger.error("*** Found exception during file upload***");
+                //e.printStackTrace();
 
+                String message = "Please selected correct files to resubmit.";  	          
+  	            this.addPageMessage(message);
+  	          
+                forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
             }
             
-            forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
+           
                     	 
         } else if ("download".equalsIgnoreCase(action)) {
             String fileName= request.getParameter("fileId");
@@ -230,6 +266,24 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
         
 
     }
+
+	/**
+	 * @return
+	 */
+	private MockHttpServletRequest getMockRequest(HttpServletRequest request) {
+		MockHttpServletRequest requestMock = new MockHttpServletRequest();
+		
+		String remoteAddress = this.getBasePath(request);	  		
+		String importDataWSUrl = remoteAddress + "/OpenClinica/pages/auth/api/clinicaldata/";	  	
+		requestMock.setAttribute("importDataWSUrl", importDataWSUrl);
+		
+		String accessToken = (String) request.getSession().getAttribute("accessToken");
+		requestMock.setAttribute("accessToken", accessToken);
+		
+		String basePath = remoteAddress;
+		requestMock.setAttribute("basePath", basePath);
+		return requestMock;
+	}
 
  // HTTP POST request
  	private void sendPost(File file) throws Exception {
@@ -574,7 +628,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   		String  mappingpartNm = null;
   		for (File file : files) {
   			
-  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+  			if(file.getName().toLowerCase().endsWith(".properties")) {
   				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
   				mappingpartNm = "uploadedData";  	 	  		
   	 	  		
@@ -586,7 +640,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	  	int i = 1;	  		
  		for (File file : files) {
  			// skip mapping file
- 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+ 			if(file.getName().toLowerCase().endsWith(".properties")) {
  				;
  			}else {
  				HttpPost post = new HttpPost(uploadMirthUrl);
@@ -778,7 +832,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   		String  mappingpartNm = null;
   		for (File file : files) {
   			
-  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+  			if(file.getName().toLowerCase().endsWith(".properties")) {
   				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
   				mappingpartNm = "uploadedData";  	 	  		
   	 	  		
@@ -790,7 +844,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	  	int i = 1;	  		
  		for (File file : files) {
  			// skip mapping file
- 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+ 			if(file.getName().toLowerCase().endsWith(".properties")) {
  				;
  			}else {
  				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
@@ -879,9 +933,33 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  * @throws Exception
  */
 	public void sendOneDataRowPerRequestByHttpClient(List<File> files,HttpServletRequest request) throws Exception {
+		/*HttpServletRequest requestMock = new MockHttpServletRequest();
+		
+		String remoteAddress = this.getBasePath(request);	  		
+	  	String importDataWSUrl = remoteAddress + "/OpenClinica/pages/auth/api/clinicaldata/";	  	
+		requestMock.setAttribute("importDataWSUrl", importDataWSUrl);
+		
+		String accessToken = (String) request.getSession().getAttribute("accessToken");
+		requestMock.setAttribute("accessToken", accessToken);
+		
+		String basePath = remoteAddress;
+		requestMock.setAttribute("basePath", basePath);
+		
+		this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(files, requestMock);*/
+		
 		this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(files, request);
+		
 	}
 	
+	
+	public void sendOneDataRowPerRequestByHttpClient(List<File> files,MockHttpServletRequest mockRequest) throws Exception {
+		
+		
+		this.getRestfulServiceHelper().sendOneDataRowPerRequestByHttpClient(files, mockRequest, true);
+		/*SendOneDataRowPerRequestRunnable sendOneDataRowPerRequestRunnable = new SendOneDataRowPerRequestRunnable(this.getRestfulServiceHelper(), files, request);
+		Thread sendOneDataRowPerRequest = new Thread(sendOneDataRowPerRequestRunnable, "sendOneDataRowPerRequest");
+		sendOneDataRowPerRequest.start();*/
+	}
 	
 	public String getImportFileDir() {
 		  if (importFileDir != null) {

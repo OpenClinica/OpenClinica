@@ -1589,7 +1589,7 @@ public class ImportCRFDataService {
                 
                 
                 if(matchedAndSkip) {
-                	System.out.println("===============================matchedAndSkip========================");
+                	//System.out.println("===============================matchedAndSkip========================");
                 	/** log message:
         	    	 * RowNo | ParticipantID | Status | Message
         				1 | SS_SUB510 | SUCCESS | InsertU
@@ -2037,7 +2037,7 @@ public class ImportCRFDataService {
 			String e =st.nextElement().toString();
 			columnNms[i]=e;
 			i++;
-			System.out.println(e);
+			//System.out.println(e);
 			
 		}
 		return columnNms;

@@ -30,6 +30,7 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -329,7 +330,7 @@ public class RestfulServiceHelper {
 	  		String  mappingpartNm = null;
 	  		for (File file : files) {
 	  			
-	  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	  			if(file.getName().toLowerCase().endsWith(".properties")) {
 	  				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
 	  				mappingpartNm = "uploadedData";  	 	  		
 	  	 	  		
@@ -341,7 +342,7 @@ public class RestfulServiceHelper {
 		  	int i = 1;	  		
 	 		for (File file : files) {
 	 			// skip mapping file
-	 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	 			if(file.getName().toLowerCase().endsWith(".properties")) {
 	 				;
 	 			}else {
 	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
@@ -388,8 +389,8 @@ public class RestfulServiceHelper {
 	 	 	 	  	    //print result	
 	 	 	 	 		int responseCode = response.getStatusLine().getStatusCode();
 
-	 	 	 	 		System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
-	 	 	 	 		System.out.println("Response Code : " + responseCode);
+	 	 	 	 		//System.out.println("\nSending 'POST' request to URL : " + uploadMirthUrl); 	
+	 	 	 	 		//System.out.println("Response Code : " + responseCode);
 
 	 	 	 	 		BufferedReader rd = new BufferedReader(
 	 	 	 	 	                new InputStreamReader(response.getEntity().getContent()));
@@ -410,7 +411,7 @@ public class RestfulServiceHelper {
 	 	 	 	 	    importCRFInfoSummary.getDetailMessages().add(responseStr);
 	 	 	 	 		//System.out.println(responseStr);
 	 	 	 	 		
-	 	 	 	 	    TimeUnit.MILLISECONDS.sleep(10);
+	 	 	 	 	    //TimeUnit.MILLISECONDS.sleep(5);
 	 				}
 	 				
 	 			   // after sent, then delete from disk
@@ -454,7 +455,7 @@ public class RestfulServiceHelper {
 	  		String  mappingpartNm = null;
 	  		for (File file : files) {
 	  			
-	  			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	  			if(file.getName().toLowerCase().endsWith(".properties")) {
 	  				mappingFile = file;
 	  				mappingpartNm = "uploadedData";  	 	  		
 	  	 	  		
@@ -466,7 +467,7 @@ public class RestfulServiceHelper {
 		  	int i = 1;	  		
 	 		for (File file : files) {
 	 			// skip mapping file
-	 			if(file.getName().toLowerCase().indexOf("mapping") > -1) {
+	 			if(file.getName().toLowerCase().endsWith(".properties")) {
 	 				;
 	 			}else {
 	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
@@ -524,8 +525,8 @@ public class RestfulServiceHelper {
 	 	 	 	  	    //print result	
 	 	 	 	 		int responseCode = response.getStatusLine().getStatusCode();
 
-	 	 	 	 		System.out.println("\nSending 'POST' request to URL : " + importDataWSUrl); 	
-	 	 	 	 		System.out.println("Response Code : " + responseCode);
+	 	 	 	 		//System.out.println("\nSending 'POST' request to URL : " + importDataWSUrl); 	
+	 	 	 	 		//System.out.println("Response Code : " + responseCode);
 
 	 	 	 	 		BufferedReader rd = new BufferedReader(
 	 	 	 	 	                new InputStreamReader(response.getEntity().getContent()));
@@ -546,7 +547,7 @@ public class RestfulServiceHelper {
 	 	 	 	 	    importCRFInfoSummary.getDetailMessages().add(responseStr);
 	 	 	 	 		//System.out.println(responseStr);
 	 	 	 	 		
-	 	 	 	 	    TimeUnit.MILLISECONDS.sleep(10);
+	 	 	 	 	    //TimeUnit.MILLISECONDS.sleep(5);
 	 				}
 	 				
 	 			   // after sent, then delete from disk
@@ -573,6 +574,140 @@ public class RestfulServiceHelper {
 			
 	 		return importCRFInfoSummary;
 	  }
+	 
+	 public ImportCRFInfoSummary sendOneDataRowPerRequestByHttpClient(List<File> files,MockHttpServletRequest request,boolean ismock) throws Exception {
+		   
+	  		String importDataWSUrl = (String) request.getAttribute("importDataWSUrl");
+	  		String accessToken = (String) request.getAttribute("accessToken");
+	  		String basePath =  (String) request.getAttribute("basePath");
+	  		
+	  		ImportCRFInfoSummary importCRFInfoSummary  = new ImportCRFInfoSummary();
+	  		ArrayList<File> tempODMFileList = new ArrayList<>();
+	  		
+	  		/**
+	  		 *  prepare mapping file
+	  		 */
+	  		File mappingFile = null;
+	  		String  mappingpartNm = null;
+	  		for (File file : files) {
+	  			
+	  			if(file.getName().toLowerCase().endsWith(".properties")) {
+	  				mappingFile = file;
+	  				mappingpartNm = "uploadedData";  	 	  		
+	  	 	  		
+	  	 	  		break;
+	  			}
+	 			
+	 		}
+	  		
+		  	int i = 1;	  		
+	 		for (File file : files) {
+	 			// skip mapping file
+	 			if(file.getName().toLowerCase().endsWith(".properties")) {
+	 				;
+	 			}else {
+	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
+	 				
+	 				Iterator dataFilesIt = dataFileList.iterator();
+	 				
+	 				while(dataFilesIt.hasNext()) {
+	 					File rowFile = (File) dataFilesIt.next();
+	 					
+	 					HttpPost post = new HttpPost(importDataWSUrl);
+	 	 	 	  		/**
+	 	 	 	  		 *  add header Authorization
+	 	 	 	  		 */	 	 	 	 		
+	 	 	 	  		post.setHeader("Authorization", "Bearer " + accessToken);	 	 	 	  			 	 	 	  		
+	 	 	 	  		post.setHeader("OCBasePath", basePath);
+	 	 	 	  		
+	 	 	 	  		//SkipMatchCriteria
+	 	 	 	  		String skipMatchCriteria = this.getImportDataHelper().getSkipMatchCriteria(rowFile, mappingFile); 
+	 	 	 	  	    post.setHeader("SkipMatchCriteria", skipMatchCriteria);
+	 	 	 	  	
+	 	 	 	 		post.setHeader("Accept", 
+	 	 	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
+	 	 	 	 		post.setHeader("Accept-Language", "en-US,en;q=0.5"); 		
+	 	 	 	 		post.setHeader("Connection", "keep-alive");
+	 	 	 	 		
+	 	 	 	 		String originalFileName = rowFile.getName();
+	 	 	 	 	    post.setHeader("originalFileName", originalFileName);
+	 	 	 			
+	 	 	 	 		MultipartEntityBuilder builder = MultipartEntityBuilder.create();
+	 	 	 		  	builder.setMode(HttpMultipartMode.BROWSER_COMPATIBLE);
+	 	 	 		  	String partNm = null;
+	 	 	 		  	/**
+	 	 	 		  	 *  Here will only send ODM XML to OC API
+	 	 	 		  	 *  
+	 	 	 		  	 */
+	 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile);
+	 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName);
+	 	 	 		    tempODMFileList.add(odmXmlFile);
+	 	 	 		 
+	 	 	 			FileBody fileBody = new FileBody(odmXmlFile, ContentType.TEXT_PLAIN);
+	 	 	 			partNm = "uploadedData" + i;
+	 	 	 	  		builder.addPart(partNm, fileBody);
+	 	 	 	  	    builder.addBinaryBody("file", odmXmlFile);
+	 	 	 	  		
+	 	 	 	  		
+	 	 	 	  		HttpEntity entity = builder.build();   		
+	 	 	 	  		post.setEntity(entity);
+	 	 	 	  		
+	 	 	 	  		CloseableHttpClient httpClient = HttpClients.createDefault();
+	 	 	 	  		HttpResponse response = httpClient.execute(post);
+	 	 	 	  		
+	 	 	 	  	    //print result	
+	 	 	 	 		int responseCode = response.getStatusLine().getStatusCode();
+
+	 	 	 	 		//System.out.println("\nSending 'POST' request to URL : " + importDataWSUrl); 	
+	 	 	 	 		//System.out.println("Response Code : " + responseCode);
+
+	 	 	 	 		BufferedReader rd = new BufferedReader(
+	 	 	 	 	                new InputStreamReader(response.getEntity().getContent()));
+
+	 	 	 	 		StringBuffer result = new StringBuffer();
+	 	 	 	 		String line = "";
+	 	 	 	 		while ((line = rd.readLine()) != null) {
+	 	 	 	 			result.append(line);
+	 	 	 	 		}
+	 	 	 	        
+	 	 	 	 		String responseStr = result.toString();
+	 	 	 	 		if(responseStr!=null && responseStr.toLowerCase().indexOf("error")>-1) {
+	 	 	 	 			importCRFInfoSummary.setFailCnt(importCRFInfoSummary.getFailCnt()+1);
+	 	 	 	 		}else {
+	 	 	 	 			importCRFInfoSummary.setPassCnt(importCRFInfoSummary.getPassCnt() +1);
+	 	 	 	 		}
+	 	 	 	 
+	 	 	 	 	    importCRFInfoSummary.getDetailMessages().add(responseStr);
+	 	 	 	 		//System.out.println(responseStr);
+	 	 	 	 		
+	 	 	 	 	    //TimeUnit.MILLISECONDS.sleep(1);
+	 				}
+	 				
+	 			   // after sent, then delete from disk
+	 				dataFilesIt = dataFileList.iterator();
+	 				while(dataFilesIt.hasNext()) {
+	 					File rowFile = (File) dataFilesIt.next();					 					
+		 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile);
+		 	 	  		
+	 				}
+	 				
+	 				dataFilesIt = tempODMFileList.iterator();
+	 				while(dataFilesIt.hasNext()) {
+	 					File tempODMFile = (File) dataFilesIt.next();					 					
+		 	 	  		this.getImportDataHelper().deleteTempImportFile(tempODMFile);
+		 	 	  		
+	 				}
+		 	 	  		
+	 			}
+	 			
+	 	  		i++;
+	 		}
+	  
+	 		this.getImportDataHelper().saveFileToImportFolder(files);
+			
+	 		return importCRFInfoSummary;
+	  }
+
 	    public ArrayList<File> splitDataFileAndProcesDataRowbyRow(File file) {
 			ArrayList<File> fileList = new ArrayList<>();
 		    BufferedReader reader;
@@ -606,7 +741,7 @@ public class RestfulServiceHelper {
 						bw = new BufferedWriter(new OutputStreamWriter(fos));
 					 
 						bw.write(columnLine);				
-						bw.write("\n\r");
+						bw.write("\r");
 					
 						bw.write(line);	
 						fileList.add(splitFile);

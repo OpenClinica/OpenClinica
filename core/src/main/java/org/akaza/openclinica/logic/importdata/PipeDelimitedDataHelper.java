@@ -3,6 +3,7 @@ package org.akaza.openclinica.logic.importdata;
 import java.io.File;
 import java.io.IOException;
 import java.io.StringWriter;
+import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
@@ -73,7 +74,7 @@ public String readFileToString(File file) throws IOException{
    	 while (sc.hasNextLine()) {
    		 currentLine = sc.nextLine();        		 
 	         sb.append(currentLine);
-	         sb.append("\n\r");
+	         sb.append("\r");
 	     }
 	
 	 }
@@ -201,7 +202,7 @@ public String readFileToString(File file) throws IOException{
 			
 			int indexofParticipantID = 0;
 			
-			for(int i=0;i<dataRows.length;i++){
+			for(int i = 0;i<dataRows.length ;i++){
 				//logger.info("++DEST++dataRows[i]g++++++" +dataRows[i]);
 				// in each data row, first position is participant ID 
 				String[] dataRow = this.toArray(dataRows[i].toString().replaceAll("\n", ""), "|");
@@ -209,8 +210,9 @@ public String readFileToString(File file) throws IOException{
 				// find subject OID, It may be at any position
 				if(i==0) {
 					for(int k=0;i<dataRow.length;k++){
-						if(dataRow[k].toString().trim().equals("ParticipantID")) {
+						if(dataRow[k].toString().trim().equals("ParticipantID") || dataRow[k].substring(1).trim().equals("ParticipantID")) {
 							indexofParticipantID = k;
+							
 							break;
 						}
 					}
@@ -426,17 +428,17 @@ public String readFileToString(File file) throws IOException{
 			     val =  keyValueStr[1].trim().replaceAll("/n|||/r", "");	
 		          			
 			    //extract the configuration data
-			    if(key.equals("StudyOID")){
-			    	mappedValues.put(key, val);		 					   			 
-			    }else if(key.equals("StudyEventOID")){		    		
-			    	mappedValues.put(key, val);					 
-			    }else  if(key.equals("FormOID")){		    	
-			    	mappedValues.put(key, val);						
-			    }else  if(key.equals("FormVersion")){			     	 
-			    	mappedValues.put(key, val);
+			    if(key.equals("StudyOID") || key.substring(1).equals("StudyOID")){
+			    	mappedValues.put("StudyOID", val);		 					   			 
+			    }else if(key.equals("StudyEventOID") || key.substring(1).equals("StudyEventOID")){		    		
+			    	mappedValues.put("StudyEventOID", val);					 
+			    }else  if(key.equals("FormOID") || key.substring(1).equals("FormOID")){		    	
+			    	mappedValues.put("FormOID", val);						
+			    }else  if(key.equals("FormVersion") || key.substring(1).equals("FormVersion")){			     	 
+			    	mappedValues.put("FormVersion", val);
 			    //SkipMatchCriteria	
-			    }else  if(key.equals("SkipMatchCriteria")){			     	 
-			    	mappedValues.put(key, val);	
+			    }else  if(key.equals("SkipMatchCriteria") || key.substring(1).equals("SkipMatchCriteria")){			     	 
+			    	mappedValues.put("SkipMatchCriteria", val);	
 			    }else{
 	                    // item OID: Height=IG_VITAL_GROUP1.HeightOID
 			    	//boolean isCorrectFormat = checkFormItemMappingFormat(rawMappingStrRowsStr);
@@ -503,14 +505,28 @@ public String readFileToString(File file) throws IOException{
 	
 	public  boolean hasParticipantIDColumn() {
 		
+		boolean found = false;
+		String textStr;
 		
 		for(int i=0; i < this.columnNms.length; i++) {
 			//System.out.println("columnNms==========================" + columnNms[i]);
 			if(columnNms[i].trim().equals("ParticipantID")) {
-				return true;
-			}
+				found = true;
+				break;
+			}			
+			
+			/**
+			 *  in case data is in UTF-8 or  UTF-8-BOM etc encoding
+			 */
+			textStr = columnNms[i].substring(1);
+			if(textStr.trim().equals("ParticipantID")) {
+				found = true;
+				break;
+			}				
+		
 		}
-		return false;
+		
+		return found;
 	}
 	
     public  String getSkipMatchCriteria() {			
