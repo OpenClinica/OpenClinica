@@ -1146,9 +1146,6 @@
                   #access-code-input {
                     width: 150px;
                   }
-                  #access-url {
-                    text-decoration: underline;
-                  }
                   #eye {
                     position: absolute;
                     top: 1px;
