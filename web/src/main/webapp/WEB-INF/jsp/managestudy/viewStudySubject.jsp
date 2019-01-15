@@ -396,7 +396,7 @@
                                       </a>
                                       &nbsp;|&nbsp;
                                       <a href="javascript:;" id="participateAccess">
-                                        View Access Details
+                                        <fmt:message key="view_participant_access_code" bundle="${resword}"/>
                                       </a>
                                     </td>
                                   </tr>
@@ -1146,9 +1146,6 @@
                   #access-code-input {
                     width: 150px;
                   }
-                  #access-note {
-                    color: #777;
-                  }
                   #access-url {
                     text-decoration: underline;
                   }
@@ -1159,6 +1156,9 @@
                     font-size: 18pt;
                     background-color: white;
                     padding: 2px 6px;
+                  }
+                  .grayed-out {
+                    color: #777;
                   }
                 </style>
                 <div id="phone-widget">
@@ -1412,7 +1412,7 @@
       <tr style="height:10px;">
         <td class="formlabel" align="left">
           <h3>
-            View Access Details
+            <fmt:message key="view_participant_access_code" bundle="${resword}"/>
           </h3>
         </td>
       </tr>
@@ -1425,20 +1425,29 @@
             <table cellspacing="10">
               <tr valign="top">
                 <td class="formlabel" align="left">
-                  <span>Access Code</span>
+                  <span><fmt:message key="access_code" bundle="${resword}"/></span>
                 </td>
                 <td valign="top" id="access-code-td">
                   <input id="access-code-input" readonly onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
                   <i id="eye" class="fa fa-eye"></i>
                 </td>
-                <td valign="top" id="access-note">
-                  <span>Viewing access code will be audited.</span>
+                <td valign="top" class="grayed-out">
+                  <span><i><fmt:message key="viewing_audited" bundle="${resword}"/></i></span>
+                </td>
+              </tr>
+              <tr valign="top">
+                <td></td>
+                <td valign="top" colspan="2" style="padding-top:7px;">
+                  <fmt:message key="participate_url" bundle="${resword}"/>: <span id="access-url"></span>
                 </td>
               </tr>
               <tr valign="top">
                 <td></td>
                 <td valign="top" colspan="2">
-                  Participate URL: <a id="access-url" href=""></a>
+                  <i>
+                    <fmt:message key="please_sign_out" bundle="${resword}"/><br>
+                    <fmt:message key="please_sign_out_line2" bundle="${resword}"/>
+                  </i>
                 </td>
               </tr>
             </table>
