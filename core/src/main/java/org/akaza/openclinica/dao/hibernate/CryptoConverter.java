@@ -1,5 +1,6 @@
 package org.akaza.openclinica.dao.hibernate;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.springframework.stereotype.Component;
 
 import javax.crypto.Cipher;
@@ -13,10 +14,11 @@ import java.util.Base64;
 public class CryptoConverter implements AttributeConverter<String, String> {
 
     private static final String ALGORITHM = "AES/ECB/PKCS5Padding";
-    private static final byte[] KEY = "MySuperSecretKey".getBytes();
+    private static final byte[] KEY = CoreResources.getField("encryptionKey").getBytes();
 
     @Override
     public String convertToDatabaseColumn(String ccNumber) {
+
         // do some encryption
         String encryptedData = null;
         if (ccNumber != null) {
@@ -35,6 +37,7 @@ public class CryptoConverter implements AttributeConverter<String, String> {
 
     @Override
     public String convertToEntityAttribute(String dbData) {
+
         String decryptedText = null;
         if (dbData != null) {
             // do some decryption

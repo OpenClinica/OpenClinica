@@ -254,6 +254,7 @@ public class StudySubject  extends DataMapDomainObject {
 		this.userStatus = userStatus;
 	}
 
+
 	@OneToOne(mappedBy = "studySubject", cascade = CascadeType.ALL,
 			fetch = FetchType.LAZY, optional = false)
 	public StudySubjectDetail getStudySubjectDetail() {
@@ -261,12 +262,10 @@ public class StudySubject  extends DataMapDomainObject {
 	}
 
 	public void setStudySubjectDetail(StudySubjectDetail detail) {
-		if (detail == null) {
-			detail = new StudySubjectDetail();
+		if (detail != null) {
+			detail.setStudySubject(this);
 		}
-		detail.setStudySubject(this);
 		this.studySubjectDetail = detail;
 	}
-
 
 }
