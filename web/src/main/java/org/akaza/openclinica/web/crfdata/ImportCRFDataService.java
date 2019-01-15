@@ -409,7 +409,7 @@ public class ImportCRFDataService {
                           *  Data from the Mirth will skip this repeat key check, because it has no repeat key
                           */
                         String skipMatchCriteria = request.getHeader("SkipMatchCriteria");
-                        if(skipMatchCriteria != null) {
+                        if(skipMatchCriteria != null && skipMatchCriteria.trim().length() >1) {
                         	continue;
                         }
                     	
@@ -468,8 +468,18 @@ public class ImportCRFDataService {
                         sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey();
                        
                         if(sampleOrdinal == null || sampleOrdinal.trim().isEmpty()) {
-                        	// not provide repeat key in the data file, then get the next available one
-                            sampleOrdinal = commonEventContainerDTO.getMaxOrdinal()+1 +"";                           
+                        	String comeFromPipe = (String) request.getHeader("PIPETEXT");
+                        	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
+                        		// not provide repeat key in the data file, then get the next available one
+                                sampleOrdinal = commonEventContainerDTO.getMaxOrdinal()+1 +""; 
+                        		 
+                        	}else {
+                        		 //for common events, if not provided studyEventRepeatKey, then skip/reject
+                        		errors.add("Missing studyEventRepeatKey for common event  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
+                                
+                                return errors;
+                        	}
+                        	                          
                         }
                        
                     	// for same subject, same event, can't have same form more than once in NON repeating COMMON event -- found same formOID in database
@@ -1589,7 +1599,7 @@ public class ImportCRFDataService {
                 
                 
                 if(matchedAndSkip) {
-                	System.out.println("===============================matchedAndSkip========================");
+                	//System.out.println("===============================matchedAndSkip========================");
                 	/** log message:
         	    	 * RowNo | ParticipantID | Status | Message
         				1 | SS_SUB510 | SUCCESS | InsertU
@@ -2037,7 +2047,7 @@ public class ImportCRFDataService {
 			String e =st.nextElement().toString();
 			columnNms[i]=e;
 			i++;
-			System.out.println(e);
+			//System.out.println(e);
 			
 		}
 		return columnNms;

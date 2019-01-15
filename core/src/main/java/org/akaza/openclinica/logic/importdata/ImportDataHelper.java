@@ -69,6 +69,7 @@ public class ImportDataHelper {
     
     static private String importFileDir;
     private String personalImportFileDir;
+    private String currentUserName;
 
     public void setSessionManager(SessionManager sm) {
         this.sm = sm;
@@ -297,10 +298,29 @@ public class ImportDataHelper {
     
     public String getPersonalImportFileDir(HttpServletRequest request) {
     	  String userName = "";
+    	  boolean prepareNewDir = false; 
     	  
 		  if (personalImportFileDir != null) {
-			  return personalImportFileDir;
+			  // All the uploaded files will be saved in filePath/import/userName/
+	          UserAccountBean userBean = this.getUserAccount(request);
+
+	          if (userBean == null) {
+	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
+	                return err_msg;
+	          }else {	        	  
+	        	  userName = userBean.getName();
+	        	  if(this.getCurrentUserName().equals(userName)) {
+	        		  return personalImportFileDir;
+	        	  }else {
+	        		  prepareNewDir = true;
+	        	  }
+	          }	  
+			  
 		  }else {
+			  prepareNewDir = true;  
+		  }	 
+		  
+		  if(prepareNewDir) {
 			  String dir = CoreResources.getField("filePath");
 	          if (!new File(dir).exists()) {
 	              logger.info("The filePath in datainfo.properties is invalid " + dir);             
@@ -312,6 +332,7 @@ public class ImportDataHelper {
 	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
 	                return err_msg;
 	          }else {
+	        	  this.setCurrentUserName(userName);
 	        	  userName = (userBean.getName()+"_" +userBean.getId()).toLowerCase().replace(" ","");
 	          }
 	          
@@ -426,7 +447,7 @@ public class ImportDataHelper {
 			line = reader.readLine();
 			while(line != null) {
 				bw.write(line);
-				bw.write("\n\r");
+				bw.write("\r");
 				line = reader.readLine();
 			}
 			
@@ -714,4 +735,12 @@ public class ImportDataHelper {
 	    
 		return dataFile;
 	}
+
+public String getCurrentUserName() {
+	return currentUserName;
+}
+
+public void setCurrentUserName(String currentUserName) {
+	this.currentUserName = currentUserName;
+}
    }

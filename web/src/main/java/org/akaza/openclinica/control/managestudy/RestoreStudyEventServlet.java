@@ -172,7 +172,12 @@ public class RestoreStudyEventServlet extends SecureController {
                     }
 
                     if (eventCRF.getStatus().equals(Status.AUTO_DELETED) && edc.getStatus().equals(Status.AVAILABLE)) {
-                        eventCRF.setStatus(Status.AVAILABLE);
+                        if (eventCRF.getOldStatus().equals(Status.UNAVAILABLE)){
+                            eventCRF.setStatus(Status.UNAVAILABLE);
+                        }
+                        else {
+                            eventCRF.setStatus(Status.AVAILABLE);
+                        }
                         eventCRF.setUpdater(ub);
                         eventCRF.setUpdatedDate(new Date());
                         ecdao.update(eventCRF);
