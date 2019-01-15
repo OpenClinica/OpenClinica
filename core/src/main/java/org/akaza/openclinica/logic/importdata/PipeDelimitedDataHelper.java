@@ -52,7 +52,7 @@ public String transformTextToODMxml(File mappingFile,File rawItemDataFile) {
 		rawItemData = this.readFileToString(rawItemDataFile);
 		
 		odmXml = transformTextToODMxml(rawMappingStr,rawItemData); 
-	} catch (IOException e) {
+	} catch (Exception e) {
 		// TODO Auto-generated catch block
 		e.printStackTrace();
 	}

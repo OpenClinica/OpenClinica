@@ -361,6 +361,9 @@ public class RestfulServiceHelper {
 	 	 	 	  		
 	 	 	 	  		String basePath = getBasePath(request);
 	 	 	 	  		post.setHeader("OCBasePath", basePath);
+  	 	 	 	  	    //PIPETEXT
+	 	 	 	  		post.setHeader("PIPETEXT", "PIPETEXT");
+
 
 	 	 	 	 		post.setHeader("Accept", 
 	 	 	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -487,6 +490,9 @@ public class RestfulServiceHelper {
 	 	 	 	  		String basePath = getBasePath(request);
 	 	 	 	  		post.setHeader("OCBasePath", basePath);
 	 	 	 	  		
+ 	 	 	 	  	    //PIPETEXT
+	 	 	 	  		post.setHeader("PIPETEXT", "PIPETEXT");
+
 	 	 	 	  		//SkipMatchCriteria
 	 	 	 	  		String skipMatchCriteria = this.getImportDataHelper().getSkipMatchCriteria(rowFile, mappingFile); 
 	 	 	 	  	    post.setHeader("SkipMatchCriteria", skipMatchCriteria);
@@ -619,6 +625,9 @@ public class RestfulServiceHelper {
 	 	 	 	  		 */	 	 	 	 		
 	 	 	 	  		post.setHeader("Authorization", "Bearer " + accessToken);	 	 	 	  			 	 	 	  		
 	 	 	 	  		post.setHeader("OCBasePath", basePath);
+	 	 	 	  	    //PIPETEXT
+	 	 	 	  		post.setHeader("PIPETEXT", "PIPETEXT");
+
 	 	 	 	  		
 	 	 	 	  		//SkipMatchCriteria
 	 	 	 	  		String skipMatchCriteria = this.getImportDataHelper().getSkipMatchCriteria(rowFile, mappingFile); 
