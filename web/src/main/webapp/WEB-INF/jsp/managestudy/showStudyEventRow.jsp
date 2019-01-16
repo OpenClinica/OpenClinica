@@ -224,7 +224,7 @@
 
 				 <c:when test="${studySub.status.name != 'removed' && studySub.status.name != 'auto-removed'}">
 					 <td>
-                <c:if test="${study.status.available && !currRow.bean.studyEvent.status.deleted && !currRow.bean.studyEvent.subjectEventStatus.locked && !userRole.monitor}">
+                <c:if test="${study.status.available && !currRow.bean.studyEvent.status.deleted && !currRow.bean.studyEvent.subjectEventStatus.locked && !currRow.bean.studyEvent.subjectEventStatus.skipped && !currRow.bean.studyEvent.subjectEventStatus.stopped && !userRole.monitor}">
                     <c:choose>
                     <c:when test="${dedc.eventCRF.status.id != 0}">
                     <a class="accessCheck" href="EnketoFormServlet?formLayoutId=<c:out value="${dedc.eventCRF.formLayout.id}"/>&studyEventId=<c:out value="${currRow.bean.studyEvent.id}"/>&eventCrfId=<c:out value="${dedc.eventCRF.status.id}"/>&originatingPage=<c:out value="${originatingPage}"/>&mode=<c:out value="edit"/>"
