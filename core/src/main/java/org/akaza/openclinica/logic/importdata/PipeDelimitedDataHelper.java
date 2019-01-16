@@ -205,7 +205,7 @@ public String readFileToString(File file) throws IOException{
 			for(int i = 0;i<dataRows.length ;i++){
 				//logger.info("++DEST++dataRows[i]g++++++" +dataRows[i]);
 				// in each data row, first position is participant ID 
-				String[] dataRow = this.toArray(dataRows[i].toString().replaceAll("\n", ""), "|");
+				String[] dataRow = this.toArrayWithFullItems(dataRows[i].toString().replaceAll("\n", ""), "|");
 				
 				// find subject OID, It may be at any position
 				if(i==0) {
@@ -280,11 +280,15 @@ public String readFileToString(File file) throws IOException{
 												//logger.info("----mappingItemName:"+ mappingItemName + "----itemName:"+ itemName);
 												 itemDataValue = dataRow[k].toString();
 						
-												 Element itemData = document.createElement("ItemData");	
-												 itemData.setAttribute("ItemOID", mappingItemOID);						
-												 itemData.setAttribute("Value", itemDataValue);
-																	              	
-												 itemGroupData.appendChild(itemData);
+												 //ignore item which has no item value or blank value
+												 if(itemDataValue != null && itemDataValue.trim().length() > 0) {
+													 Element itemData = document.createElement("ItemData");	
+													 itemData.setAttribute("ItemOID", mappingItemOID);						
+													 itemData.setAttribute("Value", itemDataValue);
+																		              	
+													 itemGroupData.appendChild(itemData); 
+												 }
+												 
 												 
 											} else{
 												//logger.info(k+"----mappingItemName:"+ mappingItemName + "----itemName:"+ itemName);
@@ -375,6 +379,7 @@ public String readFileToString(File file) throws IOException{
 	}
 
 	/**
+	 * this will ignore/not return empty elements
 	 * @param columnNmsStr
 	 * @return
 	 */
@@ -394,6 +399,18 @@ public String readFileToString(File file) throws IOException{
 		return columnNms;
 	}
 	
+	private static String[] toArrayWithFullItems(String columnNmsStr,String delemiterStr) {
+		String[] columnNms;
+		
+		if(delemiterStr.equals("|")) {		
+			columnNms = columnNmsStr.split("\\|");
+		}else {
+			columnNms = columnNmsStr.split(delemiterStr);
+		}
+			
+		
+		return columnNms;
+	}
 	 /**
      * hold mapped and filtered columns information for only items,Height.IG_VITAL_GROUP1.HeightOID
      * any columns if not configured in mapping file will not be used  as items to build ODM
