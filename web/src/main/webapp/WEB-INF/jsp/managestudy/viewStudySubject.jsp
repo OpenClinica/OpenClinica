@@ -211,7 +211,6 @@
   .subnote {
     font-size: 85%;
     color: #618ebb;
-    margin-top: 35px;
     margin-left: 5px;
   }
   .full-width {
@@ -1077,7 +1076,7 @@
                 <span><fmt:message key="first_name" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control invite-input">
               </td>
             </tr>
             <tr valign="top">
@@ -1085,10 +1084,30 @@
                 <span><fmt:message key="email" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="email-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
-                <div class="subnote hide error" id="email-input-error">
-                  Invalid e-mail address
+                <input id="email-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control invite-input">
+                <div id="email-input-info">
+                  <fmt:message key="invite_required" bundle="${resword}"/>
+                  <br>
+                  <fmt:message key="invite_required_line2" bundle="${resword}"/>
                 </div>
+                <div class="subnote hide error" id="email-input-error">
+                  <fmt:message key="invite_invalid_email" bundle="${resword}"/>
+                </div>
+              </td>
+            </tr>
+            <tr valign="top">
+              <td></td>
+              <td valign="top" id="invite-option">
+                <span style="margin-right:15px;">
+                  <fmt:message key="invite_via_email" bundle="${resword}"/>
+                </span>
+                <label><input type="radio" name="invite-option" value="true">
+                  <fmt:message key="invite_yes" bundle="${resword}"/>
+                </label>
+                &emsp;
+                <label><input type="radio" name="invite-option" value="false" checked="checked">
+                  <fmt:message key="invite_no" bundle="${resword}"/>
+                </label>
               </td>
             </tr>
             <tr valign="top">
@@ -1099,6 +1118,14 @@
               </td>
               <td valign="top">
                 <style>
+                  .invite-input {
+                    width: 250px;
+                  }
+                  #email-input-info {
+                    display: inline-block;
+                    margin: -10px 0 0 10px;
+                    font-style: italic;
+                  }
                   #phone-input {
                     padding: 4px !important;
                     padding-left: 100px !important;
@@ -1159,7 +1186,7 @@
                   }
                 </style>
                 <div id="phone-widget">
-                  <input id="phone-input" type="tel" class="formfield form-control" onfocus="this.select()"> 
+                  <input id="phone-input" type="tel" class="formfield form-control invite-input" onfocus="this.select()"> 
                   <div id="country-select">
                     <div id="country-flag" class="down-arrow">&nbsp;</div> 
                     <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
@@ -1377,16 +1404,6 @@
                 </div>
               </td>
             </tr>
-            <tr valign="top">
-              <td class="formlabel" align="left">
-                <span>Invite Participant</span>
-              </td>
-              <td valign="top" id="invite-option">
-                <label><input type="radio" name="invite-option" value="true">Yes</label>
-                &emsp;
-                <label><input type="radio" name="invite-option" value="false" checked="checked">No</label>
-              </td>
-            </tr>
           </table>
         </div>
       </td>
@@ -1487,10 +1504,9 @@
         $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
     }
     function enableDisableInviteRadios() {
+        var hasEmail = !!$('#email-input').val().trim();
         var validEmail = $('#email-input-error').is(':hidden');
-        var hasEmail = !!$('#email-input').val().trim() && validEmail;
-        var hasPhone = !!$('#phone-input').val().trim();
-        if (hasEmail || hasPhone) {
+        if (hasEmail && validEmail) {
             $('#invite-option input').removeAttr("disabled");
         }
         else {
