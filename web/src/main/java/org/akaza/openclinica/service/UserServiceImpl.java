@@ -193,7 +193,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (userStatus != null){
-            studySubject.setUserStatus(UserStatus.CREATED);
+            studySubject.setUserStatus(userStatus);
         }
 
         if (studySubject.getStudySubjectDetail() == null){
