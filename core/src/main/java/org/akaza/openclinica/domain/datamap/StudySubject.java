@@ -4,19 +4,7 @@ package org.akaza.openclinica.domain.datamap;
 import java.util.Date;
 import java.util.List;
 
-import javax.persistence.Column;
-import javax.persistence.Entity;
-import javax.persistence.FetchType;
-import javax.persistence.GeneratedValue;
-import javax.persistence.Id;
-import javax.persistence.JoinColumn;
-import javax.persistence.ManyToOne;
-import javax.persistence.OneToMany;
-import javax.persistence.OrderBy;
-import javax.persistence.Table;
-import javax.persistence.Temporal;
-import javax.persistence.TemporalType;
-import javax.persistence.UniqueConstraint;
+import javax.persistence.*;
 
 import org.akaza.openclinica.domain.DataMapDomainObject;
 import org.akaza.openclinica.domain.Status;
@@ -53,6 +41,7 @@ public class StudySubject  extends DataMapDomainObject {
 	private List<StudyEventDefinition> studyEventDefinitions;
 	private Integer userId;
 	private UserStatus userStatus;
+	private StudySubjectDetail studySubjectDetail;
 	
 	public StudySubject() {
 	}
@@ -264,4 +253,19 @@ public class StudySubject  extends DataMapDomainObject {
 	public void setUserStatus(UserStatus userStatus) {
 		this.userStatus = userStatus;
 	}
+
+
+	@OneToOne(mappedBy = "studySubject", cascade = CascadeType.ALL,
+			fetch = FetchType.LAZY, optional = false)
+	public StudySubjectDetail getStudySubjectDetail() {
+		return studySubjectDetail;
+	}
+
+	public void setStudySubjectDetail(StudySubjectDetail detail) {
+		if (detail != null) {
+			detail.setStudySubject(this);
+		}
+		this.studySubjectDetail = detail;
+	}
+
 }
