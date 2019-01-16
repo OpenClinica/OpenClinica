@@ -1635,7 +1635,7 @@
                 data: JSON.stringify({
                     auditTable: 'study_subject',
                     entityId: '${studySub.id}',
-                    entityName: 'Participant ID',
+                    entityName: 'Participant access code',
                     auditLogEventTypId: '42'                
                 }),
                 error: logDump
