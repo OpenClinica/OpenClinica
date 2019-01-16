@@ -44,6 +44,7 @@ import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.BulkEmailSenderService;
 import org.akaza.openclinica.service.OCUserDTO;
+import org.akaza.openclinica.service.ParticipantAccessDTO;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAccountRequest;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAccountResponse;
 import org.akaza.openclinica.service.participant.ParticipantServiceImpl;
@@ -66,12 +67,19 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
+import org.springframework.security.config.authentication.UserServiceBeanDefinitionParser;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
 import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
+import org.springframework.web.context.request.RequestContextHolder;
+import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.text.MessageFormat;
 import java.util.*;
 
 import javax.mail.MessagingException;
@@ -101,7 +109,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	String url;
 	String emailSubject;
 	String participateStatus;
-    StudySubjectBean studySubjectBean;
+    StudySubject studySubject;
+    HttpServletRequest request;
 
     public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionBean ruleActionBean, ParticipantDTO pDTO,
 			String email) {
@@ -113,15 +122,16 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 	}
 
-	public NotificationActionProcessor(String[] listOfEmails, StudySubjectBean studySubjectBean, StudyBean studyBean, String message, String emailSubject,
-			JavaMailSenderImpl mailSender , String participateStatus) {
+	public NotificationActionProcessor(String[] listOfEmails, StudySubject studySubject, StudyBean studyBean, String message, String emailSubject,
+			JavaMailSenderImpl mailSender , String participateStatus,HttpServletRequest request) {
 		this.listOfEmails = listOfEmails;
 		this.message = message;
 		this.emailSubject = emailSubject;
-		this.studySubjectBean = studySubjectBean;
+		this.studySubject = studySubject;
 		this.mailSender = mailSender;
 		this.studyBean = studyBean;
 		this.participateStatus=participateStatus;
+		this.request=request;
 
 	}
 
@@ -195,7 +205,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		return null;
 	}
 
-	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, int studySubjectBeanId, int eventOrdinal) {
+	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, StudySubject studySubject, int eventOrdinal) {
 		String emailList = ((NotificationActionBean) ruleActionBean).getTo();
 		String message = ((NotificationActionBean) ruleActionBean).getMessage();
 		String emailSubject = ((NotificationActionBean) ruleActionBean).getSubject();
@@ -218,14 +228,14 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		ParticipantDTO pDTO = null;
 		StudyBean studyBean = getStudyBean(studyId);
 		String[] listOfEmails = emailList.split(",");
-		StudySubjectBean ssBean = (StudySubjectBean) ssdao.findByPK(studySubjectBeanId);
 		StudyBean parentStudyBean = getParentStudy(ds, studyBean);
         OCUserDTO userDTO=null;
 
 		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(parentStudyBean.getId(), "participantPortal");
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
+		HttpServletRequest request = CoreResources.getRequest();
 
-		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, ssBean, studyBean, message, emailSubject, mailSender,participateStatus));
+		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, studySubject, studyBean, message, emailSubject, mailSender,participateStatus,request));
 		thread.start();
 
 	}
@@ -235,24 +245,22 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		String url = "";
 
-
-		message = message.replaceAll("\\$\\{participant.url}", url);
-		emailSubject = emailSubject.replaceAll("\\$\\{participant.url}", url);
-
-		pDTO = getParticipantInfo(studySubjectBean);
+		pDTO = getParticipantInfo(studySubject);
 
 
 		if (pDTO != null) {
 			String msg = null;
 			String eSubject = null;
+
 			msg = message.replaceAll("\\$\\{participant.accessCode}", pDTO.getAccessCode());
 			msg = msg.replaceAll("\\$\\{participant.firstname}", pDTO.getfName());
+			msg = msg.replaceAll("\\$\\{participant.url}", pDTO.getUrl());
+			msg = msg.replaceAll("\\$\\{participant.loginurl}", pDTO.getLoginUrl());
+
 			eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", pDTO.getAccessCode());
 			eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", pDTO.getfName());
-
-			String loginUrl = url + "?access_code=" + pDTO.getAccessCode() + "&auto_login=true";
-			msg = msg.replaceAll("\\$\\{participant.loginurl}", loginUrl);
-			eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", loginUrl);
+			eSubject = eSubject.replaceAll("\\$\\{participant.url}", pDTO.getUrl());
+			eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", pDTO.getLoginUrl());
 
 			msg = msg.replaceAll("\\\\n", "\n");
 			eSubject = eSubject.replaceAll("\\\\n", "\n");
@@ -279,9 +287,12 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			    }
 
 				// Send Email thru Local Mail Server
-				execute(ExecutionMode.SAVE, ruleActionBean, pDTO , email.trim());
+			if(email!=null) {
+				execute(ExecutionMode.SAVE, ruleActionBean, pDTO, email.trim());
 				logger.info(pDTO.getMessage() + "  (Email sent to email address from OC Mail Server :  " + email + ")");
-
+			}else{
+				logger.info(pDTO.getMessage() + "  (No Email address available to be forwarded)");
+			}
 		}
 	}
 
@@ -291,33 +302,36 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		msg = message.replaceAll("\\$\\{participant.accessCode}", "");
 		msg = msg.replaceAll("\\$\\{participant.firstname}", "");
 		msg = msg.replaceAll("\\$\\{participant.loginurl}", "");
+		msg = msg.replaceAll("\\$\\{participant.url}", "");
 		msg = msg.replaceAll("\\\\n", "\n");
 		pDTO.setMessage(msg);
 		String eSubject = null;
 		eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", "");
 		eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", "");
 		eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", "");
+		eSubject = eSubject.replaceAll("\\$\\{participant.url}", "");
 		eSubject = eSubject.replaceAll("\\\\n", "\n");
 		pDTO.setEmailSubject(eSubject);
 
 		return pDTO;
 	}
 
-	public ParticipantDTO getParticipantInfo(StudySubjectBean studySubjectBean) {
+	public ParticipantDTO getParticipantInfo(StudySubject studySubject) {
 		ParticipantDTO pDTO = null;
-		if (studySubjectBean != null && studySubjectBean.getUserId()!=0 ) {
+		if (studySubject != null && studySubject.getUserId()!=null ) {
 			pDTO = new ParticipantDTO();
-			//  Change Schema
-			udao = new UserAccountDAO(ds);
 
-			String studySchema = CoreResources.getRequestSchema();
-			CoreResources.setRequestSchema("public");
-			UserAccountBean userAccountBean = (UserAccountBean) udao.findByPK(studySubjectBean.getUserId());
-			CoreResources.setRequestSchema(studySchema);
+			pDTO.setfName(studySubject.getStudySubjectDetail().getFirstName());
+            pDTO.setParticipantEmailAccount(studySubject.getStudySubjectDetail().getEmail());
+            pDTO.setPhone(studySubject.getStudySubjectDetail().getPhone());
 
-			pDTO.setfName(userAccountBean.getFirstName());
-            pDTO.setParticipantEmailAccount(userAccountBean.getEmail());
-            pDTO.setAccessCode("");
+            if(studySubject.getUserId()!=null) {
+				ParticipantAccessDTO participantAccessDTO = getAccessLink(studySubject.getLabel());
+
+				pDTO.setAccessCode(participantAccessDTO.getAccessCode());
+				pDTO.setLoginUrl(participantAccessDTO.getAccessLink());
+				pDTO.setUrl(participantAccessDTO.getHost());
+			}
 
 		} else {
 			return null;
@@ -373,5 +387,46 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		return ruleSetDao;
 	}
 
+
+
+	private ParticipantAccessDTO getAccessLink(String ssid){
+		String baseUrl = CoreResources.getField("sysURL.base");
+		String uri = baseUrl + "pages/auth/api/clinicaldata/studies/" + studyBean.getOid() + "/participants/"+ssid+"/accessLink";
+
+		RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+
+		String accessToken = (String) request.getSession().getAttribute("accessToken");
+		headers.add("Authorization", "Bearer " + accessToken);
+		headers.add("Accept-Charset", "UTF-8");
+		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
+		HttpEntity<String> entity = new HttpEntity<String>(headers);
+
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+		List<HttpMessageConverter<?>> converters = new ArrayList<>();
+		MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
+		jsonConverter.setObjectMapper(objectMapper);
+		converters.add(jsonConverter);
+		restTemplate.setMessageConverters(converters);
+
+		ResponseEntity<ParticipantAccessDTO> response=null;
+
+		try {
+			response = restTemplate.exchange(uri, HttpMethod.GET, entity, ParticipantAccessDTO.class);
+		} catch (HttpClientErrorException e) {
+			logger.error("Runtime error message: {}", e.getResponseBodyAsString());
+		}
+
+
+
+		ParticipantAccessDTO participantAccessDTO = null;
+		if (response != null) {
+			participantAccessDTO = response.getBody();
+		}
+
+
+		return participantAccessDTO;
+	}
 
 }
