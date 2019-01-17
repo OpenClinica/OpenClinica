@@ -211,7 +211,6 @@
   .subnote {
     font-size: 85%;
     color: #618ebb;
-    margin-top: 35px;
     margin-left: 5px;
   }
   .full-width {
@@ -396,7 +395,7 @@
                                       </a>
                                       &nbsp;|&nbsp;
                                       <a href="javascript:;" id="participateAccess">
-                                        View Access Details
+                                        <fmt:message key="view_participant_access_code" bundle="${resword}"/>
                                       </a>
                                     </td>
                                   </tr>
@@ -1077,7 +1076,7 @@
                 <span><fmt:message key="first_name" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control invite-input">
               </td>
             </tr>
             <tr valign="top">
@@ -1085,10 +1084,30 @@
                 <span><fmt:message key="email" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="email-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
-                <div class="subnote hide error" id="email-input-error">
-                  Invalid e-mail address
+                <input id="email-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control invite-input">
+                <div id="email-input-info">
+                  <fmt:message key="invite_required" bundle="${resword}"/>
+                  <br>
+                  <fmt:message key="invite_required_line2" bundle="${resword}"/>
                 </div>
+                <div class="subnote hide error" id="email-input-error">
+                  <fmt:message key="invite_invalid_email" bundle="${resword}"/>
+                </div>
+              </td>
+            </tr>
+            <tr valign="top">
+              <td></td>
+              <td valign="top" id="invite-option">
+                <span style="margin-right:15px;">
+                  <fmt:message key="invite_via_email" bundle="${resword}"/>
+                </span>
+                <label><input type="radio" name="invite-option" value="true">
+                  <fmt:message key="invite_yes" bundle="${resword}"/>
+                </label>
+                &emsp;
+                <label><input type="radio" name="invite-option" value="false" checked="checked">
+                  <fmt:message key="invite_no" bundle="${resword}"/>
+                </label>
               </td>
             </tr>
             <tr valign="top">
@@ -1099,6 +1118,14 @@
               </td>
               <td valign="top">
                 <style>
+                  .invite-input {
+                    width: 250px;
+                  }
+                  #email-input-info {
+                    display: inline-block;
+                    margin: -10px 0 0 10px;
+                    font-style: italic;
+                  }
                   #phone-input {
                     padding: 4px !important;
                     padding-left: 100px !important;
@@ -1146,12 +1173,6 @@
                   #access-code-input {
                     width: 150px;
                   }
-                  #access-note {
-                    color: #777;
-                  }
-                  #access-url {
-                    text-decoration: underline;
-                  }
                   #eye {
                     position: absolute;
                     top: 1px;
@@ -1160,9 +1181,12 @@
                     background-color: white;
                     padding: 2px 6px;
                   }
+                  .grayed-out {
+                    color: #777;
+                  }
                 </style>
                 <div id="phone-widget">
-                  <input id="phone-input" type="tel" class="formfield form-control" onfocus="this.select()"> 
+                  <input id="phone-input" type="tel" class="formfield form-control invite-input" onfocus="this.select()"> 
                   <div id="country-select">
                     <div id="country-flag" class="down-arrow">&nbsp;</div> 
                     <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
@@ -1380,16 +1404,6 @@
                 </div>
               </td>
             </tr>
-            <tr valign="top">
-              <td class="formlabel" align="left">
-                <span>Invite Participant</span>
-              </td>
-              <td valign="top" id="invite-option">
-                <label><input type="radio" name="invite-option" value="true">Yes</label>
-                &emsp;
-                <label><input type="radio" name="invite-option" value="false" checked="checked">No</label>
-              </td>
-            </tr>
           </table>
         </div>
       </td>
@@ -1412,7 +1426,7 @@
       <tr style="height:10px;">
         <td class="formlabel" align="left">
           <h3>
-            View Access Details
+            <fmt:message key="view_participant_access_code" bundle="${resword}"/>
           </h3>
         </td>
       </tr>
@@ -1425,20 +1439,29 @@
             <table cellspacing="10">
               <tr valign="top">
                 <td class="formlabel" align="left">
-                  <span>Access Code</span>
+                  <span><fmt:message key="access_code" bundle="${resword}"/></span>
                 </td>
                 <td valign="top" id="access-code-td">
                   <input id="access-code-input" readonly onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
                   <i id="eye" class="fa fa-eye"></i>
                 </td>
-                <td valign="top" id="access-note">
-                  <span>Viewing access code will be audited.</span>
+                <td valign="top" class="grayed-out">
+                  <span><i><fmt:message key="viewing_audited" bundle="${resword}"/></i></span>
+                </td>
+              </tr>
+              <tr valign="top">
+                <td></td>
+                <td valign="top" colspan="2" style="padding-top:7px;">
+                  <fmt:message key="participate_url" bundle="${resword}"/>: <span id="access-url"></span>
                 </td>
               </tr>
               <tr valign="top">
                 <td></td>
                 <td valign="top" colspan="2">
-                  Participate URL: <a id="access-url" href=""></a>
+                  <i>
+                    <fmt:message key="please_sign_out" bundle="${resword}"/><br>
+                    <fmt:message key="please_sign_out_line2" bundle="${resword}"/>
+                  </i>
                 </td>
               </tr>
             </table>
@@ -1481,10 +1504,9 @@
         $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
     }
     function enableDisableInviteRadios() {
+        var hasEmail = !!$('#email-input').val().trim();
         var validEmail = $('#email-input-error').is(':hidden');
-        var hasEmail = !!$('#email-input').val().trim() && validEmail;
-        var hasPhone = !!$('#phone-input').val().trim();
-        if (hasEmail || hasPhone) {
+        if (hasEmail && validEmail) {
             $('#invite-option input').removeAttr("disabled");
         }
         else {
@@ -1613,7 +1635,7 @@
                 data: JSON.stringify({
                     auditTable: 'study_subject',
                     entityId: '${studySub.id}',
-                    entityName: 'Participant ID',
+                    entityName: 'Participant access code',
                     auditLogEventTypId: '42'                
                 }),
                 error: logDump

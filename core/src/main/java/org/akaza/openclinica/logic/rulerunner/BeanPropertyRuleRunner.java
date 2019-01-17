@@ -45,14 +45,14 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 
 	public void runRules(List<RuleSetBean> ruleSets, DataSource ds,
                          BeanPropertyService beanPropertyService, StudyEventDao studyEventDaoHib, StudyEventDefinitionDao studyEventDefDaoHib,
-                         StudyEventChangeDetails changeDetails,Integer userId , JavaMailSenderImpl mailSender) 
+                         StudyEventChangeDetails changeDetails,Integer userId , JavaMailSenderImpl mailSender)
 	{
-        for (RuleSetBean ruleSet : ruleSets) 
+        for (RuleSetBean ruleSet : ruleSets)
         {
             List<ExpressionBean> expressions = ruleSet.getExpressions();
             for (ExpressionBean expressionBean : expressions) {
                 ruleSet.setTarget(expressionBean);
-                
+
                 StudyEvent studyEvent = studyEventDaoHib.findByStudyEventId(
                         Integer.valueOf(getExpressionService().getStudyEventDefenitionOrdninalCurated(ruleSet.getTarget().getValue())));
 
@@ -60,10 +60,10 @@ public class BeanPropertyRuleRunner extends RuleRunner{
                 int studySubjectBeanId = studyEvent.getStudySubject().getStudySubjectId();
 
                 List<RuleSetRuleBean> ruleSetRules = ruleSet.getRuleSetRules();
-                for (RuleSetRuleBean ruleSetRule : ruleSetRules) 
+                for (RuleSetRuleBean ruleSetRule : ruleSetRules)
                 {
                     Object result = null;
-                    
+
                     if(ruleSetRule.getStatus()==Status.AVAILABLE)
                     {
 	                    RuleBean rule = ruleSetRule.getRuleBean();
@@ -85,14 +85,14 @@ public class BeanPropertyRuleRunner extends RuleRunner{
                             logger.debug( "Rule Expression Evaluation Result: " + result);
 	                        // Actions
 	                        List<RuleActionBean> actionListBasedOnRuleExecutionResult = ruleSetRule.getActions(result.toString());
-	
+
 	                        for (RuleActionBean ruleActionBean: actionListBasedOnRuleExecutionResult){
 	                            // ActionProcessor ap =ActionProcessorFacade.getActionProcessor(ruleActionBean.getActionType(), ds, null, null,ruleSet, null, ruleActionBean.getRuleSetRule());
 	                        	if (ruleActionBean instanceof EventActionBean){
 	                        		beanPropertyService.runAction(ruleActionBean,eow,userId,changeDetails.getRunningInTransaction());
 	                        	}else if (ruleActionBean instanceof NotificationActionBean){
-                                    notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule); 
-                                    notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studySubjectBeanId,eventOrdinal);
+                                    notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule);
+                                    notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studyEvent.getStudySubject(),eventOrdinal);
 	                        	}                	
 	                        }
 	                    }catch (OpenClinicaSystemException osa) {

@@ -568,6 +568,8 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   		
   		String basePath = getBasePath(request);
   		post.setHeader("OCBasePath", basePath);
+  		//PIPETEXT
+  		post.setHeader("PIPETEXT", "PIPETEXT");
 
  		post.setHeader("Accept", 
  	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -652,6 +654,9 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	 	  		
  	 	  		String basePath = getBasePath(request);
  	 	  		post.setHeader("OCBasePath", basePath);
+ 	 	  	    //PIPETEXT
+ 	 	  		post.setHeader("PIPETEXT", "PIPETEXT");
+
 
  	 	 		post.setHeader("Accept", 
  	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
@@ -865,6 +870,9 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	 	 	  		
  	 	 	  		String basePath = getBasePath(request);
  	 	 	  		post.setHeader("OCBasePath", basePath);
+ 	 	 	  	    //PIPETEXT
+ 	 	 	  		post.setHeader("PIPETEXT", "PIPETEXT");
+
 
  	 	 	 		post.setHeader("Accept", 
  	 	 	 	             "text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8");
