@@ -41,6 +41,7 @@ public class KeycloakClientImpl {
     private static final String USER_UUID_ATTRIBUTE = "ocUserUuid";
     private static final String CUSTOMER_UUID_ATTRIBUTE = "customerUuid";
     private static final String ACCESS_CODE_ATTRIBUTE = "accessCode";
+    private static final String STUDY_ENV_UUID_ATTRIBUTE = "studyEnvUuid";
 
     private static final String USER_TYPE_ATTRIBUTE = "userType";
     String DB_CONNECTION_KEY = "dbConnection";
@@ -55,7 +56,7 @@ public class KeycloakClientImpl {
     @Autowired
     private Keycloak keycloak;
 
-    public String createParticipateUser(HttpServletRequest request, String email, String username, String accessCode) {
+    public String createParticipateUser(HttpServletRequest request, String email, String username, String accessCode,String studyEnvironment) {
         logger.debug("Calling Keycloak to create participate user with username: {}", username);
         Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
         String customerUuid = (String) userContextMap.get("customerUuid");
@@ -68,6 +69,7 @@ public class KeycloakClientImpl {
         userRepresentation.setEmailVerified(false);
 
         Map<String, List<String>> userAttributes = new HashMap<>();
+        userAttributes.put(STUDY_ENV_UUID_ATTRIBUTE, Lists.asList(studyEnvironment));
         userAttributes.put(CUSTOMER_UUID_ATTRIBUTE, Lists.asList(customerUuid));
         userAttributes.put(USER_TYPE_ATTRIBUTE, Lists.asList(UserType.PARTICIPATE.getName()));
         userAttributes.put(ACCESS_CODE_ATTRIBUTE, Lists.asList(accessCode));

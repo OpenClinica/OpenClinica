@@ -139,13 +139,16 @@ public class UserServiceImpl implements UserService {
 
         Study publicStudy = studyDao.findPublicStudy(tenantStudy.getOc_oid());
 
+        String studyEnvironment = (publicStudy.getStudy() != null) ? publicStudy.getStudy().getStudyEnvUuid() : publicStudy.getStudyEnvUuid();
+
+
         UserAccount userAccount = null;
 
         if (studySubject != null) {
             if (studySubject.getUserId() == null) {
                 logger.info("Participate has not registered yet");
                 // create participant user Account In Keycloak
-                String keycloakUserId = keycloakClient.createParticipateUser(request, null, username, accessCode);
+                String keycloakUserId = keycloakClient.createParticipateUser(request, null, username, accessCode,studyEnvironment);
                 // create participant user Account In Runtime
                 userAccount = createUserAccount(participantDTO, studySubject, ownerUserAccountBean, username, publicStudy, keycloakUserId);
 
@@ -365,7 +368,7 @@ public class UserServiceImpl implements UserService {
         sb.append("Thank you");
         sb.append("<br>");
 
-        sb.append("The Study Team");
+        sb.append(studyName+" Team");
 
         pDTO.setMessage(sb.toString());
 
