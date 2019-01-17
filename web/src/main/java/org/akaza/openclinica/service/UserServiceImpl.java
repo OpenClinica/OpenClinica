@@ -368,7 +368,7 @@ public class UserServiceImpl implements UserService {
         sb.append("Thank you");
         sb.append("<br>");
 
-        sb.append("The Study Team");
+        sb.append(studyName+" Team");
 
         pDTO.setMessage(sb.toString());
 
