@@ -330,6 +330,9 @@ $(function() {
         collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
             var studyEventOid = studyEventData['@StudyEventOID'];
             var studyEvent = studyEvents[studyEventOid];
+            if (!studyEvent)
+                return;
+
             if (studyEvent['@OpenClinica:EventType'] !== 'Common')
                 return;
 
@@ -394,18 +397,23 @@ $(function() {
         var numVisitBaseds = 0;
         var hideStatus = $('#oc-status-hide').val();
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
-        var i = 2; // Section 0 = General Information, 1 = Visits
+        var sectionIndex = 2; // Section 0 = General Information, 1 = Visits
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
-            if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent.showMe) {
-                $('#commonEvents').append(sectionTmpl({
-                    sectionNumber: i,
-                    collapseState: store.data.collapseSections[i] ? 'collapsed' : 'expanded',
-                    studyEvent: studyEvent
-                }));
-                i++;
+            if (!studyEvent)
+                continue;
+
+            if (studyEvent['@OpenClinica:EventType'] === 'Common') {
+                if (studyEvent.showMe) {
+                    $('#commonEvents').append(sectionTmpl({
+                        sectionNumber: sectionIndex,
+                        collapseState: store.data.collapseSections[sectionIndex] ? 'collapsed' : 'expanded',
+                        studyEvent: studyEvent
+                    }));
+                    sectionIndex++;
+                }
             }
-            else {
+            else { // event type != common event
                 numVisitBaseds++;
             }
         }

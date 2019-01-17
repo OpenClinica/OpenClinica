@@ -884,3 +884,12 @@ form#searchByStudySubjectId {
 .invisible {
   visibility: hidden;
 }
+
+#bt_Home td.oc-menu-bar ul li {
+  padding: 0;
+}
+
+#bt_Home td.oc-menu-bar ul li a {
+  display: block;
+  padding: .5em;
+}

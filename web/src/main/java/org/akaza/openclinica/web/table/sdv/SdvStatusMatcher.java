@@ -11,6 +11,6 @@ public class SdvStatusMatcher implements FilterMatcher {
         String item = String.valueOf(itemValue);
         String filter = String.valueOf(filterValue);
 
-        return (filter.equalsIgnoreCase("none")) || (filter.equalsIgnoreCase("complete") && (item.contains("icon_DoubleCheck")));
+        return (filter.equalsIgnoreCase("none")) || (filter.equalsIgnoreCase("complete") && (item.contains("icon-icon-SDV-doubleCheck")));
     }
 }

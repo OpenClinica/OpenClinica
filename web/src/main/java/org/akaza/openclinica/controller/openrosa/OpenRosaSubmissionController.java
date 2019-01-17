@@ -109,9 +109,6 @@ public class OpenRosaSubmissionController {
     private StudyEventDefinitionDao studyEventDefinitionDao;
 
     @Autowired
-    PformSubmissionNotificationService notifier;
-
-    @Autowired
     CompletionStatusDao completionStatusDao;
 
     @Autowired
@@ -206,8 +203,6 @@ public class OpenRosaSubmissionController {
 
         if (!errors.hasErrors()) {
             // JsonLog submission with Participate
-            if (isParticipantSubmission(subjectContext))
-                notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
             return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
@@ -287,9 +282,34 @@ public class OpenRosaSubmissionController {
                 studyEvent.setUserAccount(userAccount);
                 persistStudyEvent(studyEvent);
             }
+        } else {
+            boolean allFormsComplete = true;
+            for (EventCrf evCrf : eventCrfs){
+                if (studyEvent.getId() != evCrf.getId() && !evCrf.getStatusId().equals(SubjectEventStatus.COMPLETED.getCode())){
+                    allFormsComplete = false;
+                }
+            }
+            if (allFormsComplete){
+                studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
+            } else {
+                studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+            }
+            persistStudyEvent(studyEvent);
         }
+
+        studySubject = unsignSignedParticipant(studySubject);
+        studySubjectDao.saveOrUpdate(studySubject);
+
         String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
         return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);
+    }
+
+    private StudySubject unsignSignedParticipant(StudySubject studySubject) {
+        Status subjectStatus = studySubject.getStatus();
+        if (subjectStatus.equals(Status.SIGNED)){
+            studySubject.setStatus(Status.AVAILABLE);
+        }
+        return studySubject;
     }
 
     /**
@@ -377,8 +397,6 @@ public class OpenRosaSubmissionController {
 
         if (!errors.hasErrors()) {
             // JsonLog submission with Participate
-            if (isParticipantSubmission(subjectContext))
-                notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform field submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
             long endMillis = System.currentTimeMillis();
@@ -475,8 +493,6 @@ public class OpenRosaSubmissionController {
 
         if (!errors.hasErrors()) {
             // JsonLog submission with Participate
-            if (isParticipantSubmission(subjectContext))
-                notifier.notify(studyOID, subjectContext);
             logger.info("Completed xform field submission. Sending successful response");
             String responseMessage = "<OpenRosaResponse xmlns=\"http://openrosa.org/http/response\">" + "<message>success</message>" + "</OpenRosaResponse>";
             return new ResponseEntity<String>(responseMessage, HttpStatus.CREATED);

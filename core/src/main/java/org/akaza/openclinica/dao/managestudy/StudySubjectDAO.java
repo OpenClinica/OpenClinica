@@ -79,83 +79,26 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
 
         this.unsetTypeExpected();
         int ind = 1;
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // study_subject_id
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // label
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // secondary_label
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // subject_id
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // study_id
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // status_id
 
-        this.setTypeExpected(ind, TypeNames.DATE);
-        ind++; // enrollment_date
-        this.setTypeExpected(ind, TypeNames.DATE);
-        ind++; // date_created
-        this.setTypeExpected(ind, TypeNames.DATE);
-        ind++; // date_updated
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // owner_id
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // update_id
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // oc oid
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // time_zone
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // user_id
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // user_status_id
-        // this.setTypeExpected(ind, TypeNames.INT);
-        // ind++; //
+        ind = setStudySubjectTypeExpected(ind);
     }
 
     public void setTypesExpectedFilter() {
 
         this.unsetTypeExpected();
         int ind = 1;
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // study_subject_id
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // label
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // secondary_label
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // subject_id
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // study_id
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // status_id
-
-        this.setTypeExpected(ind, TypeNames.DATE);
-        ind++; // enrollment_date
-        this.setTypeExpected(ind, TypeNames.TIMESTAMP);
-        ind++; // date_created
-        this.setTypeExpected(ind, TypeNames.TIMESTAMP);
-        ind++; // date_updated
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // owner_id
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // update_id
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // oc oid
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; //time_zone
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // user_id
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // user_status_id
-
+        ind = setStudySubjectTypeExpected(ind);
     }
 
     public void setDNTypesExpected() {
 
         this.unsetTypeExpected();
         int ind = 1;
+
+        ind = setStudySubjectTypeExpected(ind);
+    }
+
+    private int setStudySubjectTypeExpected(int ind){
         this.setTypeExpected(ind, TypeNames.INT);
         ind++; // study_subject_id
         this.setTypeExpected(ind, TypeNames.STRING);
@@ -180,14 +123,15 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         this.setTypeExpected(ind, TypeNames.INT);
         ind++; // update_id
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // oc oid
+        ind++; // oc_oid
         this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; //
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; //
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; //
+        ind++; // time_zone
+        this.setTypeExpected(ind, TypeNames.INT);
+        ind++; // user_id
+        this.setTypeExpected(ind, TypeNames.INT);
+        ind++; // user_status_id
 
+        return ind;
     }
 
     /**
@@ -1294,33 +1238,8 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         ind++; // unique_identifier
         this.setTypeExpected(ind, TypeNames.CHAR);
         ind++; // gender
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // study_subject_id
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // label
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // secondary_label
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // subject_id
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // study_id
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // status_id
 
-        this.setTypeExpected(ind, TypeNames.DATE);
-        ind++; // enrollment_date
-        this.setTypeExpected(ind, TypeNames.DATE);
-        ind++; // date_created
-        this.setTypeExpected(ind, TypeNames.DATE);
-        ind++; // date_updated
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // owner_id
-        this.setTypeExpected(ind, TypeNames.INT);
-        ind++; // update_id
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // secondary_label
-        this.setTypeExpected(ind, TypeNames.STRING);
-        ind++; // studyName
+        ind = setStudySubjectTypeExpected(ind);
 
         HashMap variables = new HashMap();
         variables.put(new Integer(1), new Integer(studyId));

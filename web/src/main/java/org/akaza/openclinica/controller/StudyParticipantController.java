@@ -468,6 +468,8 @@ public class StudyParticipantController {
 		    			ParameterizedErrorVM responseDTO =new ParameterizedErrorVM(errorMsg, map);
 		    			
 		        		response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+		        		
+		        		return response;
 		            }
 		            
 		            if(study != null) {
@@ -496,7 +498,18 @@ public class StudyParticipantController {
 		 */
 		 private ArrayList<StudyParticipantDTO> getStudyParticipantDTOs(String studyOid, String siteOid,StudyBean study) throws Exception {
 			 	      
-		        List<StudySubjectBean> studySubjects = this.getStudySubjectDAO().findAllByStudy(study);
+			  StudyBean studyToCheck;   
+			  /**
+		         *  pass in site OID, so will return data in site level
+		         */
+		       if(siteOid != null) {
+		    	   studyToCheck = this.getStudyDao().findByOid(siteOid);
+		       }else {
+		    	   studyToCheck = study;
+		       }
+		      
+		        
+		        List<StudySubjectBean> studySubjects = this.getStudySubjectDAO().findAllByStudy(studyToCheck);
 		        
 		        ArrayList studyParticipantDTOs = new ArrayList<StudyParticipantDTO>(); 
 		        

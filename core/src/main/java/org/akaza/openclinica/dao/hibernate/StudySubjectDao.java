@@ -44,6 +44,18 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         return (StudySubject) q.uniqueResult();
     }
 
+    public  ArrayList<StudySubject> findByFirstName(Study study, String firstName) {
+        //TODO: looks like auto-encryption is not happening need to look into it.
+        getSessionFactory().getStatistics().logSummary();
+        String query = "from " + getDomainClassName() + " " +
+                "do  where do.study.studyId = :studyid and do.studySubjectDetail.firstName = :firstName";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyid", study.getStudyId());
+        q.setString("firstName", firstName);
+        return (ArrayList<StudySubject>) q.list();
+    }
+
+
     public StudySubject findByLabelAndStudyOrParentStudy(String embeddedStudySubjectId, Study study) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where (do.study.studyId = :studyid or do.study.study.studyId = :studyid) and do.label = :label";

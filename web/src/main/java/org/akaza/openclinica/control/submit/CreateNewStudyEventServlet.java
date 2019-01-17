@@ -104,15 +104,15 @@ public class CreateNewStudyEventServlet extends SecureController {
 
         // TODO: make this sensitive to permissions
         StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());
-        StudySubjectBean ssb;
+        StudySubjectBean studySubjectBean;
         if (studySubjectId <= 0) {
-            ssb = (StudySubjectBean) request.getAttribute(INPUT_STUDY_SUBJECT);
+            studySubjectBean = (StudySubjectBean) request.getAttribute(INPUT_STUDY_SUBJECT);
         } else {
             // YW 11-08-2007, << a new study event could not be added if its
             // study subject has been removed
-            ssb = (StudySubjectBean) sdao.findByPK(studySubjectId);
-            Status s = ssb.getStatus();
-            if ("removed".equalsIgnoreCase(s.getName()) || "auto-removed".equalsIgnoreCase(s.getName())) {
+            studySubjectBean = (StudySubjectBean) sdao.findByPK(studySubjectId);
+            Status subjectStatus = studySubjectBean.getStatus();
+            if ("removed".equalsIgnoreCase(subjectStatus.getName()) || "auto-removed".equalsIgnoreCase(subjectStatus.getName())) {
                 addPageMessage(resword.getString("study_event") + resterm.getString("could_not_be") + resterm.getString("added") + "."
                         + respage.getString("study_subject_has_been_deleted"));
                 request.setAttribute("id", new Integer(studySubjectId).toString());
@@ -204,8 +204,8 @@ public class CreateNewStudyEventServlet extends SecureController {
             }
             presetValues.put(INPUT_LOCATION, currentStudy.getFacilityCity());// defualt
 
-            if (ssb != null && ssb.isActive()) {
-                presetValues.put(INPUT_STUDY_SUBJECT, ssb);
+            if (studySubjectBean != null && studySubjectBean.isActive()) {
+                presetValues.put(INPUT_STUDY_SUBJECT, studySubjectBean);
 
                 String requestStudySubject = (String) request.getAttribute(INPUT_REQUEST_STUDY_SUBJECT);
                 if (requestStudySubject != null) {
@@ -237,10 +237,6 @@ public class CreateNewStudyEventServlet extends SecureController {
             setInputMessages(new HashMap());
             forwardPage(Page.CREATE_NEW_STUDY_EVENT);
         } else {
-            // tbh
-            // String dateCheck = (String)request.getAttribute("startDate");
-            // String endCheck = (String)request.getAttribute("endDate");
-            // logger.debug(dateCheck+"; "+endCheck);
 
             String dateCheck2 = request.getParameter("startDate");
             String endCheck2 = request.getParameter("endDate");
@@ -516,6 +512,9 @@ public class CreateNewStudyEventServlet extends SecureController {
                 studyEvent.setLocation(fp.getString(INPUT_LOCATION));
                 studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
 
+                studySubject = unsignSignedParticipant(studySubject);
+                sdao.update(studySubject);
+
                 // ArrayList subjectsExistingEvents =
                 // sed.findAllByStudyAndStudySubjectId(currentStudy,
                 // studySubject.getId());
@@ -624,6 +623,14 @@ public class CreateNewStudyEventServlet extends SecureController {
                 return;
             }
         }
+    }
+
+    private StudySubjectBean unsignSignedParticipant(StudySubjectBean studySubject) {
+        Status subjectStatus = studySubject.getStatus();
+        if (subjectStatus.equals(Status.SIGNED)){
+            studySubject.setStatus(Status.AVAILABLE);
+        }
+        return studySubject;
     }
 
     @Override

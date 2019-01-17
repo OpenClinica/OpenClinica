@@ -137,6 +137,7 @@ public class RemoveStudyEventServlet extends SecureController {
                 for (int k = 0; k < eventCRFs.size(); k++) {
                     EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(k);
                     if (!eventCRF.getStatus().equals(Status.DELETED)) {
+                        eventCRF.setOldStatus(eventCRF.getStatus());
                         eventCRF.setStatus(Status.AUTO_DELETED);
                         eventCRF.setUpdater(ub);
                         eventCRF.setUpdatedDate(new Date());

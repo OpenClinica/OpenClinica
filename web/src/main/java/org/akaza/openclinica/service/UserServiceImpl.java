@@ -145,21 +145,24 @@ public class UserServiceImpl implements UserService {
             if (studySubject.getUserId() == null) {
                 logger.info("Participate has not registered yet");
                 // create participant user Account In Keycloak
-               String keycloakUserId= keycloakClient.createParticipateUser(request,null ,username,accessCode);
+                String keycloakUserId = keycloakClient.createParticipateUser(request, null, username, accessCode);
                 // create participant user Account In Runtime
-                userAccount = createUserAccount(participantDTO, studySubject, ownerUserAccountBean,username,publicStudy,keycloakUserId);
+                userAccount = createUserAccount(participantDTO, studySubject, ownerUserAccountBean, username, publicStudy, keycloakUserId);
 
                 if (userAccount != null) {
-                    studySubject.setUserId(userAccount.getUserId());
-                    studySubject.setUserStatus(UserStatus.CREATED);
-                    studySubject = studySubjectDao.saveOrUpdate(studySubject);
+                    studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.CREATED, userAccount.getUserId());
+
+                    //studySubject.setUserId(userAccount.getUserId());
+                    //studySubject.setUserStatus(UserStatus.CREATED);
+                    //studySubject = studySubjectDao.saveOrUpdate(studySubject);
                     logger.info("Participate user_id: {} and user_status: {} are added in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
                 }
             } else {
                 // Update participant user Account In Runtime
-                userAccount = updateUserAccount(participantDTO, studySubject,ownerUserAccountBean,username,publicStudy,userAccount);
+                userAccount = updateUserAccount(participantDTO, studySubject, ownerUserAccountBean, username, publicStudy, userAccount);
                 if (userAccount != null) {
-                    studySubject = studySubjectDao.saveOrUpdate(studySubject);
+                    //studySubject = studySubjectDao.saveOrUpdate(studySubject);
+                    studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, null, null);
                     logger.info("Participate with user_id: {} ,it's user_status: {} is updated in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
                 }
             }
@@ -170,15 +173,38 @@ public class UserServiceImpl implements UserService {
 
             ParticipantAccessDTO accessDTO= getAccessInfo(request,studyOid,ssid);
 
-            sendEmailToParticipant(userAccount,tenantStudy, accessDTO);
-            studySubject.setUserStatus(UserStatus.INVITED);
-            studySubject = studySubjectDao.saveOrUpdate(studySubject);
+            sendEmailToParticipant(studySubject, userAccount,tenantStudy, accessDTO);
+            //studySubject.setUserStatus(UserStatus.INVITED);
+            //studySubject = studySubjectDao.saveOrUpdate(studySubject);
+            studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null);
 
         }
         if (userAccount != null || userAccount.getId() != 0)
             ocUserDTO = buildOcUserDTO(userAccount, studySubject);
 
         return ocUserDTO;
+    }
+
+    private StudySubject saveOrUpdateStudySubject(StudySubject studySubject,OCParticipantDTO participantDTO,
+                                                  UserStatus userStatus, Integer userId){
+
+        if (userId != null){
+            studySubject.setUserId(userId);
+        }
+
+        if (userStatus != null){
+            studySubject.setUserStatus(userStatus);
+        }
+
+        if (studySubject.getStudySubjectDetail() == null){
+            StudySubjectDetail studySubjectDetail = new StudySubjectDetail();
+            studySubject.setStudySubjectDetail(studySubjectDetail);
+        }
+        studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
+        studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
+        studySubject.getStudySubjectDetail().setPhone(participantDTO.getMobilePhone() == null ? "" : participantDTO.getMobilePhone());
+        return studySubjectDao.saveOrUpdate(studySubject);
+
     }
 
 
@@ -293,7 +319,7 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private void sendEmailToParticipant(UserAccount userAccount, Study tenantStudy,ParticipantAccessDTO accessDTO) {
+    private void sendEmailToParticipant(StudySubject studySubject, UserAccount userAccount, Study tenantStudy,ParticipantAccessDTO accessDTO) {
         ParticipantDTO pDTO = new ParticipantDTO();
         pDTO.setEmailAccount(userAccount.getEmail());
         pDTO.setEmailSubject("You've been connected! We're looking forward to your participation.");
@@ -310,19 +336,38 @@ public class UserServiceImpl implements UserService {
             host = (accessDTO.getHost() == null ? "" : accessDTO.getHost());
             accessCode = (accessDTO.getAccessCode() == null ? "" : accessDTO.getAccessCode());
         }
+        StringBuffer sb = new StringBuffer();
+        sb.append("Hi ");
+        sb.append(studySubject.getStudySubjectDetail().getFirstName());
+        sb.append(",");
+        sb.append("<br>");
+        sb.append("<br>");
 
+        sb.append("Thanks for participating in ");
+        sb.append(studyName);
+        sb.append("!");
+        sb.append("<br>");
+        sb.append("<br>");
 
-        pDTO.setMessage("Hi "+userAccount.getFirstName()+",\n" +
-                "\n" +
-                "Thanks for participating in "+studyName+"!\n" +
-                "\n" +
-                "Click here to begin " + accessLink + "\n" +
-                "\n" +
-                "Or, you may go to: " + host + "\n" +
-                "and enter access code " + accessCode + "\n" +
-                "\n" +
-                "Thank you,\n" +
-                "The Study Team");
+        sb.append("<a href=\""+accessLink+"\">Click here to begin</a>");
+        sb.append("<br>");
+        sb.append("<br>");
+
+        sb.append("Or, you may go to: ");
+        sb.append(host);
+        sb.append("<br>");
+
+        sb.append("and enter access code ");
+        sb.append(accessCode);
+        sb.append("<br>");
+        sb.append("<br>");
+
+        sb.append("Thank you");
+        sb.append("<br>");
+
+        sb.append("The Study Team");
+
+        pDTO.setMessage(sb.toString());
 
         sendEmailToParticipant(pDTO);
 
@@ -337,7 +382,7 @@ public class UserServiceImpl implements UserService {
             helper.setFrom(EmailEngine.getAdminEmail());
             helper.setTo(pDTO.getEmailAccount());
             helper.setSubject(pDTO.getEmailSubject());
-            helper.setText(pDTO.getMessage());
+            helper.setText(pDTO.getMessage(),true);
 
             mailSender.send(mimeMessage);
             logger.debug("Email sent successfully on {}", new Date());
@@ -386,7 +431,7 @@ public class UserServiceImpl implements UserService {
         if (moduleConfigDTOs != null && moduleConfigDTOs.size() != 0) {
             ModuleConfigDTO moduleConfigDTO = studyBuildService.getModuleConfig(moduleConfigDTOs, tenantStudy);
             if (moduleConfigDTO != null) {
-                ModuleConfigAttributeDTO moduleConfigAttributeDTO = studyBuildService.getModuleConfigAttribute(moduleConfigDTO.getAttributes(), tenantStudy, ACCESS_LINK);
+                ModuleConfigAttributeDTO moduleConfigAttributeDTO = studyBuildService.getModuleConfigAttribute(moduleConfigDTO.getAttributes(), tenantStudy);
                 if (moduleConfigAttributeDTO != null) {
                     logger.info("Participant Access Link is :{}",moduleConfigAttributeDTO.getValue() + ACCESS_LINK_PART_URL + accessCode);
                     ParticipantAccessDTO participantAccessDTO = new ParticipantAccessDTO();

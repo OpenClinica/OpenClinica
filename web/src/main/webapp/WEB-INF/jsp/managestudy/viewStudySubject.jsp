@@ -1,6 +1,7 @@
 <%@ page contentType="text/html; charset=UTF-8" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/core" prefix="c" %>
 <%@ taglib uri="http://java.sun.com/jsp/jstl/fmt" prefix="fmt" %>
+<jsp:useBean class="org.apache.commons.lang.StringEscapeUtils" id="esc" />
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.notes" var="restext"/>
 <link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
@@ -210,7 +211,6 @@
   .subnote {
     font-size: 85%;
     color: #618ebb;
-    margin-top: 35px;
     margin-left: 5px;
   }
   .full-width {
@@ -378,7 +378,7 @@
                                   <c:choose>
                                     <c:when test="${
                                       studySub.status.name!='removed' &&
-                                      sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator' &&
+                                      (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
                                       participateStatus=='enabled'
                                     }">
                                       style="visibility:visible;"
@@ -395,7 +395,7 @@
                                       </a>
                                       &nbsp;|&nbsp;
                                       <a href="javascript:;" id="participateAccess">
-                                        View Access Details
+                                        <fmt:message key="view_participant_access_code" bundle="${resword}"/>
                                       </a>
                                     </td>
                                   </tr>
@@ -1076,7 +1076,7 @@
                 <span><fmt:message key="first_name" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
+                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control invite-input">
               </td>
             </tr>
             <tr valign="top">
@@ -1084,10 +1084,30 @@
                 <span><fmt:message key="email" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="email-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control">
-                <div class="subnote hide error" id="email-input-error">
-                  Invalid e-mail address
+                <input id="email-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control invite-input">
+                <div id="email-input-info">
+                  <fmt:message key="invite_required" bundle="${resword}"/>
+                  <br>
+                  <fmt:message key="invite_required_line2" bundle="${resword}"/>
                 </div>
+                <div class="subnote hide error" id="email-input-error">
+                  <fmt:message key="invite_invalid_email" bundle="${resword}"/>
+                </div>
+              </td>
+            </tr>
+            <tr valign="top">
+              <td></td>
+              <td valign="top" id="invite-option">
+                <span style="margin-right:15px;">
+                  <fmt:message key="invite_via_email" bundle="${resword}"/>
+                </span>
+                <label><input type="radio" name="invite-option" value="true">
+                  <fmt:message key="invite_yes" bundle="${resword}"/>
+                </label>
+                &emsp;
+                <label><input type="radio" name="invite-option" value="false" checked="checked">
+                  <fmt:message key="invite_no" bundle="${resword}"/>
+                </label>
               </td>
             </tr>
             <tr valign="top">
@@ -1098,6 +1118,14 @@
               </td>
               <td valign="top">
                 <style>
+                  .invite-input {
+                    width: 250px;
+                  }
+                  #email-input-info {
+                    display: inline-block;
+                    margin: -10px 0 0 10px;
+                    font-style: italic;
+                  }
                   #phone-input {
                     padding: 4px !important;
                     padding-left: 100px !important;
@@ -1142,15 +1170,23 @@
                   #access-code-td {
                     position: relative;
                   }
+                  #access-code-input {
+                    width: 150px;
+                  }
                   #eye {
                     position: absolute;
-                    top: 2px;
-                    right: 30px;
+                    top: 1px;
+                    left: 111px;
                     font-size: 18pt;
+                    background-color: white;
+                    padding: 2px 6px;
+                  }
+                  .grayed-out {
+                    color: #777;
                   }
                 </style>
                 <div id="phone-widget">
-                  <input id="phone-input" type="text" class="formfield form-control" onfocus="this.select()"> 
+                  <input id="phone-input" type="tel" class="formfield form-control invite-input" onfocus="this.select()"> 
                   <div id="country-select">
                     <div id="country-flag" class="down-arrow">&nbsp;</div> 
                     <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
@@ -1368,16 +1404,6 @@
                 </div>
               </td>
             </tr>
-            <tr valign="top">
-              <td class="formlabel" align="left">
-                <span>Invite Participant</span>
-              </td>
-              <td valign="top" id="invite-option">
-                <label><input type="radio" name="invite-option" value="true">Yes</label>
-                &emsp;
-                <label><input type="radio" name="invite-option" value="false" checked="checked">No</label>
-              </td>
-            </tr>
           </table>
         </div>
       </td>
@@ -1400,7 +1426,7 @@
       <tr style="height:10px;">
         <td class="formlabel" align="left">
           <h3>
-            View Access Details
+            <fmt:message key="view_participant_access_code" bundle="${resword}"/>
           </h3>
         </td>
       </tr>
@@ -1413,14 +1439,29 @@
             <table cellspacing="10">
               <tr valign="top">
                 <td class="formlabel" align="left">
-                  <span>Access Link</span>
+                  <span><fmt:message key="access_code" bundle="${resword}"/></span>
                 </td>
                 <td valign="top" id="access-code-td">
-                  <input id="access-code-input" onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
-                  <div class="subnote">
-                    Please note: viewing access code will be audited.
-                  </div>
+                  <input id="access-code-input" readonly onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
                   <i id="eye" class="fa fa-eye"></i>
+                </td>
+                <td valign="top" class="grayed-out">
+                  <span><i><fmt:message key="viewing_audited" bundle="${resword}"/></i></span>
+                </td>
+              </tr>
+              <tr valign="top">
+                <td></td>
+                <td valign="top" colspan="2" style="padding-top:7px;">
+                  <fmt:message key="participate_url" bundle="${resword}"/>: <span id="access-url"></span>
+                </td>
+              </tr>
+              <tr valign="top">
+                <td></td>
+                <td valign="top" colspan="2">
+                  <i>
+                    <fmt:message key="please_sign_out" bundle="${resword}"/><br>
+                    <fmt:message key="please_sign_out_line2" bundle="${resword}"/>
+                  </i>
                 </td>
               </tr>
             </table>
@@ -1442,9 +1483,12 @@
 <script type="text/javascript">
 
     var jsAtt = '${showOverlay}';
-
     if (jsAtt === "true"){
         jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
+    }
+
+    function logDump() {
+        console.log(arguments);
     }
 
     var participateInfo;
@@ -1459,16 +1503,38 @@
         $('#info-phone-number').text(participateInfo.phoneNumber);
         $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
     }
-    updateParticipateInfo();
+    function enableDisableInviteRadios() {
+        var hasEmail = !!$('#email-input').val().trim();
+        var validEmail = $('#email-input-error').is(':hidden');
+        if (hasEmail && validEmail) {
+            $('#invite-option input').removeAttr("disabled");
+        }
+        else {
+            $('#invite-option input').attr("disabled", "disabled");
+        }
+    }
 
-    jQuery(document).ready(function () {
+    function getAccessCode() {
         jQuery.ajax({
             type: 'get',
-            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}',
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/accessLink',
+            success: function(data) {
+                $('#access-code-input').val(data.accessCode);
+                $('#access-url').text(data.host);
+            },
+            error: logDump
+        });
+    }
+
+    jQuery(document).ready(function () {
+        updateParticipateInfo();
+        getAccessCode();
+        
+        jQuery.ajax({
+            type: 'get',
+            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
             success: updateParticipateInfo,
-            error: function() {
-                console.log(arguments);
-            }
+            error: logDump
         });
 
         jQuery('#editParticipantID').click(function () {
@@ -1484,13 +1550,14 @@
             };
             jQuery.ajax({
                 type: 'post',
-                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${studySub.label}/connect',
+                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                success: updateParticipateInfo,
-                error: function() {
-                    console.log(arguments);
-                }
+                success: function(data) {
+                    updateParticipateInfo(data);
+                    getAccessCode();
+                },
+                error: logDump
             });
             jQuery.unblockUI();
             return false;
@@ -1515,7 +1582,9 @@
                 $('#email-input-error').show();
                 $('#connect-button').attr('disabled', 'disabled');
             }
+            enableDisableInviteRadios();
         });
+        jQuery('#phone-input').blur(enableDisableInviteRadios);
 
         jQuery('#contactInformation').click(function() {
             $('#name-input').val(participateInfo.firstName);
@@ -1530,10 +1599,13 @@
             $('#email-input-error').hide();
             $('#invite-option input[value=' + participateInfo.inviteParticipant + ']').click();
 
+            enableDisableInviteRadios();
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
         });
 
         jQuery('#participateAccess').click(function() {
+            $('#eye').show();
+            $('#access-code-input').attr('type', 'password');
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
         });
 
@@ -1555,32 +1627,20 @@
         });
 
         jQuery('#eye').click(function() {
-            var eye = $(this);
-            if (eye.hasClass('fa-eye')) {
-              jQuery.ajax({
-                  type: 'post',
-                  url: '${pageContext.request.contextPath}/pages/auth/api/studies/${study.oid}/auditEvents',
-                  contentType: 'application/json',
-                  data: JSON.stringify({
-                      auditTable: 'study_subject',
-                      entityId: '${studySub.id}',
-                      entityName: 'Participant ID',
-                      auditLogEventTypId: '42'                
-                  }),
-                  success: function(data) {
-                      console.log(arguments);
-                      alert(data);
-                  },
-                  error: function() {
-                      console.log(arguments);
-                  }
-              });
-              $('#access-code-input').attr('type', 'text');
-            }
-            else {
-              $('#access-code-input').attr('type', 'password');
-            }
-            eye.toggleClass('fa-eye fa-eye-slash');
+            $(this).hide();
+            jQuery.ajax({
+                type: 'post',
+                url: '${pageContext.request.contextPath}/pages/auth/api/studies/${study.oid}/auditEvents',
+                contentType: 'application/json',
+                data: JSON.stringify({
+                    auditTable: 'study_subject',
+                    entityId: '${studySub.id}',
+                    entityName: 'Participant access code',
+                    auditLogEventTypId: '42'                
+                }),
+                error: logDump
+            });
+            $('#access-code-input').attr('type', 'text');
         });
      });
 

@@ -600,6 +600,7 @@ public class CoreResources implements ResourceLoaderAware {
         DATAINFO.setProperty("password", DATAINFO.getProperty("dbPass"));
         DATAINFO.setProperty("archiveUsername", DATAINFO.getProperty("archiveDbUser"));
         DATAINFO.setProperty("archivePassword", DATAINFO.getProperty("archiveDbPass"));
+        String dbSSLsetting = String.valueOf(DATAINFO.getOrDefault("dbSSL", "false"));
 
         String url = null, driver = null, hibernateDialect = null;
         String archiveUrl = null;
@@ -609,6 +610,9 @@ public class CoreResources implements ResourceLoaderAware {
             hibernateDialect = "org.hibernate.dialect.PostgreSQL94Dialect";
             archiveUrl = "jdbc:postgresql:" + "//" + DATAINFO.getProperty("archiveDbHost") + ":" + DATAINFO.getProperty("archiveDbPort") + "/"
                     + DATAINFO.getProperty("archiveDb");
+            if (dbSSLsetting.equals("true")){
+                url = url + "?ssl=true&sslfactory=org.postgresql.ssl.NonValidatingFactory";
+            }
         } else if (database.equalsIgnoreCase("oracle")) {
             url = "jdbc:oracle:thin:" + "@" + DATAINFO.getProperty("dbHost") + ":" + DATAINFO.getProperty("dbPort") + ":" + DATAINFO.getProperty("db");
             driver = "oracle.jdbc.driver.OracleDriver";
@@ -669,11 +673,13 @@ public class CoreResources implements ResourceLoaderAware {
         String[] fileNames = { "rules.xsd", "rules_template.xml", "rules_template_with_notes.xml" };
         Resource[] resources = null;
         Resource[] resourcesTemplate = null;
+        Resource[] resourcesPipeDelimitedTemplate = null;
         FileOutputStream out = null;
 
         resources = resolver.getResources("classpath*:properties/rules_template*.xml");
         resourcesTemplate = resolver.getResources("classpath*:properties/import_template*.xml");
-
+        resourcesPipeDelimitedTemplate =resolver.getResources("classpath*:properties/template_pipe*.txt");
+        
         File dest = new File(getField("filePath") + "rules");
         if (!dest.exists()) {
             if (!dest.mkdirs()) {
@@ -689,6 +695,15 @@ public class CoreResources implements ResourceLoaderAware {
 
         }
         for (Resource r : resourcesTemplate) {
+            File f = new File(dest, r.getFilename());
+
+            out = new FileOutputStream(f);
+            IOUtils.copy(r.getInputStream(), out);
+            out.close();
+
+        }
+        
+        for (Resource r : resourcesPipeDelimitedTemplate) {
             File f = new File(dest, r.getFilename());
 
             out = new FileOutputStream(f);

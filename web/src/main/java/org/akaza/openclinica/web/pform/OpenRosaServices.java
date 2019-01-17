@@ -415,6 +415,7 @@ public class OpenRosaServices {
             return null;
         String formLayoutOid = getFormLayoutOid(formID);
         FormLayout formLayout = formLayoutDao.findByOcOID(formLayoutOid);
+        String flavor = getQuerySet(formID);
 
         Manifest manifest = new Manifest();
 
@@ -433,19 +434,19 @@ public class OpenRosaServices {
                 manifest.add(mediaFile);
             }
         }
-
-        // Add user list
-        MediaFile userList = new MediaFile();
-        // String userXml = getUserXml(context, studyOID, ecid);
-        StudyAndSiteEnvUuid studyAndSiteUuids = getStudyAndSiteUuids(context, studyOID, ecid);
-        String userXml = openRosaService.getUserListFromUserService(studyAndSiteUuids);
-        if (userXml != null)
-            studyUserMap.put(studyAndSiteUuids.studyEnvUuid + studyAndSiteUuids.siteEnvUuid, userXml);
-        userList.setHash((DigestUtils.md5Hex(userXml == null ? "" : userXml)));
-        userList.setFilename("users.xml");
-        userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers?ecid=" + ecid);
-        manifest.add(userList);
-
+        if (!flavor.equals(PARTICIPATE_FLAVOR)) {
+            // Add user list
+            MediaFile userList = new MediaFile();
+            // String userXml = getUserXml(context, studyOID, ecid);
+            StudyAndSiteEnvUuid studyAndSiteUuids = getStudyAndSiteUuids(context, studyOID, ecid);
+            String userXml = openRosaService.getUserListFromUserService(studyAndSiteUuids);
+            if (userXml != null)
+                studyUserMap.put(studyAndSiteUuids.studyEnvUuid + studyAndSiteUuids.siteEnvUuid, userXml);
+            userList.setHash((DigestUtils.md5Hex(userXml == null ? "" : userXml)));
+            userList.setFilename("users.xml");
+            userList.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/downloadUsers?ecid=" + ecid);
+            manifest.add(userList);
+        }
         MediaFile odmPayload = new MediaFile();
         String odm = getODMMetadata(request, studyOID, ecid, context, formID);
         odmPayload.setHash((DigestUtils.md5Hex(odm)));

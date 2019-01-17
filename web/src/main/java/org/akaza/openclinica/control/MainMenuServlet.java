@@ -59,7 +59,9 @@ import java.util.stream.Collectors;
  */
 public class MainMenuServlet extends SecureController {
 
-    //Shaoyu Su
+    private final static String STUDY_ENV_UUID = "studyEnvUuid";
+    private final static String FORCE_RENEW_AUTH = "forceRenewAuth";
+
     Locale locale;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
     private SubjectDAO subjectDAO;
@@ -74,7 +76,7 @@ public class MainMenuServlet extends SecureController {
     private DiscrepancyNoteDAO discrepancyNoteDAO;
     private StudyParameterValueDAO studyParameterValueDAO;
 
-    // < ResourceBundle respage;
+    // ResourceBundle respage;
 
     @Override public void mayProceed() throws InsufficientPermissionException {
         locale = LocaleResolver.getLocale(request);
@@ -127,14 +129,40 @@ public class MainMenuServlet extends SecureController {
         return queryStr;
     }
 
+    /**
+     * The parameter separators are being URL encoded hence not being interpreted as separate parameters
+     * eg. MainMenu?studyEnvUuid%3D3d3a3d9e-8dc8-49ce-9800-810e665f062c%26forceRenewAuth%3Dtrue
+     * @param request
+     * @param parameterName
+     * @return parameter value
+     */
+    private String getParameter(HttpServletRequest request, String parameterName){
+        String paramValue = request.getParameter(parameterName);
+        if (paramValue == null){
+            ArrayList<String> parameters = extractParametersAsListFromParameterNames(request.getParameterNames());
+            paramValue = parameters.indexOf(parameterName) > -1 ? parameters.get(parameters.indexOf(parameterName) + 1) : null;
+        }
+        logger.info("Getting parameter name: " + parameterName + " value: " + paramValue);
+        return paramValue;
+    }
+
+    private ArrayList<String> extractParametersAsListFromParameterNames(Enumeration<String> parameterNames){
+        ArrayList<String> parameters = new ArrayList<>();
+        if (parameterNames.hasMoreElements()) {
+            parameters = new ArrayList<>(Arrays.asList(request.getParameterNames().nextElement().split("=|&")));
+        }
+        return parameters;
+    }
+
     public boolean processSpecificStudyEnvUuid() throws Exception {
         logger.info("MainMenuServlet processSpecificStudyEnvUuid:%%%%%%%%" + session.getAttribute("firstLoginCheck"));
         boolean isRenewAuth = false;
-        String studyEnvUuid = (String) request.getParameter("studyEnvUuid");
+        String studyEnvUuid = getParameter(request, STUDY_ENV_UUID);
         if (StringUtils.isEmpty(studyEnvUuid)) {
             return isRenewAuth;
         }
-        if (processForceRenewAuth())
+        String forceRenewAuth = getParameter(request, FORCE_RENEW_AUTH);
+        if (processForceRenewAuth(forceRenewAuth))
             return true;
         ServletContext context = getServletContext();
         WebApplicationContext ctx =
@@ -197,10 +225,9 @@ public class MainMenuServlet extends SecureController {
     }
 
     private boolean
-    processForceRenewAuth() throws IOException {
+    processForceRenewAuth(String renewAuth) throws IOException {
         logger.info("forceRenewAuth is true");
         boolean isRenewAuth = false;
-        String renewAuth = (String) request.getParameter("forceRenewAuth");
         if (StringUtils.isNotEmpty(renewAuth)) {
             Authentication auth = SecurityContextHolder.getContext().getAuthentication();
             if (auth != null) {
@@ -230,12 +257,15 @@ public class MainMenuServlet extends SecureController {
         // update last visit date to current date
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
         if (processSpecificStudyEnvUuid()) {
+            /*
+            TODO: Do we need this logic? Might come in handy if URL passed in contains more params
             Map<String, String[]> targetMap = new ConcurrentHashMap<>(request.getParameterMap());
             targetMap.remove("forceRenewAuth");
             String paramStr = Utils.getParamsString(targetMap);
-            session.removeAttribute("userRole");
             logger.info("Sending redirect to:" + request.getRequestURI() + "?" + paramStr);
-            response.sendRedirect(request.getRequestURI() + "?" + paramStr);
+            */
+            session.removeAttribute("userRole");
+            response.sendRedirect(request.getRequestURI() + "?" + STUDY_ENV_UUID  + "=" +  getParameter(request,STUDY_ENV_UUID));
             return;
         }
 

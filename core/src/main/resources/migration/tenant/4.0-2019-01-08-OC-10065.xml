@@ -1,0 +1,32 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+				   xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+				   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+	<changeSet author="kkrumlian" id="2019-01-08-OC-10065-01">
+		<comment>Create the study subject details table</comment>
+		<createTable tableName="study_subject_detail">
+			<column autoIncrement="true" name="id" type="SERIAL">
+				<constraints primaryKey="true" primaryKeyName="pk_study_subject_detail"/>
+			</column>
+			<column name="study_subject_id" type="INT">
+				<constraints nullable="false"/>
+			</column>
+			<column name="first_name" type="VARCHAR(1000)"/>
+			<column name="last_name" type="VARCHAR(1000)"/>
+			<column name="email" type="VARCHAR(1000)"/>
+			<column name="phone" type="VARCHAR(1000)"/>
+
+		</createTable>
+	</changeSet>
+
+
+	<changeSet author="jkeremian" id="2019-01-08-OC-10065-02">
+		<addForeignKeyConstraint baseColumnNames="study_subject_id"
+								 baseTableName="study_subject_detail" constraintName="study_subject_detail_study_subject_id_fk"
+								 deferrable="false" initiallyDeferred="false"
+								 referencedColumnNames="study_subject_id"
+								 referencedTableName="study_subject" />
+	</changeSet>
+
+</databaseChangeLog>
