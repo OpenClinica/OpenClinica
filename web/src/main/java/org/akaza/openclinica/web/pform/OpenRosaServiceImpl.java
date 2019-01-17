@@ -39,6 +39,7 @@ import java.util.function.Supplier;
 public class OpenRosaServiceImpl implements OpenRosaService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private String accessToken;
+    private final int USERLIST_TIMEOUT = 3000;
 
     @Autowired
     OpenRosaXMLUtil openRosaXMLUtil;
@@ -186,11 +187,7 @@ public class OpenRosaServiceImpl implements OpenRosaService {
 
         try {
             String timeoutStr = CoreResources.getField("queryUserListServiceTimeout");
-            int timeout = 1000;
-            if (StringUtils.isNotEmpty(timeoutStr)) {
-                timeout = new Integer(timeoutStr);
-            }
-            response = future.get(timeout, TimeUnit.MILLISECONDS);
+            response = future.get(USERLIST_TIMEOUT, TimeUnit.MILLISECONDS);
         }  catch(TimeoutException e) {
             logger.error("User Service Timeout", "User service did not respond within allocated time");
             return null;
