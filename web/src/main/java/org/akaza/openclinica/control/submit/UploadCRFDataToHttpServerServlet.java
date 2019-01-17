@@ -252,14 +252,21 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
            
                     	 
         } else if ("download".equalsIgnoreCase(action)) {
+        	String studyID= request.getParameter("studyId");
+        	String parentNm= request.getParameter("parentNm");
             String fileName= request.getParameter("fileId");
-            File file = this.getRestfulServiceHelper().getImportDataHelper().getPersonalImportLogFile(fileName,  request);
+            File file = this.getRestfulServiceHelper().getImportDataHelper().getImportFileByStudyIDParentNm(studyID, parentNm, fileName);
             dowloadFile(file, "text/xml");
             
         } else if ("delete".equalsIgnoreCase(action)) {
+        	String studyID= request.getParameter("studyId");
+        	String parentNm= request.getParameter("parentNm");
             String fileName= request.getParameter("fileId");
-            this.getRestfulServiceHelper().getImportDataHelper().deletePersonalTempImportFile(fileName,request);
-            
+            File tempFile = this.getRestfulServiceHelper().getImportDataHelper().getImportFileByStudyIDParentNm(studyID, parentNm, fileName);
+           
+        	if(tempFile.exists()) {
+        		tempFile.delete();
+        	}
             forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
         }
         
@@ -829,6 +836,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 	public void sendOneDataRowPerRequestByHttpClientToMirth(List<File> files) throws Exception {
 
   		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
+  		String studyOID = null;
   		
   		/**
   		 *  prepare mapping file
@@ -840,7 +848,8 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
   			if(file.getName().toLowerCase().endsWith(".properties")) {
   				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
   				mappingpartNm = "uploadedData";  	 	  		
-  	 	  		
+  				studyOID=this.getRestfulServiceHelper().getImportDataHelper().getStudyOidFromMappingFile(file);
+  				
   	 	  		break;
   			}
  			
@@ -923,7 +932,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  				dataFilesIt = dataFileList.iterator();
  				while(dataFilesIt.hasNext()) {
  					File rowFile = (File) dataFilesIt.next();					 					
- 					this.getRestfulServiceHelper().getImportDataHelper().deleteTempImportFile(rowFile);
+ 					this.getRestfulServiceHelper().getImportDataHelper().deleteTempImportFile(rowFile,studyOID);
 	 	 	  		
  				}
 	 	 	  		
@@ -932,7 +941,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  	  		i++;
  		}
   
- 		this.getRestfulServiceHelper().getImportDataHelper().saveFileToImportFolder(files);
+ 		this.getRestfulServiceHelper().getImportDataHelper().saveFileToImportFolder(files,studyOID);
   }
 
 /**

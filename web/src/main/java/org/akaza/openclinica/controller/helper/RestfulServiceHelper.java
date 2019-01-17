@@ -295,6 +295,7 @@ public class RestfulServiceHelper {
        
 	}
     
+   
     public File getXSDFile(HttpServletRequest request,String fileNm) {
     	HttpSession session = request.getSession();
         ServletContext context = session.getServletContext();
@@ -322,6 +323,7 @@ public class RestfulServiceHelper {
 
 	  		String uploadMirthUrl = CoreResources.getField("uploadMirthUrl");
 	  		ImportCRFInfoSummary importCRFInfoSummary  = new ImportCRFInfoSummary();
+	  		String studyOID = null;
 	  		
 	  		/**
 	  		 *  prepare mapping file
@@ -332,7 +334,8 @@ public class RestfulServiceHelper {
 	  			
 	  			if(file.getName().toLowerCase().endsWith(".properties")) {
 	  				mappingFileBody = new FileBody(file, ContentType.TEXT_PLAIN);
-	  				mappingpartNm = "uploadedData";  	 	  		
+	  				mappingpartNm = "uploadedData"; 
+	  				studyOID =this.getImportDataHelper().getStudyOidFromMappingFile(file);
 	  	 	  		
 	  	 	  		break;
 	  			}
@@ -345,7 +348,7 @@ public class RestfulServiceHelper {
 	 			if(file.getName().toLowerCase().endsWith(".properties")) {
 	 				;
 	 			}else {
-	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
+	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file,studyOID);
 	 				
 	 				Iterator dataFilesIt = dataFileList.iterator();
 	 				
@@ -421,7 +424,7 @@ public class RestfulServiceHelper {
 	 				dataFilesIt = dataFileList.iterator();
 	 				while(dataFilesIt.hasNext()) {
 	 					File rowFile = (File) dataFilesIt.next();					 					
-		 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile);
+		 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile,studyOID);
 		 	 	  		
 	 				}
 		 	 	  		
@@ -430,7 +433,7 @@ public class RestfulServiceHelper {
 	 	  		i++;
 	 		}
 	  
-	 		this.getImportDataHelper().saveFileToImportFolder(files);
+	 		this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
 			
 	 		return importCRFInfoSummary;
 	  }
@@ -450,6 +453,7 @@ public class RestfulServiceHelper {
 	  		String importDataWSUrl = remoteAddress + "/OpenClinica/pages/auth/api/clinicaldata/";
 	  		ImportCRFInfoSummary importCRFInfoSummary  = new ImportCRFInfoSummary();
 	  		ArrayList<File> tempODMFileList = new ArrayList<>();
+	  		String studyOID = null;
 	  		
 	  		/**
 	  		 *  prepare mapping file
@@ -460,7 +464,8 @@ public class RestfulServiceHelper {
 	  			
 	  			if(file.getName().toLowerCase().endsWith(".properties")) {
 	  				mappingFile = file;
-	  				mappingpartNm = "uploadedData";  	 	  		
+	  				mappingpartNm = "uploadedData"; 
+	  				studyOID = this.getImportDataHelper().getStudyOidFromMappingFile(file);
 	  	 	  		
 	  	 	  		break;
 	  			}
@@ -473,7 +478,7 @@ public class RestfulServiceHelper {
 	 			if(file.getName().toLowerCase().endsWith(".properties")) {
 	 				;
 	 			}else {
-	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
+	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file,studyOID);
 	 				
 	 				Iterator dataFilesIt = dataFileList.iterator();
 	 				
@@ -513,7 +518,7 @@ public class RestfulServiceHelper {
 	 	 	 		  	 *  
 	 	 	 		  	 */
 	 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile);
-	 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName);
+	 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName,studyOID);
 	 	 	 		    tempODMFileList.add(odmXmlFile);
 	 	 	 		 
 	 	 	 			FileBody fileBody = new FileBody(odmXmlFile, ContentType.TEXT_PLAIN);
@@ -560,14 +565,14 @@ public class RestfulServiceHelper {
 	 				dataFilesIt = dataFileList.iterator();
 	 				while(dataFilesIt.hasNext()) {
 	 					File rowFile = (File) dataFilesIt.next();					 					
-		 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile);
+		 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile,studyOID);
 		 	 	  		
 	 				}
 	 				
 	 				dataFilesIt = tempODMFileList.iterator();
 	 				while(dataFilesIt.hasNext()) {
 	 					File tempODMFile = (File) dataFilesIt.next();					 					
-		 	 	  		this.getImportDataHelper().deleteTempImportFile(tempODMFile);
+		 	 	  		this.getImportDataHelper().deleteTempImportFile(tempODMFile,studyOID);
 		 	 	  		
 	 				}
 		 	 	  		
@@ -576,7 +581,7 @@ public class RestfulServiceHelper {
 	 	  		i++;
 	 		}
 	  
-	 		this.getImportDataHelper().saveFileToImportFolder(files);
+	 		this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
 			
 	 		return importCRFInfoSummary;
 	  }
@@ -589,6 +594,7 @@ public class RestfulServiceHelper {
 	  		
 	  		ImportCRFInfoSummary importCRFInfoSummary  = new ImportCRFInfoSummary();
 	  		ArrayList<File> tempODMFileList = new ArrayList<>();
+	  		String studyOID = null;
 	  		
 	  		/**
 	  		 *  prepare mapping file
@@ -599,7 +605,8 @@ public class RestfulServiceHelper {
 	  			
 	  			if(file.getName().toLowerCase().endsWith(".properties")) {
 	  				mappingFile = file;
-	  				mappingpartNm = "uploadedData";  	 	  		
+	  				mappingpartNm = "uploadedData"; 
+	  				studyOID= this.getImportDataHelper().getStudyOidFromMappingFile(file);
 	  	 	  		
 	  	 	  		break;
 	  			}
@@ -612,7 +619,7 @@ public class RestfulServiceHelper {
 	 			if(file.getName().toLowerCase().endsWith(".properties")) {
 	 				;
 	 			}else {
-	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file);
+	 				ArrayList<File> dataFileList = splitDataFileAndProcesDataRowbyRow(file,studyOID);
 	 				
 	 				Iterator dataFilesIt = dataFileList.iterator();
 	 				
@@ -649,7 +656,7 @@ public class RestfulServiceHelper {
 	 	 	 		  	 *  
 	 	 	 		  	 */
 	 	 	 		  	String dataStr = this.getImportDataHelper().transformTextToODMxml(mappingFile,rowFile);
-	 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName);
+	 	 	 		  	File odmXmlFile = this.getImportDataHelper().saveDataToFile(dataStr, originalFileName,studyOID);
 	 	 	 		    tempODMFileList.add(odmXmlFile);
 	 	 	 		 
 	 	 	 			FileBody fileBody = new FileBody(odmXmlFile, ContentType.TEXT_PLAIN);
@@ -696,14 +703,14 @@ public class RestfulServiceHelper {
 	 				dataFilesIt = dataFileList.iterator();
 	 				while(dataFilesIt.hasNext()) {
 	 					File rowFile = (File) dataFilesIt.next();					 					
-		 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile);
+		 	 	  		this.getImportDataHelper().deleteTempImportFile(rowFile,studyOID);
 		 	 	  		
 	 				}
 	 				
 	 				dataFilesIt = tempODMFileList.iterator();
 	 				while(dataFilesIt.hasNext()) {
 	 					File tempODMFile = (File) dataFilesIt.next();					 					
-		 	 	  		this.getImportDataHelper().deleteTempImportFile(tempODMFile);
+		 	 	  		this.getImportDataHelper().deleteTempImportFile(tempODMFile,studyOID);
 		 	 	  		
 	 				}
 		 	 	  		
@@ -712,12 +719,12 @@ public class RestfulServiceHelper {
 	 	  		i++;
 	 		}
 	  
-	 		this.getImportDataHelper().saveFileToImportFolder(files);
+	 		this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
 			
 	 		return importCRFInfoSummary;
 	  }
 
-	    public ArrayList<File> splitDataFileAndProcesDataRowbyRow(File file) {
+	    public ArrayList<File> splitDataFileAndProcesDataRowbyRow(File file,String studyOID) {
 			ArrayList<File> fileList = new ArrayList<>();
 		    BufferedReader reader;
 		    
@@ -725,7 +732,7 @@ public class RestfulServiceHelper {
 	            int count =1;	    	
 		    		    	
 		    	File splitFile;
-		    	String importFileDir = this.getImportDataHelper().getImportFileDir();
+		    	String importFileDir = this.getImportDataHelper().getImportFileDir(studyOID);
 		    	
 		    	reader = new BufferedReader(new FileReader(file));
 		    	

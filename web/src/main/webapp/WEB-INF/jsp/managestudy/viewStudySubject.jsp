@@ -393,12 +393,10 @@
                                       <a href="javascript:;" id="contactInformation">
                                         Invite
                                       </a>
-                                      <span id="view-access-link" style="display:none;">
-                                        &nbsp;|&nbsp;
-                                        <a href="javascript:;" id="participateAccess">
-                                          <fmt:message key="view_participant_access_code" bundle="${resword}"/>
-                                        </a>
-                                      </span>
+                                      &nbsp;|&nbsp;
+                                      <a href="javascript:;" id="participateAccess">
+                                        <fmt:message key="view_participant_access_code" bundle="${resword}"/>
+                                      </a>
                                     </td>
                                   </tr>
                                   <tr>
@@ -1523,7 +1521,6 @@
             success: function(data) {
                 $('#access-code-input').val(data.accessCode);
                 $('#access-url').text(data.host);
-                $('#view-access-link').show();
             },
             error: logDump
         });
