@@ -583,55 +583,61 @@ public class ImportDataHelper {
 		boolean isNewFile = false;
 
 	    String logFileName;
+	    // OC-10156
+	    if(orginalFileName == null) {
+	    	;
+	    }else {
+	    	 try {
+	             int count =1;	    	
+	 	    		    	
+	 	    	File logFile;
+	 	    	String importFileDir = this.getPersonalImportFileDir(request);
+	     	    
+	 	    	//orginalFileName like: pipe_delimited_local_skip
+	 	    	
+	 	    	logFileName = importFileDir + orginalFileName + "_log.txt";
+	 			logFile = new File(logFileName);
+	 			
+	 			/**
+	 			 *  create new file and add first line
+	 			 *  RowNo | ParticipantID | Status | Message
+	 			 */
+	 			if(!logFile.exists()) {
+	 				logFile.createNewFile();
+	 				isNewFile = true;				
+	 			}
+	 			
+	 			// true = append file
+	 			fw = new FileWriter(logFile.getAbsoluteFile(), true);
+	 			bw = new BufferedWriter(fw);
+	             
+	 			if(isNewFile) {				
+	 				bw.write("RowNo|ParticipantID|Status|Message");	
+	 				bw.write("\n");
+	 			}
+	 			
+	 			if(msg != null) {
+	 				bw.write(msg);	
+	 				bw.write("\n");
+	 			}	
+	 			
+	 			bw.close();						
+	 	       
+	 	    } catch (Exception e) {
+	 	        e.printStackTrace();
+	 	    }finally {
+	 			try {
+	 				if (bw != null)
+	 					bw.close();
+	 				if (fw != null)
+	 					fw.close();
+	 			} catch (IOException ex) {
+	 				ex.printStackTrace();
+	 			}
+	 		}
+	    }
 	    
-	    try {
-            int count =1;	    	
-	    		    	
-	    	File logFile;
-	    	String importFileDir = this.getPersonalImportFileDir(request);
-    	    
-	    	//orginalFileName like: pipe_delimited_local_skip
-	    	
-	    	logFileName = importFileDir + orginalFileName + "_log.txt";
-			logFile = new File(logFileName);
-			
-			/**
-			 *  create new file and add first line
-			 *  RowNo | ParticipantID | Status | Message
-			 */
-			if(!logFile.exists()) {
-				logFile.createNewFile();
-				isNewFile = true;				
-			}
-			
-			// true = append file
-			fw = new FileWriter(logFile.getAbsoluteFile(), true);
-			bw = new BufferedWriter(fw);
-            
-			if(isNewFile) {				
-				bw.write("RowNo|ParticipantID|Status|Message");	
-				bw.write("\n");
-			}
-			
-			if(msg != null) {
-				bw.write(msg);	
-				bw.write("\n");
-			}	
-			
-			bw.close();						
-	       
-	    } catch (Exception e) {
-	        e.printStackTrace();
-	    }finally {
-			try {
-				if (bw != null)
-					bw.close();
-				if (fw != null)
-					fw.close();
-			} catch (IOException ex) {
-				ex.printStackTrace();
-			}
-		}	    
+	   	    
 	}  
     
     /**
