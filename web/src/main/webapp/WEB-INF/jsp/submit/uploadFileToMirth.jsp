@@ -112,16 +112,16 @@
 	File [] fileObjects = null;
 	String [] fileNames = null;
 	String fname=null;
-	
+		
     String fileDir = importDataHelper.getPersonalImportFileDir(request);
 	if(importDataHelper.hasDMrole(request)) {
     		ArrayList<File> fileList = importDataHelper.getPersonalImportLogFile(request,null);
 			fileObjects = new File[fileList.size()];
 			fileObjects = fileList.toArray(fileObjects);
 	}else{
-	   //System.out.println("\nfileDir=============: " + fileDir);
+	    //System.out.println("\nfileDir=============: " + fileDir);
 		File f = new File(fileDir);
-		fileNames = f.list();				
+		
 		fileObjects= f.listFiles();
 	}	
 	
@@ -145,8 +145,15 @@
 
         if(!fileObjects[i].isDirectory())
             {
-            fname = fileDir+fileNames[i];
-
+            fname = fileObjects[i].getName();
+            int pos = fileObjects[i].getParent().indexOf("import");
+			String path = fileObjects[i].getParent().substring(pos+7);
+			
+			pos = path.lastIndexOf(File.separatorChar);
+            String parentNm = pos < 0 || pos == path.length() ? "" : path.substring(pos + 1);
+			String studyId = pos < 0 || pos == path.length() ? "" : path.substring(0,pos);
+			
+			
             if(fname.endsWith("_log.txt"))
             {
                 
@@ -154,7 +161,7 @@
                         %>
                         <tr bgcolor="lightgray">
                             <td width=12.5% align="center">
-                                <%=fileNames[i]%>
+                                <%=fname%>
                             </td>
 
                             <td width=12.5% align="center">
@@ -172,14 +179,14 @@
    						        if(passTime >= 5000){
 									
 								%>
-                                <a target="_new" href="UploadCRFData?action=download&fileId=<%=fileNames[i]%>">
+                                <a target="_new" href="UploadCRFData?action=download&fileId=<%=fname%>&studyId=<%=studyId%>&parentNm=<%=parentNm%>">
 									<span name="bt_Download1" class="icon icon-download" border="0" align="left" hspace="6"
 										 alt="<fmt:message key="download" bundle="${resword}"/>" title="<fmt:message key="download" bundle="${resword}"/>">
 								</a>								
-								<a href="UploadCRFData?action=delete&fileId=<%=fileNames[i]%>">
+								<a href="UploadCRFData?action=delete&fileId=<%=fname%>&studyId=<%=studyId%>&parentNm=<%=parentNm%>">
 									<span name="bt_Delete1" class="icon icon-trash red" border="0" alt="<fmt:message key="delete" bundle="${resword}"/>"
 										 title="<fmt:message key="delete" bundle="${resword}"/>" align="left" hspace="6"
-										 onClick='return confirm("Please confirm that you want to delete log file <%=fileNames[i]%>");'>
+										 onClick='return confirm("Please confirm that you want to delete log file <%=fname%>");'>
 								</a>
 								<%
 								} else{

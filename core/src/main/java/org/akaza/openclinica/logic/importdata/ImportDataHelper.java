@@ -296,6 +296,48 @@ public class ImportDataHelper {
 		return importFileDir;
 	}
     
+    /**
+     * 
+     * @param studyID
+     * @param parentNm
+     * @param fileNm
+     * @return
+     */
+    public File getImportFileByStudyIDParentNm(String studyID, String parentNm, String fileNm) {
+	
+		  String dir = CoreResources.getField("filePath");
+          if (!new File(dir).exists()) {
+              logger.info("The filePath in datainfo.properties is invalid " + dir);             
+          }
+          // All the uploaded files will be saved in filePath/crf/original/
+          String theDir = dir + "import" + File.separator + studyID + File.separator + parentNm + File.separator;
+          if (!new File(theDir).isDirectory()) {
+              new File(theDir).mkdirs();
+              logger.info("Made the directory " + theDir);
+          }
+        
+        importFileDir = theDir;			 		  
+		File fileFolder = new File(importFileDir);
+	    	
+    	for (final File fileEntry : fileFolder.listFiles()) {
+    	      if (fileEntry.isDirectory()) {
+    	       ;
+    	      } else {
+    	        if (fileEntry.isFile()) {
+    	          String fileName = fileEntry.getName();
+    	          if (fileName.equals(fileNm)) {
+    	        	  return fileEntry;
+    	          }
+    	            
+    	        }
+
+    	      }
+    	    }
+    	
+    	return null;
+		
+	}
+    
     public String getPersonalImportFileDir(HttpServletRequest request) {
     	  String userName = "";
     	  boolean prepareNewDir = false; 

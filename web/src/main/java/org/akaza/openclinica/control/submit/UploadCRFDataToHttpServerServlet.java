@@ -252,14 +252,21 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
            
                     	 
         } else if ("download".equalsIgnoreCase(action)) {
+        	String studyID= request.getParameter("studyId");
+        	String parentNm= request.getParameter("parentNm");
             String fileName= request.getParameter("fileId");
-            File file = this.getRestfulServiceHelper().getImportDataHelper().getPersonalImportLogFile(fileName,  request);
+            File file = this.getRestfulServiceHelper().getImportDataHelper().getImportFileByStudyIDParentNm(studyID, parentNm, fileName);
             dowloadFile(file, "text/xml");
             
         } else if ("delete".equalsIgnoreCase(action)) {
+        	String studyID= request.getParameter("studyId");
+        	String parentNm= request.getParameter("parentNm");
             String fileName= request.getParameter("fileId");
-            this.getRestfulServiceHelper().getImportDataHelper().deletePersonalTempImportFile(fileName,request);
-            
+            File tempFile = this.getRestfulServiceHelper().getImportDataHelper().getImportFileByStudyIDParentNm(studyID, parentNm, fileName);
+           
+        	if(tempFile.exists()) {
+        		tempFile.delete();
+        	}
             forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
         }
         
