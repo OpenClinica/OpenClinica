@@ -360,7 +360,7 @@ public class UserServiceImpl implements UserService {
         sb.append(host);
         sb.append("<br>");
 
-        sb.append("and enter access code ");
+        sb.append("and enter access code: ");
         sb.append(accessCode);
         sb.append("<br>");
         sb.append("<br>");
