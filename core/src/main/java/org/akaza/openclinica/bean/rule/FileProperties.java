@@ -33,19 +33,19 @@ public class FileProperties {
     public FileProperties() {
         setExtensions("");
         setExtensionSettings(ExtensionSettings.VALID);
-        fileSizeMax = Long.valueOf(MB * 10);
+        fileSizeMax = Long.valueOf(MB * 100);
     }
 
     public FileProperties(String extensions) {
         setExtensions(extensions);
         setExtensionSettings(ExtensionSettings.VALID);
-        fileSizeMax = Long.valueOf(MB * 10);
+        fileSizeMax = Long.valueOf(MB * 100);
     }
 	
 	public FileProperties(String extensions, String extensionSettings) {
         setExtensions(extensions);
 		this.extensionSettings = getExtensionSettings(extensionSettings);
-        fileSizeMax = Long.valueOf(MB * 10);
+        fileSizeMax = Long.valueOf(MB * 100);
 	}
 
 	public void isValidExtension(String uploadedFileExtension){
