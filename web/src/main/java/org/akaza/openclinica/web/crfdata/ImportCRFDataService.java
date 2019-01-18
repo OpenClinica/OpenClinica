@@ -186,7 +186,8 @@ public class ImportCRFDataService {
     						}
     		                    
     		                if(matchedAndSkip) {
-    		                   ; // do something?	
+    		                	 // do something	
+    		                  ;// return null;
     		                }else {
     		                	if(studyEventDefinitionBean.isRepeating()) {
     		                		sampleOrdinal =	commonEventContainerDTO.getMaxOrdinal() + 1 + "";
@@ -2016,9 +2017,9 @@ public class ImportCRFDataService {
         	StringBuffer itemOIDSmt = new StringBuffer(" and i.oc_oid in (");
         	
         	for(int  i= 0; i< skipMatchCriteriaArray.length; i++) {
-        		int k = skipMatchCriteriaArray[i].trim().indexOf(".");
+        		int k = skipMatchCriteriaArray[i].indexOf(".");
         		itemGroupOID = skipMatchCriteriaArray[i].substring(0, k);
-        		itemOID =  skipMatchCriteriaArray[i].substring(k+1, skipMatchCriteriaArray[i].trim().length());
+        		itemOID =  skipMatchCriteriaArray[i].substring(k+1, skipMatchCriteriaArray[i].length()).trim();
         		
         		itemGroupOIDSmt.append("'" + itemGroupOID + "',");
         		itemOIDSmt.append("'" + itemOID + "',");
@@ -2099,7 +2100,8 @@ public class ImportCRFDataService {
 		    				 // find the itemOID first, then compare the value
 		    				 if(itemOID.equals(itemOIDinODMxml) ) {
 		    					 if(itemValue.equals(itemValueinODMxml)){
-		    						 matchCheck[i] = true;		    						 		    						 
+		    						 matchCheck[i] = true;
+		    						 break;
 		    					 }else {
 		    						 matchCheck[i] = false;
 		    					 }
