@@ -185,33 +185,27 @@ public class MainMenuServlet extends SecureController {
             CoreResources.setRequestSchema(request,currentSchema);
             return isRenewAuth;
         }
-        currentPublicStudy = tmpPublicStudy;
-        CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
-        currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
-        if (currentStudy.getParentStudyId() > 0) {
-            currentStudy.setParentStudyName(sd.findByPK(currentStudy.getParentStudyId()).getName());
-            currentPublicStudy.setParentStudyName(currentStudy.getParentStudyName());
-        }
-        StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-        scs.setParametersForStudy(currentStudy);
-        
-        session.setAttribute("publicStudy", currentPublicStudy);
-        session.setAttribute("study", currentStudy);
 
-        StudyUserRoleBean role = ub.getRoleByStudy(currentPublicStudy.getId());
+        StudyUserRoleBean role = ub.getRoleByStudy(tmpPublicStudy.getId());
 
         if (role.getStudyId() == 0) {
-            logger.error("You have no roles for this study." + studyEnvUuid + " currentStudy is:" + currentStudy.getName() + " schema:" + currentPublicStudy.getSchemaName());
+            logger.error("You have no roles for this study." + studyEnvUuid + " currentStudy is:" + tmpPublicStudy.getName() + " schema:" + tmpPublicStudy.getSchemaName());
             logger.error("Creating an invalid role, ChangeStudy page will be shown");
-            //throw new Exception("You have no roles for this study.");
-            currentStudy = new StudyBean();
-            currentPublicStudy = new StudyBean();
             currentRole = new StudyUserRoleBean();
+            session.setAttribute("userRole", currentRole);
+        } else {
+            currentPublicStudy = tmpPublicStudy;
+            CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
+            currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
+            if (currentStudy.getParentStudyId() > 0) {
+                currentStudy.setParentStudyName(sd.findByPK(currentStudy.getParentStudyId()).getName());
+                currentPublicStudy.setParentStudyName(currentStudy.getParentStudyName());
+            }
+            StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+            scs.setParametersForStudy(currentStudy);
 
             session.setAttribute("publicStudy", currentPublicStudy);
             session.setAttribute("study", currentStudy);
-            session.setAttribute("userRole", currentRole);
-        } else {
             currentRole = role;
             session.setAttribute("userRole", role);
             logger.info("Found role for this study:" + role.getRoleName());
