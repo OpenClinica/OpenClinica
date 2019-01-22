@@ -216,6 +216,26 @@
   .full-width {
     width: 100%;
   }
+  .twin {
+    width: 50%;
+  }
+  .twin:first-child {
+    padding-right: 10px;
+  }
+  .twin:last-child {
+    padding-left: 10px;
+  }
+  @media(max-width: 1024px) {
+    .twin {
+      width: 100%;
+    }
+    .twin:first-child {
+      padding-right: 0;
+    }
+    .twin:last-child {
+      padding-left: 0;
+    }
+  }
   .left {
     float: left;
   }
@@ -300,7 +320,7 @@
                         <div class="box_BL">
                           <div class="box_BR">
                             <div class="tablebox_center">
-                              <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:500px; padding-right:20px;">
+                              <table border="0" cellpadding="0" cellspacing="0" class="left twin">
                                 <!-- Table Actions row (pagination, search, tools) -->
                                 <tbody>
                                   <tr>
@@ -373,7 +393,7 @@
                                   </tr>
                                 </tbody>
                               </table>
-                              <table width="50%" border="0" cellpadding="0" cellspacing="0" class="left" style="min-width:600px;">
+                              <table border="0" cellpadding="0" cellspacing="0" class="left twin">
                                 <tbody
                                   <c:choose>
                                     <c:when test="${
