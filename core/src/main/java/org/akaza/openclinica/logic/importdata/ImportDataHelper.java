@@ -782,74 +782,7 @@ public class ImportDataHelper {
         return fileArray;
     }  
     
-    /**
-     *  FormOID=F_DEMOGRAPHICS
-		FormVersion=1
-		StudyOID=S_TEST_STU(TEST)
-		StudyEventOID=SE_COMMON
-
-     * @param file
-     * @throws IOException
-     */
-    public void validateMappingFile(File file) throws IOException,OpenClinicaSystemException{
-       
-    	boolean foundFormOID=false;
-    	boolean foundFormVersion=false;
-    	boolean foundStudyOID=false;
-    	boolean foundStudyEventOID=false;
-    			
-        try(Scanner sc = new Scanner(file)){
-       	
-         String currentLine;
-		
-       	 while (sc.hasNextLine()) {
-       		 currentLine = sc.nextLine();
-       		 String[] mappingRow = currentLine.split("=");
-       		 
-       		 if(mappingRow.length == 2) {
-       			 String keyWord = mappingRow[0];
-           		 String value = mappingRow[1];
-           		 if(keyWord != null && keyWord.trim().startsWith("FormOID") && value != null && value.trim().length() >0) {
-           			foundFormOID=true;
-           		 }
-           		 
-           		 if(keyWord != null && keyWord.trim().startsWith("FormVersion") && value != null && value.trim().length() >0) {
-           			foundFormVersion=true;
-                 }
-           		 
-           		 if(keyWord != null && keyWord.trim().startsWith("StudyOID") && value != null && value.trim().length() >0) {
-           			foundStudyOID=true;
-            	 }
-           		 
-           		 if(keyWord != null && keyWord.trim().startsWith("StudyEventOID") && value != null && value.trim().length() >0) {
-           			foundStudyEventOID=true;
-            	 } 
-       		 }
-       		
-       		 
-		    
-		     }
-		
-		 }
-		
-        if(!foundFormOID) {
-        	 throw new OpenClinicaSystemException("errorCode.noFormOID", "Please check mapping file, make sure that it has correct FormOID configuration.  ");
-        }
-        
-        if(!foundFormVersion) {
-       	 	throw new OpenClinicaSystemException("errorCode.noFormVersion", "Please check mapping file, make sure that it has correct FormVersion configuration.  ");
-        }
-        
-        if(!foundStudyOID) {
-       	 	throw new OpenClinicaSystemException("errorCode.noStudyOID", "Please check mapping file, make sure that it has correct StudyOID configuration.  ");
-        }
-        
-        if(!foundStudyEventOID) {
-       	 	throw new OpenClinicaSystemException("errorCode.noStudyEventOID", "Please check mapping file, make sure that it has correct StudyEventOID configuration.  ");
-        }
-        
-    	
-	 }
+    
    /**
     * 
     * @param dataStr
@@ -897,4 +830,5 @@ public String getCurrentUserName() {
 public void setCurrentUserName(String currentUserName) {
 	this.currentUserName = currentUserName;
 }
+
    }

@@ -28,6 +28,7 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -458,7 +459,7 @@ public String readFileToString(File file) throws IOException{
 			    }else  if(key.equals("FormVersion") || key.substring(1).equals("FormVersion")){			     	 
 			    	mappedValues.put("FormVersion", val);
 			    //SkipMatchCriteria	
-			    }else  if(key.equals("SkipMatchCriteria") || key.substring(1).equals("SkipMatchCriteria")){			     	 
+			    }else  if(key.equals("SkipMatchCriteria") ||(!(key.startsWith("#")) && key.substring(1).equals("SkipMatchCriteria"))){			     	 
 			    	mappedValues.put("SkipMatchCriteria", val);	
 			    }else{
 	                    // item OID: Height=IG_VITAL_GROUP1.HeightOID
@@ -643,4 +644,173 @@ public String readFileToString(File file) throws IOException{
     	
          return studyOID;
     } 
+    
+    /**
+     *  FormOID=F_DEMOGRAPHICS
+		FormVersion=1
+		StudyOID=S_TEST_STU(TEST)
+		StudyEventOID=SE_COMMON
+
+     * @param file
+     * @throws IOException
+     */
+    public void validateMappingFile(File file) throws IOException,OpenClinicaSystemException{
+       
+    	boolean foundFormOID=false;
+    	boolean foundFormVersion=false;
+    	boolean foundStudyOID=false;
+    	boolean foundStudyEventOID=false;
+    	
+    	String errorMsg = null;
+    	ArrayList<String> errorMsgs = new ArrayList<>();
+    			
+        try(Scanner sc = new Scanner(file)){
+       	
+         String currentLine;
+		
+       	 while (sc.hasNextLine()) {
+       		 currentLine = sc.nextLine();
+       		 
+       		 // skip comment out line or blank line
+	       	 if(currentLine != null && currentLine.trim().length() >0 && !(currentLine.startsWith("#"))){ 
+	       		 String[] mappingRow = currentLine.split("=");
+	       		 
+	       		 if(mappingRow.length == 2) {
+	       			 String keyWord = mappingRow[0];
+	           		 String value = mappingRow[1];
+	           		 if(keyWord != null && keyWord.trim().startsWith("FormOID") && value != null && value.trim().length() >0) {
+	           			foundFormOID=true;
+	           		 }else if(keyWord != null && keyWord.trim().startsWith("FormVersion") && value != null && value.trim().length() >0) {
+	           			foundFormVersion=true;
+	                 }else if(keyWord != null && keyWord.trim().startsWith("StudyOID") && value != null && value.trim().length() >0) {
+	           			foundStudyOID=true;
+	            	 }else if(keyWord != null && keyWord.trim().startsWith("StudyEventOID") && value != null && value.trim().length() >0) {
+	           			foundStudyEventOID=true;
+	            	 } else if(keyWord != null && (keyWord.trim().startsWith("SkipMatchCriteria") ||  keyWord.trim().indexOf("SkipMatchCriteria") ==1 ) && value != null && value.trim().length() >0) {
+	            		//check SkipMatchCriteria format
+	            		 errorMsg = this.validateSkipMatchCriteriaFormat(mappingRow);
+	            		 
+	            		 if(errorMsg != null) {
+		             			errorMsgs.add(errorMsg);
+		             		}
+	             	 } else {
+	             		//check item configuration format
+	             		errorMsg = this.validateItemFormat(mappingRow);
+	             		if(errorMsg != null) {
+	             			errorMsgs.add(errorMsg);
+	             		}
+	             	 }
+	       		 }
+	       	 }
+		    }// end of while loop
+		
+		 }
+		
+        if(!foundFormOID) {
+        	 throw new OpenClinicaSystemException("errorCode.noFormOID", "Please check mapping file, make sure that it has correct FormOID configuration.  ");
+        }
+        
+        if(!foundFormVersion) {
+       	 	throw new OpenClinicaSystemException("errorCode.noFormVersion", "Please check mapping file, make sure that it has correct FormVersion configuration.  ");
+        }
+        
+        if(!foundStudyOID) {
+       	 	throw new OpenClinicaSystemException("errorCode.noStudyOID", "Please check mapping file, make sure that it has correct StudyOID configuration.  ");
+        }
+        
+        if(!foundStudyEventOID) {
+       	 	throw new OpenClinicaSystemException("errorCode.noStudyEventOID", "Please check mapping file, make sure that it has correct StudyEventOID configuration.  ");
+        }
+        
+        if(errorMsgs.size() >0) {
+        	throw new OpenClinicaSystemException("errorCode.missingItemOrItemGroupOID", errorMsgs.toString());
+        }
+        
+    	
+	 }
+ 
+ /**
+  * Height Units=IG_VITAL_GROUP1.HeightUnitsOID   
+  * @param itemStr
+  * @return
+  */
+private  String  validateItemFormat(String[] keyValueStr) {		
+	
+	    String errorMsg = null;	
+		String key;
+		String val;
+	
+	    if(keyValueStr.length < 2) {
+	    	 ;
+	    }else {
+	    	key = keyValueStr[0].trim();
+		    val =  keyValueStr[1].trim().replaceAll("/n|||/r", "");	
+                        
+             String[] itemMappingvalue = toArray(val,".");
+             
+             if(itemMappingvalue.length < 2) {
+        		 errorMsg = "Missing the information of Item or Item Group OID setting in Item configuration section: " + val + "\n";
+      			 return errorMsg;
+        	 }
+             
+			 String itemGrpOid = itemMappingvalue[0]; 
+			 String itemOid = itemMappingvalue[1];			 
+			 
+			if(itemGrpOid == null || itemGrpOid.trim().length() ==0) {
+				 errorMsg = "Missing the information of Item Group OID setting for:" + keyValueStr[0] + "=" + keyValueStr[1] +  "\n";
+				 return errorMsg;
+			 }
+			
+			if(itemOid == null || itemOid.trim().length() ==0) {
+				 errorMsg = "Missing the information of Item OID setting for:" + keyValueStr[0] + "=" + keyValueStr[1] +  "\n";
+				 return errorMsg;
+			 }		        
+	     }
+	     
+	    return errorMsg;
+	}
+
+private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {		
+	
+    String errorMsg = null;	
+	String key;
+	String skipMatchCriteriaStr;
+	String[] skipMatchCriteriaVal;
+
+    if(keyValueStr.length < 2) {
+    	 ;
+    }else {
+    	key = keyValueStr[0].trim();
+    	skipMatchCriteriaStr =  keyValueStr[1].trim().replaceAll("/n|||/r", "");
+    	
+    	skipMatchCriteriaVal = this.toArray(skipMatchCriteriaStr,",");
+        for(int i=0;i < skipMatchCriteriaVal.length; i++) {
+        	 String val = skipMatchCriteriaVal[i];
+        	 String[] itemMappingvalue = toArray(val,".");
+        	 
+        	 if(itemMappingvalue.length <2) {
+        		 errorMsg = "Missing the information of Item or Item Group OID setting in SkipMatchCriteria " + val + "\n";
+      			 return errorMsg;
+        	 }
+               
+      		 String itemGrpOid = itemMappingvalue[0]; 
+      		 String itemOid = itemMappingvalue[1];			 
+      		 
+      		if(itemGrpOid == null || itemGrpOid.trim().length() ==0) {
+      			 errorMsg = "Missing the information of Item Group OID setting in SkipMatchCriteria " + val + "\n";
+      			 return errorMsg;
+      		 }
+      		
+      		if(itemOid == null || itemOid.trim().length() ==0) {
+      			 errorMsg = "Missing the information of Item OID setting in SkipMatchCriteria" + val +  "\n";
+      			 return errorMsg;
+      		 }	
+        }
+      	        
+     }
+     
+    return errorMsg;
+
+}
+
 }

@@ -66,6 +66,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.importdata.ImportDataHelper;
+import org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
 import org.akaza.openclinica.service.ViewStudySubjectService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -79,7 +80,7 @@ public class ImportCRFDataService {
     private final DataSource ds;
     private ItemDataDAO itemDataDao;
     private String skipMatchCriteriaSql;
-    private ImportDataHelper importDataHelper;
+    private PipeDelimitedDataHelper pipeDelimitedDataHelper;
 
 
     @Autowired
@@ -140,7 +141,7 @@ public class ImportCRFDataService {
               
                 studyEventBean = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
                         studyEventDefinitionBean.getId(), Integer.parseInt(sampleOrdinal));
-
+                                
                 if (!studyEventDefinitionBean.isTypeCommon()) {
                     // @pgawade 16-March-2011 Do not allow the data import
                     // if event status is one of the - stopped, signed,
@@ -211,7 +212,7 @@ public class ImportCRFDataService {
     		                	}
     		                	String msg;
     		                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Insert";
-    		    	    		getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
+    		    	    		getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
     		    	    		
     		                }
     					} catch (OpenClinicaException e) {
@@ -536,12 +537,21 @@ public class ImportCRFDataService {
 
                             
                        
+                    }else {
+                    	//OC-10148 and check status:scheduled
+                    	/*String formOid = formDataBean.getFormOID();
+                        if(!(studyEventDefinitionBean.isRepeating()) && studyEventBean!=null && !(studyEventBean.getSubjectEventStatus().getName().equals("scheduled"))) {                        		
+        	    	    		errors.add("For Non-Repeating visited event, found existing event in system - form "+ formOid +" , " +  "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
+        	    	    		
+        	    	    		return errors;
+                        	}*/
+                        	
+                        }
                     }
 
                 }
             }
-        }
-      
+       
         return errors;
     }
 
@@ -1617,7 +1627,7 @@ public class ImportCRFDataService {
                 	}
                 	String msg;
                 	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";
-    	    		getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
+    	    		getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
                 	continue;
                 }
                 
@@ -2144,14 +2154,14 @@ public class ImportCRFDataService {
 		this.skipMatchCriteriaSql = skipMatchCriteriaSql;
 	}
 
-	public ImportDataHelper getImportDataHelper() {
-		if(importDataHelper == null) {
-			importDataHelper = new ImportDataHelper();
+	public PipeDelimitedDataHelper getPipeDelimitedDataHelper() {
+		if(pipeDelimitedDataHelper == null) {
+			pipeDelimitedDataHelper = new PipeDelimitedDataHelper();
 		}
-		return importDataHelper;
+		return pipeDelimitedDataHelper;
 	}
 
-	public void setImportDataHelper(ImportDataHelper importDataHelper) {
-		this.importDataHelper = importDataHelper;
+	public void setPipeDelimitedDataHelper(PipeDelimitedDataHelper importDataHelper) {
+		this.pipeDelimitedDataHelper = importDataHelper;
 	}
 }
