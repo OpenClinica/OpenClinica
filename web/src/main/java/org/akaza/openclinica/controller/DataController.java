@@ -346,7 +346,7 @@ public class DataController {
             	}
             	String msg = e.getErrorCode() + ":" + e.getMessage();
             	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
-	    		this.dataImportService.getImportCRFDataService().getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
+	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
             }
 
             CRFDataImportValidator crfDataImportValidator = new CRFDataImportValidator(dataSource);
@@ -386,7 +386,7 @@ public class DataController {
                 	}
                 	String msg = "errorCode.ValidationFailed:" + err_msg;
                 	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
-    	    		this.dataImportService.getImportCRFDataService().getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
+    	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
     	    		
                     return errorMsgs;
                 }
@@ -413,7 +413,7 @@ public class DataController {
                 	}
                 	String msg = "errorCode.ValidationFailed:" + err_msg;
                 	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
-    	    		this.dataImportService.getImportCRFDataService().getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
+    	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
     	    		
     	    		
                     return errorMsgs;
@@ -733,7 +733,7 @@ public class DataController {
               if (mFiles[0] !=null) {
             	  boolean foundMappingFile = false;
             	  
-            	 File[] files = this.dataImportService.getImportCRFDataService().getImportDataHelper().convert(mFiles,studyOID);
+            	 File[] files = this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().convert(mFiles,studyOID);
             	  
             	  for (File file : files) {           
                       
@@ -745,7 +745,7 @@ public class DataController {
                       		foundMappingFile = true;
                       		logger.info("Found mapping property file and uploaded");
                       		
-                      		this.dataImportService.getImportCRFDataService().getImportDataHelper().validateMappingFile(file);
+                      		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().validateMappingFile(file);
                       		break;
                       	}
                       }
