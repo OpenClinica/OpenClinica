@@ -2,9 +2,11 @@ package org.akaza.openclinica.logic.rulerunner;
 
 import java.util.List;
 
+import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -91,7 +93,8 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 	                        	if (ruleActionBean instanceof EventActionBean){
 	                        		beanPropertyService.runAction(ruleActionBean,eow,userId,changeDetails.getRunningInTransaction());
 	                        	}else if (ruleActionBean instanceof NotificationActionBean){
-                                    notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule);
+									HttpServletRequest request = CoreResources.getRequest();
+									notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule,request);
                                     notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studyEvent.getStudySubject(),eventOrdinal);
 	                        	}                	
 	                        }
