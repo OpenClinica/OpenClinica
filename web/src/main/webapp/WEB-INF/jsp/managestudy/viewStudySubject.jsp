@@ -1186,7 +1186,7 @@
                   }
                 </style>
                 <div id="phone-widget">
-                  <input id="phone-input" type="tel" class="formfield form-control invite-input" onfocus="this.select()"> 
+                  <input id="phone-input" type="text" class="formfield form-control invite-input" onfocus="this.select()"> 
                   <div id="country-select">
                     <div id="country-flag" class="down-arrow">&nbsp;</div> 
                     <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
@@ -1584,7 +1584,15 @@
             }
             enableDisableInviteRadios();
         });
-        jQuery('#phone-input').blur(enableDisableInviteRadios);
+        jQuery('#phone-input')
+            .keydown(function(e) {
+                if (/[0-9 -]|Backspace|Delete|Arrow/.match(e.key)) {
+                    // OK
+                } else {
+                    e.preventDefault();
+                }
+            })
+            .blur(enableDisableInviteRadios);
 
         jQuery('#contactInformation').click(function() {
             $('#name-input').val(participateInfo.firstName);
