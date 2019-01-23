@@ -16,7 +16,6 @@ public class ActionProcessorFacade {
     public static ActionProcessor getActionProcessor(ActionType actionType, DataSource ds, JavaMailSenderImpl mailSender,
             DynamicsMetadataService itemMetadataService, RuleSetBean ruleSet, RuleActionRunLogDao ruleActionRunLogDao, RuleSetRuleBean ruleSetRule)
             throws OpenClinicaSystemException {
-        HttpServletRequest request = CoreResources.getRequest();
 
         switch (actionType) {
         case FILE_DISCREPANCY_NOTE:
@@ -24,7 +23,7 @@ public class ActionProcessorFacade {
         case EMAIL:
             return new EmailActionProcessor(ds, mailSender, ruleActionRunLogDao, ruleSetRule);
         case NOTIFICATION:
-            return new NotificationActionProcessor(ds, mailSender, ruleSetRule,request);
+            return new NotificationActionProcessor(ds, mailSender, ruleSetRule);
         case SHOW:
             return new ShowActionProcessor(ds, itemMetadataService, ruleSet);
         case HIDE:
