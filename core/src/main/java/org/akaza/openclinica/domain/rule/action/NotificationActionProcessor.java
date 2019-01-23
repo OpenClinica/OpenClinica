@@ -54,11 +54,7 @@ import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.HttpEntity;
-import org.springframework.http.HttpHeaders;
-import org.springframework.http.HttpMethod;
-import org.springframework.http.MediaType;
-import org.springframework.http.ResponseEntity;
+import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
 import org.springframework.http.converter.HttpMessageConverter;
@@ -110,7 +106,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	String emailSubject;
 	String participateStatus;
     StudySubject studySubject;
-    HttpServletRequest request;
+    String accessToken;
 
     public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionBean ruleActionBean, ParticipantDTO pDTO,
 			String email) {
@@ -123,7 +119,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	}
 
 	public NotificationActionProcessor(String[] listOfEmails, StudySubject studySubject, StudyBean studyBean, String message, String emailSubject,
-			JavaMailSenderImpl mailSender , String participateStatus,HttpServletRequest request) {
+			JavaMailSenderImpl mailSender , String participateStatus,String accessToken) {
 		this.listOfEmails = listOfEmails;
 		this.message = message;
 		this.emailSubject = emailSubject;
@@ -131,15 +127,14 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		this.mailSender = mailSender;
 		this.studyBean = studyBean;
 		this.participateStatus=participateStatus;
-		this.request=request;
+		this.accessToken=accessToken;
 
 	}
 
-	public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleSetRuleBean ruleSetRule,HttpServletRequest request) {
+	public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleSetRuleBean ruleSetRule) {
 		this.ds = ds;
 		this.mailSender = mailSender;
 		this.ruleSetRule = ruleSetRule;
-        this.request = request;
 		ssdao = new StudySubjectDAO(ds);
 		udao = new UserAccountDAO(ds);
   	   spvdao = new StudyParameterValueDAO(ds);
@@ -234,9 +229,10 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(parentStudyBean.getId(), "participantPortal");
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
-		HttpServletRequest request = CoreResources.getRequest();
+		HttpServletRequest request= CoreResources.getRequest();
+		String accessToken = (String) request.getSession().getAttribute("accessToken");
 
-		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, studySubject, studyBean, message, emailSubject, mailSender,participateStatus,request));
+		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, studySubject, studyBean, message, emailSubject, mailSender,participateStatus,accessToken));
 		thread.start();
 
 	}
@@ -397,7 +393,6 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		RestTemplate restTemplate = new RestTemplate();
 		HttpHeaders headers = new HttpHeaders();
 
-		String accessToken = (String) request.getSession().getAttribute("accessToken");
 		headers.add("Authorization", "Bearer " + accessToken);
 		headers.add("Accept-Charset", "UTF-8");
 		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));

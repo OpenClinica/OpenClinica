@@ -93,8 +93,7 @@ public class BeanPropertyRuleRunner extends RuleRunner{
 	                        	if (ruleActionBean instanceof EventActionBean){
 	                        		beanPropertyService.runAction(ruleActionBean,eow,userId,changeDetails.getRunningInTransaction());
 	                        	}else if (ruleActionBean instanceof NotificationActionBean){
-									HttpServletRequest request = CoreResources.getRequest();
-									notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule,request);
+									notificationActionProcessor = new NotificationActionProcessor(ds, mailSender, ruleSetRule);
                                     notificationActionProcessor.runNotificationAction(ruleActionBean,ruleSet,studyEvent.getStudySubject(),eventOrdinal);
 	                        	}                	
 	                        }
