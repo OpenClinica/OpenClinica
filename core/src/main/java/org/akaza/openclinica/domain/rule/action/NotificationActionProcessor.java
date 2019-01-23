@@ -135,10 +135,11 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 	}
 
-	public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleSetRuleBean ruleSetRule) {
+	public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleSetRuleBean ruleSetRule,HttpServletRequest request) {
 		this.ds = ds;
 		this.mailSender = mailSender;
 		this.ruleSetRule = ruleSetRule;
+        this.request = request;
 		ssdao = new StudySubjectDAO(ds);
 		udao = new UserAccountDAO(ds);
   	   spvdao = new StudyParameterValueDAO(ds);
