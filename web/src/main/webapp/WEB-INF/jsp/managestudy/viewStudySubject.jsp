@@ -1130,6 +1130,10 @@
                     padding: 4px !important;
                     padding-left: 100px !important;
                   }
+                  #phone-input-error {
+                    display: block;
+                    clear: left;
+                  }
                   #phone-widget {
                     position: relative;
                   }
@@ -1192,6 +1196,9 @@
                     <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
                   </div> 
                   <div id="country-code">+1</div> 
+                  <div class="subnote hide error" id="phone-input-error">
+                    <fmt:message key="invite_invalid_phone" bundle="${resword}"/>
+                  </div>
                 </div>
                 <div id="country-options" style="display:none;">
                   <style>
@@ -1503,7 +1510,7 @@
         $('#info-phone-number').text(participateInfo.phoneNumber);
         $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
     }
-    function enableDisableInviteRadios() {
+    function enableDisableControls() {
         var hasEmail = !!$('#email-input').val().trim();
         var validEmail = $('#email-input-error').is(':hidden');
         if (hasEmail && validEmail) {
@@ -1512,6 +1519,12 @@
         else {
             $('#invite-option input').attr("disabled", "disabled");
         }
+
+        var validPhone = $('#phone-input-error').is(':hidden');
+        if (validEmail && validPhone)
+            $('#connect-button').removeAttr('disabled');
+        else
+            $('#connect-button').attr('disabled', 'disabled');
     }
 
     function getAccessCode() {
@@ -1576,23 +1589,25 @@
             var validEmail = emailPattern.test(input) && hasSingleAt && afterAtHasDot && !dotRightAfterAt && !endsWithDot;
             if (validEmail || isEmpty) {
                 $('#email-input-error').hide();
-                $('#connect-button').removeAttr('disabled');
             }
             else {
                 $('#email-input-error').show();
-                $('#connect-button').attr('disabled', 'disabled');
             }
-            enableDisableInviteRadios();
+            enableDisableControls();
         });
-        jQuery('#phone-input')
-            .keydown(function(e) {
-                if (/[0-9 -]|Backspace|Delete|Arrow/.match(e.key)) {
-                    // OK
-                } else {
-                    e.preventDefault();
-                }
-            })
-            .blur(enableDisableInviteRadios);
+        jQuery('#phone-input').on('input blur', function() {
+            var phonePattern = /^[0-9 -]*$/;
+            var input = $(this).val();
+            var isEmpty = input.length === 0;
+            var isValid = phonePattern.test(input);
+            if (isEmpty || isValid) {
+                $('#phone-input-error').hide();
+            }
+            else {
+                $('#phone-input-error').show();
+            }
+            enableDisableControls();
+        });
 
         jQuery('#contactInformation').click(function() {
             $('#name-input').val(participateInfo.firstName);
@@ -1605,9 +1620,10 @@
             $('#phone-input').val(phoneNumber);
 
             $('#email-input-error').hide();
+            $('#phone-input-error').hide();
             $('#invite-option input[value=' + participateInfo.inviteParticipant + ']').click();
 
-            enableDisableInviteRadios();
+            enableDisableControls();
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
         });
 
