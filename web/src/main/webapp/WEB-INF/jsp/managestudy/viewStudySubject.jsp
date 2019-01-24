@@ -1082,7 +1082,7 @@
     <tr style="height:10px;">
       <td class="formlabel" align="left">
         <h3>
-          Contact Information
+          <fmt:message key="update_and_invite" bundle="${resword}"/>
         </h3>
       </td>
     </tr>
@@ -1107,7 +1107,7 @@
               </td>
               <td valign="top">
                 <input id="email-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control invite-input">
-                <div id="email-input-info">
+                <div id="email-input-info" class="grayed-out">
                   <fmt:message key="invite_required" bundle="${resword}"/>
                   <br>
                   <fmt:message key="invite_required_line2" bundle="${resword}"/>
@@ -1145,8 +1145,9 @@
                   }
                   #email-input-info {
                     display: inline-block;
-                    margin: -10px 0 0 10px;
+                    margin: -4px 0 0 10px;
                     font-style: italic;
+                    font-size: 10pt;
                   }
                   #phone-input {
                     padding: 4px !important;
@@ -1208,7 +1209,7 @@
                     padding: 2px 6px;
                   }
                   .grayed-out {
-                    color: #777;
+                    color: #999;
                   }
                 </style>
                 <div id="phone-widget">
@@ -1217,7 +1218,7 @@
                     <div id="country-flag" class="down-arrow">&nbsp;</div> 
                     <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
                   </div> 
-                  <div id="country-code">+1</div> 
+                  <div id="country-code" class="grayed-out">+1</div> 
                   <div class="subnote hide error" id="phone-input-error">
                     <fmt:message key="invite_invalid_phone" bundle="${resword}"/>
                   </div>
@@ -1441,7 +1442,7 @@
       <td><div class="lines"></div></td>
     </tr>
     <tr>
-      <td colspan="2" style="text-align: center;">
+      <td colspan="2" style="text-align: right;">
         <input type="button" class="cancel" value="Cancel"/>
         <input type="button" id="connect-button" value="Update"/>
       </td>
