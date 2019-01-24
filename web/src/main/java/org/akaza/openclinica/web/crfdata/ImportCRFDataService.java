@@ -101,7 +101,7 @@ public class ImportCRFDataService {
      * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the
      * findByEventSubjectVersion method in EventCRFDAO. May return more than one, hmm.
      */
-    public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs,HttpServletRequest request) {
+    public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs,HttpServletRequest request) throws OpenClinicaException {
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
@@ -196,24 +196,7 @@ public class ImportCRFDataService {
     		                		sampleOrdinal =	 "1";
     		                	}
     		                	
-    		                	/** log message:
-    		        	    	 * RowNo | ParticipantID | Status | Message
-    		        				1 | SS_SUB510 | SUCCESS | InsertU
-    		        				2 | SS_SUB511 | FAILED  | errorCode.participantNotFound
-    		        				3 | SS_SUB512 | SUCCESS | Update
-    		        				4 | SS_SUB512 | SUCCESS | Skip
-    		        	    	 */
-    		                	String originalFileName = request.getHeader("originalFileName");
-    		                	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
-    		                	String recordNum = null;
-    		                	if(originalFileName !=null) {
-    		                		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
-    		                		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
-    		                	}
-    		                	String msg;
-    		                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Insert";
-    		    	    		getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
-    		    	    		
+    		                	
     		                }
     					} catch (OpenClinicaException e) {
     						// TODO Auto-generated catch block
@@ -254,6 +237,14 @@ public class ImportCRFDataService {
                              studyEventDataBean.setStudyEventRepeatKey(sampleOrdinal);
                              
                             
+                        }else {
+                        	if(!(studyEventDefinitionBean.isRepeating())) {
+                        		// if same sample ordinal, NOT update at this time(current requirements), return same error 
+                				String err_msg ="For Non-Repeating event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID();                                       
+                                
+                                
+                                throw new OpenClinicaException(err_msg,"");
+                        	}
                         }
                     
                                               
@@ -472,8 +463,13 @@ public class ImportCRFDataService {
                         if(sampleOrdinal == null || sampleOrdinal.trim().isEmpty()) {
                         	String comeFromPipe = (String) request.getHeader("PIPETEXT");
                         	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
-                        		// not provide repeat key in the data file, then get the next available one
-                                sampleOrdinal = commonEventContainerDTO.getMaxOrdinal()+1 +""; 
+                        		 if(!isRepeating) {
+                        			 sampleOrdinal = 1 + "";
+                        		 }else {
+                        			// not provide repeat key in the data file, then get the next available one
+                                     sampleOrdinal = commonEventContainerDTO.getMaxOrdinal()+1 +""; 
+                        		 }
+                        		
                         		 
                         	}else {
                         		 //for common events, if not provided studyEventRepeatKey, then skip/reject
@@ -491,6 +487,10 @@ public class ImportCRFDataService {
                     			StudyEventBean seBean = (StudyEventBean) seList.get(j); 
                     			if(seBean.getStudySubjectId() == studySubjectBean.getId()) {
                     				if(!((seBean.getSampleOrdinal()+"").equals(sampleOrdinal))) {
+                        				errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
+                                        return errors;	
+                        			}else {
+                        				// if same sample ordinal, NOT update at this time(current requirements), return same error 
                         				errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
                                         return errors;	
                         			}
@@ -1626,9 +1626,9 @@ public class ImportCRFDataService {
                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
                 	}
                 	String msg;
-                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";
-    	    		getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
-                	continue;
+                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";    	    	
+
+    	    		throw new OpenClinicaException(msg, "");
                 }
                 
                 /**
@@ -2018,7 +2018,7 @@ public class ImportCRFDataService {
     	String[] skipMatchCriteriaArray = null;
     	
     	String skipMatchCriteria = request.getHeader("SkipMatchCriteria");
-    	if(skipMatchCriteria != null && !(skipMatchCriteria.equals("${SkipMatchCriteria}"))) {
+    	if(skipMatchCriteria != null && skipMatchCriteria.trim().length() > 0 && !(skipMatchCriteria.equals("${SkipMatchCriteria}"))) {
     		skipMatchCriteriaArray = this.toArray(skipMatchCriteria, ",");
     		
     		String itemGroupOID;
