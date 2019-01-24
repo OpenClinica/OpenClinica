@@ -249,15 +249,21 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 			String msg = null;
 			String eSubject = null;
 
-			msg = message.replaceAll("\\$\\{participant.accessCode}", pDTO.getAccessCode());
-			msg = msg.replaceAll("\\$\\{participant.firstname}", pDTO.getfName());
-			msg = msg.replaceAll("\\$\\{participant.url}", pDTO.getUrl());
-			msg = msg.replaceAll("\\$\\{participant.loginurl}", pDTO.getLoginUrl());
+			String pDTOaccessCode=(pDTO.getAccessCode()!=null)?pDTO.getAccessCode():"";
+            String pDTOurl=(pDTO.getUrl()!=null)?pDTO.getUrl():"";
+            String pDTOloginUrl=(pDTO.getLoginUrl()!=null)?pDTO.getLoginUrl():"";
+            String pDTOfName=(pDTO.getfName()!=null)?pDTO.getfName():"";
 
-			eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", pDTO.getAccessCode());
-			eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", pDTO.getfName());
-			eSubject = eSubject.replaceAll("\\$\\{participant.url}", pDTO.getUrl());
-			eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", pDTO.getLoginUrl());
+            msg = message.replaceAll("\\$\\{participant.accessCode}", pDTOaccessCode);
+			msg = msg.replaceAll("\\$\\{participant.firstname}", pDTOfName);
+			msg = msg.replaceAll("\\$\\{participant.url}", pDTOurl);
+			msg = msg.replaceAll("\\$\\{participant.loginurl}", pDTOloginUrl);
+
+			eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", pDTOaccessCode);
+			eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", pDTOfName);
+			eSubject = eSubject.replaceAll("\\$\\{participant.url}",pDTOurl);
+			eSubject = eSubject.replaceAll("\\$\\{participant.url}",pDTOurl);
+			eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", pDTOloginUrl);
 
 			msg = msg.replaceAll("\\\\n", "\n");
 			eSubject = eSubject.replaceAll("\\\\n", "\n");
@@ -323,13 +329,13 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
             pDTO.setPhone(studySubject.getStudySubjectDetail().getPhone());
 
             if(studySubject.getUserId()!=null) {
-				ParticipantAccessDTO participantAccessDTO = getAccessLink(studySubject.getLabel());
-
-				pDTO.setAccessCode(participantAccessDTO.getAccessCode());
-				pDTO.setLoginUrl(participantAccessDTO.getAccessLink());
-				pDTO.setUrl(participantAccessDTO.getHost());
-			}
-
+                ParticipantAccessDTO participantAccessDTO = getAccessLink(studySubject.getLabel());
+                if (participantAccessDTO != null) {
+                    pDTO.setAccessCode(participantAccessDTO.getAccessCode());
+                    pDTO.setLoginUrl(participantAccessDTO.getAccessLink());
+                    pDTO.setUrl(participantAccessDTO.getHost());
+                }
+            }
 		} else {
 			return null;
 		}
