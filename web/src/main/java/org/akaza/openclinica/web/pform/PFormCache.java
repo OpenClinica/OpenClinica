@@ -4,8 +4,10 @@ import java.util.HashMap;
 import java.util.LinkedHashMap;
 
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
@@ -96,6 +98,11 @@ public class PFormCache {
         contextMap.put("userAccountID", userAccountID);
         contextMap.put("studyEventID", studyEventID);
         contextMap.put("formLoadMode", formLoadMode);
+
+        HttpServletRequest request= CoreResources.getRequest();
+        String accessToken = (String) request.getSession().getAttribute("accessToken");
+        contextMap.put("accessToken", accessToken);
+
 
         contextMap.put("studyOid", studyOid);
         String hashString = userAccountID + "." + studySubjectOID + "." + studyEventDefinitionID + "." + studyEventOrdinal + "." + formLayoutOID;
