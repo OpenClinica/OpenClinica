@@ -224,6 +224,8 @@ public class OpenRosaSubmissionController {
         String studySubjectOID = subjectContext.get("studySubjectOID");
         String formLayoutOID = subjectContext.get("formLayoutOID");
         int studyEventOrdinal = Integer.valueOf(subjectContext.get("studyEventOrdinal"));
+        String accessToken = subjectContext.get("accessToken");
+        request.getSession().setAttribute("accessToken",accessToken);
 
         UserAccount userAccount = userAccountDao.findById(userAccountID);
         Study parentStudy = studyDao.findByOcOID(studyOID);
