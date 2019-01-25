@@ -193,7 +193,14 @@ public class ImportCRFDataService {
     		                  ;// return null;
     		                }else {
     		                	if(studyEventDefinitionBean.isRepeating()) {
-    		                		sampleOrdinal =	commonEventContainerDTO.getMaxOrdinal() + 1 + "";
+    		                		/**
+    		                		 *  keep existing logic -- import XML file must provide  orrect repeat key and will sue that key
+    		                		 */
+    		                		String comeFromPipe = (String) request.getHeader("PIPETEXT");
+    	                        	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
+    	                        		sampleOrdinal =	commonEventContainerDTO.getMaxOrdinal() + 1 + "";
+    	                        	}
+    		                		
     		                	}else {
     		                		sampleOrdinal =	 "1";
     		                	}
