@@ -9,11 +9,14 @@ import org.akaza.openclinica.domain.datamap.*;
 import org.apache.commons.collections4.CollectionUtils;
 import org.apache.commons.lang.StringUtils;
 import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.util.JsonSerialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
 import org.springframework.http.converter.HttpMessageConverter;
 import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
@@ -25,6 +28,8 @@ import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import java.io.IOException;
+import java.io.InputStream;
 import java.util.*;
 import java.util.stream.Collectors;
 
@@ -213,12 +218,18 @@ public class PermissionServiceImpl implements PermissionService {
 
     public String getAccessToken() {
         logger.debug("Creating Auth0 Api Token");
-        AuthzClient authzClient = AuthzClient.create();
-        AccessTokenResponse accessTokenResponse = authzClient.obtainAccessToken();
-        if (accessTokenResponse != null)
-            return accessTokenResponse.getToken();
-        return null;
 
+        try {
+            InputStream inputStream = new ClassPathResource("keycloak.json", this.getClass().getClassLoader()).getInputStream();
+            AuthzClient authzClient = AuthzClient.create(JsonSerialization.readValue(inputStream, Configuration.class));
+            AccessTokenResponse accessTokenResponse = authzClient.obtainAccessToken();
+            if (accessTokenResponse != null)
+                return accessTokenResponse.getToken();
+        } catch (IOException e) {
+            logger.error("Could not read keycloak.json", e);
+            return null;
+        }
+        return null;
     }
 
 }
