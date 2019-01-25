@@ -466,12 +466,23 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             sm = new SessionManager(ub, userName, SpringServletAccess.getApplicationContext(context));
             WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
             KeycloakController controller = (KeycloakController) webApplicationContext .getBean("keycloakController");
-
+            String ocUserUuid = null;
             System.out.println("Metric1" + new Date());
-
+            try {
+                ocUserUuid = controller.getOcUserUuid(request);
+            } catch (CustomRuntimeException e) {
+                forwardPage(Page.ERROR);
+                return;
+            }
             System.out.println("Metric2" + new Date());
 
+            if (ocUserUuid != null) {
 
+                if (ub == null || StringUtils.isEmpty(ub.getName())) {
+                    UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
+                    ub = (UserAccountBean) uDAO.findByUserUuid(ocUserUuid);
+                }
+            }
             if (ub == null || StringUtils.isEmpty(ub.getName())) {
                 if(session != null || request.isRequestedSessionIdValid() ) {
                     session.invalidate();

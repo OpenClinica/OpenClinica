@@ -664,10 +664,10 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
         eb.setDatePlannedEnd(datePlannedEnd);
         eb.setProtocolDateVerification(dateProtocolVerification);// added by
         // jxu
-        eb.setStatus(Status.get(statusId.intValue()));
+
         eb.setOid((String) hm.get("oc_oid"));
         Integer oldStatusId = (Integer) hm.get("old_status_id");
-        eb.setOldStatus(Status.get(oldStatusId));
+        eb.setOldStatus(Status.get(oldStatusId.intValue()));
         eb.setSchemaName((String) hm.get("schema_name"));
         String envTypeStr = (String) hm.get("env_type");
         if (StringUtils.isNotEmpty(envTypeStr))

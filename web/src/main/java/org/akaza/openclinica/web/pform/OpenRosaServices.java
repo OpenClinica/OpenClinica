@@ -448,8 +448,8 @@ public class OpenRosaServices {
             manifest.add(userList);
         }
         MediaFile odmPayload = new MediaFile();
-        String odm = getODMMetadata(request, studyOID, ecid, context, formID);
-        odmPayload.setHash((DigestUtils.md5Hex(odm)));
+     //   String odm = getODMMetadata(request, studyOID, ecid, context, formID);
+     //   odmPayload.setHash((DigestUtils.md5Hex(odm)));
         odmPayload.setFilename("clinicaldata.xml");
         odmPayload.setDownloadUrl(urlBase + "/rest2/openrosa/" + studyOID + "/" + ecid + "/" + formID);
         manifest.add(odmPayload);
