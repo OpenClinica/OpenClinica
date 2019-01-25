@@ -686,13 +686,16 @@ public String readFileToString(File file) throws IOException{
 	           			foundStudyOID=true;
 	            	 }else if(keyWord != null && keyWord.trim().startsWith("StudyEventOID") && value != null && value.trim().length() >0) {
 	           			foundStudyEventOID=true;
-	            	 } else if(keyWord != null && (keyWord.trim().startsWith("SkipMatchCriteria") ||  keyWord.trim().indexOf("SkipMatchCriteria") ==1 ) && value != null && value.trim().length() >0) {
+	            	 } else if(keyWord != null && (keyWord.trim().startsWith("SkipMatchCriteria") ||  keyWord.trim().indexOf("SkipMatchCriteria") ==1 ) ) {
 	            		//check SkipMatchCriteria format
-	            		 errorMsg = this.validateSkipMatchCriteriaFormat(mappingRow);
-	            		 
-	            		 if(errorMsg != null) {
-		             			errorMsgs.add(errorMsg);
-		             		}
+	            		 if(value != null && value.trim().length() >0) {
+	            			 errorMsg = this.validateSkipMatchCriteriaFormat(mappingRow);
+		            		 
+		            		 if(errorMsg != null) {
+			             			errorMsgs.add(errorMsg);
+			             		}
+	            		 }
+	            		
 	             	 } else {
 	             		//check item configuration format
 	             		errorMsg = this.validateItemFormat(mappingRow);
