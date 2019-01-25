@@ -232,6 +232,19 @@ public class ImportCRFDataServlet extends SecureController {
                     // in the next few parts of the code
                 }
             }
+            /**
+             *  check role first
+             */
+            try {
+            	getImportCRFDataService().validateUserRole(odmContainer, this.request);
+            }catch(OpenClinicaException oe) { 
+            	
+                 addPageMessage(oe.getOpenClinicaMessage());            	
+            	 forwardPage(Page.IMPORT_CRF_DATA);                  
+                 return;
+            }
+           
+          
             // TODO need to output further here
             // 2.a. is the study the same one that the user is in right now?
             // 3. validates against study metadata

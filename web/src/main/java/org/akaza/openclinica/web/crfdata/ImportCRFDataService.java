@@ -45,6 +45,7 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -81,6 +82,7 @@ public class ImportCRFDataService {
     private ItemDataDAO itemDataDao;
     private String skipMatchCriteriaSql;
     private PipeDelimitedDataHelper pipeDelimitedDataHelper;
+    private RestfulServiceHelper restfulServiceHelper;
 
 
     @Autowired
@@ -2164,4 +2166,35 @@ public class ImportCRFDataService {
 	public void setPipeDelimitedDataHelper(PipeDelimitedDataHelper importDataHelper) {
 		this.pipeDelimitedDataHelper = importDataHelper;
 	}
+
+	public RestfulServiceHelper getRestfulServiceHelper() {
+		if(restfulServiceHelper == null) {
+			restfulServiceHelper = new RestfulServiceHelper(ds);
+		}
+		return restfulServiceHelper;
+	}
+
+	public void setRestfulServiceHelper(RestfulServiceHelper restfulServiceHelper) {
+		this.restfulServiceHelper = restfulServiceHelper;
+	}
+	
+	public void validateUserRole(ODMContainer odmContainer,HttpServletRequest request) throws OpenClinicaException {
+      
+        List<String> errors = new ArrayList<String>();
+        MessageFormat mf = new MessageFormat("");
+
+  
+        StudyDAO studyDAO = new StudyDAO(ds);
+        String studyOid = odmContainer.getCrfDataPostImportContainer().getStudyOID();
+        StudyBean studyBean = studyDAO.findByOid(studyOid);
+        UserAccountBean userBean = this.getPipeDelimitedDataHelper().getUserAccount(request);
+        String userName=  userBean.getName();  
+        
+        String msg = this.getRestfulServiceHelper().verifyRole(userName, studyOid, null);
+        if (msg != null) {           
+            throw new OpenClinicaException(msg, msg);
+        }              
+    }
+	
+	
 }
