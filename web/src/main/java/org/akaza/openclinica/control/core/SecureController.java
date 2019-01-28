@@ -467,11 +467,24 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             WebApplicationContext webApplicationContext = WebApplicationContextUtils.getWebApplicationContext(getServletContext());
             KeycloakController controller = (KeycloakController) webApplicationContext .getBean("keycloakController");
 
+            String ocUserUuid = null;
             System.out.println("Metric1" + new Date());
 
+            try {
+                if (shouldProcessUser())
+                    ocUserUuid = controller.processUser(request);
+            } catch (CustomRuntimeException e) {
+                forwardPage(Page.ERROR);
+                return;
+            }
             System.out.println("Metric2" + new Date());
 
-
+            if (ocUserUuid != null) {
+                if (ub == null || StringUtils.isEmpty(ub.getName())) {
+                    UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
+                    ub = (UserAccountBean) uDAO.findByUserUuid(ocUserUuid);
+                }
+            }
             if (ub == null || StringUtils.isEmpty(ub.getName())) {
                 if(session != null || request.isRequestedSessionIdValid() ) {
                     session.invalidate();
@@ -685,6 +698,20 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         System.out.println("Metric4" + new Date());
     }
 
+    private boolean shouldProcessUser() {
+        String path = StringUtils.substringAfterLast(request.getRequestURI(), "/");
+        boolean flag = false;
+        switch(path) {
+            case "VerifyImportedRule":
+            case "UpdateRuleSetRule":
+            case "ViewRuleAssignment":
+                break;
+            default:
+                flag = true;
+                break;
+        }
+        return flag;
+    }
     public String getRequestSchema(HttpServletRequest request) {
         switch (StringUtils.substringAfterLast(request.getRequestURI(), "/")) {
         case "ChangeStudy":
