@@ -163,11 +163,22 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		OdmClinicalDataBean odmClinicalDataBean = new OdmClinicalDataBean();
 		ExportSubjectDataBean expSubjectBean;
 		List<ExportSubjectDataBean> exportSubjDataBeanList = new ArrayList<ExportSubjectDataBean>();
+		List<String> tagIds = null;
+		if(!crossForm) {
+			StudyBean studyBean = new StudyBean();
+			studyBean.setId(study.getStudyId());
+			studyBean.setStudyEnvUuid(study.getStudyEnvUuid());
+			studyBean.setStudyUuid(study.getStudyUuid());
+			studyBean.setStudyEnvSiteUuid(study.getStudyEnvSiteUuid());
+			studyBean.setParentStudyId(study.getStudy() != null ? study.getStudy().getStudyId() : 0);
+			tagIds = permissionService.getPermissionTagsList(studyBean, getRequest());
+		}
+
 		for (StudySubject studySubj : studySubjs) {
 			studyEvents = (ArrayList<StudyEvent>) getStudySubjectDao().fetchListSEs(studySubj.getOcOid());
 
 			if (studyEvents != null) {
-				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID,userId,crossForm);
+				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID,userId,crossForm,tagIds);
 				exportSubjDataBeanList.add(expSubjectBean);
 
 				odmClinicalDataBean.setExportSubjectData(exportSubjDataBeanList);
@@ -180,7 +191,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	@SuppressWarnings("unchecked")
-	private ExportSubjectDataBean setExportSubjectDataBean(StudySubject studySubj, Study study, List<StudyEvent> studyEvents, String formVersionOIDs,int userId,boolean crossForm) {
+	private ExportSubjectDataBean setExportSubjectDataBean(StudySubject studySubj, Study study, List<StudyEvent> studyEvents, String formVersionOIDs,int userId,boolean crossForm,List<String> tagIds) {
 
 		ExportSubjectDataBean exportSubjectDataBean = new ExportSubjectDataBean();
 
@@ -215,7 +226,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			if (isCollectDns())
 				exportSubjectDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(studySubj));
 
-			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(study, studySubj, studyEvents,formVersionOIDs,userId,crossForm));
+			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(study, studySubj, studyEvents,formVersionOIDs,userId,crossForm,tagIds));
 
 			exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
 
@@ -241,7 +252,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return subjectBelongs;
 	}
 
-	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(Study study, StudySubject ss, List<StudyEvent> sEvents, String formVersionOID, int userId,boolean crossForm) {
+	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(Study study, StudySubject ss, List<StudyEvent> sEvents, String formVersionOID, int userId,boolean crossForm,List<String> tagIds) {
 		ArrayList<ExportStudyEventDataBean> al = new ArrayList<ExportStudyEventDataBean>();
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -279,7 +290,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				if (collectDns)
 					expSEBean.setDiscrepancyNotes(fetchDiscrepancyNotes(se));
 
-				expSEBean.setExportFormData(getFormDataForClinicalStudy(study, ss, se, formVersionOID,userId,crossForm));
+				expSEBean.setExportFormData(getFormDataForClinicalStudy(study, ss, se, formVersionOID,userId,crossForm,tagIds));
 				expSEBean.setStudyEventDefinition(se.getStudyEventDefinition());
 				al.add(expSEBean);
 			}
@@ -288,7 +299,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return al;
 	}
 
-	private ArrayList<ExportFormDataBean> getFormDataForClinicalStudy(Study study, StudySubject ss, StudyEvent se, String formVersionOID,int userId,boolean crossForm) {
+	private ArrayList<ExportFormDataBean> getFormDataForClinicalStudy(Study study, StudySubject ss, StudyEvent se, String formVersionOID,int userId,boolean crossForm,List<String> tagIds) {
 		List<ExportFormDataBean> formDataBean = new ArrayList<ExportFormDataBean>();
 		boolean formCheck = true;
 		if (formVersionOID != null)
@@ -330,20 +341,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
 
 			}
-			StudyBean studyBean = new StudyBean();
-			studyBean.setId(study.getStudyId());
-			studyBean.setStudyEnvUuid(study.getStudyEnvUuid());
-			studyBean.setStudyUuid(study.getStudyUuid());
-			studyBean.setStudyEnvSiteUuid(study.getStudyEnvSiteUuid());
-			studyBean.setParentStudyId(study.getStudy()!=null?study.getStudy().getStudyId():0);
+
 
 			UserAccount userAccount = getUserAccountDao().findByUserId(userId);
-			List<String> tagIds = null;
 			if(crossForm) {
 				tagIds = loadPermissionTags();
-			}else{
-				 tagIds = permissionService.getPermissionTagsList(studyBean,getRequest());
-			}
+            }
 
 			List <EventDefinitionCrfPermissionTag> edcPTagIds=
 					getEventDefinitionCrfPermissionTagDao().findByEdcIdTagId(
