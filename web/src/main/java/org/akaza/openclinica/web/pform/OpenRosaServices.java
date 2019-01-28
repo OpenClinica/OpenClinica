@@ -338,7 +338,7 @@ public class OpenRosaServices {
             // TODO: them.
             // TODO Uncomment this before checking in
             if (StringUtils.isNotEmpty(xformOutput)) {
-                if (formLayout.getExternalInstance() == null) {
+                if (formLayout.getExternalInstance() == null || formLayout.getExternalInstance().equals("")) {
                     checkForCllinicalDataInstanceInXform(formLayout, xformOutput);
                 }
                 form.setHash(DigestUtils.md5Hex(xformOutput));
@@ -561,7 +561,7 @@ public class OpenRosaServices {
             if (StringUtils.isNotEmpty(xformOutput)) {
                 builder = Response.ok(xformOutput);
                 builder = builder.header("Content-Type", "text/xml");
-                if (formLayout.getExternalInstance() == null) {
+                if (formLayout.getExternalInstance() == null || formLayout.getExternalInstance().equals("")) {
                     checkForCllinicalDataInstanceInXform(formLayout, xformOutput);
                 }
                 xform = xformOutput;
