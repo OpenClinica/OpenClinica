@@ -472,7 +472,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             try {
                 if (shouldProcessUser())
-                    ocUserUuid = controller.processUser(request);
+                    ocUserUuid = controller.getOcUserUuid(request);
             } catch (CustomRuntimeException e) {
                 forwardPage(Page.ERROR);
                 return;
