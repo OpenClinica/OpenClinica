@@ -1199,13 +1199,14 @@
                   }
                   #access-code-input {
                     width: 150px;
+                    padding-right: 40px;
                   }
                   #eye {
                     position: absolute;
-                    top: 1px;
+                    top: 2px;
                     left: 111px;
                     font-size: 18pt;
-                    background-color: white;
+                    background-color: transparent;
                     padding: 2px 6px;
                   }
                   .grayed-out {
@@ -1475,7 +1476,7 @@
                   <input id="access-code-input" readonly onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
                   <i id="eye" class="fa fa-eye"></i>
                 </td>
-                <td valign="top" class="grayed-out">
+                <td valign="top" class="grayed-out" style="padding-top:4px;">
                   <span><i><fmt:message key="viewing_audited" bundle="${resword}"/></i></span>
                 </td>
               </tr>
@@ -1487,7 +1488,7 @@
               </tr>
               <tr valign="top">
                 <td></td>
-                <td valign="top" colspan="2">
+                <td valign="top" colspan="2" class="grayed-out">
                   <i>
                     <fmt:message key="please_sign_out" bundle="${resword}"/><br>
                     <fmt:message key="please_sign_out_line2" bundle="${resword}"/>
