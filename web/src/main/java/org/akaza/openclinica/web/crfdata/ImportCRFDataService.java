@@ -328,7 +328,7 @@ public class ImportCRFDataService {
         FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
         EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
 
-        if (study == null) {
+        if (study == null || study.getId() == 0) {
             logger.error("Study  is null");
             return null;
         } else if (study.getParentStudyId() == 0) {
@@ -337,18 +337,18 @@ public class ImportCRFDataService {
             logger.debug("the study with Oid {} is a Site study", study.getOid());
         }
 
-        if (studySubject == null) {
+        if (studySubject == null || studySubject.getId() == 0 ) {
             logger.error("StudySubject is null");
             return null;
         }
-        if (studyEventDefinition == null) {
+        if (studyEventDefinition == null || studyEventDefinition.getId() == 0) {
             logger.error("StudyEventDefinition is null");
             return null;
         } else if (!studyEventDefinition.getType().equals(COMMON)) {
             logger.error("StudyEventDefinition with Oid {} is not a Common Type Event", studyEventDefinition.getOid());
             return null;
         }
-        if (crf == null) {
+        if (crf == null || crf.getId() == 0) {
             logger.error("Crf is null");
             return null;
         }
@@ -357,7 +357,7 @@ public class ImportCRFDataService {
                 crf.getId(),study.getId());
 
         //EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(), study.getStudyId());
-        if (edc == null || edc.getId() ==0) {
+        if (edc == null || edc.getId() == 0) {
             edc = eventDefinitionCRFDAO.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getId(), crf.getId(),
                     study.getParentStudyId());
         }
