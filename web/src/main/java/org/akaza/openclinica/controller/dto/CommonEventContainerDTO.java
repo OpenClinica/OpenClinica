@@ -1,8 +1,13 @@
 /**
- * 
+ *
  */
 package org.akaza.openclinica.controller.dto;
 
+import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 
@@ -12,14 +17,21 @@ import org.akaza.openclinica.domain.user.UserAccount;
  */
 public class CommonEventContainerDTO {
 
+    // Hibernate objects
     private FormLayout formLayout;
     private StudySubject studySubject;
-    private int eventCrfId;
     private StudyEventDefinition studyEventDefinition;
-    private Integer maxOrdinal;
     private UserAccount userAccount;
     private EventCrf eventCrf;
-
+    // JDBC objects
+    private FormLayoutBean formLayoutBean;
+    private StudySubjectBean studySubjectBean;
+    private StudyEventDefinitionBean studyEventDefinitionBean;
+    private UserAccountBean userAccountBean;
+    private EventCRFBean eventCRFBean;
+    // ids
+    private int eventCrfId;
+    private Integer maxOrdinal;
 
 
     public StudySubject getStudySubject() {
@@ -77,5 +89,45 @@ public class CommonEventContainerDTO {
 
     public void setEventCrf(EventCrf eventCrf) {
         this.eventCrf = eventCrf;
+    }
+
+    public FormLayoutBean getFormLayoutBean() {
+        return formLayoutBean;
+    }
+
+    public void setFormLayoutBean(FormLayoutBean formLayoutBean) {
+        this.formLayoutBean = formLayoutBean;
+    }
+
+    public StudySubjectBean getStudySubjectBean() {
+        return studySubjectBean;
+    }
+
+    public void setStudySubjectBean(StudySubjectBean studySubjectBean) {
+        this.studySubjectBean = studySubjectBean;
+    }
+
+    public StudyEventDefinitionBean getStudyEventDefinitionBean() {
+        return studyEventDefinitionBean;
+    }
+
+    public void setStudyEventDefinitionBean(StudyEventDefinitionBean studyEventDefinitionBean) {
+        this.studyEventDefinitionBean = studyEventDefinitionBean;
+    }
+
+    public UserAccountBean getUserAccountBean() {
+        return userAccountBean;
+    }
+
+    public void setUserAccountBean(UserAccountBean userAccountBean) {
+        this.userAccountBean = userAccountBean;
+    }
+
+    public EventCRFBean getEventCRFBean() {
+        return eventCRFBean;
+    }
+
+    public void setEventCRFBean(EventCRFBean eventCRFBean) {
+        this.eventCRFBean = eventCRFBean;
     }
 }
