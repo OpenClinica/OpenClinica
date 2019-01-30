@@ -1477,4 +1477,22 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         req.getSession().setAttribute("userRole", currentRole);
     }
 
+    public int getSubjectCount(StudyBean studyBean) {
+        int subjectCount = 0;
+        StudyDAO sdao = new StudyDAO(sm.getDataSource());
+        if (studyBean != null)
+            subjectCount = studyBean.getSubjectCount();
+
+        if (subjectCount == 0) {
+            StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
+            ArrayList ss = ssdao.findAllBySiteId(studyBean.getId());
+            if (ss != null) {
+                subjectCount = ss.size();
+            }
+        }
+
+        return subjectCount;
+    }
+
+
 }
