@@ -278,7 +278,7 @@ public class AddNewSubjectServlet extends SecureController {
 
             } else {
 
-                int subjectCount = getSubjectCount();
+                int subjectCount = getSubjectCount(currentStudy);
 
                 StudyDAO studydao = new StudyDAO(sm.getDataSource());
                 currentStudy.setSubjectCount(subjectCount + 1);
@@ -541,7 +541,8 @@ public class AddNewSubjectServlet extends SecureController {
         if (spv != null)
             templateID = spv.getValue();
 
-        int subjectCount = getSubjectCount();
+        int subjectCount = getSubjectCount(currentStudy);
+
         String siteId = currentStudy.getIdentifier();
 
         // Adding Sample data to validate templateID
@@ -567,14 +568,5 @@ public class AddNewSubjectServlet extends SecureController {
         return wtr.toString();
     }
 
-    private int getSubjectCount() {
-        int subjectCount = 0;
-        StudySubjectDAO ssdao = new StudySubjectDAO(sm.getDataSource());
-        ArrayList ss = ssdao.findAllBySiteId(currentStudy.getId());
-        if (ss != null) {
-            subjectCount = ss.size();
-        }
-        return subjectCount;
-    }
 
 }

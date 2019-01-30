@@ -124,13 +124,8 @@ public class ReassignStudySubjectServlet extends SecureController {
                     forwardPage(Page.REASSIGN_STUDY_SUBJECT_CONFIRM);
                 } else {
 
-                    int subjectCount = st.getSubjectCount();
-                    if(subjectCount==0) {
-                        ArrayList ss = ssdao.findAllBySiteId(st.getId());
-                        if (ss != null) {
-                            subjectCount = ss.size();
-                        }
-                    }
+                    int subjectCount = getSubjectCount(st);
+
                     st.setSubjectCount(subjectCount+1);
                     sdao.update(st);
 
