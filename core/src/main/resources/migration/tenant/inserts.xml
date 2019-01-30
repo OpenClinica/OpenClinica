@@ -1092,6 +1092,42 @@
 			<column name="name" value="participant_access_link_viewed"/>
 		</insert>
 	</changeSet>
+	<changeSet author="jkeremian" id="2019-01-30-OC-9858-1">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="43"/>
+			<column name="name" value="participant_first_name_captured"/>
+		</insert>
+	</changeSet>
+	<changeSet author="jkeremian" id="2019-01-30-OC-9858-2">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="44"/>
+			<column name="name" value="participant_first_name_changed"/>
+		</insert>
+	</changeSet>
+	<changeSet author="jkeremian" id="2019-01-30-OC-9858-3">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="45"/>
+			<column name="name" value="participant_email_address_captured"/>
+		</insert>
+	</changeSet>
+	<changeSet author="jkeremian" id="2019-01-30-OC-9858-4">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="46"/>
+			<column name="name" value="participant_email_address_changed"/>
+		</insert>
+	</changeSet>
+	<changeSet author="jkeremian" id="2019-01-30-OC-9858-5">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="47"/>
+			<column name="name" value="participant_phone_number_captured"/>
+		</insert>
+	</changeSet>
+	<changeSet author="jkeremian" id="2019-01-30-OC-9858-6">
+		<insert tableName="audit_log_event_type">
+			<column name="audit_log_event_type_id" valueNumeric="48"/>
+			<column name="name" value="participant_phone_number_changed"/>
+		</insert>
+	</changeSet>
 	<changeSet author="jkeremian" id="2015-12-08-OC-6847">
 		<comment>Insert a new record in the studyParameter table</comment>
 		<insert tableName="study_parameter">
