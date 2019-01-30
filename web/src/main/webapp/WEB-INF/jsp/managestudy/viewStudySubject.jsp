@@ -1622,9 +1622,9 @@
         jQuery('#phone-input').on('input blur', function() {
             var phonePattern = /^[0-9 -]*$/;
             var input = $(this).val();
-            var isEmpty = input.length === 0;
-            var isValid = phonePattern.test(input);
-            if (isEmpty || isValid) {
+            var length = input.replace(/ |-/g, '').length;
+            var isValid = phonePattern.test(input) && length <= 12;
+            if (isValid) {
                 $('#phone-input-error').hide();
             }
             else {
