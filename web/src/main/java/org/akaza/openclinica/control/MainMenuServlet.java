@@ -212,7 +212,6 @@ public class MainMenuServlet extends SecureController {
             if (ub.getActiveStudyId() == currentPublicStudy.getId())
                 return isRenewAuth;
             ub.setActiveStudyId(currentPublicStudy.getId());
-            session.setAttribute("customUserRole", session.getAttribute("altCustomUserRole"));
         }
 
         return isRenewAuth;
