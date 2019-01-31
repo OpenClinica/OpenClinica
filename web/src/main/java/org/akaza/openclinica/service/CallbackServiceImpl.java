@@ -67,7 +67,9 @@ public class CallbackServiceImpl implements CallbackService {
             ub = createUserAccount(request, user, userContextMap);
         }
         updateUser(request, ub, user, userContextMap);
-        boolean isUserUpdated = updateStudyUserRoles(request, ub);
+        boolean isUserUpdated = false;
+        if (StringUtils.equals((String) request.getSession().getAttribute("firstLoginCheck"), "true"))
+            isUserUpdated = updateStudyUserRoles(request, ub);
         return new UserAccountHelper(ub, isUserUpdated);
     }
 
@@ -129,7 +131,7 @@ public class CallbackServiceImpl implements CallbackService {
     }
     @Modifying
     private boolean updateStudyUserRoles(HttpServletRequest request, UserAccountBean ub) throws Exception {
-        return studyBuildService.saveStudyEnvRoles(request, ub);
+        return studyBuildService.saveStudyEnvRoles(request, ub, true);
     }
 
     private UserAccountBean createUserAccount(HttpServletRequest request, KeycloakUser user, Map<String, Object> userContextMap ) throws Exception {

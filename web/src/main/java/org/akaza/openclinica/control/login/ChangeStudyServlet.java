@@ -102,7 +102,7 @@ public class ChangeStudyServlet extends SecureController {
             }
         }
 
-        ArrayList validStudies = new ArrayList();
+        ArrayList<StudyUserRoleBean> validStudies = new ArrayList<>();
         ArrayList<StudyBean> studyList = new ArrayList<>();
         for (int i = 0; i < studies.size(); i++) {
             StudyUserRoleBean sr = (StudyUserRoleBean) studies.get(i);
