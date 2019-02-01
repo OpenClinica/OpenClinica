@@ -101,6 +101,11 @@ public class CallbackServiceImpl implements CallbackService {
             isUpdated = true;
 
         }
+        if (StringUtils.equals(ub.getFirstName(), user.getGivenName()) != true) {
+            ub.setFirstName(user.getGivenName());
+            isUpdated = true;
+
+        }
         if (StringUtils.equals(ub.getEmail(), user.getEmail()) != true) {
             ub.setEmail(user.getEmail());
             isUpdated = true;
