@@ -1522,6 +1522,21 @@
         console.log(arguments);
     }
 
+    function logAudit(name, typid) {
+      jQuery.ajax({
+          type: 'post',
+          url: '${pageContext.request.contextPath}/pages/auth/api/studies/${study.oid}/auditEvents',
+          contentType: 'application/json',
+          data: JSON.stringify({
+              auditTable: 'study_subject',
+              entityId: '${studySub.id}',
+              entityName: name,
+              auditLogEventTypId: typid                
+          }),
+          error: logDump
+      });
+    }
+
     var participateInfo;
     function updateParticipateInfo(data) {
         participateInfo = data || {
@@ -1586,6 +1601,38 @@
                 mobilePhone: $('#country-code').text() + ' ' + $('#phone-input').val(),
                 inviteParticipant: $('#invite-option input:checked').val()
             };
+            var oldName  = participateInfo.firstName;
+            var oldEmail = participateInfo.email;
+            var oldPhone = participateInfo.mobilePhone;
+            var newName  = data.firstName;
+            var newEmail = data.email;
+            var newPhone = data.mobilePhone;
+            var hasOldName  = !!oldName;
+            var hasOldEmail = !!oldEmail;
+            var hasOldPhone = !!oldPhone;
+            var hasNewName  = !!newName;
+            var hasNewEmail = !!newEmail;
+            var hasNewPhone = !!newPhone;
+            var isNameNew  = !hasOldName  && hasNewName;
+            var isEmailNew = !hasOldEmail && hasNewEmail;
+            var isPhoneNew = !hasOldPhone && hasNewPhone;
+            var isNameUpdated  = hasOldName  && newName  != oldName;
+            var isEmailUpdated = hasOldEmail && newEmail != oldEmail;
+            var isPhoneUpdated = hasOldPhone && newPhone != oldPhone;
+
+            if (isNameNew)
+                logAudit('Participant first name', 43);
+            if (isNameUpdated)
+                logAudit('Participant first name', 44);
+            if (isEmailNew)
+                logAudit('Participant email address', 46);
+            if (isEmailUpdated)
+                logAudit('Participant email address', 47);
+            if (isPhoneNew)
+                logAudit('Participant phone number', 49);
+            if (isPhoneUpdated)
+                logAudit('Participant phone number', 50);
+
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
