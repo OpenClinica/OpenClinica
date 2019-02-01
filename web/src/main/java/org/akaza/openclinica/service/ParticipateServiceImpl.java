@@ -429,9 +429,13 @@ public class ParticipateServiceImpl implements ParticipateService {
         }
 
         // Complete study event only if there are no uncompleted, non-participant forms.
+        boolean statusChanged=false;
         if (completeStudyEvent) {
-            studyEvent.setSubjectEventStatusId(4);
-            StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true,false);
+            if(studyEvent.getSubjectEventStatusId()!=SubjectEventStatus.COMPLETED.getCode()){
+                studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
+                statusChanged=true;
+            }
+            StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(statusChanged,false);
             StudyEventContainer container = new StudyEventContainer(studyEvent,changeDetails);
             studyEventDao.saveOrUpdateTransactional(container);
         }
