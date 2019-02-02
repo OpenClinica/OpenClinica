@@ -7,6 +7,7 @@ import org.akaza.openclinica.bean.odmbeans.*;
 import org.akaza.openclinica.bean.submit.crfdata.*;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.EventCRFStatus;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
@@ -21,7 +22,9 @@ import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
+import java.time.Instant;
 import java.util.*;
 
 /**
@@ -46,6 +49,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	@Autowired
 	PermissionService permissionService;
+
+	@Autowired
+	private DataSource dataSource;
 
 	private StudyDao studyDao;
 
@@ -306,6 +312,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			formCheck = false;
 		boolean hiddenCrfCheckPassed = true;
 		List<CrfBean> hiddenCrfs = new ArrayList<CrfBean>();
+		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
 		for (EventCrf ecrf : se.getEventCrfs()) {
 			EventDefinitionCrf eventDefinitionCrf = null;
 			List<EventDefinitionCrf> edcs = se.getStudyEventDefinition().getEventDefinitionCrfs();
@@ -343,7 +350,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			}
 
 
-			UserAccount userAccount = getUserAccountDao().findByUserId(userId);
+			//UserAccount userAccount = getUserAccountDao().findByUserId(userId);
 			if(crossForm) {
 				tagIds = loadPermissionTags();
             }
@@ -384,9 +391,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 					dataBean.setCreatedDate(ecrf.getDateCreated());
 					dataBean.setCreatedBy(ecrf.getUserAccount().getUserName());
 					dataBean.setUpdatedDate(ecrf.getDateUpdated());
-					UserAccount updatedUserAccount = userAccountDao.findById(ecrf.getUpdateId());
-					if(updatedUserAccount != null) {
-						dataBean.setUpdatedBy(updatedUserAccount.getUserName());
+					//UserAccount updatedUserAccount = userAccountDao.findById(ecrf.getUpdateId());
+                    UserAccountBean updatedUserAccount = null;
+                    if (ecrf.getUpdateId() != null) {
+                        updatedUserAccount = (UserAccountBean) userAccountDAO.findByPK(ecrf.getUpdateId());
+                    }
+					if(updatedUserAccount != null && updatedUserAccount.getId() != 0) {
+						dataBean.setUpdatedBy(updatedUserAccount.getName());
 					}else {
 						// or not set?
 						dataBean.setUpdatedBy(ecrf.getUserAccount().getUserName());
