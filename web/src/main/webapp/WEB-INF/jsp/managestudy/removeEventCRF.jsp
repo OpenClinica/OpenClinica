@@ -129,6 +129,20 @@
 </div></div></div></div></div></div></div></div>
 
 </div>
+<script language="javascript">
+	var currentUrl = window.location.href;
+	var urlParam = currentUrl.split('?')[1] || '';
+	var params = urlParam.split('&');
+	for (var i=0; i<params.length; i++) {
+		var parts = params[i].split('=');
+		var key = parts[0];
+		var value = parts[1];
+		if (key === "originatingPage") {
+			window.originatingPage = decodeURIComponent(value);
+			break;
+		}
+	}
+</script>
 <br>
  </c:if>
 	<c:choose>
@@ -143,13 +157,13 @@
     <c:when test="${!empty items && count>0}">
      <form action='RemoveEventCRF?action=submit&eventCrfId=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
       <input type="submit" name="submit" value="<fmt:message key="remove_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="this_crf_has_data_remove" bundle="${resword}"/>");'>
-      <input type="button" onclick="confirmCancel('ViewStudyEvents');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
+      <input type="button" onclick="confirmCancel(window.originatingPage);"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
      </form>
     </c:when>
     <c:otherwise>
       <form action='RemoveEventCRF?action=submit&eventCrfId=<c:out value="${displayEventCRF.eventCRF.id}"/>&studySubId=<c:out value="${studySub.id}"/>' method="POST">
       <input type="submit" name="submit" value="<fmt:message key="remove_event_CRF" bundle="${resword}"/>" class="button_xlong" onClick='return confirm("<fmt:message key="are_you_sure_you_want_to_remove_it" bundle="${resword}"/>");'>
-      <input type="button" onclick="confirmCancel('ViewStudyEvents');"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
+      <input type="button" onclick="confirmCancel(window.originatingPage);"  name="cancel" value="   <fmt:message key="cancel" bundle="${resword}"/>   " class="button_medium"/>
      </form>
     </c:otherwise>
    </c:choose>  
