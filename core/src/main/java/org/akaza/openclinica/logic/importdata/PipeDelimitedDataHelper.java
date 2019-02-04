@@ -210,7 +210,13 @@ public String readFileToString(File file) throws IOException{
 			for(int i = 0;i<dataRows.length ;i++){
 				//logger.info("++DEST++dataRows[i]g++++++" +dataRows[i]);
 				// in each data row, first position is participant ID 
-				String[] dataRow = this.toArrayWithFullItems(dataRows[i].toString().replaceAll("\n", ""), "|");
+				// OC-10291
+				String tempDataRowStr = dataRows[i].toString().replaceAll("\n", "");
+				if(tempDataRowStr.endsWith("|")) {
+					tempDataRowStr = tempDataRowStr + " ";
+				}
+				String[] dataRow = this.toArrayWithFullItems(tempDataRowStr, "|");
+				boolean found = false;
 				
 				// find subject OID, It may be at any position
 				if(i==0) {
@@ -244,6 +250,7 @@ public String readFileToString(File file) throws IOException{
 							studyEventData.appendChild(formData);
 							subjectData.appendChild(studyEventData);
 							clinicalData.appendChild(subjectData);
+							
 							
 				              /**
 				              * Loop through all item group OIDs list to create all item groups for each study event
@@ -292,6 +299,9 @@ public String readFileToString(File file) throws IOException{
 													 itemData.setAttribute("Value", itemDataValue);
 																		              	
 													 itemGroupData.appendChild(itemData); 
+													 
+													 // if found, then skip the rest													 								 
+													 break;
 												 }
 												 
 												 
@@ -304,13 +314,12 @@ public String readFileToString(File file) throws IOException{
 													
 												}
 											}
-						          		  } //end of innner for-loop    
+						          		  } //end of inner while-loop    
 						          		       		 			        
 									}
-					          	
-					          		 
+					          		
 					               	
-					               }// end of for-loop
+					               }// end of inner for-loop
 				                   
 				                 
 
@@ -322,9 +331,8 @@ public String readFileToString(File file) throws IOException{
 						}
 					}
 					
-						
 					
-				}// end of outter for-loop
+				}// end of outer for-loop
 
 					
 				}
