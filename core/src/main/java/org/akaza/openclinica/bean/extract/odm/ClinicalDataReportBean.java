@@ -92,14 +92,16 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             xml.append(nls);
         }
         Role role = null; // OpenClinica:
+        StudyUserRoleBean userRole = null;
         StudyBean publicStudyBean = CoreResources.getPublicStudy(userBean.getActiveStudyId(), dataSource);
-        if (publicStudyBean != null) {
-            StudyUserRoleBean userRole = userBean.getRoleByStudy(publicStudyBean.getId());
+             userRole = userBean.getRoleByStudy(publicStudyBean.getId());
             if (userRole == null || !userRole.isActive())
                 userRole = userBean.getRoleByStudy(publicStudyBean.getParentStudyId());
+
             role = userRole.getRole();
-        }
-        setRoleDescription(role, publicStudyBean);
+
+        StudyBean userRoleStudy = CoreResources.getPublicStudy(userRole.getStudyId(), dataSource);
+        setRoleDescription(role, userRoleStudy);
 
         if (crossForm) {
             xml.append(indent + indent + "<UserInfo OpenClinica:UserName=\"" + StringEscapeUtils.escapeXml(userBean.getName()) + "\" OpenClinica:UserRole=\"" + StringEscapeUtils.escapeXml(role.getDescription()) + "\"/>");
@@ -942,8 +944,8 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
     }
 
 
-    private void setRoleDescription(Role role , StudyBean publicStudyBean){
-        if (publicStudyBean.getParentStudyId() > 0) {
+    private void setRoleDescription(Role role , StudyBean userRoleStudy){
+        if (userRoleStudy.getParentStudyId() > 0) {
             /*
              * The Role decription will be set depending on whether the user logged in at study lever or site level.
              * issue-2422
