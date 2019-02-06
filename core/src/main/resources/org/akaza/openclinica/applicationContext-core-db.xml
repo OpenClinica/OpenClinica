@@ -13,7 +13,7 @@
     <bean id="dataSource" class="org.akaza.openclinica.core.ExtendedBasicDataSource" primary="true">
         <property name="driverClassName" value="org.postgresql.Driver"/>
         <property name="maxTotal" value="50"/>
-        <property name="maxIdle" value="2"/>
+        <property name="maxIdle" value="20"/>
         <property name="maxWaitMillis" value="180000"/>
         <property name="removeAbandonedOnBorrow" value="true"/>
         <property name="removeAbandonedTimeout" value="300"/>
