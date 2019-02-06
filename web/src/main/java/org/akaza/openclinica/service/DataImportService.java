@@ -18,6 +18,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -126,7 +127,7 @@ public class DataImportService {
      *             msg - contains status messages
      * @return list of errors
      */
-    public List<String> validateData(ODMContainer odmContainer, DataSource dataSource, CoreResources resources, StudyBean studyBean, UserAccountBean userBean,
+    public HashMap validateData(ODMContainer odmContainer, DataSource dataSource, CoreResources resources, StudyBean studyBean, UserAccountBean userBean,
             List<DisplayItemBeanWrapper> displayItemBeanWrappers, HashMap<Integer, String> importedCRFStatuses,HttpServletRequest request) {
         ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle();
         setRespage(respage);
@@ -135,6 +136,7 @@ public class DataImportService {
         StringBuffer auditMsg = new StringBuffer();
         List<String> errors = new ArrayList<String>();
 
+        HashMap validateDataResult  = new HashMap<>();
         // htaycher: return back later?
         auditMsg.append(respage.getString("passed_study_check") + " ");
         auditMsg.append(respage.getString("passed_oid_metadata_check") + " ");
@@ -143,13 +145,19 @@ public class DataImportService {
         Boolean eventCRFStatusesValid = getImportCRFDataService().eventCRFStatusesValid(odmContainer, userBean);
         
         errors.addAll((ArrayList<String>) getImportCRFDataService().validateEventCRFBeans(odmContainer, userBean,request));        
+        
+        HashMap fetchEventCRFBeansResult  =  getImportCRFDataService().fetchStudyEventCRFBeans(odmContainer, userBean, Boolean.TRUE,request);
+        
+        List<EventCRFBean> eventCRFBeans = (List<EventCRFBean>) fetchEventCRFBeansResult.get("eventCRFBeans");
+        StudyEventBean newStudyEventBean = (StudyEventBean) fetchEventCRFBeansResult.get("NewStudyEventBean");
+        validateDataResult.put("NewStudyEventBean", newStudyEventBean); 
+        
         if(!(errors.isEmpty())) {
-        	return errors;
+        	validateDataResult.put("errors", errors);
+        	return validateDataResult;
         }
         
-        List<EventCRFBean> eventCRFBeans =  getImportCRFDataService().fetchEventCRFBeans(odmContainer, userBean, Boolean.TRUE,request);
         
-       
         // The following line updates a map that is used for setting the EventCRF status post import
         getImportCRFDataService().fetchEventCRFStatuses(odmContainer, importedCRFStatuses);
 
@@ -158,13 +166,16 @@ public class DataImportService {
         // -- does the event already exist? if not, fail
         if (eventCRFBeans == null) {
             errors.add(respage.getString("the_event_crf_not_correct_status"));
-            return errors;
+            validateDataResult.put("errors", errors);
+        	return validateDataResult;
         } else if (eventCRFBeans.isEmpty() && !eventCRFStatusesValid) {
             errors.add(respage.getString("the_event_crf_not_correct_status"));
-            return errors;
+            validateDataResult.put("errors", errors);
+        	return validateDataResult;
         } else if (eventCRFBeans.isEmpty()) {
             errors.add(respage.getString("no_event_crfs_matching_the_xml_metadata"));
-            return errors;
+            validateDataResult.put("errors", errors);
+        	return validateDataResult;
         }
         logger.debug("found a list of eventCRFBeans: " + eventCRFBeans.toString());
 
@@ -225,7 +236,8 @@ public class DataImportService {
 
         auditMsg.append(respage.getString("passing_crf_edit_checks") + " ");
 
-        return errors;
+        validateDataResult.put("errors", errors);
+    	return validateDataResult;
 
     }
 

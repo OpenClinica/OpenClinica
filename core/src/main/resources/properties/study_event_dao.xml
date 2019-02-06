@@ -1,6 +1,16 @@
 <?xml version="1.0"?>
 <queries>
     <query>
+        <name>deleteByPK</name>
+        <sql>DELETE FROM STUDY_EVENT WHERE
+            STUDY_EVENT_ID = ?</sql>
+    </query>
+     <query>
+        <name>deleteByFK</name>
+        <sql>DELETE FROM EVENT_CRF WHERE
+            STUDY_EVENT_ID = ?</sql>
+     </query>
+    <query>
         <name>findByPK</name>
         <sql>SELECT * FROM STUDY_EVENT WHERE
             STUDY_EVENT_ID = ?</sql>

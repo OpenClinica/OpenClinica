@@ -628,6 +628,52 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         return sb;
     }
 
+  
+   
+    /**
+     * delete a Study event
+     */
+    public int delete(EntityBean eb) {
+        Connection con = null;
+        return delete(eb, con);
+    }
+  
+    public int delete(EntityBean eb, Connection con) {
+        StudyEventBean sb = (StudyEventBean) eb;
+        StudyEventBean oldStudyEventBean = (StudyEventBean) findByPK(sb.getId());
+        HashMap nullVars = new HashMap();
+        HashMap variables = new HashMap();
+        String sql = null;
+        /**
+         *  first delete all children
+         *  delete from s_import_ttest.event_crf
+			where study_event_id= 58
+         */                
+        sb.setActive(false);       
+        variables.put(Integer.valueOf(1), Integer.valueOf(sb.getId()));
+
+        sql = digester.getQuery("deleteByFK");
+        if (con == null) {
+            this.execute(sql, variables, nullVars);
+        } else {
+            this.execute(sql, variables, nullVars, con);
+        }
+        
+        /**
+         * 2nd step delete the event
+         * DELETE FROM study_event 
+           WHERE STUDY_EVENT_ID=?
+         */
+        sql = digester.getQuery("deleteByPK");
+        if (con == null) {
+            this.execute(sql, variables, nullVars);
+        } else {
+            this.execute(sql, variables, nullVars, con);
+        }
+        
+        return 1;
+    }
+
     public Collection findAllByPermission(Object objCurrentUser, int intActionType, String strOrderByColumn, boolean blnAscendingSort, String strSearchPhrase) {
         ArrayList al = new ArrayList();
 

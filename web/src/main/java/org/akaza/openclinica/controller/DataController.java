@@ -39,6 +39,7 @@ import org.akaza.openclinica.bean.login.ImportDataResponseFailureDTO;
 import org.akaza.openclinica.bean.login.ImportDataResponseSuccessDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
@@ -391,10 +392,17 @@ public class DataController {
                     return errorMsgs;
                 }
 
-                errorMessagesFromValidation = dataImportService.validateData(odmContainer, dataSource, coreResources, studyBean, userBean,
+                
+                HashMap validateDataResult = dataImportService.validateData(odmContainer, dataSource, coreResources, studyBean, userBean,
                         displayItemBeanWrappers, importedCRFStatuses,request);
-
+                StudyEventBean newStudyEventBean = (StudyEventBean) validateDataResult.get("NewStudyEventBean"); 
+                errorMessagesFromValidation = (List<String>) validateDataResult.get("errors");
+                
                 if (errorMessagesFromValidation.size() > 0) {
+                	// roll back created study event
+                	if(newStudyEventBean != null) {
+                		dataImportService.getImportCRFDataService().getStudyEventDAO().delete(newStudyEventBean);
+                	}
                     String err_msg = convertToErrorString(errorMessagesFromValidation);
                     ErrorMessage errorOBject = createErrorMessage("errorCode.ValidationFailed", err_msg);
                     errorMsgs.add(errorOBject);

@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -291,9 +292,11 @@ public class ImportCRFDataServlet extends SecureController {
                 addPageMessage(respage.getString("passed_common_events_check"));
             }
            
-        	 List<EventCRFBean> eventCRFBeans =  getImportCRFDataService().fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE,request);
-             
+        	HashMap fetchEventCRFBeansResult  =  getImportCRFDataService().fetchStudyEventCRFBeans(odmContainer, ub, Boolean.FALSE,request);
             
+            List<EventCRFBean> eventCRFBeans = (List<EventCRFBean>) fetchEventCRFBeansResult.get("eventCRFBeans");
+            StudyEventBean newStudyEventBean = (StudyEventBean) fetchEventCRFBeansResult.get("NewStudyEventBean");
+                        
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
             HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
@@ -415,10 +418,24 @@ public class ImportCRFDataServlet extends SecureController {
                 //
                 // }
             }
+                      
             if (fail) {
+            	// roll back created study event
+            	if(newStudyEventBean != null) {
+            		getImportCRFDataService().getStudyEventDAO().delete(newStudyEventBean);
+            	}
+            	
                 logger.debug("failed here - forwarding...");
                 forwardPage(Page.IMPORT_CRF_DATA);
             } else {
+            	 if(!(hardValidationErrors.isEmpty())) {
+            		// roll back created study event
+                 	if(newStudyEventBean != null) {
+                 		getImportCRFDataService().getStudyEventDAO().delete(newStudyEventBean);
+                 	}
+                 	           	
+                 }
+            	 
                 addPageMessage(respage.getString("passing_crf_edit_checks"));
                 session.setAttribute("odmContainer", odmContainer);
                 session.setAttribute("importedData", displayItemBeanWrappers);
