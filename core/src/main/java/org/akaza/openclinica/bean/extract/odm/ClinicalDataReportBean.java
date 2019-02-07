@@ -92,13 +92,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             xml.append(nls);
         }
         Role role = null; // OpenClinica:
-        StudyBean publicBean = CoreResources.getPublicStudy(clinicalData.getStudyOID(), dataSource);
-        if (publicBean != null) {
-            StudyUserRoleBean userRole = userBean.getRoleByStudy(publicBean.getId());
+        StudyBean publicStudyBean = CoreResources.getPublicStudy(userBean.getActiveStudyId(), dataSource);
+        if (publicStudyBean != null) {
+            StudyUserRoleBean userRole = userBean.getRoleByStudy(publicStudyBean.getId());
             if (userRole == null || !userRole.isActive())
-                userRole = userBean.getRoleByStudy(publicBean.getParentStudyId());
+                userRole = userBean.getRoleByStudy(publicStudyBean.getParentStudyId());
             role = userRole.getRole();
         }
+        setRoleDescription(role, publicStudyBean);
 
         if (crossForm) {
             xml.append(indent + indent + "<UserInfo OpenClinica:UserName=\"" + StringEscapeUtils.escapeXml(userBean.getName()) + "\" OpenClinica:UserRole=\"" + StringEscapeUtils.escapeXml(role.getDescription()) + "\"/>");
@@ -939,6 +940,69 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         }
         return true;
     }
+
+
+    private void setRoleDescription(Role role , StudyBean publicStudyBean){
+        if (publicStudyBean.getParentStudyId() > 0) {
+            /*
+             * The Role decription will be set depending on whether the user logged in at study lever or site level.
+             * issue-2422
+             */
+
+                switch (role.getId()) {
+                    case 2:
+                        role.setDescription("site_Study_Coordinator");
+                        break;
+                    case 3:
+                        role.setDescription("site_Study_Director");
+                        break;
+                    case 4:
+                        role.setDescription("site_investigator");
+                        break;
+                    case 5:
+                        role.setDescription("site_Data_Entry_Person");
+                        break;
+                    case 6:
+                        role.setDescription("site_monitor");
+                        break;
+                    case 7:
+                        role.setDescription("site_Data_Entry_Person2");
+                        break;
+                    case 8:
+                        role.setDescription("site_Data_Entry_Participant");
+                        break;
+                    default:
+                        // logger.info("No role matched when setting role description");
+                }
+
+        } else {
+            /*
+             * If the current study is a site, we will change the role description. issue-2422
+             */
+
+                switch (role.getId()) {
+                    case 2:
+                        role.setDescription("Study_Coordinator");
+                        break;
+                    case 3:
+                        role.setDescription("Study_Director");
+                        break;
+                    case 4:
+                        role.setDescription("Investigator");
+                        break;
+                    case 5:
+                        role.setDescription("Data_Entry_Person");
+                        break;
+                    case 6:
+                        role.setDescription("Monitor");
+                        break;
+                    default:
+                        // logger.info("No role matched when setting role description");
+                }
+            }
+        }
+
+
 
 
 

@@ -1082,7 +1082,7 @@
     <tr style="height:10px;">
       <td class="formlabel" align="left">
         <h3>
-          Contact Information
+          <fmt:message key="update_and_invite" bundle="${resword}"/>
         </h3>
       </td>
     </tr>
@@ -1107,7 +1107,7 @@
               </td>
               <td valign="top">
                 <input id="email-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control invite-input">
-                <div id="email-input-info">
+                <div id="email-input-info" class="grayed-out">
                   <fmt:message key="invite_required" bundle="${resword}"/>
                   <br>
                   <fmt:message key="invite_required_line2" bundle="${resword}"/>
@@ -1145,8 +1145,9 @@
                   }
                   #email-input-info {
                     display: inline-block;
-                    margin: -10px 0 0 10px;
+                    margin: -4px 0 0 10px;
                     font-style: italic;
+                    font-size: 10pt;
                   }
                   #phone-input {
                     padding: 4px !important;
@@ -1198,17 +1199,18 @@
                   }
                   #access-code-input {
                     width: 150px;
+                    padding-right: 40px;
                   }
                   #eye {
                     position: absolute;
-                    top: 1px;
+                    top: 2px;
                     left: 111px;
                     font-size: 18pt;
-                    background-color: white;
+                    background-color: transparent;
                     padding: 2px 6px;
                   }
                   .grayed-out {
-                    color: #777;
+                    color: #999;
                   }
                 </style>
                 <div id="phone-widget">
@@ -1217,7 +1219,7 @@
                     <div id="country-flag" class="down-arrow">&nbsp;</div> 
                     <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
                   </div> 
-                  <div id="country-code">+1</div> 
+                  <div id="country-code" class="grayed-out">+1</div> 
                   <div class="subnote hide error" id="phone-input-error">
                     <fmt:message key="invite_invalid_phone" bundle="${resword}"/>
                   </div>
@@ -1441,7 +1443,7 @@
       <td><div class="lines"></div></td>
     </tr>
     <tr>
-      <td colspan="2" style="text-align: center;">
+      <td colspan="2" style="text-align: right;">
         <input type="button" class="cancel" value="Cancel"/>
         <input type="button" id="connect-button" value="Update"/>
       </td>
@@ -1474,7 +1476,7 @@
                   <input id="access-code-input" readonly onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
                   <i id="eye" class="fa fa-eye"></i>
                 </td>
-                <td valign="top" class="grayed-out">
+                <td valign="top" class="grayed-out" style="padding-top:4px;">
                   <span><i><fmt:message key="viewing_audited" bundle="${resword}"/></i></span>
                 </td>
               </tr>
@@ -1486,7 +1488,7 @@
               </tr>
               <tr valign="top">
                 <td></td>
-                <td valign="top" colspan="2">
+                <td valign="top" colspan="2" class="grayed-out">
                   <i>
                     <fmt:message key="please_sign_out" bundle="${resword}"/><br>
                     <fmt:message key="please_sign_out_line2" bundle="${resword}"/>
@@ -1518,6 +1520,21 @@
 
     function logDump() {
         console.log(arguments);
+    }
+
+    function logAudit(name, typid) {
+      jQuery.ajax({
+          type: 'post',
+          url: '${pageContext.request.contextPath}/pages/auth/api/studies/${study.oid}/auditEvents',
+          contentType: 'application/json',
+          data: JSON.stringify({
+              auditTable: 'study_subject',
+              entityId: '${studySub.id}',
+              entityName: name,
+              auditLogEventTypId: typid                
+          }),
+          error: logDump
+      });
     }
 
     var participateInfo;
@@ -1584,6 +1601,38 @@
                 mobilePhone: $('#country-code').text() + ' ' + $('#phone-input').val(),
                 inviteParticipant: $('#invite-option input:checked').val()
             };
+            var oldName  = participateInfo.firstName;
+            var oldEmail = participateInfo.email;
+            var oldPhone = participateInfo.mobilePhone;
+            var newName  = data.firstName;
+            var newEmail = data.email;
+            var newPhone = data.mobilePhone;
+            var hasOldName  = !!oldName;
+            var hasOldEmail = !!oldEmail;
+            var hasOldPhone = !!oldPhone;
+            var hasNewName  = !!newName;
+            var hasNewEmail = !!newEmail;
+            var hasNewPhone = !!newPhone;
+            var isNameNew  = !hasOldName  && hasNewName;
+            var isEmailNew = !hasOldEmail && hasNewEmail;
+            var isPhoneNew = !hasOldPhone && hasNewPhone;
+            var isNameUpdated  = hasOldName  && newName  != oldName;
+            var isEmailUpdated = hasOldEmail && newEmail != oldEmail;
+            var isPhoneUpdated = hasOldPhone && newPhone != oldPhone;
+
+            if (isNameNew)
+                logAudit('Participant first name', 43);
+            if (isNameUpdated)
+                logAudit('Participant first name', 44);
+            if (isEmailNew)
+                logAudit('Participant email address', 46);
+            if (isEmailUpdated)
+                logAudit('Participant email address', 47);
+            if (isPhoneNew)
+                logAudit('Participant phone number', 49);
+            if (isPhoneUpdated)
+                logAudit('Participant phone number', 50);
+
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
@@ -1621,9 +1670,9 @@
         jQuery('#phone-input').on('input blur', function() {
             var phonePattern = /^[0-9 -]*$/;
             var input = $(this).val();
-            var isEmpty = input.length === 0;
-            var isValid = phonePattern.test(input);
-            if (isEmpty || isValid) {
+            var length = input.replace(/ |-/g, '').length;
+            var isValid = phonePattern.test(input) && length <= 12;
+            if (isValid) {
                 $('#phone-input-error').hide();
             }
             else {

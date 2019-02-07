@@ -130,6 +130,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
     public static final String EDIT_MODE = "edit";
     public static final String JINI = "jini";
     private static final String VIEW_NOTES = "ViewNotes";
+    public static final String FORWARD_SLASH = "/";
+
+
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -795,7 +798,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private UserControl lookForUserControlInUserControl(List<UserControl> userControls, String itemName) {
         UserControl userControl = null;
         for (UserControl uControl : userControls) {
-            if (uControl.getRef().endsWith(itemName)) {
+            if (uControl.getRef().endsWith(FORWARD_SLASH+itemName)) {
                 userControl = uControl;
                 break;
             }
@@ -850,10 +853,10 @@ public class ResolveDiscrepancyServlet extends SecureController {
     private List<Bind> getBindElements(List<Bind> binds, ItemBean item) {
         for (Iterator<Bind> bindIterator = binds.iterator(); bindIterator.hasNext();) {
             Bind bind = bindIterator.next();
-            if (bind.getNodeSet().endsWith(item.getName())) {
+            if (bind.getNodeSet().endsWith(FORWARD_SLASH+item.getName())) {
                 setBindProperties(bind);
                 bind.setNodeSet("/form/group_layout/" + item.getName());
-            } else if (bind.getNodeSet().endsWith(item.getName() + COMMENT)) {
+            } else if (bind.getNodeSet().endsWith(FORWARD_SLASH+item.getName() + COMMENT)) {
                 setBindProperties(bind);
                 bind.setNodeSet("/form/group_layout/" + item.getName() + COMMENT);
                 bind.setEnkFor("/form/group_layout/" + item.getName());

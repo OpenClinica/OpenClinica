@@ -224,6 +224,8 @@ public class OpenRosaSubmissionController {
         String studySubjectOID = subjectContext.get("studySubjectOID");
         String formLayoutOID = subjectContext.get("formLayoutOID");
         int studyEventOrdinal = Integer.valueOf(subjectContext.get("studyEventOrdinal"));
+        String accessToken = subjectContext.get("accessToken");
+        request.getSession().setAttribute("accessToken",accessToken);
 
         UserAccount userAccount = userAccountDao.findById(userAccountID);
         Study parentStudy = studyDao.findByOcOID(studyOID);
@@ -257,6 +259,7 @@ public class OpenRosaSubmissionController {
         List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
         List<EventDefinitionCrf> eventDefinitionCrfs = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(sed.getStudyEventDefinitionId(),
                 study.getStudyId());
+        boolean statusChanged=false;
 
         if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.SIGNED.getCode()) {
             int count = 0;
@@ -274,13 +277,19 @@ public class OpenRosaSubmissionController {
             }
 
             if (count == eventDefinitionCrfs.size() || sed.getType().equals(COMMON)) {
-                studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
+                if(studyEvent.getSubjectEventStatusId()!=SubjectEventStatus.COMPLETED.getCode()){
+                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
+                    statusChanged=true;
+                }
                 studyEvent.setUserAccount(userAccount);
-                persistStudyEvent(studyEvent);
+                persistStudyEvent(studyEvent,statusChanged);
             } else if (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()) {
-                studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                if(studyEvent.getSubjectEventStatusId()!=SubjectEventStatus.DATA_ENTRY_STARTED.getCode()){
+                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                    statusChanged=true;
+                }
                 studyEvent.setUserAccount(userAccount);
-                persistStudyEvent(studyEvent);
+                persistStudyEvent(studyEvent,statusChanged);
             }
         } else {
             boolean allFormsComplete = true;
@@ -290,11 +299,17 @@ public class OpenRosaSubmissionController {
                 }
             }
             if (allFormsComplete){
-                studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
+                if(studyEvent.getSubjectEventStatusId()!=SubjectEventStatus.COMPLETED.getCode()){
+                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.COMPLETED.getCode());
+                    statusChanged=true;
+                }
             } else {
-                studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                if(studyEvent.getSubjectEventStatusId()!=SubjectEventStatus.DATA_ENTRY_STARTED.getCode()){
+                    studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+                    statusChanged=true;
+                }
             }
-            persistStudyEvent(studyEvent);
+            persistStudyEvent(studyEvent,statusChanged);
         }
 
         studySubject = unsignSignedParticipant(studySubject);
@@ -621,8 +636,8 @@ public class OpenRosaSubmissionController {
         itemDataDao.saveOrUpdate(itemData);
     }
 
-    private void persistStudyEvent(StudyEvent studyEvent) {
-        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true, false);
+    private void persistStudyEvent(StudyEvent studyEvent,boolean statusChanged) {
+        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(statusChanged, false);
         StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
         studyEventDao.saveOrUpdateTransactional(container);
     }

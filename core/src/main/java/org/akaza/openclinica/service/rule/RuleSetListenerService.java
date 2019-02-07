@@ -9,6 +9,7 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.expression.ExpressionBean;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
+import org.akaza.openclinica.service.rule.expression.ExpressionService;
 import org.apache.commons.lang.SerializationUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -31,7 +32,7 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
 	public void onApplicationEvent(final OnStudyEventUpdated event) {
 	
 		LOGGER.debug("listening");
-	if (event.getContainer().getChangeDetails().getStartDateChanged() || event.getContainer().getChangeDetails().getStatusChanged()){ 
+	if (event.getContainer().getChangeDetails().getStartDateChanged() || event.getContainer().getChangeDetails().getStatusChanged()){
        
 		StudyEvent studyEvent = event.getContainer().getEvent();
 		
@@ -52,8 +53,13 @@ public class RuleSetListenerService implements ApplicationListener<OnStudyEventU
     			ruleSet.setTarget(eBean);
     			ruleSet.addExpression(getRuleSetService().replaceSEDOrdinal(ruleSet.getTarget(), studyEventBean));
 			ruleSetBeans.add(ruleSet);
-			getRuleSetService().runIndividualRulesInBeanProperty(ruleSetBeans, userId,event.getContainer().getChangeDetails() , studyEventOrdinal);
-        	}	
+
+			String targetProperty = ruleSet.getTarget().getValue().substring(ruleSet.getTarget().getValue().indexOf("."));
+			if ((targetProperty.contains(ExpressionService.STARTDATE + ".A.B") && event.getContainer().getChangeDetails().getStartDateChanged())
+					|| (targetProperty.contains(ExpressionService.STATUS + ".A.B") && event.getContainer().getChangeDetails().getStatusChanged())) {
+				getRuleSetService().runIndividualRulesInBeanProperty(ruleSetBeans, userId, event.getContainer().getChangeDetails(), studyEventOrdinal);
+			}
+			}
 		   
 		}
 

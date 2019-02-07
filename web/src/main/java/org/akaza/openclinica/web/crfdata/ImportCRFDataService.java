@@ -171,8 +171,7 @@ public class ImportCRFDataService {
 
                         String formOid = formDataBean.getFormOID();
                         CRFBean crfBean = crfDAO.findByOid(formOid);
-                        CommonEventContainerDTO commonEventContainerDTO = viewStudySubjectService.addCommonForm(studyEventDefinitionBean.getOid(),crfBean.getOid(),
-                                studySubjectBean.getOid(),userAccount,studyBean.getOid());
+                        CommonEventContainerDTO commonEventContainerDTO = addCommonForm(studyEventDefinitionBean,crfBean, studySubjectBean,userAccount,studyBean);
                         
                         /**
                          *  data from mirth may don't have repeat key, and need to check SKIP logic
@@ -200,7 +199,7 @@ public class ImportCRFDataService {
     	                        	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
     	                        		sampleOrdinal =	commonEventContainerDTO.getMaxOrdinal() + 1 + "";
     	                        	}
-    		                		
+
     		                	}else {
     		                		sampleOrdinal =	 "1";
     		                	}
@@ -223,7 +222,7 @@ public class ImportCRFDataService {
                              Date today = new Date();
                              tempStudyEventBean.setCreatedDate(today);
                              tempStudyEventBean.setDateStarted(today);
-                             tempStudyEventBean.setName(commonEventContainerDTO.getStudyEventDefinition().getName());
+                             tempStudyEventBean.setName(studyEventDefinitionBean.getName());
                              tempStudyEventBean.setOwner(ub);
                              ArrayList eventCRFs = new ArrayList<>();
                              eventCRFs.add(commonEventContainerDTO.getEventCrf());
@@ -232,10 +231,10 @@ public class ImportCRFDataService {
                              tempStudyEventBean.setStudySubject(studySubjectBean);
                              tempStudyEventBean.setUpdater(ub);
                              tempStudyEventBean.setUpdatedDate(today);
-                             tempStudyEventBean.setStudySubjectId(commonEventContainerDTO.getStudySubject().getStudySubjectId());
+                             tempStudyEventBean.setStudySubjectId(studySubjectBean.getId());
                              tempStudyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
                              tempStudyEventBean.setStatus(Status.AVAILABLE);
-                             tempStudyEventBean.setStudyEventDefinitionId(commonEventContainerDTO.getStudyEventDefinition().getStudyEventDefinitionId());                        
+                             tempStudyEventBean.setStudyEventDefinitionId(studyEventDefinitionBean.getId());
                              tempStudyEventBean.setSampleOrdinal(Integer.parseInt(sampleOrdinal));
                              
                              studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
@@ -320,6 +319,101 @@ public class ImportCRFDataService {
         // iteration one
         return eventCRFBeans;
     }
+
+    public CommonEventContainerDTO addCommonForm(StudyEventDefinitionBean studyEventDefinition, CRFBean crf, StudySubjectBean studySubject,
+                                                 UserAccount userAccount, StudyBean study) {
+
+        final String COMMON = "common";
+        EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
+        FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
+        EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
+
+        if (study == null || study.getId() == 0) {
+            logger.error("Study  is null");
+            return null;
+        } else if (study.getParentStudyId() == 0) {
+            logger.debug("the study with Oid {} is a Parent study", study.getOid());
+        } else {
+            logger.debug("the study with Oid {} is a Site study", study.getOid());
+        }
+
+        if (studySubject == null || studySubject.getId() == 0 ) {
+            logger.error("StudySubject is null");
+            return null;
+        }
+        if (studyEventDefinition == null || studyEventDefinition.getId() == 0) {
+            logger.error("StudyEventDefinition is null");
+            return null;
+        } else if (!studyEventDefinition.getType().equals(COMMON)) {
+            logger.error("StudyEventDefinition with Oid {} is not a Common Type Event", studyEventDefinition.getOid());
+            return null;
+        }
+        if (crf == null || crf.getId() == 0) {
+            logger.error("Crf is null");
+            return null;
+        }
+
+        EventDefinitionCRFBean edc = eventDefinitionCRFDAO.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getId(),
+                crf.getId(),study.getId());
+
+        //EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(), study.getStudyId());
+        if (edc == null || edc.getId() == 0) {
+            edc = eventDefinitionCRFDAO.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getId(), crf.getId(),
+                    study.getParentStudyId());
+        }
+        if (edc == null || edc.getStatus().equals(Status.DELETED) || edc.getStatus().equals(Status.AUTO_DELETED)) {
+            logger.error("EventDefinitionCrf for StudyEventDefinition Oid {},Crf Oid {} and Study Oid {}is null or has Removed Status",
+                    studyEventDefinition.getOid(), crf.getOid(), study.getOid());
+            return null;
+        }
+        FormLayoutBean formLayoutBean = null;
+        int formLayoutId = edc.getDefaultVersionId();
+        if (formLayoutId == 0) {
+            logger.error("FormLayout is null");
+            return null;
+        }else{
+            formLayoutBean = (FormLayoutBean)formLayoutDAO.findByPK(formLayoutId);
+        }
+
+        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+        List<StudyEventBean> studyEvents = studyEventDAO.findAllByDefinitionAndSubject(studyEventDefinition, studySubject);
+        Integer maxOrdinal;
+        StudyEventBean studyEvent;
+        int eventCrfId = 0;
+        EventCRFBean eventCrf = null;
+        if (studyEvents.size() == 0) {
+            logger.debug("No previous study event found for this studyEventDef Oid {} and subject Oid{}", studyEventDefinition.getOid(),
+                    studySubject.getOid());
+            maxOrdinal = 0;
+        } else {
+            maxOrdinal = studyEventDAO.getMaxSampleOrdinal(studyEventDefinition,studySubject);
+        }
+
+        if (!studyEventDefinition.isRepeating()) {
+            logger.debug("StudyEventDefinition with Oid {} is Non Repeating", studyEventDefinition.getOid());
+            for (StudyEventBean stEvent : studyEvents) {
+                ArrayList<EventCRFBean> eventCRFBeans = eventCRFDAO.findByEventSubjectFormLayout(stEvent, studySubject, formLayoutBean);
+                if (eventCRFBeans != null && eventCRFBeans.size() > 0) {
+                    eventCrf = eventCRFBeans.get(0);
+                    eventCrfId = eventCrf.getId();
+                    logger.debug("EventCrf with StudyEventDefinition Oid {},Crf Oid {} and StudySubjectOid {} already exist in the System",
+                            studyEventDefinition.getOid(), crf.getOid(), studySubject.getOid());
+                    break;
+                }
+            }
+        }
+
+        CommonEventContainerDTO commonEventContainerDTO = new CommonEventContainerDTO();
+        commonEventContainerDTO.setEventCrfId(eventCrfId);
+        commonEventContainerDTO.setFormLayoutBean(formLayoutBean);
+        commonEventContainerDTO.setEventCRFBean(eventCrf);
+        commonEventContainerDTO.setStudyEventDefinitionBean(studyEventDefinition);
+        commonEventContainerDTO.setUserAccount(userAccount);
+        commonEventContainerDTO.setStudySubjectBean(studySubject);
+        commonEventContainerDTO.setMaxOrdinal(maxOrdinal);
+
+        return commonEventContainerDTO;
+    }
     
         
     /**
@@ -398,7 +492,7 @@ public class ImportCRFDataService {
                         return errors;
                     }
                 }
-                
+
                 for (FormDataBean formDataBean : formDataBeans) {
 
                     CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
@@ -419,8 +513,9 @@ public class ImportCRFDataService {
 
                         String formOid = formDataBean.getFormOID();
                         CRFBean crfBean = crfDAO.findByOid(formOid);
-                        CommonEventContainerDTO commonEventContainerDTO = viewStudySubjectService.addCommonForm(studyEventDefinitionBean.getOid(),crfBean.getOid(),
-                                studySubjectBean.getOid(),userAccount,studyBean.getOid());
+                        logger.info("KMETRIC31a: In formDataBeans loop {}", formDataBeans.size());
+                        CommonEventContainerDTO commonEventContainerDTO = addCommonForm(studyEventDefinitionBean,crfBean, studySubjectBean,userAccount,studyBean);
+                        logger.info("KMETRIC31b: In formDataBeans loop {}", formDataBeans.size());
                         
                         /**
                          *  Here check the xml data
@@ -450,8 +545,8 @@ public class ImportCRFDataService {
                                  return errors;
                         	}
                         }
-                       
-                        
+
+
                         // OC-9756 fix
                         if(!isRepeating) {
                         	 commonNonRepeatingEventSubjectKey = studyOID+subjectDataBean.getSubjectOID()+studyEventDataBean.getStudyEventOID()+formOid;
@@ -488,7 +583,7 @@ public class ImportCRFDataService {
                         	}
                         	                          
                         }
-                       
+
                     	// for same subject, same event, can't have same form more than once in NON repeating COMMON event -- found same formOID in database
                     	if(!isRepeating) {
                     		ArrayList seList = studyEventDAO.findAllByStudyEventDefinitionAndCrfOids(studyEventDefinitionBean.getOid(), crfBean.getOid());
@@ -541,11 +636,11 @@ public class ImportCRFDataService {
                                 return errors;
                             }
                         }
-                            
-                        
 
-                            
-                       
+
+
+
+
                     }else {
                     	//OC-10148 and check status:scheduled
                     	/*String formOid = formDataBean.getFormOID();

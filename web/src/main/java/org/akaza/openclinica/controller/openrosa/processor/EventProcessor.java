@@ -207,7 +207,8 @@ public class EventProcessor implements Processor {
         studyEvent.setEndTimeFlag(false);
         studyEvent.setDateCreated(currentDate);
         studyEvent.setLocation("");
-        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true, true);
+        StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true, false);
+
         StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
         studyEventDao.saveOrUpdateTransactional(container);
         studyEvent = studyEventDao.fetchByStudyEventDefOIDAndOrdinal(studyEventDefinition.getOc_oid(), ordinal, studySubject.getStudySubjectId());
@@ -284,8 +285,13 @@ public class EventProcessor implements Processor {
         if (newStatus != null) {
             studyEvent.setUpdateId(user.getUserId());
             studyEvent.setDateUpdated(new Date());
-            studyEvent.setSubjectEventStatusId(newStatus.getCode());
-            StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(true, false);
+            boolean statusChanged=false;
+            if(studyEvent.getSubjectEventStatusId()!=newStatus.getCode()){
+                studyEvent.setSubjectEventStatusId(newStatus.getCode());
+                statusChanged=true;
+            }
+
+            StudyEventChangeDetails changeDetails = new StudyEventChangeDetails(statusChanged, false);
             StudyEventContainer container = new StudyEventContainer(studyEvent, changeDetails);
             studyEvent = studyEventDao.saveOrUpdateTransactional(container);
             logger.debug("*********UPDATED STUDY EVENT ");

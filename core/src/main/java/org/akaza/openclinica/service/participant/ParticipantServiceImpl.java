@@ -128,14 +128,8 @@ public class ParticipantServiceImpl implements ParticipantService {
  * @param currentStudy
  */
 private void updateStudySubjectSize(StudyBean currentStudy) {
-	int subjectCount = currentStudy.getSubjectCount();
-	   if(subjectCount==0) {
-	       StudySubjectDAO ssdao = this.getStudySubjectDao();
-	       ArrayList ss = ssdao.findAllBySiteId(currentStudy.getId());
-	       if (ss != null) {
-	           subjectCount = ss.size();
-	       }
-	   }
+	int subjectCount = getSubjectCount(currentStudy);
+
 	   StudyDAO studydao = this.getStudyDao();
 	   currentStudy.setSubjectCount(subjectCount+1);
 	   currentStudy.setType(StudyType.GENETIC);
@@ -352,4 +346,23 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
     public void setDatasource(DataSource dataSource) {
         this.dataSource = dataSource;
     }
+
+    public int getSubjectCount(StudyBean currentStudy) {
+        int subjectCount = 0;
+        StudyDAO sdao = new StudyDAO(dataSource);
+        StudyBean studyBean = (StudyBean) sdao.findByPK(currentStudy.getId());
+        if (studyBean != null)
+            subjectCount = studyBean.getSubjectCount();
+
+        if(subjectCount==0) {
+            StudySubjectDAO ssdao = this.getStudySubjectDao();
+            ArrayList ss = ssdao.findAllBySiteId(currentStudy.getId());
+            if (ss != null) {
+                subjectCount = ss.size();
+            }
+        }
+        return subjectCount;
+    }
+
+
 }
