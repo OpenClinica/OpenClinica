@@ -46,6 +46,7 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -82,6 +83,7 @@ public class ImportCRFDataService {
     private ItemDataDAO itemDataDao;
     private String skipMatchCriteriaSql;
     private PipeDelimitedDataHelper pipeDelimitedDataHelper;
+    private RestfulServiceHelper restfulServiceHelper;
 
 
     @Autowired
@@ -101,7 +103,7 @@ public class ImportCRFDataService {
      * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the
      * findByEventSubjectVersion method in EventCRFDAO. May return more than one, hmm.
      */
-    public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs,HttpServletRequest request) {
+    public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs,HttpServletRequest request) throws OpenClinicaException {
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
@@ -197,28 +199,12 @@ public class ImportCRFDataService {
     	                        	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
     	                        		sampleOrdinal =	commonEventContainerDTO.getMaxOrdinal() + 1 + "";
     	                        	}
+
     		                	}else {
     		                		sampleOrdinal =	 "1";
     		                	}
     		                	
-    		                	/** log message:
-    		        	    	 * RowNo | ParticipantID | Status | Message
-    		        				1 | SS_SUB510 | SUCCESS | InsertU
-    		        				2 | SS_SUB511 | FAILED  | errorCode.participantNotFound
-    		        				3 | SS_SUB512 | SUCCESS | Update
-    		        				4 | SS_SUB512 | SUCCESS | Skip
-    		        	    	 */
-    		                	String originalFileName = request.getHeader("originalFileName");
-    		                	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
-    		                	String recordNum = null;
-    		                	if(originalFileName !=null) {
-    		                		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
-    		                		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
-    		                	}
-    		                	String msg;
-    		                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Insert";
-    		    	    		getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
-    		    	    		
+    		                	
     		                }
     					} catch (OpenClinicaException e) {
     						// TODO Auto-generated catch block
@@ -259,6 +245,14 @@ public class ImportCRFDataService {
                              studyEventDataBean.setStudyEventRepeatKey(sampleOrdinal);
                              
                             
+                        }else {
+                        	if(!(studyEventDefinitionBean.isRepeating())) {
+                        		// if same sample ordinal, NOT update at this time(current requirements), return same error 
+                				String err_msg ="For Non-Repeating event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID();                                       
+                                
+                                
+                                throw new OpenClinicaException(err_msg,"");
+                        	}
                         }
                     
                                               
@@ -824,8 +818,13 @@ public class ImportCRFDataService {
                         if(sampleOrdinal == null || sampleOrdinal.trim().isEmpty()) {
                         	String comeFromPipe = (String) request.getHeader("PIPETEXT");
                         	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
-                        		// not provide repeat key in the data file, then get the next available one
-                                sampleOrdinal = commonEventContainerDTO.getMaxOrdinal()+1 +""; 
+                        		 if(!isRepeating) {
+                        			 sampleOrdinal = 1 + "";
+                        		 }else {
+                        			// not provide repeat key in the data file, then get the next available one
+                                     sampleOrdinal = commonEventContainerDTO.getMaxOrdinal()+1 +""; 
+                        		 }
+                        		
                         		 
                         	}else {
                         		 //for common events, if not provided studyEventRepeatKey, then skip/reject
@@ -843,6 +842,10 @@ public class ImportCRFDataService {
                     			StudyEventBean seBean = (StudyEventBean) seList.get(j); 
                     			if(seBean.getStudySubjectId() == studySubjectBean.getId()) {
                     				if(!((seBean.getSampleOrdinal()+"").equals(sampleOrdinal))) {
+                        				errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
+                                        return errors;	
+                        			}else {
+                        				// if same sample ordinal, NOT update at this time(current requirements), return same error 
                         				errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
                                         return errors;	
                         			}
@@ -1978,9 +1981,9 @@ public class ImportCRFDataService {
                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
                 	}
                 	String msg;
-                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";
-    	    		getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
-                	continue;
+                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";    	    	
+
+    	    		throw new OpenClinicaException(msg, "");
                 }
                 
                 /**
@@ -2370,7 +2373,7 @@ public class ImportCRFDataService {
     	String[] skipMatchCriteriaArray = null;
     	
     	String skipMatchCriteria = request.getHeader("SkipMatchCriteria");
-    	if(skipMatchCriteria != null && !(skipMatchCriteria.equals("${SkipMatchCriteria}"))) {
+    	if(skipMatchCriteria != null && skipMatchCriteria.trim().length() > 0 && !(skipMatchCriteria.equals("${SkipMatchCriteria}"))) {
     		skipMatchCriteriaArray = this.toArray(skipMatchCriteria, ",");
     		
     		String itemGroupOID;
@@ -2517,7 +2520,6 @@ public class ImportCRFDataService {
 		this.pipeDelimitedDataHelper = importDataHelper;
 	}
 
-	
 
 	public DataSource getDs() {
 		return ds;
@@ -2534,4 +2536,34 @@ public class ImportCRFDataService {
 	public void setStudyEventDAO(StudyEventDAO studyEventDAO) {
 		this.studyEventDAO = studyEventDAO;
 	}
+
+	public RestfulServiceHelper getRestfulServiceHelper() {
+		if(restfulServiceHelper == null) {
+			restfulServiceHelper = new RestfulServiceHelper(ds);
+		}
+		return restfulServiceHelper;
+	}
+
+	public void setRestfulServiceHelper(RestfulServiceHelper restfulServiceHelper) {
+		this.restfulServiceHelper = restfulServiceHelper;
+	}
+	
+	public void validateUserRole(ODMContainer odmContainer,HttpServletRequest request) throws OpenClinicaException {
+      
+        List<String> errors = new ArrayList<String>();
+        MessageFormat mf = new MessageFormat("");
+
+  
+        StudyDAO studyDAO = new StudyDAO(ds);
+        String studyOid = odmContainer.getCrfDataPostImportContainer().getStudyOID();
+        StudyBean studyBean = studyDAO.findByOid(studyOid);
+        UserAccountBean userBean = this.getPipeDelimitedDataHelper().getUserAccount(request);
+        String userName=  userBean.getName();  
+        
+        String msg = this.getRestfulServiceHelper().verifyRole(userName, studyOid, null);
+        if (msg != null) {           
+            throw new OpenClinicaException(msg, msg);
+        }              
+    }
+
 }

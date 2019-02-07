@@ -370,7 +370,37 @@ public abstract class CoreSecureController extends HttpServlet {
                 // YW >>
             }
 
-            if (currentStudy.getParentStudyId() > 0) {
+
+            if (currentRole == null || currentRole.getId() <= 0) {
+                // if (ub.getId() > 0 && currentStudy.getId() > 0) {
+                // if current study has been "removed", current role will be
+                // kept as "invalid" -- YW 06-21-2007
+                if (ub.getId() > 0 && currentStudy.getId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
+                    currentRole = ub.getRoleByStudy(currentStudy.getId());
+                    if (currentStudy.getParentStudyId() > 0) {
+                        // Checking if currentStudy has been removed or not will
+                        // ge good enough -- YW 10-17-2007
+                        StudyUserRoleBean roleInParent = ub.getRoleByStudy(currentStudy.getParentStudyId());
+                        // inherited role from parent study, pick the higher
+                        // role
+                        currentRole.setRole(Role.max(currentRole.getRole(), roleInParent.getRole()));
+                    }
+                    // logger.info("currentRole:" + currentRole.getRoleName());
+                } else {
+                    currentRole = new StudyUserRoleBean();
+                }
+                session.setAttribute("userRole", currentRole);
+            }
+            // YW << For the case that current role is not "invalid" but current
+            // active study has been removed.
+            else if (currentRole.getId() > 0 && (currentStudy.getStatus().equals(Status.DELETED) || currentStudy.getStatus().equals(Status.AUTO_DELETED))) {
+                currentRole.setRole(Role.INVALID);
+                currentRole.setStatus(Status.DELETED);
+                session.setAttribute("userRole", currentRole);
+            }
+            StudyBean userRoleStudy = CoreResources.getPublicStudy(currentRole.getStudyId(), dataSource);
+
+            if (userRoleStudy.getParentStudyId() > 0) {
                 /*
                  * The Role decription will be set depending on whether the user
                  * logged in at study lever or site level. issue-2422
@@ -434,33 +464,7 @@ public abstract class CoreSecureController extends HttpServlet {
                 }
             }
 
-            if (currentRole == null || currentRole.getId() <= 0) {
-                // if (ub.getId() > 0 && currentStudy.getId() > 0) {
-                // if current study has been "removed", current role will be
-                // kept as "invalid" -- YW 06-21-2007
-                if (ub.getId() > 0 && currentStudy.getId() > 0 && !currentStudy.getStatus().getName().equals("removed")) {
-                    currentRole = ub.getRoleByStudy(currentStudy.getId());
-                    if (currentStudy.getParentStudyId() > 0) {
-                        // Checking if currentStudy has been removed or not will
-                        // ge good enough -- YW 10-17-2007
-                        StudyUserRoleBean roleInParent = ub.getRoleByStudy(currentStudy.getParentStudyId());
-                        // inherited role from parent study, pick the higher
-                        // role
-                        currentRole.setRole(Role.max(currentRole.getRole(), roleInParent.getRole()));
-                    }
-                    // logger.info("currentRole:" + currentRole.getRoleName());
-                } else {
-                    currentRole = new StudyUserRoleBean();
-                }
-                session.setAttribute("userRole", currentRole);
-            }
-            // YW << For the case that current role is not "invalid" but current
-            // active study has been removed.
-            else if (currentRole.getId() > 0 && (currentStudy.getStatus().equals(Status.DELETED) || currentStudy.getStatus().equals(Status.AUTO_DELETED))) {
-                currentRole.setRole(Role.INVALID);
-                currentRole.setStatus(Status.DELETED);
-                session.setAttribute("userRole", currentRole);
-            }
+
             // YW 06-19-2007 >>
 
             request.setAttribute("isAdminServlet", getAdminServlet());

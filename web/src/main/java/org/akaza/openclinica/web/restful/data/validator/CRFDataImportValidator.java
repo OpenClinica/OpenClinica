@@ -64,17 +64,20 @@ public class CRFDataImportValidator implements Validator {
             String studySubjectOID = study_oid;
             String originalFileName = request.getHeader("originalFileName");
         	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
-        	String recordNum = null;
-        	if(originalFileName !=null) {
-        		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
-        		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
-        	}
-        	String msg = e.getAllErrors().get(0).getCode() +":" + e.getAllErrors().get(0).getDefaultMessage();
-        	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
-    		this.getRestfulServiceHelper().getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
-    		
+            if(originalFileName != null) {
+            	String recordNum = null;
+            	if(originalFileName !=null) {
+            		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
+            		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
+            	}
+            	String msg = e.getAllErrors().get(0).getCode() +":" + e.getAllErrors().get(0).getDefaultMessage();
+            	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
+        		this.getRestfulServiceHelper().getImportDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
+        		
+            }
         	
-        	return;
+        	
+            return;
         }
 //        StudyBean study = getStudyDAO().findByOid(crfDataImportBean.getStudyUniqueId());
 //        if (study == null) {

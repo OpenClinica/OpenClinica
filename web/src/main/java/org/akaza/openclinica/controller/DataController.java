@@ -419,8 +419,15 @@ public class DataController {
                 		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
                 	}
-                	String msg = "errorCode.ValidationFailed:" + err_msg;
-                	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
+                	// keep original msg like: 1|SS_SUB4|SUCCESS|Skip
+                	String msg = null;
+                	if(err_msg != null && err_msg.indexOf("|SUCCESS|Skip") > 0){
+                		msg = err_msg;
+                	}else {
+                		msg = "errorCode.ValidationFailed:" + err_msg;
+                    	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;	
+                	}
+                	
     	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
     	    		
     	    		
@@ -435,6 +442,24 @@ public class DataController {
                 List<String> auditMsgs = new DataImportService().submitData(odmContainer, dataSource, studyBean, userBean, displayItemBeanWrappers,
                         importedCRFStatuses);
 
+                /**
+                 *  For new import, after submit, then can log success info
+                 */               
+            	String originalFileName = request.getHeader("originalFileName");
+            	if(originalFileName != null) {
+            		 String studySubjectOID = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getSubjectOID();
+                 	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
+                 	String recordNum = null;
+                 	if(originalFileName !=null) {
+                 		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
+                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
+                 	}
+                 	String msg;
+                 	msg = recordNum + "|" + studySubjectOID + "|SUCCESS|" + "Insert";	    			    		
+     	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
+     	    			
+            	}
+            	
                 // run rules if applicable
                 List<String> ruleActionMsgs = dataImportService.runRules(studyBean, userBean, containers, ruleSetService, ExecutionMode.SAVE);
 

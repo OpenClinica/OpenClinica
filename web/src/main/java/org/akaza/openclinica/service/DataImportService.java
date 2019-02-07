@@ -141,6 +141,7 @@ public class DataImportService {
         auditMsg.append(respage.getString("passed_study_check") + " ");
         auditMsg.append(respage.getString("passed_oid_metadata_check") + " ");
 
+        try {
         // validation errors, the same as in the ImportCRFDataServlet. DRY?
         Boolean eventCRFStatusesValid = getImportCRFDataService().eventCRFStatusesValid(odmContainer, userBean);
         
@@ -205,7 +206,7 @@ public class DataImportService {
         HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
         HashMap<String, String> hardValidationErrors = new HashMap<String, String>();
 
-        try {
+      
             List<DisplayItemBeanWrapper> tempDisplayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             // htaycher: this should be rewritten with validator not to use request to store data
            // MockHttpServletRequest request = new MockHttpServletRequest();
