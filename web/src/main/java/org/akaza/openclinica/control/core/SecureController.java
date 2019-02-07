@@ -38,6 +38,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
@@ -471,7 +472,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             System.out.println("Metric1" + new Date());
 
             try {
-                if (shouldProcessUser())
                     ocUserUuid = controller.getOcUserUuid(request);
             } catch (CustomRuntimeException e) {
                 forwardPage(Page.ERROR);
@@ -1436,8 +1436,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         StudyBuildService studyBuildService = (StudyBuildService) SpringServletAccess.getApplicationContext(context).getBean("studyBuildService");
         StudyDao studyDao = (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
         List<ChangeStudyDTO> byUser = studyDao.findByUser(username);
-        ResponseEntity<List<StudyEnvironmentRoleDTO>> userRoles = studyBuildService.getUserRoles(request);
-        Set<CustomRole> customRoles = userRoles.getBody().stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
+        List<StudyEnvironmentRoleDTO> userRoles = (List<StudyEnvironmentRoleDTO>) session.getAttribute("allUserRoles");
+        Set<CustomRole> customRoles = userRoles.stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
     }
 
     protected String getParticipateStatus(int parentStudyId) {

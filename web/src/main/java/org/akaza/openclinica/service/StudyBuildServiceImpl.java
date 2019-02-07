@@ -97,7 +97,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             study.setDateCreated(new Date());
             study.setSchemaName(schemaName);
             Integer studyId = (Integer) studyDao.save(study);
-            isUserUpdated = saveStudyEnvRoles(request, ub);
+            isUserUpdated = saveStudyEnvRoles(request, ub, false);
         } catch (Exception e) {
             logger.error("Error while creating a study entry in public schema:" + schemaName);
             logger.error(e.getMessage(), e);
@@ -182,7 +182,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
             if (StringUtils.isEmpty(studyEnvUuid))
                 return studyEnvUuidProcessed;
         }
-        updateStudyUserRoles(request, ub, userActiveStudyId, studyEnvUuid);
+        updateStudyUserRoles(request, ub, userActiveStudyId, studyEnvUuid, false);
 
         StudyDAO studyDAO = new StudyDAO(dataSource);
         StudyBean currentPublicStudy = studyDAO.findByStudyEnvUuid(studyEnvUuid);
@@ -224,7 +224,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return byUserId;
     }
 
-    public boolean saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ubIn) throws Exception {
+    public boolean saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ubIn, boolean isLogin) throws Exception {
         UserAccount ub = userAccountDao.findByUserId(ubIn.getId());
         boolean studyUserRoleUpdated;
         int userActiveStudyId;
@@ -243,7 +243,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
 
         if (studyEnvUuidProcessed)
             return true;
-        studyUserRoleUpdated = updateStudyUserRoles(request, ub, userActiveStudyId, null);
+        studyUserRoleUpdated = updateStudyUserRoles(request, ub, userActiveStudyId, null, isLogin);
         if (ub.getActiveStudy() == null) {
             logger.error("There are no studies or this user has no studies avaiable");
             throw new CustomRuntimeException("There are no studies or this user has no studies avaiable", null);
@@ -273,13 +273,13 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
     @Transactional(propagation = Propagation.REQUIRED, isolation = Isolation.DEFAULT)
-    public boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId, String altStudyEnvUuid) {
+    public boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId, String altStudyEnvUuid, boolean isLogin) {
         boolean studyUserRoleUpdated = false;
         HttpSession session = request.getSession();
         String currentSchema = CoreResources.getRequestSchema();
         CoreResources.setRequestSchema(request, "public");
 
-        ResponseEntity<List<StudyEnvironmentRoleDTO>> userRoles = getUserRoles(request);
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> userRoles = getUserRoles(request, isLogin);
 
         if (userRoles == null) {
             CoreResources.setRequestSchema(currentSchema);
@@ -398,8 +398,11 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return true;
     }
 
-    public ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request) {
-        return permissionService.getUserRoles(request);
+    public ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request, boolean isLogin) {
+        ResponseEntity<List<StudyEnvironmentRoleDTO>> responseEntity = permissionService.getUserRoles(request);
+        if (isLogin)
+            request.getSession().setAttribute("allUserRoles", responseEntity.getBody());
+        return responseEntity;
     }
 
     public ResponseEntity getUserDetails(HttpServletRequest request) {
