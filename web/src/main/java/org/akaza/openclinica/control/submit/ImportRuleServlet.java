@@ -235,7 +235,7 @@ public class ImportRuleServlet extends SecureController {
             return;
         }
         Role r = currentRole.getRole();
-        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR)) {
+        if (r.equals(Role.STUDYDIRECTOR) || r.equals(Role.COORDINATOR) || r.equals(Role.STUDY_RESEARCHASSISTANT) || r.equals(Role.STUDY_INVESTIGATOR) || r.equals(Role.INVESTIGATOR)) {
             return;
         }
         addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
