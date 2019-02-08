@@ -127,7 +127,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
         return study;
     }
     public List<String> findAllSchemas() {
-        Query query = getCurrentSession().createNativeQuery("SELECT schema_name FROM public.study");
+        Query query = getCurrentSession().createNativeQuery("SELECT DISTINCT schema_name FROM public.study");
         List<String> result = (List<String>) query.getResultList();
         return result;
     }
