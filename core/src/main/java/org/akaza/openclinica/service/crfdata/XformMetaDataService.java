@@ -522,6 +522,7 @@ public class XformMetaDataService {
                 FormLayout formLayout = createCRFMetaData(
                         new CrfMetaDataObject(eicObj.form, version, container, eicObj.getStudy(), eicObj.ub, eicObj.errors, formLayoutDef.getURL()));
                 saveFormArtifactsInOCDataDirectory(fileLinks, eicObj.getStudy(), eicObj.form.getOcoid(), version.getOcoid(), formLayout);
+                logger.info("After Saving Form Artifacts");
                 saveMediaFiles(fileLinks, eicObj.getStudy(), eicObj.form.getOcoid(), formLayout);
             } catch (Exception e) {
                 // TODO Auto-generated catch block
@@ -640,6 +641,7 @@ public class XformMetaDataService {
         // Create the directory structure for saving the media
         String dir = Utils.getCrfMediaPath(study.getOc_oid(), study.getFilePath(), crfOid, formLayout.getOcOid());
         for (String fileLink : fileLinks) {
+        logger.info("Saving media file {}", fileLink);
             String fileName = "";
             int startIndex = fileLink.lastIndexOf('/');
             if (startIndex != -1) {

@@ -182,9 +182,11 @@ public class OdmImportServiceImpl implements OdmImportService {
 								eventDefinitionCrf.setDateUpdated(new Date());
 								eventDefinitionCrf = getEventDefinitionCrfDao().saveOrUpdate(eventDefinitionCrf);
 								restoreSiteDefinitions(eventDefinitionCrf.getEventDefinitionCrfId(), userAccount.getUserId());
-
+								logger.info("Restoring event definition crf and cascade down to events,forms and items...{} - {}",eventDefinitionCrf.getStudyEventDefinition().getName(),eventDefinitionCrf.getCrf().getName());
 								eventService.restoreCrfFromEventDefinition(eventDefinitionCrf.getEventDefinitionCrfId(),
 										studyEventDefinition.getStudyEventDefinitionId(), userAccount.getUserId());
+								logger.info("Completed Restoring event definition crf and cascade down to events,forms and items...{} - {}",eventDefinitionCrf.getStudyEventDefinition().getName(),eventDefinitionCrf.getCrf().getName());
+
 							}
 							String defaultVersionName = null;
 							OCodmComplexTypeDefinitionConfigurationParameters conf = odmFormRef.getConfigurationParameters();
@@ -248,8 +250,10 @@ public class OdmImportServiceImpl implements OdmImportService {
 							ocEventDefCrf.setDateUpdated(new Date());
 							ocEventDefCrf = getEventDefinitionCrfDao().saveOrUpdate(ocEventDefCrf);
 							removeSiteDefinitions(ocEventDefCrf.getEventDefinitionCrfId(), userAccount.getUserId());
+							logger.info("Archiving event definition crf and cascade down to events,forms and items...{} - {}",ocEventDefCrf.getStudyEventDefinition().getName(),ocEventDefCrf.getCrf().getName());
 							eventService.removeCrfFromEventDefinition(ocEventDefCrf.getEventDefinitionCrfId(), studyEventDefinition.getStudyEventDefinitionId(),
 									userAccount.getUserId(), study.getStudyId());
+							logger.info("Completed Archiving event definition crf and cascade down to events,forms and items...{} - {}",ocEventDefCrf.getStudyEventDefinition().getName(),ocEventDefCrf.getCrf().getName());
 						}
 					}
 				}
@@ -321,6 +325,8 @@ public class OdmImportServiceImpl implements OdmImportService {
 			String crfName = odmFormDef.getName();
 
 			CrfBean crfBean = getCrfDao().findByOcOID(crfOid);
+			logger.info("Save or update Crf {}",crfName);
+
 			if (crfBean != null) {
 				List<String> jsonLayoutOids = new ArrayList<>();
 				for (OCodmComplexTypeDefinitionFormLayoutDef formLayoutDef : formLayoutDefs) {
@@ -344,6 +350,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 	private Set<Long> saveOrUpdateCrfAndFormLayouts(String crfOid, List<OCodmComplexTypeDefinitionFormLayoutDef> formLayoutDefs, Form[] fmCrfs,
 			UserAccount userAccount, Study study, String crfName, Set<Long> publishedVersions, Errors errors) {
 		for (Form crf : fmCrfs) {
+			logger.info("Executing individual crf {}",crf.getName());
 			if (crf.getOcoid().equals(crfOid)) {
 				crf.setName(crfName);
 				ExecuteIndividualCrfObject eicObj = new ExecuteIndividualCrfObject(crf, formLayoutDefs, errors, study, userAccount, true, null);
@@ -370,7 +377,9 @@ public class OdmImportServiceImpl implements OdmImportService {
 			} else {
 				if (!studyEventDefinition.getStatus().equals(Status.AVAILABLE)) {
 					// restore study event defn
+					logger.info("Restoring study event {}",studyEventDefinition.getName());
 					eventService.restoreStudyEventDefn(studyEventDefinition.getStudyEventDefinitionId(), userAccount.getUserId());
+					logger.info("Completed Restoring study event {}",studyEventDefinition.getName());
 				}
 				studyEventDefinition = getStudyEventDefDao().saveOrUpdate(updateEventDef(odmStudyEventDef, userAccount, studyEventDefinition, study, errors));
 			}
@@ -380,7 +389,9 @@ public class OdmImportServiceImpl implements OdmImportService {
 		for (StudyEventDefinition ocEvent : ocEventList) {
 			if (!jsonEventList.contains(ocEvent)) {
 				// remove study event defn
+				logger.info("Removing study event {}",ocEvent.getName());
 				eventService.removeStudyEventDefn(ocEvent.getStudyEventDefinitionId(), userAccount.getUserId());
+				logger.info("Completed Removing study event {}",ocEvent.getName());
 			}
 		}
 
