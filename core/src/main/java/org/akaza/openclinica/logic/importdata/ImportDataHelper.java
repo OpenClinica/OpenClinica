@@ -619,17 +619,35 @@ public class ImportDataHelper {
     		importFileDir = this.getPersonalImportFileDir(request);
 	    	 // check user role
 	    	if(this.hasDMrole(request)) {
-	    		//C:\tools\apache-tomcat-7.0.82/openclinica.data/import\31\root_1\
-	    		 if(importFileDir.endsWith("\\")) {
-	            	 int endIndex = importFileDir.lastIndexOf("\\");	    		
-	         		importFileDir = importFileDir.substring(0, endIndex);
-	         		// 2nd time
-	         		endIndex = importFileDir.lastIndexOf("\\");	    		
-	         		importFileDir = importFileDir.substring(0, endIndex);
-	            }else {
-	            	 int endIndex = importFileDir.lastIndexOf("\\");	    		
-		         	 importFileDir = importFileDir.substring(0, endIndex);
-	            }
+	    		//C:\tools\apache-tomcat-7.0.82/openclinica.data/import\31\root_1\	    		
+	    		if(importFileDir.indexOf("\\") > -1) {
+	    			 if(importFileDir.endsWith("\\")) {
+		            	 int endIndex = importFileDir.lastIndexOf("\\");	    		
+		         		importFileDir = importFileDir.substring(0, endIndex);
+		         		// 2nd time
+		         		endIndex = importFileDir.lastIndexOf("\\");	    		
+		         		importFileDir = importFileDir.substring(0, endIndex);
+		            }else {
+		            	 int endIndex = importFileDir.lastIndexOf("\\");	    		
+			         	 importFileDir = importFileDir.substring(0, endIndex);
+		            }
+	    		}else {
+	    			// LINUX:  /opt/tomcat/openclinica.data/import/2171/customcrc_351/
+		    		if(importFileDir.indexOf("/") > -1) {
+		    			 if(importFileDir.endsWith("/")) {
+			            	 int endIndex = importFileDir.lastIndexOf("/");	    		
+			         		importFileDir = importFileDir.substring(0, endIndex);
+			         		// 2nd time
+			         		endIndex = importFileDir.lastIndexOf("/");	    		
+			         		importFileDir = importFileDir.substring(0, endIndex);
+			            }else {
+			            	 int endIndex = importFileDir.lastIndexOf("/");	    		
+				         	 importFileDir = importFileDir.substring(0, endIndex);
+			            }
+		    		}
+	    		}
+	    		
+	    		
 	    	}
 	    	
 	    	fileFolder = new File(importFileDir);
