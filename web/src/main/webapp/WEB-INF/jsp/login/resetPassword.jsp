@@ -6,7 +6,7 @@
 <jsp:include page="../login-include/resetpwd-sidebar.jsp"/>
 
 <script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery.min.js'/>">
-<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-migrate-1.1.1.js'/>"></script>
+<script type="text/JavaScript" language="JavaScript" src="<c:url value='/includes/jmesa/jquery-migrate-1.4.1.js'/>"></script>
 <jsp:useBean scope="request" id="mustChangePass" class="java.lang.String"/>
 
 <h1><span class="title_manage"><fmt:message key="reset_password" bundle="${resword}"/></span></h1>
