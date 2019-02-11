@@ -21,7 +21,7 @@ public class CustomerServiceClientImpl {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
 
-    public CustomerDTO getCustomer(HttpServletRequest request,String customerUuid) {
+    public CustomerDTO getCustomer(String accessToken,String customerUuid) {
         int index = sbsUrl.indexOf("//");
         String protocol = sbsUrl.substring(0, index) + "//";
         String domainUrl=sbsUrl.substring(index + 2, sbsUrl.indexOf("/", index + 2));
@@ -32,7 +32,6 @@ public class CustomerServiceClientImpl {
         headers.setContentType(MediaType.APPLICATION_JSON);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Accept-Charset", "UTF-8");
         StudyBean studyBean = null;

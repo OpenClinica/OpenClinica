@@ -13,6 +13,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.submit.ItemBean;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
@@ -39,6 +40,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
 
 @Component
 public class JobTriggerService {
@@ -73,7 +75,7 @@ public class JobTriggerService {
 
 	// @Scheduled(cron = "0 0/2 * * * ?") // trigger every 2 minutes
 	// @Scheduled(cron = "0 0/1 * * * ?") // trigger every minute
-	@Scheduled(cron = "0 0 0/1 * * ?") // trigger every hour
+	 @Scheduled(cron = "0 0 0/1 * * ?") // trigger every hour
 	public void hourlyJobTrigger() throws NumberFormatException, ParseException {
 	    try {
     		logger.debug("The time is now " + currentDateFormat.format(new Date()));
@@ -96,6 +98,8 @@ public class JobTriggerService {
 			ArrayList<RuleSetBean> ruleSets = ruleSetDao.findAllRunOnSchedulesPerSchema(true, schema);
 			for (RuleSetBean ruleSet : ruleSets) {
 				if (ruleSet.getStatus().AVAILABLE != null && ruleSet.isRunSchedule()) {
+					CoreResources.tenantSchema.set(schema);
+
 					if(ruleSet.getItemId()!=null){
 						// item Specific Rule
 						System.out.println("*** Item Specific Rule ***");

@@ -163,8 +163,8 @@ public class CallbackServiceImpl implements CallbackService {
         return (UserAccountBean) request.getAttribute("createdUaBean");
     }
 
-    public void updateParticipateModuleStatus(HttpServletRequest request,String studyOid){
-        studyBuildService.updateParticipateModuleStatusInOC(request, studyOid);
+    public void updateParticipateModuleStatus(String accessToken,String studyOid){
+        studyBuildService.updateParticipateModuleStatusInOC(accessToken, studyOid);
     }
 
 }

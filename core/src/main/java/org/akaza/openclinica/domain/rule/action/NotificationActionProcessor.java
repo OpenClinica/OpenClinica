@@ -42,18 +42,21 @@ import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
 import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
-import org.akaza.openclinica.service.BulkEmailSenderService;
-import org.akaza.openclinica.service.OCUserDTO;
-import org.akaza.openclinica.service.ParticipantAccessDTO;
+import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAccountRequest;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAccountResponse;
 import org.akaza.openclinica.service.participant.ParticipantServiceImpl;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.keycloak.authorization.client.AuthzClient;
+import org.keycloak.authorization.client.Configuration;
+import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.util.JsonSerialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
 import org.springframework.http.client.ClientHttpRequestFactory;
 import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
@@ -75,6 +78,8 @@ import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
 import org.springframework.web.context.request.RequestContextHolder;
 import org.springframework.web.context.request.ServletRequestAttributes;
 
+import java.io.IOException;
+import java.io.InputStream;
 import java.text.MessageFormat;
 import java.util.*;
 
@@ -107,6 +112,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	String participateStatus;
     StudySubject studySubject;
     String accessToken;
+    PermissionService permissionService;
 
     public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionBean ruleActionBean, ParticipantDTO pDTO,
 			String email) {
@@ -229,8 +235,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(parentStudyBean.getId(), "participantPortal");
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
-		HttpServletRequest request= CoreResources.getRequest();
-		String accessToken = (String) request.getSession().getAttribute("accessToken");
+		String accessToken=getAccessToken();
 
 		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, studySubject, studyBean, message, emailSubject, mailSender,participateStatus,accessToken));
 		thread.start();
@@ -430,5 +435,22 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		return participantAccessDTO;
 	}
+
+	public String getAccessToken() {
+		logger.debug("Creating Auth0 Api Token");
+
+		try {
+			InputStream inputStream = new ClassPathResource("keycloak.json", this.getClass().getClassLoader()).getInputStream();
+			AuthzClient authzClient = AuthzClient.create(JsonSerialization.readValue(inputStream, Configuration.class));
+			AccessTokenResponse accessTokenResponse = authzClient.obtainAccessToken();
+			if (accessTokenResponse != null)
+				return accessTokenResponse.getToken();
+		} catch (IOException e) {
+			logger.error("Could not read keycloak.json", e);
+			return null;
+		}
+		return null;
+	}
+
 
 }
