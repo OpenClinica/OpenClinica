@@ -235,8 +235,6 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 		StudyParameterValueBean pStatus = spvdao.findByHandleAndStudy(parentStudyBean.getId(), "participantPortal");
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
-	//	HttpServletRequest request= CoreResources.getRequest();
-	//	String accessToken = (String) request.getSession().getAttribute("accessToken");
 		String accessToken=getAccessToken();
 
 		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, studySubject, studyBean, message, emailSubject, mailSender,participateStatus,accessToken));

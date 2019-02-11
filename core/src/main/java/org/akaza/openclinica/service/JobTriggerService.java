@@ -75,7 +75,7 @@ public class JobTriggerService {
 
 	// @Scheduled(cron = "0 0/2 * * * ?") // trigger every 2 minutes
 	// @Scheduled(cron = "0 0/1 * * * ?") // trigger every minute
-	@Scheduled(cron = "0 0 0/1 * * ?") // trigger every hour
+	 @Scheduled(cron = "0 0 0/1 * * ?") // trigger every hour
 	public void hourlyJobTrigger() throws NumberFormatException, ParseException {
 	    try {
     		logger.debug("The time is now " + currentDateFormat.format(new Date()));
@@ -87,7 +87,6 @@ public class JobTriggerService {
 	    }
 	}
 
-	@Transactional
 	public void triggerJob(){
 		ResourceBundleProvider.updateLocale(new Locale("en_US"));
 		List<String> schemas = studyDao.findAllSchemas();
