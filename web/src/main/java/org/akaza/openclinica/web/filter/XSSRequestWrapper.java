@@ -45,7 +45,6 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
         for (int i = 0; i < count; i++) {
             encodedValues[i] = stripXSS(values[i]);
         }
-
         return encodedValues;
     }
 
@@ -71,9 +70,7 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
             // Avoid null characters
             value = value.replaceAll("", "");
 
-            // Avoid anything between script tags
-            Pattern scriptPattern = Pattern.compile("<script>(.*?)</script>", Pattern.CASE_INSENSITIVE);
-            value = scriptPattern.matcher(value).replaceAll("");
+            Pattern scriptPattern;
 
             // Avoid anything in a src='...' type of expression
             scriptPattern = Pattern.compile("src[\r\n]*=[\r\n]*\\\'(.*?)\\\'", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
@@ -108,6 +105,10 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
 
             // Avoid onload= expressions
             scriptPattern = Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+            value = scriptPattern.matcher(value).replaceAll("");
+
+            // PSQL Injection
+            scriptPattern = Pattern.compile("'|%27|\\\"|%22|--|%2d%2d|/\\*\\*/|%2f\\*\\*%2f|;|%3b|(|)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
             value = scriptPattern.matcher(value).replaceAll("");
         }
         return value;

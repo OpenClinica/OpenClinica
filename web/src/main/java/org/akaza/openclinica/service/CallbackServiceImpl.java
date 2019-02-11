@@ -67,7 +67,9 @@ public class CallbackServiceImpl implements CallbackService {
             ub = createUserAccount(request, user, userContextMap);
         }
         updateUser(request, ub, user, userContextMap);
-        boolean isUserUpdated = updateStudyUserRoles(request, ub);
+        boolean isUserUpdated = false;
+        if (StringUtils.equals((String) request.getSession().getAttribute("firstLoginCheck"), "true"))
+            isUserUpdated = updateStudyUserRoles(request, ub);
         return new UserAccountHelper(ub, isUserUpdated);
     }
 
@@ -96,6 +98,11 @@ public class CallbackServiceImpl implements CallbackService {
         }
         if (StringUtils.equals(ub.getLastName(), user.getFamilyName()) != true) {
             ub.setLastName(user.getFamilyName());
+            isUpdated = true;
+
+        }
+        if (StringUtils.equals(ub.getFirstName(), user.getGivenName()) != true) {
+            ub.setFirstName(user.getGivenName());
             isUpdated = true;
 
         }
@@ -129,7 +136,7 @@ public class CallbackServiceImpl implements CallbackService {
     }
     @Modifying
     private boolean updateStudyUserRoles(HttpServletRequest request, UserAccountBean ub) throws Exception {
-        return studyBuildService.saveStudyEnvRoles(request, ub);
+        return studyBuildService.saveStudyEnvRoles(request, ub, true);
     }
 
     private UserAccountBean createUserAccount(HttpServletRequest request, KeycloakUser user, Map<String, Object> userContextMap ) throws Exception {
@@ -156,8 +163,8 @@ public class CallbackServiceImpl implements CallbackService {
         return (UserAccountBean) request.getAttribute("createdUaBean");
     }
 
-    public void updateParticipateModuleStatus(HttpServletRequest request,String studyOid){
-        studyBuildService.updateParticipateModuleStatusInOC(request, studyOid);
+    public void updateParticipateModuleStatus(String accessToken,String studyOid){
+        studyBuildService.updateParticipateModuleStatusInOC(accessToken, studyOid);
     }
 
 }

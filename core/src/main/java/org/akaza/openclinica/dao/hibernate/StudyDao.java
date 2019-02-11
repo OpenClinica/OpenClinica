@@ -42,11 +42,18 @@ public class StudyDao extends AbstractDomainDao<Study> {
         return (Study) q.uniqueResult();
     }
 
+    public List<Study> findAllActiveSites(int parentStudyId) {
+        String query = " from Study do  where parent_study_id=:parentStudyId and status_id=1";
+        Query q = getCurrentSession().createQuery(query);
+        q.setParameter("parentStudyId", parentStudyId);
+        return q.list();
+    }
     public List<ChangeStudyDTO> findByUser(String username) {
         getSessionFactory().getStatistics().logSummary();
         String query = " select s.study_id as \"studyId\", concat(s.study_env_uuid, ps.study_env_uuid) as \"studyEnvUuid\", s.study_env_site_uuid as \"siteEnvUuid\" \n" +
-                "\t      from study s left join (select study_id from study_user_role tmp where tmp.status_id = 1 and tmp.role_name != 'admin' and tmp.user_name=:username) sur on (s.study_id=sur.study_id)\n" +
-                "\t      left join study ps on (s.parent_study_id = ps.study_id)";
+                "\t      from study s\n" +
+                "\t      left join study ps on (s.parent_study_id = ps.study_id) where s.study_id in (select study_id from study_user_role where user_name=:username)\n" +
+                "\t      or s.parent_study_id in (select study_id from study_user_role where user_name=:username);";
         Query q = getCurrentSession().createNativeQuery(query).setResultTransformer(Transformers.aliasToBean(ChangeStudyDTO.class));
         q.setParameter("username", username);
         return q.list();
@@ -120,7 +127,7 @@ public class StudyDao extends AbstractDomainDao<Study> {
         return study;
     }
     public List<String> findAllSchemas() {
-        Query query = getCurrentSession().createNativeQuery("SELECT schema_name FROM public.study");
+        Query query = getCurrentSession().createNativeQuery("SELECT DISTINCT schema_name FROM public.study");
         List<String> result = (List<String>) query.getResultList();
         return result;
     }

@@ -23,6 +23,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ListStudySubjectTableFactory;
 import org.akaza.openclinica.controller.helper.StudyInfoObject;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyConfigService;
@@ -102,7 +103,7 @@ public class ChangeStudyServlet extends SecureController {
             }
         }
 
-        ArrayList validStudies = new ArrayList();
+        ArrayList<StudyUserRoleBean> validStudies = new ArrayList<>();
         ArrayList<StudyBean> studyList = new ArrayList<>();
         for (int i = 0; i < studies.size(); i++) {
             StudyUserRoleBean sr = (StudyUserRoleBean) studies.get(i);
@@ -246,7 +247,9 @@ public class ChangeStudyServlet extends SecureController {
             ub.setUpdater(ub);
             ub.setUpdatedDate(new java.util.Date());
             udao.update(ub);
-            getStudyBuildService().updateParticipateModuleStatusInOC(request,newPublicStudy.getOid());
+
+            String accessToken = (String) request.getSession().getAttribute("accessToken");
+            getStudyBuildService().updateParticipateModuleStatusInOC(accessToken,newPublicStudy.getOid());
             request.setAttribute("changeStudySchema", newStudySchema);
             StudyDAO sdaoStudy = new StudyDAO(sm.getDataSource());
             StudyBean study = sdaoStudy.findByStudyEnvUuid(studyEnvUuid);
@@ -254,7 +257,9 @@ public class ChangeStudyServlet extends SecureController {
             study.setStudyParameterConfig(newStudy.getStudyParameterConfig());
             session.setAttribute("study", study);
             currentStudy = study;
-            if (newStudy.getParentStudyId() > 0) {
+
+            StudyBean userRoleStudy = CoreResources.getPublicStudy(currentRole.getStudyId(), sm.getDataSource());
+            if (userRoleStudy.getParentStudyId() > 0) {
                 /*
                  * The Role decription will be set depending on whether the user
                  * logged in at study lever or site level. issue-2422

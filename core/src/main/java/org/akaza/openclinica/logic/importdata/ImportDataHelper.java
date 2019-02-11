@@ -70,6 +70,7 @@ public class ImportDataHelper {
     static private String importFileDir;
     private String personalImportFileDir;
     private String currentUserName;
+    private int currentActiveStudyId;
 
     public void setSessionManager(SessionManager sm) {
         this.sm = sm;
@@ -353,11 +354,12 @@ public class ImportDataHelper {
 	                return err_msg;
 	          }else {	        	  
 	        	  userName = userBean.getName();
-	        	  if(this.getCurrentUserName().equals(userName)) {
+	        	  activeStudyId = userBean.getActiveStudyId();
+	        	  
+	        	  if(this.getCurrentUserName().equals(userName) && this.getCurrentActiveStudyId()==activeStudyId) {
 	        		  return personalImportFileDir;
 	        	  }else {
-	        		  prepareNewDir = true;
-	        		  activeStudyId = userBean.getActiveStudyId();
+	        		  prepareNewDir = true;	        		  
 	        	  }
 	          }	  
 			  
@@ -376,10 +378,12 @@ public class ImportDataHelper {
 	          if (userBean == null) {
 	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
 	                return err_msg;
-	          }else {
-	        	  this.setCurrentUserName(userName);
+	          }else {	        	 
 	        	  userName = (userBean.getName()+"_" +userBean.getId()).toLowerCase().replace(" ","");
 	        	  activeStudyId = userBean.getActiveStudyId();
+	        	  
+	        	  this.setCurrentUserName(userName);
+	        	  this.setCurrentActiveStudyId(activeStudyId);
 	          }
 	          
 	          
@@ -396,69 +400,7 @@ public class ImportDataHelper {
 		return personalImportFileDir;
 	}
    
-    /**
-     *  get data manager log file folder 
-     * @param request
-     * @return
-     */
-    public String getDMImportFileDir(HttpServletRequest request) {
-  	  String userName = "";
-  	  boolean prepareNewDir = false; 
-  	  UserAccountBean userBean = null;
-  	  int activeStudyId=-999;
-  	  
-		  if (personalImportFileDir != null) {
-			  // All the uploaded files will be saved in filePath/import/userName/
-	          userBean = this.getUserAccount(request);
-
-	          if (userBean == null) {
-	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
-	                return err_msg;
-	          }else {	        	  
-	        	  userName = userBean.getName();
-	        	  if(this.getCurrentUserName().equals(userName)) {
-	        		  return personalImportFileDir;
-	        	  }else {
-	        		  prepareNewDir = true;
-	        		  activeStudyId = userBean.getActiveStudyId();
-	        	  }
-	          }	  
-			  
-		  }else {
-			  prepareNewDir = true;  
-		  }	 
-		  
-		  if(prepareNewDir) {
-			  String dir = CoreResources.getField("filePath");
-	          if (!new File(dir).exists()) {
-	              logger.info("The filePath in datainfo.properties is invalid " + dir);             
-	          }
-	          // All the uploaded files will be saved in filePath/import/userName/
-	          userBean = this.getUserAccount(request);
-
-	          if (userBean == null) {
-	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
-	                return err_msg;
-	          }else {
-	        	  this.setCurrentUserName(userName);
-	        	  userName = (userBean.getName()+"_" +userBean.getId()).toLowerCase().replace(" ","");
-	        	  activeStudyId = userBean.getActiveStudyId();
-	          }
-	          
-	          
-	          String theDir = dir + "import" + File.separator + activeStudyId+ File.separator;
-        	         
-	          if (!new File(theDir).isDirectory()) {
-	              new File(theDir).mkdirs();
-	              logger.info("Made the directory " + theDir);
-	          }
-	        
-	          personalImportFileDir = theDir;
-		  }
-		 
-		return personalImportFileDir;
-	}
-
+   
     public void deleteTempImportFile(File file,String studyOID) {
     	String fileName = file.getName();
     	String importFileDir = this.getImportFileDir(studyOID);
@@ -673,11 +615,39 @@ public class ImportDataHelper {
     	if(fileDir != null) {
     		fileFolder = fileDir;
     	}else {
+    		
+    		importFileDir = this.getPersonalImportFileDir(request);
 	    	 // check user role
 	    	if(this.hasDMrole(request)) {
-	    		importFileDir = this.getDMImportFileDir(request);
-	    	}else {
-	    		importFileDir = this.getPersonalImportFileDir(request);
+	    		//C:\tools\apache-tomcat-7.0.82/openclinica.data/import\31\root_1\	    		
+	    		if(importFileDir.indexOf("\\") > -1) {
+	    			 if(importFileDir.endsWith("\\")) {
+		            	 int endIndex = importFileDir.lastIndexOf("\\");	    		
+		         		importFileDir = importFileDir.substring(0, endIndex);
+		         		// 2nd time
+		         		endIndex = importFileDir.lastIndexOf("\\");	    		
+		         		importFileDir = importFileDir.substring(0, endIndex);
+		            }else {
+		            	 int endIndex = importFileDir.lastIndexOf("\\");	    		
+			         	 importFileDir = importFileDir.substring(0, endIndex);
+		            }
+	    		}else {
+	    			// LINUX:  /opt/tomcat/openclinica.data/import/2171/customcrc_351/
+		    		if(importFileDir.indexOf("/") > -1) {
+		    			 if(importFileDir.endsWith("/")) {
+			            	 int endIndex = importFileDir.lastIndexOf("/");	    		
+			         		importFileDir = importFileDir.substring(0, endIndex);
+			         		// 2nd time
+			         		endIndex = importFileDir.lastIndexOf("/");	    		
+			         		importFileDir = importFileDir.substring(0, endIndex);
+			            }else {
+			            	 int endIndex = importFileDir.lastIndexOf("/");	    		
+				         	 importFileDir = importFileDir.substring(0, endIndex);
+			            }
+		    		}
+	    		}
+	    		
+	    		
 	    	}
 	    	
 	    	fileFolder = new File(importFileDir);
@@ -829,6 +799,14 @@ public String getCurrentUserName() {
 
 public void setCurrentUserName(String currentUserName) {
 	this.currentUserName = currentUserName;
+}
+
+public int getCurrentActiveStudyId() {
+	return currentActiveStudyId;
+}
+
+public void setCurrentActiveStudyId(int currentActiveStudyId) {
+	this.currentActiveStudyId = currentActiveStudyId;
 }
 
    }

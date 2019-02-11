@@ -19,6 +19,7 @@ import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLRequest;
 import org.apache.commons.codec.binary.Base64;
+import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -45,6 +46,11 @@ public class UserController {
     @Autowired
     @Qualifier( "sidebarInit" )
     private SidebarInit sidebarInit;
+    private RestfulServiceHelper restfulServiceHelper;
+
+    @Autowired
+    @Qualifier( "dataSource" )
+    private BasicDataSource dataSource;
 
     @Autowired
     private UserService userService;
@@ -84,8 +90,12 @@ public class UserController {
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}/connect", method = RequestMethod.POST )
     public ResponseEntity<OCUserDTO> connectParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid, @RequestBody OCParticipantDTO participantDTO) {
+        setSchemaFromRequest(studyOid, request);
+        String accessToken = getAccessTokenFromRequest(request);
+        UserAccountBean ownerUserAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+        String customerUuid = getCustomerUuidFromRequest(request);
 
-        OCUserDTO ocUserDTO= userService.connectParticipant(studyOid, ssid, participantDTO ,request);
+        OCUserDTO ocUserDTO= userService.connectParticipant(studyOid, ssid, participantDTO ,accessToken,ownerUserAccountBean,customerUuid);
         logger.info("REST request to POST OCUserDTO : {}", ocUserDTO);
         return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.OK);
     }
@@ -93,8 +103,10 @@ public class UserController {
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}", method = RequestMethod.GET )
     public ResponseEntity<OCUserDTO> getParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid) {
+        setSchemaFromRequest(studyOid, request);
+        String accessToken = getAccessTokenFromRequest(request);
 
-        OCUserDTO ocUserDTO = userService.getParticipantAccount(studyOid, ssid, request);
+        OCUserDTO ocUserDTO = userService.getParticipantAccount(studyOid, ssid, accessToken);
         logger.info("REST request to GET OCUserDTO : {}", ocUserDTO);
         if (ocUserDTO == null) {
             return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.NOT_FOUND);
@@ -106,9 +118,10 @@ public class UserController {
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participantUsers", method = RequestMethod.GET )
     public ResponseEntity<List <OCUserDTO>> getAllParticipantFromUserService(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid) {
-        userService.getRestfulServiceHelper().setSchema(studyOid, request);
+        setSchemaFromRequest(studyOid, request);
+        String accessToken = getAccessTokenFromRequest(request);
 
-        List <OCUserDTO> ocUserDTOs = userService.getAllParticipantAccountsFromUserService(request);
+        List <OCUserDTO> ocUserDTOs = userService.getAllParticipantAccountsFromUserService(accessToken);
         logger.info("REST request to GET List of OCUserDTO : {}", ocUserDTOs);
 
         return new ResponseEntity<List <OCUserDTO>>(ocUserDTOs, HttpStatus.OK);
@@ -117,8 +130,11 @@ public class UserController {
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}/accessLink", method = RequestMethod.GET )
     public ResponseEntity<ParticipantAccessDTO> getAccessLink(HttpServletRequest request,@PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid) {
-        userService.getRestfulServiceHelper().setSchema(studyOid, request);
-        ParticipantAccessDTO participantAccessDTO= userService.getAccessInfo(request,studyOid, ssid);
+        setSchemaFromRequest(studyOid, request);
+        String accessToken = getAccessTokenFromRequest(request);
+        String customerUuid = getCustomerUuidFromRequest(request);
+
+        ParticipantAccessDTO participantAccessDTO= userService.getAccessInfo(accessToken,studyOid, ssid,customerUuid);
         if(participantAccessDTO==null){
             logger.error("REST request to GET AccessLink Object for Participant not found ");
             return new ResponseEntity<ParticipantAccessDTO>(participantAccessDTO, HttpStatus.NOT_FOUND);
@@ -159,5 +175,24 @@ public class UserController {
         this.sidebarInit = sidebarInit;
     }
 
+    public RestfulServiceHelper getRestfulServiceHelper() {
+        if (restfulServiceHelper == null) {
+            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
+        }
+        return restfulServiceHelper;
+    }
+
+    private String getAccessTokenFromRequest(HttpServletRequest request) {
+        return (String) request.getSession().getAttribute("accessToken");
+    }
+
+    private void setSchemaFromRequest(String studyOid,HttpServletRequest request){
+        getRestfulServiceHelper().setSchema(studyOid, request);
+    }
+
+private String getCustomerUuidFromRequest(HttpServletRequest request){
+    Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
+    return  (String) userContextMap.get("customerUuid");
+}
 
 }

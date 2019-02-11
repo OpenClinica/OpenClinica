@@ -75,7 +75,7 @@
 	<query>
 		<name>findByPublicPK</name>
 		<sql>SELECT s.* FROM public.study s
-			WHERE s.id = ?
+			WHERE s.study_id = ?
 		</sql>
 	</query>
 	<query>

@@ -196,6 +196,7 @@ public class EventService implements EventServiceInterface {
 	}
 
 	public void removeAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub, StudyBean study) {
+		logger.info("Removing All Event Crf Items.. {} - items",edc.getCrf().getName() );
 		CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
 		// Getting Study Events
 		ArrayList seList = getStudyEventDao().findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), crf.getOid());
@@ -257,6 +258,7 @@ public class EventService implements EventServiceInterface {
 	}
 
 	public void restoreAllEventsItems(EventDefinitionCRFBean edc, StudyEventDefinitionBean sed, UserAccountBean ub) {
+		logger.info("Restoring All Event Items.. {} - items",edc.getCrf().getName() );
 		CRFBean crf = (CRFBean) getCrfDao().findByPK(edc.getCrfId());
 		// All Study Events
 		ArrayList seList = getStudyEventDao().findAllByStudyEventDefinitionAndCrfOids(sed.getOid(), crf.getOid());

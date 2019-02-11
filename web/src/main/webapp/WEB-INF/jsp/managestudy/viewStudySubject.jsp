@@ -14,7 +14,7 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
 <%-- <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa-original.js"></script> --%>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 <script type="text/javascript">
   function onInvokeAction(id,action) {
       if(id.indexOf('findSubjects') == -1)  {
@@ -238,6 +238,9 @@
   }
   .left {
     float: left;
+  }
+  .right {
+    float: right;
   }
   .clear {
     clear: both;
@@ -1504,7 +1507,7 @@
       </tr>
       <tr>
         <td colspan="2" style="text-align: center;">
-          <input type="button" class="cancel" value="Close"/>
+          <input type="button" class="cancel right" value="Close"/>
         </td>
       </tr>
     </table>
@@ -1522,7 +1525,7 @@
         console.log(arguments);
     }
 
-    function logAudit(name, typid) {
+    function logAudit(name, typid , oldValue, newValue) {
       jQuery.ajax({
           type: 'post',
           url: '${pageContext.request.contextPath}/pages/auth/api/studies/${study.oid}/auditEvents',
@@ -1531,7 +1534,9 @@
               auditTable: 'study_subject',
               entityId: '${studySub.id}',
               entityName: name,
-              auditLogEventTypId: typid                
+              auditLogEventTypId: typid,
+              oldValue:oldValue,
+              newValue:newValue
           }),
           error: logDump
       });
@@ -1603,7 +1608,7 @@
             };
             var oldName  = participateInfo.firstName;
             var oldEmail = participateInfo.email;
-            var oldPhone = participateInfo.mobilePhone;
+            var oldPhone = participateInfo.phoneNumber;
             var newName  = data.firstName;
             var newEmail = data.email;
             var newPhone = data.mobilePhone;
@@ -1621,17 +1626,17 @@
             var isPhoneUpdated = hasOldPhone && newPhone != oldPhone;
 
             if (isNameNew)
-                logAudit('Participant first name', 43);
+                logAudit('Participant first name', 43,oldName,newName);
             if (isNameUpdated)
-                logAudit('Participant first name', 44);
+                logAudit('Participant first name', 44,oldName,newName);
             if (isEmailNew)
-                logAudit('Participant email address', 46);
+                logAudit('Participant email address', 46,oldEmail,newEmail);
             if (isEmailUpdated)
-                logAudit('Participant email address', 47);
+                logAudit('Participant email address', 47,oldEmail,newEmail);
             if (isPhoneNew)
-                logAudit('Participant phone number', 49);
+                logAudit('Participant phone number', 49,oldPhone,newPhone);
             if (isPhoneUpdated)
-                logAudit('Participant phone number', 50);
+                logAudit('Participant phone number', 50,oldPhone,newPhone);
 
             jQuery.ajax({
                 type: 'post',

@@ -18,7 +18,7 @@
         	ale.new_value, ale.event_crf_id, ua.user_name, alet.name
 			FROM audit_log_event ale JOIN user_account ua ON ale.user_id=ua.user_id
      		JOIN audit_log_event_type alet ON ale.audit_log_event_type_id=alet.audit_log_event_type_id
-			WHERE ale.audit_table='study_subject' AND ale.audit_log_event_type_id IN (2,3,4,27,42) AND ale.entity_id=? order by ale.audit_date desc;
+			WHERE ale.audit_table='study_subject' AND ale.audit_log_event_type_id IN (2,3,4,27,42,43,44,45,46,47,48,49,50,51) AND ale.entity_id=? order by ale.audit_date desc;
 		</sql>
 	</query>
 	<query>

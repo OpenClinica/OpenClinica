@@ -633,4 +633,17 @@
             droopdown.style.display = 'none';
         }
     }
+    
+    var currentUrl = window.location.href;
+    var urlParam = currentUrl.split('?')[1] || '';
+    var params = urlParam.split('&');
+    for (var i=0; i<params.length; i++) {
+        var parts = params[i].split('=');
+        var key = parts[0];
+        var value = parts[1];
+        if (key === "originatingPage") {
+            window.originatingPage = decodeURIComponent(value);
+            break;
+        }
+    }
 </script>

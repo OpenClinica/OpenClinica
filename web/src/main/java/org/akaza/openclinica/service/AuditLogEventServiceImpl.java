@@ -47,6 +47,8 @@ public class AuditLogEventServiceImpl implements AuditLogEventService {
     @Autowired
     private UserAccountDao userAccountDao;
 
+    @Autowired
+    private CryptoConverter cryptoConverter;
     private RestfulServiceHelper restfulServiceHelper;
 
 
@@ -68,6 +70,9 @@ public class AuditLogEventServiceImpl implements AuditLogEventService {
         auditLogEvent.setEntityId(Integer.valueOf(auditLogEventDTO.getEntityId()));
         auditLogEvent.setEntityName(auditLogEventDTO.getEntityName());
         auditLogEvent.setAuditTable(auditLogEventDTO.getAuditTable());
+
+        auditLogEvent.setOldValue(cryptoConverter.convertToDatabaseColumn(auditLogEventDTO.getOldValue()));
+        auditLogEvent.setNewValue(cryptoConverter.convertToDatabaseColumn(auditLogEventDTO.getNewValue()));
 
         auditLogEvent.setAuditDate(new Timestamp(System.currentTimeMillis()));
         UserAccount userAccount = userAccountDao.findByUserId(ub.getId());

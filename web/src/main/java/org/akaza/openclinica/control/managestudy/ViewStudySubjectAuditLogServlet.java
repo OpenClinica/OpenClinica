@@ -16,8 +16,10 @@ import java.util.stream.Collectors;
 
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.FormLayoutBean;
@@ -29,6 +31,7 @@ import org.akaza.openclinica.control.form.FormProcessor;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.AuditDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
@@ -105,7 +108,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
         FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
 
         ArrayList studySubjectAudits = new ArrayList();
-        ArrayList <AuditBean> eventCRFAudits = new ArrayList();
+        ArrayList<AuditBean> eventCRFAudits = new ArrayList();
         ArrayList studyEventAudits = new ArrayList();
         ArrayList allDeletedEventCRFs = new ArrayList();
         String attachedFilePath = Utils.getAttachedFilePath(currentStudy);
@@ -161,11 +164,28 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             Collection studySubjectAuditEvents = adao.findStudySubjectAuditEvents(studySubject.getId());
             // Text values will be shown on the page for the corresponding
             // integer values.
-            for (Iterator iterator = studySubjectAuditEvents.iterator(); iterator.hasNext();) {
+
+            Role role = currentRole.getRole();
+
+            for (Iterator iterator = studySubjectAuditEvents.iterator(); iterator.hasNext(); ) {
                 AuditBean auditBean = (AuditBean) iterator.next();
                 if (auditBean.getAuditEventTypeId() == 3) {
                     auditBean.setOldValue(Status.get(Integer.parseInt(auditBean.getOldValue())).getName());
                     auditBean.setNewValue(Status.get(Integer.parseInt(auditBean.getNewValue())).getName());
+                }
+
+                if (getAuditLogEventTypes().contains(auditBean.getAuditEventTypeId())) {
+
+                    if ((role.equals(Role.RESEARCHASSISTANT)
+                            && role.getDescription().equals("Clinical Research Coordinator"))
+                            || (role.equals(Role.INVESTIGATOR)
+                            && role.getDescription().equals("Investigator"))) {
+                        auditBean.setOldValue(getCrytoConverter().convertToEntityAttribute(auditBean.getOldValue()));
+                        auditBean.setNewValue(getCrytoConverter().convertToEntityAttribute(auditBean.getNewValue()));
+                    } else {
+                        auditBean.setOldValue("<Masked>");
+                        auditBean.setNewValue("<Masked>");
+                    }
                 }
             }
             studySubjectAudits.addAll(studySubjectAuditEvents);
@@ -181,7 +201,7 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
             for (int i = 0; i < events.size(); i++) {
                 // Link study event definitions
                 StudyEventBean studyEvent = (StudyEventBean) events.get(i);
-                StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean)seddao.findByPK(studyEvent.getStudyEventDefinitionId());
+                StudyEventDefinitionBean sedBean = (StudyEventDefinitionBean) seddao.findByPK(studyEvent.getStudyEventDefinitionId());
                 studyEvent.setStudyEventDefinition(sedBean);
 
                 // Link event CRFs
@@ -202,21 +222,22 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                     // Link CRF and CRF Versions
                     EventCRFBean eventCRF = (EventCRFBean) eventCRFs.get(j);
                     eventCRF.setFormLayout((FormLayoutBean) fldao.findByPK(eventCRF.getFormLayoutId()));
-                    CRFBean crf =cdao.findByLayoutId(eventCRF.getFormLayoutId());
-                    StudyEventDefinitionBean sed = (StudyEventDefinitionBean)seddao.findByPK(studyEvent.getStudyEventDefinitionId());
+                    CRFBean crf = cdao.findByLayoutId(eventCRF.getFormLayoutId());
+                    StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(studyEvent.getStudyEventDefinitionId());
                     eventCRF.setCrf(crf);
                     // Get the event crf audits
 
-                    List<String> tagIds = getPermissionTagsList().size()!=0 ?getPermissionTagsList():new ArrayList<>();
+                    List<String> tagIds = getPermissionTagsList().size() != 0 ? getPermissionTagsList() : new ArrayList<>();
 
-                    List < AuditBean> abs= (List<AuditBean>) adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId());
+                    List<AuditBean> abs = (List<AuditBean>) adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId());
                     for (AuditBean ab : abs) {
                         if (ab.getAuditTable().equalsIgnoreCase("item_data")) {
                             EventDefinitionCRFBean edc = edcdao.findByStudyEventDefinitionIdAndCRFId(study, sed.getId(), crf.getId());
-                            List <EventDefinitionCrfPermissionTag> edcPTagIds= eventDefinitionCrfPermissionTagDao.findByEdcIdTagId(edc.getId(), edc.getParentId(),tagIds);
-                            if(edcPTagIds.size()!=0){
+                            List<EventDefinitionCrfPermissionTag> edcPTagIds = eventDefinitionCrfPermissionTagDao.findByEdcIdTagId(edc.getId(), edc.getParentId(), tagIds);
+                            if (edcPTagIds.size() != 0) {
                                 ab.setOldValue("<Masked>");
-                                ab.setNewValue("<Masked>");                            }
+                                ab.setNewValue("<Masked>");
+                            }
                         }
                     }
 
@@ -252,4 +273,14 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
         }
     }
 
+    private List<Integer> getAuditLogEventTypes() {
+        List<Integer> auditLogEventTypes = new ArrayList<>();
+        auditLogEventTypes.add(43);
+        auditLogEventTypes.add(44);
+        auditLogEventTypes.add(46);
+        auditLogEventTypes.add(47);
+        auditLogEventTypes.add(49);
+        auditLogEventTypes.add(50);
+        return auditLogEventTypes;
+    }
 }
