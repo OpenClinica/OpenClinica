@@ -27,6 +27,7 @@ public class AuditLogBean extends ElementOIDBean {
     private String name = "";
     private String valueType = "";
     private String details = "";
+    private int auditLogEventTypeId;
 
     public int compareTo(Object o) {
         AuditLogBean b = (AuditLogBean) o;
@@ -113,4 +114,11 @@ public class AuditLogBean extends ElementOIDBean {
         this.details = details;
     }
 
+    public int getAuditLogEventTypeId() {
+        return auditLogEventTypeId;
+    }
+
+    public void setAuditLogEventTypeId(int auditLogEventTypeId) {
+        this.auditLogEventTypeId = auditLogEventTypeId;
+    }
 }

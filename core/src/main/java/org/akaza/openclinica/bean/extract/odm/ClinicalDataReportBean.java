@@ -657,6 +657,14 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
             String vt = audit.getValueType();
             String details = (audit.getDetails() != null) ? audit.getDetails() : "";
 
+            if (getAuditLogEventTypes().contains(audit.getAuditLogEventTypeId()) && o.length() > 0) {
+                o = StringEscapeUtils.escapeXml("Masked");
+            }
+            if (getAuditLogEventTypes().contains(audit.getAuditLogEventTypeId()) && n.length() > 0) {
+                n = StringEscapeUtils.escapeXml("Masked");
+            }
+
+
             Boolean p = i.length() > 0 || u.length() > 0 || d != null || t.length() > 0 || r.length() > 0 || o.length() > 0 || n.length() > 0 ? true : false;
             if (p) {
                 xml.append(currentIndent + "<OpenClinica:AuditLog ");
@@ -1005,7 +1013,16 @@ public class ClinicalDataReportBean extends OdmXmlReportBean {
         }
 
 
-
+    private List<Integer> getAuditLogEventTypes() {
+        List<Integer> auditLogEventTypes = new ArrayList<>();
+        auditLogEventTypes.add(43);
+        auditLogEventTypes.add(44);
+        auditLogEventTypes.add(46);
+        auditLogEventTypes.add(47);
+        auditLogEventTypes.add(49);
+        auditLogEventTypes.add(50);
+        return auditLogEventTypes;
+    }
 
 
 }
