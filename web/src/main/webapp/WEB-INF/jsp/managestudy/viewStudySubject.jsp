@@ -239,6 +239,9 @@
   .left {
     float: left;
   }
+  .right {
+    float: right;
+  }
   .clear {
     clear: both;
   }
@@ -1504,7 +1507,7 @@
       </tr>
       <tr>
         <td colspan="2" style="text-align: center;">
-          <input type="button" class="cancel" value="Close"/>
+          <input type="button" class="cancel right" value="Close"/>
         </td>
       </tr>
     </table>
