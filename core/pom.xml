@@ -7,7 +7,7 @@
     <parent>
         <groupId>org.akaza.openclinica</groupId>
         <artifactId>OpenClinica</artifactId>
-        <version>4.6.2</version>
+        <version>4.6.3</version>
     </parent>
     <dependencies>
         <dependency>
