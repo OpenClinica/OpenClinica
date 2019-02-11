@@ -117,8 +117,7 @@ public class UserServiceImpl implements UserService {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, HttpServletRequest request) {
-        getRestfulServiceHelper().setSchema(studyOid, request);
+    public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken,UserAccountBean ownerUserAccountBean,String customerUuid) {
         OCUserDTO ocUserDTO = null;
         Study tenantStudy = getStudy(studyOid);
 
@@ -128,13 +127,12 @@ public class UserServiceImpl implements UserService {
         String username = oid + "." + studySubject.getOcOid();
         username = username.replaceAll("\\(", ".").replaceAll("\\)", "");
 
-        UserAccountBean ownerUserAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 
 
         String accessCode = "";
         do {
             accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
-        } while (keycloakClient.searchAccessCodeExists(request, accessCode));
+        } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode,customerUuid));
 
 
         Study publicStudy = studyDao.findPublicStudy(tenantStudy.getOc_oid());
@@ -148,7 +146,7 @@ public class UserServiceImpl implements UserService {
             if (studySubject.getUserId() == null) {
                 logger.info("Participate has not registered yet");
                 // create participant user Account In Keycloak
-                String keycloakUserId = keycloakClient.createParticipateUser(request, null, username, accessCode,studyEnvironment);
+                String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode,studyEnvironment,customerUuid);
                 // create participant user Account In Runtime
                 userAccount = createUserAccount(participantDTO, studySubject, ownerUserAccountBean, username, publicStudy, keycloakUserId);
 
@@ -174,7 +172,7 @@ public class UserServiceImpl implements UserService {
         }
         if (participantDTO.isInviteParticipant()) {
 
-            ParticipantAccessDTO accessDTO= getAccessInfo(request,studyOid,ssid);
+            ParticipantAccessDTO accessDTO= getAccessInfo(accessToken,studyOid,ssid,customerUuid);
 
             sendEmailToParticipant(studySubject, userAccount,tenantStudy, accessDTO);
             //studySubject.setUserStatus(UserStatus.INVITED);
@@ -211,9 +209,8 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public OCUserDTO getParticipantAccount(String studyOid, String ssid, HttpServletRequest request) {
+    public OCUserDTO getParticipantAccount(String studyOid, String ssid, String accessToken) {
 
-        getRestfulServiceHelper().setSchema(studyOid, request);
         OCUserDTO ocUserDTO = null;
 
         Study study = getStudy(studyOid);
@@ -290,14 +287,13 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public List<OCUserDTO> getAllParticipantAccountsFromUserService(HttpServletRequest request) {
+    public List<OCUserDTO> getAllParticipantAccountsFromUserService(String accessToken) {
         String uri = sbsUrl.substring(0, sbsUrl.length() - 1) + PAGINATION;
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Accept-Charset", "UTF-8");
         StudyBean studyBean = null;
@@ -398,15 +394,10 @@ public class UserServiceImpl implements UserService {
         }
     }
 
-    public RestfulServiceHelper getRestfulServiceHelper() {
-        if (restfulServiceHelper == null) {
-            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
-        }
-        return restfulServiceHelper;
-    }
 
 
-    public ParticipantAccessDTO getAccessInfo( HttpServletRequest request,String studyOid, String ssid) {
+
+    public ParticipantAccessDTO getAccessInfo( String accessToken,String studyOid, String ssid,String customerUuid) {
         Study tenantStudy = getStudy(studyOid);
         StudySubject studySubject = getStudySubject(ssid, tenantStudy);
         if(studySubject==null || studySubject.getUserId()==null) {
@@ -421,7 +412,7 @@ public class UserServiceImpl implements UserService {
             logger.error("Participant account not found");
             return null;
         }
-        String accessCode = keycloakClient.getAccessCode(request,pUserAccount.getUserUuid());
+        String accessCode = keycloakClient.getAccessCode(accessToken,pUserAccount.getUserUuid(),customerUuid);
 
         if(accessCode==null) {
             logger.error(" Access code from Keycloack returned null ");
@@ -430,7 +421,7 @@ public class UserServiceImpl implements UserService {
         if (tenantStudy.getStudy()!=null)
             tenantStudy = tenantStudy.getStudy();
 
-        List<ModuleConfigDTO> moduleConfigDTOs = studyBuildService.getParticipateModuleFromStudyService(request, tenantStudy);
+        List<ModuleConfigDTO> moduleConfigDTOs = studyBuildService.getParticipateModuleFromStudyService(accessToken, tenantStudy);
         if (moduleConfigDTOs != null && moduleConfigDTOs.size() != 0) {
             ModuleConfigDTO moduleConfigDTO = studyBuildService.getModuleConfig(moduleConfigDTOs, tenantStudy);
             if (moduleConfigDTO != null) {

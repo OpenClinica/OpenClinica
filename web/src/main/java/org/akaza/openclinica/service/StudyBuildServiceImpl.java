@@ -434,17 +434,16 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         logger.debug(numUpdated + " studyUserRoles updated for user:" + user.getNickname() + " and prevUser:" + user.getUserId());
     }
 
-    public void updateParticipateModuleStatusInOC(HttpServletRequest request, String studyOid) {
-        getRestfulServiceHelper().setSchema(studyOid, request);
+    public void updateParticipateModuleStatusInOC(String accessToken, String studyOid) {
         Study study = studyDao.findByOcOID(studyOid);
         if (study.getStudy() != null)
             study = study.getStudy();
-        persistparticipateModuleStatus(request, study);
+        persistparticipateModuleStatus(accessToken, study);
     }
 
 
-    public void persistparticipateModuleStatus(HttpServletRequest request, Study study) {
-        List<ModuleConfigDTO> moduleConfigDTOs = getParticipateModuleFromStudyService(request, study);
+    public void persistparticipateModuleStatus(String accessToken, Study study) {
+        List<ModuleConfigDTO> moduleConfigDTOs = getParticipateModuleFromStudyService(accessToken, study);
         persistparticipateModuleStatus(moduleConfigDTOs, study);
     }
 
@@ -506,10 +505,10 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
 
-    public List<ModuleConfigDTO> getParticipateModuleFromStudyService(HttpServletRequest request, Study study) {
+    public List<ModuleConfigDTO> getParticipateModuleFromStudyService(String accessToken, Study study) {
         if (StringUtils.isEmpty(study.getStudyUuid())) {
             // make call to study service to get study servie
-            StudyEnvironmentDTO studyEnvironmentDTO = getStudyUuidFromStudyService(request, study);
+            StudyEnvironmentDTO studyEnvironmentDTO = getStudyUuidFromStudyService(accessToken, study);
             study.setStudyUuid(studyEnvironmentDTO.getStudyUuid());
             // save in study table in public and tenant
             studyDao.saveOrUpdate(study);
@@ -526,7 +525,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Accept-Charset", "UTF-8");
         HttpEntity<String> entity = new HttpEntity<String>(headers);
@@ -543,7 +541,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         return response.getBody();
     }
 
-    public StudyEnvironmentDTO getStudyUuidFromStudyService(HttpServletRequest request, Study study) {
+    public StudyEnvironmentDTO getStudyUuidFromStudyService(String accessToken, Study study) {
 
         String SBSUrl = CoreResources.getField("SBSUrl");
         int index = SBSUrl.indexOf("//");
@@ -557,7 +555,6 @@ public class StudyBuildServiceImpl implements StudyBuildService {
         headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
         ObjectMapper objectMapper = new ObjectMapper();
         objectMapper.registerModule(new JavaTimeModule());
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Accept-Charset", "UTF-8");
         HttpEntity<String> entity = new HttpEntity<String>(headers);

@@ -247,7 +247,9 @@ public class ChangeStudyServlet extends SecureController {
             ub.setUpdater(ub);
             ub.setUpdatedDate(new java.util.Date());
             udao.update(ub);
-            getStudyBuildService().updateParticipateModuleStatusInOC(request,newPublicStudy.getOid());
+
+            String accessToken = (String) request.getSession().getAttribute("accessToken");
+            getStudyBuildService().updateParticipateModuleStatusInOC(accessToken,newPublicStudy.getOid());
             request.setAttribute("changeStudySchema", newStudySchema);
             StudyDAO sdaoStudy = new StudyDAO(sm.getDataSource());
             StudyBean study = sdaoStudy.findByStudyEnvUuid(studyEnvUuid);

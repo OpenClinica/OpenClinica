@@ -144,7 +144,9 @@ public class KeycloakController {
             if (ub.getActiveStudyId() != 0) {
                 studyDAO = new StudyDAO(dataSource);
                 StudyBean publicStudy = studyDAO.findByPublicPK(ub.getActiveStudyId());
-                callbackService.updateParticipateModuleStatus(req, publicStudy.getOid());
+                String accessToken = (String) req.getSession().getAttribute("accessToken");
+
+                callbackService.updateParticipateModuleStatus(accessToken, publicStudy.getOid());
                 SecureController.refreshUserRole(req, ub, CoreResources.getPublicStudy(publicStudy.getOid(),dataSource));
             }
 

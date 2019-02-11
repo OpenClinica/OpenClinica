@@ -34,9 +34,9 @@ public interface StudyBuildService {
 
     UserAccount getUserAccountObject(UserAccountBean ubIn);
 
-    void updateParticipateModuleStatusInOC(HttpServletRequest request, String studyOid);
+    void updateParticipateModuleStatusInOC(String accessToken, String studyOid);
 
-    List<ModuleConfigDTO> getParticipateModuleFromStudyService(HttpServletRequest request, Study study);
+    List<ModuleConfigDTO> getParticipateModuleFromStudyService(String accessToken, Study study);
 
     ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study study);
 

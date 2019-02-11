@@ -56,12 +56,11 @@ public class KeycloakClientImpl {
     @Autowired
     private Keycloak keycloak;
 
-    public String createParticipateUser(HttpServletRequest request, String email, String username, String accessCode,String studyEnvironment) {
+    public String createParticipateUser(String accessToken, String email, String username, String accessCode,String studyEnvironment,String customerUuid) {
         logger.debug("Calling Keycloak to create participate user with username: {}", username);
-        Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
-        String customerUuid = (String) userContextMap.get("customerUuid");
 
-        String realm = getRealmName(request, customerUuid);
+
+        String realm = getRealmName(accessToken, customerUuid);
         UserRepresentation userRepresentation = new UserRepresentation();
         userRepresentation.setEnabled(true);
         userRepresentation.setEmail(email);
@@ -90,11 +89,9 @@ public class KeycloakClientImpl {
         return handleKeycloakError(createUserResponse);
     }
 
-    public boolean searchAccessCodeExistsOrig(HttpServletRequest request, String accessCode) {
+    public boolean searchAccessCodeExistsOrig(String accessToken, String accessCode,String customerUuid) {
         logger.debug("Calling Keycloak to search for AccessCode uniqueness");
-        Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
-        String customerUuid = (String) userContextMap.get("customerUuid");
-        String realm = getRealmName(request, customerUuid);
+        String realm = getRealmName(accessToken, customerUuid);
         List<UserRepresentation> response = keycloak
                 .realm(realm)
                 .users()
@@ -109,11 +106,10 @@ public class KeycloakClientImpl {
 
     }
 
-    public String getAccessCode(HttpServletRequest request, String userUuid) {
+    public String getAccessCode(String accessToken, String userUuid,String customerUuid ) {
         logger.debug("Calling Keycloak to get participate UserPresentation object");
-        Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
-        String customerUuid = (String) userContextMap.get("customerUuid");
-        String realm = getRealmName(request, customerUuid);
+
+        String realm = getRealmName(accessToken, customerUuid);
         UserResource userResource = keycloak
                 .realm(realm)
                 .users()
@@ -127,8 +123,8 @@ public class KeycloakClientImpl {
     }
 
 
-    public String getRealmName(HttpServletRequest request, String customerUuid) {
-        CustomerDTO customerDTO = customerServiceClient.getCustomer(request, customerUuid);
+    public String getRealmName(String accessToken, String customerUuid) {
+        CustomerDTO customerDTO = customerServiceClient.getCustomer(accessToken, customerUuid);
         String realmName = customerDTO.getMetadata().get(DB_CONNECTION_KEY);
         logger.debug("Realm for customer uuid: {} is {}", customerUuid, realmName);
         return realmName;
@@ -148,13 +144,12 @@ public class KeycloakClientImpl {
     }
 
 
-    public boolean searchAccessCodeExists(HttpServletRequest request, String accessCode) {
+    public boolean searchAccessCodeExists(String accessToken, String accessCode,String customerUuid) {
         logger.debug("Calling Keycloak to search for AccessCode uniqueness");
         RestTemplate restTemplate = new RestTemplate();
 
-        Map<String, Object> userContextMap = (LinkedHashMap<String, Object>) request.getSession().getAttribute("userContextMap");
-        String customerUuid = (String) userContextMap.get("customerUuid");
-        String realm = getRealmName(request, customerUuid);
+
+        String realm = getRealmName(accessToken, customerUuid);
 
         AuthzClient authzClient = AuthzClient.create();
         String keycloakBaseUrl = authzClient.getConfiguration().getAuthServerUrl();
@@ -167,7 +162,6 @@ public class KeycloakClientImpl {
         String uri = uriComponentsBuilder.toUriString();
         logger.debug("Get User Access Code search : {}", uri);
 
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
         HttpHeaders headers = new HttpHeaders();
         headers.add("Authorization", "Bearer " + accessToken);
         headers.add("Accept-Charset", "UTF-8");
