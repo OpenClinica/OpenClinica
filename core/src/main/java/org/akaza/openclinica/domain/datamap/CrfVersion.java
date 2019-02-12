@@ -237,7 +237,7 @@ public class CrfVersion extends DataMapDomainObject {
         this.versioningMaps = versioningMaps;
     }
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "crfVersion")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "crfVersion")
     public List<EventCrf> getEventCrfs() {
         return this.eventCrfs;
     }
