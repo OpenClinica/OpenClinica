@@ -164,7 +164,7 @@ public class ODMClinicaDataResource {
                 return null;
 
 
-        report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray,meta,clinical);
+        report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray,meta,clinical,crossForm);
         // xmlSerializer.setForceTopLevelObject(true);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
@@ -305,7 +305,7 @@ public class ODMClinicaDataResource {
                             formVersionOID, includeDN, includeAudit, request.getLocale(), userId, crossForm),
                      archived, permissionTagsString,meta);
 
-        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,meta,clinical);
+        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,meta,clinical,crossForm);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();
@@ -382,7 +382,7 @@ public class ODMClinicaDataResource {
             if (report.getClinicalDataMap() == null)
                 return null;
 
-        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,meta,clinical);
+        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,meta,clinical,crossForm);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();

@@ -36,7 +36,7 @@ public class FullReportBean extends OdmXmlReportBean {
     /**
      * Create one ODM XML This method is still under construction. Right now it is for Snapshot filetype only.
      */
-    public void createOdmXml(boolean isDataset, DataSource dataSource, UserAccountBean userBean,String[] permissionTagsStringArray,boolean meta,boolean clinical) {
+    public void createOdmXml(boolean isDataset, DataSource dataSource, UserAccountBean userBean,String[] permissionTagsStringArray,boolean meta,boolean clinical,boolean crossForm) {
         this.addHeading();
         this.addRootStartLine();
         if (meta) {
@@ -66,7 +66,7 @@ public class FullReportBean extends OdmXmlReportBean {
             while (itc.hasNext()) {
                 OdmClinicalDataBean c = itc.next();
                 if (c.getExportSubjectData().size() > 0) {
-                    addNodeClinicalData(c, clinical, dataSource, userBean, permissionTagsStringArray);
+                    addNodeClinicalData(c, crossForm, dataSource, userBean, permissionTagsStringArray);
                 }
             }
         }
