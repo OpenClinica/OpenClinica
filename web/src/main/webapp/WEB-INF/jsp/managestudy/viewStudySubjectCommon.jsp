@@ -234,7 +234,7 @@ $(function() {
     var columns = {};
     
     $.when(
-        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y', function(data){
+        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n', function(data){
             odm = data;
             for (var i=0, studies=collection(odm.Study); i<studies.length; i++) {
                 if (studies[i]['@OID'] === '${study.oid}') {
@@ -285,6 +285,8 @@ $(function() {
 
     ).then(function() {
         collection(metadata.StudyEventDef).forEach(function(studyEvent) {
+            studyEvents[studyEvent['@OID']] = studyEvent;
+            studyEvent.showMe = studyEvent['@OpenClinica:EventType'] === 'Common';
             studyEvent.forms = {};
 
             collection(studyEvent.FormRef).forEach(function(ref) {
@@ -311,69 +313,66 @@ $(function() {
                     showMe: false
                 }, form);
             });
-
-            studyEvent.showMe = false;
-            studyEvents[studyEvent['@OID']] = studyEvent;
         });
 
-        collection(odm.ClinicalData.SubjectData['OpenClinica:Links']['OpenClinica:Link']).forEach(function(link) {
-            if (link['@rel'] !== 'common-add-new')
-                return;
+        // collection(odm.ClinicalData.SubjectData['OpenClinica:Links']['OpenClinica:Link']).forEach(function(link) {
+        //     if (link['@rel'] !== 'common-add-new')
+        //         return;
 
-            var oids = link['@tag'].split('.');
-            var studyEvent = studyEvents[oids[0]];
-            var form = studyEvent.forms[oids[1]];
-            form.addNew = link['@href'];
-            form.showMe = studyEvent.showMe = true;
-        });
+        //     var oids = link['@tag'].split('.');
+        //     var studyEvent = studyEvents[oids[0]];
+        //     var form = studyEvent.forms[oids[1]];
+        //     form.addNew = link['@href'];
+        //     form.showMe = studyEvent.showMe = true;
+        // });
 
-        collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
-            var studyEventOid = studyEventData['@StudyEventOID'];
-            var studyEvent = studyEvents[studyEventOid];
-            if (!studyEvent)
-                return;
+        // collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
+        //     var studyEventOid = studyEventData['@StudyEventOID'];
+        //     var studyEvent = studyEvents[studyEventOid];
+        //     if (!studyEvent)
+        //         return;
 
-            if (studyEvent['@OpenClinica:EventType'] !== 'Common')
-                return;
+        //     if (studyEvent['@OpenClinica:EventType'] !== 'Common')
+        //         return;
 
-            var formData = studyEventData.FormData;
-            if (!formData)
-                return;
+        //     var formData = studyEventData.FormData;
+        //     if (!formData)
+        //         return;
 
-            var formOid = formData['@FormOID'];
-            var form = studyEvent.forms[formOid];
-            if (!form)
-                return;
+        //     var formOid = formData['@FormOID'];
+        //     var form = studyEvent.forms[formOid];
+        //     if (!form)
+        //         return;
 
-            var submission = {
-                studyStatus: studyEventData['@OpenClinica:Status'],
-                hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
-                updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
-                updatedBy: formData['@OpenClinica:UpdatedBy'],
-                fields: copyObject(form.submissionFields),
-                links: collectLinks(studyEventData, formData)
-            };
-            collection(formData.ItemGroupData).forEach(function(igd) {
-                collection(igd.ItemData).forEach(function(itemData) {
-                    var itemOid = itemData['@ItemOID'];
-                    var data = submission.fields[itemOid];
-                    if (data) {
-                        var value = itemData['@Value'];
-                        var item = items[itemOid];
-                        if (item.codes) {
-                            value = value.split(',').map(function(code) {
-                                return item.codes[code];
-                            }).join(', ');
-                        }
-                        data.push(value);
-                    }
-                });
-            });
+        //     var submission = {
+        //         studyStatus: studyEventData['@OpenClinica:Status'],
+        //         hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
+        //         updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
+        //         updatedBy: formData['@OpenClinica:UpdatedBy'],
+        //         fields: copyObject(form.submissionFields),
+        //         links: collectLinks(studyEventData, formData)
+        //     };
+        //     collection(formData.ItemGroupData).forEach(function(igd) {
+        //         collection(igd.ItemData).forEach(function(itemData) {
+        //             var itemOid = itemData['@ItemOID'];
+        //             var data = submission.fields[itemOid];
+        //             if (data) {
+        //                 var value = itemData['@Value'];
+        //                 var item = items[itemOid];
+        //                 if (item.codes) {
+        //                     value = value.split(',').map(function(code) {
+        //                         return item.codes[code];
+        //                     }).join(', ');
+        //                 }
+        //                 data.push(value);
+        //             }
+        //         });
+        //     });
 
-            form.submissions.push(submission);
-            form.showMe = true;
-            studyEvent.showMe = true;
-        });
+        //     form.submissions.push(submission);
+        //     form.showMe = true;
+        //     studyEvent.showMe = true;
+        // });
 
         var hideClass = 'oc-status-removed';
         $.fn.DataTable.ext.search.push(
