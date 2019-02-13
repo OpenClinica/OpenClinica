@@ -22,21 +22,21 @@ public interface StudyBuildService {
 
     StudyInfoObject process(HttpServletRequest request, Study study, UserAccountBean ub) throws Exception;
 
-    boolean saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub) throws Exception;
+    boolean saveStudyEnvRoles(HttpServletRequest request, UserAccountBean ub, boolean isLogin) throws Exception;
 
-    ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request);
+    ResponseEntity<List<StudyEnvironmentRoleDTO>> getUserRoles(HttpServletRequest request, boolean isLogin);
 
     ResponseEntity getUserDetails(HttpServletRequest request);
 
     void updateStudyUsername(UserAccountBean ub, KeycloakUser user);
 
-    boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId, String altStudyEnvUuid);
+    boolean updateStudyUserRoles(HttpServletRequest request, UserAccount ub, int userActiveStudyId, String altStudyEnvUuid, boolean isLogin);
 
     UserAccount getUserAccountObject(UserAccountBean ubIn);
 
-    void updateParticipateModuleStatusInOC(HttpServletRequest request, String studyOid);
+    void updateParticipateModuleStatusInOC(String accessToken, String studyOid);
 
-    List<ModuleConfigDTO> getParticipateModuleFromStudyService(HttpServletRequest request, Study study);
+    List<ModuleConfigDTO> getParticipateModuleFromStudyService(String accessToken, Study study);
 
     ModuleConfigDTO getModuleConfig(List<ModuleConfigDTO> moduleConfigDTOs, Study study);
 

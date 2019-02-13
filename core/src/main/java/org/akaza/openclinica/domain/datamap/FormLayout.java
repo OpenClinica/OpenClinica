@@ -216,7 +216,7 @@ public class FormLayout extends DataMapDomainObject {
         this.xformName = xformName;
     }
 
-    @OneToMany(fetch = FetchType.EAGER, mappedBy = "formLayout")
+    @OneToMany(fetch = FetchType.LAZY, mappedBy = "formLayout")
     public List<EventCrf> getEventCrfs() {
         return this.eventCrfs;
     }

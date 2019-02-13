@@ -14,7 +14,7 @@
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa.js"></script>
 <%-- <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jmesa-original.js"></script> --%>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 <script type="text/javascript">
   function onInvokeAction(id,action) {
       if(id.indexOf('findSubjects') == -1)  {
@@ -238,6 +238,9 @@
   }
   .left {
     float: left;
+  }
+  .right {
+    float: right;
   }
   .clear {
     clear: both;
@@ -1504,7 +1507,7 @@
       </tr>
       <tr>
         <td colspan="2" style="text-align: center;">
-          <input type="button" class="cancel" value="Close"/>
+          <input type="button" class="cancel right" value="Close"/>
         </td>
       </tr>
     </table>
@@ -1522,7 +1525,7 @@
         console.log(arguments);
     }
 
-    function logAudit(name, typid) {
+    function logAudit(name, typid , oldValue, newValue) {
       jQuery.ajax({
           type: 'post',
           url: '${pageContext.request.contextPath}/pages/auth/api/studies/${study.oid}/auditEvents',
@@ -1531,7 +1534,9 @@
               auditTable: 'study_subject',
               entityId: '${studySub.id}',
               entityName: name,
-              auditLogEventTypId: typid                
+              auditLogEventTypId: typid,
+              oldValue:oldValue,
+              newValue:newValue
           }),
           error: logDump
       });
@@ -1601,7 +1606,6 @@
                 mobilePhone: $('#country-code').text() + ' ' + $('#phone-input').val(),
                 inviteParticipant: $('#invite-option input:checked').val()
             };
-
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',

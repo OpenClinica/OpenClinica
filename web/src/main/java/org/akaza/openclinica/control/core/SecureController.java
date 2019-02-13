@@ -26,10 +26,7 @@ import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.AuditableEntityDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.extract.ArchivedDatasetFileDAO;
-import org.akaza.openclinica.dao.hibernate.ChangeStudyDTO;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
-import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
-import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyConfigService;
@@ -38,6 +35,7 @@ import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.datamap.EventCrf;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
@@ -167,6 +165,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     private static String SCHEDULER = "schedulerFactoryBean";
     public static final String ENABLED = "enabled";
     protected UserService userService;
+    protected CryptoConverter cryptoConverter;
 
     private StdScheduler scheduler;
     /**
@@ -433,7 +432,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
         currentStudy = (StudyBean) session.getAttribute("study");
         currentPublicStudy = (StudyBean) session.getAttribute("publicStudy");
-        currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
+
+
 
         // Set current language preferences
         Locale locale = LocaleResolver.getLocale(request);
@@ -471,7 +471,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             System.out.println("Metric1" + new Date());
 
             try {
-                if (shouldProcessUser())
                     ocUserUuid = controller.getOcUserUuid(request);
             } catch (CustomRuntimeException e) {
                 forwardPage(Page.ERROR);
@@ -561,8 +560,27 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 }
                 // YW >>
             }
+            currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
 
-            if (currentPublicStudy.getParentStudyId() > 0) {
+            if (currentRole == null || !currentRole.isActive() || currentRole.getId() <= 0) {
+                refreshUserRole(request,ub,currentPublicStudy);
+                currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
+            }
+            // YW << For the case that current role is not "invalid" but current
+            // active study has been removed.
+            else if (currentPublicStudy.getId() == 0)
+                throw new Exception("No study assigned to this user");
+            else if (currentRole.getId() > 0
+                    && (currentPublicStudy.getStatus().equals(Status.DELETED) || currentPublicStudy.getStatus().equals(Status.AUTO_DELETED))) {
+                currentRole.setRole(Role.INVALID);
+                currentRole.setStatus(Status.DELETED);
+                session.setAttribute("userRole", currentRole);
+            }
+
+
+            StudyBean userRoleStudy = CoreResources.getPublicStudy(currentRole.getStudyId(), sm.getDataSource());
+
+            if (userRoleStudy.getParentStudyId() > 0) {
                 /*
                  * The Role decription will be set depending on whether the user logged in at study lever or site level.
                  * issue-2422
@@ -626,20 +644,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             }
 
 
-            if (currentRole == null || currentRole.getId() <= 0) {
-                refreshUserRole(request,ub,currentPublicStudy);
-                currentRole = (StudyUserRoleBean) session.getAttribute("userRole");
-            }
-            // YW << For the case that current role is not "invalid" but current
-            // active study has been removed.
-            else if (currentPublicStudy.getId() == 0)
-                throw new Exception("No study assigned to this user");
-            else if (currentRole.getId() > 0
-                    && (currentPublicStudy.getStatus().equals(Status.DELETED) || currentPublicStudy.getStatus().equals(Status.AUTO_DELETED))) {
-                currentRole.setRole(Role.INVALID);
-                currentRole.setStatus(Status.DELETED);
-                session.setAttribute("userRole", currentRole);
-            }
+
             // YW 06-19-2007 >>
 
             request.setAttribute("isAdminServlet", getAdminServlet());
@@ -1436,8 +1441,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         StudyBuildService studyBuildService = (StudyBuildService) SpringServletAccess.getApplicationContext(context).getBean("studyBuildService");
         StudyDao studyDao = (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
         List<ChangeStudyDTO> byUser = studyDao.findByUser(username);
-        ResponseEntity<List<StudyEnvironmentRoleDTO>> userRoles = studyBuildService.getUserRoles(request);
-        Set<CustomRole> customRoles = userRoles.getBody().stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
+        List<StudyEnvironmentRoleDTO> userRoles = (List<StudyEnvironmentRoleDTO>) session.getAttribute("allUserRoles");
+        Set<CustomRole> customRoles = userRoles.stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
     }
 
     protected String getParticipateStatus(int parentStudyId) {
@@ -1492,6 +1497,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
 
         return subjectCount;
+    }
+
+    protected CryptoConverter getCrytoConverter() {
+        return cryptoConverter= (CryptoConverter) SpringServletAccess.getApplicationContext(context).getBean("cryptoConverter");
     }
 
 

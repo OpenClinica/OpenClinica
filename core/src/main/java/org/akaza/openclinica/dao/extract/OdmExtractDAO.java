@@ -2525,6 +2525,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setDatetimeStamp(auditDate);
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
+                auditLog.setAuditLogEventTypeId(typeId);
                 if (typeId == 3 || typeId == 6) {
                     if ("0".equals(newValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());
@@ -2581,6 +2582,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
                 auditLog.setDetails(details);
+                auditLog.setAuditLogEventTypeId(typeId);
                 if (typeId == 17 || typeId == 18 || typeId == 19 || typeId == 20 || typeId == 21 || typeId == 22 || typeId == 23 || typeId == 31) {
                     if ("0".equals(newValue)) {
                         auditLog.setOldValue(SubjectEventStatus.INVALID.getName());
@@ -2636,6 +2638,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setDatetimeStamp(auditDate);
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
+                auditLog.setAuditLogEventTypeId(typeId);
                 if (typeId == 8 || typeId == 10 || typeId == 11 || typeId == 14 || typeId == 15 || typeId == 16) {
                     if ("0".equals(newValue)) {
                         auditLog.setNewValue(Status.INVALID.getName());
@@ -2708,6 +2711,7 @@ public class OdmExtractDAO extends DatasetDAO {
                 auditLog.setDatetimeStamp(auditDate);
                 auditLog.setType(type);
                 auditLog.setReasonForChange(auditReason);
+                auditLog.setAuditLogEventTypeId(typeId);
                 if (typeId == 12) {
                     if ("0".equals(newValue)) {
                         auditLog.setOldValue(Status.INVALID.getName());

@@ -9,6 +9,7 @@ import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.service.CallbackService;
 import org.akaza.openclinica.service.KeycloakUser;
@@ -44,6 +45,7 @@ public class KeycloakController {
     @Autowired
     @Qualifier("dataSource")
     private DataSource dataSource;
+    private StudyDAO studyDAO;
 
     public String buildAuthorizeUrl(HttpServletRequest request) {
         AuthzClient authzClient = AuthzClient.create();
@@ -120,6 +122,11 @@ public class KeycloakController {
 
         UserAccountHelper userAccountHelper;
         UserAccountBean prevUser = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
+        if (prevUser == null || StringUtils.isEmpty(prevUser.getName())) {
+            logger.info("Setting firstLoginCheck to true");
+            req.getSession().setAttribute("firstLoginCheck", "true");
+            logger.info("CallbackController set firstLoginCheck to true:%%%%%%%%");
+        }
         try {
             userAccountHelper = callbackService.isCallbackSuccessful(req, user);
         } catch (Exception e) {
@@ -132,16 +139,15 @@ public class KeycloakController {
                 ub = callbackService.getUpdatedUser(ub);
             }
             req.getSession().setAttribute(USER_BEAN_NAME, ub);
-            if (prevUser == null || StringUtils.isEmpty(prevUser.getName())) {
-                logger.info("Setting firstLoginCheck to true");
-                req.getSession().setAttribute("firstLoginCheck", "true");
-                logger.info("CallbackController set firstLoginCheck to true:%%%%%%%%");
-            }
+
             // Public study will be null if there is no active study for this user
             if (ub.getActiveStudyId() != 0) {
-                Study publicStudy = studyDao.findPublicStudyById(ub.getActiveStudyId());
-                callbackService.updateParticipateModuleStatus(req, publicStudy.getOc_oid());
-                SecureController.refreshUserRole(req, ub, CoreResources.getPublicStudy(publicStudy.getOc_oid(),dataSource));
+                studyDAO = new StudyDAO(dataSource);
+                StudyBean publicStudy = studyDAO.findByPublicPK(ub.getActiveStudyId());
+                String accessToken = (String) req.getSession().getAttribute("accessToken");
+
+                callbackService.updateParticipateModuleStatus(accessToken, publicStudy.getOid());
+                SecureController.refreshUserRole(req, ub, CoreResources.getPublicStudy(publicStudy.getOid(),dataSource));
             }
 
         } else {
