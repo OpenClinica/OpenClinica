@@ -140,6 +140,7 @@
       store(function(data) {
         delete data.collapseSections[n];
       });
+      section.trigger('uncollapse');
     }
     else {
       body.slideUp('fast');

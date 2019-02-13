@@ -140,61 +140,63 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section {{collapseState}}" data-section-number="{{sectionNumber}}">
+    <div class="section collapsed" data-section-number="{{sectionNumber}}" data-section-oid="{{studyEvent.[@OID]}}">
         <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
             {{studyEvent.[@Name]}}
         </div>
-        <div class="section-body">
-            {{#each studyEvent.forms as |form|}}
-            {{#if form.showMe}}
-                <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
-                    <div class="subsection-header">
-                        <h3 class="form-name">{{form.[@Name]}}</h3>
-                        <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
-                            {{#if form.addNew}}
-                                data-url="{{form.addNew}}"
-                            {{else}}
-                                disabled="disabled"
-                            {{/if}}>
-                    </div>
-                    <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
-                    <thead>
-                        <tr>
-                            {{#each form.columnTitles as |coltitle|}}
-                                <td>{{truncate coltitle 30}}</td>
-                            {{/each}}
-                            <td>Status</td>
-                            <td>Last Updated</td>
-                            <td>Updated By</td>
-                            <td>Actions</td>
-                            <td>oc-status-hide</td>
-                        </tr>
-                    </thead>
-                    <tbody>
-                        {{#each form.submissions as |submission|}}
-                            <tr class="submission {{submission.hideStatus}}">
-                                {{#each submission.fields as |data|}}
-                                    <td data-search="{{data}}">{{truncate data 200}}</td>
-                                {{/each}}
-                                <td>{{submission.studyStatus}}</td>
-                                <td>{{submission.updatedDate}}</td>
-                                <td>{{submission.updatedBy}}</td>
-                                <td class="actions">
-                                    {{#each submission.links as |link|}}
-                                        <a href="${pageContext.request.contextPath}{{link.[@href]}}">
-                                            <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title="{{link.[@rel]}}"></span>
-                                        </a>
-                                    {{/each}}
-                                </td>
-                                <td>{{submission.hideStatus}}</td>
-                            </tr>
-                        {{/each}}
-                    </tbody>
-                    </table>
+    </div>
+</script>
+<script id="section-body-tmpl" type="text/x-handlebars-template">
+    <div class="section-body">
+        {{#each studyEvent.forms as |form|}}
+        {{#if form.showMe}}
+            <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
+                <div class="subsection-header">
+                    <h3 class="form-name">{{form.[@Name]}}</h3>
+                    <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
+                        {{#if form.addNew}}
+                            data-url="{{form.addNew}}"
+                        {{else}}
+                            disabled="disabled"
+                        {{/if}}>
                 </div>
-            {{/if}}
-            {{/each}}
-        </div>
+                <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
+                <thead>
+                    <tr>
+                        {{#each form.columnTitles as |coltitle|}}
+                            <td>{{truncate coltitle 30}}</td>
+                        {{/each}}
+                        <td>Status</td>
+                        <td>Last Updated</td>
+                        <td>Updated By</td>
+                        <td>Actions</td>
+                        <td>oc-status-hide</td>
+                    </tr>
+                </thead>
+                <tbody>
+                    {{#each form.submissions as |submission|}}
+                        <tr class="submission {{submission.hideStatus}}">
+                            {{#each submission.fields as |data|}}
+                                <td data-search="{{data}}">{{truncate data 200}}</td>
+                            {{/each}}
+                            <td>{{submission.studyStatus}}</td>
+                            <td>{{submission.updatedDate}}</td>
+                            <td>{{submission.updatedBy}}</td>
+                            <td class="actions">
+                                {{#each submission.links as |link|}}
+                                    <a href="${pageContext.request.contextPath}{{link.[@href]}}">
+                                        <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title="{{link.[@rel]}}"></span>
+                                    </a>
+                                {{/each}}
+                            </td>
+                            <td>{{submission.hideStatus}}</td>
+                        </tr>
+                    {{/each}}
+                </tbody>
+                </table>
+            </div>
+        {{/if}}
+        {{/each}}
     </div>
 </script>
 
@@ -315,65 +317,6 @@ $(function() {
             });
         });
 
-        // collection(odm.ClinicalData.SubjectData['OpenClinica:Links']['OpenClinica:Link']).forEach(function(link) {
-        //     if (link['@rel'] !== 'common-add-new')
-        //         return;
-
-        //     var oids = link['@tag'].split('.');
-        //     var studyEvent = studyEvents[oids[0]];
-        //     var form = studyEvent.forms[oids[1]];
-        //     form.addNew = link['@href'];
-        //     form.showMe = studyEvent.showMe = true;
-        // });
-
-        // collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
-        //     var studyEventOid = studyEventData['@StudyEventOID'];
-        //     var studyEvent = studyEvents[studyEventOid];
-        //     if (!studyEvent)
-        //         return;
-
-        //     if (studyEvent['@OpenClinica:EventType'] !== 'Common')
-        //         return;
-
-        //     var formData = studyEventData.FormData;
-        //     if (!formData)
-        //         return;
-
-        //     var formOid = formData['@FormOID'];
-        //     var form = studyEvent.forms[formOid];
-        //     if (!form)
-        //         return;
-
-        //     var submission = {
-        //         studyStatus: studyEventData['@OpenClinica:Status'],
-        //         hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
-        //         updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
-        //         updatedBy: formData['@OpenClinica:UpdatedBy'],
-        //         fields: copyObject(form.submissionFields),
-        //         links: collectLinks(studyEventData, formData)
-        //     };
-        //     collection(formData.ItemGroupData).forEach(function(igd) {
-        //         collection(igd.ItemData).forEach(function(itemData) {
-        //             var itemOid = itemData['@ItemOID'];
-        //             var data = submission.fields[itemOid];
-        //             if (data) {
-        //                 var value = itemData['@Value'];
-        //                 var item = items[itemOid];
-        //                 if (item.codes) {
-        //                     value = value.split(',').map(function(code) {
-        //                         return item.codes[code];
-        //                     }).join(', ');
-        //                 }
-        //                 data.push(value);
-        //             }
-        //         });
-        //     });
-
-        //     form.submissions.push(submission);
-        //     form.showMe = true;
-        //     studyEvent.showMe = true;
-        // });
-
         var hideClass = 'oc-status-removed';
         $.fn.DataTable.ext.search.push(
            function(settings, data, dataIndex) {
@@ -396,6 +339,7 @@ $(function() {
         var numVisitBaseds = 0;
         var hideStatus = $('#oc-status-hide').val();
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
+        var sectionBodyTmpl = Handlebars.compile($('#section-body-tmpl').html());
         var sectionIndex = 2; // Section 0 = General Information, 1 = Visits
         for (var studyEventId in studyEvents) {
             var studyEvent = studyEvents[studyEventId];
@@ -406,7 +350,6 @@ $(function() {
                 if (studyEvent.showMe) {
                     $('#commonEvents').append(sectionTmpl({
                         sectionNumber: sectionIndex,
-                        collapseState: store.data.collapseSections[sectionIndex] ? 'collapsed' : 'expanded',
                         studyEvent: studyEvent
                     }));
                     sectionIndex++;
@@ -434,6 +377,74 @@ $(function() {
                     console.log(e);
                     alert('Error. See console log.');
                 }
+            });
+        }).on('uncollapse', '.section', function() {
+            var sectionDiv = $(this);
+            var studyEventOid = sectionDiv.data('section-oid');
+            $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&metadata=n', function(data){
+                var odm = data;
+                
+                collection(odm.ClinicalData.SubjectData['OpenClinica:Links']['OpenClinica:Link']).forEach(function(link) {
+                    if (link['@rel'] !== 'common-add-new')
+                        return;
+
+                    var oids = link['@tag'].split('.');
+                    var studyEvent = studyEvents[oids[0]];
+                    var form = studyEvent.forms[oids[1]];
+                    form.addNew = link['@href'];
+                    form.showMe = studyEvent.showMe = true;
+                });
+
+                collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
+                    var studyEventOid = studyEventData['@StudyEventOID'];
+                    var studyEvent = studyEvents[studyEventOid];
+                    if (!studyEvent)
+                        return;
+
+                    if (studyEvent['@OpenClinica:EventType'] !== 'Common')
+                        return;
+
+                    var formData = studyEventData.FormData;
+                    if (!formData)
+                        return;
+
+                    var formOid = formData['@FormOID'];
+                    var form = studyEvent.forms[formOid];
+                    if (!form)
+                        return;
+
+                    var submission = {
+                        studyStatus: studyEventData['@OpenClinica:Status'],
+                        hideStatus: formData['@OpenClinica:Status'] === 'invalid' ? 'oc-status-removed' : 'oc-status-active',
+                        updatedDate: String(formData['@OpenClinica:UpdatedDate']).split(' ')[0],
+                        updatedBy: formData['@OpenClinica:UpdatedBy'],
+                        fields: copyObject(form.submissionFields),
+                        links: collectLinks(studyEventData, formData)
+                    };
+                    collection(formData.ItemGroupData).forEach(function(igd) {
+                        collection(igd.ItemData).forEach(function(itemData) {
+                            var itemOid = itemData['@ItemOID'];
+                            var data = submission.fields[itemOid];
+                            if (data) {
+                                var value = itemData['@Value'];
+                                var item = items[itemOid];
+                                if (item.codes) {
+                                    value = value.split(',').map(function(code) {
+                                        return item.codes[code];
+                                    }).join(', ');
+                                }
+                                data.push(value);
+                            }
+                        });
+                    });
+
+                    form.submissions.push(submission);
+                    form.showMe = true;
+                    studyEvent.showMe = true;
+                });        
+                sectionDiv.append(sectionBodyTmpl({
+                    studyEvent: studyEvents[studyEventOid]
+                }));
             });
         });
 
