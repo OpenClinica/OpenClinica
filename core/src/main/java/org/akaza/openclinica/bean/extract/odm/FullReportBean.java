@@ -36,38 +36,41 @@ public class FullReportBean extends OdmXmlReportBean {
     /**
      * Create one ODM XML This method is still under construction. Right now it is for Snapshot filetype only.
      */
-    public void createOdmXml(boolean isDataset, boolean clinical, DataSource dataSource, UserAccountBean userBean,String[] permissionTagsStringArray) {
+    public void createOdmXml(boolean isDataset, DataSource dataSource, UserAccountBean userBean,String[] permissionTagsStringArray,boolean meta,boolean clinical,boolean crossForm) {
         this.addHeading();
         this.addRootStartLine();
-
-        // add the contents here in order
-        // 1) the information about Study
-        Iterator<OdmStudyBean> itm = this.odmStudyMap.values().iterator();
-        while (itm.hasNext()) {
-            OdmStudyBean s = itm.next();
-            addNodeStudy(s, isDataset);
-        }
-        // 2) the information about administrative data
-        String ODMVersion = this.getODMVersion();
-        if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
-            Iterator<OdmAdminDataBean> ita = this.adminDataMap.values().iterator();
-            while (ita.hasNext()) {
-                OdmAdminDataBean a = ita.next();
-                addNodeAdminData(a);
+        if (meta) {
+            // add the contents here in order
+            // 1) the information about Study
+            Iterator<OdmStudyBean> itm = this.odmStudyMap.values().iterator();
+            while (itm.hasNext()) {
+                OdmStudyBean s = itm.next();
+                addNodeStudy(s, isDataset);
+            }
+            // 2) the information about administrative data
+            String ODMVersion = this.getODMVersion();
+            if ("oc1.2".equalsIgnoreCase(ODMVersion) || "oc1.3".equalsIgnoreCase(ODMVersion)) {
+                Iterator<OdmAdminDataBean> ita = this.adminDataMap.values().iterator();
+                while (ita.hasNext()) {
+                    OdmAdminDataBean a = ita.next();
+                    addNodeAdminData(a);
+                }
             }
         }
         // 3) the information about reference data
         // addNodeReferenceData();
         // 4) the information about clinical Data
+     if(clinical){
         if (this.clinicalDataMap != null) {
             Iterator<OdmClinicalDataBean> itc = this.clinicalDataMap.values().iterator();
             while (itc.hasNext()) {
                 OdmClinicalDataBean c = itc.next();
                 if (c.getExportSubjectData().size() > 0) {
-                    addNodeClinicalData(c, clinical, dataSource, userBean,permissionTagsStringArray);
+                    addNodeClinicalData(c, crossForm, dataSource, userBean, permissionTagsStringArray);
                 }
             }
         }
+    }
         this.addRootEndLine();
     }
 

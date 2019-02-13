@@ -181,7 +181,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 
 		for (StudySubject studySubj : studySubjs) {
-			studyEvents = (ArrayList<StudyEvent>) getStudySubjectDao().fetchListSEs(studySubj.getOcOid());
+		if(studyEvents==null)
+				studyEvents = (ArrayList<StudyEvent>) getStudySubjectDao().fetchListSEs(studySubj.getOcOid());
 
 			if (studyEvents != null) {
 				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID,userId,crossForm,tagIds);
@@ -979,12 +980,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		if (seOrdinal > 0) {
 			studyEvents = fetchSE(seOrdinal, sed.getStudyEvents(), studySubjectOID);
 		}
-
 		else {
-
 			studyEvents = fetchSE(sed.getStudyEvents(), studySubjectOID);
-
 		}
+
 
 		return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID,userId,crossForm);
 	}

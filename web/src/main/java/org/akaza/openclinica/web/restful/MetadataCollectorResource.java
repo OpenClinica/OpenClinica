@@ -197,44 +197,45 @@ public class MetadataCollectorResource {
     }
 
     public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
-                                                            boolean crossForm, boolean showArchived , String permissionTagsString) {
-        StudyBean studyBean = getStudyDao().findByOid(studyOID);
-        if (studyBean != null)
-            studyBean = populateStudyBean(studyBean);
-        MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived,permissionTagsString);
-        AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
-        MetaDataCollector.setTextLength(200);
-
-        ODMBean odmb = mdc.getODMBean();
-        odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC3-0.xsd");
-        ArrayList<String> xmlnsList = new ArrayList<String>();
-        xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
-        // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
-        xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
-        xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
-        odmb.setXmlnsList(xmlnsList);
-        odmb.setODMVersion("oc1.3");
-        mdc.setODMBean(odmb);
-        adc.setOdmbean(odmb);
-        if (studyBean == null)
-            mdc.collectFileData(formVersionOID);
-        else
-            mdc.collectFileData();
-        adc.collectFileData();
-
+                                                             boolean showArchived , String permissionTagsString,boolean meta) {
         FullReportBean report = new FullReportBean();
-        if (!crossForm) {
-            report.setAdminDataMap(adc.getOdmAdminDataMap());
-            report.setOdmStudyMap(mdc.getOdmStudyMap());
-        } else {
-            report.setAdminDataMap(new LinkedHashMap<String, OdmAdminDataBean>());
-            report.setOdmStudyMap(new LinkedHashMap<String, OdmStudyBean>());
+            StudyBean studyBean = getStudyDao().findByOid(studyOID);
+            if (studyBean != null)
+                studyBean = populateStudyBean(studyBean);
+            MetaDataCollector mdc = new MetaDataCollector(this.dataSource, studyBean, getRuleSetRuleDao(), showArchived, permissionTagsString);
+            AdminDataCollector adc = new AdminDataCollector(this.dataSource, studyBean);
+            MetaDataCollector.setTextLength(200);
+
+            ODMBean odmb = mdc.getODMBean();
+            odmb.setSchemaLocation("http://www.cdisc.org/ns/odm/v1.3 OpenClinica-ODM1-3-0-OC3-0.xsd");
+            ArrayList<String> xmlnsList = new ArrayList<String>();
+            xmlnsList.add("xmlns=\"http://www.cdisc.org/ns/odm/v1.3\"");
+            // xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/openclinica_odm/v1.3\"");
+            xmlnsList.add("xmlns:OpenClinica=\"http://www.openclinica.org/ns/odm_ext_v130/v3.1\"");
+            xmlnsList.add("xmlns:OpenClinicaRules=\"http://www.openclinica.org/ns/rules/v3.1\"");
+            odmb.setXmlnsList(xmlnsList);
+            odmb.setODMVersion("oc1.3");
+            mdc.setODMBean(odmb);
+            adc.setOdmbean(odmb);
+        if (meta) {
+            if (studyBean == null) {
+                mdc.collectFileData(formVersionOID);
+            }else {
+                mdc.collectFileData();
+                adc.collectFileData();
+            }
+
+                report.setAdminDataMap(adc.getOdmAdminDataMap());
+                report.setOdmStudyMap(mdc.getOdmStudyMap());
+
+        }else{
+            mdc.collectOdmRoot();
         }
-        report.setCoreResources(getCoreResources());
-        report.setOdmBean(mdc.getODMBean());
-        // report.setClinicalData(odmClinicalDataBean);
-        report.setClinicalDataMap(clinicalDataMap);
-        report.setODMVersion("oc1.3");
+            report.setCoreResources(getCoreResources());
+            report.setOdmBean(mdc.getODMBean());
+            // report.setClinicalData(odmClinicalDataBean);
+            report.setClinicalDataMap(clinicalDataMap);
+            report.setODMVersion("oc1.3");
 
         return report;
     }
