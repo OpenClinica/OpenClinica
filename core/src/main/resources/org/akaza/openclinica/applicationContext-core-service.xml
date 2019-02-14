@@ -141,6 +141,9 @@
         <property name="userAccountDao" ref="userDaoDomain"/>
     </bean>
 
+    <bean id="notificationService" class="org.akaza.openclinica.service.NotificationService">
+        <constructor-arg ref="dataSource"/>
+    </bean>
 
     <bean id = "enketoCredentials" class="org.akaza.openclinica.service.crfdata.xform.EnketoCredentials">
         <property name="studyDao" ref="studyDaoDomain"/>

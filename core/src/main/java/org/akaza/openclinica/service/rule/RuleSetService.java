@@ -78,6 +78,7 @@ import org.akaza.openclinica.logic.rulerunner.MessageContainer;
 import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.BulkEmailSenderService;
+import org.akaza.openclinica.service.NotificationService;
 import org.akaza.openclinica.service.crfdata.BeanPropertyService;
 import org.akaza.openclinica.service.crfdata.DynamicsMetadataService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
@@ -124,6 +125,7 @@ public class RuleSetService implements RuleSetServiceInterface {
     //hibernate based daos
     private StudyEventDao studyEventDomainDao;
     private StudyEventDefinitionDao studyEventDefDomainDao;
+    private NotificationService notificationService;
     /*
      * (non-Javadoc)
      * @see org.akaza.openclinica.service.rule.RuleSetServiceInterface#saveRuleSet(org.akaza.openclinica.domain.rule.RuleSetBean)
@@ -1095,7 +1097,7 @@ public class RuleSetService implements RuleSetServiceInterface {
 				e.printStackTrace();
 			}
 
-    		ruleRunner.runRules(ruleSets,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender);
+    		ruleRunner.runRules(ruleSets,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender,notificationService);
 }
 
     public void runIndividualRulesInBeanProperty(List<RuleSetBean> ruleSets,Integer userId,StudyEventChangeDetails changeDetails , Integer studyEventOrdinal) {	
@@ -1108,7 +1110,7 @@ public class RuleSetService implements RuleSetServiceInterface {
           }
     	}    	
 	    BeanPropertyRuleRunner ruleRunner = new BeanPropertyRuleRunner(dataSource, requestURLMinusServletPath, contextPath, mailSender);
- 		ruleRunner.runRules(ruleSetBeans,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender);
+ 		ruleRunner.runRules(ruleSetBeans,dataSource,beanPropertyService, getStudyEventDomainDao(), getStudyEventDefDomainDao(),changeDetails,userId,mailSender,notificationService);
 }
 
     
@@ -1180,5 +1182,11 @@ public class RuleSetService implements RuleSetServiceInterface {
 
 	}
 
+    public NotificationService getNotificationService() {
+        return notificationService;
+    }
 
+    public void setNotificationService(NotificationService notificationService) {
+        this.notificationService = notificationService;
+    }
 }
