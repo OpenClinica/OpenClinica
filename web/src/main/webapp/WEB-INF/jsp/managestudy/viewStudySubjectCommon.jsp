@@ -365,6 +365,69 @@ $(function() {
             $('#subjectEvents').removeClass('hide');
         }
 
+        $.fn.dataTable.moment('DD-MMM-YYYY');        
+        function datatablefy($tables) {
+            $tables.each(function(i) {
+                var table = $(this);
+                var datatable = table.DataTable({
+                    stateSave: true,
+                    stateSaveCallback: function(settings, state) {
+                        store(function(data) {
+                            data.datatables[i] = state;
+                        });
+                    },
+                    stateLoadCallback: function(settings, callback) {
+                        var data = store.data.datatables[i];
+                        callback(data);
+                        if (!data)
+                            this.fnSortNeutral();
+                    },
+                    dom: table.data('repeating') == 'Yes' ? 'frtilp' : 'frti',
+                    language: {
+                        paginate: {
+                            first: '<<',
+                            previous: '<',
+                            next: '>',
+                            last: '>>'
+                        },
+                        info: '<fmt:message key="results_m_n_of_total" bundle="${resword}"/>',
+                        infoEmpty: '<fmt:message key="results_zero_of_zero" bundle="${resword}"/>',
+                        infoFiltered: '<span class="info-filtered"><fmt:message key="results_filtered" bundle="${resword}"/></span>',
+                        lengthMenu: '<fmt:message key="results_pagesize" bundle="${resword}"/>'
+                    },
+                    columnDefs: [{
+                        targets: -1,
+                        visible: false
+                    }, {
+                        targets: -2,
+                        orderable: false
+                    }]
+                });
+                table.children('tbody').on('mouseenter', 'td', function () {
+                    var colIdx = datatable.cell(this).index();
+                    if (colIdx) {
+                        var col = colIdx.column;
+                        $(datatable.cells().nodes()).removeClass('highlight');
+                        $(datatable.column(col).nodes()).addClass('highlight');
+                    }
+                });
+                var tableWidth = table.width();
+                table.closest('.subsection').css('max-width', tableWidth < 500 ? 500 : tableWidth);
+            })
+            .prev('.dataTables_filter').each(function(i) {
+                var searchbox = $(this);
+                var subheader = searchbox.closest('.subsection').find('.subsection-header');
+                searchbox.appendTo(subheader);
+            })
+            .end()
+            .wrap($('<div>', {
+                css: {
+                    'max-width': $(window).width() - 200,
+                    overflow: 'auto'
+                }
+            }));
+        }
+
         $('#commonEvents').on('click', '.add-new', function() {
             $.ajax({
                 type: 'post',
@@ -441,74 +504,15 @@ $(function() {
                     form.submissions.push(submission);
                     form.showMe = true;
                     studyEvent.showMe = true;
-                });        
-                sectionDiv.append(sectionBodyTmpl({
+                });
+
+                var sectionBody = $(sectionBodyTmpl({
                     studyEvent: studyEvents[studyEventOid]
                 }));
+                datatablefy(sectionBody.find('table.datatable'));
+                sectionDiv.append(sectionBody);
             });
         });
-
-        $.fn.dataTable.moment('DD-MMM-YYYY');
-        $('table.datatable')
-            .each(function(i) {
-                var table = $(this);
-                var datatable = table.DataTable({
-                    stateSave: true,
-                    stateSaveCallback: function(settings, state) {
-                        store(function(data) {
-                            data.datatables[i] = state;
-                        });
-                    },
-                    stateLoadCallback: function(settings, callback) {
-                        var data = store.data.datatables[i];
-                        callback(data);
-                        if (!data)
-                            this.fnSortNeutral();
-                    },
-                    dom: table.data('repeating') == 'Yes' ? 'frtilp' : 'frti',
-                    language: {
-                        paginate: {
-                            first: '<<',
-                            previous: '<',
-                            next: '>',
-                            last: '>>'
-                        },
-                        info: '<fmt:message key="results_m_n_of_total" bundle="${resword}"/>',
-                        infoEmpty: '<fmt:message key="results_zero_of_zero" bundle="${resword}"/>',
-                        infoFiltered: '<span class="info-filtered"><fmt:message key="results_filtered" bundle="${resword}"/></span>',
-                        lengthMenu: '<fmt:message key="results_pagesize" bundle="${resword}"/>'
-                    },
-                    columnDefs: [{
-                        targets: -1,
-                        visible: false
-                    }, {
-                        targets: -2,
-                        orderable: false
-                    }]
-                });
-                table.children('tbody').on('mouseenter', 'td', function () {
-                    var colIdx = datatable.cell(this).index();
-                    if (colIdx) {
-                        var col = colIdx.column;
-                        $(datatable.cells().nodes()).removeClass('highlight');
-                        $(datatable.column(col).nodes()).addClass('highlight');
-                    }
-                });
-                var tableWidth = table.width();
-                table.closest('.subsection').css('max-width', tableWidth < 500 ? 500 : tableWidth);
-            })
-            .prev('.dataTables_filter').each(function(i) {
-                var searchbox = $(this);
-                var subheader = searchbox.closest('.subsection').find('.subsection-header');
-                searchbox.appendTo(subheader);
-            })
-            .end()
-            .wrap($('<div>', {
-                css: {
-                    'max-width': $(window).width() - 200,
-                    overflow: 'auto'
-                }
-            }));
 
         $('div.section.collapsed').children('.section-body').hide();
         $('#loading').remove();
