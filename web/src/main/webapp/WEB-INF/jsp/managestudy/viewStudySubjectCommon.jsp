@@ -144,60 +144,61 @@
         <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
             {{studyEvent.[@Name]}}
         </div>
+        <div class="section-body">
+            Loading...<br><br>
+        </div>
     </div>
 </script>
 <script id="section-body-tmpl" type="text/x-handlebars-template">
-    <div class="section-body">
-        {{#each studyEvent.forms as |form|}}
-        {{#if form.showMe}}
-            <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
-                <div class="subsection-header">
-                    <h3 class="form-name">{{form.[@Name]}}</h3>
-                    <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
-                        {{#if form.addNew}}
-                            data-url="{{form.addNew}}"
-                        {{else}}
-                            disabled="disabled"
-                        {{/if}}>
-                </div>
-                <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
-                <thead>
-                    <tr>
-                        {{#each form.columnTitles as |coltitle|}}
-                            <td>{{truncate coltitle 30}}</td>
-                        {{/each}}
-                        <td>Status</td>
-                        <td>Last Updated</td>
-                        <td>Updated By</td>
-                        <td>Actions</td>
-                        <td>oc-status-hide</td>
-                    </tr>
-                </thead>
-                <tbody>
-                    {{#each form.submissions as |submission|}}
-                        <tr class="submission {{submission.hideStatus}}">
-                            {{#each submission.fields as |data|}}
-                                <td data-search="{{data}}">{{truncate data 200}}</td>
-                            {{/each}}
-                            <td>{{submission.studyStatus}}</td>
-                            <td>{{submission.updatedDate}}</td>
-                            <td>{{submission.updatedBy}}</td>
-                            <td class="actions">
-                                {{#each submission.links as |link|}}
-                                    <a href="${pageContext.request.contextPath}{{link.[@href]}}">
-                                        <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title="{{link.[@rel]}}"></span>
-                                    </a>
-                                {{/each}}
-                            </td>
-                            <td>{{submission.hideStatus}}</td>
-                        </tr>
-                    {{/each}}
-                </tbody>
-                </table>
+    {{#each studyEvent.forms as |form|}}
+    {{#if form.showMe}}
+        <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
+            <div class="subsection-header">
+                <h3 class="form-name">{{form.[@Name]}}</h3>
+                <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
+                    {{#if form.addNew}}
+                        data-url="{{form.addNew}}"
+                    {{else}}
+                        disabled="disabled"
+                    {{/if}}>
             </div>
-        {{/if}}
-        {{/each}}
-    </div>
+            <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
+            <thead>
+                <tr>
+                    {{#each form.columnTitles as |coltitle|}}
+                        <td>{{truncate coltitle 30}}</td>
+                    {{/each}}
+                    <td>Status</td>
+                    <td>Last Updated</td>
+                    <td>Updated By</td>
+                    <td>Actions</td>
+                    <td>oc-status-hide</td>
+                </tr>
+            </thead>
+            <tbody>
+                {{#each form.submissions as |submission|}}
+                    <tr class="submission {{submission.hideStatus}}">
+                        {{#each submission.fields as |data|}}
+                            <td data-search="{{data}}">{{truncate data 200}}</td>
+                        {{/each}}
+                        <td>{{submission.studyStatus}}</td>
+                        <td>{{submission.updatedDate}}</td>
+                        <td>{{submission.updatedBy}}</td>
+                        <td class="actions">
+                            {{#each submission.links as |link|}}
+                                <a href="${pageContext.request.contextPath}{{link.[@href]}}">
+                                    <span class="icon icon-{{link.[@rel]}}" alt="{{link.[@rel]}}" title="{{link.[@rel]}}"></span>
+                                </a>
+                            {{/each}}
+                        </td>
+                        <td>{{submission.hideStatus}}</td>
+                    </tr>
+                {{/each}}
+            </tbody>
+            </table>
+        </div>
+    {{/if}}
+    {{/each}}
 </script>
 
 <script>
@@ -447,6 +448,12 @@ $(function() {
             $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&metadata=n', function(data){
                 var odm = data;
                 
+                var studyEvent = studyEvents[studyEventOid];
+                for (var formOid in studyEvent.forms) {
+                    var form = studyEvent.forms[formOid];
+                    form.submissions = [];
+                }
+
                 collection(odm.ClinicalData.SubjectData['OpenClinica:Links']['OpenClinica:Link']).forEach(function(link) {
                     if (link['@rel'] !== 'common-add-new')
                         return;
@@ -510,7 +517,7 @@ $(function() {
                     studyEvent: studyEvents[studyEventOid]
                 }));
                 datatablefy(sectionBody.find('table.datatable'));
-                sectionDiv.append(sectionBody);
+                sectionDiv.children('.section-body').empty().append(sectionBody);
             });
         });
 
