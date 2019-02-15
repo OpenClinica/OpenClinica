@@ -89,10 +89,11 @@ public class EventStatusStatisticsTableFactory extends AbstractTableFactory {
         int rowStart = limit.getRowSelect().getRowStart();
         int rowEnd = limit.getRowSelect().getRowEnd();
 
+        Integer totalEvents = studyEventDao.getCountofEvents(currentStudy);
+
         for (SubjectEventStatus subjectEventStatus : subjectEventStatuses) {
 
             Integer totalEventsByEventStatus = studyEventDao.getCountofEventsBasedOnEventStatus(currentStudy, subjectEventStatus);
-            Integer totalEvents = studyEventDao.getCountofEvents(currentStudy);
 
             Long percentage = totalEvents == 0 ? 0 : Math.round((totalEventsByEventStatus.doubleValue() / totalEvents.doubleValue()) * 100);
 
