@@ -247,11 +247,14 @@ public class ImportCRFDataService {
                             
                         }else {
                         	if(!(studyEventDefinitionBean.isRepeating())) {
-                        		// if same sample ordinal, NOT update at this time(current requirements), return same error 
-                				String err_msg ="For Non-Repeating event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID();                                       
-                                
-                                
-                                throw new OpenClinicaException(err_msg,"");
+                        		//OC-10365
+                        		if(!(studyEventDataBean.getStudyEventRepeatKey().equals("1"))) {
+                        			// if same sample ordinal, NOT update at this time(current requirements), return same error 
+                    				String err_msg ="For Non-Repeating event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID();                                                                          
+                                    
+                                    throw new OpenClinicaException(err_msg,"");
+                        		}
+                        		
                         	}
                         }
                     
@@ -594,9 +597,11 @@ public class ImportCRFDataService {
                         				errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
                                         return errors;	
                         			}else {
+                        				//OC10365
                         				// if same sample ordinal, NOT update at this time(current requirements), return same error 
-                        				errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
-                                        return errors;	
+                        				/*errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
+                                        return errors;	*/
+                        				;
                         			}
                     			}
                     			
