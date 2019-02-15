@@ -63,6 +63,8 @@ public class OdmExtractDAO extends DatasetDAO {
     EventCRFDAO ecdao = new EventCRFDAO(ds);
     Set<Integer> edcSet;
 
+    private final Integer MAX_STRING_LENGTH = 4000;
+
     EventDefinitionCrfTagService eventDefinitionCrfTagService;
     protected boolean showArchived;
 
@@ -794,7 +796,7 @@ public class OdmExtractDAO extends DatasetDAO {
 
         metadata.setCvIds(cvIds);
 
-        HashMap<Integer, Integer> maxLengths = new HashMap<Integer, Integer>();
+/*        HashMap<Integer, Integer> maxLengths = new HashMap<Integer, Integer>();
         this.setItemDataMaxLengthTypesExpected();
         rows.clear();
         logger.debug("Begin to execute GetItemDataMaxLengths");
@@ -803,7 +805,8 @@ public class OdmExtractDAO extends DatasetDAO {
         while (it.hasNext()) {
             HashMap row = (HashMap) it.next();
             maxLengths.put((Integer) row.get("item_id"), (Integer) row.get("max_length"));
-        }
+        }*/
+
         ItemDefBean itDef = new ItemDefBean();
         formDef = fetchFormDetails(crfBean, formDef);
         this.setItemGroupAndItemMetaWithUnitTypesExpected();
@@ -1009,7 +1012,12 @@ public class OdmExtractDAO extends DatasetDAO {
 
         metadata.setCvIds(cvIds);
 
-        HashMap<Integer, Integer> maxLengths = new HashMap<Integer, Integer>();
+        // This max lengths field which is displayed in the item definition bean was calculated dynamically.
+        // In studies with larges amounts of item data this call could take upwards of 30-60+ seconds.
+        // Because knowing the max length of a text field is not very useful we have decided to simply
+        // hardcode this value in. The maximum value for this field should be 4000 characters as specified
+        // in the database.
+/*        HashMap<Integer, Integer> maxLengths = new HashMap<Integer, Integer>();
         this.setItemDataMaxLengthTypesExpected();
         rows.clear();
         logger.debug("Begin to execute GetItemDataMaxLengths");
@@ -1018,7 +1026,7 @@ public class OdmExtractDAO extends DatasetDAO {
         while (it.hasNext()) {
             HashMap row = (HashMap) it.next();
             maxLengths.put((Integer) row.get("item_id"), (Integer) row.get("max_length"));
-        }
+        }*/
 
         this.setItemGroupAndItemMetaWithUnitTypesExpected();
         rows.clear();
@@ -1232,8 +1240,7 @@ public class OdmExtractDAO extends DatasetDAO {
                     if (len > 0) {
                         idef.setLength(len);
                     } else {
-                        idef.setLength(hasCode ? MetadataUnit.getDataTypeLength(codes.keySet())
-                                : maxLengths.containsKey(itId) ? maxLengths.get(itId) : MetaDataCollector.getTextLength());
+                        idef.setLength(MAX_STRING_LENGTH);
                     }
                 } else if ("integer".equalsIgnoreCase(datatype)) {
                     if (len > 0) {

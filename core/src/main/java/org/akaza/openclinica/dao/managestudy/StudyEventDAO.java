@@ -273,9 +273,7 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), currentStudy.getId());
-        variables.put(Integer.valueOf(2), currentStudy.getId());
-        variables.put(Integer.valueOf(3), subjectEventStatus.getId());
+        variables.put(Integer.valueOf(1), subjectEventStatus.getId());
         String sql = digester.getQuery("getCountofEventsBasedOnEventStatus");
 
         ArrayList rows = this.select(sql, variables);
@@ -294,8 +292,6 @@ public class StudyEventDAO extends AuditableEntityDAO implements Listener {
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        variables.put(Integer.valueOf(1), currentStudy.getId());
-        variables.put(Integer.valueOf(2), currentStudy.getId());
         String sql = digester.getQuery("getCountofEvents");
 
         ArrayList rows = this.select(sql, variables);

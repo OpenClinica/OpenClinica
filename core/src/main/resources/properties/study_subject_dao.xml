@@ -85,6 +85,14 @@
         </sql>
     </query>
     <query>
+        <name>getFromStudy</name>
+        <sql>SELECT ss.*, ST.unique_identifier
+            FROM study_subject ss, STUDY ST
+            where SS.study_id = ST.study_id
+            AND (ST.study_id=? or ST.parent_study_id=?)
+        </sql>
+    </query>
+    <query>
         <name>getWithFilterAndSort</name>
         <sql>SELECT DISTINCT(ss.*), ST.unique_identifier 
                 FROM study_subject ss LEFT JOIN study_event se ON ss.study_subject_id = se.study_subject_id,STUDY ST,SUBJECT S
