@@ -691,7 +691,14 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         setTypesExpected();
         String partialSql;
         HashMap variables = new HashMap();
-        String sql = digester.getQuery("getWithFilterAndSort");
+
+        String sql;
+        if (filter.getFilters().isEmpty()){
+            sql = digester.getQuery("getFromStudy");
+        }
+        else {
+            sql = digester.getQuery("getWithFilterAndSort");
+        }
 
         if(participateStatusSetFilter ==null) {
             variables.put(new Integer(1), currentStudy.getId());
@@ -992,7 +999,14 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         setTypesExpected();
 
         HashMap variables = new HashMap();
-        String sql = digester.getQuery("getCountWithFilter");
+        String sql;
+        if (filter.getFilters().isEmpty()){
+            sql = digester.getQuery("getCountofStudySubjects");
+        }
+        else {
+            sql = digester.getQuery("getCountWithFilter");
+        }
+
         if(participateStatusSetFilter ==null) {
             variables.put(new Integer(1), currentStudy.getId());
             variables.put(new Integer(2), currentStudy.getId());
