@@ -148,24 +148,16 @@ public class UserServiceImpl implements UserService {
                 // create participant user Account In Keycloak
                 String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode,studyEnvironment,customerUuid);
                 // create participant user Account In Runtime
-                userAccount = createUserAccount(participantDTO, studySubject, ownerUserAccountBean, username, publicStudy, keycloakUserId);
-
-                if (userAccount != null) {
+                    userAccount = createUserAccount(participantDTO, studySubject, ownerUserAccountBean, username, publicStudy, keycloakUserId);
+                // create study subject detail Account
                     studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.CREATED, userAccount.getUserId());
-
-                    //studySubject.setUserId(userAccount.getUserId());
-                    //studySubject.setUserStatus(UserStatus.CREATED);
-                    //studySubject = studySubjectDao.saveOrUpdate(studySubject);
                     logger.info("Participate user_id: {} and user_status: {} are added in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
-                }
+
             } else {
-                // Update participant user Account In Runtime
-                userAccount = updateUserAccount(participantDTO, studySubject, ownerUserAccountBean, username, publicStudy, userAccount);
-                if (userAccount != null) {
-                    //studySubject = studySubjectDao.saveOrUpdate(studySubject);
-                    studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, null, null);
+                // update study subject detail Account
+                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, null, null);
                     logger.info("Participate with user_id: {} ,it's user_status: {} is updated in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
-                }
+
             }
         } else {
             logger.info("Participant does not exists or not added yet in OC ");
@@ -174,14 +166,11 @@ public class UserServiceImpl implements UserService {
 
             ParticipantAccessDTO accessDTO= getAccessInfo(accessToken,studyOid,ssid,customerUuid);
 
-            sendEmailToParticipant(studySubject, userAccount,tenantStudy, accessDTO);
-            //studySubject.setUserStatus(UserStatus.INVITED);
-            //studySubject = studySubjectDao.saveOrUpdate(studySubject);
+            sendEmailToParticipant(studySubject,tenantStudy, accessDTO);
             studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null);
 
         }
-        if (userAccount != null || userAccount.getId() != 0)
-            ocUserDTO = buildOcUserDTO(userAccount, studySubject);
+            ocUserDTO = buildOcUserDTO(studySubject);
 
         return ocUserDTO;
     }
@@ -217,12 +206,7 @@ public class UserServiceImpl implements UserService {
         StudySubject studySubject = getStudySubject(ssid, study);
 
         if (studySubject!= null && studySubject.getUserId() != null) {
-            String studySchema = CoreResources.getRequestSchema();
-            CoreResources.setRequestSchema("public");
-            UserAccount userAccount = userAccountDao.findByUserId(studySubject.getUserId());
-            CoreResources.setRequestSchema(studySchema);
-            if (userAccount != null)
-                ocUserDTO = buildOcUserDTO(userAccount, studySubject);
+                ocUserDTO = buildOcUserDTO( studySubject);
         }
         return ocUserDTO;
     }
@@ -232,9 +216,6 @@ public class UserServiceImpl implements UserService {
         if (participantDTO == null)
             return null;
        UserAccount userAccount = new UserAccount();
-        userAccount.setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
-        userAccount.setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
-        userAccount.setPhone(participantDTO.getMobilePhone() == null ? "" : participantDTO.getMobilePhone());
         userAccount.setUserType(new org.akaza.openclinica.domain.user.UserType(4));
         userAccount.setUserName(username);
         userAccount.setActiveStudy(publicStudy);
@@ -242,47 +223,17 @@ public class UserServiceImpl implements UserService {
         userAccount.setDateCreated(new Date());
         userAccount.setUserUuid(keycloakUserId);
 
-        String studySchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
         UserAccount ownerUserAccount=userAccountDao.findByUserId(ownerUserAccountBean.getId());
         userAccount.setUserAccount(ownerUserAccount);
         StudyUserRole studyUserRole = buildStudyUserRole(username,publicStudy,ownerUserAccount.getUserId());
+
+        String studySchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
         studyUserRole = studyUserRoleDao.saveOrUpdate(studyUserRole);
         userAccount = userAccountDao.saveOrUpdate(userAccount);
         CoreResources.setRequestSchema(studySchema);
 
         logger.info("UserAccount has been created for Participate");
-        return userAccount;
-    }
-
-    private UserAccount updateUserAccount(OCParticipantDTO participantDTO , StudySubject studySubject,UserAccountBean ownerUserAccountBean,String username,Study publicStudy,UserAccount userAccount) {
-        if (participantDTO == null)
-            return userAccount;
-
-        String tenantSchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
-        userAccount = userAccountDao.findByUserId(studySubject.getUserId());
-        List<StudyUserRole> studyUserRoles = studyUserRoleDao.findAllUserRolesByUserAccountAndStudy(userAccount,publicStudy.getStudyId());
-        if(studyUserRoles.size()==0) {
-            StudyUserRole studyUserRole = buildStudyUserRole(username,publicStudy,ownerUserAccountBean.getId());
-            studyUserRole = studyUserRoleDao.saveOrUpdate(studyUserRole);
-        }else{
-            for(StudyUserRole studyUserRole:studyUserRoles){
-                updateStudyUserRole(studyUserRole,ownerUserAccountBean.getId());
-            }
-        }
-
-        userAccount.setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
-        userAccount.setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
-        userAccount.setPhone(participantDTO.getMobilePhone() == null ? "" : participantDTO.getMobilePhone());
-
-        userAccount.setDateUpdated(new Date());
-        userAccount.setUpdateId(ownerUserAccountBean.getId());
-
-        userAccount = userAccountDao.saveOrUpdate(userAccount);
-        CoreResources.setRequestSchema(tenantSchema);
-
-        logger.info("UserAccount has been Updated for Participate");
         return userAccount;
     }
 
@@ -318,9 +269,9 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private void sendEmailToParticipant(StudySubject studySubject, UserAccount userAccount, Study tenantStudy,ParticipantAccessDTO accessDTO) {
+    private void sendEmailToParticipant(StudySubject studySubject, Study tenantStudy,ParticipantAccessDTO accessDTO) {
         ParticipantDTO pDTO = new ParticipantDTO();
-        pDTO.setEmailAccount(userAccount.getEmail());
+        pDTO.setEmailAccount(studySubject.getStudySubjectDetail().getEmail());
         pDTO.setEmailSubject("You've been connected! We're looking forward to your participation.");
 
         String studyName = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getName() : tenantStudy.getName());
@@ -404,10 +355,7 @@ public class UserServiceImpl implements UserService {
          logger.error("Participant account not found");
             return null;
         }
-        String tenantSchema = CoreResources.getRequestSchema();
-        CoreResources.setRequestSchema("public");
         UserAccount pUserAccount = userAccountDao.findByUserId(studySubject.getUserId());
-        CoreResources.setRequestSchema(tenantSchema);
         if(pUserAccount==null || pUserAccount.getUserUuid()==null) {
             logger.error("Participant account not found");
             return null;
@@ -442,11 +390,11 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private OCUserDTO buildOcUserDTO(UserAccount userAccount, StudySubject studySubject) {
+    private OCUserDTO buildOcUserDTO( StudySubject studySubject) {
         OCUserDTO ocUserDTO = new OCUserDTO();
-        ocUserDTO.setEmail(userAccount.getEmail());
-        ocUserDTO.setFirstName(userAccount.getFirstName());
-        ocUserDTO.setPhoneNumber(userAccount.getPhone());
+        ocUserDTO.setEmail(studySubject.getStudySubjectDetail().getEmail());
+        ocUserDTO.setFirstName(studySubject.getStudySubjectDetail().getFirstName());
+        ocUserDTO.setPhoneNumber(studySubject.getStudySubjectDetail().getPhone());
         ocUserDTO.setStatus(studySubject.getUserStatus());
         return ocUserDTO;
     }
@@ -465,10 +413,5 @@ public class UserServiceImpl implements UserService {
         return studyUserRole;
     }
 
-    private StudyUserRole updateStudyUserRole(StudyUserRole studyUserRole, int updaterId) {
-        studyUserRole.setDateUpdated(new Date());
-        studyUserRole.setUpdateId(updaterId);
-        studyUserRole.setRoleName(Role.PARTICIPATE.getName());
-        return studyUserRole;
-    }
+
 }
