@@ -516,8 +516,10 @@ $(function() {
                 var sectionBody = $(sectionBodyTmpl({
                     studyEvent: studyEvents[studyEventOid]
                 }));
-                datatablefy(sectionBody.find('table.datatable'));
                 sectionDiv.children('.section-body').empty().append(sectionBody);
+                setTimeout(function() {
+                    datatablefy(sectionBody.find('table.datatable'));
+                }, 1);
             });
         });
 
