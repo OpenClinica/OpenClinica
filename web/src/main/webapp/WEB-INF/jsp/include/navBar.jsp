@@ -356,6 +356,11 @@
                                                                                            class="navSearch"/>
                                                                                     <input type="hidden" name="navBar" value="yes"/>
                                                                                     <input type="submit" value="View &#8594;" class="navSearchButton"/>
+                                                                                    <c:when test="${
+                                                                                      (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
+                                                                                    }">
+                                                                                        <a href="#" id="advsearch-link">Advanced Search</a>
+                                                                                    </c:when>
                                                                                 </form>
                                                                             </td>
                                                                             <td align="right" style="font-weight: normal;" class="oc-menu-bar">
