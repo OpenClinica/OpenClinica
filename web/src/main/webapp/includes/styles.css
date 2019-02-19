@@ -2133,3 +2133,25 @@ margin: 2px;;
 
 #excel_file_path{ width: 307px; 
 }
+
+
+/*  FR 2018-09-23: some css tweaks needed for proper display of eventnumber and icon at event-popup in view ListStudySubjects */  
+
+.eventcount_withicon{
+	display: inline-block;
+	max-width: 10px;
+	padding-right: 3px;
+	margin-right: 6px;	
+}
+
+.eventcount_withicon_align{
+	vertical-align: text-bottom;
+	text-align: center;
+	display: inline;
+}
+
+.eventcount_withicon_img{
+ 	position: relative; 
+ 	left: 0px;
+ 	top:0px;
+}	
