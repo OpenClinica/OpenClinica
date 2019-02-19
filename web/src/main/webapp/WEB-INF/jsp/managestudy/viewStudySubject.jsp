@@ -1536,8 +1536,8 @@
               entityId: '${studySub.id}',
               entityName: name,
               auditLogEventTypId: typid,
-              oldValue:oldValue,
-              newValue:newValue
+              oldValue: oldValue,
+              newValue: newValue
           }),
           error: logDump
       });
@@ -1633,17 +1633,17 @@
                     var isPhoneUpdated = hasOldPhone && newPhone != oldPhone;
 
                     if (isNameNew)
-                        logAudit('Participant first name', 43);
+                        logAudit('Participant first name', 43, null, newName);
                     if (isNameUpdated)
-                        logAudit('Participant first name', 44);
+                        logAudit('Participant first name', 44, oldName, newName);
                     if (isEmailNew)
-                        logAudit('Participant email address', 46);
+                        logAudit('Participant email address', 46, null, newEmail);
                     if (isEmailUpdated)
-                        logAudit('Participant email address', 47);
+                        logAudit('Participant email address', 47, oldEmail, newEmail);
                     if (isPhoneNew)
-                        logAudit('Participant phone number', 49);
+                        logAudit('Participant phone number', 49, null, newPhone);
                     if (isPhoneUpdated)
-                        logAudit('Participant phone number', 50);
+                        logAudit('Participant phone number', 50, oldPhone, newPhone);
                       
                     updateParticipateInfo(data);
                     getAccessCode();
