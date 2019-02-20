@@ -596,12 +596,17 @@ public class ImportCRFDataService {
                     				if(!((seBean.getSampleOrdinal()+"").equals(sampleOrdinal))) {
                         				errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
                                         return errors;	
-                        			}else {
-                        				//OC10365
-                        				// if same sample ordinal, NOT update at this time(current requirements), return same error 
-                        				/*errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
-                                        return errors;	*/
-                        				;
+                        			}else {                        				
+                        				String comeFromPipe = (String) request.getHeader("PIPETEXT");
+                                    	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
+                                    		//OC-10148
+                                    		errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
+                                            return errors;	                            			
+                                    	}else {
+                                    		//OC-10365:XML import into non-repeating common event still allow overwrite
+                                    		;
+                                    	}
+                        				
                         			}
                     			}
                     			
@@ -648,12 +653,12 @@ public class ImportCRFDataService {
 
                     }else {
                     	//OC-10148 and check status:scheduled
-                    	/*String formOid = formDataBean.getFormOID();
+                    	String formOid = formDataBean.getFormOID();
                         if(!(studyEventDefinitionBean.isRepeating()) && studyEventBean!=null && !(studyEventBean.getSubjectEventStatus().getName().equals("scheduled"))) {                        		
         	    	    		errors.add("For Non-Repeating visited event, found existing event in system - form "+ formOid +" , " +  "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
         	    	    		
         	    	    		return errors;
-                        	}*/
+                        	}
                         	
                         }
                     }
