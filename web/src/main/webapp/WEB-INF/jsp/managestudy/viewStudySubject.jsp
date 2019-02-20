@@ -1536,8 +1536,8 @@
               entityId: '${studySub.id}',
               entityName: name,
               auditLogEventTypId: typid,
-              oldValue:oldValue,
-              newValue:newValue
+              oldValue: oldValue,
+              newValue: newValue
           }),
           error: logDump
       });
@@ -1604,7 +1604,7 @@
             var data = {
                 firstName: $('#name-input').val(),
                 email: $('#email-input').val(),
-                mobilePhone: $('#country-code').text() + ' ' + $('#phone-input').val(),
+                phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
                 inviteParticipant: $('#invite-option input:checked').val()
             };
             jQuery.ajax({
@@ -1615,10 +1615,10 @@
                 success: function(data) {
                     var oldName  = participateInfo.firstName;
                     var oldEmail = participateInfo.email;
-                    var oldPhone = participateInfo.mobilePhone;
+                    var oldPhone = participateInfo.phoneNumber;
                     var newName  = data.firstName;
                     var newEmail = data.email;
-                    var newPhone = data.mobilePhone;
+                    var newPhone = data.phoneNumber;
                     var hasOldName  = !!oldName;
                     var hasOldEmail = !!oldEmail;
                     var hasOldPhone = !!oldPhone;
@@ -1633,17 +1633,17 @@
                     var isPhoneUpdated = hasOldPhone && newPhone != oldPhone;
 
                     if (isNameNew)
-                        logAudit('Participant first name', 43);
+                        logAudit('Participant first name', 43, null, newName);
                     if (isNameUpdated)
-                        logAudit('Participant first name', 44);
+                        logAudit('Participant first name', 44, oldName, newName);
                     if (isEmailNew)
-                        logAudit('Participant email address', 46);
+                        logAudit('Participant email address', 46, null, newEmail);
                     if (isEmailUpdated)
-                        logAudit('Participant email address', 47);
+                        logAudit('Participant email address', 47, oldEmail, newEmail);
                     if (isPhoneNew)
-                        logAudit('Participant phone number', 49);
+                        logAudit('Participant phone number', 49, null, newPhone);
                     if (isPhoneUpdated)
-                        logAudit('Participant phone number', 50);
+                        logAudit('Participant phone number', 50, oldPhone, newPhone);
                       
                     updateParticipateInfo(data);
                     getAccessCode();
