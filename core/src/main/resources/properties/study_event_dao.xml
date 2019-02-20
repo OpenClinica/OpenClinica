@@ -21,20 +21,14 @@
     <query>
         <name>getCountofEventsBasedOnEventStatus</name>
         <sql>
-            select count (*) from (select distinct se.* from study_event se, study_subject ss, study s where
-                se.study_subject_id = ss.study_subject_id AND
-                ss.study_id = s.study_id AND
-                ( s.study_id = ? or s.parent_study_id = ? )AND
-                subject_event_status_id = ?) as ss
+            select count (*) from study_event se
+            where se.subject_event_status_id = ?
         </sql>
     </query>
     <query>
         <name>getCountofEvents</name>
         <sql>
-            select count (*) from (select distinct se.* from study_event se, study_subject ss, study s where
-                se.study_subject_id = ss.study_subject_id AND
-                ss.study_id = s.study_id AND
-                ( s.study_id = ? or s.parent_study_id = ? )) as ss
+            select count (*) from study_event
         </sql>
     </query>
     <query>

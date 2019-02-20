@@ -2,7 +2,6 @@ package org.akaza.openclinica.domain.rule.action;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import liquibase.util.StringUtils;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -18,10 +17,7 @@ import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.core.form.StringUtil;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.RuleActionRunLogDao;
-import org.akaza.openclinica.dao.hibernate.RuleSetDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -32,6 +28,7 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
@@ -45,16 +42,26 @@ import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAccountRequest;
 import org.akaza.openclinica.service.crfdata.xform.EnketoAccountResponse;
+import org.akaza.openclinica.service.dto.CustomerDTO;
+import org.akaza.openclinica.service.dto.ModuleConfigAttributeDTO;
+import org.akaza.openclinica.service.dto.ModuleConfigDTO;
+import org.akaza.openclinica.service.dto.StudyEnvironmentDTO;
 import org.akaza.openclinica.service.participant.ParticipantServiceImpl;
 import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.rule.RuleSetService;
 import org.akaza.openclinica.service.rule.expression.ExpressionService;
+import org.apache.commons.lang.StringUtils;
+import org.keycloak.admin.client.Keycloak;
+import org.keycloak.admin.client.resource.UserResource;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.AccessTokenResponse;
+import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.util.JsonSerialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.ApplicationContext;
 import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
@@ -67,6 +74,7 @@ import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
 import org.springframework.security.config.authentication.UserServiceBeanDefinitionParser;
+import org.springframework.stereotype.Service;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.util.MultiValueMap;
 import org.springframework.web.bind.annotation.RequestMapping;
@@ -113,9 +121,16 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
     StudySubject studySubject;
     String accessToken;
     PermissionService permissionService;
+	NotificationService notificationService;
+	String userUuid;
 
-    public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionBean ruleActionBean, ParticipantDTO pDTO,
-			String email) {
+
+
+	public NotificationActionProcessor() {
+	}
+
+	public NotificationActionProcessor(DataSource ds, JavaMailSenderImpl mailSender, RuleActionBean ruleActionBean, ParticipantDTO pDTO,
+									   String email) {
 		this.ds = ds;
 		this.mailSender = mailSender;
 		this.ruleActionBean = ruleActionBean;
@@ -125,7 +140,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	}
 
 	public NotificationActionProcessor(String[] listOfEmails, StudySubject studySubject, StudyBean studyBean, String message, String emailSubject,
-			JavaMailSenderImpl mailSender , String participateStatus,String accessToken) {
+			JavaMailSenderImpl mailSender , String participateStatus,String accessToken,NotificationService notificationService,String userUuid) {
 		this.listOfEmails = listOfEmails;
 		this.message = message;
 		this.emailSubject = emailSubject;
@@ -134,6 +149,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		this.studyBean = studyBean;
 		this.participateStatus=participateStatus;
 		this.accessToken=accessToken;
+		this.notificationService=notificationService;
+		this.userUuid=userUuid;
 
 	}
 
@@ -164,7 +181,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		}
 	}
 
-	
+
 	private void createMimeMessagePreparator(final ParticipantDTO pDTO, final String email){
         MimeMessagePreparator preparator = new MimeMessagePreparator() {
             public void prepare(MimeMessage mimeMessage) throws Exception {
@@ -177,7 +194,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
         };
         BulkEmailSenderService.addMimeMessage(preparator);
     }
-	
+
 	private void sendEmail(RuleActionBean ruleAction, ParticipantDTO pDTO) throws OpenClinicaSystemException {
 
 		logger.info("Sending email...");
@@ -207,7 +224,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		return null;
 	}
 
-	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, StudySubject studySubject, int eventOrdinal) {
+	public void runNotificationAction(RuleActionBean ruleActionBean, RuleSetBean ruleSet, StudySubject studySubject, int eventOrdinal,NotificationService notificationService) {
 		String emailList = ((NotificationActionBean) ruleActionBean).getTo();
 		String message = ((NotificationActionBean) ruleActionBean).getMessage();
 		String emailSubject = ((NotificationActionBean) ruleActionBean).getSubject();
@@ -237,7 +254,13 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		String participateStatus = pStatus.getValue().toString(); // enabled , disabled
 		String accessToken=getAccessToken();
 
-		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, studySubject, studyBean, message, emailSubject, mailSender,participateStatus,accessToken));
+		if(studySubject.getUserId()!=null) {
+			UserAccountBean userAccountBean = (UserAccountBean) udao.findByPK(studySubject.getUserId());
+			 userUuid = userAccountBean.getUserUuid();
+		}
+
+
+		Thread thread = new Thread(new NotificationActionProcessor(listOfEmails, studySubject, studyBean, message, emailSubject, mailSender,participateStatus,accessToken,notificationService, userUuid));
 		thread.start();
 
 	}
@@ -334,7 +357,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
             pDTO.setPhone(studySubject.getStudySubjectDetail().getPhone());
 
             if(studySubject.getUserId()!=null) {
-                ParticipantAccessDTO participantAccessDTO = getAccessLink(studySubject.getLabel());
+                ParticipantAccessDTO participantAccessDTO =notificationService.getAccessInfo(accessToken,studyBean,studySubject,userUuid) ;
+
                 if (participantAccessDTO != null) {
                     pDTO.setAccessCode(participantAccessDTO.getAccessCode());
                     pDTO.setLoginUrl(participantAccessDTO.getAccessLink());
@@ -397,44 +421,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
 
 
-	private ParticipantAccessDTO getAccessLink(String ssid){
-		String baseUrl = CoreResources.getField("sysURL.base");
-		String uri = baseUrl + "pages/auth/api/clinicaldata/studies/" + studyBean.getOid() + "/participants/"+ssid+"/accessLink";
 
-		RestTemplate restTemplate = new RestTemplate();
-		HttpHeaders headers = new HttpHeaders();
-
-		headers.add("Authorization", "Bearer " + accessToken);
-		headers.add("Accept-Charset", "UTF-8");
-		headers.setAccept(Arrays.asList(MediaType.APPLICATION_JSON));
-		HttpEntity<String> entity = new HttpEntity<String>(headers);
-
-		ObjectMapper objectMapper = new ObjectMapper();
-		objectMapper.registerModule(new JavaTimeModule());
-		List<HttpMessageConverter<?>> converters = new ArrayList<>();
-		MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
-		jsonConverter.setObjectMapper(objectMapper);
-		converters.add(jsonConverter);
-		restTemplate.setMessageConverters(converters);
-
-		ResponseEntity<ParticipantAccessDTO> response=null;
-
-		try {
-			response = restTemplate.exchange(uri, HttpMethod.GET, entity, ParticipantAccessDTO.class);
-		} catch (HttpClientErrorException e) {
-			logger.error("Runtime error message: {}", e.getResponseBodyAsString());
-		}
-
-
-
-		ParticipantAccessDTO participantAccessDTO = null;
-		if (response != null) {
-			participantAccessDTO = response.getBody();
-		}
-
-
-		return participantAccessDTO;
-	}
 
 	public String getAccessToken() {
 		logger.debug("Creating Auth0 Api Token");
