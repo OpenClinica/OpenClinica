@@ -8,6 +8,7 @@ import org.akaza.openclinica.bean.extract.odm.FullReportBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -26,10 +27,7 @@ import javax.sql.DataSource;
 import javax.ws.rs.*;
 import javax.ws.rs.core.Context;
 import javax.ws.rs.core.MediaType;
-import java.util.ArrayList;
-import java.util.HashSet;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 /***
@@ -155,13 +153,20 @@ public class ODMClinicaDataResource {
             permissionTagsStringArray = permissionService.getPermissionTagsStringArray(studyBean, request);
         }
         FullReportBean report=null;
+
+        LinkedHashMap<String,OdmClinicalDataBean> clinicalDataBeans;
+
+        if (clinical) {
+            clinicalDataBeans = getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
+                    formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId(), crossForm);
+        } else {
+            clinicalDataBeans = null;
+        }
+
         XMLSerializer xmlSerializer = new XMLSerializer();
-             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
-                    getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                            formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId(), crossForm),
-                     archived, permissionTagsString,meta);
-            if (report.getClinicalDataMap() == null)
-                return null;
+             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,clinicalDataBeans, archived, permissionTagsString,meta);
+/*            if (report.getClinicalDataMap() == null)
+                return null;*/
 
 
         report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray,meta,clinical,crossForm);
@@ -300,10 +305,18 @@ public class ODMClinicaDataResource {
             permissionTagsStringArray = permissionService.getPermissionTagsStringArray(studyBean, request);
         }
         FullReportBean report=null;
-             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
-                    getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                            formVersionOID, includeDN, includeAudit, request.getLocale(), userId, crossForm),
-                     archived, permissionTagsString,meta);
+
+
+        LinkedHashMap<String,OdmClinicalDataBean> clinicalDataBeans;
+
+        if (clinical) {
+            clinicalDataBeans = getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
+                    formVersionOID, includeDN, includeAudit, request.getLocale(), userId, crossForm);
+        } else {
+            clinicalDataBeans = null;
+        }
+
+        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, archived, permissionTagsString, meta);
 
         report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,meta,clinical,crossForm);
         LOGGER.debug(report.getXmlOutput().toString().trim());
@@ -375,12 +388,19 @@ public class ODMClinicaDataResource {
             permissionTagsStringArray = permissionService.getPermissionTagsStringArray(studyBean, request);
         }
         FullReportBean report=null;
-             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,
-                    getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                            formVersionOID, includeDN, includeAudit, request.getLocale(), userId, crossForm),
-                     archived, permissionTagsString,meta);
-            if (report.getClinicalDataMap() == null)
-                return null;
+
+        LinkedHashMap<String,OdmClinicalDataBean> clinicalDataBeans;
+
+        if (clinical) {
+            clinicalDataBeans = getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
+                    formVersionOID, includeDN, includeAudit, request.getLocale(), userId, crossForm);
+        } else {
+            clinicalDataBeans = null;
+        }
+        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, archived, permissionTagsString,meta);
+
+        if (report.getClinicalDataMap() == null)
+            return null;
 
         report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,meta,clinical,crossForm);
         LOGGER.debug(report.getXmlOutput().toString().trim());
