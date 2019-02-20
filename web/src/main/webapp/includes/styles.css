@@ -22,9 +22,15 @@ input[type="text"], input[type="password"] {
   float: left;
   height: auto;
   min-height: 30px;
-  padding: .25em; }
-  input[type="text"].navSearch, input[type="password"].navSearch {
-    width: 13em; }
+  padding: .25em;
+}
+input[type="text"].navSearch, input[type="password"].navSearch {
+  width: 13em;
+}
+input.navSearch::placeholder {
+  color: #999;
+}
+
 
 input[type="submit"], input[type="button"] {
   -webkit-appearance: none; }
