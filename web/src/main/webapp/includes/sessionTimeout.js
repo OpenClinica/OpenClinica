@@ -114,13 +114,14 @@ function processUserData(inputPromise) {
                         "Error calling :" + myContextPath + '/pages/resetFirstLogin' + " " + textStatus + " " + errorThrown
                     });
             });
+            window.location.replace(myContextPath + '/MainMenu');
         } else {
             var thisUser = res;
             console.log("In processcurrentUser:" + thisUser + " firstLoginCheck:" + firstLoginCheck);
             if (thisUser !== userName) {
                 console.log("another user:" + thisUser + "New user is:" + userName);
-                window.location.replace (myContextPath + '/pages/invalidateKeycloakToken');
-
+                console.log("***********************************Going to the home page");
+                window.location.replace(myContextPath + '/MainMenu');
             } else if (firstLoginCheck === "true") {
                 jQuery.get(myContextPath + '/pages/resetFirstLogin')
                     .error(function (jqXHR, textStatus, errorThrown) {

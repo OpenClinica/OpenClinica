@@ -80,7 +80,7 @@ public class AppConfig extends KeycloakWebSecurityConfigurerAdapter {
         http.authorizeRequests()
                 .antMatchers("/css/**","/includes/**","/images/**", "/fonts/**",
                         "/js/**",
-                        "/callback", "/sso/login",
+                        "/callback",
                         "/pages/customer-service/**",
                         "/pages/ocLogin",
                         "/pages/resetOCAppTimeout",
