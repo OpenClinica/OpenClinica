@@ -1604,7 +1604,7 @@
             var data = {
                 firstName: $('#name-input').val(),
                 email: $('#email-input').val(),
-                mobilePhone: $('#country-code').text() + ' ' + $('#phone-input').val(),
+                phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
                 inviteParticipant: $('#invite-option input:checked').val()
             };
             jQuery.ajax({
@@ -1615,10 +1615,10 @@
                 success: function(data) {
                     var oldName  = participateInfo.firstName;
                     var oldEmail = participateInfo.email;
-                    var oldPhone = participateInfo.mobilePhone;
+                    var oldPhone = participateInfo.phoneNumber;
                     var newName  = data.firstName;
                     var newEmail = data.email;
-                    var newPhone = data.mobilePhone;
+                    var newPhone = data.phoneNumber;
                     var hasOldName  = !!oldName;
                     var hasOldEmail = !!oldEmail;
                     var hasOldPhone = !!oldPhone;
