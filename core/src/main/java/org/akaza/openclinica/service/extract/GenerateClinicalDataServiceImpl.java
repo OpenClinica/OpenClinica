@@ -56,6 +56,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private StudyDao studyDao;
 
 	private StudySubjectDao studySubjectDao;
+	private StudyEventDao studyEventDao;
+
 	private StudyEventDefinitionDao studyEventDefDao;
 
 	private boolean collectDns = true;
@@ -108,6 +110,14 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
 		this.studySubjectDao = studySubjectDao;
+	}
+
+	public StudyEventDao getStudyEventDao() {
+		return studyEventDao;
+	}
+
+	public void setStudyEventDao(StudyEventDao studyEventDao) {
+		this.studyEventDao = studyEventDao;
 	}
 
 	public GenerateClinicalDataServiceImpl() {
@@ -182,7 +192,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 		for (StudySubject studySubj : studySubjs) {
 		if(studyEvents==null)
-				studyEvents = (ArrayList<StudyEvent>) getStudySubjectDao().fetchListSEs(studySubj.getOcOid());
+				studyEvents = (ArrayList<StudyEvent>) getStudyEventDao().fetchListSEs(studySubj.getOcOid());
 
 			if (studyEvents != null) {
 				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID,userId,crossForm,tagIds);
@@ -191,6 +201,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				odmClinicalDataBean.setExportSubjectData(exportSubjDataBeanList);
 				odmClinicalDataBean.setStudyOID(study.getOc_oid());
 			}
+			studyEvents=null;
 		}
 
 		return odmClinicalDataBean;
@@ -198,7 +209,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	@SuppressWarnings("unchecked")
-	private ExportSubjectDataBean setExportSubjectDataBean(StudySubject studySubj, Study study, List<StudyEvent> studyEvents, String formVersionOIDs,int userId,boolean crossForm,List<String> tagIds) {
+	private ExportSubjectDataBean setExportSubjectDataBean(StudySubject studySubj, Study study, List<StudyEvent> studyEvents, String formVersionOID,int userId,boolean crossForm,List<String> tagIds) {
 
 		ExportSubjectDataBean exportSubjectDataBean = new ExportSubjectDataBean();
 
@@ -233,7 +244,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			if (isCollectDns())
 				exportSubjectDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(studySubj));
 
-			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(study, studySubj, studyEvents,formVersionOIDs,userId,crossForm,tagIds));
+			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(study, studySubj, studyEvents,formVersionOID,userId,crossForm,tagIds));
 
 			exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
 
@@ -930,23 +941,26 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				&& !studyOID.equals(INDICATE_ALL)) {
 			LOGGER.debug("Adding all the study events,formevents as it is a *");
 			LOGGER.debug("study subject is not all and so is study");
-
+            //  studyEventOid=* ,fromVersionOid=*  (Single Subject , All Events , All FormVersions)
 			clinicalDataHash.put(studyOID, getClinicalData(studyOID, studySubjectOID,userId,crossForm));
 
 			return clinicalDataHash;
 		} else if (studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL) && studySubjectOID.equals(INDICATE_ALL)
 				&& !studyOID.equals(INDICATE_ALL)) {
 			LOGGER.info("At the study level.. study event,study subject and forms are *");
+			//  studySubjectOid=* ,studyEventOid=* , fromVersionOid=* (All Subjects , All Events , All FormVersions)
 			return getClinicalData(studyOID,userId,crossForm);
 		} else if (!studyEventOID.equals(INDICATE_ALL) && !studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL)
 				&& formVersionOID.equals(INDICATE_ALL)) {
 			LOGGER.info("Obtaining the form version specific");
+			// fromVersionOid=*  (Single Subject , Single Event , All FormVersions)
 			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, null,userId,crossForm));
 			return clinicalDataHash;
 		}
 
 		else if (!studyEventOID.equals(INDICATE_ALL) && !studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL)
 				&& !formVersionOID.equals(INDICATE_ALL)) {
+			// none =* (Single Subject , Single Event , Single FormVersion)
 			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, formVersionOID,userId,crossForm));
 			return clinicalDataHash;
 		}
