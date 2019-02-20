@@ -34,13 +34,17 @@ import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import javax.ws.rs.Consumes;
 
+import org.akaza.openclinica.bean.core.DataEntryStage;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.ErrorMessage;
 import org.akaza.openclinica.bean.login.ImportDataResponseFailureDTO;
 import org.akaza.openclinica.bean.login.ImportDataResponseSuccessDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.DisplayItemBeanWrapper;
+import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
 import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.control.submit.ImportCRFInfo;
@@ -391,9 +395,13 @@ public class DataController {
                     return errorMsgs;
                 }
 
-                errorMessagesFromValidation = dataImportService.validateData(odmContainer, dataSource, coreResources, studyBean, userBean,
+                HashMap validateDataResult = (HashMap) dataImportService.validateData(odmContainer, dataSource, coreResources, studyBean, userBean,
                         displayItemBeanWrappers, importedCRFStatuses,request);
-
+                ArrayList<StudyEventBean> newStudyEventBeans = (ArrayList<StudyEventBean>) validateDataResult.get("studyEventBeans");               
+                List<EventCRFBean> eventCRFBeans = (List<EventCRFBean>) validateDataResult.get("eventCRFBeans");
+                
+                errorMessagesFromValidation = (List<String>) validateDataResult.get("errors");
+                
                 if (errorMessagesFromValidation.size() > 0) {
                     String err_msg = convertToErrorString(errorMessagesFromValidation);
                     ErrorMessage errorOBject = createErrorMessage("errorCode.ValidationFailed", err_msg);
@@ -431,6 +439,33 @@ public class DataController {
                 List<ImportDataRuleRunnerContainer> containers = dataImportService.runRulesSetup(dataSource, studyBean, userBean, subjectDataBeans,
                         ruleSetService);
 
+                // Now can create event and CRF beans here
+                if(newStudyEventBeans != null && newStudyEventBeans.size() > 0) {                
+                	ArrayList<StudyEventBean> studyEventBeanCreatedList = this.dataImportService.getImportCRFDataService().creatStudyEvent(newStudyEventBeans);
+                	
+                	ArrayList<EventCRFBean> tempEventCRFBeans = new ArrayList<>();
+                	for(StudyEventBean studyEventBean:studyEventBeanCreatedList) {
+                		tempEventCRFBeans.addAll(studyEventBean.getEventCRFs());
+                	}
+                	
+                	ArrayList<Integer> permittedEventCRFIds = new ArrayList<Integer>();
+                  
+                    for (EventCRFBean eventCRFBean : tempEventCRFBeans) {
+                         DataEntryStage dataEntryStage = eventCRFBean.getStage();
+                         Status eventCRFStatus = eventCRFBean.getStatus();
+
+                         if (eventCRFStatus.equals(Status.AVAILABLE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY)
+                                 || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE)
+                                 || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+                             permittedEventCRFIds.add(new Integer(eventCRFBean.getId()));
+                         } 
+                     }
+                	// now need to update displayItemBeanWrappers
+                    // The following line updates a map that is used for setting the EventCRF status post import
+                    this.dataImportService.getImportCRFDataService().fetchEventCRFStatuses(odmContainer, importedCRFStatuses);
+                	displayItemBeanWrappers = this.dataImportService.getImportCRFDataService().getDisplayItemBeanWrappers(request, odmContainer, userBean, permittedEventCRFIds, locale);
+                }
+                
                 List<String> auditMsgs = new DataImportService().submitData(odmContainer, dataSource, studyBean, userBean, displayItemBeanWrappers,
                         importedCRFStatuses);
 

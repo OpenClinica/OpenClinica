@@ -28,6 +28,7 @@ import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.DiscrepancyNoteBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.DisplayItemBean;
@@ -434,7 +435,11 @@ public class ImportSpringJob extends QuartzJobBean {
             // here, tbh 05/2009
 
             MockHttpServletRequest request = new MockHttpServletRequest();
-            List<EventCRFBean> eventCRFBeans = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE,request);
+            HashMap fetchEventCRFBeansResult = getImportCRFDataService(dataSource).fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE,request);
+            
+            List<EventCRFBean> eventCRFBeans = (List<EventCRFBean>) fetchEventCRFBeansResult.get("eventCRFBeans");
+            ArrayList<StudyEventBean> newStudyEventBeans = (ArrayList<StudyEventBean>) fetchEventCRFBeansResult.get("studyEventBeans");
+           
             List<EventCRFBean> permittedEventCRFs = new ArrayList<EventCRFBean>();
             Boolean eventCRFStatusesValid = getImportCRFDataService(dataSource).eventCRFStatusesValid(odmContainer, ub);
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();

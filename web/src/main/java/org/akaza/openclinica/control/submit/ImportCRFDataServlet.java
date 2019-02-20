@@ -21,6 +21,7 @@ import javax.servlet.http.HttpServletRequest;
 import org.akaza.openclinica.bean.core.DataEntryStage;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.rule.FileUploadHelper;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
@@ -304,8 +305,11 @@ public class ImportCRFDataServlet extends SecureController {
                 addPageMessage(respage.getString("passed_common_events_check"));
             }
            
-        	 List<EventCRFBean> eventCRFBeans =  getImportCRFDataService().fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE,request);
-             
+        	 HashMap fetchEventCRFBeansResult =  getImportCRFDataService().fetchEventCRFBeans(odmContainer, ub, Boolean.FALSE,request);
+        	 
+             List<EventCRFBean> eventCRFBeans = (List<EventCRFBean>) fetchEventCRFBeansResult.get("eventCRFBeans");
+             ArrayList<StudyEventBean> studyEventBeans = (ArrayList<StudyEventBean>) fetchEventCRFBeansResult.get("studyEventBeans");
+            
             
             List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
             HashMap<String, String> totalValidationErrors = new HashMap<String, String>();
