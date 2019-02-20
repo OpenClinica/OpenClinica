@@ -27,6 +27,12 @@
     var ocAppTimeoutKey = "OCAppTimeout";
     var firstLoginCheck = '<%= session.getAttribute("firstLoginCheck")%>';
     console.log("First time flag value:" + firstLoginCheck);
+    // for forceRenewAuth. It only happens with Home page, so no need to copy this to enketoFormServlet.jsp
+    var doNotInvalidate = '<%= request.getParameter("firstLoginCheck")%>';
+    if (doNotInvalidate === "true")
+        firstLoginCheck = doNotInvalidate;
+
+    console.log("***********************************firstLoginCheck as a parameter:" + firstLoginCheck);
     var CURRENT_USER = "currentUser";
     var appName = "RT";
 </script>
