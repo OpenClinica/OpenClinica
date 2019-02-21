@@ -241,10 +241,15 @@ public class ImportCRFDataService {
                              tempStudyEventBean.setStudyEventDefinitionId(studyEventDefinitionBean.getId());
                              tempStudyEventBean.setSampleOrdinal(Integer.parseInt(sampleOrdinal));
                              
-                            // will create later after all validation pass
-                            // studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
-                             isNewStudyEvent = true;
-                             studyEventBean = tempStudyEventBean;
+                            // FIX for API will create later after all validation pass
+                             String comeFromPipe = (String) request.getHeader("PIPETEXT");
+                         	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
+                         	   isNewStudyEvent = true;
+                               studyEventBean = tempStudyEventBean;
+                         	}else {
+                         		//UI will keep current pattern,  will use the same pattern as API to fix later
+                         		studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
+                         	}                                                     
                                                        
                              /**
                               * After create a new study event, update the repeat key in the data, so make sure that it is synchronized
