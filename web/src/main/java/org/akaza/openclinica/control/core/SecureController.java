@@ -1442,6 +1442,14 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         StudyDao studyDao = (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
         List<ChangeStudyDTO> byUser = studyDao.findByUser(username);
         List<StudyEnvironmentRoleDTO> userRoles = (List<StudyEnvironmentRoleDTO>) session.getAttribute("allUserRoles");
+        if (userRoles == null) {
+            logger.error("******************userRoles should not be null");
+            ResponseEntity<List<StudyEnvironmentRoleDTO>> responseEntity = studyBuildService.getUserRoles(request, true);
+            userRoles = responseEntity.getBody();
+        }
+        if (byUser == null) {
+            logger.error("byUser variable should not be null for username:" + username);
+        }
         Set<CustomRole> customRoles = userRoles.stream().flatMap(s -> byUser.stream().map(r -> checkMatchingUuid(customRole, r, s))).collect(Collectors.toSet());
     }
 
