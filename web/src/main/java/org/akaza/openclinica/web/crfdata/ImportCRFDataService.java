@@ -682,13 +682,13 @@ public class ImportCRFDataService {
 
 
                     }else {
-                    	//OC-10148 and check status:scheduled
-                    	String formOid = formDataBean.getFormOID();
+                    	//OC-10392 and check status:scheduled
+                    	/*String formOid = formDataBean.getFormOID();
                         if(!(studyEventDefinitionBean.isRepeating()) && studyEventBean!=null && !(studyEventBean.getSubjectEventStatus().getName().equals("scheduled"))) {                        		
         	    	    		errors.add("For Non-Repeating visited event, found existing event in system - form "+ formOid +" , " +  "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
         	    	    		
         	    	    		return errors;
-                        	}
+                        	}*/
                         	
                         }
                     }
