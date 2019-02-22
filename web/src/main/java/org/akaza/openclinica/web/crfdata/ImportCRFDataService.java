@@ -184,36 +184,42 @@ public class ImportCRFDataService {
                         String sqlStr;
                         ArrayList matchCriterias;
                         boolean matchedAndSkip=false;;
-    					try {
-    						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
-    						if(sqlStr != null) {
-    							matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr); 
-        		                matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
-    						}
-    		                    
-    		                if(matchedAndSkip) {
-    		                	 // do something	
-    		                  ;// return null;
-    		                }else {
-    		                	if(studyEventDefinitionBean.isRepeating()) {
-    		                		/**
-    		                		 *  keep existing logic -- import XML file must provide  orrect repeat key and will sue that key
-    		                		 */
-    		                		String comeFromPipe = (String) request.getHeader("PIPETEXT");
-    	                        	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
-    	                        		sampleOrdinal =	commonEventContainerDTO.getMaxOrdinal() + 1 + "";
-    	                        	}
+    					
+						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
+						if(sqlStr != null) {
+							matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr); 
+    		                matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
+						}
+		                    
+		                if(matchedAndSkip) {
+		                	String originalFileName = request.getHeader("originalFileName");
+		                	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
+		                	String recordNum = null;
+		                	if(originalFileName !=null) {
+		                		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
+		                		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
+		                	}
+		                	String msg;
+		                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";    	    	
 
-    		                	}else {
-    		                		sampleOrdinal =	 "1";
-    		                	}
-    		                	
-    		                	
-    		                }
-    					} catch (OpenClinicaException e) {
-    						// TODO Auto-generated catch block
-    						e.printStackTrace();
-    					}
+		    	    		throw new OpenClinicaException(msg, "");
+		                }else {
+		                	if(studyEventDefinitionBean.isRepeating()) {
+		                		/**
+		                		 *  keep existing logic -- import XML file must provide  orrect repeat key and will sue that key
+		                		 */
+		                		String comeFromPipe = (String) request.getHeader("PIPETEXT");
+	                        	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
+	                        		sampleOrdinal =	commonEventContainerDTO.getMaxOrdinal() + 1 + "";
+	                        	}
+
+		                	}else {
+		                		sampleOrdinal =	 "1";
+		                	}
+		                	
+		                	
+		                }
+					
                         //for common events, if not provided studyEventRepeatKey, if pass skip check, then will automatically assign 
     					//the next repeat key for repeat event 
                      
@@ -2170,7 +2176,7 @@ public class ImportCRFDataService {
     			"		    study_event_definition sed\r\n" + 
     			"            where \r\n" + 
     			"            ss.study_id=s.study_id\r\n" + 
-    			"            and sed.study_id= ss.study_id\r\n" + 
+    			"            and (sed.study_id= s.study_id OR sed.study_id= s.parent_study_id)\r\n" + 
     			"            and se.study_event_definition_id=sed.study_event_definition_id\r\n" + 
     			"            and ec.study_event_id=se.study_event_id\r\n" + 
     			"            and ec.study_subject_id=ss.study_subject_id\r\n" + 
@@ -2178,10 +2184,7 @@ public class ImportCRFDataService {
     			"		and fg.item_group_id=fgim.item_group_id\r\n" + 
     			"		and fgim.item_id=i.item_id\r\n" + 
     			"		and id.item_id=i.item_id\r\n";
-    	
-    	if(studyOID != null) {
-    		baseSqlStr = baseSqlStr + " " + "and s.oc_oid='"+ studyOID +"'";
-    	}
+    	    	
     	if(subjectOID != null) {
     		baseSqlStr = baseSqlStr + " " + "and ss.oc_oid='"+ subjectOID +"'";
     	}
