@@ -126,7 +126,7 @@
       datatable.page.len(defaultPageSize);
       table.dataTable().fnSortNeutral();
     });
-    clickAllSections('collapsed');
+    clickAllSections('#studySubjectRecord.collapsed, #subjectEvents.collapsed, #commonEvents>.expanded');
   }
 
   function showHide() {
@@ -152,8 +152,8 @@
     section.toggleClass('collapsed expanded');
   }
 
-  function clickAllSections(state) {
-    $('div.section.' + state + '>.section-header').each(showHide);
+  function clickAllSections(selector) {
+    $(selector).children('.section-header').each(showHide);
   };
 
   $(document.body).on('click', '.section-header', showHide);
@@ -300,9 +300,9 @@
   </span>
 </div>
 <div class="header-links">
-  <a href="javascript:clickAllSections('collapsed');"><fmt:message key="expand_all" bundle="${resword}"/></a>
+  <a href="javascript:clickAllSections('div.section.collapsed');"><fmt:message key="expand_all" bundle="${resword}"/></a>
   <span>&nbsp; | &nbsp;</span>
-  <a href="javascript:clickAllSections('expanded');"><fmt:message key="collapse_all" bundle="${resword}"/></a>  
+  <a href="javascript:clickAllSections('div.section.expanded');"><fmt:message key="collapse_all" bundle="${resword}"/></a>  
 </div>
 </div>
 <div class="section expanded clear hide" id="studySubjectRecord" data-section-number="0">
