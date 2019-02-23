@@ -91,7 +91,7 @@
         if (
           store.data.ocStatusHide !== 'oc-status-removed' ||
           store.data.datatables.some(function(state) {return canReset(state)}) ||
-          $('div.section.collapsed').length
+          $('#studySubjectRecord.collapsed, #subjectEvents.collapsed, #commonEvents>.expanded').length
         )
           $('#reset-all-filters').removeClass('invisible');
         else
