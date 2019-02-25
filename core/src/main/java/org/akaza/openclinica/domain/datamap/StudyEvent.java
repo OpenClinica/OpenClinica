@@ -110,7 +110,6 @@ public class StudyEvent extends DataMapDomainObject  {
 
 	@ManyToOne(fetch = FetchType.EAGER)
 	@JoinColumn(name = "study_event_definition_id")
-
 	public StudyEventDefinition getStudyEventDefinition() {
 		return this.studyEventDefinition;
 	}

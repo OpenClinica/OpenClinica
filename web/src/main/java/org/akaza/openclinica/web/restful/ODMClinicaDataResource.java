@@ -165,22 +165,14 @@ public class ODMClinicaDataResource {
 
         XMLSerializer xmlSerializer = new XMLSerializer();
              report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,clinicalDataBeans, archived, permissionTagsString,meta);
-/*            if (report.getClinicalDataMap() == null)
-                return null;*/
 
 
         report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray,meta,clinical,crossForm);
-        // xmlSerializer.setForceTopLevelObject(true);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
 
         JSONClinicalDataPostProcessor processor = new JSONClinicalDataPostProcessor(request.getLocale());
         processor.process((JSONObject) json);
-
-        // JSONClinicalDataPostProcessor processor = new
-        // JSONClinicalDataPostProcessor(LocaleResolver.getLocale(request));
-        // processor.process(json);
-
 
         return json.toString(INDENT_LEVEL);
     }
