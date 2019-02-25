@@ -99,18 +99,13 @@ public class LogoutController {
         return "redirect:" + returnURL + param;
     }
 
+
+
     @RequestMapping(value="/invalidateKeycloakToken", method = RequestMethod.GET)
     public void invalidateAccessToken(final HttpServletRequest request,
                                       final HttpServletResponse response) throws IOException {
-        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-        if (auth != null) {
-            logger.info("Invalidating Keycloak token");
-            auth.setAuthenticated(false);
-            final HttpSession session = request.getSession();
-            resetSession(session);
-            String authUrl = getLogoutUri(request, true);
-            response.sendRedirect(authUrl);
-        }
+        String authUrl = getLogoutUri(request, true);
+        response.sendRedirect(authUrl);
     }
 
     @RequestMapping(value="/resetFirstLogin", method = RequestMethod.GET)

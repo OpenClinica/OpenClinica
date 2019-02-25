@@ -119,9 +119,8 @@ function processUserData(inputPromise) {
             var thisUser = res;
             console.log("In processcurrentUser:" + thisUser + " firstLoginCheck:" + firstLoginCheck);
             if (thisUser !== userName) {
-                console.log("another user:" + thisUser + "New user is:" + userName);
-                console.log("***********************************Going to the home page");
-                window.location.replace(myContextPath + '/MainMenu');
+                console.log("another user:" + thisUser + "New user is:" + userName + " calling invalidateKeycloakToken");
+                window.location.replace (myContextPath + '/pages/invalidateKeycloakToken');
             } else if (firstLoginCheck === "true") {
                 jQuery.get(myContextPath + '/pages/resetFirstLogin')
                     .error(function (jqXHR, textStatus, errorThrown) {
