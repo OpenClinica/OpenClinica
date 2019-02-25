@@ -3894,8 +3894,7 @@ public class OdmExtractDAO extends DatasetDAO {
     private boolean isFormTagged(EventDefinitionCRFBean edc) {
         logger.debug("Begin to permissionTagsLookup");
             ArrayList viewRows = select(permissionTagsLookupNoPermissionTags(edc));
-            logger.info("permissionTagsLookup : "
-                    + permissionTagsLookupNoPermissionTags(edc));
+            //logger.info("permissionTagsLookup : " + permissionTagsLookupNoPermissionTags(edc));
             return (viewRows.size() > 0 ?  true:  false) ;
     }
 

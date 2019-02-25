@@ -97,7 +97,7 @@ public class StudySubject  extends DataMapDomainObject {
 		this.userAccount = userAccount;
 	}
 
-	@ManyToOne(fetch = FetchType.EAGER)
+	@ManyToOne(fetch = FetchType.LAZY)
 	@JoinColumn(name = "study_id")
 	public Study getStudy() {
 		return this.study;
