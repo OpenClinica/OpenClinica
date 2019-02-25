@@ -285,6 +285,7 @@ public class MainMenuServlet extends SecureController {
         logger.info("is ub a ldapuser??" + ub.isLdapUser());
 
         if (currentStudy == null) {
+            logger.error("CurrentStudy is null: forwarding to menu.jsp");
             forwardPage(Page.MENU);
             return;
         }
