@@ -1,15 +1,19 @@
 package org.akaza.openclinica.controller;
 
+import java.util.ArrayList;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 import io.swagger.annotations.Api;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
@@ -19,6 +23,8 @@ import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
@@ -169,6 +175,280 @@ public class StudyEventController {
         return restfulServiceHelper;
     }
 
+    @ApiOperation(value = "To schedule an event for participants at study or site level in bulk",  notes = "Will read the CSV file(CSV contains ParticipantID, StudyEventOID, Ordinal, Start Date, End Date)")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successful operation"),
+	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
+	@RequestMapping(value = "clinicaldata/studies/{studyOID}/sites/{sitesOID}/events/bulk ", method = RequestMethod.POST,consumes = {"multipart/form-data"})
+	public ResponseEntity<Object> scheduleEventAtSiteLevel(HttpServletRequest request,
+			@RequestParam("file") MultipartFile file,
+			//@RequestParam("size") Integer size,				
+			@PathVariable("studyOID") String studyOID,
+			@PathVariable("siteOID") String siteOID) throws Exception {
+		
+		
+        return scheduleEventInBulk(request, file, studyOID, siteOID);
+	}
+    
+    @ApiOperation(value = "To schedule an event for participants at study or site level in bulk",  notes = "Will read the CSV file(CSV contains ParticipantID, StudyEventOID, Ordinal, Start Date, End Date)")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successful operation"),
+	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
+	@RequestMapping(value = "clinicaldata/studies/{studyOID}/events/bulk ", method = RequestMethod.POST,consumes = {"multipart/form-data"})
+	public ResponseEntity<Object> scheduleEventAtStudyLevel(HttpServletRequest request,
+			@RequestParam("file") MultipartFile file,
+			//@RequestParam("size") Integer size,				
+			@PathVariable("studyOID") String studyOID) throws Exception {
+		
+		
+        return scheduleEventInBulk(request, file, studyOID, null);
+	}
+    
+    private void scheduleEventInBulk(HttpServletRequest request, File file, String studyOID, String siteOID);{
+
+    	String studyEventOID = null;
+    	String studySubjectOID = null;
+    	String errMsg = null;
+    	StudyBean currentStudy = null;
+    	StudyBean currentSiteStudy = null;
+    	StudyEventDefinitionBean definition = null;
+    	StudySubjectBean studySubject = null;
+    	String startDateStr;
+    	String endDateStr;
+    	Date startDate;
+    	Date endDate;
+    	
+    	/**
+    	 * Step 1: check study
+    	 */
+    	StudyDAO studyDao = new StudyDAO(sm.getDataSource());
+    	
+    	// check study level first
+    	currentStudy = studyDao.findByOid(studyOID);
+    	
+    	if(currentStudy == null) {
+    		errMsg = "A new study event could not be scheduled if its study {" + studyOID "} is not exsiting in the system.";
+    	}
+    	
+    	if (currentStudy.getStatus().equals(Status.LOCKED)) {
+    		errMsg = "A new study event could not be scheduled if its study {" + studyOID "} has been LOCKED.";
+    	}
+    	// continue check site level
+    	if(siteOID != null) {
+    		currentSiteStudy = studyDao.findSiteByOid(studyOID,siteOID);
+    		
+    		if(currentSiteStudy == null) {
+        		errMsg = "A new study event could not be scheduled if its study site {" + siteOID "} is not exsiting in the system.";
+        	}
+    	}
+    	
+    	if(currentSiteStudy != null) {
+    		currentStudy = currentSiteStudy;
+    	}
+    	
+    	    
+        /**
+         *  Step 2: check Subject              	
+         */
+        StudySubjectDAO sdao = new StudySubjectDAO(sm.getDataSource());       
+     
+        studySubject = (StudySubjectBean) sdao.findByOid(studySubjectOID);
+        //StudySubjectBean studySubject = sdao.findByLabelAndStudy(fp.getString(INPUT_STUDY_SUBJECT_LABEL), currentStudy);
+        Status subjectStatus = studySubject.getStatus();
+        if ("removed".equalsIgnoreCase(subjectStatus.getName()) || "auto-removed".equalsIgnoreCase(subjectStatus.getName())) {
+        	errMsg = "A new study event could not be scheduled if its study subject {" + studySubjectOID +"} has been removed."
+
+        	//return and stop here
+        }
+      
+       
+        // Step 3: check study event                    
+        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(sm.getDataSource());
+        definition = studyEventDefinitionDAO.findByOidAndStudy(studyEventOID,
+        		currentStudy.getId(), currentStudy.getParentStudyId());
+   
+        StudyBean studyWithEventDefinitions = currentStudy;
+        if (currentStudy.getParentStudyId() > 0) {
+            studyWithEventDefinitions = new StudyBean();
+            studyWithEventDefinitions.setId(currentStudy.getParentStudyId());
+        }
+        // find all active definitions with CRFs
+        ArrayList<StudyEventDefinitionBean> eventDefinitions = seddao.findAllActiveByStudy(studyWithEventDefinitions);
+        ArrayList<StudyEventDefinitionBean> tempList = new ArrayList<>();
+        for (StudyEventDefinitionBean eventDefinition : eventDefinitions) {
+            if (!eventDefinition.getType().equals(COMMON)) {
+            	tempList.add(eventDefinition);
+            }
+        }
+        
+        eventDefinitions = new ArrayList(tempList);       
+        Collections.sort(eventDefinitions);
+      
+        ArrayList eventDefinitionsScheduled = new ArrayList(eventDefinitions);
+
+     ////////////////////
+
+            String dateCheck2 = request.getParameter("startDate");
+            String endCheck2 = request.getParameter("endDate");
+            logger.debug(dateCheck2 + "; " + endCheck2);
+     
+         
+            Date start = getInputStartDate();
+            Date end = null;
+          
+            if (!subjectMayReceiveStudyEvent(sm.getDataSource(), definition, studySubject)) {
+            	errMsg ="This type of event may not be scheduled to the specified participant, since the event definition is not repeating, and an event of this type already exists for the specified participant.";
+               
+            }
+
+            
+            // check startDate and end Date
+            if (!"".equals(strEnd) && !errors.containsKey(INPUT_STARTDATE_PREFIX) && !errors.containsKey(INPUT_ENDDATE_PREFIX)) {
+                end = getInputEndDate();
+                if (!fp.getString(INPUT_STARTDATE_PREFIX + "Date").equals(fp.getString(INPUT_ENDDATE_PREFIX + "Date"))) {
+                    if (end.before(start)) {
+                        Validator.addError(errors, INPUT_ENDDATE_PREFIX, resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
+                    }
+                } else {
+                    // if in same date, only check when both had time entered
+                    if (fp.timeEntered(INPUT_STARTDATE_PREFIX) && fp.timeEntered(INPUT_ENDDATE_PREFIX)) {
+                        if (end.before(start) || end.equals(start)) {
+                            Validator.addError(errors, INPUT_ENDDATE_PREFIX,
+                                    resexception.getString("input_provided_not_occure_after_previous_start_date_time"));
+                        }
+                    }
+                }
+            }
+
+            // pass all validation check
+            StudyEventDAO sed = new StudyEventDAO(sm.getDataSource());
+
+            StudyEventBean studyEvent = new StudyEventBean();
+            Date today = new Date();
+            studyEvent.setCreatedDate(today);
+            studyEvent.setUpdatedDate(today);
+            studyEvent.setStudyEventDefinitionId(definition.getId());
+            studyEvent.setStudySubjectId(studySubject.getId());
+              
+                studyEvent.setDateStarted(startDate);
+                studyEvent.setDateEnded(endDate);
+              
+                studyEvent.setOwner(ub);
+                studyEvent.setStatus(Status.AVAILABLE);                                
+                studyEvent.setStudySubjectId(studySubject.getId());
+                studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+
+                studySubject = unsignSignedParticipant(studySubject);
+                sdao.update(studySubject);
+
+                studyEvent.setSampleOrdinal(sed.getMaxSampleOrdinal(definition, studySubject) + 1);
+
+                studyEvent = (StudyEventBean) sed.create(studyEvent);
+             
+                if (!studyEvent.isActive()) {
+                    throw new OpenClinicaException(restext.getString("event_not_created_in_database"), "2");
+                }
+               
+///////////
+               
+                StudyEventBean studyEventScheduled = new StudyEventBean();
+                studyEventScheduled.setStudyEventDefinitionId(scheduledDefinitionIds[i]);
+                studyEventScheduled.setStudySubjectId(studySubject.getId());
+
+                // YW 11-14-2007
+                if ("-1".equals(fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Hour"))
+                        && "-1".equals(fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Minute"))
+                        && "".equals(fp.getString(INPUT_STARTDATE_PREFIX_SCHEDULED[i] + "Half"))) {
+                    studyEventScheduled.setStartTimeFlag(false);
+                } else {
+                    studyEventScheduled.setStartTimeFlag(true);
+                }
+                // YW >>
+
+                studyEventScheduled.setDateStarted(startScheduled[i]);
+                // YW, 3-12-2008, 2220 fix<<
+                if (!"".equals(strEndScheduled[i])) {
+                    endScheduled[i] = fp.getDateTime(INPUT_ENDDATE_PREFIX_SCHEDULED[i]);
+                    if ("-1".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Hour"))
+                            && "-1".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Minute"))
+                            && "".equals(fp.getString(INPUT_ENDDATE_PREFIX_SCHEDULED[i] + "Half"))) {
+                        studyEventScheduled.setEndTimeFlag(false);
+                    } else {
+                        studyEventScheduled.setEndTimeFlag(true);
+                    }
+                }
+                studyEventScheduled.setDateEnded(endScheduled[i]);
+                // YW >>
+                studyEventScheduled.setOwner(ub);
+                studyEventScheduled.setStatus(Status.AVAILABLE);
+                studyEventScheduled.setLocation(fp.getString(INPUT_SCHEDULED_LOCATION[i]));
+                studyEvent.setSubjectEventStatus(SubjectEventStatus.SCHEDULED);
+
+                // subjectsExistingEvents =
+                // sed.findAllByStudyAndStudySubjectId(
+                // currentStudy,
+                // studySubject.getId());
+                studyEventScheduled.setSampleOrdinal(sed.getMaxSampleOrdinal(definitionScheduleds.get(i), studySubject) + 1);
+                // System.out.println("create scheduled events");
+                studyEventScheduled = (StudyEventBean) sed.create(studyEventScheduled);
+                if (!studyEventScheduled.isActive()) {
+                    throw new OpenClinicaException(restext.getString("scheduled_event_not_created_in_database"), "2");
+                }
+
+          
+                       
+                    
+
+
+               
+                return;
+           
+      
+    
+    }
+    
+    
+    /**
+     * Determines whether a subject may receive an additional study event. This
+     * is true if:
+     * <ul>
+     * <li>The study event definition is repeating; or
+     * <li>The subject does not yet have a study event for the given study event
+     * definition
+     * </ul>
+     *
+     * @param studyEventDefinition
+     *            The definition of the study event which is to be added for the
+     *            subject.
+     * @param studySubject
+     *            The subject for which the study event is to be added.
+     * @return <code>true</code> if the subject may receive an additional study
+     *         event, <code>false</code> otherwise.
+     */
+    public static boolean subjectMayReceiveStudyEvent(DataSource ds, StudyEventDefinitionBean studyEventDefinition, StudySubjectBean studySubject) {
+
+        if (studyEventDefinition.isRepeating()) {          
+            return true;
+        }
+
+        StudyEventDAO sedao = new StudyEventDAO(ds);
+        ArrayList allEvents = sedao.findAllByDefinitionAndSubject(studyEventDefinition, studySubject);
+
+        if (allEvents.size() > 0) {           
+            return false;
+        }
+
+        return true;
+    }
+    
+    private StudySubjectBean unsignSignedParticipant(StudySubjectBean studySubject) {
+        Status subjectStatus = studySubject.getStatus();
+        if (subjectStatus.equals(Status.SIGNED)){
+            studySubject.setStatus(Status.AVAILABLE);
+        }
+        return studySubject;
+    }
+    
 }
 
 
