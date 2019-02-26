@@ -257,9 +257,8 @@ public class MainMenuServlet extends SecureController {
             String paramStr = Utils.getParamsString(targetMap);
             logger.info("Sending redirect to:" + request.getRequestURI() + "?" + paramStr);
             */
-            /* this handles the scenario when forceRenewAuth is true */
             session.removeAttribute("userRole");
-            response.sendRedirect(request.getRequestURI() + "?" + STUDY_ENV_UUID  + "=" +  getParameter(request,STUDY_ENV_UUID) +  "&firstLoginCheck=true");
+            response.sendRedirect(request.getRequestURI() + "?" + STUDY_ENV_UUID  + "=" +  getParameter(request,STUDY_ENV_UUID));
             return;
         }
 
