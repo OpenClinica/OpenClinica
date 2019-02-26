@@ -113,6 +113,33 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
 
     }
 
+    public List<StudyEvent> fetchStudyEvents(String oid, String subjectOID) {
+        List<StudyEvent> eventList = null;
+
+        String query = " from StudyEvent se where se.studySubject.ocOid = :subjectOID and se.studyEventDefinition.oc_oid = :oid order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setString("subjectOID", subjectOID);
+        q.setString("oid", oid);
+
+        eventList = (List<StudyEvent>) q.list();
+        return eventList;
+
+    }
+
+    public List<StudyEvent> fetchStudyEvents(int studyEventOrdinal, String oid, String subjectOID) {
+        List<StudyEvent> eventList = null;
+
+        String query = " from StudyEvent se where se.studySubject.ocOid = :subjectOID and se.studyEventDefinition.oc_oid = :oid and se.sampleOrdinal = :seOrdinal order by se.studyEventDefinition.ordinal,se.sampleOrdinal";
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setString("subjectOID", subjectOID);
+        q.setString("oid", oid);
+        q.setInteger("seOrdinal", studyEventOrdinal);
+
+        eventList = (List<StudyEvent>) q.list();
+        return eventList;
+
+    }
+
     @Transactional
     public StudyEvent saveOrUpdate(StudyEventContainer container) {
         StudyEvent event = saveOrUpdate(container.getEvent());

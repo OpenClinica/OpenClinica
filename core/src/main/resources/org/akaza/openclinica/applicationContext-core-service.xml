@@ -124,7 +124,6 @@
         <property name="studyDao" ref="studyDaoDomain"></property>
         <property name="studySubjectDao" ref="studySubjectDaoDomain"/>
         <property name="studyEventDefDao" ref="studyEventDefDaoDomain"/>
-        <property name="studyEventDao" ref="studyEventDaoDomain"/>
         <property name="auditEventDAO" ref="auditLogEventDaoDomain"/>
         <property name="userAccountDao" ref="userDaoDomain"/>
         <property name="studyUserRoleDao" ref="studyUserRoleDao"/>        

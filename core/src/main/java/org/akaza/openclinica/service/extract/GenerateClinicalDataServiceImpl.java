@@ -29,9 +29,9 @@ import java.util.*;
 
 /**
  * Generate CDISC-ODM clinical data without data set.
- * 
+ *
  * @author jnyayapathi
- * 
+ *
  */
 
 @Service("generateClinicalDataService")
@@ -53,10 +53,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	@Autowired
 	private DataSource dataSource;
 
+	@Autowired
+	private StudyEventDao studyEventDao;
+
 	private StudyDao studyDao;
 
 	private StudySubjectDao studySubjectDao;
-	private StudyEventDao studyEventDao;
 
 	private StudyEventDefinitionDao studyEventDefDao;
 
@@ -110,14 +112,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
 		this.studySubjectDao = studySubjectDao;
-	}
-
-	public StudyEventDao getStudyEventDao() {
-		return studyEventDao;
-	}
-
-	public void setStudyEventDao(StudyEventDao studyEventDao) {
-		this.studyEventDao = studyEventDao;
 	}
 
 	public GenerateClinicalDataServiceImpl() {
@@ -191,8 +185,8 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		}
 
 		for (StudySubject studySubj : studySubjs) {
-		if(studyEvents==null)
-				studyEvents = (ArrayList<StudyEvent>) getStudyEventDao().fetchListSEs(studySubj.getOcOid());
+			if(studyEvents==null)
+				studyEvents = (ArrayList<StudyEvent>) studyEventDao.fetchListSEs(studySubj.getOcOid());
 
 			if (studyEvents != null) {
 				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID,userId,crossForm,tagIds);
@@ -365,13 +359,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			//UserAccount userAccount = getUserAccountDao().findByUserId(userId);
 			if(crossForm) {
 				tagIds = loadPermissionTags();
-            }
+			}
 
 			List <EventDefinitionCrfPermissionTag> edcPTagIds=
 					getEventDefinitionCrfPermissionTagDao().findByEdcIdTagId(
 							eventDefinitionCrf.getEventDefinitionCrfId(),eventDefinitionCrf.getParentId()!=null? eventDefinitionCrf.getParentId(): 0, tagIds);
 			if(edcPTagIds.size()!=0){
-              continue;
+				continue;
 			}
 
 
@@ -404,17 +398,17 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 					dataBean.setCreatedBy(ecrf.getUserAccount().getUserName());
 					dataBean.setUpdatedDate(ecrf.getDateUpdated());
 					//UserAccount updatedUserAccount = userAccountDao.findById(ecrf.getUpdateId());
-                    UserAccountBean updatedUserAccount = null;
-                    if (ecrf.getUpdateId() != null) {
-                        updatedUserAccount = (UserAccountBean) userAccountDAO.findByPK(ecrf.getUpdateId());
-                    }
+					UserAccountBean updatedUserAccount = null;
+					if (ecrf.getUpdateId() != null) {
+						updatedUserAccount = (UserAccountBean) userAccountDAO.findByPK(ecrf.getUpdateId());
+					}
 					if(updatedUserAccount != null && updatedUserAccount.getId() != 0) {
 						dataBean.setUpdatedBy(updatedUserAccount.getName());
 					}else {
 						// or not set?
 						dataBean.setUpdatedBy(ecrf.getUserAccount().getUserName());
 					}
-					
+
 					if (ecrf.getFormLayout().getName() != null)
 						dataBean.setFormLayoutName(ecrf.getFormLayout().getName());
 					if (collectAudits)
@@ -584,7 +578,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	private ArrayList<ImportItemGroupDataBean> populateImportItemGrpBean(HashMap<String, ArrayList<String>> oidMap,
-			HashMap<String, List<ItemData>> oidDNAuditMap) {
+																		 HashMap<String, List<ItemData>> oidDNAuditMap) {
 		Set<String> keysGrpOIDs = oidMap.keySet();
 		ArrayList<ImportItemGroupDataBean> iigDataBean = new ArrayList<ImportItemGroupDataBean>();
 		ImportItemGroupDataBean importItemGrpDataBean = new ImportItemGroupDataBean();
@@ -619,13 +613,13 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 						LOGGER.debug("****************user:" + getCurrentUser());
 						LOGGER.debug("schema:" + CoreResources.getRequestSchema());
 						try {
-                            iiDataBean.setItemName(item.getName());
-                        } catch (NullPointerException npe) {
+							iiDataBean.setItemName(item.getName());
+						} catch (NullPointerException npe) {
 							CoreResources.getRequestSchema();
 							Item item1 = itemDao.findByOcOID(itemOid);
 							HttpServletRequest request = getRequest();
-                            throw npe;
-                        }
+							throw npe;
+						}
 						if (isCollectAudits() || isCollectDns()) {
 							iiDataBean = fetchItemDataAuditValue(oidDNAuditMap.get(grpOID), iiDataBean);
 						}
@@ -642,23 +636,23 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 		return iigDataBean;
 	}
-    private HttpServletRequest getRequest() {
-        ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
-        if (requestAttributes != null && requestAttributes.getRequest() != null) {
-            HttpServletRequest request = requestAttributes.getRequest();
-            return request;
-        }
-        return null;
-    }
+	private HttpServletRequest getRequest() {
+		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
+		if (requestAttributes != null && requestAttributes.getRequest() != null) {
+			HttpServletRequest request = requestAttributes.getRequest();
+			return request;
+		}
+		return null;
+	}
 	private String getCurrentUser() {
 		ServletRequestAttributes requestAttributes = (ServletRequestAttributes) RequestContextHolder.getRequestAttributes();
 		HttpServletRequest request = requestAttributes.getRequest();
 		UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
- 		if (userAccountBean != null) {
-				return userAccountBean.getName();
-			}else {
-				  return null;
-			  }
+		if (userAccountBean != null) {
+			return userAccountBean.getName();
+		}else {
+			return null;
+		}
 	}
 
 
@@ -902,7 +896,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	 */
 	@Override
 	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID,
-			Boolean collectDNs, Boolean collectAudit, Locale locale, int userId , boolean crossForm) {
+																	  Boolean collectDNs, Boolean collectAudit, Locale locale, int userId , boolean crossForm) {
 		setLocale(locale);
 		setCollectDns(collectDNs);
 		setCollectAudits(collectAudit);
@@ -941,7 +935,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				&& !studyOID.equals(INDICATE_ALL)) {
 			LOGGER.debug("Adding all the study events,formevents as it is a *");
 			LOGGER.debug("study subject is not all and so is study");
-            //  studyEventOid=* ,fromVersionOid=*  (Single Subject , All Events , All FormVersions)
+			//  studyEventOid=* ,fromVersionOid=*  (Single Subject , All Events , All FormVersions)
 			clinicalDataHash.put(studyOID, getClinicalData(studyOID, studySubjectOID,userId,crossForm));
 
 			return clinicalDataHash;
@@ -980,7 +974,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		int seOrdinal = 0;
 		String temp = studyEventOID;
 		List<StudyEvent> studyEvents = new ArrayList<StudyEvent>();
-		StudyEventDefinition sed = null;
+		StudyEventDefinition studyEventDefinition = null;
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
 		List<StudySubject> ss = listStudySubjects(studySubjectOID);
 		int idx = studyEventOID.indexOf(OPEN_ORDINAL_DELIMITER);
@@ -989,40 +983,17 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			studyEventOID = studyEventOID.substring(0, idx);
 			seOrdinal = new Integer(temp.substring(idx + 1, temp.indexOf(CLOSE_ORDINAL_DELIMITER))).intValue();
 		}
-		sed = getStudyEventDefDao().findByColumnName(studyEventOID, "oc_oid");
+		studyEventDefinition = getStudyEventDefDao().findByColumnName(studyEventOID, "oc_oid");
 		LOGGER.info("study event ordinal.." + seOrdinal);
 		if (seOrdinal > 0) {
-			studyEvents = fetchSE(seOrdinal, sed.getStudyEvents(), studySubjectOID);
+			studyEvents = studyEventDao.fetchStudyEvents(seOrdinal, studyEventDefinition.getOc_oid(), studySubjectOID);
 		}
 		else {
-			studyEvents = fetchSE(sed.getStudyEvents(), studySubjectOID);
+			studyEvents = studyEventDao.fetchStudyEvents(studyEventDefinition.getOc_oid(), studySubjectOID);
 		}
 
 
 		return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID,userId,crossForm);
-	}
-
-	private List<StudyEvent> fetchSE(int seOrdinal, List<StudyEvent> studyEvents, String ssOID) {
-		List<StudyEvent> sEs = new ArrayList<StudyEvent>();
-		LOGGER.debug("fetching all the study events");
-		for (StudyEvent se : studyEvents) {
-			if (se.getSampleOrdinal() == seOrdinal && se.getStudySubject().getOcOid().equals(ssOID)) {
-				sEs.add(se);
-
-			}
-		}
-		return sEs;
-	}
-
-	private List<StudyEvent> fetchSE(List<StudyEvent> studyEvents, String ssOID) {
-		List<StudyEvent> sEs = new ArrayList<StudyEvent>();
-		for (StudyEvent se : studyEvents) {
-			if (se.getStudySubject().getOcOid().equals(ssOID)) {
-				sEs.add(se);
-
-			}
-		}
-		return sEs;
 	}
 
 	public UserAccountDao getUserAccountDao() {
