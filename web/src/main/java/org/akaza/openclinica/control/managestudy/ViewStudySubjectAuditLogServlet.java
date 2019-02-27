@@ -192,6 +192,8 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                 allDeletedEventCRFs.addAll(deletedEventCRFs);
                 logger.info("deletedEventCRFs size[" + deletedEventCRFs.size() + "]");
             }
+            
+            List<String> tagIds = getPermissionTagsList().size()!=0 ?getPermissionTagsList():new ArrayList<>();
 
             for (int i = 0; i < events.size(); i++) {
                 StudyEventBean studyEvent = (StudyEventBean) events.get(i);
@@ -207,7 +209,6 @@ public class ViewStudySubjectAuditLogServlet extends SecureController {
                     eventCRF.setCrf(crf);
                     // Get the event crf audits
 
-                    List<String> tagIds = getPermissionTagsList().size()!=0 ?getPermissionTagsList():new ArrayList<>();
 
                     List < AuditBean> abs= (List<AuditBean>) adao.findEventCRFAuditEventsWithItemDataType(eventCRF.getId());
                     for (AuditBean ab : abs) {
