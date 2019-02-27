@@ -352,7 +352,7 @@ $(function() {
                     $('#commonEvents').append(sectionTmpl({
                         sectionNumber: sectionIndex,
                         studyEvent: studyEvent,
-                        collapseOrExpand: store.data.collapseSections[sectionIndex]? 'collapsed' : 'expanded'
+                        collapseOrExpand: store.data.collapseSections[sectionIndex] === false ? 'expanded' : 'collapsed'
                     }));
                     sectionIndex++;
                 }
