@@ -138,7 +138,7 @@
       body.slideDown('fast');
       header.attr('title', '<fmt:message key="collapse_section" bundle="${resword}"/>');
       store(function(data) {
-        delete data.collapseSections[n];
+        data.collapseSections[n] = false;
       });
       section.trigger('uncollapse');
     }
