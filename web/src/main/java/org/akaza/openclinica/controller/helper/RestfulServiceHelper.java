@@ -264,6 +264,49 @@ public class RestfulServiceHelper {
 	 }
 	 
 	 /**
+	  * 
+	  * @param userName
+	  * @param study_oid
+	  * @param site_oid
+	  * @return
+	  */
+	 public String verifyRole(String userName,  String study_oid,
+				String site_oid) {
+		
+		  String studyOid = study_oid;
+	      String siteOid = site_oid;
+	      String err_msg = null;
+			
+	      StudyUserRoleBean studyLevelRole = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,studyOid);
+			if(studyLevelRole == null) {
+				if (siteOid != null) {
+	 	        	
+	 	 	        	StudyUserRoleBean siteLevelRole = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,siteOid);
+	 	 	        	if(siteLevelRole == null) {
+	 	 	        		err_msg= "errorCode.noRoleSetUp " + "You do not have any role set up for user " + userName + " in study site " + siteOid;	 	 	        			 	 	        	
+	 	 	        	}else if(siteLevelRole.getId() == 0 || siteLevelRole.getRole().equals(Role.MONITOR)) {	 	 				    
+		 	 				err_msg= "errorCode.noSufficientPrivileges" + "You do not have sufficient privileges to proceed with this operation.";	 	 	        	  		 	 			
+	 	 				}
+	 	 	        
+		        }else {
+		        	 err_msg="errorCode.noRoleSetUp " + "You do not have any role set up for user " + userName + " in study " + studyOid;
+	
+		        }	 		 
+	        
+		    }else {
+		    	if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
+		    		err_msg = "errorCode.noSufficientPrivileges " + "You do not have sufficient privileges to proceed with this operation.";
+	
+	 				}
+		    }
+			
+		
+			
+			return err_msg;
+			
+	 }
+	 
+	 /**
      * Helper Method to get the user account
      * 
      * @return UserAccountBean

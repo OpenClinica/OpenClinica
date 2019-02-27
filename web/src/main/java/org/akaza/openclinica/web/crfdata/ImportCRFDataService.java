@@ -45,6 +45,7 @@ import org.akaza.openclinica.control.form.FormDiscrepancyNotes;
 import org.akaza.openclinica.control.form.Validator;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.akaza.openclinica.controller.dto.CommonEventContainerDTO;
+import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -81,6 +82,7 @@ public class ImportCRFDataService {
     private ItemDataDAO itemDataDao;
     private String skipMatchCriteriaSql;
     private PipeDelimitedDataHelper pipeDelimitedDataHelper;
+    private RestfulServiceHelper restfulServiceHelper;
 
 
     @Autowired
@@ -101,8 +103,11 @@ public class ImportCRFDataService {
      * purpose: look up EventCRFBeans by the following: Study Subject, Study Event, CRF Version, using the
      * findByEventSubjectVersion method in EventCRFDAO. May return more than one, hmm.
      */
-    public List<EventCRFBean> fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs,HttpServletRequest request) {
+    public HashMap fetchEventCRFBeans(ODMContainer odmContainer, UserAccountBean ub, Boolean persistEventCrfs,HttpServletRequest request) throws OpenClinicaException {
+    	HashMap fetchEventCRFBeansResult = new HashMap();
         ArrayList<EventCRFBean> eventCRFBeans = new ArrayList<EventCRFBean>();
+        //StudyEventBean List to hold new common event
+        ArrayList<StudyEventBean> studyEventBeans = new ArrayList<StudyEventBean>();
         EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
         StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
         StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
@@ -116,7 +121,7 @@ public class ImportCRFDataService {
         StudyBean studyBean = studyDAO.findByOid(studyOID);
         if (studyBean.getStatus() != Status.AVAILABLE) {
             logger.error("Study status is :" + studyBean.getStatus() + ", so dataImport is not allowed.");
-            return eventCRFBeans;
+            return fetchEventCRFBeansResult ;
         }
         ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
         for (SubjectDataBean subjectDataBean : subjectDataBeans) {
@@ -124,6 +129,7 @@ public class ImportCRFDataService {
 
             StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
             for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
+            	boolean isNewStudyEvent = false;
                 ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
 
                 String sampleOrdinal = studyEventDataBean.getStudyEventRepeatKey() == null ? "1" : studyEventDataBean.getStudyEventRepeatKey();
@@ -178,52 +184,42 @@ public class ImportCRFDataService {
                         String sqlStr;
                         ArrayList matchCriterias;
                         boolean matchedAndSkip=false;;
-    					try {
-    						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
-    						if(sqlStr != null) {
-    							matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr); 
-        		                matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
-    						}
-    		                    
-    		                if(matchedAndSkip) {
-    		                	 // do something	
-    		                  ;// return null;
-    		                }else {
-    		                	if(studyEventDefinitionBean.isRepeating()) {
-    		                		/**
-    		                		 *  keep existing logic -- import XML file must provide  orrect repeat key and will sue that key
-    		                		 */
-    		                		String comeFromPipe = (String) request.getHeader("PIPETEXT");
-    	                        	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
-    	                        		sampleOrdinal =	commonEventContainerDTO.getMaxOrdinal() + 1 + "";
-    	                        	}
-    		                	}else {
-    		                		sampleOrdinal =	 "1";
-    		                	}
-    		                	
-    		                	/** log message:
-    		        	    	 * RowNo | ParticipantID | Status | Message
-    		        				1 | SS_SUB510 | SUCCESS | InsertU
-    		        				2 | SS_SUB511 | FAILED  | errorCode.participantNotFound
-    		        				3 | SS_SUB512 | SUCCESS | Update
-    		        				4 | SS_SUB512 | SUCCESS | Skip
-    		        	    	 */
-    		                	String originalFileName = request.getHeader("originalFileName");
-    		                	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
-    		                	String recordNum = null;
-    		                	if(originalFileName !=null) {
-    		                		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
-    		                		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
-    		                	}
-    		                	String msg;
-    		                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Insert";
-    		    	    		getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
-    		    	    		
-    		                }
-    					} catch (OpenClinicaException e) {
-    						// TODO Auto-generated catch block
-    						e.printStackTrace();
-    					}
+    					
+						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
+						if(sqlStr != null) {
+							matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr); 
+    		                matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
+						}
+		                    
+		                if(matchedAndSkip) {
+		                	String originalFileName = request.getHeader("originalFileName");
+		                	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
+		                	String recordNum = null;
+		                	if(originalFileName !=null) {
+		                		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
+		                		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
+		                	}
+		                	String msg;
+		                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";    	    	
+
+		    	    		throw new OpenClinicaException(msg, "");
+		                }else {
+		                	if(studyEventDefinitionBean.isRepeating()) {
+		                		/**
+		                		 *  keep existing logic -- import XML file must provide  orrect repeat key and will sue that key
+		                		 */
+		                		String comeFromPipe = (String) request.getHeader("PIPETEXT");
+	                        	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
+	                        		sampleOrdinal =	commonEventContainerDTO.getMaxOrdinal() + 1 + "";
+	                        	}
+
+		                	}else {
+		                		sampleOrdinal =	 "1";
+		                	}
+		                	
+		                	
+		                }
+					
                         //for common events, if not provided studyEventRepeatKey, if pass skip check, then will automatically assign 
     					//the next repeat key for repeat event 
                      
@@ -251,14 +247,33 @@ public class ImportCRFDataService {
                              tempStudyEventBean.setStudyEventDefinitionId(studyEventDefinitionBean.getId());
                              tempStudyEventBean.setSampleOrdinal(Integer.parseInt(sampleOrdinal));
                              
-                             studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
-                             
+                            // FIX for API will create later after all validation pass
+                             String comeFromPipe = (String) request.getHeader("PIPETEXT");
+                         	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
+                         	   isNewStudyEvent = true;
+                               studyEventBean = tempStudyEventBean;
+                         	}else {
+                         		//UI will keep current pattern,  will use the same pattern as API to fix later
+                         		studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
+                         	}                                                     
+                                                       
                              /**
                               * After create a new study event, update the repeat key in the data, so make sure that it is synchronized
                               */
                              studyEventDataBean.setStudyEventRepeatKey(sampleOrdinal);
                              
                             
+                        }else {
+                        	if(!(studyEventDefinitionBean.isRepeating())) {
+                        		
+                        		if(!(studyEventDataBean.getStudyEventRepeatKey().equals("1"))) {
+                        			// if same sample ordinal, NOT update at this time(current requirements), return same error 
+                    				String err_msg ="For Non-Repeating event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID();                                                                          
+                                    
+                                    throw new OpenClinicaException(err_msg,"");
+                        		}
+                        		
+                        	}
                         }
                     
                                               
@@ -287,8 +302,16 @@ public class ImportCRFDataService {
 
                                 EventCRFBean newEventCrfBean = buildEventCrfBean(studySubjectBean, studyEventBean, formLayoutBean, crfVersionBean, ub);
                                 if (persistEventCrfs){
-                                    newEventCrfBean = (EventCRFBean) eventCrfDAO.create(newEventCrfBean);
+                                  // if is new event, all it's EventCRFBean will be created later  
+                                   if(isNewStudyEvent) {
+                                		studyEventBean.getEventCRFs().add(newEventCrfBean); 
+                                   }else {
+                                	   newEventCrfBean = (EventCRFBean) eventCrfDAO.create(newEventCrfBean);
+                                   }
+                                   
+                                  
                                 }
+                                
 
                                 logger.debug("   created and added new event crf");
 
@@ -317,13 +340,23 @@ public class ImportCRFDataService {
                         	}
                            
                         }
-                    }
+                    }                                                                       
                 }
+                
+                if(isNewStudyEvent) {
+             	   studyEventBeans.add(studyEventBean);
+                }    
+                
             }
         }
+        
+        // update hashMap
+        
+        fetchEventCRFBeansResult.put("studyEventBeans", studyEventBeans);
+        fetchEventCRFBeansResult.put("eventCRFBeans", eventCRFBeans);
         // if it's null, throw an error, since they should be existing beans for
         // iteration one
-        return eventCRFBeans;
+        return fetchEventCRFBeansResult;
     }
 
     public CommonEventContainerDTO addCommonForm(StudyEventDefinitionBean studyEventDefinition, CRFBean crf, StudySubjectBean studySubject,
@@ -573,8 +606,13 @@ public class ImportCRFDataService {
                         if(sampleOrdinal == null || sampleOrdinal.trim().isEmpty()) {
                         	String comeFromPipe = (String) request.getHeader("PIPETEXT");
                         	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
-                        		// not provide repeat key in the data file, then get the next available one
-                                sampleOrdinal = commonEventContainerDTO.getMaxOrdinal()+1 +""; 
+                        		 if(!isRepeating) {
+                        			 sampleOrdinal = 1 + "";
+                        		 }else {
+                        			// not provide repeat key in the data file, then get the next available one
+                                     sampleOrdinal = commonEventContainerDTO.getMaxOrdinal()+1 +""; 
+                        		 }
+                        		
                         		 
                         	}else {
                         		 //for common events, if not provided studyEventRepeatKey, then skip/reject
@@ -594,6 +632,17 @@ public class ImportCRFDataService {
                     				if(!((seBean.getSampleOrdinal()+"").equals(sampleOrdinal))) {
                         				errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
                                         return errors;	
+                        			}else {                        				
+                        				String comeFromPipe = (String) request.getHeader("PIPETEXT");
+                                    	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
+                                    		//OC-10148
+                                    		errors.add("For Non-Repeating common event, found existing event in system - form "+ formOid +" , repeatKey: " + sampleOrdinal + "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());                                       
+                                            return errors;	                            			
+                                    	}else {
+                                    		//OC-10365:XML import into non-repeating common event still allow overwrite
+                                    		;
+                                    	}
+                        				
                         			}
                     			}
                     			
@@ -639,7 +688,7 @@ public class ImportCRFDataService {
 
 
                     }else {
-                    	//OC-10148 and check status:scheduled
+                    	//OC-10392 and check status:scheduled
                     	/*String formOid = formDataBean.getFormOID();
                         if(!(studyEventDefinitionBean.isRepeating()) && studyEventBean!=null && !(studyEventBean.getSubjectEventStatus().getName().equals("scheduled"))) {                        		
         	    	    		errors.add("For Non-Repeating visited event, found existing event in system - form "+ formOid +" , " +  "  StudyEventOID: " + studyEventDataBean.getStudyEventOID());
@@ -1727,9 +1776,9 @@ public class ImportCRFDataService {
                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
                 	}
                 	String msg;
-                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";
-    	    		getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
-                	continue;
+                	msg = recordNum + "|" + studySubjectBean.getOid() + "|SUCCESS|" + "Skip";    	    	
+
+    	    		throw new OpenClinicaException(msg, "");
                 }
                 
                 /**
@@ -1747,6 +1796,28 @@ public class ImportCRFDataService {
                 StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
                         sedBean.getId(), ordinal);
 
+                if(studyEvent == null || studyEvent.getId() == 0) {
+                	 StudyEventBean tempStudyEventBean = new StudyEventBean();
+                     Date today = new Date();
+                     tempStudyEventBean.setCreatedDate(today);
+                     tempStudyEventBean.setDateStarted(today);
+                     tempStudyEventBean.setName(sedBean.getName());
+                     tempStudyEventBean.setOwner(ub);
+                     ArrayList eventCRFs = new ArrayList<>();                    
+                     tempStudyEventBean.setEventCRFs(eventCRFs);
+                     tempStudyEventBean.setOwnerId(ub.getId());
+                     tempStudyEventBean.setStudySubject(studySubjectBean);
+                     tempStudyEventBean.setUpdater(ub);
+                     tempStudyEventBean.setUpdatedDate(today);
+                     tempStudyEventBean.setStudySubjectId(studySubjectBean.getId());
+                     tempStudyEventBean.setSubjectEventStatus(SubjectEventStatus.DATA_ENTRY_STARTED);
+                     tempStudyEventBean.setStatus(Status.AVAILABLE);
+                     tempStudyEventBean.setStudyEventDefinitionId(sedBean.getId());
+                     tempStudyEventBean.setSampleOrdinal(ordinal);                     
+                   
+                     studyEvent = tempStudyEventBean;                                               
+                    
+                }
                 displayItemBeans = new ArrayList<DisplayItemBean>();
 
                 for (FormDataBean formDataBean : formDataBeans) {
@@ -1770,7 +1841,15 @@ public class ImportCRFDataService {
                     logger.debug("iterating through form beans: found " + crfVersion.getOid());
                     // may be the point where we cut off item groups etc and
                     // instead work on sections
+                    
                     EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
+                    
+                    if(eventCRFBean == null && studyEvent.getId()==0) {
+                    	ArrayList<FormLayoutBean> formLayoutBeans = getFormLayoutBeans(formDataBean, ds);
+                    	FormLayoutBean formLayoutBean = (FormLayoutBean)formLayoutBeans.get(0);                    	
+                    	eventCRFBean = buildEventCrfBean(studySubjectBean, studyEvent, formLayoutBean, crfVersion, ub);
+                    }
+                    
                     EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
                     EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(),
                             crfVersion.getId());
@@ -2007,7 +2086,7 @@ public class ImportCRFDataService {
         // we statically update the hash map here, so it should not have to be
         // thrown, tbh 06/2008
         if (!hardValidator.isEmpty()) {
-            // throw new OpenClinicaException(hardValidatorErrorMsgs, "");
+             throw new OpenClinicaException(hardValidatorErrorMsgs, "");
         }
         return wrappers;
     }
@@ -2097,7 +2176,7 @@ public class ImportCRFDataService {
     			"		    study_event_definition sed\r\n" + 
     			"            where \r\n" + 
     			"            ss.study_id=s.study_id\r\n" + 
-    			"            and sed.study_id= ss.study_id\r\n" + 
+    			"            and (sed.study_id= s.study_id OR sed.study_id= s.parent_study_id)\r\n" + 
     			"            and se.study_event_definition_id=sed.study_event_definition_id\r\n" + 
     			"            and ec.study_event_id=se.study_event_id\r\n" + 
     			"            and ec.study_subject_id=ss.study_subject_id\r\n" + 
@@ -2105,10 +2184,7 @@ public class ImportCRFDataService {
     			"		and fg.item_group_id=fgim.item_group_id\r\n" + 
     			"		and fgim.item_id=i.item_id\r\n" + 
     			"		and id.item_id=i.item_id\r\n";
-    	
-    	if(studyOID != null) {
-    		baseSqlStr = baseSqlStr + " " + "and s.oc_oid='"+ studyOID +"'";
-    	}
+    	    	
     	if(subjectOID != null) {
     		baseSqlStr = baseSqlStr + " " + "and ss.oc_oid='"+ subjectOID +"'";
     	}
@@ -2119,7 +2195,7 @@ public class ImportCRFDataService {
     	String[] skipMatchCriteriaArray = null;
     	
     	String skipMatchCriteria = request.getHeader("SkipMatchCriteria");
-    	if(skipMatchCriteria != null && !(skipMatchCriteria.equals("${SkipMatchCriteria}"))) {
+    	if(skipMatchCriteria != null && skipMatchCriteria.trim().length() > 0 && !(skipMatchCriteria.equals("${SkipMatchCriteria}"))) {
     		skipMatchCriteriaArray = this.toArray(skipMatchCriteria, ",");
     		
     		String itemGroupOID;
@@ -2265,4 +2341,322 @@ public class ImportCRFDataService {
 	public void setPipeDelimitedDataHelper(PipeDelimitedDataHelper importDataHelper) {
 		this.pipeDelimitedDataHelper = importDataHelper;
 	}
+
+	public RestfulServiceHelper getRestfulServiceHelper() {
+		if(restfulServiceHelper == null) {
+			restfulServiceHelper = new RestfulServiceHelper(ds);
+		}
+		return restfulServiceHelper;
+	}
+
+	public void setRestfulServiceHelper(RestfulServiceHelper restfulServiceHelper) {
+		this.restfulServiceHelper = restfulServiceHelper;
+	}
+	
+	public void validateUserRole(ODMContainer odmContainer,HttpServletRequest request) throws OpenClinicaException {
+      
+        List<String> errors = new ArrayList<String>();
+        MessageFormat mf = new MessageFormat("");
+
+  
+        StudyDAO studyDAO = new StudyDAO(ds);
+        String studyOid = odmContainer.getCrfDataPostImportContainer().getStudyOID();
+        StudyBean studyBean = studyDAO.findByOid(studyOid);
+        UserAccountBean userBean = this.getPipeDelimitedDataHelper().getUserAccount(request);
+        String userName=  userBean.getName();  
+        
+        String msg = this.getRestfulServiceHelper().verifyRole(userName, studyOid, null);
+        if (msg != null) {           
+            throw new OpenClinicaException(msg, msg);
+        }              
+    }
+	
+
+	public ArrayList<StudyEventBean> creatStudyEvent(ArrayList<StudyEventBean> studyEventBeans) {
+		ArrayList<StudyEventBean> studyEventBeanCreatedList = new ArrayList<>();
+		StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+		
+		for(StudyEventBean tempStudyEventBean:studyEventBeans) {
+			StudyEventBean e = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
+			
+			ArrayList<EventCRFBean> tempEventCRFBeans = new ArrayList<>();
+			ArrayList<EventCRFBean> eventCRFBeans = tempStudyEventBean.getEventCRFs();
+			// update study event information
+			for(EventCRFBean eventCRFBean:eventCRFBeans) {
+				if(eventCRFBean != null) {
+					eventCRFBean.setStudyEvent(e);
+					eventCRFBean.setStudyEventId(e.getId());
+					tempEventCRFBeans.add(eventCRFBean);
+				}
+				
+			}
+			
+			ArrayList<EventCRFBean> newEventCRFBeans = creatEventCRFBeans(tempEventCRFBeans);
+			e.setEventCRFs(newEventCRFBeans);
+			if(e != null) {
+				studyEventBeanCreatedList.add(e);
+			}
+			
+		}				
+		return studyEventBeanCreatedList;
+	}
+	
+	public StudyEventBean creatStudyEvent(StudyEventBean tempStudyEventBean) {
+		StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+		StudyEventBean studyEventBean = (StudyEventBean) studyEventDAO.create(tempStudyEventBean);
+		
+		ArrayList<EventCRFBean> eventCRFBeans = tempStudyEventBean.getEventCRFs();
+		creatEventCRFBeans(eventCRFBeans);
+		
+		return studyEventBean;
+	}
+	
+	public ArrayList<EventCRFBean> creatEventCRFBeans(ArrayList<EventCRFBean> eventCRFBeans) {
+		ArrayList<EventCRFBean> eventCRFBeansCreated = new  ArrayList<>();
+		EventCRFDAO eventCrfDAO = new EventCRFDAO(ds);
+		
+		for(EventCRFBean newEventCrfBean:eventCRFBeans) {
+			if(newEventCrfBean != null) {
+				EventCRFBean newCreatedEventCrfBean = (EventCRFBean) eventCrfDAO.create(newEventCrfBean);
+				eventCRFBeansCreated.add(newCreatedEventCrfBean);
+			}
+			
+		}
+		
+		
+		return eventCRFBeansCreated;
+	}
+	
+	 public List<DisplayItemBeanWrapper> getDisplayItemBeanWrappers(HttpServletRequest request, ODMContainer odmContainer, UserAccountBean ub,
+             ArrayList<Integer> permittedEventCRFIds, Locale locale)
+		throws OpenClinicaException {
+		
+		ResourceBundleProvider.updateLocale(locale);
+		ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
+		
+		DisplayItemBeanWrapper displayItemBeanWrapper = null;
+		HashMap validationErrors = new HashMap();
+		List<DisplayItemBeanWrapper> wrappers = new ArrayList<DisplayItemBeanWrapper>();
+		ImportHelper importHelper = new ImportHelper();
+		FormDiscrepancyNotes discNotes = new FormDiscrepancyNotes();
+		DiscrepancyValidator discValidator = new DiscrepancyValidator(request, discNotes);
+		
+		HashMap<String, String> hardValidator = new HashMap<String, String>();
+		
+		StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+		StudyDAO studyDAO = new StudyDAO(ds);
+		StudyBean studyBean = studyDAO.findByOid(odmContainer.getCrfDataPostImportContainer().getStudyOID());
+		StudySubjectDAO studySubjectDAO = new StudySubjectDAO(ds);
+		StudyEventDefinitionDAO sedDao = new StudyEventDefinitionDAO(ds);
+		HashMap<String, ItemDataBean> blankCheck = new HashMap<String, ItemDataBean>();
+		String hardValidatorErrorMsgs = "";
+		
+		ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
+		int totalEventCRFCount = 0;
+		int totalItemDataBeanCount = 0;
+		// int totalValidationErrors = 0;
+		for (SubjectDataBean subjectDataBean : subjectDataBeans) {
+		ArrayList<DisplayItemBean> displayItemBeans = new ArrayList<DisplayItemBean>();
+		logger.debug("iterating through subject data beans: found " + subjectDataBean.getSubjectOID());
+		ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
+		totalEventCRFCount += studyEventDataBeans.size();
+		
+		// ArrayList<Integer> eventCRFBeanIds = new ArrayList<Integer>();
+		// to stop repeats...?
+		StudySubjectBean studySubjectBean = studySubjectDAO.findByOidAndStudy(subjectDataBean.getSubjectOID(), studyBean.getId());
+		
+		for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
+		int parentStudyId = studyBean.getParentStudyId();
+		StudyEventDefinitionBean sedBean = sedDao.findByOidAndStudy(studyEventDataBean.getStudyEventOID(), studyBean.getId(), parentStudyId);
+		ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
+		logger.debug("iterating through study event data beans: found " + studyEventDataBean.getStudyEventOID());
+	                
+		int ordinal = 1;
+		try {
+			ordinal = new Integer(studyEventDataBean.getStudyEventRepeatKey()).intValue();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		StudyEventBean studyEvent = (StudyEventBean) studyEventDAO.findByStudySubjectIdAndDefinitionIdAndOrdinal(studySubjectBean.getId(),
+		sedBean.getId(), ordinal);
+			
+		displayItemBeans = new ArrayList<DisplayItemBean>();
+		
+		for (FormDataBean formDataBean : formDataBeans) {
+			Map<String,Integer> groupMaxOrdinals = new HashMap<String,Integer>();
+			displayItemBeanWrapper = null;
+			CRFVersionDAO crfVersionDAO = new CRFVersionDAO(ds);
+			EventCRFDAO eventCRFDAO = new EventCRFDAO(ds);
+			ArrayList<CRFVersionBean> crfVersionBeans = crfVersionDAO.findAllByFormOid(formDataBean.getFormOID());
+			ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
+			
+			if ((crfVersionBeans == null) || (crfVersionBeans.size() == 0)) {
+				MessageFormat mf = new MessageFormat("");
+				mf.applyPattern(respage.getString("your_crf_version_oid_did_not_generate"));
+				Object[] arguments = { formDataBean.getFormOID() };
+				
+				throw new OpenClinicaException(mf.format(arguments), "");
+			}
+			CRFVersionBean crfVersion = crfVersionBeans.get(0);
+			
+			EventCRFBean eventCRFBean = eventCRFDAO.findByEventCrfVersion(studyEvent, crfVersion);
+				
+			EventDefinitionCRFDAO eventDefinitionCRFDAO = new EventDefinitionCRFDAO(ds);
+			EventDefinitionCRFBean eventDefinitionCRF = eventDefinitionCRFDAO.findByStudyEventIdAndCRFVersionId(studyBean, studyEvent.getId(),
+			crfVersion.getId());
+			if (eventCRFBean != null) {
+				if (permittedEventCRFIds.contains(new Integer(eventCRFBean.getId()))) {
+					
+					for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
+						groupMaxOrdinals.put(itemGroupDataBean.getItemGroupOID(),1);
+					}
+					
+						for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
+						ArrayList<ItemBean> blankCheckItems = new ArrayList<ItemBean>();
+						ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
+						logger.debug("iterating through group beans: " + itemGroupDataBean.getItemGroupOID());
+						// put a checker in here
+						ItemGroupDAO itemGroupDAO = new ItemGroupDAO(ds);
+						ItemGroupBean testBean = itemGroupDAO.findByOid(itemGroupDataBean.getItemGroupOID());
+						if (testBean == null) {
+						// TODO i18n of message
+						// logger.debug("hit the exception for item groups! " +
+						// itemGroupDataBean.getItemGroupOID());
+						MessageFormat mf = new MessageFormat("");
+						mf.applyPattern(respage.getString("your_item_group_oid_for_form_oid"));
+						Object[] arguments = { itemGroupDataBean.getItemGroupOID(), formDataBean.getFormOID() };
+						
+						throw new OpenClinicaException(mf.format(arguments), "");
+						}
+						totalItemDataBeanCount += itemDataBeans.size();
+						
+						for (ImportItemDataBean importItemDataBean : itemDataBeans) {
+						logger.debug("   iterating through item data beans: " + importItemDataBean.getItemOID());
+						ItemDAO itemDAO = new ItemDAO(ds);
+						ItemFormMetadataDAO itemFormMetadataDAO = new ItemFormMetadataDAO(ds);
+						
+						List<ItemBean> itemBeans = itemDAO.findByOid(importItemDataBean.getItemOID());
+						if (!itemBeans.isEmpty()) {
+						ItemBean itemBean = itemBeans.get(0);
+						logger.debug("   found " + itemBean.getName());
+						// throw a null pointer? hopefully not if its been checked...
+						DisplayItemBean displayItemBean = new DisplayItemBean();
+						displayItemBean.setItem(itemBean);
+						
+						ArrayList<ItemFormMetadataBean> metadataBeans = itemFormMetadataDAO.findAllByItemId(itemBean.getId());
+						logger.debug("      found metadata item beans: " + metadataBeans.size());
+						// groupOrdinal = the ordinal in item groups, for repeating items
+						int groupOrdinal = 1;
+						if (itemGroupDataBean.getItemGroupRepeatKey() != null) {
+							try {
+								groupOrdinal = new Integer(itemGroupDataBean.getItemGroupRepeatKey()).intValue();
+								if (groupOrdinal > groupMaxOrdinals.get(itemGroupDataBean.getItemGroupOID())) {
+								  groupMaxOrdinals.put(itemGroupDataBean.getItemGroupOID(),groupOrdinal);
+								}
+							} catch (Exception e) {
+								e.printStackTrace();
+							}
+						}
+						ItemDataBean itemDataBean = createItemDataBean(itemBean, eventCRFBean, importItemDataBean.getValue(), ub, groupOrdinal);
+						blankCheckItems.add(itemBean);
+						String newKey = groupOrdinal + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
+						+ subjectDataBean.getSubjectOID();
+						blankCheck.put(newKey, itemDataBean);
+						logger.info("adding " + newKey + " to blank checks");
+						if (!metadataBeans.isEmpty()) {
+							ItemFormMetadataBean metadataBean = metadataBeans.get(0);
+						
+							displayItemBean.setData(itemDataBean);
+							displayItemBean.setMetadata(metadataBean);
+							// set event def crf?
+							displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);							
+							displayItemBeans.add(displayItemBean);
+							
+						} else {
+							MessageFormat mf = new MessageFormat("");
+							mf.applyPattern(respage.getString("no_metadata_could_be_found"));
+							Object[] arguments = { importItemDataBean.getItemOID() };
+							
+							throw new OpenClinicaException(mf.format(arguments), "");
+							}
+						} else {
+							// report the error there
+							MessageFormat mf = new MessageFormat("");
+							mf.applyPattern(respage.getString("no_item_could_be_found"));
+							Object[] arguments = { importItemDataBean.getItemOID() };
+							
+							throw new OpenClinicaException(mf.format(arguments), "");
+						}
+						}// end item data beans
+										
+						for (int i = 1; i <= groupMaxOrdinals.get(itemGroupDataBean.getItemGroupOID()); i++) {
+							for (ItemBean itemBean : blankCheckItems) {
+								String newKey = i + "_" + itemGroupDataBean.getItemGroupOID() + "_" + itemBean.getOid() + "_"
+								+ subjectDataBean.getSubjectOID();
+								if (blankCheck.get(newKey) == null) {
+									// if it already exists, Do Not Add It.
+									ItemDataBean itemDataCheck = getItemDataDao().findByItemIdAndEventCRFIdAndOrdinal(itemBean.getId(),
+									  eventCRFBean.getId(), i);
+									logger.debug("found item data bean id: " + itemDataCheck.getId() + " for ordinal " + i);
+									if (itemDataCheck.getId() == 0) {
+										ItemDataBean blank = createItemDataBean(itemBean, eventCRFBean, "", ub, i);
+										DisplayItemBean displayItemBean = new DisplayItemBean();
+										displayItemBean.setItem(itemBean);
+										displayItemBean.setData(blank);
+									
+										displayItemBean.setEventDefinitionCRF(eventDefinitionCRF);
+										String eventCRFRepeatKey = studyEventDataBean.getStudyEventRepeatKey();
+										// if you do indeed leave off this in the XML it will pass but return
+										// 'null'
+										
+										displayItemBeans.add(displayItemBean);
+										logger.debug("... adding display item bean");
+										}
+								}
+								logger.debug("found a blank at " + i + ", adding " + blankCheckItems.size() + " blank items");
+							}
+						}
+						blankCheckItems = new ArrayList<ItemBean>();
+					}// end item group data beans
+					
+					}// matches if on permittedCRFIDs
+			
+			CRFDAO crfDAO = new CRFDAO(ds);
+			CRFBean crfBean = crfDAO.findByVersionId(crfVersion.getCrfId());
+			
+			String studyEventId = studyEvent.getId() + "";
+			String crfVersionId = crfVersion.getId() + "";
+			
+			logger.debug("creation of wrapper: original count of display item beans " + displayItemBeans.size() + ", count of item data beans "
+			+ totalItemDataBeanCount + " count of validation errors " + validationErrors.size() + " count of study subjects "
+			+ subjectDataBeans.size() + " count of event crfs " + totalEventCRFCount + " count of hard error checks "
+			+ hardValidator.size());
+			// check if we need to overwrite
+			DataEntryStage dataEntryStage = eventCRFBean.getStage();
+			Status eventCRFStatus = eventCRFBean.getStatus();
+			boolean overwrite = false;
+			
+			if (dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY_COMPLETE) || dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY_COMPLETE)
+			|| dataEntryStage.equals(DataEntryStage.INITIAL_DATA_ENTRY) || dataEntryStage.equals(DataEntryStage.DOUBLE_DATA_ENTRY)) {
+				overwrite = true;
+				}
+			
+			displayItemBeanWrapper = new DisplayItemBeanWrapper(displayItemBeans, true, overwrite, validationErrors, studyEventId, crfVersionId,
+			studyEventDataBean.getStudyEventOID(), studySubjectBean.getLabel(), eventCRFBean.getCreatedDate(), crfBean.getName(),
+			crfVersion.getName(), studySubjectBean.getOid(), studyEventDataBean.getStudyEventRepeatKey(), eventCRFBean);
+			
+			}
+			}// after forms
+		
+			if (displayItemBeanWrapper != null && displayItemBeans.size() > 0)
+				wrappers.add(displayItemBeanWrapper);
+		}// after study events
+		
+		
+		}// after study subjects
+		
+	
+		return wrappers;
+	}
+
 }
