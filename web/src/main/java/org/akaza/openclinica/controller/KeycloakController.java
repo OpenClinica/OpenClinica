@@ -1,6 +1,8 @@
 package org.akaza.openclinica.controller;
 
 import net.sf.json.util.JSONUtils;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.core.SecureController;
@@ -8,6 +10,7 @@ import org.akaza.openclinica.controller.helper.UserAccountHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.service.CallbackService;
 import org.akaza.openclinica.service.KeycloakUser;
 import org.apache.commons.lang.StringUtils;
@@ -52,7 +55,7 @@ public class KeycloakController {
         if (port != 80 && port != 443) {
             portStr = ":" + port;
         }
-        String redirectUri = request.getScheme() + "://" + request.getServerName() + portStr + request.getContextPath() + "/MainMenu";
+        String redirectUri = request.getScheme() + "://" + request.getServerName() + portStr + request.getContextPath() + "/pages/login";
         String authUrl = coreAuthUrl + "/realms/" + authzClient.getConfiguration().getRealm()
                 + "/protocol/openid-connect/auth?scope=openid&client_id=" + authzClient.getConfiguration().getResource() +
                 "&response_type=code&login=true&redirect_uri=" + redirectUri;
@@ -116,9 +119,6 @@ public class KeycloakController {
             ocUserUuid = (String) user.getUserContext().get("userUuid");
         }
 
-        logger.debug("%%%%%%%%%%%In KeycloakController :getOcUserUuid: " + ocUserUuid);
-        CoreResources.setRequestSchema(req, "public");
-
         UserAccountHelper userAccountHelper;
         UserAccountBean prevUser = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
         if (prevUser == null || StringUtils.isEmpty(prevUser.getName())) {
@@ -150,7 +150,7 @@ public class KeycloakController {
             }
 
         } else {
-            logger.error("UserAccountBean ub is null");
+            logger.error("UserAccountBean ub ");
 
         }
         return ocUserUuid;
