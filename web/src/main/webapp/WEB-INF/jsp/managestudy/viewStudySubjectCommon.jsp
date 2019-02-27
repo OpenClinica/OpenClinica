@@ -140,7 +140,7 @@
     });
 </script>
 <script id="section-tmpl" type="text/x-handlebars-template">
-    <div class="section collapsed" data-section-number="{{sectionNumber}}" data-section-oid="{{studyEvent.[@OID]}}">
+    <div class="section {{collapseOrExpand}}" data-section-number="{{sectionNumber}}" data-section-oid="{{studyEvent.[@OID]}}">
         <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
             {{studyEvent.[@Name]}}
         </div>
@@ -351,7 +351,8 @@ $(function() {
                 if (studyEvent.showMe) {
                     $('#commonEvents').append(sectionTmpl({
                         sectionNumber: sectionIndex,
-                        studyEvent: studyEvent
+                        studyEvent: studyEvent,
+                        collapseOrExpand: store.data.collapseSections[sectionIndex] === false ? 'expanded' : 'collapsed'
                     }));
                     sectionIndex++;
                 }
@@ -521,7 +522,7 @@ $(function() {
                     datatablefy(sectionBody.find('table.datatable'));
                 }, 1);
             });
-        });
+        }).children('.expanded').trigger('uncollapse');
 
         $('div.section.collapsed').children('.section-body').hide();
         $('#loading').remove();
