@@ -41,9 +41,8 @@ public class LogoutController {
     protected void home(final Map<String, Object> model, final HttpServletRequest req, final HttpServletResponse response) {
         String authUrl = getLogoutUri(req, false);
         HttpSession session = req.getSession();
-        logger.debug("Logout page");
+        logger.info("Called Logout page");
         resetSession(session);
-        String redirectUri = getRedirectUri(req, false);
         try {
             req.logout();
             response.sendRedirect(authUrl);
@@ -64,6 +63,7 @@ public class LogoutController {
         } else {
             redirectUri += "/MainMenu";
         }
+        logger.info("Redirect URI:" + redirectUri);
         return redirectUri;
     }
 
@@ -83,6 +83,7 @@ public class LogoutController {
             if (callback) {
                 authUrl += "&client_id=bridge&response_type=code";
             }
+            logger.info("authUrl:" + authUrl);
         } catch (UnsupportedEncodingException e) {
             logger.error("Encoding redirect URI:" + redirectUri, e);
         }

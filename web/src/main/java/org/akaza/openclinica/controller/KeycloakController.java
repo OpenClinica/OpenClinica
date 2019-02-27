@@ -119,7 +119,6 @@ public class KeycloakController {
             ocUserUuid = (String) user.getUserContext().get("userUuid");
         }
 
-
         UserAccountHelper userAccountHelper;
         UserAccountBean prevUser = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
         if (prevUser == null || StringUtils.isEmpty(prevUser.getName())) {
