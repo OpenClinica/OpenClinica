@@ -246,7 +246,7 @@ public class Study extends DataMapDomainObject {
     // this.studyType = studyType;
     // }
 
-	@ManyToOne(optional = false, fetch = FetchType.LAZY)
+	@ManyToOne(optional = false, fetch = FetchType.EAGER)
 	@JoinColumn(name = "parent_study_id")
 	public Study getStudy() {
 		return this.study;
@@ -748,7 +748,7 @@ public class Study extends DataMapDomainObject {
         this.studyEventDefinitions = studyEventDefinitions;
     }
 
-    @OneToMany(fetch = FetchType.LAZY, mappedBy = "study")
+    @OneToMany(fetch = FetchType.EAGER, mappedBy = "study")
     public List<Study> getStudies() {
         return this.studies;
     }
