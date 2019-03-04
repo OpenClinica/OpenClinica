@@ -415,7 +415,7 @@
                                   <tr>
                                     <td class="table_actions" valign="top">
                                       <a href="javascript:;" id="contactInformation">
-                                        Invite
+                                        <fmt:message key="party_invite" bundle="${resword}"/>
                                       </a>
                                       <span id="view-access-link" style="display:none;">
                                         &nbsp;|&nbsp;
@@ -457,6 +457,48 @@
                                               <fmt:message key="email" bundle="${resword}"/>
                                             </td>
                                             <td class="table_cell" id="info-email">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+                                          </tr>
+                                        </tbody>
+                                      </table>
+                                      <!-- End Table Contents -->
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                              <table border="0" cellpadding="0" cellspacing="0" class="left twin">
+                                <tbody
+                                  <c:choose>
+                                    <c:when test="${
+                                      studySub.status.name!='removed' &&
+                                      (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
+                                      participateStatus=='enabled'
+                                    }">
+                                      style="visibility:visible;"
+                                    </c:when>
+                                    <c:otherwise>
+                                      class="invisible"
+                                    </c:otherwise>
+                                  </c:choose>
+                                >
+                                  <tr>
+                                    <td class="table_actions" valign="top">
+                                      <a href="javascript:;" id="partid-edit">
+                                        <fmt:message key="partid_edit" bundle="${resword}"/>
+                                      </a>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td valign="top">
+                                      <!-- Table Contents -->
+                                      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                        <tbody>
+                                          <tr>
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="partid_identifier" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell_top" id="info-identifier">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
@@ -1515,6 +1557,47 @@
   </form>
 </div>
 
+<div id="partid-edit-form" class="hide">
+  <form method="post">
+    <table border="0" cellpadding="0" align="center" style="cursor:default;">
+      <tr style="height:10px;">
+        <td class="formlabel" align="left">
+          <h3>
+            <fmt:message key="partid_edit" bundle="${resword}"/>
+          </h3>
+        </td>
+      </tr>
+      <tr>
+        <td><div class="lines"></div></td>
+      </tr>
+      <tr>
+        <td>
+          <div style="max-height: 550px; min-width:400px; background:#FFFFFF; overflow-y: auto;">
+            <table cellspacing="10">
+              <tr valign="top">
+                <td class="formlabel" align="left">
+                  <span><fmt:message key="partid_identifier" bundle="${resword}"/></span>
+                </td>
+                <td valign="top" id="access-code-td">
+                  <input id="partid-input" readonly onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><div class="lines"></div></td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: center;">
+          <input type="button" class="cancel right" value="Close"/>
+        </td>
+      </tr>
+    </table>
+  </form>
+</div>
+
 <script type="text/javascript">
 
     var jsAtt = '${showOverlay}';
@@ -1703,6 +1786,10 @@
 
             enableDisableControls();
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
+        });
+
+        jQuery('#partid-edit').click(function() {
+            jQuery.blockUI({ message: jQuery('#partid-edit-form'), css:{left: "300px", top:"10px" } });
         });
 
         jQuery('#participateAccess').click(function() {
