@@ -460,6 +460,15 @@
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
+
+                                          <tr>
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="partid_identifier" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell" id="info-identifier" colspan="3">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+                                          </tr>
                                         </tbody>
                                       </table>
                                       <!-- End Table Contents -->
@@ -498,7 +507,7 @@
                                             <td class="table_header_column_top">
                                               <fmt:message key="partid_identifier" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top" id="info-identifier">
+                                            <td class="table_cell_top" id="info-identifier-standalone">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
@@ -1144,7 +1153,15 @@
                 <span><fmt:message key="first_name" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control invite-input">
+                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
+              </td>
+            </tr>
+            <tr valign="top">
+              <td class="formlabel" align="left">
+                <span><fmt:message key="last_name" bundle="${resword}"/></span>
+              </td>
+              <td valign="top">
+                <input id="lastname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
               </td>
             </tr>
             <tr valign="top">
@@ -1481,6 +1498,14 @@
                 </div>
               </td>
             </tr>
+            <tr valign="top">
+              <td class="formlabel" align="left">
+                <span><fmt:message key="partid_identifier" bundle="${resword}"/></span>
+              </td>
+              <td valign="top">
+                <input id="identifier-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
+              </td>
+            </tr>
           </table>
         </div>
       </td>
@@ -1590,8 +1615,9 @@
         <td><div class="lines"></div></td>
       </tr>
       <tr>
-        <td colspan="2" style="text-align: center;">
-          <input type="button" class="cancel right" value="Close"/>
+        <td colspan="2" style="text-align: right;">
+          <input type="button" class="cancel" value="Cancel"/>
+          <input type="button" value="Save"/>
         </td>
       </tr>
     </table>
