@@ -9,6 +9,7 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.hibernate.query.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
 
@@ -44,14 +45,58 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         return (StudySubject) q.uniqueResult();
     }
 
-    public  ArrayList<StudySubject> findByFirstName(Study study, String firstName) {
+    public ArrayList<StudySubject> findByParticipantIdFirstNameLastNameIdentifier(Study study, String participantId, String firstNameForSearchUse, String lastNameForSearchUse, String identifierForSearchUse) {
+
+        getSessionFactory().getStatistics().logSummary();
+        String query = "from " + getDomainClassName() + " do where  do.study.studyId = :studyid ";
+
+        if (participantId != null)
+            query = query + " and lower(do.label) like :participantId ";
+        if (firstNameForSearchUse != null)
+            query = query + " and do.studySubjectDetail.firstNameForSearchUse = :firstNameForSearchUse ";
+
+        if (lastNameForSearchUse != null)
+            query = query + " and do.studySubjectDetail.lastNameForSearchUse = :lastNameForSearchUse ";
+
+        if (identifierForSearchUse != null)
+            query = query + " and do.studySubjectDetail.identifierForSearchUse = :identifierForSearchUse";
+
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
+        q.setInteger("studyid", study.getStudyId());
+
+        if (participantId != null)
+            q.setString("participantId","%" + participantId.toLowerCase()+ "%");
+
+        if (firstNameForSearchUse != null)
+            q.setString("firstNameForSearchUse", firstNameForSearchUse);
+
+        if (lastNameForSearchUse != null)
+            q.setString("lastNameForSearchUse", lastNameForSearchUse);
+
+        if (identifierForSearchUse != null)
+            q.setString("identifierForSearchUse", identifierForSearchUse);
+
+        return (ArrayList<StudySubject>) q.list();
+    }
+
+    public  ArrayList<StudySubject> findByIdentifier(String studyOid, String identifier) {
         //TODO: looks like auto-encryption is not happening need to look into it.
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " " +
-                "do  where do.study.studyId = :studyid and do.studySubjectDetail.firstName = :firstName";
+                "do  where do.study.oc_oid = :studyOid and do.studySubjectDetail.identifier = :identifier";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
-        q.setInteger("studyid", study.getStudyId());
-        q.setString("firstName", firstName);
+        q.setString("studyOid", studyOid);
+        q.setString("identifier" , identifier);
+        return (ArrayList<StudySubject>) q.list();
+    }
+
+
+    public  ArrayList<StudySubject> findAllParticipateParticipants() {
+        //TODO: looks like auto-encryption is not happening need to look into it.
+        getSessionFactory().getStatistics().logSummary();
+        String query = "from " + getDomainClassName() + " " +
+                "do  where do.userId != null" ;
+        org.hibernate.Query q = getCurrentSession().createQuery(query);
         return (ArrayList<StudySubject>) q.list();
     }
 
