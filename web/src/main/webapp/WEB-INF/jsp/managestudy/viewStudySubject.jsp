@@ -397,21 +397,21 @@
                                   </tr>
                                 </tbody>
                               </table>
-                              <table border="0" cellpadding="0" cellspacing="0" class="left twin">
-                                <tbody
-                                  <c:choose>
-                                    <c:when test="${
-                                      studySub.status.name!='removed' &&
-                                      (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
-                                      participateStatus=='enabled'
-                                    }">
-                                      style="visibility:visible;"
-                                    </c:when>
-                                    <c:otherwise>
-                                      class="invisible"
-                                    </c:otherwise>
-                                  </c:choose>
-                                >
+                              <table border="0" cellpadding="0" cellspacing="0"
+                                <c:choose>
+                                  <c:when test="${
+                                    studySub.status.name!='removed' &&
+                                    (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
+                                    participateStatus=='enabled'
+                                  }">
+                                    class="right twin"
+                                  </c:when>
+                                  <c:otherwise>
+                                    class="hide"
+                                  </c:otherwise>
+                                </c:choose>
+                              >
+                                <tbody>
                                   <tr>
                                     <td class="table_actions" valign="top">
                                       <a href="javascript:;" id="contactInformation">
@@ -467,21 +467,21 @@
                                   </tr>
                                 </tbody>
                               </table>
-                              <table border="0" cellpadding="0" cellspacing="0" class="left twin">
-                                <tbody
-                                  <c:choose>
-                                    <c:when test="${
-                                      studySub.status.name!='removed' &&
-                                      (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
-                                      participateStatus=='enabled'
-                                    }">
-                                      style="visibility:visible;"
-                                    </c:when>
-                                    <c:otherwise>
-                                      class="invisible"
-                                    </c:otherwise>
-                                  </c:choose>
-                                >
+                              <table border="0" cellpadding="0" cellspacing="0"
+                                <c:choose>
+                                  <c:when test="${
+                                    studySub.status.name!='removed' &&
+                                    (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
+                                    participateStatus!='enabled'
+                                  }">
+                                    class="right twin"
+                                  </c:when>
+                                  <c:otherwise>
+                                    class="hide"
+                                  </c:otherwise>
+                                </c:choose>
+                              >
+                                <tbody>
                                   <tr>
                                     <td class="table_actions" valign="top">
                                       <a href="javascript:;" id="partid-edit">
