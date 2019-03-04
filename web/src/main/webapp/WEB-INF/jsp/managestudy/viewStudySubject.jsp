@@ -1118,9 +1118,9 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <input type="button" class="cancel" value="Cancel"/>
+                    <input type="button" class="cancel" value='<fmt:message key="cancel" bundle="${resword}"/>'/>
                     &nbsp;
-                    <input type="submit" value="Update"/>
+                    <input type="submit" value='<fmt:message key="update" bundle="${resword}"/>'/>
 
 
                     <div id="dvForCalander_${rand}" style="width:1px; height:1px;"></div>
@@ -1575,7 +1575,7 @@
       </tr>
       <tr>
         <td colspan="2" style="text-align: center;">
-          <input type="button" class="cancel right" value="Close"/>
+          <input type="button" class="cancel right" value='<fmt:message key="close" bundle="${resword}"/>'/>
         </td>
       </tr>
     </table>
@@ -1616,8 +1616,8 @@
       </tr>
       <tr>
         <td colspan="2" style="text-align: right;">
-          <input type="button" class="cancel" value="Cancel"/>
-          <input type="button" value="Save"/>
+          <input type="button" class="cancel" value='<fmt:message key="cancel" bundle="${resword}"/>'/>
+          <input type="button" value='<fmt:message key="save" bundle="${resword}"/>'/>
         </td>
       </tr>
     </table>
