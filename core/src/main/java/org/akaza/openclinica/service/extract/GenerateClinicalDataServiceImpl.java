@@ -53,10 +53,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	@Autowired
 	private DataSource dataSource;
 
+	@Autowired
+	private StudyEventDao studyEventDao;
+
 	private StudyDao studyDao;
 
 	private StudySubjectDao studySubjectDao;
-	private StudyEventDao studyEventDao;
 
 	private StudyEventDefinitionDao studyEventDefDao;
 
@@ -110,14 +112,6 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	public void setStudySubjectDao(StudySubjectDao studySubjectDao) {
 		this.studySubjectDao = studySubjectDao;
-	}
-
-	public StudyEventDao getStudyEventDao() {
-		return studyEventDao;
-	}
-
-	public void setStudyEventDao(StudyEventDao studyEventDao) {
-		this.studyEventDao = studyEventDao;
 	}
 
 	public GenerateClinicalDataServiceImpl() {
@@ -192,7 +186,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 		for (StudySubject studySubj : studySubjs) {
 		if(studyEvents==null)
-				studyEvents = (ArrayList<StudyEvent>) getStudyEventDao().fetchListSEs(studySubj.getOcOid());
+				studyEvents = (ArrayList<StudyEvent>) studyEventDao.fetchListSEs(studySubj.getOcOid());
 
 			if (studyEvents != null) {
 				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID,userId,crossForm,tagIds);
@@ -981,7 +975,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		int seOrdinal = 0;
 		String temp = studyEventOID;
 		List<StudyEvent> studyEvents = new ArrayList<StudyEvent>();
-		StudyEventDefinition sed = null;
+		StudyEventDefinition studyEventDefinition = null;
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
 		List<StudySubject> ss = listStudySubjects(studySubjectOID);
 		int idx = studyEventOID.indexOf(OPEN_ORDINAL_DELIMITER);
@@ -990,40 +984,17 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			studyEventOID = studyEventOID.substring(0, idx);
 			seOrdinal = new Integer(temp.substring(idx + 1, temp.indexOf(CLOSE_ORDINAL_DELIMITER))).intValue();
 		}
-		sed = getStudyEventDefDao().findByColumnName(studyEventOID, "oc_oid");
+		studyEventDefinition = getStudyEventDefDao().findByColumnName(studyEventOID, "oc_oid");
 		LOGGER.info("study event ordinal.." + seOrdinal);
 		if (seOrdinal > 0) {
-			studyEvents = fetchSE(seOrdinal, sed.getStudyEvents(), studySubjectOID);
+			studyEvents = studyEventDao.fetchStudyEvents(seOrdinal, studyEventDefinition.getOc_oid(), studySubjectOID);
 		}
 		else {
-			studyEvents = fetchSE(sed.getStudyEvents(), studySubjectOID);
+			studyEvents = studyEventDao.fetchStudyEvents(studyEventDefinition.getOc_oid(), studySubjectOID);
 		}
 
 
 		return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID,userId,crossForm);
-	}
-
-	private List<StudyEvent> fetchSE(int seOrdinal, List<StudyEvent> studyEvents, String ssOID) {
-		List<StudyEvent> sEs = new ArrayList<StudyEvent>();
-		LOGGER.debug("fetching all the study events");
-		for (StudyEvent se : studyEvents) {
-			if (se.getSampleOrdinal() == seOrdinal && se.getStudySubject().getOcOid().equals(ssOID)) {
-				sEs.add(se);
-
-			}
-		}
-		return sEs;
-	}
-
-	private List<StudyEvent> fetchSE(List<StudyEvent> studyEvents, String ssOID) {
-		List<StudyEvent> sEs = new ArrayList<StudyEvent>();
-		for (StudyEvent se : studyEvents) {
-			if (se.getStudySubject().getOcOid().equals(ssOID)) {
-				sEs.add(se);
-
-			}
-		}
-		return sEs;
 	}
 
 	public UserAccountDao getUserAccountDao() {
