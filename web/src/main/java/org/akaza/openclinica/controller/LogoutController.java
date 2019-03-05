@@ -17,7 +17,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.ResponseStatus;
 
-import javax.servlet.ServletException;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
@@ -39,13 +38,16 @@ public class LogoutController {
     EventCRFLocker eventCRFLocker;
 
     @RequestMapping(value="/logout", method = RequestMethod.GET)
-    protected void home(final Map<String, Object> model, HttpServletRequest req, final HttpServletResponse response) throws ServletException, IOException {
+    protected void home(final Map<String, Object> model, final HttpServletRequest req, final HttpServletResponse response) {
+        String authUrl = getLogoutUri(req, false);
+        HttpSession session = req.getSession();
+        logger.info("Called Logout page");
+        resetSession(session);
         try {
             req.logout();
-            response.sendRedirect(req.getContextPath());
+            response.sendRedirect(authUrl);
         } catch (Exception e) {
             logger.error("Error logging out:", e);
-            throw e;
         }
     }
 
@@ -61,6 +63,7 @@ public class LogoutController {
         } else {
             redirectUri += "/MainMenu";
         }
+        logger.info("Redirect URI:" + redirectUri);
         return redirectUri;
     }
 
@@ -80,6 +83,7 @@ public class LogoutController {
             if (callback) {
                 authUrl += "&client_id=bridge&response_type=code";
             }
+            logger.info("authUrl:" + authUrl);
         } catch (UnsupportedEncodingException e) {
             logger.error("Encoding redirect URI:" + redirectUri, e);
         }
@@ -111,9 +115,9 @@ public class LogoutController {
     @RequestMapping(value="/resetFirstLogin", method = RequestMethod.GET)
     @ResponseStatus(value = HttpStatus.OK)
     public void resetFirstLogin(final HttpServletRequest request,
-                                final HttpServletResponse response) throws IOException {
+                                      final HttpServletResponse response) throws IOException {
         final HttpSession session = request.getSession();
-        logger.info("**********Resetting first time to false**********");
+        logger.error("**********Resetting first time to false**********");
         session.setAttribute("firstLoginCheck", "false");
     }
 
@@ -127,4 +131,3 @@ public class LogoutController {
         SecurityContextHolder.clearContext();
     }
 }
-
