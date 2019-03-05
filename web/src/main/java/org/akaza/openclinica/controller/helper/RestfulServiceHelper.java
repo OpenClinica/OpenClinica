@@ -10,6 +10,7 @@ import org.akaza.openclinica.control.submit.ImportCRFInfoSummary;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.I18nFormatUtil;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -55,6 +56,8 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
@@ -854,43 +857,29 @@ public class RestfulServiceHelper {
 			this.importDataHelper = importDataHelper;
 		}
 		
-		 public Date getDateTime(String dateTimeStr) {
+		/**
+		 * 
+		 * @param dateTimeStr:
+		 * yyyy-MM-dd
+		 * @return
+		 */
+		 public Date getDateTime(String dateTimeStr) throws OpenClinicaException {
+		        String dataFormat = "yyyy-MM-dd";
+			 	DateFormat  sdf = new SimpleDateFormat(dataFormat);		   
+		        Date result = null;
 		        
-		        ResourceBundle resformat = ResourceBundleProvider.getFormatBundle(locale);
-		        String date = getString(prefix + "Date");
-		        String hour = getString(prefix + "Hour");
-		        String minute = getString(prefix + "Minute");
-		        String half = getString(prefix + "Half");
-		        if (hour.startsWith("-1")) {
-		            hour = "12";
-		        } else if (hour.length() == 1) {
-		            hour = "0" + hour;
-		        }
-		        if (minute.startsWith("-1")) {
-		            minute = "00";
-		        } else if (minute.length() == 1) {
-		            minute = "0" + minute;
-		        }
-		        if ("".equals(half)) {
-		            half = "am";
-		        }
-
-		        String fieldValue = date + " " + hour + ":" + minute + ":00 " + half;
-		        SimpleDateFormat sdf = I18nFormatUtil.getDateTimeFormat(locale);
-
-		        sdf.setLenient(false);
-
-		        java.util.Date result;
-		        try {
-		            logger.debug("trying to parse " + fieldValue + " on the pattern " + resformat.getString("date_time_format_string"));
-		            result = sdf.parse(fieldValue);
-		        } catch (Exception fe) {
-		            logger.debug("failed to parse");
-		            fe.printStackTrace();
-		            result = DEFAULT_DATE;
-		            logger.debug("replace with default date: " + result.toString());
-		        }
-		        logger.debug("returning " + result.toString());
+				try {
+					if(dateTimeStr != null) {
+						result = sdf.parse(dateTimeStr);	
+					}
+								
+					
+				} catch (ParseException e) {
+					String errMsg = "The input date("+ dateTimeStr + ") can't be parsed, please use the correct format " + dataFormat;
+		        	throw new OpenClinicaException(errMsg,"dateParsedError");
+				}
+		       
+		        
 		        return result;
 		    }
 }
