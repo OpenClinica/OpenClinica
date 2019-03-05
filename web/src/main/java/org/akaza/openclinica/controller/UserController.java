@@ -4,9 +4,12 @@ import java.util.*;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
+import javax.ws.rs.PathParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.login.UserDTO;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -144,7 +147,19 @@ public class UserController {
         return new ResponseEntity<ParticipantAccessDTO>(participantAccessDTO, HttpStatus.OK);
     }
 
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/searchByFields", method = RequestMethod.GET )
+    public ResponseEntity<List<OCUserDTO>> searchByIdentifier(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid,@PathParam( "participantId" ) String participantId,@PathParam( "firstName" ) String firstName,@PathParam( "lastName" ) String lastName, @PathParam( "identifier" ) String identifier) {
+        setSchemaFromRequest(studyOid, request);
+        String accessToken = getAccessTokenFromRequest(request);
+        UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
 
+        // validate accessToken against studyOid ,
+        // also validate accessToken's user role crc/investigator
+
+        List<OCUserDTO> userDTOs= userService.searchParticipantsByFields(studyOid ,accessToken,participantId,firstName,lastName,identifier,userAccountBean);
+        logger.info("REST request to POST OCUserDTO : {}", userDTOs);
+        return new ResponseEntity<List<OCUserDTO>>(userDTOs, HttpStatus.OK);
+    }
 
     private void setUpSidebar(HttpServletRequest request) {
         if (sidebarInit.getAlertsBoxSetup() ==

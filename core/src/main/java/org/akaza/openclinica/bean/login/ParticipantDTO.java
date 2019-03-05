@@ -17,6 +17,7 @@ public class ParticipantDTO {
 		private String url;
 		private String loginUrl;
 		private Boolean encryptedEmailAccount;
+		private String identifier;
 
 		
 		
@@ -113,5 +114,12 @@ public class ParticipantDTO {
         public void setEncryptedEmailAccount(Boolean encryptedEmailAccount) {
             this.encryptedEmailAccount = encryptedEmailAccount;
         }
-		
+
+	public String getIdentifier() {
+		return identifier;
 	}
+
+	public void setIdentifier(String identifier) {
+		this.identifier = identifier;
+	}
+}
