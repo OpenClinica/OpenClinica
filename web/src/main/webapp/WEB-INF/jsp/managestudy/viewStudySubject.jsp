@@ -461,14 +461,18 @@
                                             </td>
                                           </tr>
 
-                                          <tr>
-                                            <td class="table_header_column_top">
-                                              <fmt:message key="partid_identifier" bundle="${resword}"/>
-                                            </td>
-                                            <td class="table_cell" id="info-identifier" colspan="3">
-                                              &emsp;&emsp;&emsp;&emsp;
-                                            </td>
-                                          </tr>
+                                          <c:choose>
+                                            <c:when test="${advsearchStatus=='enabled'}">
+                                              <tr>
+                                                <td class="table_header_column_top">
+                                                  <fmt:message key="partid_identifier" bundle="${resword}"/>
+                                                </td>
+                                                <td class="table_cell" id="info-identifier" colspan="3">
+                                                  &emsp;&emsp;&emsp;&emsp;
+                                                </td>
+                                              </tr>
+                                            </c:when>
+                                          </c:choose>
                                         </tbody>
                                       </table>
                                       <!-- End Table Contents -->
@@ -481,7 +485,8 @@
                                   <c:when test="${
                                     studySub.status.name!='removed' &&
                                     (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
-                                    participateStatus!='enabled'
+                                    participateStatus!='enabled' &&
+                                    advsearchStatus=='enabled'
                                   }">
                                     class="right twin"
                                   </c:when>
@@ -1498,14 +1503,19 @@
                 </div>
               </td>
             </tr>
-            <tr valign="top">
-              <td class="formlabel" align="left">
-                <span><fmt:message key="partid_identifier" bundle="${resword}"/></span>
-              </td>
-              <td valign="top">
-                <input id="identifier-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
-              </td>
-            </tr>
+
+            <c:choose>
+              <c:when test="${advsearchStatus=='enabled'}">
+                <tr valign="top">
+                  <td class="formlabel" align="left">
+                    <span><fmt:message key="partid_identifier" bundle="${resword}"/></span>
+                  </td>
+                  <td valign="top">
+                    <input id="identifier-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
+                  </td>
+                </tr>
+              </c:when>
+            </c:choose>
           </table>
         </div>
       </td>
