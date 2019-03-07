@@ -397,25 +397,25 @@
                                   </tr>
                                 </tbody>
                               </table>
-                              <table border="0" cellpadding="0" cellspacing="0" class="left twin">
-                                <tbody
-                                  <c:choose>
-                                    <c:when test="${
-                                      studySub.status.name!='removed' &&
-                                      (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
-                                      participateStatus=='enabled'
-                                    }">
-                                      style="visibility:visible;"
-                                    </c:when>
-                                    <c:otherwise>
-                                      class="invisible"
-                                    </c:otherwise>
-                                  </c:choose>
-                                >
+                              <table border="0" cellpadding="0" cellspacing="0"
+                                <c:choose>
+                                  <c:when test="${
+                                    studySub.status.name!='removed' &&
+                                    (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
+                                    participateStatus=='enabled'
+                                  }">
+                                    class="right twin"
+                                  </c:when>
+                                  <c:otherwise>
+                                    class="hide"
+                                  </c:otherwise>
+                                </c:choose>
+                              >
+                                <tbody>
                                   <tr>
                                     <td class="table_actions" valign="top">
                                       <a href="javascript:;" id="contactInformation">
-                                        Invite
+                                        <fmt:message key="party_invite" bundle="${resword}"/>
                                       </a>
                                       <span id="view-access-link" style="display:none;">
                                         &nbsp;|&nbsp;
@@ -457,6 +457,62 @@
                                               <fmt:message key="email" bundle="${resword}"/>
                                             </td>
                                             <td class="table_cell" id="info-email">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+                                          </tr>
+
+                                          <c:choose>
+                                            <c:when test="${advsearchStatus=='enabled'}">
+                                              <tr>
+                                                <td class="table_header_column_top">
+                                                  <fmt:message key="partid_identifier" bundle="${resword}"/>
+                                                </td>
+                                                <td class="table_cell" id="info-identifier" colspan="3">
+                                                  &emsp;&emsp;&emsp;&emsp;
+                                                </td>
+                                              </tr>
+                                            </c:when>
+                                          </c:choose>
+                                        </tbody>
+                                      </table>
+                                      <!-- End Table Contents -->
+                                    </td>
+                                  </tr>
+                                </tbody>
+                              </table>
+                              <table border="0" cellpadding="0" cellspacing="0"
+                                <c:choose>
+                                  <c:when test="${
+                                    studySub.status.name!='removed' &&
+                                    (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
+                                    participateStatus!='enabled' &&
+                                    advsearchStatus=='enabled'
+                                  }">
+                                    class="right twin"
+                                  </c:when>
+                                  <c:otherwise>
+                                    class="hide"
+                                  </c:otherwise>
+                                </c:choose>
+                              >
+                                <tbody>
+                                  <tr>
+                                    <td class="table_actions" valign="top">
+                                      <a href="javascript:;" id="partid-edit">
+                                        <fmt:message key="partid_edit" bundle="${resword}"/>
+                                      </a>
+                                    </td>
+                                  </tr>
+                                  <tr>
+                                    <td valign="top">
+                                      <!-- Table Contents -->
+                                      <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                        <tbody>
+                                          <tr>
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="partid_identifier" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell_top" id="info-identifier-standalone">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
@@ -1067,9 +1123,9 @@
             </tr>
             <tr>
                 <td colspan="2" style="text-align:center;">
-                    <input type="button" class="cancel" value="Cancel"/>
+                    <input type="button" class="cancel" value='<fmt:message key="cancel" bundle="${resword}"/>'/>
                     &nbsp;
-                    <input type="submit" value="Update"/>
+                    <input type="submit" value='<fmt:message key="update" bundle="${resword}"/>'/>
 
 
                     <div id="dvForCalander_${rand}" style="width:1px; height:1px;"></div>
@@ -1103,6 +1159,14 @@
               </td>
               <td valign="top">
                 <input id="name-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
+              </td>
+            </tr>
+            <tr valign="top">
+              <td class="formlabel" align="left">
+                <span><fmt:message key="last_name" bundle="${resword}"/></span>
+              </td>
+              <td valign="top">
+                <input id="lastname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
               </td>
             </tr>
             <tr valign="top">
@@ -1439,6 +1503,19 @@
                 </div>
               </td>
             </tr>
+
+            <c:choose>
+              <c:when test="${advsearchStatus=='enabled'}">
+                <tr valign="top">
+                  <td class="formlabel" align="left">
+                    <span><fmt:message key="partid_identifier" bundle="${resword}"/></span>
+                  </td>
+                  <td valign="top">
+                    <input id="identifier-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
+                  </td>
+                </tr>
+              </c:when>
+            </c:choose>
           </table>
         </div>
       </td>
@@ -1508,7 +1585,49 @@
       </tr>
       <tr>
         <td colspan="2" style="text-align: center;">
-          <input type="button" class="cancel right" value="Close"/>
+          <input type="button" class="cancel right" value='<fmt:message key="close" bundle="${resword}"/>'/>
+        </td>
+      </tr>
+    </table>
+  </form>
+</div>
+
+<div id="partid-edit-form" class="hide">
+  <form method="post">
+    <table border="0" cellpadding="0" align="center" style="cursor:default;">
+      <tr style="height:10px;">
+        <td class="formlabel" align="left">
+          <h3>
+            <fmt:message key="partid_edit" bundle="${resword}"/>
+          </h3>
+        </td>
+      </tr>
+      <tr>
+        <td><div class="lines"></div></td>
+      </tr>
+      <tr>
+        <td>
+          <div style="max-height: 550px; min-width:400px; background:#FFFFFF; overflow-y: auto;">
+            <table cellspacing="10">
+              <tr valign="top">
+                <td class="formlabel" align="left">
+                  <span><fmt:message key="partid_identifier" bundle="${resword}"/></span>
+                </td>
+                <td valign="top" id="access-code-td">
+                  <input id="partid-input" readonly onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
+                </td>
+              </tr>
+            </table>
+          </div>
+        </td>
+      </tr>
+      <tr>
+        <td><div class="lines"></div></td>
+      </tr>
+      <tr>
+        <td colspan="2" style="text-align: right;">
+          <input type="button" class="cancel" value='<fmt:message key="cancel" bundle="${resword}"/>'/>
+          <input type="button" value='<fmt:message key="save" bundle="${resword}"/>'/>
         </td>
       </tr>
     </table>
@@ -1703,6 +1822,10 @@
 
             enableDisableControls();
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
+        });
+
+        jQuery('#partid-edit').click(function() {
+            jQuery.blockUI({ message: jQuery('#partid-edit-form'), css:{left: "300px", top:"10px" } });
         });
 
         jQuery('#participateAccess').click(function() {
