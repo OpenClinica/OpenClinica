@@ -361,7 +361,7 @@
                                                                                           (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
                                                                                           advsearchStatus=='enabled'
                                                                                         }">
-                                                                                            <a href="#" id="advsearch-link">
+                                                                                            <a href="ParticipantSearch" id="advsearch-link">
                                                                                                 <fmt:message key="advanced_search" bundle="${resword}"/>
                                                                                             </a>
                                                                                         </c:when>

@@ -26,7 +26,6 @@ import org.akaza.openclinica.control.submit.CreateNewStudyEventServlet;
 import org.akaza.openclinica.control.submit.SubmitDataServlet;
 import org.akaza.openclinica.dao.admin.AuditEventDAO;
 import org.akaza.openclinica.dao.admin.CRFDAO;
-import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.*;
@@ -369,8 +368,6 @@ public class ViewStudySubjectServlet extends SecureController {
                 request.setAttribute("errorData", errorData);
 
             request.setAttribute("participateStatus", getParticipateStatus(parentStudyId).toLowerCase());
-            request.setAttribute("advsearchStatus", CoreResources.getField("participantAdvanceSearch").toLowerCase());
-
             forwardPage(Page.VIEW_STUDY_SUBJECT);
         }
     }
