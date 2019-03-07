@@ -99,6 +99,13 @@ public class StudyEventController {
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private RestfulServiceHelper restfulServiceHelper;
 
+    /**
+     *  more DAOs
+     */
+    private StudyDAO msStudyDao = null;
+    private StudySubjectDAO msStudySubjectDAO = null;
+    private StudyEventDefinitionDAO sedDao = null;
+    private StudyEventDAO seDao = null;
     private final String COMMON = "common";
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -195,7 +202,23 @@ public class StudyEventController {
         return restfulServiceHelper;
     }
 
-    
+    @ApiOperation(value = "To schedule an event for participant at site level",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successful operation"),
+	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
+	@RequestMapping(value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/{subjectKey}/events", method = RequestMethod.POST,consumes = {"multipart/form-data"})
+	public ResponseEntity<Object> scheduleEventAtSiteLevel(HttpServletRequest request,
+			@RequestParam(value = "ordinal",required = false) String ordinal,
+			@RequestParam("studyEventOID") String studyEventOID,
+			@PathVariable("subjectKey") String subjectKey,			
+			@ApiParam(value = "date format: yyyy-MM-dd") @RequestParam(value = "endDate",required = false) String endDate,
+			@ApiParam(value = "date format: yyyy-MM-dd", required = true) @RequestParam("startDate") String startDate,			
+			@PathVariable("studyOID") String studyOID,
+			@PathVariable("siteOID") String siteOID) throws Exception {
+		
+    	
+    	return scheduleEvent(request, studyOID, siteOID,studyEventOID,subjectKey,ordinal,startDate,endDate);
+	}
     
     @ApiOperation(value = "To schedule an event for participant at study level",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
 	@ApiResponses(value = {
@@ -222,7 +245,7 @@ public class StudyEventController {
     	
     	String message="";
     	
-    	String studySubjectOID = null;
+    	String studySubjectKey = participantId;
     	String errMsg = null;
     	StudyBean currentStudy = null;
     	StudyBean currentSiteStudy = null;
@@ -277,13 +300,13 @@ public class StudyEventController {
 	    	/**
 	    	 * Step 1: check study
 	    	 */
-	    	StudyDAO studyDao = new StudyDAO(dataSource);
+	    	StudyDAO studyDao = this.getMsStudyDao();
 	    	
 	    	// check study first
 	    	currentStudy = studyDao.findByOid(studyOID);
 	    	
 	    	if(currentStudy == null) {
-	    		errMsg = "A new study event could not be scheduled, because the study {" + studyOID + "} is not exsiting in the system.";
+	    		errMsg = "A new study event could not be scheduled, because the study {" + studyOID + "} is not existing in the system.";
 	    		throw new OpenClinicaException(errMsg,"NoStudyFound");
 	    	}else if (currentStudy.getStatus().equals(Status.LOCKED)) {
 	    		errMsg = "A new study event could not be scheduled, because the study {" + studyOID +"} has been LOCKED.";
@@ -294,7 +317,7 @@ public class StudyEventController {
 	    		currentSiteStudy = studyDao.findSiteByOid(studyOID,siteOID);
 	    		
 	    		if(currentSiteStudy == null) {
-	        		errMsg = "A new study event could not be scheduled if its study site {" + siteOID +"} is not exsiting in the system.";
+	        		errMsg = "A new study event could not be scheduled if its study site {" + siteOID +"} is not existing in the system.";
 	        		throw new OpenClinicaException(errMsg,"NoStudySiteFound");
 	        	}
 	    	}
@@ -321,16 +344,16 @@ public class StudyEventController {
 	        /**
 	         *  Step 3: check Subject/Participant              	
 	         */
-	        StudySubjectDAO sdao = new StudySubjectDAO(dataSource);       
+	        StudySubjectDAO sdao = this.getMsStudySubjectDAO();       
 	     
 	        studySubject = (StudySubjectBean) sdao.findByLabelAndStudy(participantId, currentStudy);
 	        if(studySubject == null || (studySubject.getId() == 0 && studySubject.getLabel().trim().length() == 0)) {
-	        	errMsg = "A study event could not be scheduled if the study subject {" + studySubjectOID +"} can not be found in the system.";
+	        	errMsg = "A study event could not be scheduled if the study subject {" + studySubjectKey +"} can not be found in the system.";
 	        	throw new OpenClinicaException(errMsg,"subjectRemoved");
 	        }
 	        Status subjectStatus = studySubject.getStatus();
 	        if ("removed".equalsIgnoreCase(subjectStatus.getName()) || "auto-removed".equalsIgnoreCase(subjectStatus.getName())) {
-	        	errMsg = "A study event could not be scheduled if the study subject {" + studySubjectOID +"} has been removed.";
+	        	errMsg = "A study event could not be scheduled if the study subject {" + studySubjectKey +"} has been removed.";
 	        	throw new OpenClinicaException(errMsg,"subjectRemoved");
 	        }
 	      
@@ -338,7 +361,7 @@ public class StudyEventController {
 	        /**
 	         *  Step 4: check study event                    
 	         */
-	        StudyEventDefinitionDAO seddao = new StudyEventDefinitionDAO(dataSource);
+	        StudyEventDefinitionDAO seddao = this.getSedDao();
 	        definition = seddao.findByOidAndStudy(studyEventOID,
 	        		currentStudy.getId(), currentStudy.getParentStudyId());
 	        
@@ -373,7 +396,7 @@ public class StudyEventController {
 	       /**
 	        * At this stage, it has passed all validation check
 	        */
-	        StudyEventDAO sed = new StudyEventDAO(dataSource);
+	        StudyEventDAO sed = this.getSeDao();
 	        int maxSampleOrdinal = sed.getMaxSampleOrdinal(definition, studySubject) + 1;
 	        if(sampleOrdinal > maxSampleOrdinal) {
 	        	errMsg ="This type of event may not be scheduled to the specified participant, because the ordinal is out of sequential scope,the current ordinal can't be greater than " + maxSampleOrdinal;
@@ -472,6 +495,49 @@ public class StudyEventController {
         }
         return studySubject;
     }
+	public StudyDAO getMsStudyDao() {
+		
+		if(msStudyDao ==  null) {
+			msStudyDao = new StudyDAO(dataSource);	
+		}
+		
+		return msStudyDao;
+	}
+	public void setMsStudyDao(StudyDAO msStudyDao) {
+		this.msStudyDao = msStudyDao;
+	}
+	
+	public StudySubjectDAO getMsStudySubjectDAO() {
+		if(msStudySubjectDAO == null) {
+			msStudySubjectDAO = new StudySubjectDAO(dataSource); 
+		}
+		
+		return msStudySubjectDAO;
+	}
+	public void setMsStudySubjectDAO(StudySubjectDAO msStudySubjectDAO) {
+		this.msStudySubjectDAO = msStudySubjectDAO;
+	}
+	
+	public StudyEventDefinitionDAO getSedDao() {
+		if(sedDao == null) {
+			 sedDao = new StudyEventDefinitionDAO(dataSource);
+		}
+		
+		return sedDao;
+	}
+	public void setSedDao(StudyEventDefinitionDAO sedDao) {
+		this.sedDao = sedDao;
+	}
+	
+	public StudyEventDAO getSeDao() {
+		if(seDao == null) {
+			 seDao = new StudyEventDAO(dataSource);
+		}
+		return seDao;
+	}
+	public void setSeDao(StudyEventDAO seDao) {
+		this.seDao = seDao;
+	}
     
 }
 
