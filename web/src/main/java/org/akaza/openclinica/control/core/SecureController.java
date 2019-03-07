@@ -648,6 +648,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // YW 06-19-2007 >>
 
             request.setAttribute("isAdminServlet", getAdminServlet());
+            request.setAttribute("advsearchStatus", CoreResources.getField("participantAdvanceSearch").toLowerCase());
 
             this.request = request;
             this.response = response;
