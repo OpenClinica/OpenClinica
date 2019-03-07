@@ -17,6 +17,7 @@ import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.importdata.ImportDataHelper;
 import org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
 import org.akaza.openclinica.service.UserStatus;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -245,21 +246,21 @@ public class RestfulServiceHelper {
 	 	        	
 	 	 	        	StudyUserRoleBean siteLevelRole = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,siteOid);
 	 	 	        	if(siteLevelRole == null) {
-	 	 	        		 e.reject("errorCode.noRoleSetUp", "You do not have any role set up for user " + userName + " in study site " + siteOid );
+	 	 	        		 e.reject(ErrorConstants.ERR_NO_ROLE_SETUP, "You do not have any role set up for user " + userName + " in study site " + siteOid );
 	 	 	        		hasRolePermission = false;
 	 	 	        	}else if(siteLevelRole.getId() == 0 || siteLevelRole.getRole().equals(Role.MONITOR)) {
-	 	 				    e.reject("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
+	 	 				    e.reject(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, "You do not have sufficient privileges to proceed with this operation.");
 	 	 				  hasRolePermission = false;
 	 	 				}
 	 	 	        
 		        }else {
-		        	 e.reject("errorCode.noRoleSetUp", "You do not have any role set up for user " + userName + " in study " + studyOid );
+		        	 e.reject(ErrorConstants.ERR_NO_ROLE_SETUP, "You do not have any role set up for user " + userName + " in study " + studyOid );
 		        	 hasRolePermission = false;
 		        }	 		 
 	        
 		    }else {
 		    	if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
-	 				    e.reject("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
+	 				    e.reject(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, "You do not have sufficient privileges to proceed with this operation.");
 	 				   hasRolePermission = false;
 	 				}
 		    }
@@ -289,19 +290,19 @@ public class RestfulServiceHelper {
 	 	        	
 	 	 	        	StudyUserRoleBean siteLevelRole = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,siteOid);
 	 	 	        	if(siteLevelRole == null) {
-	 	 	        		err_msg= "errorCode.noRoleSetUp " + "You do not have any role set up for user " + userName + " in study site " + siteOid;	 	 	        			 	 	        	
+	 	 	        		err_msg= ErrorConstants.ERR_NO_ROLE_SETUP + " You do not have any role set up for user " + userName + " in study site " + siteOid;	 	 	        			 	 	        	
 	 	 	        	}else if(siteLevelRole.getId() == 0 || siteLevelRole.getRole().equals(Role.MONITOR)) {	 	 				    
-		 	 				err_msg= "errorCode.noSufficientPrivileges" + "You do not have sufficient privileges to proceed with this operation.";	 	 	        	  		 	 			
+		 	 				err_msg= ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES + " You do not have sufficient privileges to proceed with this operation.";	 	 	        	  		 	 			
 	 	 				}
 	 	 	        
 		        }else {
-		        	 err_msg="errorCode.noRoleSetUp " + "You do not have any role set up for user " + userName + " in study " + studyOid;
+		        	 err_msg=ErrorConstants.ERR_NO_ROLE_SETUP + " You do not have any role set up for user " + userName + " in study " + studyOid;
 	
 		        }	 		 
 	        
 		    }else {
 		    	if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
-		    		err_msg = "errorCode.noSufficientPrivileges " + "You do not have sufficient privileges to proceed with this operation.";
+		    		err_msg = ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES + " You do not have sufficient privileges to proceed with this operation.";
 	
 	 				}
 		    }
