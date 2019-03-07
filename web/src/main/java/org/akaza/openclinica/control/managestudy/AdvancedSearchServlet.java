@@ -17,8 +17,8 @@ public class AdvancedSearchServlet extends SecureController {
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-        Role role = ub.getActiveStudyRole();
-        if (role == Role.INVESTIGATOR || role == Role.RESEARCHASSISTANT)
+        int roleid = ub.getActiveStudyRole().getId();
+        if (roleid == Role.INVESTIGATOR.getId() || roleid == Role.RESEARCHASSISTANT.getId())
             return;
         
         throw new InsufficientPermissionException(Page.ADVANCED_SEARCH, resexception.getString("not_crc_nor_investigator"), "1");
