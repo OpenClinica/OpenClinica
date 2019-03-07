@@ -350,7 +350,7 @@
                                                                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                                                         <tr>
                                                                             <td>
-                                                                                <form METHOD="GET" action="${urlPrefix}ListStudySubjects">
+                                                                                <form METHOD="GET" action="${urlPrefix}ListStudySubjects" style="margin-block-end:0;">
                                                                                     <input type="text" name="findSubjects_f_studySubject.label"
                                                                                            placeholder='<fmt:message key="enter_participant_ID" bundle="${resword}"/>'
                                                                                            class="navSearch"/>
