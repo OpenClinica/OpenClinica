@@ -1102,7 +1102,7 @@
                 <span><fmt:message key="first_name" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control invite-input">
+                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
               </td>
             </tr>
             <tr valign="top">
@@ -1110,7 +1110,7 @@
                 <span><fmt:message key="email" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="email-input" onfocus="this.select()" type="text" value="" size="45" class="formfield form-control invite-input">
+                <input id="email-input" onfocus="this.select()" type="text" value="" size="45" maxlength="255" class="formfield form-control invite-input">
                 <div id="email-input-info" class="grayed-out">
                   <fmt:message key="invite_required" bundle="${resword}"/>
                   <br>
@@ -1218,7 +1218,7 @@
                   }
                 </style>
                 <div id="phone-widget">
-                  <input id="phone-input" type="text" class="formfield form-control invite-input" onfocus="this.select()"> 
+                  <input id="phone-input" type="text" class="formfield form-control invite-input" onfocus="this.select()" maxlength="15"> 
                   <div id="country-select">
                     <div id="country-flag" class="down-arrow">&nbsp;</div> 
                     <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 

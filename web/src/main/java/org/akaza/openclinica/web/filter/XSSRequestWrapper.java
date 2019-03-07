@@ -106,10 +106,6 @@ public class XSSRequestWrapper extends HttpServletRequestWrapper {
             // Avoid onload= expressions
             scriptPattern = Pattern.compile("onload(.*?)=", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
             value = scriptPattern.matcher(value).replaceAll("");
-
-            // PSQL Injection
-            scriptPattern = Pattern.compile("'|%27|\\\"|%22|--|%2d%2d|/\\*\\*/|%2f\\*\\*%2f|;|%3b|(|)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
-            value = scriptPattern.matcher(value).replaceAll("");
         }
         return value;
     }
