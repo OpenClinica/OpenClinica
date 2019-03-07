@@ -356,6 +356,16 @@
                                                                                            class="navSearch"/>
                                                                                     <input type="hidden" name="navBar" value="yes"/>
                                                                                     <input type="submit" value="View &#8594;" class="navSearchButton"/>
+                                                                                    <c:choose>
+                                                                                        <c:when test="${
+                                                                                          (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
+                                                                                          advsearchStatus=='enabled'
+                                                                                        }">
+                                                                                            <a href="#" id="advsearch-link">
+                                                                                                <fmt:message key="advanced_search" bundle="${resword}"/>
+                                                                                            </a>
+                                                                                        </c:when>
+                                                                                    </c:choose>
                                                                                 </form>
                                                                             </td>
                                                                             <td align="right" style="font-weight: normal;" class="oc-menu-bar">
