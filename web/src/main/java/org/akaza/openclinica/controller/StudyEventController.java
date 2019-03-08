@@ -212,7 +212,7 @@ public class StudyEventController {
 			@PathVariable("siteOID") String siteOID) throws Exception {
 		
     	
-    	return studyEventService.scheduleEvent(request, studyOID, siteOID,studyEventOID,subjectKey,ordinal,startDate,endDate);
+    	return scheduleEvent(request, studyOID, siteOID,studyEventOID,subjectKey,ordinal,startDate,endDate);
 	}
     
     @ApiOperation(value = "To schedule an event for participant at study level",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
@@ -229,9 +229,38 @@ public class StudyEventController {
 			@PathVariable("studyOID") String studyOID) throws Exception {
 		
 		
-    	return studyEventService.scheduleEvent(request, studyOID, null,studyEventOID,subjectKey,ordinal,startDate,endDate);
+    	return scheduleEvent(request, studyOID, null,studyEventOID,subjectKey,ordinal,startDate,endDate);
 	}
     
+    
+
+	public ResponseEntity<Object> scheduleEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId,String sampleOrdinalStr, String startDate,String endDate){
+	    	ResponseEntity response = null;
+	    	RestReponseDTO responseDTO = null;	    	    	
+	    	String message="";
+	    	
+	    	
+	    	responseDTO = studyEventService.scheduleStudyEvent(request, studyOID, siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
+	    	
+	    	/**
+	         *  response
+	         */
+	    	if(responseDTO.getErrors().size() > 0) {
+	    		message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " Failed.";
+	 	        responseDTO.setMessage(message);
+
+	 			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+	    	}else{
+	    		message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " sucessfully.";
+	 	        responseDTO.setMessage(message);
+
+	 			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.OK);
+	    	}
+	       
+	    	return response;
+	      
+	    
+	    }
    	    
 }
 

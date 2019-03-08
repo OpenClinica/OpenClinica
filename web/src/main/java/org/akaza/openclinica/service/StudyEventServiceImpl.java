@@ -50,33 +50,6 @@ public class StudyEventServiceImpl implements StudyEventService {
     private final String COMMON = "common";
     
 	
-	public ResponseEntity<Object> scheduleEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId,String sampleOrdinalStr, String startDate,String endDate){
-	    	ResponseEntity response = null;
-	    	RestReponseDTO responseDTO = null;	    	    	
-	    	String message="";
-	    	
-	    	
-	    	responseDTO = this.scheduleStudyEvent(request, studyOID, siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
-	    	
-	    	/**
-	         *  response
-	         */
-	    	if(responseDTO.getErrors().size() > 0) {
-	    		message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " Failed.";
-	 	        responseDTO.setMessage(message);
-
-	 			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-	    	}else{
-	    		message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " sucessfully.";
-	 	        responseDTO.setMessage(message);
-
-	 			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.OK);
-	    	}
-	       
-	    	return response;
-	      
-	    
-	    }
 	    
 	public RestReponseDTO scheduleStudyEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId,String sampleOrdinalStr, String startDate,String endDate){
 		
