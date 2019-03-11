@@ -10,10 +10,14 @@ import org.akaza.openclinica.control.submit.ImportCRFInfoSummary;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.util.I18nFormatUtil;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.logic.importdata.ImportDataHelper;
 import org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
 import org.akaza.openclinica.service.UserStatus;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
@@ -53,6 +57,9 @@ import java.nio.file.Files;
 import java.nio.file.Paths;
 import java.sql.Connection;
 import java.sql.SQLException;
+import java.text.DateFormat;
+import java.text.ParseException;
+import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -239,21 +246,21 @@ public class RestfulServiceHelper {
 	 	        	
 	 	 	        	StudyUserRoleBean siteLevelRole = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,siteOid);
 	 	 	        	if(siteLevelRole == null) {
-	 	 	        		 e.reject("errorCode.noRoleSetUp", "You do not have any role set up for user " + userName + " in study site " + siteOid );
+	 	 	        		 e.reject(ErrorConstants.ERR_NO_ROLE_SETUP, "You do not have any role set up for user " + userName + " in study site " + siteOid );
 	 	 	        		hasRolePermission = false;
 	 	 	        	}else if(siteLevelRole.getId() == 0 || siteLevelRole.getRole().equals(Role.MONITOR)) {
-	 	 				    e.reject("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
+	 	 				    e.reject(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, "You do not have sufficient privileges to proceed with this operation.");
 	 	 				  hasRolePermission = false;
 	 	 				}
 	 	 	        
 		        }else {
-		        	 e.reject("errorCode.noRoleSetUp", "You do not have any role set up for user " + userName + " in study " + studyOid );
+		        	 e.reject(ErrorConstants.ERR_NO_ROLE_SETUP, "You do not have any role set up for user " + userName + " in study " + studyOid );
 		        	 hasRolePermission = false;
 		        }	 		 
 	        
 		    }else {
 		    	if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
-	 				    e.reject("errorCode.noSufficientPrivileges", "You do not have sufficient privileges to proceed with this operation.");
+	 				    e.reject(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, "You do not have sufficient privileges to proceed with this operation.");
 	 				   hasRolePermission = false;
 	 				}
 		    }
@@ -283,19 +290,19 @@ public class RestfulServiceHelper {
 	 	        	
 	 	 	        	StudyUserRoleBean siteLevelRole = this.getUserAccountDAO().findTheRoleByUserNameAndStudyOid(userName,siteOid);
 	 	 	        	if(siteLevelRole == null) {
-	 	 	        		err_msg= "errorCode.noRoleSetUp " + "You do not have any role set up for user " + userName + " in study site " + siteOid;	 	 	        			 	 	        	
+	 	 	        		err_msg= ErrorConstants.ERR_NO_ROLE_SETUP + " You do not have any role set up for user " + userName + " in study site " + siteOid;	 	 	        			 	 	        	
 	 	 	        	}else if(siteLevelRole.getId() == 0 || siteLevelRole.getRole().equals(Role.MONITOR)) {	 	 				    
-		 	 				err_msg= "errorCode.noSufficientPrivileges" + "You do not have sufficient privileges to proceed with this operation.";	 	 	        	  		 	 			
+		 	 				err_msg= ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES + " You do not have sufficient privileges to proceed with this operation.";	 	 	        	  		 	 			
 	 	 				}
 	 	 	        
 		        }else {
-		        	 err_msg="errorCode.noRoleSetUp " + "You do not have any role set up for user " + userName + " in study " + studyOid;
+		        	 err_msg=ErrorConstants.ERR_NO_ROLE_SETUP + " You do not have any role set up for user " + userName + " in study " + studyOid;
 	
 		        }	 		 
 	        
 		    }else {
 		    	if(studyLevelRole.getId() == 0 || studyLevelRole.getRole().equals(Role.MONITOR)) {
-		    		err_msg = "errorCode.noSufficientPrivileges " + "You do not have sufficient privileges to proceed with this operation.";
+		    		err_msg = ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES + " You do not have sufficient privileges to proceed with this operation.";
 	
 	 				}
 		    }
@@ -850,4 +857,30 @@ public class RestfulServiceHelper {
 		public void setImportDataHelper(PipeDelimitedDataHelper importDataHelper) {
 			this.importDataHelper = importDataHelper;
 		}
+		
+		/**
+		 * 
+		 * @param dateTimeStr:
+		 * yyyy-MM-dd
+		 * @return
+		 */
+		 public Date getDateTime(String dateTimeStr) throws OpenClinicaException {
+		        String dataFormat = "yyyy-MM-dd";
+			 	DateFormat  sdf = new SimpleDateFormat(dataFormat);		   
+		        Date result = null;
+		        
+				try {
+					if(dateTimeStr != null) {
+						result = sdf.parse(dateTimeStr);	
+					}
+								
+					
+				} catch (ParseException e) {
+					String errMsg = "The input date("+ dateTimeStr + ") can't be parsed, please use the correct format " + dataFormat;
+		        	throw new OpenClinicaException(errMsg,"dateParsedError");
+				}
+		       
+		        
+		        return result;
+		    }
 }
