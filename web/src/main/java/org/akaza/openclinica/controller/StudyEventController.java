@@ -1,15 +1,31 @@
 package org.akaza.openclinica.controller;
 
+import java.io.File;
+import java.time.LocalDateTime;
+import java.util.ArrayList;
+import java.util.Collections;
+import java.util.Date;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
 
 import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
 
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiOperation;
+import io.swagger.annotations.ApiResponse;
+import io.swagger.annotations.ApiResponses;
+import io.swagger.annotations.ApiParam;
+
+import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.bean.login.RestReponseDTO;
+import org.akaza.openclinica.bean.login.ResponseSuccessStudyParticipantDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
@@ -19,7 +35,10 @@ import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.domain.Status;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
 import org.akaza.openclinica.domain.datamap.Study;
@@ -27,10 +46,12 @@ import org.akaza.openclinica.domain.datamap.StudyEvent;
 import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.service.ParticipateService;
+import org.akaza.openclinica.service.StudyEventService;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
@@ -38,13 +59,18 @@ import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.multipart.MultipartFile;
+
 
 @Controller
 @RequestMapping( value = "/auth/api" )
@@ -74,8 +100,10 @@ public class StudyEventController {
     private EventDefinitionCrfDao eventDefinitionCrfDao;
     private RestfulServiceHelper restfulServiceHelper;
 
+    @Autowired
+	private StudyEventService studyEventService;
+	
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-
 
     /**
      * @api {put} /pages/auth/api/v1/studyevent/studysubject/{studySubjectOid}/studyevent/{studyEventDefOid}/ordinal/{ordinal}/complete Complete a Participant Event
@@ -169,6 +197,71 @@ public class StudyEventController {
         return restfulServiceHelper;
     }
 
+    @ApiOperation(value = "To schedule an event for participant at site level",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successful operation"),
+	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
+	@RequestMapping(value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/{subjectKey}/events", method = RequestMethod.POST,consumes = {"multipart/form-data"})
+	public ResponseEntity<Object> scheduleEventAtSiteLevel(HttpServletRequest request,
+			@RequestParam(value = "ordinal",required = false) String ordinal,
+			@RequestParam("studyEventOID") String studyEventOID,
+			@PathVariable("subjectKey") String subjectKey,			
+			@ApiParam(value = "date format: yyyy-MM-dd") @RequestParam(value = "endDate",required = false) String endDate,
+			@ApiParam(value = "date format: yyyy-MM-dd", required = true) @RequestParam("startDate") String startDate,			
+			@PathVariable("studyOID") String studyOID,
+			@PathVariable("siteOID") String siteOID) throws Exception {
+		
+    	
+    	return scheduleEvent(request, studyOID, siteOID,studyEventOID,subjectKey,ordinal,startDate,endDate);
+	}
+    
+    @ApiOperation(value = "To schedule an event for participant at study level",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successful operation"),
+	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
+	@RequestMapping(value = "clinicaldata/studies/{studyOID}/participants/{subjectKey}/events", method = RequestMethod.POST,consumes = {"multipart/form-data"})
+	public ResponseEntity<Object> scheduleEventAtStudyLevel(HttpServletRequest request,
+			@RequestParam(value = "ordinal",required = false) String ordinal,
+			@RequestParam("studyEventOID") String studyEventOID,
+			@PathVariable("subjectKey") String subjectKey,			
+			@ApiParam(value = "date format: yyyy-MM-dd") @RequestParam(value = "endDate",required = false) String endDate,
+			@ApiParam(value = "date format: yyyy-MM-dd", required = true) @RequestParam("startDate") String startDate,			
+			@PathVariable("studyOID") String studyOID) throws Exception {
+		
+		
+    	return scheduleEvent(request, studyOID, null,studyEventOID,subjectKey,ordinal,startDate,endDate);
+	}
+    
+    
+
+	public ResponseEntity<Object> scheduleEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId,String sampleOrdinalStr, String startDate,String endDate){
+	    	ResponseEntity response = null;
+	    	RestReponseDTO responseDTO = null;	    	    	
+	    	String message="";
+	    	
+	    	
+	    	responseDTO = studyEventService.scheduleStudyEvent(request, studyOID, siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
+	    	
+	    	/**
+	         *  response
+	         */
+	    	if(responseDTO.getErrors().size() > 0) {
+	    		message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " Failed.";
+	 	        responseDTO.setMessage(message);
+
+	 			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+	    	}else{
+	    		message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " sucessfully.";
+	 	        responseDTO.setMessage(message);
+
+	 			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.OK);
+	    	}
+	       
+	    	return response;
+	      
+	    
+	    }
+   	    
 }
 
 

@@ -419,18 +419,16 @@ public class DataController {
                 		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
                 	}
-                	// keep original msg like: 1|SS_SUB4|SUCCESS|Skip
+                	// for skip err_msg:1|SS_SITE_SB1|SUCCESS|Skip
                 	String msg = null;
-                	if(err_msg != null && err_msg.indexOf("|SUCCESS|Skip") > 0){
+                	if(err_msg.indexOf("SUCCESS|Skip") > -1) {
                 		msg = err_msg;
                 	}else {
                 		msg = "errorCode.ValidationFailed:" + err_msg;
-                    	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;	
+                    	msg = recordNum + "|" + studySubjectOID + "|FAILED|" + msg;
                 	}
                 	
-    	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
-    	    		
-    	    		
+    	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);    	    		    	    		
                     return errorMsgs;
                 }
 
@@ -469,27 +467,24 @@ public class DataController {
                 List<String> auditMsgs = new DataImportService().submitData(odmContainer, dataSource, studyBean, userBean, displayItemBeanWrappers,
                         importedCRFStatuses);
 
-                /**
-                 *  For new import, after submit, then can log success info
-                 */               
-            	String originalFileName = request.getHeader("originalFileName");
-            	if(originalFileName != null) {
-            		 String studySubjectOID = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getSubjectOID();
-                 	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
-                 	String recordNum = null;
-                 	if(originalFileName !=null) {
-                 		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
-                 		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
-                 	}
-                 	String msg;
-                 	msg = recordNum + "|" + studySubjectOID + "|SUCCESS|" + "Insert";	    			    		
-     	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
-     	    			
-            	}
-            	
                 // run rules if applicable
                 List<String> ruleActionMsgs = dataImportService.runRules(studyBean, userBean, containers, ruleSetService, ExecutionMode.SAVE);
 
+                /**
+                 *  Now it's time to log successful message into log file                      
+                 */ 
+                String studySubjectOID = odmContainer.getCrfDataPostImportContainer().getSubjectData().get(0).getSubjectOID();
+                String originalFileName = request.getHeader("originalFileName");
+            	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
+            	String recordNum = null;
+            	if(originalFileName !=null) {
+            		recordNum = originalFileName.substring(originalFileName.lastIndexOf("_")+1,originalFileName.indexOf("."));
+            		originalFileName = originalFileName.substring(0, originalFileName.lastIndexOf("_"));
+            	}
+            	String msg = "imported";
+            	msg = recordNum + "|" + studySubjectOID + "|SUCCESS|" + msg;
+	    		this.dataImportService.getImportCRFDataService().getPipeDelimitedDataHelper().writeToMatchAndSkipLog(originalFileName, msg,request);
+	    	
                 ImportCRFInfoContainer importCrfInfo = new ImportCRFInfoContainer(odmContainer, dataSource);
                 List<String> skippedCRFMsgs = getSkippedCRFMessages(importCrfInfo);
 
@@ -594,83 +589,7 @@ public class DataController {
         return serviceHelper;
     }
     
-    /**
-     *  start upload file to mirth
-     */
-
-    @ApiOperation(value = "To create data channel", notes = "Will read the data in channel XML configuration file and set up  data channel ")
-    @ApiResponses(value = {
-            @ApiResponse(code = 200, message = "Successful operation"),
-            @ApiResponse(code = 400, message = "Bad Request -- for detail please see the error message")})
-    @RequestMapping(value = "/createChannel", method = RequestMethod.POST)
-    public ResponseEntity<String> createChanelwithXMLConfigurationFile(HttpServletRequest request, MultipartFile file) throws Exception {
-
-        ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
-        ResponseEntity<String> response = null;
-        String createChannelUrl = CoreResources.getField("MirthCreateChannelUrl");
-        String validation_failed_message = "VALIDATION FAILED";
-        String validation_passed_message = "SUCCESS";
-      
-        if(createChannelUrl == null || createChannelUrl.trim().length()==0) {
-        	createChannelUrl = "https://10.0.11.149:8443/api/#!/Channels/createChannel";
-        } 
-        
-        URL url = new URL(createChannelUrl);
-        HttpsURLConnection conn = (HttpsURLConnection) url.openConnection();
-		conn.setDoOutput(true);
-		conn.setRequestMethod("POST");
-		conn.setRequestProperty("Content-Type", "multipart/form-data");
-		//Authorization
- 		String loginPassword = "root:password";
- 		String encoded = Base64.getEncoder().encodeToString(loginPassword.getBytes()); 		
- 		conn.setRequestProperty ("Authorization", "Basic " + encoded);
-
-		
-		OutputStream os = conn.getOutputStream();
-		os.write(file.getBytes());
-		
-		os.flush();
-		os.close();
-	
-
-		BufferedReader br = null;
-		try {
-			br = new BufferedReader(new InputStreamReader(
-					(conn.getInputStream())));
-		}catch(Exception e) {
-			e.printStackTrace();
-			try {
-				br = new BufferedReader(new InputStreamReader(
-						(conn.getErrorStream())));
-			}catch(Exception e2) {
-				System.out.println("===================================================================");
-				e2.printStackTrace();
-			}	
-			
-		}
-		
-
-		String output;
-		StringBuffer fromMirthcall = new StringBuffer();
-		System.out.println("Output from Server .... \n");
-		while ((output = br.readLine()) != null) {
-			fromMirthcall.append(output);
-			System.out.println(output);
-		}
-
-		
-		response = new ResponseEntity(conn.getResponseCode(), org.springframework.http.HttpStatus.OK);
-		br.close();
-		conn.disconnect();
-		
-        return response;
-       
-       
-        
-       
-    
-    }
-    
+     
     private static void disableSslVerification() {
         try{
             // Create a trust manager that does not validate certificate chains
@@ -706,63 +625,7 @@ public class DataController {
         }
     }
     
-    public ResponseEntity<String> createChanelwithXMLConfigurationFileBAK(HttpServletRequest request, MultipartFile file) throws Exception {
-
-        ArrayList<ErrorMessage> errorMsgs = new ArrayList<ErrorMessage>();
-        ResponseEntity<String> response = null;
-        String createChannelUrl = CoreResources.getField("MirthCreateChannelUrl");
-        String validation_failed_message = "VALIDATION FAILED";
-        String validation_passed_message = "SUCCESS";
-      
-        CloseableHttpClient httpClient = 
-	    HttpClients.custom().setSSLHostnameVerifier(new NoopHostnameVerifier()).build();
-	    HttpComponentsClientHttpRequestFactory reqFactory = new HttpComponentsClientHttpRequestFactory();
-	    reqFactory.setHttpClient(httpClient);
-
-        RestTemplate restTemplate = new RestTemplate(reqFactory);
-         
-        HttpHeaders headers = new HttpHeaders();
-        headers.setAccept(Arrays.asList(MediaType.APPLICATION_XML));
-             
-        //Authorization        
-        String accessToken = (String) request.getSession().getAttribute("accessToken");
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Accept-Charset", "UTF-8");
-        HttpEntity<String> entity = new HttpEntity<String>(headers);
-        
-        HashMap<String, Object> map = new HashMap<String, Object>();
-        map.put("username", "user1");
-        map.put("password", "password");
-        map.put("file", file);
-        HttpEntity requestEntity = new HttpEntity<>(map, headers);
- 		      
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        objectMapper.configure(SerializationFeature.FAIL_ON_EMPTY_BEANS, false);
-        List<HttpMessageConverter<?>> converters = new ArrayList<>();
-        MappingJackson2HttpMessageConverter jsonConverter = new MappingJackson2HttpMessageConverter();
-        jsonConverter.setObjectMapper(objectMapper);                
-        converters.add(jsonConverter);        
-        restTemplate.setMessageConverters(converters);
-               
-        if(createChannelUrl == null || createChannelUrl.trim().length()==0) {
-        	createChannelUrl = "https://10.0.11.149:8443/api/#!/Channels/createChannel";
-        } 
-        try {                
-        	  
-        	 response = restTemplate.postForEntity(createChannelUrl, requestEntity, String.class);
-        }catch(Exception e){
-        	e.printStackTrace();
-        }
-       
-        return response;
-       
-       
-        
-       
-    
-    }
-    
+   
     @ApiOperation(value = "To import study data in Pipe Delimited Text File", notes = "Will read both the data text files and  one mapping text file, then validate study,event and participant against the  setup first, for more detail please refer to OpenClinica online document  ")
     @ApiResponses(value = {
             @ApiResponse(code = 200, message = "Successful operation"),
