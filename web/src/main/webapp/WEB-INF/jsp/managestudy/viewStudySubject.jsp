@@ -1158,7 +1158,7 @@
                 <span><fmt:message key="first_name" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="name-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
+                <input id="fname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
               </td>
             </tr>
             <tr valign="top">
@@ -1166,7 +1166,7 @@
                 <span><fmt:message key="last_name" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="lastname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
+                <input id="lname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
               </td>
             </tr>
             <tr valign="top">
@@ -1511,7 +1511,7 @@
                     <span><fmt:message key="partid_identifier" bundle="${resword}"/></span>
                   </td>
                   <td valign="top">
-                    <input id="identifier-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
+                    <input id="secid-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
                   </td>
                 </tr>
               </c:when>
@@ -1721,10 +1721,12 @@
 
         jQuery('#connect-button').click(function () {
             var data = {
-                firstName: $('#name-input').val(),
+                firstName: $('#fname-input').val(),
+                lastName: $('#lname-input').val(),
                 email: $('#email-input').val(),
                 phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
-                inviteParticipant: $('#invite-option input:checked').val()
+                inviteParticipant: $('#invite-option input:checked').val(),
+                identifier: $('#secid-input').val()
             };
             jQuery.ajax({
                 type: 'post',
@@ -1807,8 +1809,10 @@
         });
 
         jQuery('#contactInformation').click(function() {
-            $('#name-input').val(participateInfo.firstName);
+            $('#fname-input').val(participateInfo.firstName);
+            $('#lname-input').val(participateInfo.lastName);
             $('#email-input').val(participateInfo.email);
+            $('#secid-input').val(participateInfo.identifier);
 
             var phoneParts = participateInfo.phoneNumber.split(' ');
             var countryCode = phoneParts.shift();
