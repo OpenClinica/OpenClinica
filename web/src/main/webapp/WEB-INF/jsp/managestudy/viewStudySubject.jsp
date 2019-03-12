@@ -1142,7 +1142,14 @@
     <tr style="height:10px;">
       <td class="formlabel" align="left">
         <h3>
-          <fmt:message key="update_and_invite" bundle="${resword}"/>
+          <c:choose>
+            <c:when test="${participateStatus=='enabled'}">
+              <fmt:message key="update_and_invite" bundle="${resword}"/>
+            </c:when>
+            <c:otherwise>
+              <fmt:message key="partid_edit" bundle="${resword}"/>
+            </c:otherwise>
+          </c:choose>
         </h3>
       </td>
     </tr>
@@ -1169,346 +1176,350 @@
                 <input id="lname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
               </td>
             </tr>
-            <tr valign="top">
-              <td class="formlabel" align="left">
-                <span><fmt:message key="email" bundle="${resword}"/></span>
-              </td>
-              <td valign="top">
-                <input id="email-input" onfocus="this.select()" type="text" value="" size="45" maxlength="255" class="formfield form-control invite-input">
-                <div id="email-input-info" class="grayed-out">
-                  <fmt:message key="invite_required" bundle="${resword}"/>
-                  <br>
-                  <fmt:message key="invite_required_line2" bundle="${resword}"/>
-                </div>
-                <div class="subnote hide error" id="email-input-error">
-                  <fmt:message key="invite_invalid_email" bundle="${resword}"/>
-                </div>
-              </td>
-            </tr>
-            <tr valign="top">
-              <td></td>
-              <td valign="top" id="invite-option">
-                <span style="margin-right:15px;">
-                  <fmt:message key="invite_via_email" bundle="${resword}"/>
-                </span>
-                <label><input type="radio" name="invite-option" value="true">
-                  <fmt:message key="invite_yes" bundle="${resword}"/>
-                </label>
-                &emsp;
-                <label><input type="radio" name="invite-option" value="false" checked="checked">
-                  <fmt:message key="invite_no" bundle="${resword}"/>
-                </label>
-              </td>
-            </tr>
-            <tr valign="top">
-              <td class="formlabel" align="left">
-                <span>
-                  Mobile
-                </span>
-              </td>
-              <td valign="top">
-                <style>
-                  .invite-input {
-                    width: 250px;
-                  }
-                  #email-input-info {
-                    display: inline-block;
-                    margin: -4px 0 0 10px;
-                    font-style: italic;
-                    font-size: 10pt;
-                  }
-                  #phone-input {
-                    padding: 4px !important;
-                    padding-left: 100px !important;
-                  }
-                  #phone-input-error {
-                    display: block;
-                    clear: left;
-                  }
-                  #phone-widget {
-                    position: relative;
-                  }
-                  #country-code {
-                    position: absolute;
-                    top: 4px;
-                    left: 54px;
-                    width: 37px;
-                    text-align: center;
-                  }
-                  #country-select {
-                    position: absolute;
-                    height: 26px;
-                    top: 2px;
-                    left: 2px;                    
-                    padding-top: 2px;
-                  }
-                  #country-select:hover {
-                    background-color: #eee;
-                  }
-                  #country-select-down-arrow {
-                    background: url(images/down-arrow.png) no-repeat center center;
-                    width: 10px;
-                    margin-left: 0px;
-                    margin-right: 5px;
-                    display: inline-block;
-                  }
-                  #country-flag {
-                    top: 9px;
-                    background: url(images/flags.png) no-repeat 0 0;
-                    width: 20px;
-                    height: 11px;
-                    overflow: hidden;
-                    margin-left: 11px;
-                    display: inline-block;
-                    background-position: 0px -44px;
-                  }
-                  #access-code-td {
-                    position: relative;
-                  }
-                  #access-code-input {
-                    width: 150px;
-                    padding-right: 40px;
-                  }
-                  #eye {
-                    position: absolute;
-                    top: 2px;
-                    left: 111px;
-                    font-size: 18pt;
-                    background-color: transparent;
-                    padding: 2px 6px;
-                  }
-                  .grayed-out {
-                    color: #999;
-                  }
-                </style>
-                <div id="phone-widget">
-                  <input id="phone-input" type="text" class="formfield form-control invite-input" onfocus="this.select()" maxlength="15"> 
-                  <div id="country-select">
-                    <div id="country-flag" class="down-arrow">&nbsp;</div> 
-                    <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
-                  </div> 
-                  <div id="country-code" class="grayed-out">+1</div> 
-                  <div class="subnote hide error" id="phone-input-error">
-                    <fmt:message key="invite_invalid_phone" bundle="${resword}"/>
-                  </div>
-                </div>
-                <div id="country-options" style="display:none;">
-                  <style>
-                    #country-options {
-                      position: absolute;
-                      border: 1px solid #d9d9d9;
-                      background-color: white;
-                      padding-left: 0px;
-                      padding-right: 0px;
-                      z-index: 100;
-                      overflow: auto;
-                      height: 200px;
-                    }
-                    .country-option:hover {
-                      background-color: #618ebb;
-                      color: white;
-                    }
-                    .country-option:hover .the-country-code {
-                      color: white;
-                    }
-                    .the-country-code {
-                      color: #666;
-                      padding-right: 10px;
-                    }
-                    .flag-holder {
-                      padding-left: 5px;
-                      padding-right: 5px;
-                      padding-top: 1px;
-                    }
-                    .the-flag {
-                      background: url(images/flags.png) no-repeat 0 0;
-                      height: 11px;
-                      overflow: hidden;
-                      margin-left: 11px;
-                      width: 20px;
-                    }
-                  </style>
-                  <table cellspacing="0">
-                    <tbody>
-                      <tr class="country-option" data-country="AU">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1716px;"></div>
-                          </td>
-                          <td>
-                              <span>Australia</span>&nbsp;&nbsp;<span class="the-country-code">+61</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="AT">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1331px;"></div>
-                          </td>
-                          <td>
-                              <span>Austria</span>&nbsp;&nbsp;<span class="the-country-code">+43</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="BE">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px 0px;"></div>
-                          </td>
-                          <td>
-                              <span>Belgium</span>&nbsp;&nbsp;<span class="the-country-code">+32</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="BR">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -770px;"></div>
-                          </td>
-                          <td>
-                              <span>Brazil</span>&nbsp;&nbsp;<span class="the-country-code">+55</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="CA">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1375px;"></div>
-                          </td>
-                          <td>
-                              <span>Canada</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="CL">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1342px;"></div>
-                          </td>
-                          <td>
-                              <span>Chile</span>&nbsp;&nbsp;<span class="the-country-code">+56</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="CN">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -825px;"></div>
-                          </td>
-                          <td>
-                              <span>China</span>&nbsp;&nbsp;<span class="the-country-code">+86</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="DK">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1386px;"></div>
-                          </td>
-                          <td>
-                              <span>Denmark</span>&nbsp;&nbsp;<span class="the-country-code">+45</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="DO">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1529px;"></div>
-                          </td>
-                          <td>
-                              <span>Dominican Republic</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="FR">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1012px;"></div>
-                          </td>
-                          <td>
-                              <span>France</span>&nbsp;&nbsp;<span class="the-country-code">+33</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="DE">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -2509px;"></div>
-                          </td>
-                          <td>
-                              <span>Germany</span>&nbsp;&nbsp;<span class="the-country-code">+49</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="IN">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1694px;"></div>
-                          </td>
-                          <td>
-                              <span>India</span>&nbsp;&nbsp;<span class="the-country-code">+91</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="IE">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1969px;"></div>
-                          </td>
-                          <td>
-                              <span>Ireland</span>&nbsp;&nbsp;<span class="the-country-code">+353</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="IT">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -143px;"></div>
-                          </td>
-                          <td>
-                              <span>Italy</span>&nbsp;&nbsp;<span class="the-country-code">+39</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="JP">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -429px;"></div>
-                          </td>
-                          <td>
-                              <span>Japan</span>&nbsp;&nbsp;<span class="the-country-code">+81</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="NL">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1441px;"></div>
-                          </td>
-                          <td>
-                              <span>Netherlands</span>&nbsp;&nbsp;<span class="the-country-code">+31</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="ES">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1155px;"></div>
-                          </td>
-                          <td>
-                              <span>Spain</span>&nbsp;&nbsp;<span class="the-country-code">+34</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="SE">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -385px;"></div>
-                          </td>
-                          <td>
-                              <span>Sweden</span>&nbsp;&nbsp;<span class="the-country-code">+46</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="CH">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -1320px;"></div>
-                          </td>
-                          <td>
-                              <span>Switzerland</span>&nbsp;&nbsp;<span class="the-country-code">+41</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="GB">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -55px;"></div>
-                          </td>
-                          <td>
-                              <span>United Kingdom</span>&nbsp;&nbsp;<span class="the-country-code">+44</span>
-                          </td>
-                      </tr>
-                      <tr class="country-option" data-country="US">
-                          <td class="flag-holder">
-                              <div class="the-flag" style="background-position: 0px -44px;"></div>
-                          </td>
-                          <td>
-                              <span>United States</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
-                          </td>
-                      </tr>
-                    </tbody>
-                  </table>
-                </div>
-              </td>
-            </tr>
+            <c:choose>
+              <c:when test="${participateStatus=='enabled'}">
+                <tr valign="top">
+                  <td class="formlabel" align="left">
+                    <span><fmt:message key="email" bundle="${resword}"/></span>
+                  </td>
+                  <td valign="top">
+                    <input id="email-input" onfocus="this.select()" type="text" value="" size="45" maxlength="255" class="formfield form-control invite-input">
+                    <div id="email-input-info" class="grayed-out">
+                      <fmt:message key="invite_required" bundle="${resword}"/>
+                      <br>
+                      <fmt:message key="invite_required_line2" bundle="${resword}"/>
+                    </div>
+                    <div class="subnote hide error" id="email-input-error">
+                      <fmt:message key="invite_invalid_email" bundle="${resword}"/>
+                    </div>
+                  </td>
+                </tr>
+                <tr valign="top">
+                  <td></td>
+                  <td valign="top" id="invite-option">
+                    <span style="margin-right:15px;">
+                      <fmt:message key="invite_via_email" bundle="${resword}"/>
+                    </span>
+                    <label><input type="radio" name="invite-option" value="true">
+                      <fmt:message key="invite_yes" bundle="${resword}"/>
+                    </label>
+                    &emsp;
+                    <label><input type="radio" name="invite-option" value="false" checked="checked">
+                      <fmt:message key="invite_no" bundle="${resword}"/>
+                    </label>
+                  </td>
+                </tr>
+                <tr valign="top">
+                  <td class="formlabel" align="left">
+                    <span>
+                      Mobile
+                    </span>
+                  </td>
+                  <td valign="top">
+                    <style>
+                      .invite-input {
+                        width: 250px;
+                      }
+                      #email-input-info {
+                        display: inline-block;
+                        margin: -4px 0 0 10px;
+                        font-style: italic;
+                        font-size: 10pt;
+                      }
+                      #phone-input {
+                        padding: 4px !important;
+                        padding-left: 100px !important;
+                      }
+                      #phone-input-error {
+                        display: block;
+                        clear: left;
+                      }
+                      #phone-widget {
+                        position: relative;
+                      }
+                      #country-code {
+                        position: absolute;
+                        top: 4px;
+                        left: 54px;
+                        width: 37px;
+                        text-align: center;
+                      }
+                      #country-select {
+                        position: absolute;
+                        height: 26px;
+                        top: 2px;
+                        left: 2px;                    
+                        padding-top: 2px;
+                      }
+                      #country-select:hover {
+                        background-color: #eee;
+                      }
+                      #country-select-down-arrow {
+                        background: url(images/down-arrow.png) no-repeat center center;
+                        width: 10px;
+                        margin-left: 0px;
+                        margin-right: 5px;
+                        display: inline-block;
+                      }
+                      #country-flag {
+                        top: 9px;
+                        background: url(images/flags.png) no-repeat 0 0;
+                        width: 20px;
+                        height: 11px;
+                        overflow: hidden;
+                        margin-left: 11px;
+                        display: inline-block;
+                        background-position: 0px -44px;
+                      }
+                      #access-code-td {
+                        position: relative;
+                      }
+                      #access-code-input {
+                        width: 150px;
+                        padding-right: 40px;
+                      }
+                      #eye {
+                        position: absolute;
+                        top: 2px;
+                        left: 111px;
+                        font-size: 18pt;
+                        background-color: transparent;
+                        padding: 2px 6px;
+                      }
+                      .grayed-out {
+                        color: #999;
+                      }
+                    </style>
+                    <div id="phone-widget">
+                      <input id="phone-input" type="text" class="formfield form-control invite-input" onfocus="this.select()" maxlength="15"> 
+                      <div id="country-select">
+                        <div id="country-flag" class="down-arrow">&nbsp;</div> 
+                        <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
+                      </div> 
+                      <div id="country-code" class="grayed-out">+1</div> 
+                      <div class="subnote hide error" id="phone-input-error">
+                        <fmt:message key="invite_invalid_phone" bundle="${resword}"/>
+                      </div>
+                    </div>
+                    <div id="country-options" style="display:none;">
+                      <style>
+                        #country-options {
+                          position: absolute;
+                          border: 1px solid #d9d9d9;
+                          background-color: white;
+                          padding-left: 0px;
+                          padding-right: 0px;
+                          z-index: 100;
+                          overflow: auto;
+                          height: 200px;
+                        }
+                        .country-option:hover {
+                          background-color: #618ebb;
+                          color: white;
+                        }
+                        .country-option:hover .the-country-code {
+                          color: white;
+                        }
+                        .the-country-code {
+                          color: #666;
+                          padding-right: 10px;
+                        }
+                        .flag-holder {
+                          padding-left: 5px;
+                          padding-right: 5px;
+                          padding-top: 1px;
+                        }
+                        .the-flag {
+                          background: url(images/flags.png) no-repeat 0 0;
+                          height: 11px;
+                          overflow: hidden;
+                          margin-left: 11px;
+                          width: 20px;
+                        }
+                      </style>
+                      <table cellspacing="0">
+                        <tbody>
+                          <tr class="country-option" data-country="AU">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1716px;"></div>
+                              </td>
+                              <td>
+                                  <span>Australia</span>&nbsp;&nbsp;<span class="the-country-code">+61</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="AT">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1331px;"></div>
+                              </td>
+                              <td>
+                                  <span>Austria</span>&nbsp;&nbsp;<span class="the-country-code">+43</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="BE">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px 0px;"></div>
+                              </td>
+                              <td>
+                                  <span>Belgium</span>&nbsp;&nbsp;<span class="the-country-code">+32</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="BR">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -770px;"></div>
+                              </td>
+                              <td>
+                                  <span>Brazil</span>&nbsp;&nbsp;<span class="the-country-code">+55</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="CA">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1375px;"></div>
+                              </td>
+                              <td>
+                                  <span>Canada</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="CL">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1342px;"></div>
+                              </td>
+                              <td>
+                                  <span>Chile</span>&nbsp;&nbsp;<span class="the-country-code">+56</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="CN">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -825px;"></div>
+                              </td>
+                              <td>
+                                  <span>China</span>&nbsp;&nbsp;<span class="the-country-code">+86</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="DK">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1386px;"></div>
+                              </td>
+                              <td>
+                                  <span>Denmark</span>&nbsp;&nbsp;<span class="the-country-code">+45</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="DO">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1529px;"></div>
+                              </td>
+                              <td>
+                                  <span>Dominican Republic</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="FR">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1012px;"></div>
+                              </td>
+                              <td>
+                                  <span>France</span>&nbsp;&nbsp;<span class="the-country-code">+33</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="DE">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -2509px;"></div>
+                              </td>
+                              <td>
+                                  <span>Germany</span>&nbsp;&nbsp;<span class="the-country-code">+49</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="IN">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1694px;"></div>
+                              </td>
+                              <td>
+                                  <span>India</span>&nbsp;&nbsp;<span class="the-country-code">+91</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="IE">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1969px;"></div>
+                              </td>
+                              <td>
+                                  <span>Ireland</span>&nbsp;&nbsp;<span class="the-country-code">+353</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="IT">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -143px;"></div>
+                              </td>
+                              <td>
+                                  <span>Italy</span>&nbsp;&nbsp;<span class="the-country-code">+39</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="JP">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -429px;"></div>
+                              </td>
+                              <td>
+                                  <span>Japan</span>&nbsp;&nbsp;<span class="the-country-code">+81</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="NL">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1441px;"></div>
+                              </td>
+                              <td>
+                                  <span>Netherlands</span>&nbsp;&nbsp;<span class="the-country-code">+31</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="ES">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1155px;"></div>
+                              </td>
+                              <td>
+                                  <span>Spain</span>&nbsp;&nbsp;<span class="the-country-code">+34</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="SE">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -385px;"></div>
+                              </td>
+                              <td>
+                                  <span>Sweden</span>&nbsp;&nbsp;<span class="the-country-code">+46</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="CH">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -1320px;"></div>
+                              </td>
+                              <td>
+                                  <span>Switzerland</span>&nbsp;&nbsp;<span class="the-country-code">+41</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="GB">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -55px;"></div>
+                              </td>
+                              <td>
+                                  <span>United Kingdom</span>&nbsp;&nbsp;<span class="the-country-code">+44</span>
+                              </td>
+                          </tr>
+                          <tr class="country-option" data-country="US">
+                              <td class="flag-holder">
+                                  <div class="the-flag" style="background-position: 0px -44px;"></div>
+                              </td>
+                              <td>
+                                  <span>United States</span>&nbsp;&nbsp;<span class="the-country-code">+1</span>
+                              </td>
+                          </tr>
+                        </tbody>
+                      </table>
+                    </div>
+                  </td>
+                </tr>
+              </c:when>
+            </c:choose>
 
             <c:choose>
               <c:when test="${advsearchStatus=='enabled'}">
                 <tr valign="top">
                   <td class="formlabel" align="left">
-                    <span><fmt:message key="partid_identifier" bundle="${resword}"/></span>
+                    <span><fmt:message key="secondary_ID" bundle="${resword}"/></span>
                   </td>
                   <td valign="top">
                     <input id="secid-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
@@ -1586,48 +1597,6 @@
       <tr>
         <td colspan="2" style="text-align: center;">
           <input type="button" class="cancel right" value='<fmt:message key="close" bundle="${resword}"/>'/>
-        </td>
-      </tr>
-    </table>
-  </form>
-</div>
-
-<div id="partid-edit-form" class="hide">
-  <form method="post">
-    <table border="0" cellpadding="0" align="center" style="cursor:default;">
-      <tr style="height:10px;">
-        <td class="formlabel" align="left">
-          <h3>
-            <fmt:message key="partid_edit" bundle="${resword}"/>
-          </h3>
-        </td>
-      </tr>
-      <tr>
-        <td><div class="lines"></div></td>
-      </tr>
-      <tr>
-        <td>
-          <div style="max-height: 550px; min-width:400px; background:#FFFFFF; overflow-y: auto;">
-            <table cellspacing="10">
-              <tr valign="top">
-                <td class="formlabel" align="left">
-                  <span><fmt:message key="partid_identifier" bundle="${resword}"/></span>
-                </td>
-                <td valign="top" id="access-code-td">
-                  <input id="partid-input" readonly onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
-                </td>
-              </tr>
-            </table>
-          </div>
-        </td>
-      </tr>
-      <tr>
-        <td><div class="lines"></div></td>
-      </tr>
-      <tr>
-        <td colspan="2" style="text-align: right;">
-          <input type="button" class="cancel" value='<fmt:message key="cancel" bundle="${resword}"/>'/>
-          <input type="button" value='<fmt:message key="save" bundle="${resword}"/>'/>
         </td>
       </tr>
     </table>
@@ -1829,7 +1798,7 @@
         });
 
         jQuery('#partid-edit').click(function() {
-            jQuery.blockUI({ message: jQuery('#partid-edit-form'), css:{left: "300px", top:"10px" } });
+            jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
         });
 
         jQuery('#participateAccess').click(function() {
