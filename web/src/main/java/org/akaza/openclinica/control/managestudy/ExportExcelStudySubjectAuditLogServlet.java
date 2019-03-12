@@ -170,17 +170,8 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
                     auditBean.setNewValue(Status.get(Integer.parseInt(auditBean.getNewValue())).getName());
                 }
                 if (getAuditLogEventTypes().contains(auditBean.getAuditEventTypeId())) {
-
-                    if ((role.equals(Role.RESEARCHASSISTANT)
-                            && role.getDescription().equals("Clinical Research Coordinator"))
-                            || (role.equals(Role.INVESTIGATOR)
-                            && role.getDescription().equals("Investigator"))) {
-                        auditBean.setOldValue(getCrytoConverter().convertToEntityAttribute(auditBean.getOldValue()));
-                        auditBean.setNewValue(getCrytoConverter().convertToEntityAttribute(auditBean.getNewValue()));
-                    } else {
                         auditBean.setOldValue("<Masked>");
                         auditBean.setNewValue("<Masked>");
-                    }
                 }
             }
             studySubjectAudits.addAll(studySubjectAuditEvents);
