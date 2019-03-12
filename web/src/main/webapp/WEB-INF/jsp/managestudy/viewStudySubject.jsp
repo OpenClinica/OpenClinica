@@ -1193,17 +1193,27 @@
                 <span><fmt:message key="first_name" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="fname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
+                <input id="fname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
+                <span style="float:left; margin: 2px 10px;">
+                  <fmt:message key="last_name" bundle="${resword}"/>
+                </span>
+                <input id="lname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
               </td>
             </tr>
-            <tr valign="top">
-              <td class="formlabel" align="left">
-                <span><fmt:message key="last_name" bundle="${resword}"/></span>
-              </td>
-              <td valign="top">
-                <input id="lname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
-              </td>
-            </tr>
+
+            <c:choose>
+              <c:when test="${advsearchStatus=='enabled'}">
+                <tr valign="top">
+                  <td class="formlabel" align="left">
+                    <span><fmt:message key="secondary_ID" bundle="${resword}"/></span>
+                  </td>
+                  <td valign="top">
+                    <input id="secid-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
+                  </td>
+                </tr>
+              </c:when>
+            </c:choose>
+            
             <c:choose>
               <c:when test="${participateStatus=='enabled'}">
                 <tr valign="top">
@@ -1247,6 +1257,9 @@
                     <style>
                       .invite-input {
                         width: 250px;
+                      }
+                      .invite-input-halfsize {
+                        width: 130px;
                       }
                       #email-input-info {
                         display: inline-block;
@@ -1538,19 +1551,6 @@
                         </tbody>
                       </table>
                     </div>
-                  </td>
-                </tr>
-              </c:when>
-            </c:choose>
-
-            <c:choose>
-              <c:when test="${advsearchStatus=='enabled'}">
-                <tr valign="top">
-                  <td class="formlabel" align="left">
-                    <span><fmt:message key="secondary_ID" bundle="${resword}"/></span>
-                  </td>
-                  <td valign="top">
-                    <input id="secid-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
                   </td>
                 </tr>
               </c:when>
