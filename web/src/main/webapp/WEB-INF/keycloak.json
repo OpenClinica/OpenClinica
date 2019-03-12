@@ -1,10 +1,10 @@
 {
-  "realm": "${keycloak.realm}",
-  "auth-server-url": "${keycloak.auth-server-url}",
+  "realm": "yogi-aws-dev",
+  "auth-server-url": "https://auth.openclinica-dev.io/auth",
   "ssl-required": "external",
   "resource": "bridge",
   "credentials": {
-    "secret": "${keycloak.client.secret}"
+    "secret": "e3307ce9-5e67-4579-8665-38d447103521"
   },
   "confidential-port": 0
 }

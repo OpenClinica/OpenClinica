@@ -67,12 +67,7 @@ public class CallbackServiceImpl implements CallbackService {
             ub = createUserAccount(request, user, userContextMap);
         }
         updateUser(request, ub, user, userContextMap);
-        boolean isUserUpdated = false;
-        if (StringUtils.equals((String) request.getSession().getAttribute("firstLoginCheck"), "true")) {
-            isUserUpdated = updateStudyUserRoles(request, ub);
-        } else {
-            logger.info("allUserRoles won't be updated for user:" + ub.getName());
-        }
+        boolean isUserUpdated = updateStudyUserRoles(request, ub);
         return new UserAccountHelper(ub, isUserUpdated);
     }
 
