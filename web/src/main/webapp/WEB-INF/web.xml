@@ -2301,4 +2301,14 @@
         <url-pattern>/rest/*</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <display-name>AdvancedSearch</display-name>
+        <servlet-name>AdvancedSearchServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.AdvancedSearchServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>AdvancedSearchServlet</servlet-name>
+        <url-pattern>/ParticipantSearch</url-pattern>
+    </servlet-mapping>
+
 </web-app>

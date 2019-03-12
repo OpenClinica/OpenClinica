@@ -367,9 +367,7 @@ public class ViewStudySubjectServlet extends SecureController {
             if (StringUtils.isNotEmpty(errorData))
                 request.setAttribute("errorData", errorData);
 
-            String participateStatus = getParticipateStatus(parentStudyId);
-            request.setAttribute("participateStatus", participateStatus);
-
+            request.setAttribute("participateStatus", getParticipateStatus(parentStudyId).toLowerCase());
             forwardPage(Page.VIEW_STUDY_SUBJECT);
         }
     }

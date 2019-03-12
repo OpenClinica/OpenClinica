@@ -627,6 +627,9 @@ public enum Page {
     CHOOSE_DOWNLOAD_FORMAT ("/WEB-INF/jsp/submit/chooseDownloadFormat.jsp", "Choose download format"),
     LIST_SUBJECT_DISC_NOTE_SERVLET ("/ListDiscNotesSubjectServlet", "List Disc Notes Servlet"),
 
+    ADVANCED_SEARCH ("/WEB-INF/jsp/" + "managestudy/advancedSearch.jsp", "advanced search"),
+    ADVANCED_SEARCH_SERVLET ("/ParticipantSearch", "advanced search"),
+
     FILE_UPLOAD ("/WEB-INF/jsp/submit/uploadFile.jsp", "Form For File Uploading"),
     //UPLOAD_FILE_SERVLET ("/UploadFile", "Upload File"),
     DOWNLOAD_ATTACHED_FILE ("/WEB-INF/jsp/submit/downloadAttachedFile.jsp", "Download Attached File"),
