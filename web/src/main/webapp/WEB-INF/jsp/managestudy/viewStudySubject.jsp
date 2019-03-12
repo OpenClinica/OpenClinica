@@ -255,6 +255,37 @@
   .error {
     color: red;
   }
+  
+  .invite-input {
+    width: 250px;
+  }
+  .invite-input-halfsize {
+    width: 130px;
+  }
+  #email-input-info {
+    display: inline-block;
+    margin: -4px 0 0 10px;
+    font-style: italic;
+    font-size: 10pt;
+  }
+  #access-code-td {
+    position: relative;
+  }
+  #access-code-input {
+    width: 150px;
+    padding-right: 40px;
+  }
+  #eye {
+    position: absolute;
+    top: 2px;
+    left: 111px;
+    font-size: 18pt;
+    background-color: transparent;
+    padding: 2px 6px;
+  }
+  .grayed-out {
+    color: #999;
+  }
 </style>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -1593,18 +1624,6 @@
                   </td>
                   <td valign="top">
                     <style>
-                      .invite-input {
-                        width: 250px;
-                      }
-                      .invite-input-halfsize {
-                        width: 130px;
-                      }
-                      #email-input-info {
-                        display: inline-block;
-                        margin: -4px 0 0 10px;
-                        font-style: italic;
-                        font-size: 10pt;
-                      }
                       #phone-input {
                         padding: 4px !important;
                         padding-left: 100px !important;
@@ -1649,24 +1668,6 @@
                         margin-left: 11px;
                         display: inline-block;
                         background-position: 0px -44px;
-                      }
-                      #access-code-td {
-                        position: relative;
-                      }
-                      #access-code-input {
-                        width: 150px;
-                        padding-right: 40px;
-                      }
-                      #eye {
-                        position: absolute;
-                        top: 2px;
-                        left: 111px;
-                        font-size: 18pt;
-                        background-color: transparent;
-                        padding: 2px 6px;
-                      }
-                      .grayed-out {
-                        color: #999;
                       }
                     </style>
                     <div id="phone-widget">
