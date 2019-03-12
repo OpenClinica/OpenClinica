@@ -117,6 +117,7 @@ public class KeycloakController {
         }
 
         logger.debug("%%%%%%%%%%%In KeycloakController :getOcUserUuid: " + ocUserUuid);
+        String requestSchema = CoreResources.getRequestSchema(req);
         CoreResources.setRequestSchema(req, "public");
 
         UserAccountHelper userAccountHelper;
@@ -131,6 +132,8 @@ public class KeycloakController {
         } catch (Exception e) {
             logger.error("UserAccountHelper:", e);
             throw e;
+        } finally {
+            CoreResources.setRequestSchema(req, requestSchema);
         }
         UserAccountBean ub = userAccountHelper.getUb();
         if (ub != null && StringUtils.isNotEmpty(ub.getName())) {
