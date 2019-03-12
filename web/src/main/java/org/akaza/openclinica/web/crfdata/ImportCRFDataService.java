@@ -1314,40 +1314,53 @@ public class ImportCRFDataService {
         // JN commenting out the following as we dont need hard edits for these cases, they need to be soft stops and DN
         // should be filed REF MANTIS 6271
 
-        else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
-            // logger.info(itemOid + "is a RADIO or
-            // a SELECT ");
-            // adding a new hard edit check here; response_option mismatch
-            String theValue = matchValueWithOptions(displayItemBean, displayItemBean.getData().getValue(),
-                    displayItemBean.getMetadata().getResponseSet().getOptions());
-            request.setAttribute(itemOid, theValue);
-            logger.debug("        found the value for radio/single: " + theValue);
-            if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
-                // fail it here
-                logger.debug("-- theValue was NULL, the real value was " + displayItemBean.getData().getValue());
-                hardv.put(itemOid, "This is not in the correct response set.");
-                // throw new OpenClinicaException("One of your items did not
-                // have the correct response set. Please review Item OID "
-                // + displayItemBean.getItem().getOid() + " repeat key " +
-                // displayItemBean.getData().getOrdinal(), "");
+        else if (!responseSetIsLongList(displayItemBean)) {
+            if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.RADIO) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECT)) {
+                // logger.info(itemOid + "is a RADIO or
+                // a SELECT ");
+                // adding a new hard edit check here; response_option mismatch
+                String theValue = matchValueWithOptions(displayItemBean, displayItemBean.getData().getValue(),
+                        displayItemBean.getMetadata().getResponseSet().getOptions());
+                request.setAttribute(itemOid, theValue);
+                logger.debug("        found the value for radio/single: " + theValue);
+                if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
+                    // fail it here
+                    logger.debug("-- theValue was NULL, the real value was " + displayItemBean.getData().getValue());
+                    hardv.put(itemOid, "This is not in the correct response set.");
+                    // throw new OpenClinicaException("One of your items did not
+                    // have the correct response set. Please review Item OID "
+                    // + displayItemBean.getItem().getOid() + " repeat key " +
+                    // displayItemBean.getData().getOrdinal(), "");
+                }
+                displayItemBean = importHelper.validateDisplayItemBeanSingleCV(v, displayItemBean, itemOid);
+                // errors = v.validate();
+            } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
+                // logger.info(itemOid + "is a CHECKBOX
+                // or a SELECTMULTI ");
+                String theValue = matchValueWithManyOptions(displayItemBean, displayItemBean.getData().getValue(),
+                        displayItemBean.getMetadata().getResponseSet().getOptions());
+                request.setAttribute(itemOid, theValue);
+                // logger.debug(" found the value for checkbx/multi: " + theValue);
+                if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
+                    // fail it here? found an 0,1 in the place of a NULL
+                    // logger.debug("-- theValue was NULL, the real value was " + displayItemBean.getData().getValue());
+                    hardv.put(itemOid, "This is not in the correct response set.");
+                }
+                displayItemBean = importHelper.validateDisplayItemBeanMultipleCV(v, displayItemBean, itemOid);
+                // errors = v.validate();
             }
-            displayItemBean = importHelper.validateDisplayItemBeanSingleCV(v, displayItemBean, itemOid);
-            // errors = v.validate();
-        } else if (rt.equals(org.akaza.openclinica.bean.core.ResponseType.CHECKBOX) || rt.equals(org.akaza.openclinica.bean.core.ResponseType.SELECTMULTI)) {
-            // logger.info(itemOid + "is a CHECKBOX
-            // or a SELECTMULTI ");
-            String theValue = matchValueWithManyOptions(displayItemBean, displayItemBean.getData().getValue(),
-                    displayItemBean.getMetadata().getResponseSet().getOptions());
-            request.setAttribute(itemOid, theValue);
-            // logger.debug(" found the value for checkbx/multi: " + theValue);
-            if (theValue == null && displayItemBean.getData().getValue() != null && !displayItemBean.getData().getValue().isEmpty()) {
-                // fail it here? found an 0,1 in the place of a NULL
-                // logger.debug("-- theValue was NULL, the real value was " + displayItemBean.getData().getValue());
-                hardv.put(itemOid, "This is not in the correct response set.");
-            }
-            displayItemBean = importHelper.validateDisplayItemBeanMultipleCV(v, displayItemBean, itemOid);
-            // errors = v.validate();
         }
+    }
+
+    // This is checking to see if the question is using a code list. We do not seem to store whether or not
+    // an item is using a long list anywhere in the metadata. Enketo validates this in the front end using the
+    // provided list.
+    private boolean responseSetIsLongList(DisplayItemBean displayItemBean) {
+        ArrayList<ResponseOptionBean> list = displayItemBean.getMetadata().getResponseSet().getOptions();
+        if (list.size() == 1 && list.get(0).getValue().equals("_"))
+            return true;
+        else
+            return false;
     }
 
     private String matchValueWithOptions(DisplayItemBean displayItemBean, String value, List options) {
