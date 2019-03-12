@@ -434,14 +434,39 @@
                                             <td class="table_header_column_top">
                                               <fmt:message key="first_name" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top" id="info-first-name">
+                                            <td class="table_cell_top" id="info-fname">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
+
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="last_name" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell_top" id="info-lname">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+                                          </tr>
+                                          <tr>
+                                            <c:choose>
+                                              <c:when test="${advsearchStatus=='enabled'}">
+                                                <td class="table_header_column_top">
+                                                  <fmt:message key="secondary_ID" bundle="${resword}"/>
+                                                </td>
+                                                <td class="table_cell" id="info-secid">
+                                                  &emsp;&emsp;&emsp;&emsp;
+                                                </td>
+                                              </c:when>
+                                            </c:choose>
 
                                             <td class="table_header_column">
                                               Mobile Number
                                             </td>
-                                            <td class="table_cell" id="info-phone-number">
+                                            <td class="table_cell" id="info-phone-number"
+                                              <c:choose>
+                                                <c:when test="${advsearchStatus!='enabled'}">
+                                                  colspan="3"
+                                                </c:when>
+                                              </c:choose>
+                                            >
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
@@ -460,19 +485,6 @@
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
-
-                                          <c:choose>
-                                            <c:when test="${advsearchStatus=='enabled'}">
-                                              <tr>
-                                                <td class="table_header_column_top">
-                                                  <fmt:message key="partid_identifier" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_cell" id="info-identifier" colspan="3">
-                                                  &emsp;&emsp;&emsp;&emsp;
-                                                </td>
-                                              </tr>
-                                            </c:when>
-                                          </c:choose>
                                         </tbody>
                                       </table>
                                       <!-- End Table Contents -->
@@ -510,9 +522,25 @@
                                         <tbody>
                                           <tr>
                                             <td class="table_header_column_top">
-                                              <fmt:message key="partid_identifier" bundle="${resword}"/>
+                                              <fmt:message key="first_name" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top" id="info-identifier-standalone">
+                                            <td class="table_cell_top" id="info-fname-2">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="last_name" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell_top" id="info-lname-2">
+                                              &emsp;&emsp;&emsp;&emsp;
+                                            </td>
+                                          </tr>
+
+                                          <tr>
+                                            <td class="table_header_column_top">
+                                              <fmt:message key="secondary_ID" bundle="${resword}"/>
+                                            </td>
+                                            <td class="table_cell_top" id="info-secid-2" colspan="3">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
@@ -1638,7 +1666,9 @@
             status: ' '
         };
         participateInfo.phoneNumber = participateInfo.phoneNumber || '';
-        $('#info-first-name').text(participateInfo.firstName);
+        $('#info-fname, #info-fname-2').text(participateInfo.firstName);
+        $('#info-lname, #info-lname-2').text(participateInfo.lastName);
+        $('#info-secid, #info-secid-2').text(participateInfo.identifier);
         $('#info-email').text(participateInfo.email);
         $('#info-phone-number').text(participateInfo.phoneNumber);
         $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
