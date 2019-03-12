@@ -1231,7 +1231,20 @@
                 <input id="lname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
               </td>
             </tr>
-
+            
+            <c:choose>
+              <c:when test="${advsearchStatus=='enabled'}">
+                <tr valign="top">
+                  <td class="formlabel" align="left">
+                    <span><fmt:message key="secondary_ID" bundle="${resword}"/></span>
+                  </td>
+                  <td valign="top">
+                    <input id="secid-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
+                  </td>
+                </tr>
+              </c:when>
+            </c:choose>
+            
             <c:choose>
               <c:when test="${participateStatus=='enabled'}">
                 <tr valign="top">
