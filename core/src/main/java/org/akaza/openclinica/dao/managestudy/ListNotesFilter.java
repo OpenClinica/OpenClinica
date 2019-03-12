@@ -3,6 +3,7 @@ package org.akaza.openclinica.dao.managestudy;
 import java.util.ArrayList;
 import java.util.HashMap;
 import java.util.List;
+import java.util.regex.Pattern;
 
 public class ListNotesFilter implements CriteriaCommand {
 
@@ -44,53 +45,59 @@ public class ListNotesFilter implements CriteriaCommand {
     }
 
     private String buildCriteria(String criteria, String property, Object value) {
+        String filterValue = value.toString();
+
+        Pattern scriptPattern;
+        scriptPattern = Pattern.compile("'|%27|\\\"|%22|--|%2d%2d|/\\*\\*/|%2f\\*\\*%2f|;|%3b|(|)", Pattern.CASE_INSENSITIVE | Pattern.MULTILINE | Pattern.DOTALL);
+        filterValue = scriptPattern.matcher(filterValue).replaceAll("");
+
         if (value != null) {
 			if (property.equals("studySubject.labelExact")){
                 criteria = criteria + " and ";
-                criteria = criteria + " UPPER(" + columnMapping.get(property) + ") = UPPER('" + value.toString() + "')" + " ";
+                criteria = criteria + " UPPER(" + columnMapping.get(property) + ") = UPPER('" + filterValue + "')" + " ";
             }else if (property.equals("studySubject.label") || property.equals("discrepancyNoteBean.description") || property.equals("discrepancyNoteBean.user")) {
                 criteria = criteria + " and ";
-                criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + value.toString() + "%')" + " ";
+                criteria = criteria + " UPPER(" + columnMapping.get(property) + ") like UPPER('%" + filterValue + "%')" + " ";
             } else if (property.equals("siteId")) {
                 criteria = criteria + " and ";
-                criteria = criteria + "ss.study_id in ( SELECT study_id FROM study WHERE unique_identifier like '%"+ value.toString() +"%')";
+                criteria = criteria + "ss.study_id in ( SELECT study_id FROM study WHERE unique_identifier like '%"+ filterValue +"%')";
             } else if (property.equals("age")) {
-                if(value.toString().startsWith(">") || value.toString().startsWith("<")
-                        || value.toString().startsWith("=")){
+                if(filterValue.startsWith(">") || filterValue.startsWith("<")
+                        || filterValue.startsWith("=")){
                     criteria = criteria + " and ";
-                    criteria = criteria + " age " + value.toString();
+                    criteria = criteria + " age " + filterValue;
                 }
             } else if (property.equals("days")) {
-                if(value.toString().startsWith(">") || value.toString().startsWith("<")
-                        || value.toString().startsWith("=")){
+                if(filterValue.startsWith(">") || filterValue.startsWith("<")
+                        || filterValue.startsWith("=")){
                     criteria = criteria + " and ";
-                    criteria = criteria + " days " + value.toString();
+                    criteria = criteria + " days " + filterValue;
                 }
             } else if ("discrepancyNoteBean.disType".equalsIgnoreCase(property)) {
-                if(filterDnTypeQueryAndFailedValidationCheck.equals(value.toString())) {
+                if(filterDnTypeQueryAndFailedValidationCheck.equals(filterValue)) {
                     criteria = criteria + " and ";
                     criteria = criteria + " (dn.discrepancy_note_type_id = 1 or dn.discrepancy_note_type_id = 3)";
                 } else {
                     criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
+                    criteria = criteria + " " + columnMapping.get(property) + " = '" + filterValue + "' ";
                 }
             } else if ("discrepancyNoteBean.resolutionStatus".equalsIgnoreCase(property)) {
-                if (filterResStatusNewAndUpdated.equals(value.toString())) {
+                if (filterResStatusNewAndUpdated.equals(filterValue)) {
                     criteria = criteria + " and ";
                     criteria = criteria + " (dn.resolution_status_id = 1 or dn.resolution_status_id = 2)";
-                } else if (filterResStatusClosedAndClosedModified.equals(value.toString())) {
+                } else if (filterResStatusClosedAndClosedModified.equals(filterValue)) {
                     criteria = criteria + " and ";
                     criteria = criteria + " (dn.resolution_status_id = 4 or dn.resolution_status_id = 6)";
                 }  else {
                     criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
+                    criteria = criteria + " " + columnMapping.get(property) + " = '" + filterValue + "' ";
                 }
             } else if ("discrepancyNoteBean.createdDate".equalsIgnoreCase(property) || "discrepancyNoteBean.updatedDate".equalsIgnoreCase(property) ) {                
                     criteria = criteria + " and ";
-                    criteria = criteria + " " + columnMapping.get(property) + "::timestamp::date = '" + value.toString() + "' ";                
+                    criteria = criteria + " " + columnMapping.get(property) + "::timestamp::date = '" + filterValue + "' ";
             } else {
                 criteria = criteria + " and ";
-                criteria = criteria + " " + columnMapping.get(property) + " = '" + value.toString() + "' ";
+                criteria = criteria + " " + columnMapping.get(property) + " = '" + filterValue + "' ";
             }
         }
         return criteria;
