@@ -59,10 +59,10 @@
 
 <table id="search-table">
   <tr>
-    <td><fmt:message key="participant_id" bundle="${resword}"/></td>
+    <td><fmt:message key="participant_ID" bundle="${resword}"/></td>
     <td><fmt:message key="first_name" bundle="${resword}"/></td>
     <td><fmt:message key="last_name" bundle="${resword}"/></td>
-    <td><fmt:message key="secondary_id" bundle="${resword}"/></td>
+    <td><fmt:message key="secondary_ID" bundle="${resword}"/></td>
     <td></td>
   </tr>
   <tr>
@@ -73,10 +73,10 @@
     <td><input type="button" value="Search" id="btn-search"></td>
   </tr>
   <tr class="gray-bg">
-    <td><fmt:message key="participant_id" bundle="${resword}"/></td>
+    <td><fmt:message key="participant_ID" bundle="${resword}"/></td>
     <td><fmt:message key="first_name" bundle="${resword}"/></td>
     <td><fmt:message key="last_name" bundle="${resword}"/></td>
-    <td><fmt:message key="secondary_id" bundle="${resword}"/></td>
+    <td><fmt:message key="secondary_ID" bundle="${resword}"/></td>
     <td><fmt:message key="actions" bundle="${resword}"/></td>
   </tr>
 </table>
