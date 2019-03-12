@@ -228,7 +228,7 @@ public class UserServiceImpl implements UserService {
 
        public List<OCUserDTO> searchParticipantsByFields(String studyOid, String accessToken,String participantId,String firstName,String lastName,String identifier,UserAccountBean userAccountBean){
            Study study = studyDao.findByOcOID(studyOid);
-           String participantAdvanceSearch = CoreResources.getField("participantAdvanceSearch");
+           String participantAdvanceSearch = CoreResources.getField("module.contacts");
            if(!participantAdvanceSearch.equalsIgnoreCase("enabled")){
                return null;
            }

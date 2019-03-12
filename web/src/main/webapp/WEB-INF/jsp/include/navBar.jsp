@@ -350,12 +350,22 @@
                                                                     <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                                                         <tr>
                                                                             <td>
-                                                                                <form METHOD="GET" action="${urlPrefix}ListStudySubjects">
+                                                                                <form METHOD="GET" action="${urlPrefix}ListStudySubjects" style="margin-block-end:0;">
                                                                                     <input type="text" name="findSubjects_f_studySubject.label"
                                                                                            placeholder='<fmt:message key="enter_participant_ID" bundle="${resword}"/>'
                                                                                            class="navSearch"/>
                                                                                     <input type="hidden" name="navBar" value="yes"/>
                                                                                     <input type="submit" value="View &#8594;" class="navSearchButton"/>
+                                                                                    <c:choose>
+                                                                                        <c:when test="${
+                                                                                          (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
+                                                                                          advsearchStatus=='enabled'
+                                                                                        }">
+                                                                                            <a href="ParticipantSearch" id="advsearch-link">
+                                                                                                <fmt:message key="advanced_search" bundle="${resword}"/>
+                                                                                            </a>
+                                                                                        </c:when>
+                                                                                    </c:choose>
                                                                                 </form>
                                                                             </td>
                                                                             <td align="right" style="font-weight: normal;" class="oc-menu-bar">
