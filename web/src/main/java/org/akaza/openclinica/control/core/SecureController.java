@@ -472,6 +472,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             try {
                     ocUserUuid = controller.getOcUserUuid(request);
+                    ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
             } catch (CustomRuntimeException e) {
                 forwardPage(Page.ERROR);
                 return;
