@@ -7,6 +7,7 @@ import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.submit.ImportCRFInfoSummary;
+import org.akaza.openclinica.controller.dto.StudyEventScheduleDTO;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -76,11 +77,18 @@ public class RestfulServiceHelper {
 	private static final String [] FILE_HEADER_MAPPING = {"ParticipantID"};
 	private static final String ParticipantID_header = "ParticipantID";
 	
+	//Study event bulk schedule CSV file header	
+	private static final String [] STUDY_EVENT_BULK_SCHEDULE_FILE_HEADER_MAPPING = {"ParticipantID", "StudyEventOID", "Ordinal", "StartDate", "EndDate"};
+	private static final String StudyEventOID_header = "StudyEventOID";
+	private static final String Ordinal_header = "Ordinal";
+	private static final String StartDate_header = "StartDate";
+	private static final String EndDate_header = "EndDate";
 	
 	private DataSource dataSource;	
 	private StudyDAO studyDao; 
 	private UserAccountDAO userAccountDAO;
 	private PipeDelimitedDataHelper importDataHelper;
+	private MessageLogger messageLogger;
 
 	
 	public RestfulServiceHelper(DataSource dataSource2) {
@@ -135,6 +143,87 @@ public class RestfulServiceHelper {
 		return subjectKeyList;
 	}
 	
+	
+	/**
+	 * @param file
+	 * @return
+	 * @throws Exception 
+	 */
+	public static ArrayList<StudyEventScheduleDTO> readStudyEventScheduleBulkCSVFile(MultipartFile file, String studyOID, String siteOID) throws Exception {
+		
+		ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = new ArrayList<>();
+
+		//Study event bulk schedule CSV file header position
+		int ParticipantID_index = -999;	
+		int StudyEventOID_index = -999;
+		int Ordinal_index = -999;
+		int StartDate_index = -999;
+		int EndDate_index = -999;
+		
+		try(Scanner sc = new Scanner(file.getInputStream())){
+			
+			 String line;
+			
+			 int lineNm = 1;
+			 int position = 0;
+			 
+			 while (sc.hasNextLine()) {
+				 line = sc.nextLine();
+				 
+				 //in case the last column is empty
+				 if(line.endsWith(",")) {
+					 line = line + " ,";
+				 }
+				 
+				 String[] lineVal= line.split(",", 0);
+				 
+				 // check ParticipantID column number
+				 if(lineNm ==1) {
+					 
+					 for(int i=0; i < lineVal.length;i++) {
+						 String currentHeader = lineVal[i].trim();
+						if(currentHeader.equalsIgnoreCase(ParticipantID_header)) {
+							ParticipantID_index = i;	
+						}else if(currentHeader.equalsIgnoreCase(StudyEventOID_header)) {
+							StudyEventOID_index = i;
+						}else if(currentHeader.equalsIgnoreCase(Ordinal_header)) {
+							Ordinal_index = i;
+						}else if(currentHeader.equalsIgnoreCase(StartDate_header)) {
+							StartDate_index = i;							
+						}else if(currentHeader.equalsIgnoreCase(EndDate_header)) {							
+							EndDate_index = i;
+						}else {
+							;
+						}
+					 }
+				 }else {
+					 StudyEventScheduleDTO studyEventScheduleDTO = new StudyEventScheduleDTO();
+					 
+					 studyEventScheduleDTO.setStudyOID(studyOID);
+					 studyEventScheduleDTO.setSiteOID(siteOID);
+					 studyEventScheduleDTO.setSubjectKey(lineVal[ParticipantID_index]);
+					 studyEventScheduleDTO.setStudyEventOID(lineVal[StudyEventOID_index]);
+					 studyEventScheduleDTO.setOrdinal(lineVal[Ordinal_index]);
+					 studyEventScheduleDTO.setStartDate(lineVal[StartDate_index]);
+					 studyEventScheduleDTO.setEndDate(lineVal[EndDate_index]);
+					 studyEventScheduleDTO.setRowNum(lineNm - 1);
+					 
+					 studyEventScheduleDTOList.add(studyEventScheduleDTO);
+				 }
+				 
+				 
+				
+				 lineNm++;
+			 }
+			
+		} catch (Exception e) {
+			log.error("Exception with cause = {} {}", e.getCause(), e.getMessage());
+	    }
+		
+	
+		 
+		return studyEventScheduleDTOList;
+	}
 	
 	/**
 	 * @param file
@@ -877,10 +966,25 @@ public class RestfulServiceHelper {
 					
 				} catch (ParseException e) {
 					String errMsg = "The input date("+ dateTimeStr + ") can't be parsed, please use the correct format " + dataFormat;
-		        	throw new OpenClinicaException(errMsg,"dateParsedError");
+		        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_PARSE_DATE);
 				}
 		       
 		        
 		        return result;
 		    }
+
+
+		public MessageLogger getMessageLogger() {
+			
+			if(messageLogger == null) {
+				messageLogger = new MessageLogger(this.dataSource);
+			}
+			
+			return messageLogger;
+		}
+
+
+		public void setMessageLogger(MessageLogger messageLogger) {
+			this.messageLogger = messageLogger;
+		}
 }
