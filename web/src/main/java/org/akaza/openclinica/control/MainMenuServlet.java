@@ -9,7 +9,6 @@ package org.akaza.openclinica.control;
 
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.control.admin.EventStatusStatisticsTableFactory;
@@ -27,10 +26,8 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
 import org.akaza.openclinica.dao.submit.SubjectGroupMapDAO;
-import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.i18n.core.LocaleResolver;
 import org.akaza.openclinica.service.StudyBuildService;
-import org.akaza.openclinica.service.StudyBuildServiceImpl;
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InsufficientPermissionException;
 import org.akaza.openclinica.web.table.sdv.SDVUtil;
@@ -48,8 +45,6 @@ import java.io.IOException;
 import java.io.UnsupportedEncodingException;
 import java.net.URLDecoder;
 import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
-import java.util.stream.Collectors;
 
 /**
  * The main controller servlet for all the work behind study sites for
@@ -60,7 +55,6 @@ import java.util.stream.Collectors;
 public class MainMenuServlet extends SecureController {
 
     private final static String STUDY_ENV_UUID = "studyEnvUuid";
-    private final static String FORCE_RENEW_AUTH = "forceRenewAuth";
 
     Locale locale;
     private StudyEventDefinitionDAO studyEventDefinitionDAO;
@@ -129,109 +123,6 @@ public class MainMenuServlet extends SecureController {
         return queryStr;
     }
 
-    /**
-     * The parameter separators are being URL encoded hence not being interpreted as separate parameters
-     * eg. MainMenu?studyEnvUuid%3D3d3a3d9e-8dc8-49ce-9800-810e665f062c%26forceRenewAuth%3Dtrue
-     * @param request
-     * @param parameterName
-     * @return parameter value
-     */
-    private String getParameter(HttpServletRequest request, String parameterName){
-        String paramValue = request.getParameter(parameterName);
-        if (paramValue == null){
-            ArrayList<String> parameters = extractParametersAsListFromParameterNames(request.getParameterNames());
-            paramValue = parameters.indexOf(parameterName) > -1 ? parameters.get(parameters.indexOf(parameterName) + 1) : null;
-        }
-        logger.info("Getting parameter name: " + parameterName + " value: " + paramValue);
-        return paramValue;
-    }
-
-    private ArrayList<String> extractParametersAsListFromParameterNames(Enumeration<String> parameterNames){
-        ArrayList<String> parameters = new ArrayList<>();
-        if (parameterNames.hasMoreElements()) {
-            parameters = new ArrayList<>(Arrays.asList(request.getParameterNames().nextElement().split("=|&")));
-        }
-        return parameters;
-    }
-
-    public boolean processSpecificStudyEnvUuid() throws Exception {
-        logger.info("MainMenuServlet processSpecificStudyEnvUuid:%%%%%%%%" + session.getAttribute("firstLoginCheck"));
-        boolean isRenewAuth = false;
-        String studyEnvUuid = getParameter(request, STUDY_ENV_UUID);
-        if (StringUtils.isEmpty(studyEnvUuid)) {
-            return isRenewAuth;
-        }
-        String forceRenewAuth = getParameter(request, FORCE_RENEW_AUTH);
-        if (processForceRenewAuth(forceRenewAuth))
-            return true;
-        ServletContext context = getServletContext();
-        WebApplicationContext ctx =
-                WebApplicationContextUtils
-                        .getWebApplicationContext(context);
-        String currentSchema = CoreResources.getRequestSchema(request);
-        CoreResources.setRequestSchema(request, "public");
-        StudyBuildService studyService = ctx.getBean("studyBuildService", StudyBuildService.class);
-
-        studyService.updateStudyUserRoles(request, studyService.getUserAccountObject(ub), ub.getActiveStudyId(), studyEnvUuid, false);
-        UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
-
-        ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getName());
-        ub.setRoles(userRoleBeans);
-        session.setAttribute(SecureController.USER_BEAN_NAME, ub);
-        StudyDAO sd = getStudyDAO();
-        StudyBean tmpPublicStudy = sd.findByStudyEnvUuid(studyEnvUuid);
-
-        if (tmpPublicStudy == null) {
-            CoreResources.setRequestSchema(request,currentSchema);
-            return isRenewAuth;
-        }
-
-        StudyUserRoleBean role = ub.getRoleByStudy(tmpPublicStudy.getId());
-
-        if (role.getStudyId() == 0) {
-            logger.error("You have no roles for this study." + studyEnvUuid + " currentStudy is:" + tmpPublicStudy.getName() + " schema:" + tmpPublicStudy.getSchemaName());
-            logger.error("Creating an invalid role, ChangeStudy page will be shown");
-            currentRole = new StudyUserRoleBean();
-            session.setAttribute("userRole", currentRole);
-        } else {
-            currentPublicStudy = tmpPublicStudy;
-            CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
-            currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
-            if (currentStudy.getParentStudyId() > 0) {
-                currentStudy.setParentStudyName(sd.findByPK(currentStudy.getParentStudyId()).getName());
-                currentPublicStudy.setParentStudyName(currentStudy.getParentStudyName());
-            }
-            StudyConfigService scs = new StudyConfigService(sm.getDataSource());
-            scs.setParametersForStudy(currentStudy);
-
-            session.setAttribute("publicStudy", currentPublicStudy);
-            session.setAttribute("study", currentStudy);
-            currentRole = role;
-            session.setAttribute("userRole", role);
-            logger.info("Found role for this study:" + role.getRoleName());
-            if (ub.getActiveStudyId() == currentPublicStudy.getId())
-                return isRenewAuth;
-            ub.setActiveStudyId(currentPublicStudy.getId());
-        }
-
-        return isRenewAuth;
-    }
-
-    private boolean
-    processForceRenewAuth(String renewAuth) throws IOException {
-        logger.info("forceRenewAuth is true");
-        boolean isRenewAuth = false;
-        if (StringUtils.isNotEmpty(renewAuth)) {
-            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
-            if (auth != null) {
-                auth.setAuthenticated(false);
-                SecurityContextHolder.clearContext();
-            }
-            return true;
-        }
-        return isRenewAuth;
-    }
-
     @Override public void processRequest() throws Exception {
 
         FormProcessor fp = new FormProcessor(request);
@@ -249,19 +140,6 @@ public class MainMenuServlet extends SecureController {
         // time log in or pwd expired
         // update last visit date to current date
         UserAccountDAO udao = new UserAccountDAO(sm.getDataSource());
-        if (processSpecificStudyEnvUuid()) {
-            /*
-            TODO: Do we need this logic? Might come in handy if URL passed in contains more params
-            Map<String, String[]> targetMap = new ConcurrentHashMap<>(request.getParameterMap());
-            targetMap.remove("forceRenewAuth");
-            String paramStr = Utils.getParamsString(targetMap);
-            logger.info("Sending redirect to:" + request.getRequestURI() + "?" + paramStr);
-            */
-            /* this handles the scenario when forceRenewAuth is true */
-            session.removeAttribute("userRole");
-            response.sendRedirect(request.getRequestURI() + "?" + STUDY_ENV_UUID  + "=" +  getParameter(request,STUDY_ENV_UUID) +  "&firstLoginCheck=true");
-            return;
-        }
 
         ub.setLastVisitDate(new Date(System.currentTimeMillis()));
         // have to actually set the above to a timestamp? tbh

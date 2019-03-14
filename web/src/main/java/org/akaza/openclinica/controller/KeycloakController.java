@@ -117,6 +117,8 @@ public class KeycloakController {
         }
 
         logger.debug("%%%%%%%%%%%In KeycloakController :getOcUserUuid: " + ocUserUuid);
+        String requestSchema = CoreResources.getRequestSchema(req);
+        CoreResources.setRequestSchema(req, "public");
 
         UserAccountHelper userAccountHelper;
         UserAccountBean prevUser = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
@@ -130,6 +132,8 @@ public class KeycloakController {
         } catch (Exception e) {
             logger.error("UserAccountHelper:", e);
             throw e;
+        } finally {
+            CoreResources.setRequestSchema(req, requestSchema);
         }
         UserAccountBean ub = userAccountHelper.getUb();
         if (ub != null && StringUtils.isNotEmpty(ub.getName())) {
@@ -148,9 +152,10 @@ public class KeycloakController {
                     studyDAO = new StudyDAO(dataSource);
                     publicStudy = studyDAO.findByPublicPK(ub.getActiveStudyId());
                 }
-                String accessToken = (String) req.getSession().getAttribute("accessToken");
 
+                String accessToken = (String) req.getSession().getAttribute("accessToken");
                 callbackService.updateParticipateModuleStatus(accessToken, publicStudy.getOid());
+
                 SecureController.refreshUserRole(req, ub, CoreResources.getPublicStudy(publicStudy.getOid(),dataSource));
             }
 
