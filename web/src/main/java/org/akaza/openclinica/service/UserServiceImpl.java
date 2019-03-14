@@ -95,6 +95,9 @@ public class UserServiceImpl implements UserService {
     StudyBuildService studyBuildService;
 
     @Autowired
+    ValidateService validateService;
+
+    @Autowired
     CryptoConverter cryptoConverter;
 
     private RestfulServiceHelper restfulServiceHelper;
@@ -110,8 +113,7 @@ public class UserServiceImpl implements UserService {
     public static final String ENABLED = "enabled";
 
 
-    private String sbsUrl = CoreResources.getField("SBSUrl");
-    private String advanceSearch = CoreResources.getField("module.contacts");
+    private static String sbsUrl = CoreResources.getField("SBSUrl");
 
     StudyDAO sdao;
 
@@ -150,7 +152,7 @@ public class UserServiceImpl implements UserService {
         UserAccount userAccount = null;
 
         if (studySubject != null) {
-            if (studySubject.getUserId() == null && isParticipateActive(tenantStudy)) {
+            if (studySubject.getUserId() == null && validateService.isParticipateActive(tenantStudy)) {
                 logger.info("Participate has not registered yet");
                 // create participant user Account In Keycloak
                 String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode,studyEnvironment,customerUuid);
@@ -200,12 +202,12 @@ public class UserServiceImpl implements UserService {
         studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
         studySubject.getStudySubjectDetail().setFirstNameForSearchUse(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName().toLowerCase());
 
-         if( isParticipateActive(tenantStudy)) {
+         if( validateService.isParticipateActive(tenantStudy)) {
              studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
              studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber() == null ? "" : participantDTO.getPhoneNumber());
          }
 
-        if(advanceSearch.equalsIgnoreCase(ENABLED)) {
+        if(validateService.isAdvanceSearchEnabled()) {
             studySubject.getStudySubjectDetail().setLastName(participantDTO.getLastName() == null ? "" : participantDTO.getLastName());
             studySubject.getStudySubjectDetail().setLastNameForSearchUse(participantDTO.getLastName() == null ? "" : participantDTO.getLastName().toLowerCase());
 
@@ -234,7 +236,7 @@ public class UserServiceImpl implements UserService {
 
        public List<OCUserDTO> searchParticipantsByFields(String studyOid, String accessToken,String participantId,String firstName,String lastName,String identifier,UserAccountBean userAccountBean){
            Study study = studyDao.findByOcOID(studyOid);
-           if(!advanceSearch.equalsIgnoreCase(ENABLED)){
+           if(!validateService.isAdvanceSearchEnabled()){
                return null;
            }
 
@@ -469,12 +471,6 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public boolean isParticipateActive(Study tenantStudy) {
-               StudyParameterValueDAO spvdao = new StudyParameterValueDAO(dataSource);
-               String participateFormStatus = spvdao.findByHandleAndStudy(tenantStudy.getStudy() != null ? tenantStudy.getStudy().getStudyId() : tenantStudy.getStudyId(), "participantPortal").getValue();
-                if (participateFormStatus.equals(ENABLED))
-                        return true;
-               return false;
-            }
+
 
 }

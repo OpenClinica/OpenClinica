@@ -155,9 +155,8 @@ public class UserController {
         List<OCUserDTO> userDTOs=null;
         // validate accessToken against studyOid ,
         // also validate accessToken's user role crc/investigator
-        if (firstName != null || lastName != null || participantId != null || identifier != null) {
             userDTOs = userService.searchParticipantsByFields(studyOid, accessToken, participantId, firstName, lastName, identifier, userAccountBean);
-        }
+
         logger.info("REST request to POST OCUserDTO : {}", userDTOs);
         return new ResponseEntity<List<OCUserDTO>>(userDTOs, HttpStatus.OK);
     }
