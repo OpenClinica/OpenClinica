@@ -39,8 +39,19 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 <style>
-  .gray-bg {
-    background-color: lightgrey;
+  th {
+    background-color: lightgray;
+    font-weight: normal;
+    text-align: left;
+    padding: 3px;
+  }
+  input[type=button][disabled], input[type=button][disabled]:hover {
+    background: none;
+    background-color: lightgray;
+    color: darkgray;
+  }
+  #btn-search {
+    margin-bottom: 3px;    
   }
 </style>
 
@@ -57,7 +68,7 @@
   <fmt:message key="search_by" bundle="${resword}"/>
 </div>
 
-<table id="search-table">
+<table>
   <tr>
     <td><fmt:message key="participant_ID" bundle="${resword}"/></td>
     <td><fmt:message key="first_name" bundle="${resword}"/></td>
@@ -65,19 +76,19 @@
     <td><fmt:message key="secondary_ID" bundle="${resword}"/></td>
     <td></td>
   </tr>
-  <tr>
+  <tr id="search-inputs">
     <td><input type="text" id="input-id"></td>
     <td><input type="text" id="input-fname"></td>
     <td><input type="text" id="input-lname"></td>
     <td><input type="text" id="input-secid"></td>
-    <td><input type="button" value="Search" id="btn-search"></td>
+    <td><input type="button" value="Search" id="btn-search" disabled="disabled"></td>
   </tr>
-  <tr class="gray-bg">
-    <td><fmt:message key="participant_ID" bundle="${resword}"/></td>
-    <td><fmt:message key="first_name" bundle="${resword}"/></td>
-    <td><fmt:message key="last_name" bundle="${resword}"/></td>
-    <td><fmt:message key="secondary_ID" bundle="${resword}"/></td>
-    <td><fmt:message key="actions" bundle="${resword}"/></td>
+  <tr>
+    <th><fmt:message key="participant_ID" bundle="${resword}"/></th>
+    <th><fmt:message key="first_name" bundle="${resword}"/></th>
+    <th><fmt:message key="last_name" bundle="${resword}"/></th>
+    <th><fmt:message key="secondary_ID" bundle="${resword}"/></th>
+    <th><fmt:message key="actions" bundle="${resword}"/></th>
   </tr>
 </table>
 
@@ -105,5 +116,18 @@ $('#btn-search').click(function() {
           console.log(arguments);
         }
     });
+});
+
+$('#search-inputs').on('change keyup paste', function() {
+  var anyFilled = $('#input-id, #input-fname, #input-lname, #input-secid').filter(function() {
+    return this.value !== '';
+  }).length > 0;
+
+  if (anyFilled) {
+    $('#btn-search').removeAttr('disabled');    
+  }
+  else {
+    $('#btn-search').attr('disabled', 'disabled');
+  }
 });
 </script>
