@@ -257,6 +257,7 @@ public class UserServiceImpl implements UserService {
             userDTO.setPhoneNumber(studySubjectDetail!=null?studySubjectDetail.getPhone():"");
             userDTO.setIdentifier(studySubjectDetail!=null?studySubjectDetail.getIdentifier():"");
             userDTO.setParticipantId(studySubject.getLabel());
+            userDTO.setViewStudySubjectId(studySubject.getStudySubjectId());
          userDTOS.add(userDTO);
         }
 
