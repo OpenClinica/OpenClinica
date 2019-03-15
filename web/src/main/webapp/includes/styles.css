@@ -373,7 +373,7 @@ form[action="CreateDataset"] input {
 form[name="subjectForm"] a, form[action="UpdateStudySubject"] a {
   text-decoration: none; }
 
-form[name="subjectForm"] .formlabel, form[name="subjectForm"] input[type="text"], form[name="subjectForm"] select, form[action="UpdateStudySubject"] .formlabel, form[action="UpdateStudySubject"] input[type="text"], form[action="UpdateStudySubject"] select {
+form[name="subjectForm"] .formlabel, form[name="subjectForm"] input[type="text"], form[name="subjectForm"] select, form[action="UpdateStudySubject"] .formlabel, form[action="UpdateStudySubject"] input[type="text"], form[action="UpdateStudySubject"] select, form[name="pidVerificationForm"] input[type="text"] {
   display: block;
   margin-bottom: 1em;
   margin-right: 1em;

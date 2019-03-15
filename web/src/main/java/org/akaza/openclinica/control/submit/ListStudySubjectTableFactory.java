@@ -12,6 +12,7 @@ import org.akaza.openclinica.bean.submit.SubjectGroupMapBean;
 import org.akaza.openclinica.control.AbstractTableFactory;
 import org.akaza.openclinica.control.DefaultActionsEditor;
 import org.akaza.openclinica.control.ListStudyView;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.managestudy.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.EventCRFDAO;
@@ -75,6 +76,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private UserService userService;
     private HttpServletRequest request;
+    private String isNeedVerification;
 
     final HashMap<Integer, String> imageIconPaths = new HashMap<Integer, String>(8);
 
@@ -83,6 +85,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
     public TableFacade createTable(HttpServletRequest request, HttpServletResponse response) {
         locale = LocaleResolver.getLocale(request);
         session = request.getSession();
+        isNeedVerification = CoreResources.getField("participantIDVerification.enabled");
         TableFacade tableFacade = getTableFacadeImpl(request, response);
         tableFacade.setStateAttr("restore");
         // https://jira.openclinica.com/browse/OC-9952
@@ -248,7 +251,6 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         Collection<StudySubjectBean> items = getStudySubjectDAO().getWithFilterAndSort(getStudyBean(), subjectFilter, subjectSort, rowStart, rowEnd,participateStatusSetFilter);
 
         Collection<HashMap<Object, Object>> theItems = new ArrayList<HashMap<Object, Object>>();
-
         for (StudySubjectBean studySubjectBean : items) {
             StudyBean study = (StudyBean) getStudyDAO().findByPK(studySubjectBean.getStudyId());
 
@@ -256,10 +258,13 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             theItem.put("studySubject", studySubjectBean);
             HtmlBuilder subjectLink = new HtmlBuilder();
 
-            subjectLink
-                    .append("<a href=\"ViewStudySubject?id="
-                            + studySubjectBean.getId());
-            subjectLink.append("\">" + studySubjectBean.getLabel() + "</a>");
+            if (isNeedVerification.equalsIgnoreCase("true")) {
+                subjectLink.append("<a name=\"" + studySubjectBean.getLabel() + "\" class=\"pidVerification\" id=\"pid-" + studySubjectBean.getId() + "\" href=\"javascript:;\">");
+                subjectLink.append(studySubjectBean.getLabel() + "</a>");
+            } else {
+                subjectLink.append("<a href=\"ViewStudySubject?id="+ studySubjectBean.getId());
+                subjectLink.append("\">" + studySubjectBean.getLabel() + "</a>");
+            }
             theItem.put("studySubject.label", subjectLink.toString());
             theItem.put("studySubject.status", studySubjectBean.getStatus());
             theItem.put("enrolledAt", study.getIdentifier());
@@ -893,10 +898,14 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
 
     private String viewStudySubjectLinkBuilder(StudySubjectBean studySubject) {
         HtmlBuilder actionLink = new HtmlBuilder();
-        actionLink
-                .append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"ViewStudySubject?id="
-                        + studySubject.getId());
-        actionLink.append("\"><span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_Reassign1\"/></a>");
+        if (isNeedVerification.equalsIgnoreCase("true")) {
+            actionLink.append("<a name=\"" + studySubject.getLabel() + "\" class=\"pidVerification\" id=\"pid-" + studySubject.getId() + "\" onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"javascript:;\">");
+            actionLink.append("<span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_Reassign1\"/></a>");
+        } else {
+            actionLink.append("<a onmouseup=\"javascript:setImage('bt_View1','icon icon-search');\" onmousedown=\"javascript:setImage('bt_View1','icon icon-search');\" href=\"ViewStudySubject?id="
+                            + studySubject.getId());
+            actionLink.append("\"><span hspace=\"2\" border=\"0\" title=\"View\" alt=\"View\" class=\"icon icon-search\" name=\"bt_Reassign1\"/></a>");
+        }
         actionLink.append("&nbsp;&nbsp;&nbsp;");
         return actionLink.toString();
     }

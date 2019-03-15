@@ -26,6 +26,8 @@
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 
 <script type="text/javascript">
+    var currentPID = "null";
+    var currentPLabel = "null";
     function onInvokeAction(id,action) {
         if(id.indexOf('findSubjects') == -1)  {
         setExportToLimit(id, '');
@@ -51,7 +53,35 @@
         if (params.get('addNewSubject')) {
             jQuery('#addSubject').click();
         }
+
+        jQuery('.pidVerification').click(function() {
+            currentPLabel = jQuery(this)[0].name;
+            currentPID = jQuery(this)[0].id.split("pid-")[1];
+            jQuery.blockUI({ message: jQuery('#pidVerificationForm'), css:{left: "300px", top:"10px" } });
+            setTimeout(function() {
+                jQuery('.blockUI.blockOverlay').css({'opacity':0.9});
+            }, 250);
+        });
+
     });
+
+    function clearPIDVerificationForm() {
+        jQuery.unblockUI();
+        jQuery('#retype_pid').val("");
+        jQuery('#pidv-err').css({'display':'none'});
+        jQuery('#pidv-match').css({'display':'none'});
+    }
+
+    function validatePIDVerificationForm() {
+        if (jQuery('#retype_pid').val() === currentPLabel) {
+            jQuery('#pidv-err').css({'display':'none'});
+            jQuery('#pidv-match').css({'display':'block'});
+            window.location = window.location.origin + "/OpenClinica/ViewStudySubject?id=" + currentPID;
+        } else {
+            jQuery('#pidv-err').css({'display':'block'});
+            jQuery('#pidv-match').css({'display':'none'});
+        }
+    }
 
     window.onload = function() {
         document.getElementById("btn").focus();
@@ -93,7 +123,7 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 
-<h1>   
+<h1>
     <span class="title_manage">
         <fmt:message key="view_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
     </span>
@@ -106,10 +136,10 @@
         <c:if test="${(!study.status.pending)}">
             <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
         </c:if>
-        
+
         <c:if test="${(study.status.pending)}">
             <fmt:message key="study_design_note" bundle="${restext}"/>
-        </c:if>   
+        </c:if>
     </span><br>
     <div style="text-align:center; width:100%;">
         <button id="btn" onclick="hm('box');">OK</button>
@@ -130,6 +160,9 @@
     </div>
 </c:if>
 
+<div id="pidVerificationForm" style="display:none;">
+    <c:import url="../submit/pidVerification.jsp"></c:import>
+</div>
 
 <br>
 <jsp:include page="../include/footer.jsp"/>
