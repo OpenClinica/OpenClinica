@@ -21,7 +21,7 @@
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/plug-ins/1.10.16/api/fnSortNeutral.js"></script>
 
 <script id="result-tmpl" type="text/x-handlebars-template">
-  <tr>
+  <tr class="search-result">
     <td>{{result.participantId}}</td>
     <td>{{result.firstName}}</td>
     <td>{{result.lastName}}</td>
@@ -107,6 +107,8 @@ var tblSearch = $('#tbl-search');
 var resultTmpl = Handlebars.compile($('#result-tmpl').html());
 
 $('#btn-search').click(function() {
+    tblSearch.children('.search-result').remove();
+
     var queryParams = [];
     function addParam(name, selector) {
         var val = $(selector).val();
