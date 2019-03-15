@@ -474,13 +474,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             String ocUserUuid = null;
             System.out.println("Metric1" + new Date());
             if (processSpecificStudyEnvUuid()) {
-            /*
-            TODO: Do we need this logic? Might come in handy if URL passed in contains more params
-            Map<String, String[]> targetMap = new ConcurrentHashMap<>(request.getParameterMap());
-            targetMap.remove("forceRenewAuth");
-            String paramStr = Utils.getParamsString(targetMap);
-            logger.info("Sending redirect to:" + request.getRequestURI() + "?" + paramStr);
-            */
                 /* this handles the scenario when forceRenewAuth is true */
                 session.removeAttribute("userRole");
                 response.sendRedirect(request.getRequestURI() + "?" + STUDY_ENV_UUID  + "=" +  getParameter(request,STUDY_ENV_UUID) +  "&firstLoginCheck=true");
@@ -1471,8 +1464,15 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     public boolean processSpecificStudyEnvUuid() throws Exception {
-        logger.info("MainMenuServlet processSpecificStudyEnvUuid:%%%%%%%%" + session.getAttribute("firstLoginCheck"));
         boolean isRenewAuth = false;
+
+        // Only do this for MainMenuServlet
+        String path = StringUtils.substringAfterLast(request.getRequestURI(), "/");
+
+        if (!path.equalsIgnoreCase("MainMenu")) {
+            return isRenewAuth;
+        }
+        logger.info("MainMenuServlet processSpecificStudyEnvUuid:%%%%%%%%" + session.getAttribute("firstLoginCheck"));
         String studyEnvUuid = getParameter(request, STUDY_ENV_UUID);
         if (StringUtils.isEmpty(studyEnvUuid)) {
             return isRenewAuth;

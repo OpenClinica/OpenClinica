@@ -1,8 +1,10 @@
 package org.akaza.openclinica.service.user;
 
+import liquibase.util.StringUtils;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.UserAccountBean;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.AuthoritiesDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.domain.user.AuthoritiesBean;
@@ -163,8 +165,11 @@ public class CreateUserCoreServiceImpl implements CreateUserCoreService {
 
         createdUserAccountBean.addUserType(userType);
 
+        String requestSchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
         authoritiesDao.saveOrUpdate(new AuthoritiesBean(createdUserAccountBean.getName()));
-
+        if (StringUtils.isNotEmpty(requestSchema))
+            CoreResources.setRequestSchema(requestSchema);
         return createdUserAccountBean;
     }
 
