@@ -66,6 +66,7 @@ import org.springframework.http.ResponseEntity;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
+import org.springframework.security.core.Authentication;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.context.WebApplicationContext;
@@ -148,6 +149,9 @@ import java.util.stream.Collectors;
 public abstract class SecureController extends HttpServlet implements SingleThreadModel {
     protected ServletContext context;
     protected SessionManager sm;
+    private final static String STUDY_ENV_UUID = "studyEnvUuid";
+    private final static String FORCE_RENEW_AUTH = "forceRenewAuth";
+
     // protected final Logger logger =
     // LoggerFactory.getLogger(getClass().getName());
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
@@ -469,10 +473,15 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             String ocUserUuid = null;
             System.out.println("Metric1" + new Date());
-
+            if (processSpecificStudyEnvUuid()) {
+                /* this handles the scenario when forceRenewAuth is true */
+                session.removeAttribute("userRole");
+                response.sendRedirect(request.getRequestURI() + "?" + STUDY_ENV_UUID  + "=" +  getParameter(request,STUDY_ENV_UUID) +  "&firstLoginCheck=true");
+                return;
+            }
             try {
-                    ocUserUuid = controller.getOcUserUuid(request);
-                    ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
+                ocUserUuid = controller.getOcUserUuid(request);
+                ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
             } catch (CustomRuntimeException e) {
                 forwardPage(Page.ERROR);
                 return;
@@ -1412,6 +1421,117 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             return true;
         else
             return false;
+    }
+    private boolean
+    processForceRenewAuth(String renewAuth) throws IOException {
+        logger.info("forceRenewAuth is true");
+        boolean isRenewAuth = false;
+        if (StringUtils.isNotEmpty(renewAuth)) {
+            Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+            if (auth != null) {
+                auth.setAuthenticated(false);
+                SecurityContextHolder.clearContext();
+            }
+            return true;
+        }
+        return isRenewAuth;
+    }
+
+
+    private ArrayList<String> extractParametersAsListFromParameterNames(Enumeration<String> parameterNames){
+        ArrayList<String> parameters = new ArrayList<>();
+        if (parameterNames.hasMoreElements()) {
+            parameters = new ArrayList<>(Arrays.asList(request.getParameterNames().nextElement().split("=|&")));
+        }
+        return parameters;
+    }
+
+    /**
+     * The parameter separators are being URL encoded hence not being interpreted as separate parameters
+     * eg. MainMenu?studyEnvUuid%3D3d3a3d9e-8dc8-49ce-9800-810e665f062c%26forceRenewAuth%3Dtrue
+     * @param request
+     * @param parameterName
+     * @return parameter value
+     */
+    protected String getParameter(HttpServletRequest request, String parameterName){
+        String paramValue = request.getParameter(parameterName);
+        if (paramValue == null){
+            ArrayList<String> parameters = extractParametersAsListFromParameterNames(request.getParameterNames());
+            paramValue = parameters.indexOf(parameterName) > -1 ? parameters.get(parameters.indexOf(parameterName) + 1) : null;
+        }
+        logger.info("Getting parameter name: " + parameterName + " value: " + paramValue);
+        return paramValue;
+    }
+
+    public boolean processSpecificStudyEnvUuid() throws Exception {
+        boolean isRenewAuth = false;
+
+        // Only do this for MainMenuServlet
+        String path = StringUtils.substringAfterLast(request.getRequestURI(), "/");
+
+        if (!path.equalsIgnoreCase("MainMenu")) {
+            return isRenewAuth;
+        }
+        logger.info("MainMenuServlet processSpecificStudyEnvUuid:%%%%%%%%" + session.getAttribute("firstLoginCheck"));
+        String studyEnvUuid = getParameter(request, STUDY_ENV_UUID);
+        if (StringUtils.isEmpty(studyEnvUuid)) {
+            return isRenewAuth;
+        }
+        String forceRenewAuth = getParameter(request, FORCE_RENEW_AUTH);
+        if (processForceRenewAuth(forceRenewAuth))
+            return true;
+        ServletContext context = getServletContext();
+        WebApplicationContext ctx =
+                WebApplicationContextUtils
+                        .getWebApplicationContext(context);
+        String currentSchema = CoreResources.getRequestSchema(request);
+        CoreResources.setRequestSchema(request, "public");
+        StudyBuildService studyService = ctx.getBean("studyBuildService", StudyBuildService.class);
+
+        studyService.updateStudyUserRoles(request, studyService.getUserAccountObject(ub), ub.getActiveStudyId(), studyEnvUuid, false);
+        UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
+
+        ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getName());
+        ub.setRoles(userRoleBeans);
+        session.setAttribute(SecureController.USER_BEAN_NAME, ub);
+        StudyDAO sd = new StudyDAO(sm.getDataSource());
+        StudyBean tmpPublicStudy = sd.findByStudyEnvUuid(studyEnvUuid);
+
+        if (tmpPublicStudy == null) {
+            CoreResources.setRequestSchema(request,currentSchema);
+            return isRenewAuth;
+        }
+
+        StudyUserRoleBean role = ub.getRoleByStudy(tmpPublicStudy.getId());
+
+        if (role.getStudyId() == 0) {
+            logger.error("You have no roles for this study." + studyEnvUuid + " currentStudy is:" + tmpPublicStudy.getName() + " schema:" + tmpPublicStudy.getSchemaName());
+            logger.error("Creating an invalid role, ChangeStudy page will be shown");
+            currentRole = new StudyUserRoleBean();
+            session.setAttribute("userRole", currentRole);
+        } else {
+            currentPublicStudy = tmpPublicStudy;
+            CoreResources.setRequestSchema(request, currentPublicStudy.getSchemaName());
+            currentStudy = sd.findByStudyEnvUuid(studyEnvUuid);
+            if (currentStudy.getParentStudyId() > 0) {
+                currentStudy.setParentStudyName(sd.findByPK(currentStudy.getParentStudyId()).getName());
+                currentPublicStudy.setParentStudyName(currentStudy.getParentStudyName());
+            }
+            StudyConfigService scs = new StudyConfigService(sm.getDataSource());
+            scs.setParametersForStudy(currentStudy);
+
+            session.setAttribute("publicStudy", currentPublicStudy);
+            session.setAttribute("study", currentStudy);
+            currentRole = role;
+            session.setAttribute("userRole", role);
+            logger.info("Found role for this study:" + role.getRoleName());
+            if (ub.getActiveStudyId() == currentPublicStudy.getId())
+                return isRenewAuth;
+            ub.setActiveStudyId(currentPublicStudy.getId());
+            userAccountDAO.update(ub);
+        }
+
+        return isRenewAuth;
     }
 
     public String getPermissionTagsString() {

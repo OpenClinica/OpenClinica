@@ -117,8 +117,6 @@ public class KeycloakController {
         }
 
         logger.debug("%%%%%%%%%%%In KeycloakController :getOcUserUuid: " + ocUserUuid);
-        String requestSchema = CoreResources.getRequestSchema(req);
-        CoreResources.setRequestSchema(req, "public");
 
         UserAccountHelper userAccountHelper;
         UserAccountBean prevUser = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
@@ -132,8 +130,6 @@ public class KeycloakController {
         } catch (Exception e) {
             logger.error("UserAccountHelper:", e);
             throw e;
-        } finally {
-            CoreResources.setRequestSchema(req, requestSchema);
         }
         UserAccountBean ub = userAccountHelper.getUb();
         if (ub != null && StringUtils.isNotEmpty(ub.getName())) {
@@ -144,11 +140,18 @@ public class KeycloakController {
 
             // Public study will be null if there is no active study for this user
             if (ub.getActiveStudyId() != 0) {
-                studyDAO = new StudyDAO(dataSource);
-                StudyBean publicStudy = studyDAO.findByPublicPK(ub.getActiveStudyId());
-                String accessToken = (String) req.getSession().getAttribute("accessToken");
 
+                StudyBean publicStudy = null;
+                publicStudy = (StudyBean) req.getSession().getAttribute("publicStudy");
+
+                if (publicStudy == null) {
+                    studyDAO = new StudyDAO(dataSource);
+                    publicStudy = studyDAO.findByPublicPK(ub.getActiveStudyId());
+                }
+
+                String accessToken = (String) req.getSession().getAttribute("accessToken");
                 callbackService.updateParticipateModuleStatus(accessToken, publicStudy.getOid());
+
                 SecureController.refreshUserRole(req, ub, CoreResources.getPublicStudy(publicStudy.getOid(),dataSource));
             }
 
