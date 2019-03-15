@@ -14,10 +14,20 @@
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
+<script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/plug-ins/1.10.16/api/fnSortNeutral.js"></script>
+
+<script id="result-tmpl" type="text/x-handlebars-template">
+  <tr>
+    <td>{{result.participantId}}</td>
+    <td>{{result.firstName}}</td>
+    <td>{{result.lastName}}</td>
+    <td>{{result.identifier}}</td>
+  </tr>
+</script>
 
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -68,7 +78,7 @@
   <fmt:message key="search_by" bundle="${resword}"/>
 </div>
 
-<table>
+<table id="tbl-search">
   <tr>
     <td><fmt:message key="participant_ID" bundle="${resword}"/></td>
     <td><fmt:message key="first_name" bundle="${resword}"/></td>
@@ -93,6 +103,9 @@
 </table>
 
 <script>
+var tblSearch = $('#tbl-search');
+var resultTmpl = Handlebars.compile($('#result-tmpl').html());
+
 $('#btn-search').click(function() {
     var queryParams = [];
     function addParam(name, selector) {
@@ -110,7 +123,9 @@ $('#btn-search').click(function() {
         type: 'get',
         url: url + queryParams.join('&'),
         success: function(data) {
-          console.log(data);
+          jQuery.each(data, function(i, result) {
+            tblSearch.append(resultTmpl({result: result}));
+          });
         },
         error: function() {
           console.log(arguments);
