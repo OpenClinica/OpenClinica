@@ -1224,11 +1224,19 @@
                 <span><fmt:message key="first_name" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="fname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
-                <span style="float:left; margin: 2px 10px;">
-                  <fmt:message key="last_name" bundle="${resword}"/>
-                </span>
-                <input id="lname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
+                <input id="fname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35"
+                <c:choose>
+                  <c:when test="${advsearchStatus=='enabled'}">
+                    class="formfield form-control invite-input-halfsize">
+                    <span style="float:left; margin: 2px 10px;">
+                      <fmt:message key="last_name" bundle="${resword}"/>
+                    </span>
+                    <input id="lname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
+                  </c:when>
+                  <c:otherwise>
+                    class="formfield form-control invite-input">
+                  </c:otherwise>
+                </c:choose>
               </td>
             </tr>
             
