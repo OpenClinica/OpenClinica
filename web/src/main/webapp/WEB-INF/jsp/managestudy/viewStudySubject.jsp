@@ -465,16 +465,26 @@
                                             <td class="table_header_column_top">
                                               <fmt:message key="first_name" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top" id="info-fname">
+                                            <td class="table_cell_top" id="info-fname"
+                                              <c:choose>
+                                                <c:when test="${advsearchStatus!='enabled'}">
+                                                  colspan="3"
+                                                </c:when>
+                                              </c:choose>
+                                            >
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
 
-                                            <td class="table_header_column_top">
-                                              <fmt:message key="last_name" bundle="${resword}"/>
-                                            </td>
-                                            <td class="table_cell_top" id="info-lname">
-                                              &emsp;&emsp;&emsp;&emsp;
-                                            </td>
+                                            <c:choose>
+                                              <c:when test="${advsearchStatus=='enabled'}">
+                                                <td class="table_header_column_top">
+                                                  <fmt:message key="last_name" bundle="${resword}"/>
+                                                </td>
+                                                <td class="table_cell_top" id="info-lname">
+                                                  &emsp;&emsp;&emsp;&emsp;
+                                                </td>
+                                              </c:when>
+                                            </c:choose>
                                           </tr>
                                           <tr>
                                             <c:choose>
@@ -1224,19 +1234,11 @@
                 <span><fmt:message key="first_name" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="fname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35"
-                <c:choose>
-                  <c:when test="${advsearchStatus=='enabled'}">
-                    class="formfield form-control invite-input-halfsize">
-                    <span style="float:left; margin: 2px 10px;">
-                      <fmt:message key="last_name" bundle="${resword}"/>
-                    </span>
-                    <input id="lname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
-                  </c:when>
-                  <c:otherwise>
-                    class="formfield form-control invite-input">
-                  </c:otherwise>
-                </c:choose>
+                <input id="fname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
+                <span style="float:left; margin: 2px 10px;">
+                  <fmt:message key="last_name" bundle="${resword}"/>
+                </span>
+                <input id="lname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
               </td>
             </tr>
             
