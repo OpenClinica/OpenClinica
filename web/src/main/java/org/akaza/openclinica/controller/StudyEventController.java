@@ -82,6 +82,7 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.ResponseEntity;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
@@ -285,13 +286,13 @@ public class StudyEventController {
 	        @ApiResponse(code = 200, message = "Successful operation"),
 	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
 	@RequestMapping(value = "clinicaldata/studies/{studyOID}/events/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
+    @Async
 	public ResponseEntity<Object> scheduleBulkEventAtStudyLevel(HttpServletRequest request, 
 			MultipartFile file,
 			@PathVariable("studyOID") String studyOID) throws Exception {
 		
     	 CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
-    		 UserAccountBean ub = getUserAccount(request);
-    		
+    		 UserAccountBean ub = getUserAccount(request);    		 
     		 return scheduleEvent(request,file, studyOID, null, ub);
     	 });
     	 
@@ -315,7 +316,7 @@ public class StudyEventController {
 
 
 	private ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, String studyOID, String siteOID,UserAccountBean ub) {
-		
+			
 		ResponseEntity response = null;
 		String logFileName = null;
 		
