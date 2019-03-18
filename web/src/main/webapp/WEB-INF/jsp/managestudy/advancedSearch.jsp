@@ -79,32 +79,45 @@
 </div>
 
 <table id="tbl-search">
-  <tr>
-    <td><fmt:message key="participant_ID" bundle="${resword}"/></td>
-    <td><fmt:message key="first_name" bundle="${resword}"/></td>
-    <td><fmt:message key="last_name" bundle="${resword}"/></td>
-    <td><fmt:message key="secondary_ID" bundle="${resword}"/></td>
-    <td></td>
-  </tr>
-  <tr id="search-inputs">
-    <td><input type="text" id="input-id"></td>
-    <td><input type="text" id="input-fname"></td>
-    <td><input type="text" id="input-lname"></td>
-    <td><input type="text" id="input-secid"></td>
-    <td><input type="button" value="Search" id="btn-search" disabled="disabled"></td>
-  </tr>
-  <tr>
-    <th><fmt:message key="participant_ID" bundle="${resword}"/></th>
-    <th><fmt:message key="first_name" bundle="${resword}"/></th>
-    <th><fmt:message key="last_name" bundle="${resword}"/></th>
-    <th><fmt:message key="secondary_ID" bundle="${resword}"/></th>
-    <th><fmt:message key="actions" bundle="${resword}"/></th>
-  </tr>
+  <thead>
+    <tr>
+      <td><fmt:message key="participant_ID" bundle="${resword}"/></td>
+      <td><fmt:message key="first_name" bundle="${resword}"/></td>
+      <td><fmt:message key="last_name" bundle="${resword}"/></td>
+      <td><fmt:message key="secondary_ID" bundle="${resword}"/></td>
+      <td></td>
+    </tr>
+    <tr id="search-inputs">
+      <td><input type="text" id="input-id"></td>
+      <td><input type="text" id="input-fname"></td>
+      <td><input type="text" id="input-lname"></td>
+      <td><input type="text" id="input-secid"></td>
+      <td><input type="button" value="Search" id="btn-search" disabled="disabled"></td>
+    </tr>
+    <tr>
+      <th><fmt:message key="participant_ID" bundle="${resword}"/></th>
+      <th><fmt:message key="first_name" bundle="${resword}"/></th>
+      <th><fmt:message key="last_name" bundle="${resword}"/></th>
+      <th><fmt:message key="secondary_ID" bundle="${resword}"/></th>
+      <th><fmt:message key="actions" bundle="${resword}"/></th>
+    </tr>
+  </thead>
+  <tbody>
+  </tbody>
 </table>
 
 <script>
-var tblSearch = $('#tbl-search');
 var resultTmpl = Handlebars.compile($('#result-tmpl').html());
+var tblSearch = $('#tbl-search');
+tblSearch.DataTable({
+  searching: false,
+  paging: false,
+  dom: 't',
+  columnDefs: [{
+    targets: -1,
+    orderable: false
+  }]
+});
 
 $('#btn-search').click(function() {
     tblSearch.children('.search-result').remove();
