@@ -109,7 +109,7 @@
 <script>
 var resultTmpl = Handlebars.compile($('#result-tmpl').html());
 var tblSearch = $('#tbl-search');
-tblSearch.DataTable({
+var datatable = tblSearch.DataTable({
   searching: false,
   paging: false,
   dom: 't',
@@ -120,32 +120,39 @@ tblSearch.DataTable({
 });
 
 $('#btn-search').click(function() {
-    tblSearch.children('.search-result').remove();
+  datatable.clear();
 
-    var queryParams = [];
-    function addParam(name, selector) {
-        var val = $(selector).val().trim();
-        if (val)
-            queryParams.push(name + '=' + val);
+  var queryParams = [];
+  function addParam(name, selector) {
+    var val = $(selector).val().trim();
+    if (val)
+      queryParams.push(name + '=' + val);
+  }
+  addParam('participantId', '#input-id');
+  addParam('firstName',     '#input-fname');
+  addParam('lastName',      '#input-lname');
+  addParam('identifier',    '#input-secid');
+
+  var url = '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/searchByFields?';
+  jQuery.ajax({
+    type: 'get',
+    url: url + queryParams.join('&'),
+    success: function(data) {
+      jQuery.each(data, function(i, result) {
+        datatable.rows.add([[
+          result.participantId,
+          result.firstName,
+          result.lastName,
+          result.identifier,
+          ''
+        ]]);
+      });
+      datatable.draw();
+    },
+    error: function() {
+      console.log(arguments);
     }
-    addParam('participantId', '#input-id');
-    addParam('firstName',     '#input-fname');
-    addParam('lastName',      '#input-lname');
-    addParam('identifier',    '#input-secid');
-
-    var url = '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/searchByFields?';
-    jQuery.ajax({
-        type: 'get',
-        url: url + queryParams.join('&'),
-        success: function(data) {
-          jQuery.each(data, function(i, result) {
-            tblSearch.append(resultTmpl({result: result}));
-          });
-        },
-        error: function() {
-          console.log(arguments);
-        }
-    });
+  });
 });
 
 $('#search-inputs').on('change keyup paste', function() {
