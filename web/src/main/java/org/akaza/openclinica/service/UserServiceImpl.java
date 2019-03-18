@@ -15,6 +15,7 @@ import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.rule.action.RuleActionBean;
@@ -94,6 +95,9 @@ public class UserServiceImpl implements UserService {
     StudyBuildService studyBuildService;
 
     @Autowired
+    ValidateService validateService;
+
+    @Autowired
     CryptoConverter cryptoConverter;
 
     private RestfulServiceHelper restfulServiceHelper;
@@ -106,9 +110,10 @@ public class UserServiceImpl implements UserService {
     public static final String PASSWORD_LENGTH = "9";
     public static final String ACCESS_LINK = "accessLink";
     public static final String ACCESS_LINK_PART_URL = "?accessCode=";
+    public static final String ENABLED = "enabled";
 
 
-    private String sbsUrl = CoreResources.getField("SBSUrl");
+    private static String sbsUrl = CoreResources.getField("SBSUrl");
 
     StudyDAO sdao;
 
@@ -147,19 +152,19 @@ public class UserServiceImpl implements UserService {
         UserAccount userAccount = null;
 
         if (studySubject != null) {
-            if (studySubject.getUserId() == null) {
+            if (studySubject.getUserId() == null && validateService.isParticipateActive(tenantStudy)) {
                 logger.info("Participate has not registered yet");
                 // create participant user Account In Keycloak
                 String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode,studyEnvironment,customerUuid);
                 // create participant user Account In Runtime
                     userAccount = createUserAccount(participantDTO, studySubject, ownerUserAccountBean, username, publicStudy, keycloakUserId);
                 // create study subject detail Account
-                    studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.CREATED, userAccount.getUserId());
+                    studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.CREATED, userAccount.getUserId(),tenantStudy);
                     logger.info("Participate user_id: {} and user_status: {} are added in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
 
             } else {
                 // update study subject detail Account
-                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, null, null);
+                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, null, null,tenantStudy);
                     logger.info("Participate with user_id: {} ,it's user_status: {} is updated in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
 
             }
@@ -171,7 +176,7 @@ public class UserServiceImpl implements UserService {
             ParticipantAccessDTO accessDTO= getAccessInfo(accessToken,studyOid,ssid,customerUuid);
 
             sendEmailToParticipant(studySubject,tenantStudy, accessDTO);
-            studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null);
+            studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null,tenantStudy);
 
         }
             ocUserDTO = buildOcUserDTO(studySubject);
@@ -180,7 +185,7 @@ public class UserServiceImpl implements UserService {
     }
 
     private StudySubject saveOrUpdateStudySubject(StudySubject studySubject,OCParticipantDTO participantDTO,
-                                                  UserStatus userStatus, Integer userId){
+                                                  UserStatus userStatus, Integer userId,Study tenantStudy){
 
         if (userId != null){
             studySubject.setUserId(userId);
@@ -197,15 +202,18 @@ public class UserServiceImpl implements UserService {
         studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
         studySubject.getStudySubjectDetail().setFirstNameForSearchUse(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName().toLowerCase());
 
-        studySubject.getStudySubjectDetail().setLastName(participantDTO.getLastName() == null ? "" : participantDTO.getLastName());
-        studySubject.getStudySubjectDetail().setLastNameForSearchUse(participantDTO.getLastName() == null ? "" : participantDTO.getLastName().toLowerCase());
+         if( validateService.isParticipateActive(tenantStudy)) {
+             studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
+             studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber() == null ? "" : participantDTO.getPhoneNumber());
+         }
 
-        studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
-        studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber() == null ? "" : participantDTO.getPhoneNumber());
+        if(validateService.isAdvanceSearchEnabled()) {
+            studySubject.getStudySubjectDetail().setLastName(participantDTO.getLastName() == null ? "" : participantDTO.getLastName());
+            studySubject.getStudySubjectDetail().setLastNameForSearchUse(participantDTO.getLastName() == null ? "" : participantDTO.getLastName().toLowerCase());
 
-        studySubject.getStudySubjectDetail().setIdentifier(participantDTO.getIdentifier() == null ? "" : participantDTO.getIdentifier());
-        studySubject.getStudySubjectDetail().setIdentifierForSearchUse (participantDTO.getIdentifier() == null ? "" : participantDTO.getIdentifier().toLowerCase());
-
+            studySubject.getStudySubjectDetail().setIdentifier(participantDTO.getIdentifier() == null ? "" : participantDTO.getIdentifier());
+            studySubject.getStudySubjectDetail().setIdentifierForSearchUse(participantDTO.getIdentifier() == null ? "" : participantDTO.getIdentifier().toLowerCase());
+        }
         return studySubjectDao.saveOrUpdate(studySubject);
 
     }
@@ -228,8 +236,7 @@ public class UserServiceImpl implements UserService {
 
        public List<OCUserDTO> searchParticipantsByFields(String studyOid, String accessToken,String participantId,String firstName,String lastName,String identifier,UserAccountBean userAccountBean){
            Study study = studyDao.findByOcOID(studyOid);
-           String participantAdvanceSearch = CoreResources.getField("module.contacts");
-           if(!participantAdvanceSearch.equalsIgnoreCase("enabled")){
+           if(!validateService.isAdvanceSearchEnabled()){
                return null;
            }
 
@@ -243,12 +250,14 @@ public class UserServiceImpl implements UserService {
 
         for(StudySubject studySubject:studySubjects){
             OCUserDTO userDTO = new OCUserDTO();
-            userDTO.setFirstName(studySubject.getStudySubjectDetail().getFirstName());
-            userDTO.setLastName(studySubject.getStudySubjectDetail().getLastName());
-            userDTO.setEmail(studySubject.getStudySubjectDetail().getEmail());
-            userDTO.setPhoneNumber(studySubject.getStudySubjectDetail().getPhone());
-            userDTO.setIdentifier(studySubject.getStudySubjectDetail().getIdentifier());
+            StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
+            userDTO.setFirstName(studySubjectDetail!=null?studySubjectDetail.getFirstName():"");
+            userDTO.setLastName(studySubjectDetail!=null?studySubjectDetail.getLastName():"");
+            userDTO.setEmail(studySubjectDetail!=null?studySubjectDetail.getEmail():"");
+            userDTO.setPhoneNumber(studySubjectDetail!=null?studySubjectDetail.getPhone():"");
+            userDTO.setIdentifier(studySubjectDetail!=null?studySubjectDetail.getIdentifier():"");
             userDTO.setParticipantId(studySubject.getLabel());
+            userDTO.setViewStudySubjectId(studySubject.getStudySubjectId());
          userDTOS.add(userDTO);
         }
 
@@ -461,6 +470,8 @@ public class UserServiceImpl implements UserService {
         studyUserRole.setOwnerId(ownerId);
         return studyUserRole;
     }
+
+
 
 
 }

@@ -25,10 +25,7 @@ import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.dao.core.AuditableEntityDAO;
-import org.akaza.openclinica.dao.core.DAODigester;
-import org.akaza.openclinica.dao.core.SQLFactory;
-import org.akaza.openclinica.dao.core.TypeNames;
+import org.akaza.openclinica.dao.core.*;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.apache.commons.lang.StringUtils;
@@ -140,6 +137,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     @Override
     public EntityBean update(EntityBean eb) {
+        String requestSchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
         UserAccountBean uab = (UserAccountBean) eb;
         HashMap variables = new HashMap();
         HashMap nullVars = new HashMap();
@@ -238,6 +237,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
             // "+variables.toString());
         }
 
+        if (StringUtils.isNotEmpty(requestSchema))
+            CoreResources.setRequestSchema(requestSchema);
         return eb;
     }
 
@@ -296,6 +297,9 @@ public class UserAccountDAO extends AuditableEntityDAO {
 
     @Override
     public EntityBean create(EntityBean eb) {
+        String requestSchema = CoreResources.getRequestSchema();
+        CoreResources.setRequestSchema("public");
+
         UserAccountBean uab = (UserAccountBean) eb;
         HashMap variables = new HashMap();
         int id = getNextPK();
@@ -350,6 +354,8 @@ public class UserAccountDAO extends AuditableEntityDAO {
             uab.setId(id);
         }
 
+        if (StringUtils.isNotEmpty(requestSchema))
+            CoreResources.setRequestSchema(requestSchema);
         return uab;
     }
 

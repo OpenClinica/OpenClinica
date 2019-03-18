@@ -488,6 +488,24 @@ public class StudyDAO<K extends String, V extends ArrayList> extends AuditableEn
             return null;
         }
     }
+    
+    public StudyBean findStudyByOid(String studyOid) {
+        StudyBean sb = null;
+        this.unsetTypeExpected();
+        this.setTypesExpected();
+        HashMap variables = new HashMap();        
+        variables.put(new Integer(1), studyOid);
+        ArrayList alist = this.select(digester.getQuery("findStudyByOid"), variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            sb = (StudyBean) this.getEntityFromHashMap((HashMap) it.next());
+            return sb;
+        } else {
+            logger.info("returning null from find by study OID...");
+            return null;
+        }
+    }
     public StudyBean createStepTwo(StudyBean sb) {
         // UPDATE STUDY SET TYPE_ID=?, PROTOCOL_TYPE=?,PROTOCOL_DESCRIPTION=?,
         // PROTOCOL_DATE_VERIFICATION=?, PHASE=?, EXPECTED_TOTAL_ENROLLMENT=?,

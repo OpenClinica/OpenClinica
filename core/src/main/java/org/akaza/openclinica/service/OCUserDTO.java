@@ -12,6 +12,8 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
 
     private String uuid;
 
+    private int viewStudySubjectId;
+
     @NotNull
     private String firstName;
 
@@ -159,6 +161,14 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
         if ( ! Objects.equals(uuid, oCUserDTO.uuid)) { return false; }
 
         return true;
+    }
+
+    public int getViewStudySubjectId() {
+        return viewStudySubjectId;
+    }
+
+    public void setViewStudySubjectId(int viewStudySubjectId) {
+        this.viewStudySubjectId = viewStudySubjectId;
     }
 
     @Override

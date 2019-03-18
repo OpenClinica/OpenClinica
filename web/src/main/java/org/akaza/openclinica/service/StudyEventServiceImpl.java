@@ -82,8 +82,10 @@ public class StudyEventServiceImpl implements StudyEventService {
 				startDt = this.getRestfulServiceHelper().getDateTime(startDate);	
 			}
 			
-			
-			endDt = this.getRestfulServiceHelper().getDateTime(endDate);
+			// endDate is optional
+			if(endDate != null && endDate.trim().length() > 7) {
+				endDt = this.getRestfulServiceHelper().getDateTime(endDate);
+			}			
 			
 	    	if(startDt == null) {
 	    		errMsg = "start date can't be parsed as a valid date,please enter in correct date format";
@@ -101,7 +103,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	    	 */
 	    	int sampleOrdinal = -999;
 	    	try {
-	    		if(sampleOrdinalStr != null) {
+	    		if(sampleOrdinalStr != null && sampleOrdinalStr.trim().length() > 0) {
 		    		sampleOrdinal = Integer.parseInt(sampleOrdinalStr);			
 		    	}else {
 		    		sampleOrdinal = 1;
@@ -117,13 +119,13 @@ public class StudyEventServiceImpl implements StudyEventService {
 	    	StudyDAO studyDao = this.getMsStudyDao();
 	    	
 	    	// check study first
-	    	currentStudy = studyDao.findByOid(studyOID);
+	    	currentStudy = studyDao.findStudyByOid(studyOID);
 	    	
 	    	if(currentStudy == null) {
-	    		errMsg = "A new study event could not be scheduled, because the study {" + studyOID + "} is not existing in the system.";
+	    		errMsg = "The study {" + studyOID + "} is not existing in the system.";
 	    		throw new OpenClinicaException(errMsg,ErrorConstants.ERR_STUDY_NOT_EXIST);
 	    	}else if (currentStudy.getStatus().equals(Status.LOCKED)) {
-	    		errMsg = "A new study event could not be scheduled, because the study {" + studyOID +"} has been LOCKED.";
+	    		errMsg = "The study {" + studyOID +"} has been LOCKED.";
 	    		throw new OpenClinicaException(errMsg,ErrorConstants.ERR_STUDY_LOCKED);
 	    	}
 	    	// continue check site
@@ -131,7 +133,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	    		currentSiteStudy = studyDao.findSiteByOid(studyOID,siteOID);
 	    		
 	    		if(currentSiteStudy == null) {
-	        		errMsg = "A new study event could not be scheduled if its study site {" + siteOID +"} is not existing in the system.";
+	        		errMsg = "The study site {" + siteOID +"} is not existing in the system.";
 	        		throw new OpenClinicaException(errMsg,ErrorConstants.ERR_SITE_NOT_EXIST);
 	        	}
 	    	}
@@ -152,7 +154,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	    	}
 	    	
 	        if (errMsg != null) {           
-	             throw new OpenClinicaException(errMsg, errMsg);
+	             throw new OpenClinicaException(errMsg, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
 	        }  
 	    	    
 	        /**
@@ -162,12 +164,12 @@ public class StudyEventServiceImpl implements StudyEventService {
 	     
 	        studySubject = (StudySubjectBean) sdao.findByLabelAndStudy(participantId, currentStudy);
 	        if(studySubject == null || (studySubject.getId() == 0 && studySubject.getLabel().trim().length() == 0)) {
-	        	errMsg = "A study event could not be scheduled if the study subject {" + studySubjectKey +"} can not be found in the system.";
+	        	errMsg = "The study subject {" + studySubjectKey +"} can not be found in the system.";
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NO_SUBJECT_FOUND);
 	        }
 	        Status subjectStatus = studySubject.getStatus();
 	        if ("removed".equalsIgnoreCase(subjectStatus.getName()) || "auto-removed".equalsIgnoreCase(subjectStatus.getName())) {
-	        	errMsg = "A study event could not be scheduled if the study subject {" + studySubjectKey +"} has been removed.";
+	        	errMsg = "The study subject {" + studySubjectKey +"} has been removed.";
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_SUBJECT_REMOVED);
 	        }
 	      
@@ -202,7 +204,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        
 	            
 	        if (!subjectMayReceiveStudyEvent(dataSource, definition, studySubject,sampleOrdinal)) {
-	        	errMsg ="This event can't be scheduled, since the event is NON repeating, and an event of this type already exists for the specified participant.";
+	        	errMsg ="The event is NON repeating, and an event of this type already exists for the specified participant.";
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NON_REPEATING_ALREADY_EXISIT);
 	           
 	        }
@@ -213,7 +215,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        StudyEventDAO sed = this.getSeDao();
 	        int maxSampleOrdinal = sed.getMaxSampleOrdinal(definition, studySubject) + 1;
 	        if(sampleOrdinal > maxSampleOrdinal) {
-	        	errMsg ="This type of event may not be scheduled to the specified participant, because the ordinal is out of sequential scope,the current ordinal can't be greater than " + maxSampleOrdinal;
+	        	errMsg ="The ordinal is out of sequential scope,the current ordinal can't be greater than " + maxSampleOrdinal;
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_GREATER_THAN_MAX_ORDINAL);
 	        }
 	        	        
@@ -238,13 +240,13 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        studyEvent = (StudyEventBean) sed.create(studyEvent);
 	     
 	        if (!studyEvent.isActive()) {
-	            throw new OpenClinicaException("Event is not scheduled","NotActive");
+	            throw new OpenClinicaException("Event is not scheduled",ErrorConstants.ERR_EVENT_NOT_ACTIVE);
 	        }
 	
     	}catch(OpenClinicaException e) {
 			 message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " Failed.";
 		     responseDTO.setMessage(message);	     
-		     responseDTO.getErrors().add(e.getOpenClinicaMessage());	
+		     responseDTO.getErrors().add(e.errorID+":" +e.getOpenClinicaMessage());	
 		
 		     return responseDTO;
     	}
@@ -285,7 +287,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        if (studyEventDefinition.isRepeating()) {  
 	        	for(StudyEventBean studyEvent:allEvents) {
 	        		if(studyEvent.getSampleOrdinal() == ordinal) {
-	        			throw new OpenClinicaException("found repeating event with same ordinal ","sameOrdinal");
+	        			throw new OpenClinicaException("found repeating event with same ordinal " + ordinal,ErrorConstants.ERR_ALREADY_EXISIT);
 	        		}
 	        	}
 	           

@@ -27,6 +27,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.controller.dto.StudyEventScheduleDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
@@ -47,6 +48,7 @@ import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
 import org.akaza.openclinica.domain.datamap.StudyParameterValue;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
@@ -232,8 +234,116 @@ public class StudyEventController {
     	return scheduleEvent(request, studyOID, null,studyEventOID,subjectKey,ordinal,startDate,endDate);
 	}
     
+    @ApiOperation(value = "To schedule an event for participants at site level in bulk",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successful operation"),
+	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
+	@RequestMapping(value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/events/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
+	public ResponseEntity<Object> scheduleBulkEventAtSiteLevel(HttpServletRequest request,
+			MultipartFile file,
+			@PathVariable("studyOID") String studyOID,
+			@PathVariable("siteOID") String siteOID) throws Exception {
+		
+    	
+    	return scheduleEvent(request,file, studyOID, siteOID);
+	}
+    
+    @ApiOperation(value = "To schedule an event for participants at study level in bulk",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
+	@ApiResponses(value = {
+	        @ApiResponse(code = 200, message = "Successful operation"),
+	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
+	@RequestMapping(value = "clinicaldata/studies/{studyOID}/events/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
+	public ResponseEntity<Object> scheduleBulkEventAtStudyLevel(HttpServletRequest request, 
+			MultipartFile file,
+			@PathVariable("studyOID") String studyOID) throws Exception {
+		
+		
+    	return scheduleEvent(request,file, studyOID, null);
+	}
     
 
+
+	private ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, String studyOID, String siteOID) {
+		
+		ResponseEntity response = null;
+		
+		/**
+         * log error / info into log file 
+         * Response should be a logfile with columns - 
+         * Row, ParticipantID, StudyEventOID, Ordinal, Status, ErrorMessage
+         */ 
+    	String logFileName = null;
+    	if(siteOID == null) {
+    		logFileName = studyOID+"_log.txt";
+    	}else {
+    		logFileName = studyOID+"_"+siteOID+"_log.txt";
+    	}
+		
+		try {
+			if (!file.isEmpty()) {
+				 String fileNm = file.getOriginalFilename();
+				 
+				 //only support CSV file
+				 if(!(fileNm.endsWith(".csv")) ){
+					 throw new OpenClinicaSystemException("errorCode.notSupportedFileFormat","The file format is not supported at this time, please send CSV file, like *.csv ");
+				 }
+		
+				// read csv file
+				 ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = RestfulServiceHelper.readStudyEventScheduleBulkCSVFile(file, studyOID, siteOID);
+				 
+				 //schedule events
+				 for(StudyEventScheduleDTO studyEventScheduleDTO:studyEventScheduleDTOList) {
+					 String studyEventOID = studyEventScheduleDTO.getStudyEventOID();
+					 String participantId = studyEventScheduleDTO.getSubjectKey();
+					 String sampleOrdinalStr = studyEventScheduleDTO.getOrdinal();
+					 String startDate = studyEventScheduleDTO.getStartDate();
+					 String endDate = studyEventScheduleDTO.getEndDate();
+					 int rowNum = studyEventScheduleDTO.getRowNum();
+					 
+					 RestReponseDTO responseTempDTO = null;	    	    	
+				     String status="";
+				     String message="";
+				    	
+				     responseTempDTO = studyEventService.scheduleStudyEvent(request, studyOID, siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
+				    
+				     /**
+			         *  response
+			         */
+			    	if(responseTempDTO.getErrors().size() > 0) {
+			    		status = "Failed";
+			    		message = responseTempDTO.getErrors().get(0).toString();
+			 	      
+			    	}else{
+			    		status = "Sucessful";
+			    		message = "Scheduled";
+			 	       
+			    	}
+                    
+                	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
+                	String recordNum = null;
+                	String headerLine = "Row|ParticipantID|StudyEventOID|Ordinal|Status|ErrorMessage";
+                	String msg = null;
+                	msg = rowNum + "|" + participantId + "|" + studyEventOID +"|"+ sampleOrdinalStr +"|" + status + "|"+message;
+                	String subDir = "study-event-schedule";
+    	    		this.getRestfulServiceHelper().getMessageLogger().writeToLog(subDir,logFileName, headerLine, msg, request);
+    	    		
+    	    		
+				 }
+				 
+			}
+			
+		} catch (Exception e) {
+			// TODO Auto-generated catch block
+			e.printStackTrace();
+		}
+		
+		RestReponseDTO responseDTO = new RestReponseDTO();
+		String finalMsg = "Please check detail schedule information in log file:" + logFileName;
+		responseDTO.setMessage(finalMsg);
+		response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.OK);
+		
+		return response;
+	}
 	public ResponseEntity<Object> scheduleEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId,String sampleOrdinalStr, String startDate,String endDate){
 	    	ResponseEntity response = null;
 	    	RestReponseDTO responseDTO = null;	    	    	
