@@ -124,7 +124,7 @@ $('#btn-search').click(function() {
 
     var queryParams = [];
     function addParam(name, selector) {
-        var val = $(selector).val();
+        var val = $(selector).val().trim();
         if (val)
             queryParams.push(name + '=' + val);
     }
@@ -150,7 +150,7 @@ $('#btn-search').click(function() {
 
 $('#search-inputs').on('change keyup paste', function() {
   var anyFilled = $('#input-id, #input-fname, #input-lname, #input-secid').filter(function() {
-    return this.value !== '';
+    return this.value.trim() !== '';
   }).length > 0;
 
   if (anyFilled) {
