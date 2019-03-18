@@ -13,6 +13,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.apache.commons.lang.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
@@ -24,7 +25,6 @@ import org.springframework.web.context.request.ServletRequestAttributes;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.text.SimpleDateFormat;
-import java.time.Instant;
 import java.util.*;
 
 /**
@@ -56,14 +56,15 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	@Autowired
 	private StudyEventDao studyEventDao;
 
+	@Autowired
+	private EventCrfDao eventCrfDao;
+
 	private StudyDao studyDao;
 
 	private StudySubjectDao studySubjectDao;
 
 	private StudyEventDefinitionDao studyEventDefDao;
 
-	private boolean collectDns = true;
-	private boolean collectAudits = true;
 	private AuditLogEventDao auditEventDAO;
 	private Locale locale;
 
@@ -82,21 +83,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		this.auditEventDAO = auditEventDAO;
 	}
 
-	public boolean isCollectDns() {
-		return collectDns;
-	}
-
-	public void setCollectDns(boolean collectDns) {
-		this.collectDns = collectDns;
-	}
-
-	public boolean isCollectAudits() {
-		return collectAudits;
-	}
-
-	public void setCollectAudits(boolean collectAudits) {
-		this.collectAudits = collectAudits;
-	}
+	private ODMFilterDTO odmFilter;
 
 	public StudyEventDefinitionDao getStudyEventDefDao() {
 		return studyEventDefDao;
@@ -122,19 +109,19 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 	}
 
-	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID,int userId,boolean crossForm) {
+	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID,int userId, ODMFilterDTO odmFilter) {
 		LinkedHashMap<String, OdmClinicalDataBean> hm = new LinkedHashMap<String, OdmClinicalDataBean>();
-
+		this.odmFilter = odmFilter;
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
 		List<StudySubject> studySubjs = study.getStudySubjects();
 		if (study.getStudies().size() < 1) {
-			hm.put(studyOID, constructClinicalData(study, studySubjs,userId,crossForm));
+			hm.put(studyOID, constructClinicalData(study, studySubjs,userId));
 		}
 		// return odmClinicalDataBean;
 		else {
-			hm.put(studyOID, constructClinicalData(study, studySubjs,userId,crossForm));// at study level
+			hm.put(studyOID, constructClinicalData(study, studySubjs,userId));// at study level
 			for (Study s : study.getStudies()) {// all the sites
-				hm.put(s.getOc_oid(), constructClinicalData(s, s.getStudySubjects(),userId,crossForm));
+				hm.put(s.getOc_oid(), constructClinicalData(s, s.getStudySubjects(),userId));
 			}
 		}
 
@@ -150,10 +137,11 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return studySubjs;
 	}
 
-	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID,int userId ,boolean crossForm) {
+	public OdmClinicalDataBean getClinicalData(String studyOID, String studySubjectOID, int userId, ODMFilterDTO odmFilter) {
 		Study study = getStudyDao().findByColumnName(studyOID, "oc_oid");
+		this.odmFilter = odmFilter;
 
-		return constructClinicalData(study, listStudySubjects(studySubjectOID),userId,crossForm);
+		return constructClinicalData(study, listStudySubjects(studySubjectOID), userId);
 	}
 
 	public StudyDao getStudyDao() {
@@ -164,17 +152,17 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		this.studyDao = studyDao;
 	}
 
-	private OdmClinicalDataBean constructClinicalData(Study study, List<StudySubject> studySubjs,int userId,boolean crossForm  ) {
+	private OdmClinicalDataBean constructClinicalData(Study study, List<StudySubject> studySubjs, int userId) {
 
-		return constructClinicalDataStudy(studySubjs, study, null, null,userId,crossForm);
+		return constructClinicalDataStudy(studySubjs, study, null, null, userId);
 	}
 
-	private OdmClinicalDataBean constructClinicalDataStudy(List<StudySubject> studySubjs, Study study, List<StudyEvent> studyEvents, String formVersionOID,int userId,boolean crossForm) {
+	private OdmClinicalDataBean constructClinicalDataStudy(List<StudySubject> studySubjs, Study study, List<StudyEvent> studyEvents, String formVersionOID, int userId) {
 		OdmClinicalDataBean odmClinicalDataBean = new OdmClinicalDataBean();
 		ExportSubjectDataBean expSubjectBean;
 		List<ExportSubjectDataBean> exportSubjDataBeanList = new ArrayList<ExportSubjectDataBean>();
 		List<String> tagIds = null;
-		if(!crossForm) {
+		if(!odmFilter.isCrossForm()) {
 			StudyBean studyBean = new StudyBean();
 			studyBean.setId(study.getStudyId());
 			studyBean.setStudyEnvUuid(study.getStudyEnvUuid());
@@ -189,7 +177,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				studyEvents = (ArrayList<StudyEvent>) studyEventDao.fetchListSEs(studySubj.getOcOid());
 
 			if (studyEvents != null) {
-				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID,userId,crossForm,tagIds);
+				expSubjectBean = setExportSubjectDataBean(studySubj, study, studyEvents, formVersionOID,userId, tagIds);
 				exportSubjDataBeanList.add(expSubjectBean);
 
 				odmClinicalDataBean.setExportSubjectData(exportSubjDataBeanList);
@@ -203,7 +191,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	}
 
 	@SuppressWarnings("unchecked")
-	private ExportSubjectDataBean setExportSubjectDataBean(StudySubject studySubj, Study study, List<StudyEvent> studyEvents, String formVersionOID,int userId,boolean crossForm,List<String> tagIds) {
+	private ExportSubjectDataBean setExportSubjectDataBean(StudySubject studySubj, Study study, List<StudyEvent> studyEvents, String formVersionOID, int userId, List<String> tagIds) {
 
 		ExportSubjectDataBean exportSubjectDataBean = new ExportSubjectDataBean();
 
@@ -227,7 +215,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 				exportSubjectDataBean.setUniqueIdentifier(studySubj.getSubject().getUniqueIdentifier());
 			exportSubjectDataBean.setSecondaryId(studySubj.getSecondaryLabel());
 			exportSubjectDataBean.setStatus(studySubj.getStatus().toString());
-			if (isCollectAudits())
+			if (odmFilter.isIncludeAudit())
 				exportSubjectDataBean.setAuditLogs(fetchAuditLogs(studySubj.getStudySubjectId(), "study_subject", studySubj.getOcOid(), null));
 			AuditLogsBean subjectGroupMapLogs = fetchAuditLogs(studySubj.getStudySubjectId(), "subject_group_map", studySubj.getOcOid(), null);
 			AuditLogsBean subjectLogs = fetchAuditLogs(studySubj.getSubject().getSubjectId(), "subject", studySubj.getOcOid(), null);
@@ -235,10 +223,10 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			exportSubjectDataBean.getAuditLogs().getAuditLogs().addAll(subjectGroupMapLogs.getAuditLogs());
 			exportSubjectDataBean.getAuditLogs().getAuditLogs().addAll(subjectLogs.getAuditLogs());
 			Collections.sort(exportSubjectDataBean.getAuditLogs().getAuditLogs());
-			if (isCollectDns())
+			if (odmFilter.isIncludeDN())
 				exportSubjectDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(studySubj));
 
-			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(study, studySubj, studyEvents,formVersionOID,userId,crossForm,tagIds));
+			exportSubjectDataBean.setExportStudyEventData(setExportStudyEventDataBean(study, studySubj, studyEvents,formVersionOID, userId, tagIds));
 
 			exportSubjectDataBean.setSubjectOID(studySubj.getOcOid());
 
@@ -264,7 +252,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return subjectBelongs;
 	}
 
-	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(Study study, StudySubject ss, List<StudyEvent> sEvents, String formVersionOID, int userId,boolean crossForm,List<String> tagIds) {
+	private ArrayList<ExportStudyEventDataBean> setExportStudyEventDataBean(Study study, StudySubject ss, List<StudyEvent> sEvents, String formVersionOID, int userId, List<String> tagIds) {
 		ArrayList<ExportStudyEventDataBean> al = new ArrayList<ExportStudyEventDataBean>();
 
 		SimpleDateFormat sdf = new SimpleDateFormat("yyyy-MM-dd");
@@ -297,12 +285,12 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 					expSEBean.setAgeAtEvent(Utils.getAge(se.getStudySubject().getSubject().getDateOfBirth(), se.getDateStart()));
 
 				expSEBean.setStatus(fetchStudyEventStatus(se.getSubjectEventStatusId()));
-				if (collectAudits)
+				if (odmFilter.isIncludeAudit())
 					expSEBean.setAuditLogs(fetchAuditLogs(se.getStudyEventId(), "study_event", se.getStudyEventDefinition().getOc_oid(), null));
-				if (collectDns)
+				if (odmFilter.isIncludeDN())
 					expSEBean.setDiscrepancyNotes(fetchDiscrepancyNotes(se));
 
-				expSEBean.setExportFormData(getFormDataForClinicalStudy(study, ss, se, formVersionOID,userId,crossForm,tagIds));
+				expSEBean.setExportFormData(getFormDataForClinicalStudy(study, ss, se, formVersionOID, userId ,tagIds));
 				expSEBean.setStudyEventDefinition(se.getStudyEventDefinition());
 				al.add(expSEBean);
 			}
@@ -311,7 +299,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return al;
 	}
 
-	private ArrayList<ExportFormDataBean> getFormDataForClinicalStudy(Study study, StudySubject ss, StudyEvent se, String formVersionOID,int userId,boolean crossForm,List<String> tagIds) {
+	private ArrayList<ExportFormDataBean> getFormDataForClinicalStudy(Study study, StudySubject ss, StudyEvent se, String formVersionOID, int userId, List<String> tagIds) {
 		List<ExportFormDataBean> formDataBean = new ArrayList<ExportFormDataBean>();
 		boolean formCheck = true;
 		if (formVersionOID != null)
@@ -319,108 +307,115 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		boolean hiddenCrfCheckPassed = true;
 		List<CrfBean> hiddenCrfs = new ArrayList<CrfBean>();
 		UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
-		for (EventCrf ecrf : se.getEventCrfs()) {
-			EventDefinitionCrf eventDefinitionCrf = null;
-			List<EventDefinitionCrf> edcs = se.getStudyEventDefinition().getEventDefinitionCrfs();
-			hiddenCrfCheckPassed = true;
-			int siteId = 0;
-			int parentStudyId = 0;
-			if (study.getStudy() != null) {
-				// it is site subject
 
-				if (isActiveRoleAtSite) {
-					siteId = study.getStudyId();
-					parentStudyId = study.getStudy().getStudyId();
-					hiddenCrfs = listOfHiddenCrfs(siteId, parentStudyId, edcs, ecrf);
-				} else {
-					parentStudyId = study.getStudy().getStudyId();
-					hiddenCrfs = listOfHiddenCrfs(parentStudyId, parentStudyId, edcs, ecrf);
-				}
+		List<EventCrf> eventCrfs;
+		if (odmFilter.showArchived()){
+			eventCrfs = se.getEventCrfs();}
+		else{
+			eventCrfs = eventCrfDao.findNonArchivedByStudyEventId(se.getStudyEventId());}
 
-				if (hiddenCrfs.contains(ecrf.getCrfVersion().getCrf())) {
-					hiddenCrfCheckPassed = false;
-				}
+		for (EventCrf ecrf : eventCrfs) {
+				EventDefinitionCrf eventDefinitionCrf = null;
+				List<EventDefinitionCrf> edcs = se.getStudyEventDefinition().getEventDefinitionCrfs();
+				hiddenCrfCheckPassed = true;
+				int siteId = 0;
+				int parentStudyId = 0;
+				if (study.getStudy() != null) {
+					// it is site subject
 
-				eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-						se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
-
-				if (eventDefinitionCrf == null) {
-					eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-							se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudy().getStudyId());
-				}
-
-			} else {
-				eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
-						se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
-
-			}
-
-
-			//UserAccount userAccount = getUserAccountDao().findByUserId(userId);
-			if(crossForm) {
-				tagIds = loadPermissionTags();
-            }
-
-			List <EventDefinitionCrfPermissionTag> edcPTagIds=
-					getEventDefinitionCrfPermissionTagDao().findByEdcIdTagId(
-							eventDefinitionCrf.getEventDefinitionCrfId(),eventDefinitionCrf.getParentId()!=null? eventDefinitionCrf.getParentId(): 0, tagIds);
-			if(edcPTagIds.size()!=0){
-              continue;
-			}
-
-
-
-			// This logic is to use the same method for both S_OID/SS_OID/*/* and full path
-			if (hiddenCrfCheckPassed) {
-				if (!formCheck) {
-					if (ecrf.getCrfVersion().getOcOid().equals(formVersionOID))
-						formCheck = true;
-					else
-						formCheck = false;
-				}
-				if (formCheck) {
-					ExportFormDataBean dataBean = new ExportFormDataBean();
-
-					dataBean.setEventDefinitionCrf(eventDefinitionCrf);
-					dataBean.setEventCrf(ecrf);
-					dataBean.setFormLayout(ecrf.getFormLayout());
-					dataBean.setFormName(ecrf.getCrfVersion().getCrf().getName());
-					dataBean.setItemGroupData(
-							fetchItemData(ecrf.getCrfVersion().getItemGroupMetadatas(), ecrf.getEventCrfId(), ecrf.getCrfVersion().getVersioningMaps(), ecrf));
-					dataBean.setFormOID(ecrf.getCrfVersion().getCrf().getOcOid());
-					if (ecrf.getDateInterviewed() != null)
-						dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
-					if (ecrf.getInterviewerName() != null)
-						dataBean.setInterviewerName(ecrf.getInterviewerName());
-					// dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(getLocale()));
-					dataBean.setStatus(fetchEventCRFStatus(ecrf));
-					dataBean.setCreatedDate(ecrf.getDateCreated());
-					dataBean.setCreatedBy(ecrf.getUserAccount().getUserName());
-					dataBean.setUpdatedDate(ecrf.getDateUpdated());
-					//UserAccount updatedUserAccount = userAccountDao.findById(ecrf.getUpdateId());
-                    UserAccountBean updatedUserAccount = null;
-                    if (ecrf.getUpdateId() != null) {
-                        updatedUserAccount = (UserAccountBean) userAccountDAO.findByPK(ecrf.getUpdateId());
-                    }
-					if(updatedUserAccount != null && updatedUserAccount.getId() != 0) {
-						dataBean.setUpdatedBy(updatedUserAccount.getName());
-					}else {
-						// or not set?
-						dataBean.setUpdatedBy(ecrf.getUserAccount().getUserName());
+					if (isActiveRoleAtSite) {
+						siteId = study.getStudyId();
+						parentStudyId = study.getStudy().getStudyId();
+						hiddenCrfs = listOfHiddenCrfs(siteId, parentStudyId, edcs, ecrf);
+					} else {
+						parentStudyId = study.getStudy().getStudyId();
+						hiddenCrfs = listOfHiddenCrfs(parentStudyId, parentStudyId, edcs, ecrf);
 					}
-					
-					if (ecrf.getFormLayout().getName() != null)
-						dataBean.setFormLayoutName(ecrf.getFormLayout().getName());
-					if (collectAudits)
-						dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(), "event_crf", ecrf.getCrfVersion().getCrf().getOcOid(), null));
-					if (collectDns)
-						dataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(ecrf));
 
-					formDataBean.add(dataBean);
-					if (formVersionOID != null)
-						formCheck = false;
+					if (hiddenCrfs.contains(ecrf.getCrfVersion().getCrf())) {
+						hiddenCrfCheckPassed = false;
+					}
+
+					eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+							se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
+
+					if (eventDefinitionCrf == null) {
+						eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+								se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudy().getStudyId());
+					}
+
+				} else {
+					eventDefinitionCrf = getEventDefinitionCrfDao().findByStudyEventDefinitionIdAndCRFIdAndStudyId(
+							se.getStudyEventDefinition().getStudyEventDefinitionId(), ecrf.getFormLayout().getCrf().getCrfId(), study.getStudyId());
+
 				}
-			}
+
+
+				//UserAccount userAccount = getUserAccountDao().findByUserId(userId);
+				if (odmFilter.isCrossForm()) {
+					tagIds = loadPermissionTags();
+				}
+
+				List<EventDefinitionCrfPermissionTag> edcPTagIds =
+						getEventDefinitionCrfPermissionTagDao().findByEdcIdTagId(
+								eventDefinitionCrf.getEventDefinitionCrfId(), eventDefinitionCrf.getParentId() != null ? eventDefinitionCrf.getParentId() : 0, tagIds);
+				if (edcPTagIds.size() != 0) {
+					continue;
+				}
+
+
+				// This logic is to use the same method for both S_OID/SS_OID/*/* and full path
+				if (hiddenCrfCheckPassed) {
+					if (!formCheck) {
+						if (ecrf.getCrfVersion().getOcOid().equals(formVersionOID))
+							formCheck = true;
+						else
+							formCheck = false;
+					}
+					if (formCheck) {
+						ExportFormDataBean dataBean = new ExportFormDataBean();
+
+						dataBean.setEventDefinitionCrf(eventDefinitionCrf);
+						dataBean.setEventCrf(ecrf);
+						dataBean.setFormLayout(ecrf.getFormLayout());
+						dataBean.setFormName(ecrf.getCrfVersion().getCrf().getName());
+						dataBean.setItemGroupData(
+								fetchItemData(ecrf.getCrfVersion().getItemGroupMetadatas(), ecrf.getEventCrfId(), ecrf.getCrfVersion().getVersioningMaps(), ecrf));
+						dataBean.setFormOID(ecrf.getCrfVersion().getCrf().getOcOid());
+						if (ecrf.getDateInterviewed() != null)
+							dataBean.setInterviewDate(ecrf.getDateInterviewed() + "");
+						if (ecrf.getInterviewerName() != null)
+							dataBean.setInterviewerName(ecrf.getInterviewerName());
+						// dataBean.setStatus(EventCRFStatus.getByCode(Integer.valueOf(ecrf.getStatus().getCode())).getI18nDescription(getLocale()));
+						dataBean.setStatus(fetchEventCRFStatus(ecrf));
+						dataBean.setCreatedDate(ecrf.getDateCreated());
+						dataBean.setCreatedBy(ecrf.getUserAccount().getUserName());
+						dataBean.setUpdatedDate(ecrf.getDateUpdated());
+						//UserAccount updatedUserAccount = userAccountDao.findById(ecrf.getUpdateId());
+						UserAccountBean updatedUserAccount = null;
+						if (ecrf.getUpdateId() != null) {
+							updatedUserAccount = (UserAccountBean) userAccountDAO.findByPK(ecrf.getUpdateId());
+						}
+						if (updatedUserAccount != null && updatedUserAccount.getId() != 0) {
+							dataBean.setUpdatedBy(updatedUserAccount.getName());
+						} else {
+							// or not set?
+							dataBean.setUpdatedBy(ecrf.getUserAccount().getUserName());
+						}
+
+						if (ecrf.getFormLayout().getName() != null)
+							dataBean.setFormLayoutName(ecrf.getFormLayout().getName());
+						if (odmFilter.isIncludeAudit())
+							dataBean.setAuditLogs(fetchAuditLogs(ecrf.getEventCrfId(), "event_crf", ecrf.getCrfVersion().getCrf().getOcOid(), null));
+						if (odmFilter.isIncludeDN())
+							dataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(ecrf));
+
+						formDataBean.add(dataBean);
+						if (formVersionOID != null)
+							formCheck = false;
+					}
+				}
+
 		}
 
 		return (ArrayList<ExportFormDataBean>) formDataBean;
@@ -620,7 +615,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 							HttpServletRequest request = getRequest();
                             throw npe;
                         }
-						if (isCollectAudits() || isCollectDns()) {
+						if (odmFilter.isIncludeAudit() || odmFilter.isIncludeDN()) {
 							iiDataBean = fetchItemDataAuditValue(oidDNAuditMap.get(grpOID), iiDataBean);
 						}
 						// if(isCollectDns())
@@ -660,9 +655,9 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	private ImportItemDataBean fetchItemDataAuditValue(List<ItemData> list, ImportItemDataBean iiDataBean) {
 		for (ItemData id : list) {
 			if (id.getItem().getOcOid().equals(iiDataBean.getItemOID())) {
-				if (isCollectAudits())
+				if (odmFilter.isIncludeAudit())
 					iiDataBean.setAuditLogs(fetchAuditLogs(id.getItemDataId(), "item_data", iiDataBean.getItemOID(), null));
-				if (isCollectDns())
+				if (odmFilter.isIncludeDN())
 					iiDataBean.setDiscrepancyNotes(fetchDiscrepancyNotes(id));
 				return iiDataBean;
 			}
@@ -675,7 +670,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		List<DnItemDataMap> dnItemDataMaps = itemData.getDnItemDataMaps();
 		DiscrepancyNotesBean dnNotesBean = new DiscrepancyNotesBean();
 		dnNotesBean.setEntityID(itemData.getItem().getOcOid());
-		if (isCollectDns()) {
+		if (odmFilter.isIncludeDN()) {
 			DiscrepancyNoteBean dnNoteBean = new DiscrepancyNoteBean();
 
 			ArrayList<DiscrepancyNoteBean> dnNotes = new ArrayList<DiscrepancyNoteBean>();
@@ -812,7 +807,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 
 		AuditLogsBean auditLogsBean = new AuditLogsBean();
 
-		if (isCollectAudits()) {
+		if (odmFilter.isIncludeAudit()) {
 			AuditLogEvent auditLog = new AuditLogEvent();
 			auditLog.setEntityId(new Integer(entityID));
 			auditLog.setAuditTable(itemDataAuditTable);
@@ -896,16 +891,16 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 	 * combination of URL parameters, further course is determined.
 	 */
 	@Override
-	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID,
-			Boolean collectDNs, Boolean collectAudit, Locale locale, int userId , boolean crossForm) {
+	public LinkedHashMap<String, OdmClinicalDataBean> getClinicalData(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID, Locale locale, int userId , ODMFilterDTO odmFilter) {
 		setLocale(locale);
-		setCollectDns(collectDNs);
-		setCollectAudits(collectAudit);
+		this.odmFilter = odmFilter;
+		//setCollectDns(odmFilter.isIncludeDN());
+		//setCollectAudits(odmFilter.isIncludeAudit());
 		LinkedHashMap<String, OdmClinicalDataBean> clinicalDataHash = new LinkedHashMap<String, OdmClinicalDataBean>();
 		UserAccount userAccount = getUserAccountDao().findByColumnName(userId, "userId");
 		LOGGER.debug("*********userAccount:userId:" + userId + " name:" + userAccount.getUserName());
-		LOGGER.debug("Entering the URL with " + studyOID + ":" + studySubjectOID + ":" + studyEventOID + ":" + formVersionOID + ":DNS:" + collectDNs
-				+ ":Audits:" + collectAudit);
+		LOGGER.debug("Entering the URL with " + studyOID + ":" + studySubjectOID + ":" + studyEventOID + ":" + formVersionOID + ":DNS:" + odmFilter.isIncludeDN()
+				+ ":Audits:" + odmFilter.isIncludeAudit());
 		LOGGER.debug("Determining the generic paramters...");
 		int parentStudyId = 0;
 		Study publicStudy = getStudyDao().findPublicStudy(studyOID);
@@ -937,26 +932,26 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			LOGGER.debug("Adding all the study events,formevents as it is a *");
 			LOGGER.debug("study subject is not all and so is study");
             //  studyEventOid=* ,fromVersionOid=*  (Single Subject , All Events , All FormVersions)
-			clinicalDataHash.put(studyOID, getClinicalData(studyOID, studySubjectOID,userId,crossForm));
+			clinicalDataHash.put(studyOID, getClinicalData(studyOID, studySubjectOID, userId, odmFilter));
 
 			return clinicalDataHash;
 		} else if (studyEventOID.equals(INDICATE_ALL) && formVersionOID.equals(INDICATE_ALL) && studySubjectOID.equals(INDICATE_ALL)
 				&& !studyOID.equals(INDICATE_ALL)) {
 			LOGGER.info("At the study level.. study event,study subject and forms are *");
 			//  studySubjectOid=* ,studyEventOid=* , fromVersionOid=* (All Subjects , All Events , All FormVersions)
-			return getClinicalData(studyOID,userId,crossForm);
+			return getClinicalData(studyOID, userId, odmFilter);
 		} else if (!studyEventOID.equals(INDICATE_ALL) && !studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL)
 				&& formVersionOID.equals(INDICATE_ALL)) {
 			LOGGER.info("Obtaining the form version specific");
 			// fromVersionOid=*  (Single Subject , Single Event , All FormVersions)
-			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, null,userId,crossForm));
+			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, null, userId));
 			return clinicalDataHash;
 		}
 
 		else if (!studyEventOID.equals(INDICATE_ALL) && !studySubjectOID.equals(INDICATE_ALL) && !studyOID.equals(INDICATE_ALL)
 				&& !formVersionOID.equals(INDICATE_ALL)) {
 			// none =* (Single Subject , Single Event , Single FormVersion)
-			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, formVersionOID,userId,crossForm));
+			clinicalDataHash.put(studyOID, getClinicalDatas(studyOID, studySubjectOID, studyEventOID, formVersionOID, userId));
 			return clinicalDataHash;
 		}
 
@@ -971,7 +966,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 		return locale;
 	}
 
-	private OdmClinicalDataBean getClinicalDatas(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID,int userId,boolean crossForm) {
+	private OdmClinicalDataBean getClinicalDatas(String studyOID, String studySubjectOID, String studyEventOID, String formVersionOID, int userId) {
 		int seOrdinal = 0;
 		String temp = studyEventOID;
 		List<StudyEvent> studyEvents = new ArrayList<StudyEvent>();
@@ -993,8 +988,7 @@ public class GenerateClinicalDataServiceImpl implements GenerateClinicalDataServ
 			studyEvents = studyEventDao.fetchStudyEvents(studyEventDefinition.getOc_oid(), studySubjectOID);
 		}
 
-
-		return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID,userId,crossForm);
+		return constructClinicalDataStudy(ss, study, studyEvents, formVersionOID,userId);
 	}
 
 	public UserAccountDao getUserAccountDao() {

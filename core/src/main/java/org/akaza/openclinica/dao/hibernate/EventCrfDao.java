@@ -8,8 +8,16 @@ public class EventCrfDao extends AbstractDomainDao<EventCrf> {
 
     @Override
     Class<EventCrf> domainClass() {
-        // TODO Auto-generated method stub
         return EventCrf.class;
+    }
+
+    public List<EventCrf> findNonArchivedByStudyEventId(int study_event_id) {
+        String query = "from " + getDomainClassName()
+                + " event_crf where event_crf.studyEvent.studyEventId = :studyeventid and event_crf.statusId not in (5,7)";
+        org.hibernate.query.Query hibernateQuery = getCurrentSession().createQuery(query);
+        hibernateQuery.setParameter("studyeventid", study_event_id);
+
+        return hibernateQuery.list();
     }
 
     public EventCrf findByStudyEventIdStudySubjectIdCrfVersionId(int study_event_id, int study_subject_id, int crf_version_id) {
