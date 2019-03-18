@@ -119,24 +119,11 @@ var datatable = tblSearch.DataTable({
   }]
 });
 
-$('#btn-search').click(function() {
-  datatable.clear();
-
-  var queryParams = [];
-  function addParam(name, selector) {
-    var val = $(selector).val().trim();
-    if (val)
-      queryParams.push(name + '=' + val);
-  }
-  addParam('participantId', '#input-id');
-  addParam('firstName',     '#input-fname');
-  addParam('lastName',      '#input-lname');
-  addParam('identifier',    '#input-secid');
-
+function sendSearchQuery(params) {
   var url = '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/searchByFields?';
   jQuery.ajax({
     type: 'get',
-    url: url + queryParams.join('&'),
+    url: url + params,
     success: function(data) {
       jQuery.each(data, function(i, result) {
         datatable.rows.add([[
@@ -153,6 +140,23 @@ $('#btn-search').click(function() {
       console.log(arguments);
     }
   });
+}
+
+$('#btn-search').click(function() {
+  datatable.clear();
+
+  var queryParams = [];
+  function addParam(name, selector) {
+    var val = $(selector).val().trim();
+    if (val)
+      queryParams.push(name + '=' + val);
+  }
+  addParam('participantId', '#input-id');
+  addParam('firstName',     '#input-fname');
+  addParam('lastName',      '#input-lname');
+  addParam('identifier',    '#input-secid');
+
+  sendSearchQuery(queryParams.join('&'));
 });
 
 $('#search-inputs').on('change keyup paste', function() {
@@ -166,5 +170,9 @@ $('#search-inputs').on('change keyup paste', function() {
   else {
     $('#btn-search').attr('disabled', 'disabled');
   }
+});
+
+$('#show-all').click(function() {
+  sendSearchQuery('');
 });
 </script>
