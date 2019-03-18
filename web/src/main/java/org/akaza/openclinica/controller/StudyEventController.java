@@ -256,6 +256,7 @@ public class StudyEventController {
 	        @ApiResponse(code = 200, message = "Successful operation"),
 	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
 	@RequestMapping(value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/events/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
+    @Async
 	public ResponseEntity<Object> scheduleBulkEventAtSiteLevel(HttpServletRequest request,
 			MultipartFile file,
 			@PathVariable("studyOID") String studyOID,
