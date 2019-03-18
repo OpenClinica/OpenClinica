@@ -409,7 +409,7 @@ public class UserAccountDAO extends AuditableEntityDAO {
         Integer ownerId = (Integer) hm.get("owner_id");
         Integer updateId = (Integer) hm.get("update_id");
 
-        surb.setName((String) hm.get("user_name"));
+        surb.setName((String) hm.get("role_name"));
         surb.setUserName((String) hm.get("user_name"));
         surb.setRoleName((String) hm.get("role_name"));
         surb.setCreatedDate(dateCreated);

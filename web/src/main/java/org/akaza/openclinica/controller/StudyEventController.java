@@ -1,6 +1,7 @@
 package org.akaza.openclinica.controller;
 
 import java.io.File;
+import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.Collections;
@@ -9,6 +10,11 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Locale;
 import java.util.Map;
+import java.util.UUID;
+import java.util.concurrent.CompletableFuture;
+import java.util.concurrent.ExecutionException;
+import java.util.concurrent.Future;
+import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -29,12 +35,14 @@ import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.dto.StudyEventScheduleDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
 import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
@@ -52,11 +60,14 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
+import org.akaza.openclinica.service.CustomRuntimeException;
 import org.akaza.openclinica.service.ParticipateService;
 import org.akaza.openclinica.service.StudyEventService;
+import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
+import org.apache.commons.collections4.map.PassiveExpiringMap;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -71,6 +82,8 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
 
 
@@ -105,6 +118,9 @@ public class StudyEventController {
     @Autowired
 	private StudyEventService studyEventService;
 	
+    PassiveExpiringMap<String, Future<ResponseEntity<Object>>> expiringMap =
+            new PassiveExpiringMap<>(24, TimeUnit.HOURS);
+    
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     /**
@@ -244,8 +260,24 @@ public class StudyEventController {
 			@PathVariable("studyOID") String studyOID,
 			@PathVariable("siteOID") String siteOID) throws Exception {
 		
+    	 CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
+    		 UserAccountBean ub = getUserAccount(request);    		
+    		 return scheduleEvent(request,file, studyOID, siteOID,ub);
+    	 });
+    	 
+    	  String uuid = UUID.randomUUID().toString();
+          System.out.println(uuid);
+          synchronized (expiringMap) {
+              expiringMap.put(uuid, future);
+          }
+          ResponseEntity response = null;
+          RestReponseDTO responseDTO = new RestReponseDTO();
+    		String finalMsg = "The schedule job is running, here is the schedule job ID:" + uuid;
+    		responseDTO.setMessage(finalMsg);
+    		response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.OK);
+    		
+    		return response;
     	
-    	return scheduleEvent(request,file, studyOID, siteOID);
 	}
     
     @ApiOperation(value = "To schedule an event for participants at study level in bulk",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
@@ -257,37 +289,54 @@ public class StudyEventController {
 			MultipartFile file,
 			@PathVariable("studyOID") String studyOID) throws Exception {
 		
+    	 CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
+    		 UserAccountBean ub = getUserAccount(request);
+    		
+    		 return scheduleEvent(request,file, studyOID, null, ub);
+    	 });
+    	 
+    	 String uuid = UUID.randomUUID().toString();
+         
+         synchronized (expiringMap) {
+              expiringMap.put(uuid, future);
+          }
+        
+        ResponseEntity response = null;
+        RestReponseDTO responseDTO = new RestReponseDTO();
+  		String finalMsg = "The schedule job is running, here is the schedule job ID:" + uuid;
+  		responseDTO.setMessage(finalMsg);
+  		response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.OK);
+  		
+  		return response;
 		
-    	return scheduleEvent(request,file, studyOID, null);
+    	
 	}
     
 
 
-	private ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, String studyOID, String siteOID) {
+	private ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, String studyOID, String siteOID,UserAccountBean ub) {
 		
 		ResponseEntity response = null;
+		String logFileName = null;
 		
-		/**
-         * log error / info into log file 
-         * Response should be a logfile with columns - 
-         * Row, ParticipantID, StudyEventOID, Ordinal, Status, ErrorMessage
-         */ 
-    	String logFileName = null;
-    	if(siteOID == null) {
-    		logFileName = studyOID+"_log.txt";
-    	}else {
-    		logFileName = studyOID+"_"+siteOID+"_log.txt";
-    	}
+		if (!file.isEmpty()) {
+			 String fileNm = file.getOriginalFilename();
+			 
+			 //only support CSV file
+			 if(!(fileNm.endsWith(".csv")) ){
+				 throw new OpenClinicaSystemException("errorCode.notSupportedFileFormat","The file format is not supported at this time, please send CSV file, like *.csv ");
+			 }
+	
+			 int endIndex = fileNm.indexOf(".csv"); 
+			 String originalFileNm =  fileNm.substring(0, endIndex);
+			 logFileName = this.getRestfulServiceHelper().getMessageLogger().getLogfileNamewithTimeStamp(originalFileNm);
+			
+		}else {
+			throw new OpenClinicaSystemException("errorCode.emptyFile","The file is empty ");
+		}
 		
 		try {
-			if (!file.isEmpty()) {
-				 String fileNm = file.getOriginalFilename();
-				 
-				 //only support CSV file
-				 if(!(fileNm.endsWith(".csv")) ){
-					 throw new OpenClinicaSystemException("errorCode.notSupportedFileFormat","The file format is not supported at this time, please send CSV file, like *.csv ");
-				 }
-		
+			 
 				// read csv file
 				 ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = RestfulServiceHelper.readStudyEventScheduleBulkCSVFile(file, studyOID, siteOID);
 				 
@@ -303,8 +352,8 @@ public class StudyEventController {
 					 RestReponseDTO responseTempDTO = null;	    	    	
 				     String status="";
 				     String message="";
-				    	
-				     responseTempDTO = studyEventService.scheduleStudyEvent(request, studyOID, siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
+				     	
+				     responseTempDTO = studyEventService.scheduleStudyEvent(ub, studyOID, siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
 				    
 				     /**
 			         *  response
@@ -319,18 +368,22 @@ public class StudyEventController {
 			 	       
 			    	}
                     
-                	// sample file name like:originalFileName_123.txt,pipe_delimited_local_skip_2.txt
+			    	/**
+			         * log error / info into log file 
+			         * Response should be a logfile with columns - 
+			         * Row, ParticipantID, StudyEventOID, Ordinal, Status, ErrorMessage
+			         */ 
                 	String recordNum = null;
                 	String headerLine = "Row|ParticipantID|StudyEventOID|Ordinal|Status|ErrorMessage";
                 	String msg = null;
                 	msg = rowNum + "|" + participantId + "|" + studyEventOID +"|"+ sampleOrdinalStr +"|" + status + "|"+message;
                 	String subDir = "study-event-schedule";
-    	    		this.getRestfulServiceHelper().getMessageLogger().writeToLog(subDir,logFileName, headerLine, msg, request);
+    	    		this.getRestfulServiceHelper().getMessageLogger().writeToLog(subDir,logFileName, headerLine, msg, ub);
     	    		
     	    		
 				 }
 				 
-			}
+			
 			
 		} catch (Exception e) {
 			// TODO Auto-generated catch block
@@ -371,7 +424,82 @@ public class StudyEventController {
 	      
 	    
 	    }
-   	    
+	
+	@ApiOperation(value = "To check schedule job status with job ID",  notes = " the job ID is included in the response when you run bulk schedule task")
+	@SuppressWarnings("unchecked")
+    @RequestMapping(value = "/scheduleJobs/{uuid}", method = RequestMethod.GET)
+    public ResponseEntity<Object>  checkScheduleStatus(@PathVariable("uuid") String scheduleUuid,
+                                                           HttpServletRequest request) {
+
+	    Future<ResponseEntity<Object>> future = null;
+        synchronized (expiringMap) {
+            future = expiringMap.get(scheduleUuid);
+        }
+        if (future == null) {
+            logger.info("Schedule Future :" + scheduleUuid + " couldn't be found");
+            return new ResponseEntity<>("Schedule Future :" + scheduleUuid + " couldn't be found", HttpStatus.BAD_REQUEST);
+        } else if (future.isDone()) {
+            try {
+                ResponseEntity<Object> objectResponseEntity = future.get();
+                return new ResponseEntity<>("Completed", HttpStatus.OK);
+            } catch (InterruptedException e) {
+                e.printStackTrace();              
+                return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
+            } catch (CustomRuntimeException e) {
+                
+                return new ResponseEntity<>(e.getErrList(), HttpStatus.BAD_REQUEST);
+            } catch (ExecutionException e) {
+                Throwable cause = e.getCause();
+                if (cause != null && cause instanceof CustomRuntimeException) {
+                
+                    return new ResponseEntity<>(((CustomRuntimeException) cause).getErrList(), HttpStatus.BAD_REQUEST);
+                } else {
+                    List<ErrorObj> err = new ArrayList<>();
+                    ErrorObj errorObj = new ErrorObj(e.getMessage(), e.getMessage());
+                    err.add(errorObj);
+                    e.printStackTrace();
+                    
+                    return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
+                }
+            }
+        } else {
+            return new ResponseEntity<>(HttpStatus.PROCESSING.getReasonPhrase(), HttpStatus.OK);
+        }
+    
+	}
+  
+	
+	 /**
+     * Helper Method to get the user account
+     * 
+     * @return UserAccountBean
+     */
+    public UserAccountBean getUserAccount(HttpServletRequest request) {
+    	UserAccountBean userBean;    
+    	
+    	if(request.getSession().getAttribute("userBean") != null) {
+    		userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
+    		
+    	}else {
+    		 Object principal = SecurityContextHolder.getContext().getAuthentication().getPrincipal();
+    	        String username = null;
+    	        if (principal instanceof UserDetails) {
+    	            username = ((UserDetails) principal).getUsername();
+    	        } else {
+    	            username = principal.toString();
+    	        }
+
+			String schema = CoreResources.getRequestSchema();
+			CoreResources.setRequestSchema("public");
+    	        UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
+    	        userBean = (UserAccountBean) userAccountDAO.findByUserName(username);
+			CoreResources.setRequestSchema(schema);
+
+    	}
+    	
+    	return userBean;
+       
+	}
 }
 
 
