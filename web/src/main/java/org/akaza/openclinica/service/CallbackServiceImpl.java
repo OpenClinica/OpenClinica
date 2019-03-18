@@ -67,13 +67,13 @@ public class CallbackServiceImpl implements CallbackService {
             ub = createUserAccount(request, user, userContextMap);
         }
         updateUser(request, ub, user, userContextMap);
-        boolean isUserUpdated = false;
+        boolean userRolesUpdated = false;
         if (StringUtils.equals((String) request.getSession().getAttribute("firstLoginCheck"), "true")) {
-            isUserUpdated = updateStudyUserRoles(request, ub);
+            userRolesUpdated = updateStudyUserRoles(request, ub);
         } else {
             logger.info("allUserRoles won't be updated for user:" + ub.getName());
         }
-        return new UserAccountHelper(ub, isUserUpdated);
+        return new UserAccountHelper(ub, userRolesUpdated);
     }
 
     private void updateUser(HttpServletRequest request, UserAccountBean ub,
@@ -118,7 +118,6 @@ public class CallbackServiceImpl implements CallbackService {
             UserAccountDAO userAccountDAO = new UserAccountDAO(dataSource);
             userAccountDAO.update(ub);
         }
-
     }
     public void getUserDetails(HttpServletRequest request, KeycloakUser user) {
         ResponseEntity<OCUserDTO> userDetails = studyBuildService.getUserDetails(request);

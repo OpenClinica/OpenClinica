@@ -44,7 +44,6 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	@Autowired
     private Configuration freemarkerConfiguration;
 
-
 	
 	
 	public ParticipantValidator(DataSource dataSource) {
@@ -161,7 +160,8 @@ public class ParticipantValidator extends SubjectTransferValidator {
     
 	 public void validate(Object obj, Errors e) {
 	        SubjectTransferBean subjectTransferBean = (SubjectTransferBean) obj;
-	        currentStudy = subjectTransferBean.getStudy();	        
+	        currentStudy = subjectTransferBean.getStudy();
+
 	        
 	        if (currentStudy == null) {
 	        	currentStudy = getStudyDAO().findByPublicOid(subjectTransferBean.getStudyOid());

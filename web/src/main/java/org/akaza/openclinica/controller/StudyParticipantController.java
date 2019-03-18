@@ -19,6 +19,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.participant.ParticipantService;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.validator.ParticipantValidator;
@@ -58,6 +59,9 @@ public class StudyParticipantController {
 		@Autowired
 		private ParticipantService participantService;
 
+        @Autowired
+        private UtilService utilService;
+
 		private StudyDAO studyDao;
 		private StudySubjectDAO ssDao;
 		private UserAccountDAO userAccountDao;
@@ -67,9 +71,19 @@ public class StudyParticipantController {
 		protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 		
 		@ApiOperation(value = "To create a participant at study level",  notes = "Will read the subjectKey value provided by the user if the study participant ID is configured to be Manually generated  ")
-		@ApiResponses(value = {
-		        @ApiResponse(code = 200, message = "Successful operation"),
-		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list")})
+        @ApiResponses(value = {
+                @ApiResponse(code = 200, message = "Successful operation"),
+                @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
+                        + "<br />Error Code                                            Descriptions"
+                        + "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
+                        + "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
+                        + "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
+                        + "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
+                        + "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
+                        + "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
+                        + "<br />participantIDNotUnique                        : Participant ID already exists."
+                        + "<br />studyHasSystemGeneratedIdEnabled                        : Study is set to have system-generated ID, hence no new participant can be added."
+                        + "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 		@RequestMapping(value = "/{studyOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
@@ -94,7 +108,20 @@ public class StudyParticipantController {
 		}
 		
 		@ApiOperation(value = "To create a participant at study site level",  notes = "Will read the subjectKey")
-		@RequestMapping(value = "/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
+        @ApiResponses(value = {
+                @ApiResponse(code = 200, message = "Successful operation"),
+                @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
+                        + "<br />Error Code                                            Descriptions"
+                        + "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
+                        + "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
+                        + "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
+                        + "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
+                        + "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
+                        + "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
+                        + "<br />participantIDNotUnique                        : Participant ID already exists."
+                        + "<br />studyHasSystemGeneratedIdEnabled                        : Study is set to have system-generated ID, hence no new participant can be added."
+                        + "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
+        @RequestMapping(value = "/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request, 
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
 				@PathVariable("studyOID") String studyOID,
@@ -229,7 +256,9 @@ public class StudyParticipantController {
 				@RequestBody HashMap<String, Object> map,
 				 String studyOID,
 				String siteOID) throws Exception {
-			
+
+
+
 			ArrayList<String> errorMessages = new ArrayList<String>();
 			ErrorObject errorOBject = null;
 			ResponseEntity<Object> response = null;
@@ -247,8 +276,10 @@ public class StudyParticipantController {
 					
 			subjectTransferBean.setOwner(this.participantService.getUserAccount(request));
 			
-			StudyBean study = this.getRestfulServiceHelper().setSchema(studyOID, request);
-			subjectTransferBean.setStudy(study);
+			StudyBean tenantstudy = this.getRestfulServiceHelper().setSchema(studyOID, request);
+
+
+			subjectTransferBean.setStudy(tenantstudy);
 			
 			if(siteOID != null) {
 				StudyBean siteStudy = getStudyDao().findSiteByOid(subjectTransferBean.getStudyOid(), siteOID);
@@ -260,8 +291,13 @@ public class StudyParticipantController {
 	        
 	        DataBinder dataBinder = new DataBinder(subjectTransferBean);
 	        errors = dataBinder.getBindingResult();
-	        participantValidator.validate(subjectTransferBean, errors);
-	        
+            if (utilService.isParticipantIDSystemGenerated(tenantstudy)){
+                errors.reject("errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");
+            }
+
+            participantValidator.validate(subjectTransferBean, errors);
+
+
 	        if(errors.hasErrors()) {
 	        	ArrayList validerrors = new ArrayList(errors.getAllErrors());
 	        	Iterator errorIt = validerrors.iterator();
@@ -288,7 +324,7 @@ public class StudyParticipantController {
 	    		
 	    		response = new ResponseEntity(responseFailure, org.springframework.http.HttpStatus.BAD_REQUEST);
 	        } else {        				
-			  	String label = create(subjectTransferBean,study);	           
+			  	String label = create(subjectTransferBean,tenantstudy);
 			  	studyParticipantDTO.setSubjectKey(label);
 
 				StudySubjectBean subject = this.getStudySubjectDAO().findByLabel(label);

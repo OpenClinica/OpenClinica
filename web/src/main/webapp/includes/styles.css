@@ -30,7 +30,12 @@ input[type="text"].navSearch, input[type="password"].navSearch {
 input.navSearch::placeholder {
   color: #999;
 }
-
+#advsearch-link {
+  font-size: 8pt;
+  position: relative;
+  top: 22px;
+  left: -97px;
+}
 
 input[type="submit"], input[type="button"] {
   -webkit-appearance: none; }

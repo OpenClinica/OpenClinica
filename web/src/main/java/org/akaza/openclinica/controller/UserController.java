@@ -152,11 +152,11 @@ public class UserController {
         setSchemaFromRequest(studyOid, request);
         String accessToken = getAccessTokenFromRequest(request);
         UserAccountBean userAccountBean = (UserAccountBean) request.getSession().getAttribute("userBean");
-
+        List<OCUserDTO> userDTOs=null;
         // validate accessToken against studyOid ,
         // also validate accessToken's user role crc/investigator
+            userDTOs = userService.searchParticipantsByFields(studyOid, accessToken, participantId, firstName, lastName, identifier, userAccountBean);
 
-        List<OCUserDTO> userDTOs= userService.searchParticipantsByFields(studyOid ,accessToken,participantId,firstName,lastName,identifier,userAccountBean);
         logger.info("REST request to POST OCUserDTO : {}", userDTOs);
         return new ResponseEntity<List<OCUserDTO>>(userDTOs, HttpStatus.OK);
     }
