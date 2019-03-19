@@ -118,7 +118,7 @@ var datatable = tblSearch.DataTable({
     orderable: false
   }],
   language: {
-    emptyTable: '<span id="empty-result-msg"><fmt:message key="advsearch_result_init" bundle="${resword}"/></span>'
+    emptyTable: ''
   }
 });
 
