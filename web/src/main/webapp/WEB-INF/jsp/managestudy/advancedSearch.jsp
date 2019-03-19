@@ -116,10 +116,16 @@ var datatable = tblSearch.DataTable({
   columnDefs: [{
     targets: -1,
     orderable: false
-  }]
+  }],
+  language: {
+    emptyTable: '<span id="empty-result-msg"><fmt:message key="advsearch_result_init" bundle="${resword}"/></span>'
+  }
 });
 
-function sendSearchQuery(params) {
+function doSearch(params) {
+  datatable.clear();
+  datatable.draw();
+
   var url = '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/searchByFields?';
   jQuery.ajax({
     type: 'get',
@@ -143,8 +149,6 @@ function sendSearchQuery(params) {
 }
 
 $('#btn-search').click(function() {
-  datatable.clear();
-
   var queryParams = [];
   function addParam(name, selector) {
     var val = $(selector).val().trim();
@@ -156,7 +160,7 @@ $('#btn-search').click(function() {
   addParam('lastName',      '#input-lname');
   addParam('identifier',    '#input-secid');
 
-  sendSearchQuery(queryParams.join('&'));
+  doSearch(queryParams.join('&'));
 });
 
 $('#search-inputs').on('change keyup paste', function() {
@@ -173,6 +177,6 @@ $('#search-inputs').on('change keyup paste', function() {
 });
 
 $('#show-all').click(function() {
-  sendSearchQuery('');
+  doSearch('');
 });
 </script>
