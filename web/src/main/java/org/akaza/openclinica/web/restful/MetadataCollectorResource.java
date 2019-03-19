@@ -197,7 +197,7 @@ public class MetadataCollectorResource {
     }
 
     public FullReportBean collectODMMetadataForClinicalData(String studyOID, String formVersionOID, LinkedHashMap<String, OdmClinicalDataBean> clinicalDataMap,
-                                                             boolean showArchived , String permissionTagsString,boolean meta) {
+                                                             boolean showArchived , String permissionTagsString, boolean includeMetadata) {
         FullReportBean report = new FullReportBean();
             StudyBean studyBean = getStudyDao().findByOid(studyOID);
             if (studyBean != null)
@@ -217,18 +217,16 @@ public class MetadataCollectorResource {
             odmb.setODMVersion("oc1.3");
             mdc.setODMBean(odmb);
             adc.setOdmbean(odmb);
-        if (meta) {
+        if (includeMetadata) {
             if (studyBean == null) {
                 mdc.collectFileData(formVersionOID);
-            }else {
+            } else {
                 mdc.collectFileData();
                 adc.collectFileData();
             }
-
                 report.setAdminDataMap(adc.getOdmAdminDataMap());
                 report.setOdmStudyMap(mdc.getOdmStudyMap());
-
-        }else{
+        } else {
             mdc.collectOdmRoot();
         }
             report.setCoreResources(getCoreResources());

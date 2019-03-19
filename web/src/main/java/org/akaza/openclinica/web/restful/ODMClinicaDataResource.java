@@ -103,13 +103,12 @@ public class ODMClinicaDataResource {
                                      @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
                                      @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
                                      @Context HttpServletRequest request,
-                                     @DefaultValue("y") @QueryParam("clinicaldata") String clinicaldata,
-                                     @DefaultValue("y") @QueryParam("metadata") String metadata,
+                                     @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
                                      @QueryParam("showArchived") String showArchived ,
                                      @DefaultValue("n") @QueryParam("crossFormLogic") String crossFormLogic ) {
         LOGGER.debug("Requesting clinical data resource");
 
-        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, metadata, clinicaldata);
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata);
 
         UserAccountBean userAccountBean = ((UserAccountBean) request.getSession().getAttribute("userBean"));
         StudyDAO sdao = new StudyDAO(getDataSource());
@@ -128,7 +127,7 @@ public class ODMClinicaDataResource {
 
         LinkedHashMap<String,OdmClinicalDataBean> clinicalDataBeans;
 
-        if (odmFilter.isClinical()) {
+        if (odmFilter.includeClinical()) {
             clinicalDataBeans = getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                     formVersionOID, request.getLocale(), userAccountBean.getId(), odmFilter);
         } else {
@@ -136,9 +135,9 @@ public class ODMClinicaDataResource {
         }
 
         XMLSerializer xmlSerializer = new XMLSerializer();
-             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.isMeta());
+             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
-        report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray,odmFilter.isMeta(), odmFilter.isClinical(), odmFilter.isCrossForm());
+        report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray,odmFilter.includeMetadata(), odmFilter.includeClinical(), odmFilter.isCrossForm());
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
 
@@ -215,7 +214,7 @@ public class ODMClinicaDataResource {
                                  @DefaultValue("n")@QueryParam("crossFormLogic") String crossFormLogic ) {
         LOGGER.debug("Requesting clinical data resource");
 
-        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, metadata, clinicaldata);
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, metadata);
 
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -242,16 +241,16 @@ public class ODMClinicaDataResource {
 
         LinkedHashMap<String,OdmClinicalDataBean> clinicalDataBeans;
 
-        if (odmFilter.isClinical()) {
+        if (odmFilter.includeClinical()) {
             clinicalDataBeans = getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                     formVersionOID, request.getLocale(), userId, odmFilter);
         } else {
             clinicalDataBeans = null;
         }
 
-        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.isMeta());
+        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
-        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray, odmFilter.isMeta(), odmFilter.isClinical(), odmFilter.isCrossForm());
+        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray, odmFilter.includeMetadata(), odmFilter.includeClinical(), odmFilter.isCrossForm());
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();
@@ -261,13 +260,12 @@ public class ODMClinicaDataResource {
                                    @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
                                    @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
                                    @Context HttpServletRequest request,
-                                   @DefaultValue("y") @QueryParam("clinicaldata") String clinicaldata,
-                                   @DefaultValue("y") @QueryParam("metadata") String metadata,
+                                   @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
                                    @QueryParam("showArchived") String showArchived ,
                                    @DefaultValue("n")@QueryParam("crossFormLogic") String crossFormLogic ) {
 
         LOGGER.debug("Requesting clinical data resource");
-        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, metadata, clinicaldata);
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata);
 
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -293,18 +291,18 @@ public class ODMClinicaDataResource {
 
         LinkedHashMap<String,OdmClinicalDataBean> clinicalDataBeans;
 
-        if (odmFilter.isClinical()) {
+        if (odmFilter.includeClinical()) {
             clinicalDataBeans = getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
                     formVersionOID, request.getLocale(), userId, odmFilter);
         } else {
             clinicalDataBeans = null;
         }
-        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.isMeta());
+        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
         if (report.getClinicalDataMap() == null)
             return null;
 
-        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,odmFilter.isMeta(), odmFilter.isClinical(), odmFilter.isCrossForm());
+        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,odmFilter.includeMetadata(), odmFilter.includeClinical(), odmFilter.isCrossForm());
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();
