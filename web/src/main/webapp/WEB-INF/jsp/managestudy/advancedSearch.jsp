@@ -124,22 +124,24 @@ var datatable = tblSearch.DataTable({
 
 function doSearch(params) {
   datatable.clear();
-  datatable.draw();
 
   var url = '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/searchByFields?';
   jQuery.ajax({
     type: 'get',
     url: url + params,
     success: function(data) {
-      jQuery.each(data, function(i, result) {
-        datatable.rows.add([[
-          result.participantId,
+      datatable.rows.add(data.map(function(result) {
+        function linkToPDP(s) {
+          return '<a href="ViewStudySubject?id=' + result.viewStudySubjectId + '">' + s + '</a>';
+        }
+        return [
+          linkToPDP(result.participantId),
           result.firstName,
           result.lastName,
           result.identifier,
-          ''
-        ]]);
-      });
+          linkToPDP('<span class="icon icon-search"></span>')
+        ];
+      }));
       datatable.draw();
     },
     error: function() {
