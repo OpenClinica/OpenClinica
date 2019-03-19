@@ -3,10 +3,12 @@ package org.akaza.openclinica.service;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.core.Role;
+import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
@@ -59,8 +61,10 @@ import java.util.List;
 public class ValidateServiceImpl implements ValidateService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     public static final String ENABLED = "enabled";
+    public static final String DISABLED = "enabled";
+
     private static String sbsUrl = CoreResources.getField("SBSUrl");
-    private static String advanceSearch = CoreResources.getField("module.contacts");
+    private static final String ADVANCE_SEARCH = "contactsModule";
 
     @Autowired
     @Qualifier( "dataSource" )
@@ -69,7 +73,8 @@ public class ValidateServiceImpl implements ValidateService {
     @Autowired
     StudyDao studyDao;
 
-
+    @Autowired
+    StudyParameterValueDao studyParameterValueDao;
 
     public boolean isStudyOidValid(String studyOid) {
         Study publicStudy = getPublicStudy(studyOid);
@@ -122,6 +127,12 @@ public class ValidateServiceImpl implements ValidateService {
         }
         return false;
     }
+    public boolean isUserHasTechAdminRole(UserAccount userAccount){
+        if(userAccount.getUserType().getUserTypeId()== UserType.TECHADMIN.getId())
+            return true;
+        return false;
+    }
+
 
     public boolean isUserRoleHasAccessToSite(ArrayList<StudyUserRoleBean> userRoles, String siteOid) {
         Study publicSite = getPublicStudy(siteOid);
@@ -141,14 +152,22 @@ public class ValidateServiceImpl implements ValidateService {
         return false;
     }
 
-    public boolean isAdvanceSearchEnabled() {
-        if(advanceSearch.equalsIgnoreCase(ENABLED))
+    public boolean isAdvanceSearchEnabled(Study tenantStudy) {
+        StudyParameterValue spv = studyParameterValueDao.findByStudyIdParameter(tenantStudy.getStudy()==null?tenantStudy.getStudyId():tenantStudy.getStudy().getStudyId() , ADVANCE_SEARCH);
+
+        if (spv != null && spv.getValue().equals(ENABLED))
             return true;
+
+
         return false;
     }
 
     private Study getPublicStudy(String studyOid) {
         return studyDao.findPublicStudy(studyOid);
     }
+
+
+
+
 
 }

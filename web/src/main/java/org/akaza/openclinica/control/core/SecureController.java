@@ -168,8 +168,9 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     protected UserAccountDao userDaoDomain;
     private static String SCHEDULER = "schedulerFactoryBean";
     public static final String ENABLED = "enabled";
+    public static final String DISABLED = "disabled";
+
     protected UserService userService;
-    protected CryptoConverter cryptoConverter;
 
     private StdScheduler scheduler;
     /**
@@ -557,7 +558,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         scs.setParametersForSite(currentStudy);
                     }
                 }
-                request.setAttribute("requestSchema", "public");
+             //   request.setAttribute("requestSchema", "public");
+
                 session.setAttribute("study", currentStudy);
             } else if (currentPublicStudy.getId() > 0) {
                 // YW 06-20-2007<< set site's parentstudy name when site is
@@ -566,7 +568,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     currentPublicStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentPublicStudy.getParentStudyId())).getName());
                     request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                     currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId())).getName());
-                    request.setAttribute("requestSchema", "public");
+           //         request.setAttribute("requestSchema", "public");
                 }
                 // YW >>
             }
@@ -658,7 +660,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             // YW 06-19-2007 >>
 
             request.setAttribute("isAdminServlet", getAdminServlet());
-            request.setAttribute("advsearchStatus", CoreResources.getField("module.contacts").toLowerCase());
+
+            Study tenantStudy =getStudyDao().findById(currentStudy.getId());
+            boolean advSearch = getValidateService().isAdvanceSearchEnabled(tenantStudy);
+            request.setAttribute("advsearchStatus", (advSearch? ENABLED : DISABLED));
 
             this.request = request;
             this.response = response;
@@ -1561,8 +1566,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     protected void populateCustomUserRoles(CustomRole customRole, String username) {
         StudyBuildService studyBuildService = (StudyBuildService) SpringServletAccess.getApplicationContext(context).getBean("studyBuildService");
-        StudyDao studyDao = (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
-        List<ChangeStudyDTO> byUser = studyDao.findByUser(username);
+        List<ChangeStudyDTO> byUser = getStudyDao().findByUser(username);
         List<StudyEnvironmentRoleDTO> userRoles = (List<StudyEnvironmentRoleDTO>) session.getAttribute("allUserRoles");
         if (userRoles == null) {
             logger.error("******************userRoles should not be null");
@@ -1630,8 +1634,14 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     }
 
     protected CryptoConverter getCrytoConverter() {
-        return cryptoConverter= (CryptoConverter) SpringServletAccess.getApplicationContext(context).getBean("cryptoConverter");
+        return (CryptoConverter) SpringServletAccess.getApplicationContext(context).getBean("cryptoConverter");
     }
 
+    protected ValidateService getValidateService() {
+        return (ValidateService) SpringServletAccess.getApplicationContext(context).getBean("validateService");
+    }
 
+    protected StudyDao getStudyDao() {
+        return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
+    }
 }
