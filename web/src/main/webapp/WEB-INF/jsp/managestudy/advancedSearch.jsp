@@ -63,9 +63,9 @@
   }
   .datatable thead th {
     background-color: #ccc;
-    font-weight: normal;
+    font-weight: normal !important;
     padding: 3px;
-    border-bottom: none;
+    border-bottom: none !important;
   }
   .datatable tbody td:last-child {
     text-align: center;
@@ -173,7 +173,7 @@ function doSearch(params) {
           linkToPDP('<span class="icon icon-search"></span>')
         ];
       }));
-      setEmptyMessage('<fmt:message key="advsearch_noresult" bundle="${resword}"/>...');
+      setEmptyMessage('<fmt:message key="advsearch_noresult" bundle="${resword}"/>');
       datatable.draw();
     },
     error: function() {
