@@ -49,11 +49,30 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 <style>
-  th {
-    background-color: lightgray;
+  .datatable {
+    border-bottom: none !important;
+    border-collapse: collapse !important;
+    font-size: 13.6px;
+  }
+  .datatable td {
+    border: 1px solid #ccc;
+    border-bottom-color: #ccc !important;
+  }
+  .datatable thead td {
+    border-color: white !important;
+  }
+  .datatable thead th {
+    background-color: #ccc;
     font-weight: normal;
-    text-align: left;
     padding: 3px;
+    border-bottom: none;
+  }
+  .datatable tbody td:last-child {
+    text-align: center;
+  }
+  input[type=text] {
+    width: 100%;
+    padding: 0;
   }
   input[type=button][disabled], input[type=button][disabled]:hover {
     background: none;
@@ -62,6 +81,12 @@
   }
   #btn-search {
     margin-bottom: 3px;    
+  }
+  #search-inputs td {
+    padding-top: 0;
+  }
+  #search-message {
+    text-align: center;
   }
 </style>
 
@@ -78,7 +103,7 @@
   <fmt:message key="search_by" bundle="${resword}"/>
 </div>
 
-<table id="tbl-search">
+<table id="tbl-search" class="datatable">
   <thead>
     <tr>
       <td><fmt:message key="participant_ID" bundle="${resword}"/></td>
@@ -118,12 +143,18 @@ var datatable = tblSearch.DataTable({
     orderable: false
   }],
   language: {
-    emptyTable: ''
+    emptyTable: '<fmt:message key="advsearch_initresult" bundle="${resword}"/>'
   }
 });
 
+function setEmptyMessage(message) {
+  datatable.settings()[0].oLanguage.sEmptyTable = message;
+}
+
 function doSearch(params) {
+  setEmptyMessage('<fmt:message key="loading" bundle="${resword}"/>...');
   datatable.clear();
+  datatable.draw();
 
   var url = '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/searchByFields?';
   jQuery.ajax({
@@ -142,6 +173,7 @@ function doSearch(params) {
           linkToPDP('<span class="icon icon-search"></span>')
         ];
       }));
+      setEmptyMessage('<fmt:message key="advsearch_noresult" bundle="${resword}"/>...');
       datatable.draw();
     },
     error: function() {
