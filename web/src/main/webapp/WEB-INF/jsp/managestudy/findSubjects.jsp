@@ -25,7 +25,13 @@
 
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 
+<link href="includes/bootstrap-tour-0.12.0/css/bootstrap-tour-standalone.min.css" rel="stylesheet">
+<script src="includes/bootstrap-tour-0.12.0/js/bootstrap-tour-standalone.min.js"></script>
+
 <script type="text/javascript">
+    var currentPID = "null";
+    var currentPLabel = "null";
+    var tourElement = "null";
     function onInvokeAction(id,action) {
         if(id.indexOf('findSubjects') == -1)  {
         setExportToLimit(id, '');
@@ -51,7 +57,112 @@
         if (params.get('addNewSubject')) {
             jQuery('#addSubject').click();
         }
+
+
+        jQuery('.pidVerification').click(function() {
+            currentPLabel = jQuery(this)[0].name;
+            currentPID = jQuery(this)[0].id.split("pid-")[1];
+            tourElement = new Tour({
+                name: "pidv",
+                backdrop: true,
+                backdropPadding: {
+                    top: -10,
+                    right: 0,
+                    bottom: -10,
+                    left: 0
+                },
+                next: 1,
+                prev: 1,
+                steps:
+                [{
+                    element: "#" + jQuery(this)[0].id,
+                    title: "<span class='addNewSubjectTitle'><fmt:message key='pid_verification' bundle='${resword}'/></span>",
+                    content: "<table border='0' cellpadding='0' align='center' style='cursor:default;'> \
+                                <tr> \
+                                    <td> \
+                                        <table border='0' cellpadding='0' cellspacing='0' class='full-width'> \
+                                            <tr> \
+                                                <td valign='top'> \
+                                                    <div class='formfieldXL_BG' style='width: 250px;'> \
+                                                        <input type='text' name='label' id='retype_pid' width='30' class='formfieldXL form-control'> \
+                                                    </div> \
+                                                </td> \
+                                            </tr> \
+                                            <tr> \
+                                                <td> \
+                                                    <div style='margin-top: 5px;margin-bottom: 5px'>\
+                                                        <div id='pidv-err' style='display: none;' class='alert small'> \
+                                                            <fmt:message key='pidv_err' bundle='${resword}'/> \
+                                                        </div> \
+                                                        <div id='pidv-match' style='display: none; color: #0cb924;' class='alert small'> \
+                                                            <fmt:message key='pidv_match' bundle='${resword}'/> \
+                                                        </div> \
+                                                    </div>\
+                                                </td> \
+                                            </tr> \
+                                        </table> \
+                                    </td> \
+                                </tr> \
+                                <tr> \
+                                    <td colspan='2' style='text-align: center;'> \
+                                            <input type='button' value='Cancel' onclick='clearPIDVerificationForm()'/> \
+                                            &nbsp; \
+                                            <input type='button' value='Checking' onclick='validatePIDVerificationForm()'/> \
+                                    </td> \
+                                </tr> \
+                            </table>"
+                }],
+                template: "<div class='popover tour'> \
+                            <div class='arrow'></div> \
+                            <h3 class='popover-title'></h3> \
+                            <div class='popover-content'></div> \
+                            <nav class='popover-navigation' style='display:none;'> \
+                                <button class='btn btn-default' data-role='prev'>« Prev</button> \
+                                <span data-role='separator'>|</span> \
+                                <button class='btn btn-default' data-role='next'>Next »</button> \
+                                <button class='btn btn-default' data-role='end'>End tour</button> \
+                            </nav> \
+                            </div>",
+                onEnd: function(t) {
+                    // need to found the correct way to handle this default setting
+                    jQuery("#pid-" + currentPID).css({'display':'block'});
+                },
+                onShown: function(t) {
+                    // disable right click
+                    jQuery("#step-0").find('#retype_pid').on('contextmenu',function(){
+                        return false;
+                    });
+                    // disable cut copy paste
+                    jQuery("#step-0").find('#retype_pid').bind('cut copy paste', function (e) {
+                        e.preventDefault();
+                    });
+                }
+            });
+
+            tourElement.init();
+            tourElement.start(true);
+        });
+
+
     });
+
+    function clearPIDVerificationForm() {
+        tourElement.end();
+        jQuery("#step-0").find('input#retype_pid').val("");
+        jQuery("#step-0").find('#pidv-err').css({'display':'none'});
+        jQuery("#step-0").find('#pidv-match').css({'display':'none'});
+    }
+
+    function validatePIDVerificationForm() {
+        if (jQuery("#step-0").find('input').val() === currentPLabel) {
+            jQuery("#step-0").find('#pidv-err').css({'display':'none'});
+            jQuery("#step-0").find('#pidv-match').css({'display':'block'});
+            window.location = window.location.origin + "/OpenClinica/ViewStudySubject?id=" + currentPID;
+        } else {
+            jQuery("#step-0").find('#pidv-err').css({'display':'block'});
+            jQuery("#step-0").find('#pidv-match').css({'display':'none'});
+        }
+    }
 
     window.onload = function() {
         document.getElementById("btn").focus();
@@ -93,7 +204,7 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 
-<h1>   
+<h1>
     <span class="title_manage">
         <fmt:message key="view_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
     </span>
@@ -106,10 +217,10 @@
         <c:if test="${(!study.status.pending)}">
             <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
         </c:if>
-        
+
         <c:if test="${(study.status.pending)}">
             <fmt:message key="study_design_note" bundle="${restext}"/>
-        </c:if>   
+        </c:if>
     </span><br>
     <div style="text-align:center; width:100%;">
         <button id="btn" onclick="hm('box');">OK</button>
@@ -129,7 +240,6 @@
           </c:import>
     </div>
 </c:if>
-
 
 <br>
 <jsp:include page="../include/footer.jsp"/>
