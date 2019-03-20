@@ -355,7 +355,7 @@
                                                                                            placeholder='<fmt:message key="enter_participant_ID" bundle="${resword}"/>'
                                                                                            class="navSearch"/>
                                                                                     <input type="hidden" name="navBar" value="yes"/>
-                                                                                    <input type="submit" value="View &#8594;" class="navSearchButton"/>
+                                                                                    <input type="submit" value='<fmt:message key="view" bundle="${resword}"/>' class="navSearchButton"/>
                                                                                     <c:choose>
                                                                                         <c:when test="${
                                                                                           (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
