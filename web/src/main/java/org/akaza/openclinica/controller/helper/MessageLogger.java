@@ -14,6 +14,8 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -105,7 +107,7 @@ public class MessageLogger {
 	   	    
 	} 
     
- public void writeToLog(String subDir,String orginalFileName, String headerLine,String msg,UserAccountBean userBean) {
+ public void writeToLog(String subDir,String orginalFileName, String headerLine,String msg,UserAccountBean userBean) throws OpenClinicaException {
 		
     	BufferedWriter bw = null;
 		FileWriter fw = null;
@@ -114,7 +116,7 @@ public class MessageLogger {
 	    String logFileName;
 	   
 	    if(orginalFileName == null) {
-	    	;
+	    	logger.info("errorCode.emptyFile -- The file is null ");
 	    }else {
 	    	 try {
 	             int count =1;	    	
@@ -153,7 +155,8 @@ public class MessageLogger {
 	 			bw.close();						
 	 	       
 	 	    } catch (Exception e) {
-	 	        e.printStackTrace();
+	 	    	logger.info("Log File error " + e.getMessage());
+	 	    	throw new OpenClinicaException("Write to log file error", ErrorConstants.ERR_LOG_FILE);
 	 	    }finally {
 	 			try {
 	 				if (bw != null)
@@ -161,7 +164,8 @@ public class MessageLogger {
 	 				if (fw != null)
 	 					fw.close();
 	 			} catch (IOException ex) {
-	 				ex.printStackTrace();
+	 				logger.info("Log File error " + ex.getMessage());
+	 				throw new OpenClinicaException("Write to log file error", ErrorConstants.ERR_LOG_FILE);
 	 			}
 	 		}
 	    }

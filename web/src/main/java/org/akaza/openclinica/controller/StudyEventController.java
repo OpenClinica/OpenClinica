@@ -334,6 +334,7 @@ public class StudyEventController {
 			 logFileName = this.getRestfulServiceHelper().getMessageLogger().getLogfileNamewithTimeStamp(originalFileNm);
 			
 		}else {
+			logger.info("errorCode.emptyFile -- The file is empty ");
 			throw new OpenClinicaSystemException("errorCode.emptyFile","The file is empty ");
 		}
 		
