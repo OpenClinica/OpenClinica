@@ -30,7 +30,8 @@ public class TokenServiceImpl implements TokenService {
     @Autowired
     CreateUserCoreService userService;
 
-    private static final String PUBLIC_KEY_LOCATION = "/etc/ssl/certs/keycloak.cer";
+    private static final String PUBLIC_KEY_LOCATION = "/etc/ssl/certs/keycloak.cer"; 
+ 
     private static final String X509_CERTFICATE = "X509";
     private static final String API_AUDIENCE = "https://www.openclinica.com";
 

@@ -31,10 +31,7 @@ input.navSearch::placeholder {
   color: #999;
 }
 #advsearch-link {
-  font-size: 8pt;
-  position: relative;
-  top: 22px;
-  left: -97px;
+  margin-left: 10px;
 }
 
 input[type="submit"], input[type="button"] {
@@ -65,9 +62,12 @@ input[type="submit"], input[type="button"] {
   border: 0;
   min-height: 30px;
   font-size: 1em;
-  padding-left: .75em; }
-  .navSearchButton:hover {
-    background: #20354a; }
+  padding-left: .75em;
+  padding-right: .75em;
+}
+.navSearchButton:hover {
+  background: #20354a;
+}
 
 body {
   font-size: 100%;

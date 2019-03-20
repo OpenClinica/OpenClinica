@@ -409,7 +409,7 @@ public class RestfulServiceHelper {
     public UserAccountBean getUserAccount(HttpServletRequest request) {
     	UserAccountBean userBean;    
     	
-    	if(request.getSession().getAttribute("userBean") != null) {
+    	if(request.getSession()!= null && request.getSession().getAttribute("userBean") != null) {
     		userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
     		
     	}else {

@@ -6,6 +6,7 @@ package org.akaza.openclinica.service;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.user.UserAccount;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -29,10 +30,12 @@ public interface ValidateService {
 
 	boolean isUserHasCrcOrInvestigaterRole(List<StudyUserRoleBean> userRoles);
 
+	boolean isUserHasTechAdminRole(UserAccount userAccount);
+
 	boolean isUserRoleHasAccessToSite(ArrayList<StudyUserRoleBean> userRoles, String siteOid);
 
 	boolean isParticipateActive(Study tenantStudy);
 
-	boolean isAdvanceSearchEnabled();
+	boolean isAdvanceSearchEnabled(Study tenantStudy);
 
 	}
