@@ -108,6 +108,12 @@ public class LogoutController {
     @RequestMapping(value="/invalidateKeycloakToken", method = RequestMethod.GET)
     public void invalidateAccessToken(final HttpServletRequest request,
                                       final HttpServletResponse response) throws IOException {
+        Authentication auth = SecurityContextHolder.getContext().getAuthentication();
+        logger.info("Invalidating Keycloak token");
+        if (auth != null) {
+            auth.setAuthenticated(false);
+            resetSession(request.getSession());
+        }
         String authUrl = getLogoutUri(request, true);
         response.sendRedirect(authUrl);
     }
