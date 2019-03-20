@@ -96,17 +96,16 @@
   </span>
 </h1>
 <br>
-<div>
-  <fmt:message key="search_by" bundle="${resword}"/>
-</div>
-
 <table id="tbl-search" class="datatable">
   <thead>
     <tr>
-      <td><fmt:message key="participant_ID" bundle="${resword}"/></td>
-      <td><fmt:message key="first_name" bundle="${resword}"/></td>
-      <td><fmt:message key="last_name" bundle="${resword}"/></td>
-      <td><fmt:message key="secondary_ID" bundle="${resword}"/></td>
+      <td>
+        <fmt:message key="search_by" bundle="${resword}"/><br>
+        <fmt:message key="participant_ID" bundle="${resword}"/>
+      </td>
+      <td><br><fmt:message key="first_name" bundle="${resword}"/></td>
+      <td><br><fmt:message key="last_name" bundle="${resword}"/></td>
+      <td><br><fmt:message key="secondary_ID" bundle="${resword}"/></td>
       <td></td>
     </tr>
     <tr id="search-inputs">
@@ -133,8 +132,8 @@ var resultTmpl = Handlebars.compile($('#result-tmpl').html());
 var tblSearch = $('#tbl-search');
 var datatable = tblSearch.DataTable({
   searching: false,
-  paging: false,
-  dom: 't',
+  paging: true,
+  pageLength: 50,
   columnDefs: [{
     targets: -1,
     orderable: false
