@@ -155,7 +155,7 @@ public class MessageLogger {
 	 			bw.close();						
 	 	       
 	 	    } catch (Exception e) {
-	 	    	logger.info("Log File error " + e.getMessage());
+	 	    	logger.error("Log File error " + e.getMessage());
 	 	    	throw new OpenClinicaException("Write to log file error", ErrorConstants.ERR_LOG_FILE);
 	 	    }finally {
 	 			try {
@@ -164,7 +164,7 @@ public class MessageLogger {
 	 				if (fw != null)
 	 					fw.close();
 	 			} catch (IOException ex) {
-	 				logger.info("Log File error " + ex.getMessage());
+	 				logger.error("Log File error " + ex.getMessage());
 	 				throw new OpenClinicaException("Write to log file error", ErrorConstants.ERR_LOG_FILE);
 	 			}
 	 		}

@@ -113,7 +113,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 		    	}
 	    	}catch(NumberFormatException e) {
 	    		errMsg = "The inputted ordinal is not an integer";
-	    		logger.info(errMsg);
+	    		logger.error(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NOT_INTEGER);
 	    	}
 	    	
@@ -340,7 +340,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 		    	}
 	    	}catch(NumberFormatException e) {
 	    		errMsg = "The inputted ordinal is not an integer";
-	    		logger.info(errMsg);
+	    		logger.error(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NOT_INTEGER);
 	    	}
 	    	

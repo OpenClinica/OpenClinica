@@ -389,8 +389,7 @@ public class StudyEventController {
 			
 			
 		} catch (Exception e) {
-			// TODO Auto-generated catch block
-			e.printStackTrace();
+			logger.error("Error " + e.getMessage());
 		}
 		
 		RestReponseDTO responseDTO = new RestReponseDTO();
@@ -446,7 +445,7 @@ public class StudyEventController {
                 ResponseEntity<Object> objectResponseEntity = future.get();
                 return new ResponseEntity<>("Completed", HttpStatus.OK);
             } catch (InterruptedException e) {
-                e.printStackTrace();              
+            	logger.error("Error " + e.getMessage());              
                 return new ResponseEntity<>(e.getMessage(), HttpStatus.BAD_REQUEST);
             } catch (CustomRuntimeException e) {
                 
@@ -460,7 +459,7 @@ public class StudyEventController {
                     List<ErrorObj> err = new ArrayList<>();
                     ErrorObj errorObj = new ErrorObj(e.getMessage(), e.getMessage());
                     err.add(errorObj);
-                    e.printStackTrace();
+                    logger.error("Error " + e.getMessage());
                     
                     return new ResponseEntity<>(err, HttpStatus.BAD_REQUEST);
                 }
