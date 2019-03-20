@@ -95,9 +95,6 @@
     <fmt:message key="advanced_search" bundle="${resword}"/>
   </span>
 </h1>
-<div>
-  <fmt:message key="advsearch_description" bundle="${resword}"/>
-</div>
 <br>
 <div>
   <fmt:message key="search_by" bundle="${resword}"/>
@@ -143,7 +140,7 @@ var datatable = tblSearch.DataTable({
     orderable: false
   }],
   language: {
-    emptyTable: '<fmt:message key="advsearch_initresult" bundle="${resword}"/>'
+    emptyTable: '<fmt:message key="advsearch_noresult" bundle="${resword}"/>'
   }
 });
 
