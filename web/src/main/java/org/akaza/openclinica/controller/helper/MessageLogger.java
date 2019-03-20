@@ -4,6 +4,9 @@ import java.io.BufferedWriter;
 import java.io.File;
 import java.io.FileWriter;
 import java.io.IOException;
+import java.text.SimpleDateFormat;
+import java.util.Date;
+import java.util.HashMap;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
@@ -11,6 +14,8 @@ import javax.sql.DataSource;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
+import org.akaza.openclinica.exception.OpenClinicaException;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -101,6 +106,72 @@ public class MessageLogger {
 	    
 	   	    
 	} 
+    
+ public void writeToLog(String subDir,String orginalFileName, String headerLine,String msg,UserAccountBean userBean) throws OpenClinicaException {
+		
+    	BufferedWriter bw = null;
+		FileWriter fw = null;
+		boolean isNewFile = false;
+
+	    String logFileName;
+	   
+	    if(orginalFileName == null) {
+	    	logger.info("errorCode.emptyFile -- The file is null ");
+	    }else {
+	    	 try {
+	             int count =1;	    	
+	 	    		    	
+	 	    	File logFile;
+	 	    	String importFileDir = this.getPersonalLogFileDir(userBean,subDir);
+	     	    
+	 	    	logFileName = importFileDir + orginalFileName;
+	 			logFile = new File(logFileName);
+	 			
+	 			/**
+	 			 *  create new file and add headerLine as first line
+	 			 *  example :
+	 			 *  RowNo | ParticipantID | Status | Message
+	 			 */
+	 			if(!logFile.exists()) {
+	 				logFile.createNewFile();
+	 				isNewFile = true;				
+	 			}
+	 			
+	 			// true = append file
+	 			fw = new FileWriter(logFile.getAbsoluteFile(), true);
+	 			bw = new BufferedWriter(fw);
+	            
+	 			// create new file and prepare header line
+	 			if(isNewFile) {				
+	 				bw.write(headerLine);	
+	 				bw.write("\n");
+	 			}
+	 			
+	 			if(msg != null) {
+	 				bw.write(msg);	
+	 				bw.write("\n");
+	 			}	
+	 			
+	 			bw.close();						
+	 	       
+	 	    } catch (Exception e) {
+	 	    	logger.error("Log File error " + e.getMessage());
+	 	    	throw new OpenClinicaException("Write to log file error", ErrorConstants.ERR_LOG_FILE);
+	 	    }finally {
+	 			try {
+	 				if (bw != null)
+	 					bw.close();
+	 				if (fw != null)
+	 					fw.close();
+	 			} catch (IOException ex) {
+	 				logger.error("Log File error " + ex.getMessage());
+	 				throw new OpenClinicaException("Write to log file error", ErrorConstants.ERR_LOG_FILE);
+	 			}
+	 		}
+	    }
+	    
+	   	    
+	} 
     /**
      * 
      * @param request
@@ -168,6 +239,66 @@ public class MessageLogger {
 		return personalLogFileDir;
 	}
 
+    public String getPersonalLogFileDir(UserAccountBean ub, String subDir) {
+    	  String userName = "";
+    	  boolean prepareNewDir = false; 
+    	  UserAccountBean userBean = null;
+    	  int activeStudyId=-999;
+    	  
+  		  if (personalLogFileDir != null) {
+  			
+  	          userBean = ub;
+
+  	          if (userBean == null) {
+  	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
+  	                return err_msg;
+  	          }else {	        	  
+  	        	  userName = userBean.getName();
+  	        	  activeStudyId = userBean.getActiveStudyId();
+  	        	  
+  	        	  if(this.getCurrentUserName().equals(userName) && this.getCurrentActiveStudyId()==activeStudyId) {
+  	        		  return personalLogFileDir;
+  	        	  }else {
+  	        		  prepareNewDir = true;	        		  
+  	        	  }
+  	          }	  
+  			  
+  		  }else {
+  			  prepareNewDir = true;  
+  		  }	 
+  		  
+  		  if(prepareNewDir) {
+  			  String dir = CoreResources.getField("filePath");
+  	          if (!new File(dir).exists()) {
+  	              logger.info("The filePath in datainfo.properties is invalid " + dir);             
+  	          }
+  	          // All the uploaded files will be saved in filePath/import/userName/
+  	          userBean = ub;
+
+  	          if (userBean == null) {
+  	                String err_msg = "errorCode.InvalidUser:"+ "Please send request as a valid user";	               
+  	                return err_msg;
+  	          }else {	        	 
+  	        	  userName = (userBean.getName()+"_" +userBean.getId()).toLowerCase().replace(" ","");
+  	        	  activeStudyId = userBean.getActiveStudyId();
+  	        	  
+  	        	  this.setCurrentUserName(userName);
+  	        	  this.setCurrentActiveStudyId(activeStudyId);
+  	          }
+  	          
+  	          
+  	          String theDir = dir + subDir + File.separator + activeStudyId+ File.separator + userName + File.separator;
+          	         
+  	          if (!new File(theDir).isDirectory()) {
+  	              new File(theDir).mkdirs();
+  	              logger.info("Made the directory " + theDir);
+  	          }
+  	        
+  	          personalLogFileDir = theDir;
+  		  }
+  		 
+  		return personalLogFileDir;
+  	}
     
     /**
      * Helper Method to get the user account
@@ -195,7 +326,7 @@ public class MessageLogger {
     	return userBean;
        
 	}
-
+       
 	public String getCurrentUserName() {
 		return currentUserName;
 	}
@@ -210,5 +341,16 @@ public class MessageLogger {
 
 	public void setCurrentActiveStudyId(int currentActiveStudyId) {
 		this.currentActiveStudyId = currentActiveStudyId;
+	}
+	
+	public String getLogfileNamewithTimeStamp(String originalFileNm) {
+      
+    	String dataFormat =  "yyyy_MM_dd_HH_mm_ddZ";
+    	SimpleDateFormat  sdf = new SimpleDateFormat(dataFormat);	
+    	
+    	String sdfStr = sdf.format(new Date());    	    
+    	String logFileName = originalFileNm + "_"+ sdfStr+ "_log.txt";
+    	
+    	return logFileName;    	
 	}
 }
