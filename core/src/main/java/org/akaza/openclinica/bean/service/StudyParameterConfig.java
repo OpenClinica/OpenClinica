@@ -59,6 +59,8 @@ public class StudyParameterConfig implements Serializable{
 
     private String enforceEnrollmentCap;
 
+    private String contactsModule;
+
     public String getRandomization() {
         return randomization;
     }
@@ -334,6 +336,14 @@ public class StudyParameterConfig implements Serializable{
     }
     public void setParticipantIdTemplate(String participantIdTemplate) {
         this.participantIdTemplate = participantIdTemplate;
+    }
+
+    public String getContactsModule() {
+        return contactsModule;
+    }
+
+    public void setContactsModule(String contactsModule) {
+        this.contactsModule = contactsModule;
     }
 
     @Override

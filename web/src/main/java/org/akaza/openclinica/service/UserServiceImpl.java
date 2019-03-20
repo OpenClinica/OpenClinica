@@ -207,7 +207,7 @@ public class UserServiceImpl implements UserService {
              studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber() == null ? "" : participantDTO.getPhoneNumber());
          }
 
-        if(validateService.isAdvanceSearchEnabled()) {
+        if(validateService.isAdvanceSearchEnabled(tenantStudy)) {
             studySubject.getStudySubjectDetail().setLastName(participantDTO.getLastName() == null ? "" : participantDTO.getLastName());
             studySubject.getStudySubjectDetail().setLastNameForSearchUse(participantDTO.getLastName() == null ? "" : participantDTO.getLastName().toLowerCase());
 
@@ -235,8 +235,8 @@ public class UserServiceImpl implements UserService {
 
 
        public List<OCUserDTO> searchParticipantsByFields(String studyOid, String accessToken,String participantId,String firstName,String lastName,String identifier,UserAccountBean userAccountBean){
-           Study study = studyDao.findByOcOID(studyOid);
-           if(!validateService.isAdvanceSearchEnabled()){
+           Study tenantStudy = studyDao.findByOcOID(studyOid);
+           if(!validateService.isAdvanceSearchEnabled(tenantStudy)){
                return null;
            }
 
@@ -246,7 +246,7 @@ public class UserServiceImpl implements UserService {
       String identifierForSearchUse= cryptoConverter.convertToDatabaseColumn(identifier==null ? null: identifier.toLowerCase());
 
         List<OCUserDTO> userDTOS = new ArrayList<>();
-        List<StudySubject> studySubjects =studySubjectDao.findByParticipantIdFirstNameLastNameIdentifier(study,participantId,firstNameForSearchUse,lastNameForSearchUse,identifierForSearchUse);
+        List<StudySubject> studySubjects =studySubjectDao.findByParticipantIdFirstNameLastNameIdentifier(tenantStudy,participantId,firstNameForSearchUse,lastNameForSearchUse,identifierForSearchUse);
 
         for(StudySubject studySubject:studySubjects){
             OCUserDTO userDTO = new OCUserDTO();
