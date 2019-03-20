@@ -77,6 +77,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 			
 			if(startDate == null) {
 				errMsg = "start date is missing";
+				logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NO_START_DATE);
 			}else {
 				startDt = this.getRestfulServiceHelper().getDateTime(startDate);	
@@ -89,11 +90,13 @@ public class StudyEventServiceImpl implements StudyEventService {
 			
 	    	if(startDt == null) {
 	    		errMsg = "start date can't be parsed as a valid date,please enter in correct date format";
+	    		logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_START_DATE);
 	    	}else if(endDt != null) { 
 	    		
 	    		if(endDt.before(startDt)) {
 		        	errMsg = "The endDate can not before startDate";
+		        	logger.info(errMsg);
 		        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_END_DATE_BEFORE_START_DATE);
 		        }
 	    	}	
@@ -110,6 +113,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 		    	}
 	    	}catch(NumberFormatException e) {
 	    		errMsg = "The inputted ordinal is not an integer";
+	    		logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NOT_INTEGER);
 	    	}
 	    	
@@ -123,9 +127,11 @@ public class StudyEventServiceImpl implements StudyEventService {
 	    	
 	    	if(currentStudy == null) {
 	    		errMsg = "The study {" + studyOID + "} is not existing in the system.";
+	    		logger.info(errMsg);
 	    		throw new OpenClinicaException(errMsg,ErrorConstants.ERR_STUDY_NOT_EXIST);
 	    	}else if (currentStudy.getStatus().equals(Status.LOCKED)) {
 	    		errMsg = "The study {" + studyOID +"} has been LOCKED.";
+	    		logger.info(errMsg);
 	    		throw new OpenClinicaException(errMsg,ErrorConstants.ERR_STUDY_LOCKED);
 	    	}
 	    	// continue check site
@@ -134,6 +140,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	    		
 	    		if(currentSiteStudy == null) {
 	        		errMsg = "The study site {" + siteOID +"} is not existing in the system.";
+	        		logger.info(errMsg);
 	        		throw new OpenClinicaException(errMsg,ErrorConstants.ERR_SITE_NOT_EXIST);
 	        	}
 	    	}
@@ -153,7 +160,8 @@ public class StudyEventServiceImpl implements StudyEventService {
 	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, null);
 	    	}
 	    	
-	        if (errMsg != null) {           
+	        if (errMsg != null) {  
+	        	logger.info(errMsg);
 	             throw new OpenClinicaException(errMsg, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
 	        }  
 	    	    
@@ -165,11 +173,13 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        studySubject = (StudySubjectBean) sdao.findByLabelAndStudy(participantId, currentStudy);
 	        if(studySubject == null || (studySubject.getId() == 0 && studySubject.getLabel().trim().length() == 0)) {
 	        	errMsg = "The study subject {" + studySubjectKey +"} can not be found in the system.";
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NO_SUBJECT_FOUND);
 	        }
 	        Status subjectStatus = studySubject.getStatus();
 	        if ("removed".equalsIgnoreCase(subjectStatus.getName()) || "auto-removed".equalsIgnoreCase(subjectStatus.getName())) {
 	        	errMsg = "The study subject {" + studySubjectKey +"} has been removed.";
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_SUBJECT_REMOVED);
 	        }
 	      
@@ -189,13 +199,16 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        // find all active definitions with CRFs
 	        if(definition == null) {
 	        	errMsg ="The definition of event(" + studyEventOID + ") can not be found in the study(" + studyOID + ").";
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_EVENT_NOT_EXIST);
 	        }else if (definition.getType().equals(COMMON)) {
 	        	errMsg ="The type of event(" + studyEventOID + ") in the study(" + studyOID + ") is not a visit based event.";
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_WRONG_EVENT_TYPE);
 	        }else if(!(definition.isRepeating())) {
 	        	if(sampleOrdinal != 1) {
 	        		errMsg ="The type of event(" + studyEventOID + ") in the study(" + studyOID + ") is a visit based NON repeating event,so ordinal must be 1.";
+	        		logger.info(errMsg);
 		        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_ORDINAL_NOT_ONE_FOR_NONREPEATING);
 	        	}
 	        }else{
@@ -205,6 +218,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	            
 	        if (!subjectMayReceiveStudyEvent(dataSource, definition, studySubject,sampleOrdinal)) {
 	        	errMsg ="The event is NON repeating, and an event of this type already exists for the specified participant.";
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NON_REPEATING_ALREADY_EXISIT);
 	           
 	        }
@@ -216,6 +230,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        int maxSampleOrdinal = sed.getMaxSampleOrdinal(definition, studySubject) + 1;
 	        if(sampleOrdinal > maxSampleOrdinal) {
 	        	errMsg ="The ordinal is out of sequential scope,the current ordinal can't be greater than " + maxSampleOrdinal;
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_GREATER_THAN_MAX_ORDINAL);
 	        }
 	        	        
@@ -240,6 +255,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        studyEvent = (StudyEventBean) sed.create(studyEvent);
 	     
 	        if (!studyEvent.isActive()) {
+	        	logger.info("Event is not scheduled -- because it's not active");
 	            throw new OpenClinicaException("Event is not scheduled",ErrorConstants.ERR_EVENT_NOT_ACTIVE);
 	        }
 	
@@ -288,6 +304,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 			
 			if(startDate == null) {
 				errMsg = "start date is missing";
+				logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NO_START_DATE);
 			}else {
 				startDt = this.getRestfulServiceHelper().getDateTime(startDate);	
@@ -300,11 +317,13 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 			
 	    	if(startDt == null) {
 	    		errMsg = "start date can't be parsed as a valid date,please enter in correct date format";
+	    		logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_START_DATE);
 	    	}else if(endDt != null) { 
 	    		
 	    		if(endDt.before(startDt)) {
 		        	errMsg = "The endDate can not before startDate";
+		        	logger.info(errMsg);
 		        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_END_DATE_BEFORE_START_DATE);
 		        }
 	    	}	
@@ -321,6 +340,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 		    	}
 	    	}catch(NumberFormatException e) {
 	    		errMsg = "The inputted ordinal is not an integer";
+	    		logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NOT_INTEGER);
 	    	}
 	    	
@@ -334,9 +354,11 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	    	
 	    	if(currentStudy == null) {
 	    		errMsg = "The study {" + studyOID + "} is not existing in the system.";
+	    		logger.info(errMsg);
 	    		throw new OpenClinicaException(errMsg,ErrorConstants.ERR_STUDY_NOT_EXIST);
 	    	}else if (currentStudy.getStatus().equals(Status.LOCKED)) {
 	    		errMsg = "The study {" + studyOID +"} has been LOCKED.";
+	    		logger.info(errMsg);
 	    		throw new OpenClinicaException(errMsg,ErrorConstants.ERR_STUDY_LOCKED);
 	    	}
 	    	// continue check site
@@ -345,6 +367,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	    		
 	    		if(currentSiteStudy == null) {
 	        		errMsg = "The study site {" + siteOID +"} is not existing in the system.";
+	        		logger.info(errMsg);
 	        		throw new OpenClinicaException(errMsg,ErrorConstants.ERR_SITE_NOT_EXIST);
 	        	}
 	    	}
@@ -363,7 +386,8 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, null);
 	    	}
 	    	
-	        if (errMsg != null) {           
+	        if (errMsg != null) { 
+	        	logger.info(errMsg);
 	             throw new OpenClinicaException(errMsg, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
 	        }  
 	    	    
@@ -375,11 +399,13 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	        studySubject = (StudySubjectBean) sdao.findByLabelAndStudy(participantId, currentStudy);
 	        if(studySubject == null || (studySubject.getId() == 0 && studySubject.getLabel().trim().length() == 0)) {
 	        	errMsg = "The study subject {" + studySubjectKey +"} can not be found in the system.";
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NO_SUBJECT_FOUND);
 	        }
 	        Status subjectStatus = studySubject.getStatus();
 	        if ("removed".equalsIgnoreCase(subjectStatus.getName()) || "auto-removed".equalsIgnoreCase(subjectStatus.getName())) {
 	        	errMsg = "The study subject {" + studySubjectKey +"} has been removed.";
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_SUBJECT_REMOVED);
 	        }
 	      
@@ -399,13 +425,16 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	        // find all active definitions with CRFs
 	        if(definition == null) {
 	        	errMsg ="The definition of event(" + studyEventOID + ") can not be found in the study(" + studyOID + ").";
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_EVENT_NOT_EXIST);
 	        }else if (definition.getType().equals(COMMON)) {
 	        	errMsg ="The type of event(" + studyEventOID + ") in the study(" + studyOID + ") is not a visit based event.";
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_WRONG_EVENT_TYPE);
 	        }else if(!(definition.isRepeating())) {
 	        	if(sampleOrdinal != 1) {
 	        		errMsg ="The type of event(" + studyEventOID + ") in the study(" + studyOID + ") is a visit based NON repeating event,so ordinal must be 1.";
+	        		logger.info(errMsg);
 		        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_ORDINAL_NOT_ONE_FOR_NONREPEATING);
 	        	}
 	        }else{
@@ -415,6 +444,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	            
 	        if (!subjectMayReceiveStudyEvent(dataSource, definition, studySubject,sampleOrdinal)) {
 	        	errMsg ="The event is NON repeating, and an event of this type already exists for the specified participant.";
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NON_REPEATING_ALREADY_EXISIT);
 	           
 	        }
@@ -426,6 +456,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	        int maxSampleOrdinal = sed.getMaxSampleOrdinal(definition, studySubject) + 1;
 	        if(sampleOrdinal > maxSampleOrdinal) {
 	        	errMsg ="The ordinal is out of sequential scope,the current ordinal can't be greater than " + maxSampleOrdinal;
+	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_GREATER_THAN_MAX_ORDINAL);
 	        }
 	        	        
@@ -450,6 +481,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	        studyEvent = (StudyEventBean) sed.create(studyEvent);
 	     
 	        if (!studyEvent.isActive()) {
+	        	logger.info("Event is not scheduled -- because it's not active" );
 	            throw new OpenClinicaException("Event is not scheduled",ErrorConstants.ERR_EVENT_NOT_ACTIVE);
 	        }
 	
@@ -496,7 +528,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	      
 	        if (studyEventDefinition.isRepeating()) {  
 	        	for(StudyEventBean studyEvent:allEvents) {
-	        		if(studyEvent.getSampleOrdinal() == ordinal) {
+	        		if(studyEvent.getSampleOrdinal() == ordinal) {	        		
 	        			throw new OpenClinicaException("found repeating event with same ordinal " + ordinal,ErrorConstants.ERR_ALREADY_EXISIT);
 	        		}
 	        	}
