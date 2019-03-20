@@ -17,11 +17,19 @@ public class AdvancedSearchServlet extends SecureController {
      */
     @Override
     public void mayProceed() throws InsufficientPermissionException {
-        int roleid = ub.getActiveStudyRole().getId();
-        if (roleid == Role.INVESTIGATOR.getId() || roleid == Role.RESEARCHASSISTANT.getId())
-            return;
-        
-        throw new InsufficientPermissionException(Page.ADVANCED_SEARCH, resexception.getString("not_crc_nor_investigator"), "1");
+
+        if(request.getAttribute("advsearchStatus").equals(DISABLED)){
+            addPageMessage(respage.getString("contacts_module_is_disabled") + respage.getString("change_study_contact_sysadmin"));
+            throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("contacts_module_is_disabled"), "1");
+        }
+
+
+        Role r = currentRole.getRole();
+        if (!r.equals(Role.INVESTIGATOR) && !r.equals(Role.RESEARCHASSISTANT)) {
+            addPageMessage(respage.getString("no_have_correct_privilege_current_study") + respage.getString("change_study_contact_sysadmin"));
+            throw new InsufficientPermissionException(Page.MENU_SERVLET, resexception.getString("not_crc_nor_investigator"), "1");
+        }
+
     }
 
 
