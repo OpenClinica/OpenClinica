@@ -139,10 +139,11 @@ public class UserServiceImpl implements UserService {
 
 
         String accessCode = "";
-        do {
-            accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
-        } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode,customerUuid));
-
+        if(validateService.isParticipateActive(tenantStudy)) {
+            do {
+                accessCode = RandomStringUtils.random(Integer.parseInt(PASSWORD_LENGTH), true, true);
+            } while (keycloakClient.searchAccessCodeExists(accessToken, accessCode, customerUuid));
+        }
 
         Study publicStudy = studyDao.findPublicStudy(tenantStudy.getOc_oid());
 
@@ -226,7 +227,7 @@ public class UserServiceImpl implements UserService {
         Study study = getStudy(studyOid);
         StudySubject studySubject = getStudySubject(ssid, study);
 
-        if (studySubject!= null && studySubject.getUserId() != null) {
+        if (studySubject!= null) {
                 ocUserDTO = buildOcUserDTO( studySubject);
         }
         return ocUserDTO;
@@ -406,6 +407,11 @@ public class UserServiceImpl implements UserService {
 
     public ParticipantAccessDTO getAccessInfo( String accessToken,String studyOid, String ssid,String customerUuid) {
         Study tenantStudy = getStudy(studyOid);
+        if(!validateService.isParticipateActive(tenantStudy)){
+            logger.error("Participant account is not Active");
+            return null;
+        }
+
         StudySubject studySubject = getStudySubject(ssid, tenantStudy);
         if(studySubject==null || studySubject.getUserId()==null) {
          logger.error("Participant account not found");
