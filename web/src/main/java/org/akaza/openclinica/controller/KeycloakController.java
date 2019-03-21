@@ -152,7 +152,11 @@ public class KeycloakController {
                 String accessToken = (String) req.getSession().getAttribute("accessToken");
                 callbackService.updateParticipateModuleStatus(accessToken, publicStudy.getOid());
 
-                SecureController.refreshUserRole(req, ub, CoreResources.getPublicStudy(publicStudy.getOid(),dataSource));
+                req.setAttribute("requestSchema", publicStudy.getSchemaName());
+
+                StudyBean studyBean =CoreResources.getPublicStudy(publicStudy.getOid(),dataSource);
+
+                SecureController.refreshUserRole(req, ub, studyBean);
             }
 
         } else {
