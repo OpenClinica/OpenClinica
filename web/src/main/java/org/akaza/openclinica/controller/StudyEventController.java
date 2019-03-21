@@ -34,6 +34,7 @@ import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.dto.StudyEventScheduleDTO;
+import org.akaza.openclinica.controller.dto.StudyEventScheduleRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.EventCrfDao;
@@ -77,6 +78,7 @@ import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
+import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
@@ -217,36 +219,39 @@ public class StudyEventController {
     }
 
     @ApiOperation(value = "To schedule an event for participant at site level",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 200, message = "Successful operation"),
-	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
-	@RequestMapping(value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/{subjectKey}/events", method = RequestMethod.POST,consumes = {"multipart/form-data"})
-	public ResponseEntity<Object> scheduleEventAtSiteLevel(HttpServletRequest request,
-			@RequestParam(value = "ordinal",required = false) String ordinal,
-			@RequestParam("studyEventOID") String studyEventOID,
-			@PathVariable("subjectKey") String subjectKey,			
-			@ApiParam(value = "date format: yyyy-MM-dd") @RequestParam(value = "endDate",required = false) String endDate,
-			@ApiParam(value = "date format: yyyy-MM-dd", required = true) @RequestParam("startDate") String startDate,			
-			@PathVariable("studyOID") String studyOID,
-			@PathVariable("siteOID") String siteOID) throws Exception {
-		
+    @ApiResponses(value = {
+            @ApiResponse(code = 200, message = "Successful operation"),
+            @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
+    @RequestMapping(value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/{subjectKey}/events", method = RequestMethod.POST)
+    public ResponseEntity<Object> scheduleEventAtSiteLevel(HttpServletRequest request,
+            @RequestBody StudyEventScheduleRequestDTO studyEventScheduleRequestDTO,
+            @PathVariable("subjectKey") String subjectKey,
+            @PathVariable("studyOID") String studyOID,
+            @PathVariable("siteOID") String siteOID) throws Exception {
+        
+        String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();
+        String ordinal = studyEventScheduleRequestDTO.getOrdinal();
+        String startDate = studyEventScheduleRequestDTO.getStartDate();
+        String endDate = studyEventScheduleRequestDTO.getEndDate();
+        
     	
     	return scheduleEvent(request, studyOID, siteOID,studyEventOID,subjectKey,ordinal,startDate,endDate);
 	}
     
     @ApiOperation(value = "To schedule an event for participant at study level",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 200, message = "Successful operation"),
-	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
-	@RequestMapping(value = "clinicaldata/studies/{studyOID}/participants/{subjectKey}/events", method = RequestMethod.POST,consumes = {"multipart/form-data"})
-	public ResponseEntity<Object> scheduleEventAtStudyLevel(HttpServletRequest request,
-			@RequestParam(value = "ordinal",required = false) String ordinal,
-			@RequestParam("studyEventOID") String studyEventOID,
-			@PathVariable("subjectKey") String subjectKey,			
-			@ApiParam(value = "date format: yyyy-MM-dd") @RequestParam(value = "endDate",required = false) String endDate,
-			@ApiParam(value = "date format: yyyy-MM-dd", required = true) @RequestParam("startDate") String startDate,			
-			@PathVariable("studyOID") String studyOID) throws Exception {
-		
+   	@ApiResponses(value = {
+   	        @ApiResponse(code = 200, message = "Successful operation"),
+   	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
+   	@RequestMapping(value = "clinicaldata/studies/{studyOID}/participants/{subjectKey}/events", method = RequestMethod.POST)
+   	public ResponseEntity<Object> scheduleEventAtStudyLevel(HttpServletRequest request,
+   			@RequestBody StudyEventScheduleRequestDTO studyEventScheduleRequestDTO,
+   			@PathVariable("subjectKey") String subjectKey,									
+   			@PathVariable("studyOID") String studyOID) throws Exception {
+   		
+       	String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();
+       	String ordinal = studyEventScheduleRequestDTO.getOrdinal();
+       	String startDate = studyEventScheduleRequestDTO.getStartDate();
+       	String endDate = studyEventScheduleRequestDTO.getEndDate();
 		
     	return scheduleEvent(request, studyOID, null,studyEventOID,subjectKey,ordinal,startDate,endDate);
 	}
