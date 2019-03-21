@@ -236,7 +236,7 @@ public class SignStudySubjectServlet extends SecureController {
             KeycloakUserService keycloakUserService = ctx.getBean("keycloakUserService", KeycloakUserServiceImpl.class);
             boolean isAuthenticated = keycloakUserService.authenticateKeycloakUser(username, password);
 
-            if (isAuthenticated && ub.getName().equals(username)) {
+            if (isAuthenticated && ub.getName().equalsIgnoreCase(username)) {
                 if (signSubjectEvents(studySub, sm.getDataSource(), ub)) {
                     // Making the StudySubject signed as all the events have
                     // become signed.
