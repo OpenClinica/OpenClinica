@@ -1493,12 +1493,6 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         CoreResources.setRequestSchema(request, "public");
         StudyBuildService studyService = ctx.getBean("studyBuildService", StudyBuildService.class);
 
-        studyService.updateStudyUserRoles(request, studyService.getUserAccountObject(ub), ub.getActiveStudyId(), studyEnvUuid, false);
-        UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
-
-        ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getName());
-        ub.setRoles(userRoleBeans);
-        session.setAttribute(SecureController.USER_BEAN_NAME, ub);
         StudyDAO sd = new StudyDAO(sm.getDataSource());
         StudyBean tmpPublicStudy = sd.findByStudyEnvUuid(studyEnvUuid);
 
@@ -1506,6 +1500,13 @@ public abstract class SecureController extends HttpServlet implements SingleThre
             CoreResources.setRequestSchema(request,currentSchema);
             return isRenewAuth;
         }
+
+        studyService.updateStudyUserRoles(request, studyService.getUserAccountObject(ub), tmpPublicStudy.getId(), studyEnvUuid, false);
+        UserAccountDAO userAccountDAO = new UserAccountDAO(sm.getDataSource());
+
+        ArrayList userRoleBeans = (ArrayList) userAccountDAO.findAllRolesByUserName(ub.getName());
+        ub.setRoles(userRoleBeans);
+        session.setAttribute(SecureController.USER_BEAN_NAME, ub);
 
         StudyUserRoleBean role = ub.getRoleByStudy(tmpPublicStudy.getId());
 
