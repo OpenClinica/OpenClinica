@@ -558,7 +558,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                         scs.setParametersForSite(currentStudy);
                     }
                 }
-             //   request.setAttribute("requestSchema", "public");
+                request.setAttribute("requestSchema", "public");
 
                 session.setAttribute("study", currentStudy);
             } else if (currentPublicStudy.getId() > 0) {
@@ -568,7 +568,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                     currentPublicStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentPublicStudy.getParentStudyId())).getName());
                     request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
                     currentStudy.setParentStudyName(((StudyBean) sdao.findByPK(currentStudy.getParentStudyId())).getName());
-           //         request.setAttribute("requestSchema", "public");
+                    request.setAttribute("requestSchema", "public");
                 }
                 // YW >>
             }
@@ -661,8 +661,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             request.setAttribute("isAdminServlet", getAdminServlet());
 
-            Study tenantStudy =getStudyDao().findById(currentStudy.getId());
-            boolean advSearch = getValidateService().isAdvanceSearchEnabled(tenantStudy);
+            boolean advSearch = isContactsModuleEnabled();
             request.setAttribute("advsearchStatus", (advSearch? ENABLED : DISABLED));
 
             this.request = request;
@@ -1644,5 +1643,27 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
     protected StudyDao getStudyDao() {
         return (StudyDao) SpringServletAccess.getApplicationContext(context).getBean("studyDaoDomain");
+    }
+
+
+
+    private boolean isContactsModuleEnabled(){
+        String previousSchema = (String) request.getAttribute("requestSchema");
+        request.setAttribute("requestSchema", currentPublicStudy.getSchemaName());
+
+        StudyParameterValueDAO studyParameterValueDAO = new StudyParameterValueDAO(sm.getDataSource());
+        String contactsModuleStatus=null;
+        if(currentStudy.getParentStudyId()!=0){
+            contactsModuleStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getParentStudyId(), "contactsModule").getValue();
+        }else {
+            contactsModuleStatus = studyParameterValueDAO.findByHandleAndStudy(currentStudy.getId(), "contactsModule").getValue();
+        }
+        request.setAttribute("requestSchema", previousSchema);
+
+        if (contactsModuleStatus.equals(ENABLED)) {
+            return true;
+        } else {
+            return false;
+        }
     }
 }
