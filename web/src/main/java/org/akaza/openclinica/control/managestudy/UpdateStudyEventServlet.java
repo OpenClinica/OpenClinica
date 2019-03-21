@@ -555,7 +555,7 @@ public class UpdateStudyEventServlet extends SecureController {
             } catch (HttpResponseException e) {
                 logger.error("Authorization:" + e);
             }
-            if (isAuthenticated && ub.getName().equals(username)) {
+            if (isAuthenticated && ub.getName().equalsIgnoreCase(username)) {
                 Date date = new Date();
                 seb.setUpdater(ub);
                 seb.setUpdatedDate(date);
