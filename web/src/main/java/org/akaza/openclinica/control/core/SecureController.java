@@ -474,12 +474,7 @@ public abstract class SecureController extends HttpServlet implements SingleThre
 
             String ocUserUuid = null;
             System.out.println("Metric1" + new Date());
-            if (processSpecificStudyEnvUuid()) {
-                /* this handles the scenario when forceRenewAuth is true */
-                session.removeAttribute("userRole");
-                response.sendRedirect(request.getRequestURI() + "?" + STUDY_ENV_UUID  + "=" +  getParameter(request,STUDY_ENV_UUID) +  "&firstLoginCheck=true");
-                return;
-            }
+
             try {
                 ocUserUuid = controller.getOcUserUuid(request);
                 ub = (UserAccountBean) session.getAttribute(USER_BEAN_NAME);
@@ -509,6 +504,12 @@ public abstract class SecureController extends HttpServlet implements SingleThre
                 return;
             }
             request.setAttribute("userBean", ub);
+            if (processSpecificStudyEnvUuid()) {
+                /* this handles the scenario when forceRenewAuth is true */
+                session.removeAttribute("userRole");
+                response.sendRedirect(request.getRequestURI() + "?" + STUDY_ENV_UUID  + "=" +  getParameter(request,STUDY_ENV_UUID) +  "&firstLoginCheck=true");
+                return;
+            }
             StudyDAO sdao = new StudyDAO(sm.getDataSource());
             if (currentPublicStudy == null || currentPublicStudy.getId() <= 0) {
                 UserAccountDAO uDAO = new UserAccountDAO(sm.getDataSource());
