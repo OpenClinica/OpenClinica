@@ -1682,6 +1682,9 @@
         $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
     }
     function enableDisableControls() {
+        if (!$('#email-input').length)
+            return;
+
         var hasEmail = !!$('#email-input').val().trim();
         var validEmail = $('#email-input-error').is(':hidden');
         if (hasEmail && validEmail) {
@@ -1815,7 +1818,7 @@
             enableDisableControls();
         });
 
-        jQuery('#contactInformation').click(function() {
+        jQuery('#contactInformation, #partid-edit').click(function() {
             $('#fname-input').val(participateInfo.firstName);
             $('#lname-input').val(participateInfo.lastName);
             $('#email-input').val(participateInfo.email);
@@ -1832,10 +1835,6 @@
             $('#invite-option input[value=' + participateInfo.inviteParticipant + ']').click();
 
             enableDisableControls();
-            jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
-        });
-
-        jQuery('#partid-edit').click(function() {
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
         });
 
