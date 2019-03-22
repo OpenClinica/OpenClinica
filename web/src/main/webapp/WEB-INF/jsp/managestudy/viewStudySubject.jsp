@@ -465,13 +465,7 @@
                                             <td class="table_header_column_top">
                                               <fmt:message key="first_name" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top" id="info-fname"
-                                              <c:choose>
-                                                <c:when test="${advsearchStatus!='enabled'}">
-                                                  colspan="3"
-                                                </c:when>
-                                              </c:choose>
-                                            >
+                                            <td class="table_cell_top" id="info-fname">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
 
@@ -483,12 +477,8 @@
                                                 <td class="table_cell_top" id="info-lname">
                                                   &emsp;&emsp;&emsp;&emsp;
                                                 </td>
-                                              </c:when>
-                                            </c:choose>
-                                          </tr>
-                                          <tr>
-                                            <c:choose>
-                                              <c:when test="${advsearchStatus=='enabled'}">
+                                              </tr>
+                                              <tr>
                                                 <td class="table_header_column_top">
                                                   <fmt:message key="secondary_ID" bundle="${resword}"/>
                                                 </td>
@@ -501,13 +491,7 @@
                                             <td class="table_header_column">
                                               Mobile Number
                                             </td>
-                                            <td class="table_cell" id="info-phone-number"
-                                              <c:choose>
-                                                <c:when test="${advsearchStatus!='enabled'}">
-                                                  colspan="3"
-                                                </c:when>
-                                              </c:choose>
-                                            >
+                                            <td class="table_cell" id="info-phone-number">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
@@ -1234,11 +1218,24 @@
                 <span><fmt:message key="first_name" bundle="${resword}"/></span>
               </td>
               <td valign="top">
-                <input id="fname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
-                <span style="float:left; margin: 2px 10px;">
-                  <fmt:message key="last_name" bundle="${resword}"/>
-                </span>
-                <input id="lname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
+                <input id="fname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control
+                  <c:choose>
+                    <c:when test="${advsearchStatus=='enabled'}">
+                      invite-input-halfsize  
+                    </c:when>
+                    <c:otherwise>
+                      invite-input
+                    </c:otherwise>
+                  </c:choose>
+                ">
+                <c:choose>
+                  <c:when test="${advsearchStatus=='enabled'}">
+                    <span style="float:left; margin: 2px 10px;">
+                      <fmt:message key="last_name" bundle="${resword}"/>
+                    </span>
+                    <input id="lname-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input-halfsize">
+                  </c:when>
+                </c:choose>
               </td>
             </tr>
             
@@ -1685,6 +1682,9 @@
         $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
     }
     function enableDisableControls() {
+        if (!$('#email-input').length)
+            return;
+
         var hasEmail = !!$('#email-input').val().trim();
         var validEmail = $('#email-input-error').is(':hidden');
         if (hasEmail && validEmail) {
@@ -1818,7 +1818,7 @@
             enableDisableControls();
         });
 
-        jQuery('#contactInformation').click(function() {
+        jQuery('#contactInformation, #partid-edit').click(function() {
             $('#fname-input').val(participateInfo.firstName);
             $('#lname-input').val(participateInfo.lastName);
             $('#email-input').val(participateInfo.email);
@@ -1835,10 +1835,6 @@
             $('#invite-option input[value=' + participateInfo.inviteParticipant + ']').click();
 
             enableDisableControls();
-            jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
-        });
-
-        jQuery('#partid-edit').click(function() {
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
         });
 
