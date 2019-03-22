@@ -465,13 +465,7 @@
                                             <td class="table_header_column_top">
                                               <fmt:message key="first_name" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top" id="info-fname"
-                                              <c:choose>
-                                                <c:when test="${advsearchStatus!='enabled'}">
-                                                  colspan="3"
-                                                </c:when>
-                                              </c:choose>
-                                            >
+                                            <td class="table_cell_top" id="info-fname">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
 
@@ -483,12 +477,8 @@
                                                 <td class="table_cell_top" id="info-lname">
                                                   &emsp;&emsp;&emsp;&emsp;
                                                 </td>
-                                              </c:when>
-                                            </c:choose>
-                                          </tr>
-                                          <tr>
-                                            <c:choose>
-                                              <c:when test="${advsearchStatus=='enabled'}">
+                                              </tr>
+                                              <tr>
                                                 <td class="table_header_column_top">
                                                   <fmt:message key="secondary_ID" bundle="${resword}"/>
                                                 </td>
@@ -501,13 +491,7 @@
                                             <td class="table_header_column">
                                               Mobile Number
                                             </td>
-                                            <td class="table_cell" id="info-phone-number"
-                                              <c:choose>
-                                                <c:when test="${advsearchStatus!='enabled'}">
-                                                  colspan="3"
-                                                </c:when>
-                                              </c:choose>
-                                            >
+                                            <td class="table_cell" id="info-phone-number">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
