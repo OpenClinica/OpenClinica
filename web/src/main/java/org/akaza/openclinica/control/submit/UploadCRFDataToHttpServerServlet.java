@@ -19,6 +19,8 @@ import java.util.concurrent.TimeUnit;
 import javax.servlet.AsyncContext;
 import javax.servlet.http.HttpServletRequest;
 
+import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
+
 import java.io.BufferedReader;
 import java.io.BufferedWriter;
 import java.net.HttpURLConnection;
@@ -289,6 +291,10 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
 		
 		String basePath = remoteAddress;
 		requestMock.setAttribute("basePath", basePath);
+		
+		UserAccountBean ub = (UserAccountBean) request.getSession().getAttribute(USER_BEAN_NAME);
+		requestMock.getSession(true).setAttribute(USER_BEAN_NAME, ub);
+		
 		return requestMock;
 	}
 
