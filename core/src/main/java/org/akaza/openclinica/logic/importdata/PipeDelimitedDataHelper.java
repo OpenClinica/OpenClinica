@@ -100,7 +100,8 @@ public String readFileToString(File file) throws IOException{
 		String itemDataXMLValue;
 		
 		ArrayList itemDataValues;
-		String fileNm;		
+		String fileNm;
+		boolean foundItemData = false;
 		
 		
 
@@ -297,7 +298,7 @@ public String readFileToString(File file) throws IOException{
 													 itemData.setAttribute("Value", itemDataValue);
 																		              	
 													 itemGroupData.appendChild(itemData); 
-													 
+													 foundItemData = true;
 													 // if found, then skip the rest													 								 
 													 break;
 												 }
@@ -336,7 +337,9 @@ public String readFileToString(File file) throws IOException{
 				}
 				
 							
-		
+		    if(!foundItemData) {
+		    	throw new OpenClinicaSystemException("Import failed because no matched item data found in data file","errorCode.NoItemDataFound");
+		    }
 		
 
 			
@@ -363,12 +366,15 @@ public String readFileToString(File file) throws IOException{
 			pce.printStackTrace();
 		} catch (TransformerException tfe) {
 			tfe.printStackTrace();
-		}catch (Exception e) {
+		} catch (OpenClinicaSystemException ose) {
+			throw ose;
+		} catch (Exception e) {
 			String msg = e.toString();
 			
 			if(msg != null && msg.indexOf("ArrayIndexOutOfBoundsException") > -1) {
 				throw new OpenClinicaSystemException("Error-data file format missing pipe","errorCode.dataRowMissingPipe");
 			}
+
 			
 		}
 		

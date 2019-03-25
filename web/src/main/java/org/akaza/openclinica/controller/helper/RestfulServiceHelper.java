@@ -896,7 +896,10 @@ public class RestfulServiceHelper {
 		    	
 		    	String orginalFileName = file.getName();
 		    	int pos = orginalFileName.indexOf(".");
-		    	orginalFileName = orginalFileName.substring(0,pos);
+		    	if(pos > 0) {
+		    		orginalFileName = orginalFileName.substring(0,pos);
+		    	}
+		    	
 		    	
 		    	String columnLine = reader.readLine();
 		    	String line = columnLine;
