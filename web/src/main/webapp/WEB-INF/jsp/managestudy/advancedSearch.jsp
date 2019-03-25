@@ -70,6 +70,10 @@
   .datatable tbody td:last-child {
     text-align: center;
   }
+  .dataTables_length {
+      padding-top: 0.75em;
+      padding-left: 1.5em;
+  }
   input[type=text] {
     width: 100%;
     padding: 0;
@@ -131,6 +135,7 @@
 var resultTmpl = Handlebars.compile($('#result-tmpl').html());
 var tblSearch = $('#tbl-search');
 var datatable = tblSearch.DataTable({
+  dom: 'tilp',
   searching: false,
   paging: true,
   pageLength: 50,
@@ -139,7 +144,17 @@ var datatable = tblSearch.DataTable({
     orderable: false
   }],
   language: {
-    emptyTable: '<fmt:message key="advsearch_noresult" bundle="${resword}"/>'
+    emptyTable: '<fmt:message key="advsearch_noresult" bundle="${resword}"/>',
+    paginate: {
+        first: '<<',
+        previous: '<',
+        next: '>',
+        last: '>>'
+    },
+    info: '<fmt:message key="results_m_n_of_total" bundle="${resword}"/>',
+    infoEmpty: '<fmt:message key="results_zero_of_zero" bundle="${resword}"/>',
+    infoFiltered: '<span class="info-filtered"><fmt:message key="results_filtered" bundle="${resword}"/></span>',
+    lengthMenu: '<fmt:message key="results_pagesize" bundle="${resword}"/>'
   }
 });
 
