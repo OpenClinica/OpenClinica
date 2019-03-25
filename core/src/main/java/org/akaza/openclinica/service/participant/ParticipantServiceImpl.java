@@ -12,6 +12,8 @@ import java.util.Map;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 
+import com.fasterxml.jackson.databind.ObjectMapper;
+import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
@@ -20,20 +22,31 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.StudyType;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
+import org.akaza.openclinica.bean.oid.OidGenerator;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
 import org.akaza.openclinica.core.SessionManager;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.SubjectDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
+import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.dto.AuditLogEventDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.core.ParameterizedTypeReference;
+import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
@@ -44,20 +57,27 @@ import org.springframework.transaction.annotation.Transactional;
 import freemarker.template.Configuration;
 import freemarker.template.Template;
 import freemarker.template.TemplateException;
+import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestTemplate;
 
 @Service("ParticipantService")
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
 public class ParticipantServiceImpl implements ParticipantService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	
-	private SubjectDAO subjectDao;	
+	private SubjectDAO subjectDao;
 	private StudyParameterValueDAO studyParameterValueDAO;		
 	private StudySubjectDAO studySubjectDao;
 	private StudyDAO studyDao;
 	
 	@Autowired
 	private UserAccountDAO userAccountDao;
-	
+
+
+
+    @Autowired
+    private StudySubjectDao studySubjectHibDao;
+
     @Autowired
 	@Qualifier("dataSource")
 	private DataSource dataSource;
@@ -75,45 +95,60 @@ public class ParticipantServiceImpl implements ParticipantService {
     * @return
     * @throws OpenClinicaException
     */
-    public String createParticipant(SubjectTransferBean subjectTransfer,StudyBean currentStudy) throws OpenClinicaException {
+    public String createParticipant(SubjectTransferBean subjectTransfer,StudyBean currentStudy,String accessToken) throws Exception {
    	   // create subject
-       SubjectBean subject = new SubjectBean();
-       subject.setStatus(Status.AVAILABLE);
-       subject.setOwner(subjectTransfer.getOwner());
-      
-       subject = this.getSubjectDao().create(subject);
-       if (!subject.isActive()) {
-           throw new OpenClinicaException("Could not create subject", "3");
-       }
-       
-       // create study subject
-       StudyBean siteStudy = subjectTransfer.getSiteStudy();
-       String siteOid = subjectTransfer.getSiteIdentifier();
-       
-       StudySubjectBean studySubject = new StudySubjectBean();
-       studySubject.setSubjectId(subject.getId());
-       if(siteStudy != null) {
-    	   studySubject.setStudyId(siteStudy.getId());
-       }else {
-    	   studySubject.setStudyId(subjectTransfer.getStudy().getId());
-       }
-       
-       studySubject.setLabel(subjectTransfer.getStudySubjectId());
-       studySubject.setStatus(Status.AVAILABLE);
-       studySubject.setOwner(subjectTransfer.getOwner());
-       Date now = new Date();
-       studySubject.setCreatedDate(now);
-       studySubject.setUpdater(subjectTransfer.getOwner());
-       studySubject.setUpdatedDate(now);
-       studySubject = this.getStudySubjectDao().createWithoutGroup(studySubject);
-       if (!studySubject.isActive()) {
-           throw new OpenClinicaException("Could not create study subject", "4");
-       }
+        StudyBean siteStudy = subjectTransfer.getSiteStudy();
+        String siteOid = subjectTransfer.getSiteIdentifier();
+        StudySubject studySubject=null;
+      StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudy(subjectTransfer.getPersonId(), currentStudy);
+
+if(studySubjectBean==null || !studySubjectBean.isActive()) {
+// Create New Study Subject
+    SubjectBean subjectBean = new SubjectBean();
+    subjectBean.setStatus(Status.AVAILABLE);
+    subjectBean.setOwner(subjectTransfer.getOwner());
+
+    subjectBean = this.getSubjectDao().create(subjectBean);
+    if (!subjectBean.isActive()) {
+        throw new OpenClinicaException("Could not create subject", "3");
+    }
+
+
+
+
+     studySubjectBean = new StudySubjectBean();
+    studySubjectBean.setSubjectId(subjectBean.getId());
+    if (siteStudy != null) {
+        studySubjectBean.setStudyId(siteStudy.getId());
+    } else {
+        studySubjectBean.setStudyId(subjectTransfer.getStudy().getId());
+    }
+
+    studySubjectBean.setLabel(subjectTransfer.getStudySubjectId());
+    studySubjectBean.setStatus(Status.AVAILABLE);
+    studySubjectBean.setOwner(subjectTransfer.getOwner());
+    Date now = new Date();
+    studySubjectBean.setCreatedDate(now);
+    studySubjectBean.setUpdater(subjectTransfer.getOwner());
+    studySubjectBean.setUpdatedDate(now);
+    studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
+
+}
+        studySubject=saveOrUpdateStudySubjectDetails( studySubjectBean,  subjectTransfer,accessToken,currentStudy.getOid(),subjectTransfer.getOwner());
+
+        if (!studySubjectBean.isActive() || studySubject==null) {
+            throw new OpenClinicaException("Could not create study subject", "4");
+        }
+
+
+
+
+
        
        //update subject account
        if(siteStudy != null) {
     	   //update at site level
-    	   updateStudySubjectSize(siteStudy);
+    	   updateStudySubjectSize(subjectTransfer.getSiteStudy());
     	   // update at parent level
     	   updateStudySubjectSize(currentStudy);
        }else {
@@ -230,29 +265,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
     }
     
            
-   public boolean isSystemGenerating(StudyBean study) {
-    	
-    	boolean isSystemGenerating = false;
-    	
-    	StudyBean currentStudy = study;
-    	 
-        int handleStudyId = currentStudy.getParentStudyId() > 0 ? currentStudy.getParentStudyId() : currentStudy.getId();
-        String idSetting = "";
-        StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectIdGeneration");
-        idSetting = subjectIdGenerationParameter.getValue();
-       
-        /**
-		 *  Participant ID auto generate
-		 */
-        if ((idSetting.equals("auto editable") || idSetting.equals("auto non-editable"))) {
-	        StudyParameterValueBean participantIdTemplateSetting = this.getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "participantIdTemplate");
-	        if (participantIdTemplateSetting!=null && participantIdTemplateSetting.getValue() != null) {
-	        	isSystemGenerating = true;	        			        	   
-            }
-        }
-        
-        return isSystemGenerating;
-    }
+
     
     /**
      * Helper Method to get the user account
@@ -364,5 +377,118 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         return subjectCount;
     }
 
+
+
+    private AuditLogEventDTO populateAuditLogEventDTO(int entityId, String oldValue, String newValue, int auditLogEventTypeId, String entityName , int userId) {
+        AuditLogEventDTO auditLogEventDTO=null;
+            auditLogEventDTO = new AuditLogEventDTO();
+            auditLogEventDTO.setOldValue(oldValue);
+            auditLogEventDTO.setNewValue(newValue);
+            auditLogEventDTO.setEntityId(entityId);
+            auditLogEventDTO.setEntityName(entityName);
+            auditLogEventDTO.setAuditTable("study_subject");
+            auditLogEventDTO.setAuditLogEventTypId(auditLogEventTypeId);
+            auditLogEventDTO.setUserId(userId);
+
+
+
+        return auditLogEventDTO;
+
+    }
+
+    private StudySubject saveOrUpdateStudySubjectDetails(StudySubjectBean studySubjectBean, SubjectTransferBean subjectTransfer, String accessToken, String studyOid , UserAccountBean userAccountBean) {
+        StudySubject studySubject = studySubjectHibDao.findById(studySubjectBean.getId());
+        String firstNameOldValue = "";
+        String lastNameOldValue = "";
+        String emailOldValue = "";
+        String phoneOldValue = "";
+        String identifierOldValue = "";
+
+
+        StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
+
+
+        if (studySubjectDetail == null) {
+            studySubjectDetail = new StudySubjectDetail();
+        } else {
+            firstNameOldValue = studySubjectDetail.getFirstName();
+            lastNameOldValue = studySubjectDetail.getLastName();
+            emailOldValue = studySubjectDetail.getEmail();
+            phoneOldValue = studySubjectDetail.getPhone();
+            identifierOldValue = studySubjectDetail.getIdentifier();
+        }
+
+
+        studySubjectDetail.setFirstName(subjectTransfer.getFirstName());
+        studySubjectDetail.setLastName(subjectTransfer.getLastName());
+        studySubjectDetail.setIdentifier(subjectTransfer.getIdentifier());
+        studySubjectDetail.setEmail(subjectTransfer.getEmailAddress());
+        studySubjectDetail.setPhone(subjectTransfer.getPhoneNumber());
+
+        studySubject.setStudySubjectDetail(studySubjectDetail);
+
+        studySubject = studySubjectHibDao.saveOrUpdate(studySubject);
+
+        int studySubjectId = studySubject.getStudySubjectId();
+        String firstNameNewValue = subjectTransfer.getFirstName();
+        String lastNameNewValue = subjectTransfer.getLastName();
+        String emailNewValue = subjectTransfer.getEmailAddress();
+        String phoneNewValue = subjectTransfer.getPhoneNumber();
+        String identifierNewValue = subjectTransfer.getIdentifier();
+        AuditLogEventDTO auditLogEventDTO=null;
+
+        if (!firstNameNewValue.equals(firstNameOldValue)) {
+            auditLogEventDTO=populateAuditLogEventDTO(studySubjectId, firstNameOldValue, firstNameNewValue, (firstNameOldValue == null || firstNameOldValue == "") ? 43 : 44, "Participant first name",userAccountBean.getId() );
+            auditEvent(auditLogEventDTO, accessToken, studyOid);
+        }
+
+        if (!emailNewValue.equals(emailOldValue)) {
+            auditLogEventDTO=    populateAuditLogEventDTO(studySubjectId, emailOldValue, emailNewValue, (emailOldValue == null || emailOldValue == "") ? 46 : 47, "Participant email address",userAccountBean.getId());
+            auditEvent(auditLogEventDTO, accessToken, studyOid);
+        }
+
+        if (!phoneNewValue.equals(phoneOldValue)) {
+            auditLogEventDTO= populateAuditLogEventDTO(studySubjectId, phoneOldValue, phoneNewValue, (phoneOldValue == null || phoneOldValue == "") ? 49 : 50, "Participant phone number",userAccountBean.getId());
+            auditEvent(auditLogEventDTO, accessToken, studyOid);
+        }
+        if (!lastNameNewValue.equals(lastNameOldValue)) {
+            auditLogEventDTO= populateAuditLogEventDTO(studySubjectId, lastNameOldValue, lastNameNewValue, (lastNameOldValue == null || lastNameOldValue == "") ? 52 : 53, "Participant last name",userAccountBean.getId());
+            auditEvent(auditLogEventDTO, accessToken, studyOid);
+        }
+        if (!identifierNewValue.equals(identifierOldValue)) {
+            auditLogEventDTO= populateAuditLogEventDTO(studySubjectId, identifierOldValue, identifierNewValue, (identifierOldValue == null || identifierOldValue == "") ? 55 : 56, "Participant identifier",userAccountBean.getId());
+            auditEvent(auditLogEventDTO, accessToken, studyOid);
+        }
+        return studySubject;
+
+    }
+    public void auditEvent(AuditLogEventDTO auditLogEventDTO, String accessToken, String studyOid) {
+        String urlBase = CoreResources.getField("sysURL").split("/MainMenu")[0];
+
+
+        String uri = urlBase + "/pages/auth/api/studies/" + studyOid + "/auditEvents";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        StudyBean studyBean = null;
+        HttpEntity<AuditLogEventDTO> entity = new HttpEntity<>(auditLogEventDTO,headers);
+
+        try {
+
+          ResponseEntity responseEntity=  restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
+         if(responseEntity!=null){
+             logger.info("Auditing complete");
+         }
+
+        } catch (Exception e) {
+            logger.error("Auditing error");
+        }
+
+    }
 
 }

@@ -201,7 +201,6 @@ public class UserServiceImpl implements UserService {
             studySubject.setStudySubjectDetail(studySubjectDetail);
         }
         studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
-        studySubject.getStudySubjectDetail().setFirstNameForSearchUse(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName().toLowerCase());
 
          if( validateService.isParticipateActive(tenantStudy)) {
              studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
@@ -210,10 +209,8 @@ public class UserServiceImpl implements UserService {
 
         if(validateService.isAdvanceSearchEnabled(tenantStudy)) {
             studySubject.getStudySubjectDetail().setLastName(participantDTO.getLastName() == null ? "" : participantDTO.getLastName());
-            studySubject.getStudySubjectDetail().setLastNameForSearchUse(participantDTO.getLastName() == null ? "" : participantDTO.getLastName().toLowerCase());
 
             studySubject.getStudySubjectDetail().setIdentifier(participantDTO.getIdentifier() == null ? "" : participantDTO.getIdentifier());
-            studySubject.getStudySubjectDetail().setIdentifierForSearchUse(participantDTO.getIdentifier() == null ? "" : participantDTO.getIdentifier().toLowerCase());
         }
         return studySubjectDao.saveOrUpdate(studySubject);
 

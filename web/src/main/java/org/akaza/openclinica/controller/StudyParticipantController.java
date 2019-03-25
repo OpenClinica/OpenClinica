@@ -82,7 +82,12 @@ public class StudyParticipantController {
                         + "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
                         + "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
                         + "<br />participantIDNotUnique                        : Participant ID already exists."
-                        + "<br />studyHasSystemGeneratedIdEnabled                        : Study is set to have system-generated ID, hence no new participant can be added."
+                        + "<br />studyHasSystemGeneratedIdEnabled              : Study is set to have system-generated ID, hence no new participant can be added."
+						+ "<br />firstName                                     : First Name length should not exceed 35 characters."
+						+ "<br />lastName                                      : Last Name length should not exceed 35 characters."
+						+ "<br />identifier                                    : Identifier Name length should not exceed 35 characters."
+						+ "<br />emailAddress                                  : Email Address length should not exceed 255 characters."
+						+ "<br />phoneNumber                                   : Phone number length should not exceed 15 characters."
                         + "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 		@RequestMapping(value = "/{studyOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
@@ -91,7 +96,12 @@ public class StudyParticipantController {
 			String subjectKeyVal = participantRestfulRequestDTO.getSubjectKey();
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("subjectKey", subjectKeyVal);
-			
+			map.put("firstName", participantRestfulRequestDTO.getFirstName());
+			map.put("emailAddress", participantRestfulRequestDTO.getEmailAddress());
+			map.put("phoneNumber", participantRestfulRequestDTO.getPhoneNumber());
+			map.put("lastName", participantRestfulRequestDTO.getLastName());
+			map.put("identifier", participantRestfulRequestDTO.getIdentifier());
+
 			ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
 							
 			try {
@@ -119,17 +129,26 @@ public class StudyParticipantController {
                         + "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
                         + "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
                         + "<br />participantIDNotUnique                        : Participant ID already exists."
-                        + "<br />studyHasSystemGeneratedIdEnabled                        : Study is set to have system-generated ID, hence no new participant can be added."
-                        + "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
+                        + "<br />studyHasSystemGeneratedIdEnabled              : Study is set to have system-generated ID, hence no new participant can be added."
+						+ "<br />firstName                                     : First Name length should not exceed 35 characters."
+						+ "<br />lastName                                      : Last Name length should not exceed 35 characters."
+						+ "<br />identifier                                    : Identifier Name length should not exceed 35 characters."
+						+ "<br />emailAddress                                  : Email Address length should not exceed 255 characters."
+						+ "<br />phoneNumber                                   : Phone number length should not exceed 15 characters."
+						+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
         @RequestMapping(value = "/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request, 
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
 				@PathVariable("studyOID") String studyOID,
 				@PathVariable("siteOID") String siteOID) throws Exception {
-			String subjectKeyVal = participantRestfulRequestDTO.getSubjectKey();
 			HashMap<String, Object> map = new HashMap<>();
-			map.put("subjectKey", subjectKeyVal);
-			
+			map.put("subjectKey", participantRestfulRequestDTO.getSubjectKey());
+			map.put("firstName", participantRestfulRequestDTO.getFirstName());
+			map.put("emailAddress", participantRestfulRequestDTO.getEmailAddress());
+			map.put("phoneNumber", participantRestfulRequestDTO.getPhoneNumber());
+			map.put("lastName", participantRestfulRequestDTO.getLastName());
+			map.put("identifier", participantRestfulRequestDTO.getIdentifier());
+
 			ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
 			
 			try {
@@ -295,7 +314,25 @@ public class StudyParticipantController {
                 errors.reject("errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");
             }
 
-            participantValidator.validate(subjectTransferBean, errors);
+            if (subjectTransferBean.getFirstName().length()>35){
+				errors.reject("errorCode.firsName","First name length should not exceed 35 characters");
+			}
+			if (subjectTransferBean.getLastName().length()>35){
+				errors.reject("errorCode.lastName","Last name length should not exceed 35 characters");
+			}
+			if (subjectTransferBean.getIdentifier().length()>35){
+				errors.reject("errorCode.identifier","Identifier length should not exceed 35 characters");
+			}
+			if (subjectTransferBean.getEmailAddress().length()>255){
+				errors.reject("errorCode.emailAddress","Email Address length should not exceed 255 characters");
+			}
+			if (subjectTransferBean.getPhoneNumber().length()>15){
+				errors.reject("errorCode.phoneNumber","Phone number length should not exceed 15 characters");
+			}
+
+
+
+			participantValidator.validate(subjectTransferBean, errors);
 
 
 	        if(errors.hasErrors()) {
@@ -324,7 +361,7 @@ public class StudyParticipantController {
 	    		
 	    		response = new ResponseEntity(responseFailure, org.springframework.http.HttpStatus.BAD_REQUEST);
 	        } else {        				
-			  	String label = create(subjectTransferBean,tenantstudy);
+			  	String label = create(subjectTransferBean,tenantstudy,request);
 			  	studyParticipantDTO.setSubjectKey(label);
 
 				StudySubjectBean subject = this.getStudySubjectDAO().findByLabel(label);
@@ -366,7 +403,8 @@ public class StudyParticipantController {
 			StudyBean study = this.getRestfulServiceHelper().setSchema(studyOID, request);
 			StudyBean studyBean = null;
 			studyBean = this.participantService.validateRequestAndReturnStudy(studyOID, siteOID,request);			
-        	if(this.participantService.isSystemGenerating(studyBean)) {
+        	if(utilService.isParticipantIDSystemGenerated(studyBean)) {
+
 				 throw new OpenClinicaSystemException("errorCode.bulkUploadNotSupportSystemGeneratedSetting","This study has set up participant ID to be System-generated, bulk upload is not supported at this time ");
 			 }
         	
@@ -429,7 +467,7 @@ public class StudyParticipantController {
 		        	failureCount++;
 		        	responseStudyParticipantsBulkDTO.getFailedParticipants().add(e);
 		        } else {        				
-				  	String label = create(subjectTransferBean,study);
+				  	String label = create(subjectTransferBean,study,request);
 				  	ResponseSuccessStudyParticipantDTO e = new ResponseSuccessStudyParticipantDTO();
 				  	e.setSubjectKey(studyParticipantDTO.getSubjectKey());
 				  	e.setStatus("Available");
@@ -583,9 +621,11 @@ public class StudyParticipantController {
 	     * @return String
 		 * @throws OpenClinicaException 
 	     */
-	    private String create(SubjectTransferBean subjectTransferBean,StudyBean currentStudy) throws OpenClinicaException {
+	    private String create(SubjectTransferBean subjectTransferBean,StudyBean currentStudy, HttpServletRequest request) throws Exception {
 	          logger.debug("creating subject transfer");
-	          return this.participantService.createParticipant(subjectTransferBean,currentStudy);    
+	          String accessToken = utilService.getAccessTokenFromRequest(request);
+
+	          return this.participantService.createParticipant(subjectTransferBean,currentStudy,accessToken);
 	    }
 	    
 	   
@@ -635,19 +675,32 @@ public class StudyParticipantController {
 		 * @throws ParseException
 		 * @throws Exception
 		 */
-		 private SubjectTransferBean transferToSubject(HashMap<String, Object> map) throws ParseException, Exception {
-		 	   			
-			    String personId = (String) map.get("subjectKey");
-			   
-			    
-			    SubjectTransferBean subjectTransferBean = new SubjectTransferBean();		       
-		        	
-		        subjectTransferBean.setPersonId(personId);
-		        subjectTransferBean.setStudySubjectId(personId);
-		        
-		        return subjectTransferBean;
-			 
-		 }
+		private SubjectTransferBean transferToSubject(HashMap<String, Object> map) throws ParseException, Exception {
+
+			String personId = (String) map.get("subjectKey");
+			String firstName = (String) map.get("firstName");
+			String lastName = (String) map.get("lastName");
+			String identifier = (String) map.get("identifier");
+
+			String emailAddress = (String) map.get("emailAddress");
+			String phoneNumber = (String) map.get("phoneNumber");
+
+
+			SubjectTransferBean subjectTransferBean = new SubjectTransferBean();
+
+			subjectTransferBean.setPersonId(personId);
+			subjectTransferBean.setStudySubjectId(personId);
+			subjectTransferBean.setFirstName(firstName);
+			subjectTransferBean.setLastName(lastName);
+			subjectTransferBean.setIdentifier(identifier);
+
+			subjectTransferBean.setEmailAddress(emailAddress);
+			subjectTransferBean.setPhoneNumber(phoneNumber);
+
+
+			return subjectTransferBean;
+
+		}
 		 
 		 /**
 		  * 
