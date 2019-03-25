@@ -40,7 +40,7 @@
     <link rel="SHORTCUT ICON" href="images/favicon.png" type="image/x-icon" />
     <link rel="stylesheet" href="includes/styles.css" type="text/css"/>
     <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-    <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
+    <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/bluebird/3.3.4/bluebird.min.js"></script>
     <script type="text/javascript" src="js/lib/es6-promise.auto.min.js"></script>
     <script type="text/javascript" src="js/lib/client.js"></script>

@@ -12,7 +12,7 @@
 <jsp:include page="../include/submit-header.jsp"/>
 <link rel="stylesheet" href="includes/font-awesome-4.7.0/css/font-awesome.css">
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/permissionTagAccess.js"></script>
 <script type="text/javascript" language="javascript">

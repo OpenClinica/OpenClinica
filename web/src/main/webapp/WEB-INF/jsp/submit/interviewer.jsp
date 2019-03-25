@@ -28,7 +28,7 @@
 <c:set var="contextPath" value="${fn:replace(pageContext.request.requestURL, fn:substringAfter(pageContext.request.requestURL, pageContext.request.contextPath), '')}" />
 
 <script type="text/JavaScript" language="JavaScript" src="includes/jmesa/jquery.min.js"></script>
-<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.1.1.js"></script>
+<script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 <style type="text/css">
 
 .tooltip {
