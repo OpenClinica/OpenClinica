@@ -64,6 +64,7 @@ public class ErrorConstants {
     public static final String ERR_GREATER_THAN_MAX_ORDINAL = "errorCode.greaterThanMaxSampleOrdinal";
     public static final String ERR_EVENT_NOT_ACTIVE = "errorCode.notActive";
     public static final String ERR_LOG_FILE = "errorCode.logFile";
+    public static final String ERR_DATA_MISSING_PIPE = "errorCode.dataRowMissingPipe";
     
     
 
