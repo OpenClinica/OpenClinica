@@ -58,6 +58,7 @@ public class StudySubjectDetail extends DataMapDomainObject {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+        setFirstNameForSearchUse(getFirstName() == null ? "" : getFirstName().toLowerCase());
     }
 
     @Convert(converter = CryptoConverter.class)
@@ -68,6 +69,7 @@ public class StudySubjectDetail extends DataMapDomainObject {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+        setLastNameForSearchUse(getLastName() == null ? "" : getLastName().toLowerCase());
     }
 
     @Convert(converter = CryptoConverter.class)
@@ -100,6 +102,7 @@ public class StudySubjectDetail extends DataMapDomainObject {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+        setIdentifierForSearchUse(getIdentifier() == null ? "" : getIdentifier().toLowerCase());
     }
 
     @Convert(converter = CryptoConverter.class)

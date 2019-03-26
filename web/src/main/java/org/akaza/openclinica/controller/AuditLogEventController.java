@@ -9,9 +9,7 @@ import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.datamap.AuditLogEvent;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.service.AuditLogEventService;
-import org.akaza.openclinica.service.ParticipateService;
-import org.akaza.openclinica.service.SiteBuildService;
+import org.akaza.openclinica.service.*;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.cdisc.ns.odm.v130.ODM;
 import org.slf4j.Logger;
@@ -43,15 +41,18 @@ public class AuditLogEventController {
 
     @Autowired
     private AuditLogEventService auditLogEventService;
+    @Autowired
+    private ValidateService validateService;
 
+    @Autowired
+    private UtilService utilService;
 
     @RequestMapping(value = "/auth/api/studies/{studyOID}/auditEvents", method = RequestMethod.POST)
     public ResponseEntity<?> createAuditLogEvent(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @RequestBody AuditLogEventDTO auditLogEventDTO) {
         logger.info("Creating AuditLogEvent : {}", auditLogEventDTO);
 
-        auditLogEventService.getRestfulServiceHelper().setSchema(studyOid, request);
-        UserAccountBean ub = auditLogEventService.getRestfulServiceHelper().getUserAccount(request);
-
+        utilService.setSchemaFromStudyOid(studyOid);
+        UserAccountBean ub =utilService.getUserAccountFromRequest(request);
         auditLogEventService.saveAuditLogEvent(auditLogEventDTO,ub);
 
         HttpHeaders headers = new HttpHeaders();

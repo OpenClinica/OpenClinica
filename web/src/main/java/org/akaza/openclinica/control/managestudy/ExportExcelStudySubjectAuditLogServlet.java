@@ -658,6 +658,10 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
         auditLogEventTypes.add(47);
         auditLogEventTypes.add(49);
         auditLogEventTypes.add(50);
+        auditLogEventTypes.add(52);
+        auditLogEventTypes.add(53);
+        auditLogEventTypes.add(55);
+        auditLogEventTypes.add(56);
         return auditLogEventTypes;
     }
 }
