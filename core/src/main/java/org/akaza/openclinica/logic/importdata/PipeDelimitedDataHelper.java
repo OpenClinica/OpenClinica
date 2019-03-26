@@ -45,24 +45,22 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 	 * @param mappingFile
 	 * @param rawItemDataFile
 	 * @return
+	 * @throws IOException 
 	 */
-public String transformTextToODMxml(File mappingFile,File rawItemDataFile) {
+public String transformTextToODMxml(File mappingFile,File rawItemDataFile) throws OpenClinicaSystemException, IOException{
 	
-	String rawMappingStr;
-	String rawItemData;
-	String odmXml = null;
+		String rawMappingStr;
+		String rawItemData;
+		String odmXml = null;
+		
 	
-	try {
 		rawMappingStr = this.readFileToString(mappingFile);
 		rawItemData = this.readFileToString(rawItemDataFile);
 		
 		odmXml = transformTextToODMxml(rawMappingStr,rawItemData); 
-	} catch (Exception e) {
-		// TODO Auto-generated catch block
-		e.printStackTrace();
-	}
 	
 		return odmXml;
+	
 	}
 
 /**
@@ -86,7 +84,7 @@ public String readFileToString(File file) throws IOException{
 	
       return sb.toString();
 }
-	public String transformTextToODMxml(String rawMappingStr,String rawItemData) {
+	public String transformTextToODMxml(String rawMappingStr,String rawItemData) throws OpenClinicaSystemException {
 		
 		String studyOID;
 		String subjectKey;
@@ -102,7 +100,8 @@ public String readFileToString(File file) throws IOException{
 		String itemDataXMLValue;
 		
 		ArrayList itemDataValues;
-		String fileNm;		
+		String fileNm;
+		boolean foundItemData = false;
 		
 		
 
@@ -299,7 +298,7 @@ public String readFileToString(File file) throws IOException{
 													 itemData.setAttribute("Value", itemDataValue);
 																		              	
 													 itemGroupData.appendChild(itemData); 
-													 
+													 foundItemData = true;
 													 // if found, then skip the rest													 								 
 													 break;
 												 }
@@ -338,7 +337,9 @@ public String readFileToString(File file) throws IOException{
 				}
 				
 							
-		
+		    if(!foundItemData) {
+		    	throw new OpenClinicaSystemException("Import failed because no matched item data found in data file","errorCode.NoItemDataFound");
+		    }
 		
 
 			
@@ -365,8 +366,16 @@ public String readFileToString(File file) throws IOException{
 			pce.printStackTrace();
 		} catch (TransformerException tfe) {
 			tfe.printStackTrace();
-		}catch (Exception e) {
-			return e.toString();
+		} catch (OpenClinicaSystemException ose) {
+			throw ose;
+		} catch (Exception e) {
+			String msg = e.toString();
+			
+			if(msg != null && msg.indexOf("ArrayIndexOutOfBoundsException") > -1) {
+				throw new OpenClinicaSystemException("Error-data file format missing pipe","errorCode.dataRowMissingPipe");
+			}
+
+			
 		}
 		
 		return "";
@@ -823,5 +832,87 @@ private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {
     return errorMsg;
 
 }
+
+
+public String getParticipantID(File mappingFile,File rawItemDataFile) throws OpenClinicaSystemException, IOException{
+	
+	String rawMappingStr;
+	String rawItemData;
+	String participantID = null;
+	
+
+	rawMappingStr = this.readFileToString(mappingFile);
+	rawItemData = this.readFileToString(rawItemDataFile);
+	
+	participantID = getParticipantID(rawMappingStr,rawItemData); 
+
+	return participantID;
+
+}
+
+public String getParticipantID(String rawMappingStr,String rawItemData) throws OpenClinicaSystemException {
+	
+	String subjectKey;
+	
+     /**
+     * Hold all ItemOIDs coming from mapping file
+     * each ite, like:
+     *  ItemGroupOID--Item Name -- Item OID
+     */
+	ArrayList mappedColumnNameList = null;
+     /**
+     * Hold all ItemGroupOIDs coming from mapping file
+     */
+	Object[] mappingItemGroupOIDs;
+     
+	try {
+		
+		columnNms = getDataColumnNames(rawItemData);	
+	
+		mappedValues = getDataMappedValues(rawMappingStr,columnNms);				
+		mappedColumnNameList =(ArrayList) mappedValues.get("mappedColumnNameList");
+		ArrayList itemGroupOIDList = (ArrayList) mappedValues.get("itemGroupOIDList");
+		
+		mappingItemGroupOIDs=(Object[]) itemGroupOIDList.toArray();						
+		String[] dataRows = rawItemData.split(new Character((char) 13).toString());
+		
+		int indexofParticipantID = 0;
+		
+		for(int i = 0;i<dataRows.length ;i++){			
+			String tempDataRowStr = dataRows[i].toString().replaceAll("\n", "");
+			if(tempDataRowStr.endsWith("|")) {
+				tempDataRowStr = tempDataRowStr + " ";
+			}
+			String[] dataRow = this.toArrayWithFullItems(tempDataRowStr, "|");
+			// find subject OID, It may be at any position
+			if(i==0) {
+				for(int k=0;i<dataRow.length;k++){
+					if(dataRow[k].toString().trim().equals("ParticipantID") || dataRow[k].substring(1).trim().equals("ParticipantID")) {
+						indexofParticipantID = k;
+						
+						break;
+					}
+				}
+			 }else {					
+				if(dataRows[i].toString().replaceAll("/n|||/r", "").trim().length() > 0) {
+					subjectKey = dataRow[indexofParticipantID].toString().trim();
+					
+					return subjectKey;
+				}				
+				
+			}
+
+				
+			}
+	
+
+	} catch (Exception e) {
+		String msg = e.toString();
+		throw new OpenClinicaSystemException(msg,"errorCode.noParticipantID");				
+	}
+	
+	return "";
+ }
+
 
 }
