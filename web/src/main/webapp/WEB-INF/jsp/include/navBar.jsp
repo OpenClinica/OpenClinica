@@ -6,6 +6,7 @@
 <fmt:setBundle basename="org.akaza.openclinica.i18n.words" var="resword"/>
 <fmt:setBundle basename="org.akaza.openclinica.i18n.format" var="resformat"/>
 <jsp:useBean scope='session' id='userBean' class='org.akaza.openclinica.bean.login.UserAccountBean'/>
+
 <%
     String currentURL = null;
     if (request.getAttribute("javax.servlet.forward.request_uri") != null) {
@@ -66,6 +67,8 @@
             });
         </script>
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
+        <link href="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/css/bootstrap-tour-standalone.min.css" rel="stylesheet">
+        <script src="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/js/bootstrap-tour-standalone.min.js"></script>
     </c:when>
     <c:otherwise>
         <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
@@ -81,6 +84,8 @@
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/sessionTimeout.js"></script>
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/auth0/captureKeyboardMouseEvents.js"></script>
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
+        <link href="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/css/bootstrap-tour-standalone.min.css" rel="stylesheet">
+        <script src="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/js/bootstrap-tour-standalone.min.js"></script>
     </c:otherwise>
 </c:choose>
 
