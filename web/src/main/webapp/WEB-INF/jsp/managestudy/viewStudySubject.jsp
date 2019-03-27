@@ -1707,38 +1707,7 @@
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function(data) {
-                    var oldName  = participateInfo.firstName;
-                    var oldEmail = participateInfo.email;
-                    var oldPhone = participateInfo.phoneNumber;
-                    var newName  = data.firstName;
-                    var newEmail = data.email;
-                    var newPhone = data.phoneNumber;
-                    var hasOldName  = !!oldName;
-                    var hasOldEmail = !!oldEmail;
-                    var hasOldPhone = !!oldPhone;
-                    var hasNewName  = !!newName;
-                    var hasNewEmail = !!newEmail;
-                    var hasNewPhone = !!newPhone;
-                    var isNameNew  = !hasOldName  && hasNewName;
-                    var isEmailNew = !hasOldEmail && hasNewEmail;
-                    var isPhoneNew = !hasOldPhone && hasNewPhone;
-                    var isNameUpdated  = hasOldName  && newName  != oldName;
-                    var isEmailUpdated = hasOldEmail && newEmail != oldEmail;
-                    var isPhoneUpdated = hasOldPhone && newPhone != oldPhone;
 
-                    if (isNameNew)
-                        logAudit('Participant first name', 43, null, newName);
-                    if (isNameUpdated)
-                        logAudit('Participant first name', 44, oldName, newName);
-                    if (isEmailNew)
-                        logAudit('Participant email address', 46, null, newEmail);
-                    if (isEmailUpdated)
-                        logAudit('Participant email address', 47, oldEmail, newEmail);
-                    if (isPhoneNew)
-                        logAudit('Participant phone number', 49, null, newPhone);
-                    if (isPhoneUpdated)
-                        logAudit('Participant phone number', 50, oldPhone, newPhone);
-                      
                     updateParticipateInfo(data);
                     getAccessCode();
                 },

@@ -379,22 +379,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
 
 
 
-    private AuditLogEventDTO populateAuditLogEventDTO(int entityId, String oldValue, String newValue, int auditLogEventTypeId, String entityName , int userId) {
-        AuditLogEventDTO auditLogEventDTO=null;
-            auditLogEventDTO = new AuditLogEventDTO();
-            auditLogEventDTO.setOldValue(oldValue);
-            auditLogEventDTO.setNewValue(newValue);
-            auditLogEventDTO.setEntityId(entityId);
-            auditLogEventDTO.setEntityName(entityName);
-            auditLogEventDTO.setAuditTable("study_subject");
-            auditLogEventDTO.setAuditLogEventTypId(auditLogEventTypeId);
-            auditLogEventDTO.setUserId(userId);
 
-
-
-        return auditLogEventDTO;
-
-    }
 
     private StudySubject saveOrUpdateStudySubjectDetails(StudySubjectBean studySubjectBean, SubjectTransferBean subjectTransfer, String accessToken, String studyOid , UserAccountBean userAccountBean) {
         StudySubject studySubject = studySubjectHibDao.findById(studySubjectBean.getId());
@@ -429,65 +414,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
 
         studySubject = studySubjectHibDao.saveOrUpdate(studySubject);
 
-        int studySubjectId = studySubject.getStudySubjectId();
-        String firstNameNewValue = subjectTransfer.getFirstName();
-        String lastNameNewValue = subjectTransfer.getLastName();
-        String emailNewValue = subjectTransfer.getEmailAddress();
-        String phoneNewValue = subjectTransfer.getPhoneNumber();
-        String identifierNewValue = subjectTransfer.getIdentifier();
-        AuditLogEventDTO auditLogEventDTO=null;
-
-        if (!firstNameNewValue.equals(firstNameOldValue)) {
-            auditLogEventDTO=populateAuditLogEventDTO(studySubjectId, firstNameOldValue, firstNameNewValue, (firstNameOldValue == null || firstNameOldValue == "") ? 43 : 44, "Participant first name",userAccountBean.getId() );
-            auditEvent(auditLogEventDTO, accessToken, studyOid);
-        }
-
-        if (!emailNewValue.equals(emailOldValue)) {
-            auditLogEventDTO=    populateAuditLogEventDTO(studySubjectId, emailOldValue, emailNewValue, (emailOldValue == null || emailOldValue == "") ? 46 : 47, "Participant email address",userAccountBean.getId());
-            auditEvent(auditLogEventDTO, accessToken, studyOid);
-        }
-
-        if (!phoneNewValue.equals(phoneOldValue)) {
-            auditLogEventDTO= populateAuditLogEventDTO(studySubjectId, phoneOldValue, phoneNewValue, (phoneOldValue == null || phoneOldValue == "") ? 49 : 50, "Participant phone number",userAccountBean.getId());
-            auditEvent(auditLogEventDTO, accessToken, studyOid);
-        }
-        if (!lastNameNewValue.equals(lastNameOldValue)) {
-            auditLogEventDTO= populateAuditLogEventDTO(studySubjectId, lastNameOldValue, lastNameNewValue, (lastNameOldValue == null || lastNameOldValue == "") ? 52 : 53, "Participant last name",userAccountBean.getId());
-            auditEvent(auditLogEventDTO, accessToken, studyOid);
-        }
-        if (!identifierNewValue.equals(identifierOldValue)) {
-            auditLogEventDTO= populateAuditLogEventDTO(studySubjectId, identifierOldValue, identifierNewValue, (identifierOldValue == null || identifierOldValue == "") ? 55 : 56, "Participant identifier",userAccountBean.getId());
-            auditEvent(auditLogEventDTO, accessToken, studyOid);
-        }
         return studySubject;
-
-    }
-    public void auditEvent(AuditLogEventDTO auditLogEventDTO, String accessToken, String studyOid) {
-        String urlBase = CoreResources.getField("sysURL").split("/MainMenu")[0];
-
-
-        String uri = urlBase + "/pages/auth/api/studies/" + studyOid + "/auditEvents";
-
-        RestTemplate restTemplate = new RestTemplate();
-        HttpHeaders headers = new HttpHeaders();
-        headers.setContentType(MediaType.APPLICATION_JSON);
-        ObjectMapper objectMapper = new ObjectMapper();
-        objectMapper.registerModule(new JavaTimeModule());
-        headers.add("Authorization", "Bearer " + accessToken);
-        headers.add("Accept-Charset", "UTF-8");
-        StudyBean studyBean = null;
-        HttpEntity<AuditLogEventDTO> entity = new HttpEntity<>(auditLogEventDTO,headers);
-
-        try {
-
-          ResponseEntity responseEntity=  restTemplate.exchange(uri, HttpMethod.POST, entity, String.class);
-         if(responseEntity!=null){
-             logger.info("Auditing complete");
-         }
-
-        } catch (Exception e) {
-            logger.error("Auditing error");
-        }
 
     }
 
