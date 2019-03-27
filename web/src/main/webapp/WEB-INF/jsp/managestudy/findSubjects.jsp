@@ -25,6 +25,10 @@
 
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 
+<c:if test="${participantIDVerification == 'true'}">
+    <script type="text/javascript" language="JavaScript" src="js/lib/bootstrap-tour.js"></script>
+</c:if>
+
 <script type="text/javascript">
     function onInvokeAction(id,action) {
         if(id.indexOf('findSubjects') == -1)  {
@@ -120,9 +124,6 @@
     <form  action="${pageContext.request.contextPath}/ListStudySubjects">
         <input type="hidden" name="module" value="admin">
         ${findSubjectsHtml}
-        <c:if test="${participantIDVerification == 'true'}">
-            <c:import url="../include/bootstrapTour.jsp"></c:import>
-        </c:if>
     </form>
 </div>
 
