@@ -160,12 +160,14 @@ public class UserServiceImpl implements UserService {
                 // create participant user Account In Runtime
                     userAccount = createUserAccount(participantDTO, studySubject, ownerUserAccountBean, username, publicStudy, keycloakUserId);
                 // create study subject detail Account
-                    studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.CREATED, userAccount.getUserId(),tenantStudy);
+                    studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.CREATED, userAccount.getUserId(),tenantStudy,userAccount);
                     logger.info("Participate user_id: {} and user_status: {} are added in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
 
             } else {
                 // update study subject detail Account
-                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, null, null,tenantStudy);
+                userAccount=userAccountDao.findByUserId(ownerUserAccountBean.getId());
+                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, null, null,tenantStudy,userAccount);
+
                     logger.info("Participate with user_id: {} ,it's user_status: {} is updated in study_subject table: ", studySubject.getUserId(), studySubject.getUserStatus());
 
             }
@@ -177,7 +179,7 @@ public class UserServiceImpl implements UserService {
             ParticipantAccessDTO accessDTO= getAccessInfo(accessToken,studyOid,ssid,customerUuid);
 
             sendEmailToParticipant(studySubject,tenantStudy, accessDTO);
-            studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null,tenantStudy);
+            studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null,tenantStudy,userAccount);
 
         }
             ocUserDTO = buildOcUserDTO(studySubject);
@@ -186,8 +188,10 @@ public class UserServiceImpl implements UserService {
     }
 
     private StudySubject saveOrUpdateStudySubject(StudySubject studySubject,OCParticipantDTO participantDTO,
-                                                  UserStatus userStatus, Integer userId,Study tenantStudy){
+                                                  UserStatus userStatus, Integer userId,Study tenantStudy,UserAccount userAccount){
 
+        studySubject.setUpdateId(userAccount.getUserId());
+        studySubject.setDateUpdated(new Date());
         if (userId != null){
             studySubject.setUserId(userId);
         }
@@ -200,17 +204,16 @@ public class UserServiceImpl implements UserService {
             StudySubjectDetail studySubjectDetail = new StudySubjectDetail();
             studySubject.setStudySubjectDetail(studySubjectDetail);
         }
-        studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName() == null ? "" : participantDTO.getFirstName());
+      studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName());
 
          if( validateService.isParticipateActive(tenantStudy)) {
-             studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail() == null ? "" : participantDTO.getEmail());
-             studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber() == null ? "" : participantDTO.getPhoneNumber());
+             studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail() );
+             studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber() );
          }
 
         if(validateService.isAdvanceSearchEnabled(tenantStudy)) {
-            studySubject.getStudySubjectDetail().setLastName(participantDTO.getLastName() == null ? "" : participantDTO.getLastName());
-
-            studySubject.getStudySubjectDetail().setIdentifier(participantDTO.getIdentifier() == null ? "" : participantDTO.getIdentifier());
+            studySubject.getStudySubjectDetail().setLastName(participantDTO.getLastName() );
+            studySubject.getStudySubjectDetail().setIdentifier(participantDTO.getIdentifier() );
         }
         return studySubjectDao.saveOrUpdate(studySubject);
 
@@ -451,11 +454,20 @@ public class UserServiceImpl implements UserService {
 
     private OCUserDTO buildOcUserDTO( StudySubject studySubject) {
         OCUserDTO ocUserDTO = new OCUserDTO();
-        ocUserDTO.setEmail(studySubject.getStudySubjectDetail().getEmail());
-        ocUserDTO.setFirstName(studySubject.getStudySubjectDetail().getFirstName());
-        ocUserDTO.setLastName(studySubject.getStudySubjectDetail().getLastName());
-        ocUserDTO.setPhoneNumber(studySubject.getStudySubjectDetail().getPhone());
-        ocUserDTO.setIdentifier(studySubject.getStudySubjectDetail().getIdentifier());
+        StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
+        if(studySubjectDetail!=null) {
+            ocUserDTO.setFirstName(studySubjectDetail.getFirstName()!=null?studySubjectDetail.getFirstName():"");
+            ocUserDTO.setEmail(studySubjectDetail.getEmail()!=null?studySubjectDetail.getEmail():"");
+            ocUserDTO.setPhoneNumber(studySubjectDetail.getPhone()!=null?studySubjectDetail.getPhone():"");
+            ocUserDTO.setLastName(studySubjectDetail.getLastName()!=null?studySubjectDetail.getLastName():"");
+            ocUserDTO.setIdentifier(studySubjectDetail.getIdentifier()!=null?studySubjectDetail.getIdentifier():"");
+        }else{
+            ocUserDTO.setFirstName("");
+            ocUserDTO.setEmail("");
+            ocUserDTO.setPhoneNumber("");
+            ocUserDTO.setLastName("");
+            ocUserDTO.setIdentifier("");
+        }
         ocUserDTO.setStatus(studySubject.getUserStatus());
         return ocUserDTO;
     }
