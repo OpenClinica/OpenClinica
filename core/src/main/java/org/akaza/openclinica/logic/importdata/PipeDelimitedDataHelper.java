@@ -120,6 +120,9 @@ public String readFileToString(File file) throws IOException{
 
 		try {
 			
+
+			checkPipeNumber(rawItemData);
+			
 			columnNms = getDataColumnNames(rawItemData);	
 			
 			if(this.hasParticipantIDColumn()) {
@@ -379,6 +382,32 @@ public String readFileToString(File file) throws IOException{
 		}
 		
 		return "";
+	}
+
+	/**
+	 * @param rawItemData
+	 * @throws OpenClinicaSystemException
+	 */
+	private void checkPipeNumber(String rawItemData) throws OpenClinicaSystemException {
+		String[] dataRows = rawItemData.split(new Character((char) 13).toString());
+		
+		String tempDataRowStr = dataRows[0].toString().replaceAll("\n", "");
+		if(tempDataRowStr.endsWith("|")) {
+			tempDataRowStr = tempDataRowStr + " ";
+		}
+		String[] headerRow = this.toArrayWithFullItems(tempDataRowStr, "|");
+		
+		tempDataRowStr = dataRows[1].toString().replaceAll("\n", "");
+		if(tempDataRowStr.endsWith("|")) {
+			tempDataRowStr = tempDataRowStr + " ";
+		}
+		String[] dataRow = this.toArrayWithFullItems(tempDataRowStr, "|");
+		
+		if(dataRow.length < headerRow.length) {
+			throw new OpenClinicaSystemException("Error-data file format not match header - less pipe than header","errorCode.dataRowMissingPipe");
+		}else if(dataRow.length > headerRow.length) {
+			throw new OpenClinicaSystemException("Error-data file format not match header - more pipe than header","errorCode.dataRowMorePipe");
+		}
 	}
 
 	/**
