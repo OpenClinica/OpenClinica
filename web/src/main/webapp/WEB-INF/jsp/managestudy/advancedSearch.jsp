@@ -113,10 +113,10 @@
       <td></td>
     </tr>
     <tr id="search-inputs">
-      <td><input type="text" id="input-id"></td>
-      <td><input type="text" id="input-fname"></td>
-      <td><input type="text" id="input-lname"></td>
-      <td><input type="text" id="input-secid"></td>
+      <td><input type="text" id="input-id"    maxlength="35"></td>
+      <td><input type="text" id="input-fname" maxlength="35"></td>
+      <td><input type="text" id="input-lname" maxlength="35"></td>
+      <td><input type="text" id="input-secid" maxlength="35"></td>
       <td><input type="button" value="Search" id="btn-search" disabled="disabled"></td>
     </tr>
     <tr>
@@ -221,7 +221,7 @@ $('#search-inputs').on('change keyup paste', function() {
   }
 });
 
-$('#show-all').click(function() {
+$('#tbl-search').on('click', '#show-all', function() {
   doSearch('');
 });
 </script>

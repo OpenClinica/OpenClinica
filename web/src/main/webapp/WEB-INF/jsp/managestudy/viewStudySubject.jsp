@@ -159,6 +159,13 @@
   $(document.body).on('click', '.section-header', showHide);
 </script>
 <style>
+  #general-actions > td {
+    width: 50%;
+    padding-top: 3px;
+  }
+  #general-actions a {
+    font-size: 14px;
+  }
   #header {
     display: inline-block;
     margin-bottom: 25px;
@@ -171,6 +178,9 @@
   }
   .table_cell {
     padding-top: 6px;
+  }
+  .tablebox_center {
+    margin: 0;
   }
   .section {
     margin-bottom: 3px;
@@ -214,29 +224,6 @@
     color: #618ebb;
     margin-left: 5px;
   }
-  .full-width {
-    width: 100%;
-  }
-  .twin {
-    width: 50%;
-  }
-  .twin:first-child {
-    padding-right: 10px;
-  }
-  .twin:last-child {
-    padding-left: 10px;
-  }
-  @media(max-width: 1024px) {
-    .twin {
-      width: 100%;
-    }
-    .twin:first-child {
-      padding-right: 0;
-    }
-    .twin:last-child {
-      padding-left: 0;
-    }
-  }
   .left {
     float: left;
   }
@@ -255,7 +242,6 @@
   .error {
     color: red;
   }
-
   .invite-input {
     width: 250px;
   }
@@ -313,7 +299,7 @@
 <input type="button" class="invisible" id="reset-all-filters" value='<fmt:message key="custom_view_on" bundle="${resword}"/> &nbsp; &times;' onclick="resetAllFilters();">
 <div class="header-links">
   <span>
-    <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}')"/>">
+    <a href="javascript:openDocWindow('ViewStudySubjectAuditLog?id=<c:out value="${studySub.id}"/>')">
       <c:out value="${studySub.label}"/> <fmt:message key="audit_log" bundle="${resword}"/>
     </a>
   </span>
@@ -341,10 +327,44 @@
     <fmt:message key="general_information" bundle="${resword}"/>
   </div>
   <div class="section-body">
-    <table border="0" cellpadding="0" cellspacing="0" class="full-width">
+    <table width="100%">
       <tbody>
+        <tr id="general-actions">
+          <!-- Table Tools/Actions cell -->
+          <td>
+           <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
+              <a href="javascript:;" id="editParticipantID" <c:if test="${userRole.monitor}">class="invisible"</c:if>>
+                <fmt:message key="edit" bundle="${resword}"/>
+              </a>
+            </c:if>
+          </td>
+          <td>
+            <c:if test="${
+              studySub.status.name!='removed' &&
+              (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
+            }">
+              <c:if test="${participateStatus=='enabled'}">
+                <a href="javascript:;" id="contactInformation">
+                  <fmt:message key="party_invite" bundle="${resword}"/>
+                </a>
+                <span id="view-access-link" style="display:none;">
+                  &nbsp;|&nbsp;
+                  <a href="javascript:;" id="participateAccess">
+                    <fmt:message key="view_participant_access_code" bundle="${resword}"/>
+                  </a>
+                </span>
+              </c:if>
+              <c:if test="${participateStatus!='enabled' && advsearchStatus=='enabled'}">
+                <a href="javascript:;" id="partid-edit">
+                  <fmt:message key="partid_edit" bundle="${resword}"/>
+                </a>
+              </c:if>
+            </c:if>
+          </td>
+          <!-- End Table Tools/Actions cell -->
+        </tr>
         <tr>
-          <td style="padding-right: 20px;" valign="top" width="800">
+          <td valign="top">
             <!-- These DIVs define shaded box borders -->
             <div class="box_T">
               <div class="box_L">
@@ -355,227 +375,170 @@
                         <div class="box_BL">
                           <div class="box_BR">
                             <div class="tablebox_center">
-                              <table border="0" cellpadding="0" cellspacing="0" class="left twin">
-                                <!-- Table Actions row (pagination, search, tools) -->
+                              <table width="100%">
                                 <tbody>
                                   <tr>
-                                    <!-- Table Tools/Actions cell -->
-                                    <td class="table_actions" valign="top">
-                                     <c:if test="${study.studyParameterConfig.subjectIdGeneration=='manual' && study.status.available}">
-                                        <a href="javascript:;" id="editParticipantID" <c:if test="${userRole.monitor}">class="invisible"</c:if>>
-                                          <fmt:message key="edit" bundle="${resword}"/>
+                                    <td class="table_header_column_top">
+                                      <fmt:message key="study_subject_ID" bundle="${resword}"/>
+                                    </td>
+                                    <td class="table_cell_top">
+                                      <c:out value="${studySub.label}"/>
+                                    </td>
+
+                                    <td class="table_header_column">
+                                      <fmt:message key="status" bundle="${resword}"/>
+                                    </td>
+                                    <td class="table_cell">
+                                      <c:out value="${studySub.status.name}"/>
+                                    </td>
+                                  </tr>
+
+                                  <tr>
+                                    <td class="table_header_column_top">
+                                      <fmt:message key="study_name" bundle="${resword}"/>
+                                    </td>
+                                    <td class="table_cell">
+                                      <c:choose>
+                                        <c:when test="${subjectStudy.parentStudyId>0}">
+                                          <a href="ViewStudy?id=<c:out value="${parentStudy.id}"/>&amp;viewFull=yes">
+                                            <c:out value="${parentStudy.name}"/>
+                                          </a>
+                                        </c:when>
+                                        <c:otherwise>
+                                          <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>&amp;viewFull=yes">
+                                            <c:out value="${subjectStudy.name}"/>
+                                          </a>
+                                        </c:otherwise>
+                                      </c:choose>
+                                    </td>
+                                    <td class="table_header_row">
+                                      <fmt:message key="site_name" bundle="${resword}"/>
+                                    </td>
+                                    <td class="table_cell">
+                                      <c:if test="${subjectStudy.parentStudyId>0}">
+                                        <a href="ViewSite?id=<c:out value="${subjectStudy.id}"/>">
+                                          <c:out value="${subjectStudy.name}"/>
                                         </a>
                                       </c:if>
-                                    </td>
-                                    <!-- End Table Tools/Actions cell -->
-                                  </tr>
-                                  <!-- end Table Actions row (pagination, search, tools) -->
-                                  <tr>
-                                    <td valign="top">
-                                      <!-- Table Contents -->
-                                      <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                                        <tbody>
-                                          <tr>
-                                            <td class="table_header_column_top">
-                                              <fmt:message key="study_subject_ID" bundle="${resword}"/>
-                                            </td>
-                                            <td class="table_cell_top">
-                                              <c:out value="${studySub.label}"/>
-                                            </td>
-
-                                            <td class="table_header_column">
-                                              <fmt:message key="status" bundle="${resword}"/>
-                                            </td>
-                                            <td class="table_cell">
-                                              <c:out value="${studySub.status.name}"/>
-                                            </td>
-                                          </tr>
-
-                                          <tr>
-                                            <td class="table_header_column_top">
-                                              <fmt:message key="study_name" bundle="${resword}"/>
-                                            </td>
-                                            <td class="table_cell">
-                                              <c:choose>
-                                                <c:when test="${subjectStudy.parentStudyId>0}">
-                                                  <a href="ViewStudy?id=<c:out value="${parentStudy.id}"/>&amp;viewFull=yes">
-                                                    <c:out value="${parentStudy.name}"/>
-                                                  </a>
-                                                </c:when>
-                                                <c:otherwise>
-                                                  <a href="ViewStudy?id=<c:out value="${subjectStudy.id}"/>&amp;viewFull=yes">
-                                                    <c:out value="${subjectStudy.name}"/>
-                                                  </a>
-                                                </c:otherwise>
-                                              </c:choose>
-                                            </td>
-                                            <td class="table_header_row">
-                                              <fmt:message key="site_name" bundle="${resword}"/>
-                                            </td>
-                                            <td class="table_cell">
-                                              <c:if test="${subjectStudy.parentStudyId>0}">
-                                                <a href="ViewSite?id=<c:out value="${subjectStudy.id}"/>">
-                                                  <c:out value="${subjectStudy.name}"/>
-                                                </a>
-                                              </c:if>
-                                              &nbsp;
-                                            </td>
-                                          </tr>
-                                        </tbody>
-                                      </table>
-                                      <!-- End Table Contents -->
+                                      &nbsp;
                                     </td>
                                   </tr>
                                 </tbody>
                               </table>
-                              <table border="0" cellpadding="0" cellspacing="0"
-                                <c:choose>
-                                  <c:when test="${
-                                    studySub.status.name!='removed' &&
-                                    (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
-                                    participateStatus=='enabled'
-                                  }">
-                                    class="right twin"
-                                  </c:when>
-                                  <c:otherwise>
-                                    class="hide"
-                                  </c:otherwise>
-                                </c:choose>
-                              >
-                                <tbody>
-                                  <tr>
-                                    <td class="table_actions" valign="top">
-                                      <a href="javascript:;" id="contactInformation">
-                                        <fmt:message key="party_invite" bundle="${resword}"/>
-                                      </a>
-                                      <span id="view-access-link" style="display:none;">
-                                        &nbsp;|&nbsp;
-                                        <a href="javascript:;" id="participateAccess">
-                                          <fmt:message key="view_participant_access_code" bundle="${resword}"/>
-                                        </a>
-                                      </span>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td valign="top">
-                                      <!-- Table Contents -->
-                                      <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                                        <tbody>
-                                          <tr>
-                                            <td class="table_header_column_top">
-                                              <fmt:message key="first_name" bundle="${resword}"/>
-                                            </td>
-                                            <td class="table_cell_top" id="info-fname">
-                                              &emsp;&emsp;&emsp;&emsp;
-                                            </td>
+                            </div>
+                          </div>
+                        </div>
+                      </div>
+                    </div>
+                  </div>
+                </div>
+              </div>
+            </div>
+          </td>
+          <td valign="top">
+            <div class="box_T">
+              <div class="box_L">
+                <div class="box_R">
+                  <div class="box_B">
+                    <div class="box_TL">
+                      <div class="box_TR">
+                        <div class="box_BL">
+                          <div class="box_BR">
+                            <div class="tablebox_center">
+                              <c:if test="${
+                                studySub.status.name!='removed' &&
+                                (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator')
+                              }">
+                                <c:if test="${participateStatus=='enabled'}">
+                                  <!-- Table Contents -->
+                                  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                    <tbody>
+                                      <tr>
+                                        <td class="table_header_column_top">
+                                          <fmt:message key="first_name" bundle="${resword}"/>
+                                        </td>
+                                        <td class="table_cell_top" id="info-fname">
+                                          &emsp;&emsp;&emsp;&emsp;
+                                        </td>
 
-                                            <c:choose>
-                                              <c:when test="${advsearchStatus=='enabled'}">
-                                                <td class="table_header_column_top">
-                                                  <fmt:message key="last_name" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_cell_top" id="info-lname">
-                                                  &emsp;&emsp;&emsp;&emsp;
-                                                </td>
-                                              </tr>
-                                              <tr>
-                                                <td class="table_header_column_top">
-                                                  <fmt:message key="secondary_ID" bundle="${resword}"/>
-                                                </td>
-                                                <td class="table_cell" id="info-secid">
-                                                  &emsp;&emsp;&emsp;&emsp;
-                                                </td>
-                                              </c:when>
-                                            </c:choose>
-
-                                            <td class="table_header_column">
-                                              Mobile Number
-                                            </td>
-                                            <td class="table_cell" id="info-phone-number">
-                                              &emsp;&emsp;&emsp;&emsp;
-                                            </td>
-                                          </tr>
-
-                                          <tr>
-                                            <td class="table_header_column_top">
-                                              <fmt:message key="participate_status" bundle="${resword}"/>
-                                            </td>
-                                            <td class="table_cell" id="info-participate-status">
-                                              &emsp;&emsp;&emsp;&emsp;
-                                            </td>
-                                            <td class="table_header_column">
-                                              <fmt:message key="email" bundle="${resword}"/>
-                                            </td>
-                                            <td class="table_cell" id="info-email">
-                                              &emsp;&emsp;&emsp;&emsp;
-                                            </td>
-                                          </tr>
-                                        </tbody>
-                                      </table>
-                                      <!-- End Table Contents -->
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
-                              <table border="0" cellpadding="0" cellspacing="0"
-                                <c:choose>
-                                  <c:when test="${
-                                    studySub.status.name!='removed' &&
-                                    (sessionScope.baseUserRole=='Clinical Research Coordinator' || sessionScope.baseUserRole=='Investigator') &&
-                                    participateStatus!='enabled' &&
-                                    advsearchStatus=='enabled'
-                                  }">
-                                    class="right twin"
-                                  </c:when>
-                                  <c:otherwise>
-                                    class="hide"
-                                  </c:otherwise>
-                                </c:choose>
-                              >
-                                <tbody>
-                                  <tr>
-                                    <td class="table_actions" valign="top">
-                                      <a href="javascript:;" id="partid-edit">
-                                        <fmt:message key="partid_edit" bundle="${resword}"/>
-                                      </a>
-                                    </td>
-                                  </tr>
-                                  <tr>
-                                    <td valign="top">
-                                      <!-- Table Contents -->
-                                      <table width="100%" border="0" cellpadding="0" cellspacing="0">
-                                        <tbody>
-                                          <tr>
-                                            <td class="table_header_column_top">
-                                              <fmt:message key="first_name" bundle="${resword}"/>
-                                            </td>
-                                            <td class="table_cell_top" id="info-fname-2">
-                                              &emsp;&emsp;&emsp;&emsp;
-                                            </td>
-
+                                        <c:choose>
+                                          <c:when test="${advsearchStatus=='enabled'}">
                                             <td class="table_header_column_top">
                                               <fmt:message key="last_name" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top" id="info-lname-2">
+                                            <td class="table_cell_top" id="info-lname">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
-
                                           <tr>
                                             <td class="table_header_column_top">
                                               <fmt:message key="secondary_ID" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top" id="info-secid-2" colspan="3">
+                                            <td class="table_cell" id="info-secid">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
-                                          </tr>
-                                        </tbody>
-                                      </table>
-                                      <!-- End Table Contents -->
-                                    </td>
-                                  </tr>
-                                </tbody>
-                              </table>
+                                          </c:when>
+                                        </c:choose>
+
+                                        <td class="table_header_column">
+                                          Mobile Number
+                                        </td>
+                                        <td class="table_cell" id="info-phone-number">
+                                          &emsp;&emsp;&emsp;&emsp;
+                                        </td>
+                                      </tr>
+
+                                      <tr>
+                                        <td class="table_header_column_top">
+                                          <fmt:message key="participate_status" bundle="${resword}"/>
+                                        </td>
+                                        <td class="table_cell" id="info-participate-status">
+                                          &emsp;&emsp;&emsp;&emsp;
+                                        </td>
+                                        <td class="table_header_column">
+                                          <fmt:message key="email" bundle="${resword}"/>
+                                        </td>
+                                        <td class="table_cell" id="info-email">
+                                          &emsp;&emsp;&emsp;&emsp;
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                  <!-- End Table Contents -->
+                                </c:if>
+                                <c:if test="${participateStatus!='enabled' && advsearchStatus=='enabled'}">
+                                  <!-- Table Contents -->
+                                  <table width="100%" border="0" cellpadding="0" cellspacing="0">
+                                    <tbody>
+                                      <tr>
+                                        <td class="table_header_column_top">
+                                          <fmt:message key="first_name" bundle="${resword}"/>
+                                        </td>
+                                        <td class="table_cell_top" id="info-fname-2">
+                                          &emsp;&emsp;&emsp;&emsp;
+                                        </td>
+
+                                        <td class="table_header_column_top">
+                                          <fmt:message key="last_name" bundle="${resword}"/>
+                                        </td>
+                                        <td class="table_cell_top" id="info-lname-2">
+                                          &emsp;&emsp;&emsp;&emsp;
+                                        </td>
+                                      </tr>
+
+                                      <tr>
+                                        <td class="table_header_column_top">
+                                          <fmt:message key="secondary_ID" bundle="${resword}"/>
+                                        </td>
+                                        <td class="table_cell_top" id="info-secid-2" colspan="3">
+                                          &emsp;&emsp;&emsp;&emsp;
+                                        </td>
+                                      </tr>
+                                    </tbody>
+                                  </table>
+                                  <!-- End Table Contents -->
+                                </c:if>
+                              </c:if>
                             </div>
                           </div>
                         </div>
@@ -1134,7 +1097,7 @@
                                 <fmt:message key="study_subject_ID" bundle="${resword}"/></span>
                                 </td>
                                 <td valign="top">
-                                    <table border="0" cellpadding="0" cellspacing="0" class="full-width">
+                                    <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                         <tr>
                                             <td valign="top">
                                                 <div class="formfieldXL_BG">
@@ -1246,7 +1209,7 @@
                     <span><fmt:message key="secondary_ID" bundle="${resword}"/></span>
                   </td>
                   <td valign="top">
-                    <input id="secid-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
+                    <input id="secid-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
                   </td>
                 </tr>
               </c:when>
@@ -1744,38 +1707,7 @@
                 contentType: 'application/json',
                 data: JSON.stringify(data),
                 success: function(data) {
-                    var oldName  = participateInfo.firstName;
-                    var oldEmail = participateInfo.email;
-                    var oldPhone = participateInfo.phoneNumber;
-                    var newName  = data.firstName;
-                    var newEmail = data.email;
-                    var newPhone = data.phoneNumber;
-                    var hasOldName  = !!oldName;
-                    var hasOldEmail = !!oldEmail;
-                    var hasOldPhone = !!oldPhone;
-                    var hasNewName  = !!newName;
-                    var hasNewEmail = !!newEmail;
-                    var hasNewPhone = !!newPhone;
-                    var isNameNew  = !hasOldName  && hasNewName;
-                    var isEmailNew = !hasOldEmail && hasNewEmail;
-                    var isPhoneNew = !hasOldPhone && hasNewPhone;
-                    var isNameUpdated  = hasOldName  && newName  != oldName;
-                    var isEmailUpdated = hasOldEmail && newEmail != oldEmail;
-                    var isPhoneUpdated = hasOldPhone && newPhone != oldPhone;
 
-                    if (isNameNew)
-                        logAudit('Participant first name', 43, null, newName);
-                    if (isNameUpdated)
-                        logAudit('Participant first name', 44, oldName, newName);
-                    if (isEmailNew)
-                        logAudit('Participant email address', 46, null, newEmail);
-                    if (isEmailUpdated)
-                        logAudit('Participant email address', 47, oldEmail, newEmail);
-                    if (isPhoneNew)
-                        logAudit('Participant phone number', 49, null, newPhone);
-                    if (isPhoneUpdated)
-                        logAudit('Participant phone number', 50, oldPhone, newPhone);
-                      
                     updateParticipateInfo(data);
                     getAccessCode();
                 },

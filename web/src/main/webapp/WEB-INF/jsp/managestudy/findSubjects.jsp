@@ -25,6 +25,10 @@
 
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 
+<c:if test="${participantIDVerification == 'true'}">
+    <script type="text/javascript" language="JavaScript" src="js/lib/bootstrap-tour.js"></script>
+</c:if>
+
 <script type="text/javascript">
     function onInvokeAction(id,action) {
         if(id.indexOf('findSubjects') == -1)  {
@@ -93,7 +97,7 @@
 <jsp:useBean scope='request' id='crf' class='org.akaza.openclinica.bean.admin.CRFBean'/>
 
 
-<h1>   
+<h1>
     <span class="title_manage">
         <fmt:message key="view_subjects_in" bundle="${restext}"/> <c:out value="${study.name}"/>
     </span>
@@ -106,10 +110,10 @@
         <c:if test="${(!study.status.pending)}">
             <fmt:message key="study_frozen_locked_note" bundle="${restext}"/>
         </c:if>
-        
+
         <c:if test="${(study.status.pending)}">
             <fmt:message key="study_design_note" bundle="${restext}"/>
-        </c:if>   
+        </c:if>
     </span><br>
     <div style="text-align:center; width:100%;">
         <button id="btn" onclick="hm('box');">OK</button>
@@ -129,7 +133,6 @@
           </c:import>
     </div>
 </c:if>
-
 
 <br>
 <jsp:include page="../include/footer.jsp"/>
