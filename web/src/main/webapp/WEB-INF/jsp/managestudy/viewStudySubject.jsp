@@ -1209,7 +1209,7 @@
                     <span><fmt:message key="secondary_ID" bundle="${resword}"/></span>
                   </td>
                   <td valign="top">
-                    <input id="secid-input" onfocus="this.select()" type="text" value="" size="45" maxlength="32" class="formfield form-control invite-input">
+                    <input id="secid-input" onfocus="this.select()" type="text" value="" size="45" maxlength="35" class="formfield form-control invite-input">
                   </td>
                 </tr>
               </c:when>
