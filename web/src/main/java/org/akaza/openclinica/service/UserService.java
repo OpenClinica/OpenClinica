@@ -1,5 +1,5 @@
 /**
- * 
+ *
  */
 package org.akaza.openclinica.service;
 
@@ -12,6 +12,9 @@ import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.cdisc.ns.odm.v130.ODM;
 import org.springframework.http.HttpMethod;
+import org.springframework.scheduling.annotation.EnableAsync;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
@@ -20,17 +23,19 @@ import java.util.List;
  * @author joekeremian
  *
  */
+
 public interface UserService {
 
 
-	OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO,String accessToken,UserAccountBean ownerUserAccountBean,String customerUuid);
+    OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken, UserAccountBean ownerUserAccountBean, String customerUuid);
 
-	OCUserDTO getParticipantAccount(String studyOid, String ssid,String accessToken);
+    OCUserDTO getParticipantAccount(String studyOid, String ssid, String accessToken);
 
-	List<OCUserDTO> getAllParticipantAccountsFromUserService(String accessToken);
+    List<OCUserDTO> getAllParticipantAccountsFromUserService(String accessToken);
 
-    ParticipantAccessDTO getAccessInfo(String accessToken,String studyOid, String ssid,String customerUuid);
+    ParticipantAccessDTO getAccessInfo(String accessToken, String studyOid, String ssid, String customerUuid, UserAccountBean userAccountBean);
 
-	List<OCUserDTO> searchParticipantsByFields(String studyOid, String accessToken,String participantId,String firstName,String lastName,String identifier,UserAccountBean userAccountBean);
+    List<OCUserDTO> searchParticipantsByFields(String studyOid, String accessToken, String participantId, String firstName, String lastName, String identifier, UserAccountBean userAccountBean);
 
+    void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean);
 }

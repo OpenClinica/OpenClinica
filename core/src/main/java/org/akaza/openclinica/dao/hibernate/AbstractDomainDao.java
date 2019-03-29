@@ -45,7 +45,11 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
         return (ArrayList<T>) q.list();
     }
 
-    @SuppressWarnings("unchecked") public T findByOcOID(String OCOID) {
+
+
+    @SuppressWarnings("unchecked")
+    @Transactional
+    public T findByOcOID(String OCOID) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.oc_oid = :oc_oid";
         Query q = getCurrentSession().createQuery(query);

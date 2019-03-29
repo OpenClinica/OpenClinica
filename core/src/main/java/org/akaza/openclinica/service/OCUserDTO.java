@@ -45,6 +45,10 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
 
     private String participantId;
 
+    private String accessCode;
+
+
+
     public String getUuid() {
         return uuid;
     }
@@ -198,5 +202,13 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public String getAccessCode() {
+        return accessCode;
+    }
+
+    public void setAccessCode(String accessCode) {
+        this.accessCode = accessCode;
     }
 }
