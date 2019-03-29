@@ -1616,8 +1616,7 @@
     var participateInfo;
     function updateParticipateInfo(data) {
         participateInfo = data || {
-            phoneNumber: '',
-            status: ' '
+            phoneNumber: ''
         };
         participateInfo.phoneNumber = participateInfo.phoneNumber || '';
         $('#info-fname, #info-fname-2').text(participateInfo.firstName);
@@ -1625,7 +1624,12 @@
         $('#info-secid, #info-secid-2').text(participateInfo.identifier);
         $('#info-email').text(participateInfo.email);
         $('#info-phone-number').text(participateInfo.phoneNumber);
-        $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
+
+        var status = participateInfo.status;
+        if (status) {
+            $('#info-participate-status').text(status[0] + status.substr(1).toLowerCase());
+            $('#view-access-link').show();
+        }
     }
     function enableDisableControls() {
         if (!$('#email-input').length)
@@ -1654,7 +1658,6 @@
             success: function(data) {
                 $('#access-code-input').val(data.accessCode);
                 $('#access-url').text(data.host);
-                $('#view-access-link').show();
             },
             error: logDump
         });
@@ -1662,14 +1665,15 @@
 
     jQuery(document).ready(function () {
         updateParticipateInfo();
-        getAccessCode();
         
-        jQuery.ajax({
-            type: 'get',
-            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
-            success: updateParticipateInfo,
-            error: logDump
-        });
+        if ($('#contactInformation, #partid-edit').length) {
+            jQuery.ajax({
+                type: 'get',
+                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
+                success: updateParticipateInfo,
+                error: logDump
+            });
+        }
 
         jQuery('#editParticipantID').click(function () {
             jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
@@ -1689,11 +1693,7 @@
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                success: function(data) {
-
-                    updateParticipateInfo(data);
-                    getAccessCode();
-                },
+                success: updateParticipateInfo,
                 error: logDump
             });
             jQuery.unblockUI();
@@ -1754,6 +1754,7 @@
         });
 
         jQuery('#participateAccess').click(function() {
+            getAccessCode();
             $('#eye').show();
             $('#access-code-input').attr('type', 'password');
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
