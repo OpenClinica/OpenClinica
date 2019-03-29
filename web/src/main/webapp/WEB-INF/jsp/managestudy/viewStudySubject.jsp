@@ -1613,23 +1613,6 @@
         console.log(arguments);
     }
 
-    function logAudit(name, typid , oldValue, newValue) {
-      jQuery.ajax({
-          type: 'post',
-          url: '${pageContext.request.contextPath}/pages/auth/api/studies/${study.oid}/auditEvents',
-          contentType: 'application/json',
-          data: JSON.stringify({
-              auditTable: 'study_subject',
-              entityId: '${studySub.id}',
-              entityName: name,
-              auditLogEventTypId: typid,
-              oldValue: oldValue,
-              newValue: newValue
-          }),
-          error: logDump
-      });
-    }
-
     var participateInfo;
     function updateParticipateInfo(data) {
         participateInfo = data || {
@@ -1795,7 +1778,6 @@
 
         jQuery('#eye').click(function() {
             $(this).hide();
-            logAudit('Participant access code', 42);
             $('#access-code-input').attr('type', 'text');
         });
      });
