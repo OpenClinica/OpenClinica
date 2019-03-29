@@ -9,7 +9,7 @@ public class ODMFilterDTO {
     boolean metadata = true;
     boolean clinical = true;
 
-    public ODMFilterDTO(String includeDns, String includeAudits, String crossFormLogic, String showArchived, String metadata) {
+    public ODMFilterDTO(String includeDns, String includeAudits, String crossFormLogic, String showArchived, String metadata, String clinicalData) {
 
         if (showArchived != null && (showArchived.equalsIgnoreCase("yes") || showArchived.equalsIgnoreCase("y")))
             setArchived(true);
@@ -21,6 +21,8 @@ public class ODMFilterDTO {
             setIncludeDN(true);
         if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
             setIncludeAudit(true);
+        if (clinicalData.equalsIgnoreCase("no") ||  clinicalData.equalsIgnoreCase("n"))
+            setClinical(false);
     }
 
     public boolean isIncludeDN() {

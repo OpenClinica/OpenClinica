@@ -104,11 +104,12 @@ public class ODMClinicaDataResource {
                                      @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
                                      @Context HttpServletRequest request,
                                      @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
+                                     @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
                                      @QueryParam("showArchived") String showArchived ,
                                      @DefaultValue("n") @QueryParam("crossFormLogic") String crossFormLogic ) {
         LOGGER.debug("Requesting clinical data resource");
 
-        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata);
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData);
 
         UserAccountBean userAccountBean = ((UserAccountBean) request.getSession().getAttribute("userBean"));
         StudyDAO sdao = new StudyDAO(getDataSource());
@@ -210,11 +211,12 @@ public class ODMClinicaDataResource {
                                  @Context HttpServletRequest request, String userAccountID,
                                  @DefaultValue("y") @QueryParam("clinicaldata") String clinicaldata,
                                  @DefaultValue("y") @QueryParam("metadata") String metadata,
+                                 @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
                                  @QueryParam("showArchived") String showArchived ,
                                  @DefaultValue("n")@QueryParam("crossFormLogic") String crossFormLogic ) {
         LOGGER.debug("Requesting clinical data resource");
 
-        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, metadata);
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, metadata, clinicalData);
 
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -261,11 +263,12 @@ public class ODMClinicaDataResource {
                                    @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
                                    @Context HttpServletRequest request,
                                    @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
+                                    @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
                                    @QueryParam("showArchived") String showArchived ,
                                    @DefaultValue("n")@QueryParam("crossFormLogic") String crossFormLogic ) {
 
         LOGGER.debug("Requesting clinical data resource");
-        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata);
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData);
 
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
