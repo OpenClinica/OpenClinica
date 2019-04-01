@@ -63,6 +63,11 @@ import java.sql.SQLException;
 import java.text.DateFormat;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.time.format.ResolverStyle;
 import java.util.*;
 import java.util.concurrent.TimeUnit;
 
@@ -978,21 +983,18 @@ public class RestfulServiceHelper {
 		 */
 		 public Date getDateTime(String dateTimeStr) throws OpenClinicaException {
 		        String dataFormat = "yyyy-MM-dd";
-			 	DateFormat  sdf = new SimpleDateFormat(dataFormat);		   
 		        Date result = null;
-		        
-				try {
-					if(dateTimeStr != null) {
-						result = sdf.parse(dateTimeStr);	
-					}
-								
-					
-				} catch (ParseException e) {
+		       try {
+		    	   DateTimeFormatter formatter = DateTimeFormatter.ofPattern(dataFormat);		       
+			        LocalDate parsedDate = LocalDate.parse(dateTimeStr, formatter);
+			        
+			        result = Date.from(parsedDate.atStartOfDay(ZoneId.systemDefault()).toInstant());
+			        
+		       } catch (DateTimeParseException e) {
 					String errMsg = "The input date("+ dateTimeStr + ") can't be parsed, please use the correct format " + dataFormat;
 		        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_PARSE_DATE);
 				}
 		       
-		        
 		        return result;
 		    }
 
