@@ -327,7 +327,7 @@
     <fmt:message key="general_information" bundle="${resword}"/>
   </div>
   <div class="section-body">
-    <table width="100%">
+    <table border="0" cellpadding="0" cellspacing="0" width="100%">
       <tbody>
         <tr id="general-actions">
           <!-- Table Tools/Actions cell -->
@@ -375,7 +375,7 @@
                         <div class="box_BL">
                           <div class="box_BR">
                             <div class="tablebox_center">
-                              <table width="100%">
+                              <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tbody>
                                   <tr>
                                     <td class="table_header_column_top">
