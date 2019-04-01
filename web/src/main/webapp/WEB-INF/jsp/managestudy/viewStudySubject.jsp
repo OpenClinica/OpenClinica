@@ -327,7 +327,7 @@
     <fmt:message key="general_information" bundle="${resword}"/>
   </div>
   <div class="section-body">
-    <table border="0" cellpadding="0" cellspacing="0" width="100%">
+    <table width="100%">
       <tbody>
         <tr id="general-actions">
           <!-- Table Tools/Actions cell -->
@@ -530,7 +530,7 @@
                                         <td class="table_header_column_top">
                                           <fmt:message key="secondary_ID" bundle="${resword}"/>
                                         </td>
-                                        <td class="table_cell_top" id="info-secid-2" colspan="3">
+                                        <td class="table_cell" id="info-secid-2" colspan="3">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
                                       </tr>
