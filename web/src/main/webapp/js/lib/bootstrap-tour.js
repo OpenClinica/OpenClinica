@@ -88,6 +88,11 @@ jQuery(document).ready(function() {
         tourElement.init();
         tourElement.start(true);
     });
+
+    // disable right click open
+    jQuery('.pidVerification').on('contextmenu',function(){
+        return false;
+    });
 });
 
 function clearPIDVerificationForm() {
