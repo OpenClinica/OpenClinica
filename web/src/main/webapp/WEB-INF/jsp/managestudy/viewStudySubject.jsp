@@ -375,7 +375,7 @@
                         <div class="box_BL">
                           <div class="box_BR">
                             <div class="tablebox_center">
-                              <table width="100%">
+                              <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tbody>
                                   <tr>
                                     <td class="table_header_column_top">
@@ -530,7 +530,7 @@
                                         <td class="table_header_column_top">
                                           <fmt:message key="secondary_ID" bundle="${resword}"/>
                                         </td>
-                                        <td class="table_cell_top" id="info-secid-2" colspan="3">
+                                        <td class="table_cell" id="info-secid-2" colspan="3">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
                                       </tr>
