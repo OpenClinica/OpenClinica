@@ -9,6 +9,7 @@
 	<description>OpenClinica</description>
 
 	<modules>
+		<module>odm</module>
 		<module>core</module>
 		<module>web</module>
 		<module>ws</module>
@@ -22,7 +23,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Project's source control URL -->
-		<git.url>git://github.com/OpenClinica/OpenClinica.git</git.url>
+		<git.url>git://github.com/reliatec-gmbh/LibreClinica</git.url>
 
 		<!-- Config file - required by liquibase plugin -->
 		<config.file>src/main/resources/datainfo.properties</config.file>
@@ -94,8 +95,8 @@
 				<version>2.4.2-oc</version>
 			</dependency>
 			<dependency>
-				<groupId>org.akaza.openclinica.odm</groupId>
-				<artifactId>openclinica-odm</artifactId>
+				<groupId>org.libreclinica.odm</groupId>
+				<artifactId>LibreClinica-odm</artifactId>
 				<version>2.2</version>
 			</dependency>
 			<dependency>
