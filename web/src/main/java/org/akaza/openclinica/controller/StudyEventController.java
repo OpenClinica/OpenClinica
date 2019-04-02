@@ -66,6 +66,7 @@ import org.akaza.openclinica.service.ParticipateService;
 import org.akaza.openclinica.service.StudyEventService;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.collections4.map.PassiveExpiringMap;
@@ -416,10 +417,32 @@ public class StudyEventController {
 	         *  response
 	         */
 	    	if(responseDTO.getErrors().size() > 0) {
-	    		message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " Failed.";
-	 	        responseDTO.setMessage(message);
-
-	 			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+	    		String errorMsg = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " Failed.";
+	 	      
+                HashMap<String, String> map = new HashMap<>();
+                map.put("studyOID", studyOID);
+                
+                if(siteOID !=null && siteOID.trim().length() > 0) {
+                	map.put("siteOID", siteOID);
+                }
+               
+               	map.put("studyEventOID", studyEventOID);                              
+               	map.put("subjectKey", participantId);
+                
+               	if(sampleOrdinalStr !=null && sampleOrdinalStr.trim().length() > 0) {
+                	map.put("ordinal", sampleOrdinalStr);
+                }
+                if(endDate !=null && endDate.trim().length() > 0) {
+                	map.put("endDate", endDate);
+                }
+               
+               	map.put("startDate", startDate);
+               
+                
+    			ParameterizedErrorVM responseDTOerror =new ParameterizedErrorVM(errorMsg, map);
+    			
+        		response = new ResponseEntity(responseDTOerror, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+        		
 	    	}else{
 	    		message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " sucessfully.";
 	 	        responseDTO.setMessage(message);
