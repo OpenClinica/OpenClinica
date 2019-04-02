@@ -1,19 +1,23 @@
 package org.akaza.openclinica.controller.dto;
 
+import io.swagger.annotations.ApiModelProperty;
+
 public class StudyEventScheduleRequestDTO {
 
 	private String endDate;
 	private String startDate;
-	private String ordinal;
+	private int ordinal;
 	private String studyEventOID;
 				
-	
-	public String getOrdinal() {
+	@ApiModelProperty(value = "ordinal")
+	public int getOrdinal() {
 		return ordinal;
 	}
-	public void setOrdinal(String ordinal) {
+	public void setOrdinal(int ordinal) {
 		this.ordinal = ordinal;
 	}
+	
+	@ApiModelProperty(required=true)
 	public String getStudyEventOID() {
 		return studyEventOID;
 	}
@@ -21,12 +25,15 @@ public class StudyEventScheduleRequestDTO {
 		this.studyEventOID = studyEventOID;
 	}
 	
+	@ApiModelProperty(value = "End Date", allowableValues = "yyyy-MM-dd")
 	public String getEndDate() {
 		return endDate;
 	}
 	public void setEndDate(String endDate) {
 		this.endDate = endDate;
 	}
+	
+	@ApiModelProperty(value = "Start Date", allowableValues = "yyyy-MM-dd",required=true)
 	public String getStartDate() {
 		return startDate;
 	}
