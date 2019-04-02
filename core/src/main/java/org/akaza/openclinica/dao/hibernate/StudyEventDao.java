@@ -12,6 +12,8 @@ import org.springframework.context.ApplicationEventPublisher;
 import org.springframework.context.ApplicationEventPublisherAware;
 import org.springframework.transaction.annotation.Transactional;
 
+import static java.lang.Math.toIntExact;
+
 public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements ApplicationEventPublisherAware {
 
     private ApplicationEventPublisher eventPublisher;
@@ -138,6 +140,20 @@ public class StudyEventDao extends AbstractDomainDao<StudyEvent> implements Appl
         eventList = (List<StudyEvent>) q.list();
         return eventList;
 
+    }
+
+    @Transactional
+    public int fetchCountOfInitiatedSEs(String oid, String subjectOID) {
+        List<StudyEvent> eventList = null;
+
+        String queryString = "SELECT count(*) from StudyEvent se where se.studySubject.ocOid = :subjectOID and se.studyEventDefinition.oc_oid = :oid";
+        Query query = getCurrentSession().createQuery(queryString);
+        query.setParameter("subjectOID", subjectOID);
+        query.setParameter("oid", oid);
+
+        int result = toIntExact((long) query.getSingleResult());
+
+        return result;
     }
 
     @Transactional

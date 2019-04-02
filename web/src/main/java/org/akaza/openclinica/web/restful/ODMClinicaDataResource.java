@@ -1,5 +1,6 @@
 package org.akaza.openclinica.web.restful;
 
+import com.google.gson.JsonObject;
 import com.sun.jersey.api.view.Viewable;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
@@ -10,6 +11,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
@@ -57,6 +59,8 @@ public class ODMClinicaDataResource {
     private DataSource dataSource;
     @Autowired
     private PermissionService permissionService;
+    @Autowired
+    private StudyEventDao studyEventDao;
 
     public MetadataCollectorResource getMetadataCollectorResource() {
         return metadataCollectorResource;
@@ -146,6 +150,35 @@ public class ODMClinicaDataResource {
         processor.process((JSONObject) json);
 
         return json.toString(INDENT_LEVEL);
+    }
+
+    /**
+     * @api {get} /rest/clinicaldata/json/stats/:study/:subject/:event Retrieve stats on this study subject event
+     * @apiVersion 3.8.0
+     * @apiName getODMClinicalStats
+     * @apiGroup Subject
+     * @apiPermission user
+     * @apiDescription Returns statistics on study events that have been started. Use asterisks in place of OIDs as wildcards.
+     * @apiParam {String} study Study or Site OID.
+     * @apiParam {String} subject Subject OID.
+     * @apiParam {String} event Study Event Definition OID. Use '*' for all.
+     * @apiError NoAccessRight Only authenticated users can access the data.
+     * @apiError NotFound The resource was not found.
+     */
+    @GET
+    @Path("/json/stats/{studyOID}/{studySubjectIdentifier}/{studyEventOID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public String getODMClinicalStats(@PathParam("studyOID") String studyOID,
+                                     @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
+                                     @Context HttpServletRequest request) {
+        LOGGER.debug("Requesting clinical data resource");
+
+        int count = studyEventDao.fetchCountOfInitiatedSEs(studyEventOID, studySubjectIdentifier);
+
+        JsonObject json = new JsonObject();
+        json.addProperty("matchingForms", count);
+
+        return json.toString();
     }
 
     /**
