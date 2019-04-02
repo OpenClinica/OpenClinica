@@ -92,6 +92,9 @@
   #search-message {
     text-align: center;
   }
+  #show-all {
+    text-decoration: underline;
+  }
 </style>
 
 <h1 id="header">
@@ -222,6 +225,7 @@ $('#search-inputs').on('change keyup paste', function() {
 });
 
 $('#tbl-search').on('click', '#show-all', function() {
+  $('#search-inputs input[type=text]').val('');
   doSearch('');
 });
 </script>

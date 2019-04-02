@@ -375,7 +375,7 @@
                         <div class="box_BL">
                           <div class="box_BR">
                             <div class="tablebox_center">
-                              <table width="100%">
+                              <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tbody>
                                   <tr>
                                     <td class="table_header_column_top">
@@ -530,7 +530,7 @@
                                         <td class="table_header_column_top">
                                           <fmt:message key="secondary_ID" bundle="${resword}"/>
                                         </td>
-                                        <td class="table_cell_top" id="info-secid-2" colspan="3">
+                                        <td class="table_cell" id="info-secid-2" colspan="3">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
                                       </tr>
@@ -1613,28 +1613,10 @@
         console.log(arguments);
     }
 
-    function logAudit(name, typid , oldValue, newValue) {
-      jQuery.ajax({
-          type: 'post',
-          url: '${pageContext.request.contextPath}/pages/auth/api/studies/${study.oid}/auditEvents',
-          contentType: 'application/json',
-          data: JSON.stringify({
-              auditTable: 'study_subject',
-              entityId: '${studySub.id}',
-              entityName: name,
-              auditLogEventTypId: typid,
-              oldValue: oldValue,
-              newValue: newValue
-          }),
-          error: logDump
-      });
-    }
-
     var participateInfo;
     function updateParticipateInfo(data) {
         participateInfo = data || {
-            phoneNumber: '',
-            status: ' '
+            phoneNumber: ''
         };
         participateInfo.phoneNumber = participateInfo.phoneNumber || '';
         $('#info-fname, #info-fname-2').text(participateInfo.firstName);
@@ -1642,7 +1624,12 @@
         $('#info-secid, #info-secid-2').text(participateInfo.identifier);
         $('#info-email').text(participateInfo.email);
         $('#info-phone-number').text(participateInfo.phoneNumber);
-        $('#info-participate-status').text(participateInfo.status[0] + participateInfo.status.substr(1).toLowerCase());
+
+        var status = participateInfo.status;
+        if (status) {
+            $('#info-participate-status').text(status[0] + status.substr(1).toLowerCase());
+            $('#view-access-link').show();
+        }
     }
     function enableDisableControls() {
         if (!$('#email-input').length)
@@ -1671,7 +1658,6 @@
             success: function(data) {
                 $('#access-code-input').val(data.accessCode);
                 $('#access-url').text(data.host);
-                $('#view-access-link').show();
             },
             error: logDump
         });
@@ -1679,14 +1665,15 @@
 
     jQuery(document).ready(function () {
         updateParticipateInfo();
-        getAccessCode();
         
-        jQuery.ajax({
-            type: 'get',
-            url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
-            success: updateParticipateInfo,
-            error: logDump
-        });
+        if ($('#contactInformation, #partid-edit').length) {
+            jQuery.ajax({
+                type: 'get',
+                url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}',
+                success: updateParticipateInfo,
+                error: logDump
+            });
+        }
 
         jQuery('#editParticipantID').click(function () {
             jQuery.blockUI({message: jQuery('#editSubjectForm'), css: {left: "300px", top: "10px"}});
@@ -1706,11 +1693,7 @@
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                success: function(data) {
-
-                    updateParticipateInfo(data);
-                    getAccessCode();
-                },
+                success: updateParticipateInfo,
                 error: logDump
             });
             jQuery.unblockUI();
@@ -1771,6 +1754,7 @@
         });
 
         jQuery('#participateAccess').click(function() {
+            getAccessCode();
             $('#eye').show();
             $('#access-code-input').attr('type', 'password');
             jQuery.blockUI({ message: jQuery('#participateAccessForm'), css:{left: "300px", top:"10px" } });
@@ -1795,7 +1779,6 @@
 
         jQuery('#eye').click(function() {
             $(this).hide();
-            logAudit('Participant access code', 42);
             $('#access-code-input').attr('type', 'text');
         });
      });

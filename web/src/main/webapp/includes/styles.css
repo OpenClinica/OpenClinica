@@ -904,3 +904,7 @@ form#searchByStudySubjectId {
   display: block;
   padding: .5em;
 }
+
+.main_BG .tour-backdrop {
+  opacity: 1
+}
