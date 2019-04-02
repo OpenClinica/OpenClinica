@@ -6,14 +6,14 @@ public class StudyEventScheduleRequestDTO {
 
 	private String endDate;
 	private String startDate;
-	private int ordinal;
+	private String ordinal;
 	private String studyEventOID;
 				
-	@ApiModelProperty(value = "ordinal")
-	public int getOrdinal() {
+	@ApiModelProperty(value = "ordinal",allowableValues = "1")
+	public String getOrdinal() {
 		return ordinal;
 	}
-	public void setOrdinal(int ordinal) {
+	public void setOrdinal(String ordinal) {
 		this.ordinal = ordinal;
 	}
 	

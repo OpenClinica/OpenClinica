@@ -230,7 +230,7 @@ public class StudyEventController {
             @PathVariable("siteOID") String siteOID) throws Exception {
         
         String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();
-        String ordinal = studyEventScheduleRequestDTO.getOrdinal() +"";
+        String ordinal = studyEventScheduleRequestDTO.getOrdinal();
         String startDate = studyEventScheduleRequestDTO.getStartDate();
         String endDate = studyEventScheduleRequestDTO.getEndDate();
         
@@ -249,7 +249,7 @@ public class StudyEventController {
    			@PathVariable("studyOID") String studyOID) throws Exception {
    		
        	String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();
-       	String ordinal = studyEventScheduleRequestDTO.getOrdinal()+"";
+       	String ordinal = studyEventScheduleRequestDTO.getOrdinal();
        	String startDate = studyEventScheduleRequestDTO.getStartDate();
        	String endDate = studyEventScheduleRequestDTO.getEndDate();
 		
