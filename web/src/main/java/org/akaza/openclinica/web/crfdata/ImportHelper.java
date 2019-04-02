@@ -140,7 +140,7 @@ public class ImportHelper {
 
                 } else if (idt.equals(ItemDataType.REAL)) {
                     // hard edit check, will comment out for now, tbh 05/08
-                    // v.addValidation(inputName, Validator.IS_A_NUMBER);
+                     v.addValidation(inputName, Validator.IS_A_NUMBER);
                     // v.alwaysExecuteLastValidation(inputName);
                 } else if (idt.equals(ItemDataType.BL)) {
                     // there is no validation here since this data type is
