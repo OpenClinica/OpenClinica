@@ -511,17 +511,17 @@
                                   <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
                                       <tr>
-                                        <td class="table_header_column_top">
+                                        <td class="table_header_column_top" width="25%">
                                           <fmt:message key="first_name" bundle="${resword}"/>
                                         </td>
-                                        <td class="table_cell_top" id="info-fname-2">
+                                        <td class="table_cell_top" id="info-fname-2" width="25%">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
 
-                                        <td class="table_header_column_top">
+                                        <td class="table_header_column_top" width="25%">
                                           <fmt:message key="last_name" bundle="${resword}"/>
                                         </td>
-                                        <td class="table_cell_top" id="info-lname-2">
+                                        <td class="table_cell_top" id="info-lname-2" width="25%">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
                                       </tr>

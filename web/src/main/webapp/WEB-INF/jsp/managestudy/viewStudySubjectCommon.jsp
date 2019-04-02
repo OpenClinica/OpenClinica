@@ -304,6 +304,7 @@ $(function() {
                 var components = columns[componentOid];
                 collection(components).forEach(function(col) {
                     var item = items[col];
+                    alert(item);
                     columnTitles.push((item && item.Question) ? item.Question.TranslatedText : col);
                     submissionFields[col] = [];
                 });
