@@ -82,6 +82,12 @@ jQuery(document).ready(function() {
                 jQuery("#step-0").find('#retype_pid').bind('cut copy paste', function (e) {
                     e.preventDefault();
                 });
+                // trigger checking when enter
+                jQuery("#step-0").find('#retype_pid').on('keypress',function(e) {
+                    if(e.which == 13) {
+                        validatePIDVerificationForm();
+                    }
+                });
             }
         });
 
