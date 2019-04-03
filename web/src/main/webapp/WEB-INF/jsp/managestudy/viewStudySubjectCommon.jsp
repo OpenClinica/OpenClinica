@@ -300,7 +300,7 @@ $(function() {
                   success: function(statData)
                   {
                       var stats = statData;
-                      if (stats.matchingForms > 0){
+                      if (stats.body.matchingForms > 0){
                         studyEvent.showMe = true;
                       }
                       }

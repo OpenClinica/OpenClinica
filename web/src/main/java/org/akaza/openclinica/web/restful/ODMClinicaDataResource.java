@@ -1,6 +1,5 @@
 package org.akaza.openclinica.web.restful;
 
-import com.google.gson.JsonObject;
 import com.sun.jersey.api.view.Viewable;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
@@ -16,12 +15,15 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
+import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -168,17 +170,16 @@ public class ODMClinicaDataResource {
     @GET
     @Path("/json/stats/{studyOID}/{studySubjectIdentifier}/{studyEventOID}")
     @Produces(MediaType.APPLICATION_JSON)
-    public String getODMClinicalStats(@PathParam("studyOID") String studyOID,
-                                     @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
-                                     @Context HttpServletRequest request) {
-        LOGGER.debug("Requesting clinical data resource");
+    public ResponseEntity<JSONObject> getODMClinicalStats(@PathParam("studyOID") String studyOID,
+                                                      @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
+                                                      @Context HttpServletRequest request) {
 
         int count = studyEventDao.fetchCountOfInitiatedSEs(studyEventOID, studySubjectIdentifier);
 
-        JsonObject json = new JsonObject();
-        json.addProperty("matchingForms", count);
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("matchingForms", count);
 
-        return json.toString();
+        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
     }
 
     /**
