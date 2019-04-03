@@ -26,6 +26,7 @@ import java.util.List;
 
 public interface UserService {
 
+    public static final String BULK_JOBS = "bulk_jobs";
 
     OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken, UserAccountBean ownerUserAccountBean, String customerUuid);
 
@@ -37,5 +38,9 @@ public interface UserService {
 
     List<OCUserDTO> searchParticipantsByFields(String studyOid, String accessToken, String participantId, String firstName, String lastName, String identifier, UserAccountBean userAccountBean);
 
-    void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean);
+    void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean,String schema,JobDetail jobDetail);
+
+    JobDetail persistJobCreated(Study study, Study site, UserAccount createdBy);
+
+
 }

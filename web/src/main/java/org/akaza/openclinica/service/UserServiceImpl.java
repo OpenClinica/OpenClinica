@@ -4,7 +4,6 @@ import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
-import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.*;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
@@ -13,12 +12,11 @@ import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.core.EmailEngine;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
-import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
-import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
-import org.akaza.openclinica.domain.rule.action.RuleActionBean;
+import org.akaza.openclinica.domain.enumsupport.JobStatus;
+import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
@@ -33,9 +31,8 @@ import org.springframework.http.*;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
-import org.springframework.scheduling.annotation.Async;
-import org.springframework.scheduling.annotation.EnableAsync;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
@@ -44,20 +41,14 @@ import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
-import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
+import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.List;
-import java.util.Set;
-
-
-import static java.util.Collections.*;
+import java.util.*;
+import java.util.concurrent.CompletableFuture;
 
 /**
  * This Service class is used with View Study Subject Page
@@ -66,8 +57,6 @@ import static java.util.Collections.*;
  */
 
 @Service( "userService" )
-@Transactional
-@EnableAsync
 public class UserServiceImpl implements UserService {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
@@ -117,6 +106,9 @@ public class UserServiceImpl implements UserService {
     @Autowired
     CryptoConverter cryptoConverter;
 
+    @Autowired
+    JobService jobService;
+
     private RestfulServiceHelper restfulServiceHelper;
 
     public static final String FORM_CONTEXT = "ecid";
@@ -129,6 +121,9 @@ public class UserServiceImpl implements UserService {
     public static final String ACCESS_LINK_PART_URL = "?accessCode=";
     public static final String ENABLED = "enabled";
     public static final String SEPERATOR = "|";
+    public static final String PARTICIPANT_ACCESS_CODE = "_Participant Access Code";
+
+
     private String urlBase = CoreResources.getField("sysURL").split("/MainMenu")[0];
 
     private static String sbsUrl = CoreResources.getField("SBSUrl");
@@ -165,12 +160,12 @@ public class UserServiceImpl implements UserService {
         Study publicStudy = studyDao.findPublicStudy(tenantStudy.getOc_oid());
 
         String studyEnvironment = (publicStudy.getStudy() != null) ? publicStudy.getStudy().getStudyEnvUuid() : publicStudy.getStudyEnvUuid();
-        UserAccount userAccount=userAccountDao.findById(userAccountBean.getId());
+        UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
         UserAccount pUserAccount = null;
 
         if (studySubject != null) {
-                if (studySubject.getUserId() == null && validateService.isParticipateActive(tenantStudy)) {
-                    logger.info("Participate has not registered yet");
+            if (studySubject.getUserId() == null && validateService.isParticipateActive(tenantStudy)) {
+                logger.info("Participate has not registered yet");
                 // create participant user Account In Keycloak
                 String keycloakUserId = keycloakClient.createParticipateUser(accessToken, null, username, accessCode, studyEnvironment, customerUuid);
                 // create participant user Account In Runtime
@@ -232,13 +227,15 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Async
-    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean) {
-        utilService.setSchemaFromStudyOid(studyOid);
+    @Transactional(propagation = Propagation.REQUIRES_NEW)
+    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean,String schema,JobDetail jobDetail) {
+
+        CoreResources.setRequestSchema(schema);
 
         Study site = studyDao.findByOcOID(siteOid);
+        Study study = studyDao.findByOcOID(studyOid);
 
-        System.out.println("Execute method asynchronously. "
+        logger.info("Execute method asynchronously. "
                 + Thread.currentThread().getName());
 
         // Get all list of StudySubjects by studyId
@@ -262,9 +259,10 @@ public class UserServiceImpl implements UserService {
             }
         }
         // add a new method to write this object into text file
-        writeToFile(userDTOS, userAccountBean, studyOid);
+        String fileName = study.getUniqueIdentifier()+ DASH+study.getEnvType()+ PARTICIPANT_ACCESS_CODE + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
+        writeToFile(userDTOS, studyOid, fileName);
 
-
+        persistJobCompleted(jobDetail,fileName);
     }
 
     public OCUserDTO getParticipantAccount(String studyOid, String ssid, String accessToken) {
@@ -515,6 +513,7 @@ public class UserServiceImpl implements UserService {
             ocUserDTO.setPhoneNumber(studySubjectDetail.getPhone() != null ? studySubjectDetail.getPhone() : "");
             ocUserDTO.setLastName(studySubjectDetail.getLastName() != null ? studySubjectDetail.getLastName() : "");
             ocUserDTO.setIdentifier(studySubjectDetail.getIdentifier() != null ? studySubjectDetail.getIdentifier() : "");
+            ocUserDTO.setStatus(studySubject.getUserStatus());
         } else {
             ocUserDTO.setFirstName("");
             ocUserDTO.setEmail("");
@@ -522,7 +521,6 @@ public class UserServiceImpl implements UserService {
             ocUserDTO.setLastName("");
             ocUserDTO.setIdentifier("");
         }
-        ocUserDTO.setStatus(studySubject.getUserStatus());
         return ocUserDTO;
     }
 
@@ -541,45 +539,26 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    private void writeToFile(List<OCUserDTO> userDTOs, UserAccountBean userAccountBean, String studyOid) {
-        String origFileName = studyOid + "_Participant_Access_Code_" + new SimpleDateFormat("_yyyy-MM-dd-hhmmssSaa'.txt'").format(new Date());
-        String zippedFileName = origFileName.replace(".txt", ".zip");
-        String filePath = getFilePath() + File.separator;
-        String origFilePath = filePath + origFileName;
-        String zippedFilePath = filePath + zippedFileName;
+    private void writeToFile(List<OCUserDTO> userDTOs, String studyOid, String fileName) {
+        String filePath = getFilePath() + File.separator + fileName;
 
 
-        File origFile = new File(origFilePath);
+        File file = new File(filePath);
 
         PrintWriter writer = null;
         try {
-            writer = openFile(origFile);
+            writer = openFile(file);
         } catch (FileNotFoundException | UnsupportedEncodingException e) {
             e.printStackTrace();
         } finally {
             writer.print(writeToTextFile(userDTOs));
             closeFile(writer);
         }
-        String fullName = userAccountBean.getFirstName() + " " + userAccountBean.getLastName();
         StringBuilder body = new StringBuilder();
-
-        body.append("Dear " + fullName + "<br/>");
-        body.append("Please find attached report to the extract Participants " + "<br/>");
-        String urlBase = CoreResources.getField("sysURL").split("/MainMenu")[0];
-
-        body.append("The report file name :" + origFileName + "<br/>");
-
-        body.append("Thank you, Your OpenClinica System");
 
 
         logger.info(body.toString());
 
-        //  openClinicaMailSender.sendEmail(userAccountBean.getEmail(), EmailEngine.getAdminEmail(),
-        //          "Report File", body.toString(), true,origFileName,origFile);
-
-        for (OCUserDTO userDTO : userDTOs) {
-
-        }
 
     }
 
@@ -588,9 +567,13 @@ public class UserServiceImpl implements UserService {
         return fileLocation;
     }
 
-    public String getFilePath() {
-        return CoreResources.getField("filePath") + "participants_report_file";
-
+    private String getFilePath() {
+      String path= CoreResources.getField("filePath") + BULK_JOBS;
+      File file = new File(path);
+        if (!file.exists()) {
+            file.mkdir();
+        }
+        return path;
     }
 
     private PrintWriter openFile(File file) throws FileNotFoundException, UnsupportedEncodingException {
@@ -604,7 +587,7 @@ public class UserServiceImpl implements UserService {
     }
 
 
-    public String writeToTextFile(List<OCUserDTO> userDTOS) {
+    private String writeToTextFile(List<OCUserDTO> userDTOS) {
 
         StringBuffer stringBuffer = new StringBuffer();
         stringBuffer.append("Participant Id");
@@ -657,5 +640,29 @@ public class UserServiceImpl implements UserService {
 
         return auditLogEventDTO;
     }
+
+    public JobDetail persistJobCreated(Study study, Study site, UserAccount createdBy) {
+        JobDetail jobDetail = new JobDetail();
+        jobDetail.setCreatedBy(createdBy);
+        jobDetail.setDateCreated(new Date());
+        jobDetail.setSite(site);
+        jobDetail.setStudy(study);
+        jobDetail.setStatus(JobStatus.IN_PROGRESS);
+        jobDetail.setType(JobType.ACCESS_CODE);
+        jobDetail.setUuid(UUID.randomUUID().toString());
+        return jobService.saveOrUpdateJob(jobDetail);
+    }
+
+
+    private void persistJobCompleted(JobDetail jobDetail, String fileName) {
+        jobDetail.setLogPath(fileName);
+        jobDetail.setDateCompleted(new Date());
+        jobDetail.setStatus(JobStatus.COMPLETED);
+        jobDetail =jobService.saveOrUpdateJob(jobDetail);
+    }
+
+
+
+
 
 }

@@ -15,6 +15,8 @@ public final class ErrorConstants {
     public static final String ERR_MISMATCH_STUDY_OID_AND_SITE_OID = "error.mismatchStudyOidAndSiteOid";
 
     public static final String ERR_PARTICIAPTE_INACTIVE = "error.participateInactive";
+    public static final String ERR_JOB_FAILED = "error.jobfailed";
+    public static final String ERR_INCORRECT_USER = "error.incorrectUser";
 
 
     private ErrorConstants() {

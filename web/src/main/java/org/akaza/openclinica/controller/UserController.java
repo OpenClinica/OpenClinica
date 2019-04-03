@@ -6,6 +6,7 @@ import java.io.IOException;
 import java.util.*;
 
 import java.io.InputStream;
+import java.util.concurrent.CompletableFuture;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -23,6 +24,8 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.StudySubject;
@@ -77,6 +80,8 @@ public class UserController {
 
     @Autowired
     private StudyDao studyDao;
+    @Autowired
+    UserAccountDao userAccountDao;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private static final String ENTITY_NAME = "UserController";
@@ -186,7 +191,7 @@ public class UserController {
 
     @ApiOperation( value = "To extract participants info", notes = "Will extract the data in a text file" )
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.GET )
-    public ResponseEntity<List<OCUserDTO>> extractPartcipantsInfo(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid) throws InterruptedException {
+    public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
         Study tenantSite = getTenantStudy(siteOid);
@@ -227,11 +232,13 @@ public class UserController {
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
-        userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean);
-
+      String uuid= startExtractJob( studyOid,  siteOid,  accessToken,  customerUuid,  userAccountBean);
+         if(uuid==null){
+             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_JOB_FAILED, "Job Failed. Job did not complete")).body(null);
+         }
 
         logger.info("REST request to POST OCUserDTO ");
-        return new ResponseEntity<List<OCUserDTO>>(HttpStatus.OK);
+        return new ResponseEntity<Object>("job uuid: "+uuid,HttpStatus.OK);
     }
 
 
@@ -268,38 +275,19 @@ public class UserController {
         return studyDao.findByOcOID(studyOid);
     }
 
-    @ApiOperation( value = "To download participant access code", notes = "Will download access code report text file" )
-    @RequestMapping( value = "/participants/{filename}/downloadReportFile", method = RequestMethod.GET )
-    public void getLogFile(HttpServletRequest request, @PathVariable( "filename" ) String fileName, HttpServletResponse response) throws Exception {
+    public String startExtractJob(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean) {
+        utilService.setSchemaFromStudyOid(studyOid);
+        String schema = CoreResources.getRequestSchema();
 
-        InputStream inputStream = null;
-        try {
-            String logFileName = getFilePath() + File.separator + fileName;
-            File fileToDownload = new File(logFileName);
-            inputStream = new FileInputStream(fileToDownload);
-            response.setContentType("application/force-download");
-            response.setHeader("Content-Disposition", "attachment; filename=" + fileName);
-            IOUtils.copy(inputStream, response.getOutputStream());
-            response.flushBuffer();
-        } catch (Exception e) {
-            logger.debug("Request could not be completed at this moment. Please try again.");
-            logger.debug(e.getStackTrace().toString());
-            throw e;
-        } finally {
-            if (inputStream != null) {
-                try {
-                    inputStream.close();
-                } catch (IOException e) {
-                    logger.debug(e.getStackTrace().toString());
-                    throw e;
-                }
-            }
-        }
+        Study site = studyDao.findByOcOID(siteOid);
+        Study study = studyDao.findByOcOID(studyOid);
+        UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
+        JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount);
+        CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
+            userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean,schema,jobDetail);
+            return null;
+        });
+        return jobDetail.getUuid();
     }
-
-    private String getFilePath() {
-        return CoreResources.getField("filePath") + "participants_report_file";
-    }
-
 
 }
