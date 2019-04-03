@@ -67,8 +67,6 @@
             });
         </script>
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
-        <link href="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/css/bootstrap-tour-standalone.min.css" rel="stylesheet">
-        <script src="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/js/bootstrap-tour-standalone.min.js"></script>
     </c:when>
     <c:otherwise>
         <script type="text/JavaScript" language="JavaScript" src="${pageContext.request.contextPath}/includes/jmesa/jquery.min.js"></script>
@@ -84,11 +82,10 @@
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/sessionTimeout.js"></script>
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/auth0/captureKeyboardMouseEvents.js"></script>
         <script type="text/javascript" language="JavaScript" src="${pageContext.request.contextPath}/includes/moment.min.js"></script>
-        <link href="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/css/bootstrap-tour-standalone.min.css" rel="stylesheet">
-        <script src="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/js/bootstrap-tour-standalone.min.js"></script>
     </c:otherwise>
 </c:choose>
-
+<link href="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/css/bootstrap-tour-standalone.min.css" rel="stylesheet">
+        <script src="${pageContext.request.contextPath}/includes/bootstrap-tour-0.12.0/js/bootstrap-tour-standalone.min.js"></script>
 
 <script type="text/javascript">
 
@@ -629,6 +626,17 @@
 
     //we have it open on mouse-over OR click when it is closed
     $(document).ready(function(){
+        var participantIDVerification = '<c:out value="${participantIDVerification}"/>';
+        if (participantIDVerification == 'true') {
+            // disable right click
+            $("input[name='findSubjects_f_studySubject.label']").on('contextmenu',function(){
+                return false;
+            });
+            // disable cut copy paste
+            $("input[name='findSubjects_f_studySubject.label']").bind('cut copy paste', function (e) {
+                e.preventDefault();
+            });
+        }
         // Show hide popover
         $(".nav_TaskB").click(function(){
             $(this).find(".dropdown").slideToggle("fast");

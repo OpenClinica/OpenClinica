@@ -375,7 +375,7 @@
                         <div class="box_BL">
                           <div class="box_BR">
                             <div class="tablebox_center">
-                              <table width="100%">
+                              <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tbody>
                                   <tr>
                                     <td class="table_header_column_top">
@@ -511,17 +511,17 @@
                                   <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
                                       <tr>
-                                        <td class="table_header_column_top">
+                                        <td class="table_header_column_top" width="25%">
                                           <fmt:message key="first_name" bundle="${resword}"/>
                                         </td>
-                                        <td class="table_cell_top" id="info-fname-2">
+                                        <td class="table_cell_top" id="info-fname-2" width="25%">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
 
-                                        <td class="table_header_column_top">
+                                        <td class="table_header_column_top" width="25%">
                                           <fmt:message key="last_name" bundle="${resword}"/>
                                         </td>
-                                        <td class="table_cell_top" id="info-lname-2">
+                                        <td class="table_cell_top" id="info-lname-2" width="25%">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
                                       </tr>
@@ -530,7 +530,7 @@
                                         <td class="table_header_column_top">
                                           <fmt:message key="secondary_ID" bundle="${resword}"/>
                                         </td>
-                                        <td class="table_cell_top" id="info-secid-2" colspan="3">
+                                        <td class="table_cell" id="info-secid-2" colspan="3">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
                                       </tr>
