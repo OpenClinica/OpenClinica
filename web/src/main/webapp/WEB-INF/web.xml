@@ -20,7 +20,6 @@
             classpath:org/akaza/openclinica/applicationContext-core-security.xml
             classpath:org/akaza/openclinica/applicationContext-core-service.xml
             classpath:org/akaza/openclinica/applicationContext-core-scheduler.xml
-            classpath:org/akaza/openclinica/applicationContext-core-annotation-scheduler.xml
             classpath:org/akaza/openclinica/applicationContext-core-hibernate.xml
             classpath:org/akaza/openclinica/applicationContext-core-email.xml
             classpath:org/akaza/openclinica/applicationContext-core-db.xml
@@ -115,7 +114,7 @@
     </filter-mapping>
     <filter>
         <filter-name>compressFilter</filter-name>
-        <filter-class>com.planetj.servlet.filter.compression.CompressingFilter</filter-class>
+        <filter-class>net.sf.ehcache.constructs.web.filter.GzipFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>compressFilter</filter-name>
@@ -163,7 +162,7 @@
     </filter-mapping>
     <filter>
         <filter-name>hibernateFilter</filter-name>
-        <filter-class>org.springframework.orm.hibernate3.support.OpenSessionInViewFilter</filter-class>
+        <filter-class>org.springframework.orm.hibernate5.support.OpenSessionInViewFilter</filter-class>
     </filter>
     <filter-mapping>
         <filter-name>hibernateFilter</filter-name>

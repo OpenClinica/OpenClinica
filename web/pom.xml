@@ -284,17 +284,17 @@
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-server</artifactId>
-            <version>1.17.1</version>
+            <version>1.19.3</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey</groupId>
             <artifactId>jersey-client</artifactId>
-            <version>1.17.1</version>
+            <version>1.19.3</version>
         </dependency>
         <dependency>
             <groupId>com.sun.jersey.contribs</groupId>
             <artifactId>jersey-spring</artifactId>
-            <version>1.13</version>
+            <version>1.19.3</version>
             <exclusions>
                 <exclusion>
                     <groupId>org.springframework</groupId>
@@ -316,6 +316,14 @@
                     <groupId>org.springframework</groupId>
                     <artifactId>spring-context</artifactId>
                 </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-aop</artifactId>
+                </exclusion>
+                <exclusion>
+                    <groupId>org.springframework</groupId>
+                    <artifactId>spring-asm</artifactId>
+                </exclusion>
             </exclusions>
         </dependency>
         <dependency>
@@ -335,18 +343,14 @@
             <version>1.9.5</version>
             <scope>test</scope>
         </dependency>
-
         <dependency>
-    <groupId>org.codehaus.jackson</groupId>
-    <artifactId>jackson-core-lgpl</artifactId>
-    <version>1.8.1</version>
-</dependency>
-
-<dependency>
-    <groupId>org.codehaus.jackson</groupId>
-    <artifactId>jackson-mapper-lgpl</artifactId>
-    <version>1.8.1</version>
-</dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-core</artifactId>
+        </dependency>
+        <dependency>
+            <groupId>com.fasterxml.jackson.core</groupId>
+            <artifactId>jackson-databind</artifactId>
+        </dependency>
     </dependencies>
 
     <build>

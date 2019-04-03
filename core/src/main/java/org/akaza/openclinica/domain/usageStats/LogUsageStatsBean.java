@@ -25,7 +25,7 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name = "usage_statistics_data")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "usage_statistics_data_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "usage_statistics_data_id_seq") })
 public class LogUsageStatsBean extends AbstractMutableDomainObject {
 
     private String param_key;

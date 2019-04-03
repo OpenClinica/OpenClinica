@@ -22,7 +22,7 @@ import org.hibernate.annotations.Parameter;
  */
 @Entity
 @Table(name = "subject_group_map")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "subject_group_map_subject_group_map_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "subject_group_map_subject_group_map_id_seq") })
 
 public class SubjectGroupMap extends DataMapDomainObject {
 

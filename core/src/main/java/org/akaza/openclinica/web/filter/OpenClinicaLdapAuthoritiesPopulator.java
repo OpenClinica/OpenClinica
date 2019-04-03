@@ -5,7 +5,7 @@ import java.util.Collection;
 
 import org.springframework.ldap.core.DirContextOperations;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.security.ldap.userdetails.LdapAuthoritiesPopulator;
 
 /**
@@ -17,7 +17,7 @@ public class OpenClinicaLdapAuthoritiesPopulator implements LdapAuthoritiesPopul
 
     public Collection<GrantedAuthority> getGrantedAuthorities(DirContextOperations userData, String username) {
         Collection<GrantedAuthority> auths = new ArrayList<GrantedAuthority>(1);
-        auths.add(new GrantedAuthorityImpl("ROLE_USER"));
+        auths.add(new SimpleGrantedAuthority("ROLE_USER"));
         return auths;
     }
 

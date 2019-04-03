@@ -2,9 +2,11 @@ package org.akaza.openclinica.domain.enumsupport;
 
 import org.hibernate.Hibernate;
 import org.hibernate.HibernateException;
+import org.hibernate.engine.spi.SharedSessionContractImplementor;
+import org.hibernate.type.IntegerType;
 import org.hibernate.usertype.EnhancedUserType;
 import org.hibernate.usertype.ParameterizedType;
-import org.hibernate.util.ReflectHelper;
+import org.hibernate.internal.util.ReflectHelper;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +59,7 @@ public class CodedEnumType implements EnhancedUserType, ParameterizedType {
      * 
      */
     public int[] sqlTypes() {
-        return new int[] { Hibernate.INTEGER.sqlType() };
+        return new int[] { IntegerType.INSTANCE.sqlType() };
     }
 
     /* 
@@ -111,6 +113,32 @@ public class CodedEnumType implements EnhancedUserType, ParameterizedType {
         return x.hashCode();
     }
 
+    /*
+        * Retrieves the property value from the JDBC Result-Set. You can also access the owner of the component
+        * if you need it for the conversion.
+        * @see org.hibernate.usertype.UserType#nullSafeGet(java.sql.ResultSet, java.lang.String[], java.lang.Object)
+        */
+    @Override
+    public Object nullSafeGet(ResultSet rs, String[] strings, SharedSessionContractImplementor sharedSessionContractImplementor, Object o) throws HibernateException, SQLException {
+        String key = rs.getString(strings[0]);
+        return rs.wasNull() ? null : getByCode(key);
+    }
+
+    /*
+    * This method writes the property value to the JDBC Prepared-Statement.
+    * @see org.hibernate.usertype.UserType#nullSafeSet(java.sql.PreparedStatement, java.lang.Object, int)
+    */
+    @Override
+    public void nullSafeSet(PreparedStatement st, Object value, int index, SharedSessionContractImplementor sharedSessionContractImplementor) throws HibernateException, SQLException {
+        if (value == null) {
+            st.setNull(index, IntegerType.INSTANCE.sqlType());
+        } else {
+            Integer code = getCode(value);
+            logger.debug("Binding '{}' to parameter: {}", code, index);
+            st.setInt(index, code);
+        }
+    }
+
     public Object fromXMLString(String xmlValue) {
         return getByCode(xmlValue);
     }
@@ -123,29 +151,6 @@ public class CodedEnumType implements EnhancedUserType, ParameterizedType {
         return getCodeAsString(value);
     }
 
-    /* 
-     * Retrieves the property value from the JDBC Result-Set. You can also access the owner of the component
-     * if you need it for the conversion.
-     * @see org.hibernate.usertype.UserType#nullSafeGet(java.sql.ResultSet, java.lang.String[], java.lang.Object)
-     */
-    public Object nullSafeGet(ResultSet rs, String[] names, Object owner) throws SQLException {
-        String key = rs.getString(names[0]);
-        return rs.wasNull() ? null : getByCode(key);
-    }
-
-    /* 
-     * This method writes the property value to the JDBC Prepared-Statement.
-     * @see org.hibernate.usertype.UserType#nullSafeSet(java.sql.PreparedStatement, java.lang.Object, int)
-     */
-    public void nullSafeSet(PreparedStatement st, Object value, int index) throws SQLException {
-        if (value == null) {
-            st.setNull(index, Hibernate.INTEGER.sqlType());
-        } else {
-            Integer code = getCode(value);
-            logger.debug("Binding '{}' to parameter: {}", code, index);
-            st.setInt(index, code);
-        }
-    }
 
     private Integer getCode(Object value) {
         return ((CodedEnum) value).getCode();

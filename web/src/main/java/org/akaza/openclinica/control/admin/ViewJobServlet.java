@@ -17,12 +17,16 @@ import org.akaza.openclinica.web.job.ExampleSpringJob;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.quartz.JobDataMap;
 import org.quartz.Trigger;
+import org.quartz.Trigger.TriggerState;
+import org.quartz.TriggerKey;
 import org.quartz.impl.StdScheduler;
+import org.quartz.impl.matchers.GroupMatcher;
 import org.springframework.scheduling.quartz.SchedulerFactoryBean;
 
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.HashMap;
+import java.util.Set;
 
 /**
  * 
@@ -70,17 +74,13 @@ public class ViewJobServlet extends SecureController {
         // First we must get a reference to a scheduler
         scheduler = getScheduler();
         XsltTriggerService xsltTriggerSrvc = new XsltTriggerService();
-        // Scheduler sched = sfb.getScheduler();
-
-     String[] triggerNames = scheduler.getTriggerNames(xsltTriggerSrvc.getTriggerGroupNameForExportJobs());
-  //      String[]    triggerNames          =           scheduler.getJobNames(XsltTriggerService.TRIGGER_GROUP_NAME);
-        // logger.info("trigger list: "+triggerNames.length);
-        // logger.info("trigger names: "+triggerNames.toString());
-
+        
+        Set<TriggerKey> triggerKeySet = scheduler.getTriggerKeys(GroupMatcher.triggerGroupEquals(xsltTriggerSrvc.getTriggerGroupNameForExportJobs()));
+        TriggerKey[] triggerKeys = triggerKeySet.stream().toArray(TriggerKey[]::new);
 
         ArrayList triggerBeans = new ArrayList();
-        for (String triggerName : triggerNames) {
-            Trigger trigger = scheduler.getTrigger(triggerName, xsltTriggerSrvc.getTriggerGroupNameForExportJobs());
+        for (TriggerKey triggerKey : triggerKeys) {
+            Trigger trigger = scheduler.getTrigger(triggerKey);
             try {
                 logger.debug("prev fire time " + trigger.getPreviousFireTime().toString());
                 logger.debug("next fire time " + trigger.getNextFireTime().toString());
@@ -92,7 +92,7 @@ public class ViewJobServlet extends SecureController {
             // logger.info(trigger.getDescription());
             // logger.info("");//getJobDataMap()
             TriggerBean triggerBean = new TriggerBean();
-            triggerBean.setFullName(trigger.getName());
+            triggerBean.setFullName(triggerKey.getName());
             triggerBean.setPreviousDate(trigger.getPreviousFireTime());
             triggerBean.setNextDate(trigger.getNextFireTime());
             if (trigger.getDescription() != null) {
@@ -114,13 +114,13 @@ public class ViewJobServlet extends SecureController {
                 triggerBean.setStudyName(study.getName());
                 // triggerBean.setStudyName(dataMap.getString(ExampleSpringJob.STUDY_NAME));
             }
-            logger.debug("Trigger Priority: " + trigger.getName() + " " + trigger.getPriority());
-            if (scheduler.getTriggerState(triggerName, XsltTriggerService.TRIGGER_GROUP_NAME) == Trigger.STATE_PAUSED) {
+            logger.debug("Trigger Priority: " + triggerKey.getName() + " " + trigger.getPriority());
+            if (scheduler.getTriggerState(triggerKey) == TriggerState.PAUSED) {
                 triggerBean.setActive(false);
-                logger.debug("setting active to false for trigger: " + trigger.getName());
+                logger.debug("setting active to false for trigger: " + triggerKey.getName());
             } else {
                 triggerBean.setActive(true);
-                logger.debug("setting active to TRUE for trigger: " + trigger.getName());
+                logger.debug("setting active to TRUE for trigger: " + triggerKey.getName());
             }
             triggerBeans.add(triggerBean);
             // our wrapper to show triggers

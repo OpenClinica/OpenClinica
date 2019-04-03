@@ -26,7 +26,7 @@ import javax.persistence.Transient;
 
 @Entity
 @Table(name = "rule_set_audit")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_set_audit_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_set_audit_id_seq") })
 public class RuleSetAuditBean extends AbstractMutableDomainObject {
 
     RuleSetBean ruleSetBean;

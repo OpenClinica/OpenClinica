@@ -22,6 +22,10 @@ import org.akaza.openclinica.control.submit.ImportCRFInfo;
 import org.akaza.openclinica.control.submit.ImportCRFInfoContainer;
 import org.quartz.JobDataMap;
 import org.quartz.SimpleTrigger;
+import org.quartz.impl.triggers.SimpleTriggerImpl;
+
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 
 public class TriggerService {
 
@@ -78,7 +82,6 @@ public class TriggerService {
         }
         // set up and commit job here
 
-        SimpleTrigger trigger = new SimpleTrigger(jobName, "DEFAULT", 64000, interval.longValue());
 
         // set the job detail name,
         // based on our choice of format above
@@ -86,40 +89,37 @@ public class TriggerService {
         // what is the number of times it should repeat?
         // arbitrary large number, 64K should be enough :)
 
-        trigger.setDescription(jobDesc);
-        // set just the start date
-        trigger.setStartTime(startDateTime);
-        trigger.setName(jobName);// + datasetId);
-        trigger.setGroup("DEFAULT");// + datasetId);
-        trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
-        // set job data map
-        JobDataMap jobDataMap = new JobDataMap();
-        jobDataMap.put(DATASET_ID, datasetId);
-        jobDataMap.put(PERIOD, period);
-        jobDataMap.put(EMAIL, email);
-        jobDataMap.put(TAB, tab);
-        jobDataMap.put(CDISC, cdisc);
-        jobDataMap.put(ExampleSpringJob.CDISC12, cdisc12);
-        jobDataMap.put(ExampleSpringJob.LOCALE, locale);
-        // System.out.println("found 1.2: " +
-        // jobDataMap.get(ExampleSpringJob.CDISC12));
-        jobDataMap.put(ExampleSpringJob.CDISC13, cdisc13);
-        // System.out.println("found 1.3: " +
-        // jobDataMap.get(ExampleSpringJob.CDISC13));
-        jobDataMap.put(ExampleSpringJob.CDISC13OC, cdisc13oc);
-        // System.out.println("found 1.3oc: " +
-        // jobDataMap.get(ExampleSpringJob.CDISC13OC));
-        jobDataMap.put(SPSS, spss);
-        jobDataMap.put(USER_ID, userAccount.getId());
-        // StudyDAO studyDAO = new StudyDAO();
-        jobDataMap.put(STUDY_ID, study.getId());
-        jobDataMap.put(STUDY_NAME, study.getName());
-        jobDataMap.put(STUDY_OID, study.getOid());
+        SimpleTrigger trigger = (SimpleTrigger) newTrigger()
+                .forJob(jobName, "DEFAULT")
+                .withDescription(jobDesc)
+                .startAt(startDateTime)
+                .withSchedule(simpleSchedule().withRepeatCount(64000).withIntervalInSeconds(interval.intValue()).withMisfireHandlingInstructionNextWithExistingCount());
 
-        trigger.setJobDataMap(jobDataMap);
+        // set job data map
+        trigger.getJobDataMap().put(DATASET_ID, datasetId);
+        trigger.getJobDataMap().put(PERIOD, period);
+        trigger.getJobDataMap().put(EMAIL, email);
+        trigger.getJobDataMap().put(TAB, tab);
+        trigger.getJobDataMap().put(CDISC, cdisc);
+        trigger.getJobDataMap().put(ExampleSpringJob.CDISC12, cdisc12);
+        trigger.getJobDataMap().put(ExampleSpringJob.LOCALE, locale);
+        // System.out.println("found 1.2: " +
+        // trigger.getJobDataMap().get(ExampleSpringJob.CDISC12));
+        trigger.getJobDataMap().put(ExampleSpringJob.CDISC13, cdisc13);
+        // System.out.println("found 1.3: " +
+        // trigger.getJobDataMap().get(ExampleSpringJob.CDISC13));
+        trigger.getJobDataMap().put(ExampleSpringJob.CDISC13OC, cdisc13oc);
+        // System.out.println("found 1.3oc: " +
+        // trigger.getJobDataMap().get(ExampleSpringJob.CDISC13OC));
+        trigger.getJobDataMap().put(SPSS, spss);
+        trigger.getJobDataMap().put(USER_ID, userAccount.getId());
+        // StudyDAO studyDAO = new StudyDAO();
+        trigger.getJobDataMap().put(STUDY_ID, study.getId());
+        trigger.getJobDataMap().put(STUDY_NAME, study.getName());
+        trigger.getJobDataMap().put(STUDY_OID, study.getOid());
+        
         // trigger.setRepeatInterval(interval.longValue());
         // System.out.println("default for volatile: " + trigger.isVolatile());
-        trigger.setVolatility(false);
         return trigger;
     }
 
@@ -148,27 +148,23 @@ public class TriggerService {
             long minutesInt = minutes * 60000;
             interval = interval + minutesInt;
         }
-        SimpleTrigger trigger = new SimpleTrigger(jobName, IMPORT_TRIGGER, 64000, interval);
-        trigger.setDescription(jobDesc);
-        // set just the start date
-        trigger.setStartTime(startDateTime);
-        trigger.setName(jobName);// + datasetId);
-        trigger.setGroup(IMPORT_TRIGGER);// + datasetId);
-        trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
+        SimpleTrigger trigger = (SimpleTrigger) newTrigger()
+                .forJob(jobName, IMPORT_TRIGGER)
+                .withDescription(jobDesc)
+                .startAt(startDateTime)
+                .withSchedule(simpleSchedule().withRepeatCount(64000).withIntervalInSeconds(new Long(interval).intValue()).withMisfireHandlingInstructionNextWithExistingCount());
+
+        
         // set job data map
-        JobDataMap jobDataMap = new JobDataMap();
+        trigger.getJobDataMap().put(EMAIL, email);
+        trigger.getJobDataMap().put(USER_ID, userAccount.getId());
+        trigger.getJobDataMap().put(STUDY_NAME, study.getName());
+        trigger.getJobDataMap().put(STUDY_OID, study.getOid());
+        trigger.getJobDataMap().put(DIRECTORY, directory);
+        trigger.getJobDataMap().put(ExampleSpringJob.LOCALE, locale);
+        trigger.getJobDataMap().put("hours", hours);
+        trigger.getJobDataMap().put("minutes", minutes);
 
-        jobDataMap.put(EMAIL, email);
-        jobDataMap.put(USER_ID, userAccount.getId());
-        jobDataMap.put(STUDY_NAME, study.getName());
-        jobDataMap.put(STUDY_OID, study.getOid());
-        jobDataMap.put(DIRECTORY, directory);
-        jobDataMap.put(ExampleSpringJob.LOCALE, locale);
-        jobDataMap.put("hours", hours);
-        jobDataMap.put("minutes", minutes);
-
-        trigger.setJobDataMap(jobDataMap);
-        trigger.setVolatility(false);
         return trigger;
     }
 
