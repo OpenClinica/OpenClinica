@@ -744,14 +744,15 @@ public String readFileToString(File file) throws IOException{
     	boolean foundStudyOID=false;
     	boolean foundStudyEventOID=false;
     	
-    	String formOIDValue;
-    	String formVersionValue;
-    	String studyOIDValue;
-    	String studyEventOIDValue;
+    	String formOIDValue = null;
+    	String formVersionValue = null;
+    	String studyOIDValue = null;
+    	String studyEventOIDValue = null;
     	
     	String errorMsg = null;
     	ArrayList<String> errorMsgs = new ArrayList<>();
-    			
+    	ArrayList<ImportItemGroupDTO> importItemGroupDTOs = new ArrayList<ImportItemGroupDTO>();
+    	
         try(Scanner sc = new Scanner(file)){
        	
          String currentLine;
@@ -794,6 +795,11 @@ public String readFileToString(File file) throws IOException{
 	             		if(errorMsg != null) {
 	             			errorMsgs.add(errorMsg);
 	             		}
+	             		
+	             		ImportItemGroupDTO  importItemGroupDTO = this.convertToImportItemGroupDTO(mappingRow);
+	             		
+	             		addToItemGroupDTOList(importItemGroupDTOs, importItemGroupDTO);
+	             		
 	             	 }
 	       		 }
 	       	 }
@@ -821,9 +827,40 @@ public String readFileToString(File file) throws IOException{
         	throw new OpenClinicaSystemException("errorCode.missingItemOrItemGroupOID", errorMsgs.toString());
         }
         
-        // check against DB
-    	
+        // check against current system/DB
+        errorMsgs.clear();
+        errorMsgs = this.validateStudyMetadata(formOIDValue, formVersionValue, studyOIDValue, studyEventOIDValue, importItemGroupDTOs, null);
+        if(errorMsgs.size() >0) {
+        	throw new OpenClinicaSystemException("errorCode.ItemOrItemGroupOIDValidationFailed", errorMsgs.toString());
+        }
+        
 	 }
+    /**
+     * 
+     * @param importItemGroupDTOs
+     * @param importItemGroupDTO
+     */
+	private void addToItemGroupDTOList(ArrayList<ImportItemGroupDTO> importItemGroupDTOs,
+			ImportItemGroupDTO importItemGroupDTO) {
+		
+		boolean found = false;
+		if(importItemGroupDTOs.isEmpty()) {
+			importItemGroupDTOs.add(importItemGroupDTO);
+		}else {
+			for(ImportItemGroupDTO  itemGroupDTO : importItemGroupDTOs) {
+				String itemGroupOID = itemGroupDTO.getItemGroupOID();
+				if(itemGroupOID != null && itemGroupOID.equals(importItemGroupDTO.getItemGroupOID()) ) {
+					found = true;
+					itemGroupDTO.getItemOIDs().addAll(importItemGroupDTO.getItemOIDs());
+				}
+				
+			}
+			
+			if(!found) {
+				importItemGroupDTOs.add(importItemGroupDTO);
+			}
+		}
+	}
  
  /**
   * Height Units=IG_VITAL_GROUP1.HeightUnitsOID   
@@ -864,6 +901,37 @@ private  String  validateItemFormat(String[] keyValueStr) {
 	     }
 	     
 	    return errorMsg;
+	}
+
+
+/**
+ * Height Units=IG_VITAL_GROUP1.HeightUnitsOID   
+ * @param itemStr
+ * @return
+ */
+private  ImportItemGroupDTO  convertToImportItemGroupDTO(String[] keyValueStr) {		
+	
+	    ImportItemGroupDTO importItemGroupDTO = null;	
+		String key;
+		String val;
+	
+	    if(keyValueStr.length < 2) {
+	    	 ;
+	    }else {
+	    	key = keyValueStr[0].trim();
+		    val =  keyValueStr[1].trim().replaceAll("/n|||/r", "");	
+                       
+            String[] itemMappingvalue = toArray(val,".");
+                     
+			String itemGroupOID = itemMappingvalue[0]; 
+			String itemOID = itemMappingvalue[1];
+			 
+			importItemGroupDTO = new ImportItemGroupDTO();
+			importItemGroupDTO.setItemGroupOID(itemGroupOID);
+			importItemGroupDTO.getItemOIDs().add(itemOID);			 				        
+	     }
+	     
+	    return importItemGroupDTO;
 	}
 
 private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {		
@@ -909,13 +977,15 @@ private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {
 
 }
 
-<<<<<<< HEAD
-public List<String> validateStudyMetadata(String formOIDValue,
+
+public ArrayList<String> validateStudyMetadata(String formOIDValue,
 										  String formVersionValue,
 										  String studyOIDValue,
-										  String studyEventOIDValue,Locale newLocale) {
+										  String studyEventOIDValue,
+										  ArrayList<ImportItemGroupDTO> importItemGroupDTOs,
+										  Locale newLocale) {
   
-    List<String> errors = new ArrayList<String>();
+	ArrayList<String> errors = new ArrayList<String>();
     Locale locale;
     if(newLocale !=null) {
     	locale = newLocale;
@@ -966,69 +1036,69 @@ public List<String> validateStudyMetadata(String formOIDValue,
         String formOid = formOIDValue;
         String formLayoutName = formVersionValue;
         CRFBean crfBean = crfDAO.findByOid(formOid);
-                                if (crfBean != null && studyEventDefintionBean != null) {
-                                    EventDefinitionCRFBean edcBean = edcDAO.findByStudyEventDefinitionIdAndCRFId(studyEventDefintionBean.getId(),
-                                            crfBean.getId());
-                                    if (edcBean == null || edcBean.getId() == 0) {
-                                        mf.applyPattern(respage.getString("your_form_oid_for_study_event_oid"));
-                                        Object[] arguments = { formOid, sedOid };
-                                        errors.add(mf.format(arguments));
-                                    }
-                                }
+        if (crfBean != null && studyEventDefintionBean != null) {
+            EventDefinitionCRFBean edcBean = edcDAO.findByStudyEventDefinitionIdAndCRFId(studyEventDefintionBean.getId(),
+                    crfBean.getId());
+            if (edcBean == null || edcBean.getId() == 0) {
+                mf.applyPattern(respage.getString("your_form_oid_for_study_event_oid"));
+                Object[] arguments = { formOid, sedOid };
+                errors.add(mf.format(arguments));
+            }
+        }
 
-                                if (crfBean != null) {
-                                    FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByFullName(formLayoutName, crfBean.getName());
-                                    if (formLayoutBean == null || formLayoutBean.getId() == 0) {
-                                        mf.applyPattern(respage.getString("your_form_layout_oid_for_form_oid"));
-                                        Object[] arguments = { formLayoutName, formOid };
-                                        errors.add(mf.format(arguments));
-                                    }
-                                } else {
-                                    mf.applyPattern(respage.getString("your_form_oid_did_not_generate"));
-                                    Object[] arguments = { formOid };
-                                    errors.add(mf.format(arguments));
-                                }
+        if (crfBean != null) {
+            FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByFullName(formLayoutName, crfBean.getName());
+            if (formLayoutBean == null || formLayoutBean.getId() == 0) {
+                mf.applyPattern(respage.getString("your_form_layout_oid_for_form_oid"));
+                Object[] arguments = { formLayoutName, formOid };
+                errors.add(mf.format(arguments));
+            }
+        } else {
+            mf.applyPattern(respage.getString("your_form_oid_did_not_generate"));
+            Object[] arguments = { formOid };
+            errors.add(mf.format(arguments));
+        }
 
-                                ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
-                                if (itemGroupDataBeans != null) {
-                                    for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
-                                        String itemGroupOID = itemGroupDataBean.getItemGroupOID();
-                                        ItemGroupBean itemGroupBean = itemGroupDAO.findByOid(itemGroupOID);
-                                        if (itemGroupBean != null && crfBean != null) {
-                                            itemGroupBean = itemGroupDAO.findByOidAndCrf(itemGroupOID, crfBean.getId());
-                                            if (itemGroupBean == null) {
-                                                mf.applyPattern(respage.getString("your_item_group_oid_for_form_oid"));
-                                                Object[] arguments = { itemGroupOID, formOid };
-                                                errors.add(mf.format(arguments));
-                                            }
-                                        } else if (itemGroupBean == null) {
-                                            mf.applyPattern(respage.getString("the_item_group_oid_did_not"));
-                                            Object[] arguments = { itemGroupOID };
-                                            errors.add(mf.format(arguments));
-                                        }
+        // check item group and Item OID                       
+        if (importItemGroupDTOs != null) {
+            for (ImportItemGroupDTO importItemGroupDTO : importItemGroupDTOs) {
+                String itemGroupOID = importItemGroupDTO.getItemGroupOID();
+                ItemGroupBean itemGroupBean = itemGroupDAO.findByOid(itemGroupOID);
+                if (itemGroupBean != null && crfBean != null) {
+                    itemGroupBean = itemGroupDAO.findByOidAndCrf(itemGroupOID, crfBean.getId());
+                    if (itemGroupBean == null) {
+                        mf.applyPattern(respage.getString("your_item_group_oid_for_form_oid"));
+                        Object[] arguments = { itemGroupOID, formOid };
+                        errors.add(mf.format(arguments));
+                    }
+                } else if (itemGroupBean == null) {
+                    mf.applyPattern(respage.getString("the_item_group_oid_did_not"));
+                    Object[] arguments = { itemGroupOID };
+                    errors.add(mf.format(arguments));
+                }
 
-                                        ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
-                                        if (itemDataBeans != null) {
-                                            for (ImportItemDataBean itemDataBean : itemDataBeans) {
-                                                String itemOID = itemDataBean.getItemOID();
-                                                List<ItemBean> itemBeans = (List<ItemBean>) itemDAO.findByOid(itemOID);
-                                                if (itemBeans.size() != 0 && itemGroupBean != null) {
-                                                    ItemBean itemBean = itemDAO.findItemByGroupIdandItemOid(itemGroupBean.getId(), itemOID);
-                                                    if (itemBean == null) {
-                                                        mf.applyPattern(respage.getString("your_item_oid_for_item_group_oid"));
-                                                        Object[] arguments = { itemOID, itemGroupOID };
-                                                        errors.add(mf.format(arguments));
-                                                    }
-                                                } else if (itemBeans.size() == 0) {
-                                                    mf.applyPattern(respage.getString("the_item_oid_did_not"));
-                                                    Object[] arguments = { itemOID };
-                                                    errors.add(mf.format(arguments));
-                                                }
-                                            } // itemDataBean
-                                        } // if (itemDataBeans != null)
-                                    } // itemGroupDataBean
-                                } // if (itemGroupDataBeans != null)
-                            
+                ArrayList<String> itemOIDs = importItemGroupDTO.getItemOIDs();
+                if (itemOIDs != null) {
+                    for (String itemOID : itemOIDs) {
+                     
+                        List<ItemBean> itemBeans = (List<ItemBean>) itemDAO.findByOid(itemOID);
+                        if (itemBeans.size() != 0 && itemGroupBean != null) {
+                            ItemBean itemBean = itemDAO.findItemByGroupIdandItemOid(itemGroupBean.getId(), itemOID);
+                            if (itemBean == null) {
+                                mf.applyPattern(respage.getString("your_item_oid_for_item_group_oid"));
+                                Object[] arguments = { itemOID, itemGroupOID };
+                                errors.add(mf.format(arguments));
+                            }
+                        } else if (itemBeans.size() == 0) {
+                            mf.applyPattern(respage.getString("the_item_oid_did_not"));
+                            Object[] arguments = { itemOID };
+                            errors.add(mf.format(arguments));
+                        }
+                    } // itemOID
+                } // if (itemOIDs != null)
+            } // importItemGroupDTOs
+        } // if (importItemGroupDTOs != null)
+    
                    
                
            
@@ -1041,7 +1111,7 @@ public List<String> validateStudyMetadata(String formOIDValue,
     return errors;
 }
 
-=======
+
 
 public String getParticipantID(File mappingFile,File rawItemDataFile) throws OpenClinicaSystemException, IOException{
 	
@@ -1124,5 +1194,5 @@ public String getParticipantID(String rawMappingStr,String rawItemData) throws O
  }
 
 
->>>>>>> upstream/master
+
 }
