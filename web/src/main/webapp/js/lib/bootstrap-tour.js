@@ -82,11 +82,22 @@ jQuery(document).ready(function() {
                 jQuery("#step-0").find('#retype_pid').bind('cut copy paste', function (e) {
                     e.preventDefault();
                 });
+                // trigger checking when enter
+                jQuery("#step-0").find('#retype_pid').on('keypress',function(e) {
+                    if(e.which == 13) {
+                        validatePIDVerificationForm();
+                    }
+                });
             }
         });
 
         tourElement.init();
         tourElement.start(true);
+    });
+
+    // disable right click open
+    jQuery('.pidVerification').on('contextmenu',function(){
+        return false;
     });
 });
 
