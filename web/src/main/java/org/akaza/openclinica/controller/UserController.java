@@ -1,13 +1,21 @@
 package org.akaza.openclinica.controller;
 
+import java.io.File;
+import java.io.FileInputStream;
+import java.io.IOException;
 import java.util.*;
 
+import java.io.InputStream;
+import java.util.concurrent.CompletableFuture;
+
 import javax.servlet.http.HttpServletRequest;
+import javax.servlet.http.HttpServletResponse;
 import javax.servlet.http.HttpSession;
 import javax.ws.rs.PathParam;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import io.swagger.annotations.ApiOperation;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -16,14 +24,19 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
+import org.akaza.openclinica.dao.hibernate.UserAccountDao;
+import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLRequest;
+import org.akaza.openclinica.web.util.ErrorConstants;
+import org.akaza.openclinica.web.util.HeaderUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.dbcp2.BasicDataSource;
+import org.apache.commons.io.IOUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -67,8 +80,11 @@ public class UserController {
 
     @Autowired
     private StudyDao studyDao;
+    @Autowired
+    UserAccountDao userAccountDao;
 
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+    private static final String ENTITY_NAME = "UserController";
 
     public UserController() {
     }
@@ -106,10 +122,10 @@ public class UserController {
     public ResponseEntity<OCUserDTO> connectParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid, @RequestBody OCParticipantDTO participantDTO) {
         utilService.setSchemaFromStudyOid(studyOid);
         String accessToken = utilService.getAccessTokenFromRequest(request);
-        UserAccountBean ownerUserAccountBean =utilService.getUserAccountFromRequest(request);
-        String customerUuid =utilService.getCustomerUuidFromRequest(request);
+        UserAccountBean ownerUserAccountBean = utilService.getUserAccountFromRequest(request);
+        String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
-        OCUserDTO ocUserDTO= userService.connectParticipant(studyOid, ssid, participantDTO ,accessToken,ownerUserAccountBean,customerUuid);
+        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid);
         logger.info("REST request to POST OCUserDTO : {}", ocUserDTO);
         return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.OK);
     }
@@ -118,7 +134,7 @@ public class UserController {
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}", method = RequestMethod.GET )
     public ResponseEntity<OCUserDTO> getParticipant(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid) {
         utilService.setSchemaFromStudyOid(studyOid);
-        String accessToken=utilService.getAccessTokenFromRequest(request);
+        String accessToken = utilService.getAccessTokenFromRequest(request);
 
         OCUserDTO ocUserDTO = userService.getParticipantAccount(studyOid, ssid, accessToken);
         logger.info("REST request to GET OCUserDTO : {}", ocUserDTO);
@@ -131,25 +147,26 @@ public class UserController {
 
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participantUsers", method = RequestMethod.GET )
-    public ResponseEntity<List <OCUserDTO>> getAllParticipantFromUserService(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid) {
+    public ResponseEntity<List<OCUserDTO>> getAllParticipantFromUserService(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid) {
         utilService.setSchemaFromStudyOid(studyOid);
         String accessToken = utilService.getAccessTokenFromRequest(request);
 
-        List <OCUserDTO> ocUserDTOs = userService.getAllParticipantAccountsFromUserService(accessToken);
+        List<OCUserDTO> ocUserDTOs = userService.getAllParticipantAccountsFromUserService(accessToken);
         logger.info("REST request to GET List of OCUserDTO : {}", ocUserDTOs);
 
-        return new ResponseEntity<List <OCUserDTO>>(ocUserDTOs, HttpStatus.OK);
+        return new ResponseEntity<List<OCUserDTO>>(ocUserDTOs, HttpStatus.OK);
 
     }
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/{SSID}/accessLink", method = RequestMethod.GET )
-    public ResponseEntity<ParticipantAccessDTO> getAccessLink(HttpServletRequest request,@PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid) {
+    public ResponseEntity<ParticipantAccessDTO> getAccessLink(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "SSID" ) String ssid) {
         utilService.setSchemaFromStudyOid(studyOid);
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
+        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
 
-        ParticipantAccessDTO participantAccessDTO= userService.getAccessInfo(accessToken,studyOid, ssid,customerUuid);
-        if(participantAccessDTO==null){
+        ParticipantAccessDTO participantAccessDTO = userService.getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean);
+        if (participantAccessDTO == null) {
             logger.error("REST request to GET AccessLink Object for Participant not found ");
             return new ResponseEntity<ParticipantAccessDTO>(participantAccessDTO, HttpStatus.NOT_FOUND);
         }
@@ -159,18 +176,71 @@ public class UserController {
     }
 
     @RequestMapping( value = "/clinicaldata/studies/{studyOID}/participants/searchByFields", method = RequestMethod.GET )
-    public ResponseEntity<List<OCUserDTO>> searchByIdentifier(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid,@PathParam( "participantId" ) String participantId,@PathParam( "firstName" ) String firstName,@PathParam( "lastName" ) String lastName, @PathParam( "identifier" ) String identifier) {
+    public ResponseEntity<List<OCUserDTO>> searchByIdentifier(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathParam( "participantId" ) String participantId, @PathParam( "firstName" ) String firstName, @PathParam( "lastName" ) String lastName, @PathParam( "identifier" ) String identifier) {
         utilService.setSchemaFromStudyOid(studyOid);
         String accessToken = utilService.getAccessTokenFromRequest(request);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-        List<OCUserDTO> userDTOs=null;
+        List<OCUserDTO> userDTOs = null;
         // validate accessToken against studyOid ,
         // also validate accessToken's user role crc/investigator
-            userDTOs = userService.searchParticipantsByFields(studyOid, accessToken, participantId, firstName, lastName, identifier, userAccountBean);
+        userDTOs = userService.searchParticipantsByFields(studyOid, accessToken, participantId, firstName, lastName, identifier, userAccountBean);
 
         logger.info("REST request to POST OCUserDTO : {}", userDTOs);
         return new ResponseEntity<List<OCUserDTO>>(userDTOs, HttpStatus.OK);
     }
+
+    @ApiOperation( value = "To extract participants info", notes = "Will extract the data in a text file" )
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.GET )
+    public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid) throws InterruptedException {
+        utilService.setSchemaFromStudyOid(studyOid);
+        Study tenantStudy = getTenantStudy(studyOid);
+        Study tenantSite = getTenantStudy(siteOid);
+
+
+        if (!validateService.isStudyOidValid(studyOid)) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_STUDY_OID, "InValid StudyOID. The StudyOID is invalid or does not exist")).body(null);
+        }
+        if (!validateService.isStudyOidValidStudyLevelOid(studyOid)) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_STUDY_OID_AS_STUDY, "InValid StudyOID. The StudyOID should have a Study Level Oid")).body(null);
+        }
+        if (!validateService.isSiteOidValid(siteOid)) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_SITE_OID, "InValid SiteOID. The SiteOID is invalid or does not exist")).body(null);
+        }
+        if (!validateService.isSiteOidValidSiteLevelOid(siteOid)) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_SITE_OID_AS_SITE, "InValid SiteOID. The SiteOID should have a Site Level Oid")).body(null);
+        }
+        if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_MISMATCH_STUDY_OID_AND_SITE_OID, "Mismatch StudyOID and SiteOID. The StudyOID and SiteOID relation is invalid")).body(null);
+        }
+
+        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
+
+        if (!validateService.isUserHasCrcOrInvestigaterRole(userRoles)) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INCORRECT_USER_ROLE, "Incorrect User Role. The user role should be either a CRC or an Investigator")).body(null);
+        }
+
+        if (!validateService.isUserRoleHasAccessToSite(userRoles, siteOid)) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_MISMATCH_USER_ROLE_AND_SITE, "Mismatch User Role and Site. The user role does not have permission to access this site")).body(null);
+        }
+
+
+        if (!validateService.isParticipateActive(tenantStudy)) {
+            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_PARTICIAPTE_INACTIVE, "Participate is Inactive. Participate module for the study is inactive")).body(null);
+        }
+
+        String accessToken = utilService.getAccessTokenFromRequest(request);
+        String customerUuid = utilService.getCustomerUuidFromRequest(request);
+
+      String uuid= startExtractJob( studyOid,  siteOid,  accessToken,  customerUuid,  userAccountBean);
+         if(uuid==null){
+             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_JOB_FAILED, "Job Failed. Job did not complete")).body(null);
+         }
+
+        logger.info("REST request to POST OCUserDTO ");
+        return new ResponseEntity<Object>("job uuid: "+uuid,HttpStatus.OK);
+    }
+
 
     private void setUpSidebar(HttpServletRequest request) {
         if (sidebarInit.getAlertsBoxSetup() ==
@@ -201,9 +271,23 @@ public class UserController {
         this.sidebarInit = sidebarInit;
     }
 
+    private Study getTenantStudy(String studyOid) {
+        return studyDao.findByOcOID(studyOid);
+    }
 
+    public String startExtractJob(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean) {
+        utilService.setSchemaFromStudyOid(studyOid);
+        String schema = CoreResources.getRequestSchema();
 
-
-
+        Study site = studyDao.findByOcOID(siteOid);
+        Study study = studyDao.findByOcOID(studyOid);
+        UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
+        JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount);
+        CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
+            userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean,schema,jobDetail);
+            return null;
+        });
+        return jobDetail.getUuid();
+    }
 
 }

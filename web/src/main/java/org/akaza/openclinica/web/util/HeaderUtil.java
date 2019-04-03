@@ -32,6 +32,10 @@ public final class HeaderUtil {
         return createAlert("A " + entityName + " is deleted with identifier " + param, param);
     }
 
+    public static HttpHeaders downloadFileAlert(String entityName, String param) {
+        return createAlert("A " + entityName + " is downloaded with identifier " + param, param);
+    }
+
     public static HttpHeaders createFailureAlert(String entityName, String errorKey, String defaultMessage) {
         log.error("Entity creation failed, {}", defaultMessage);
         HttpHeaders headers = new HttpHeaders();

@@ -109,6 +109,7 @@
                 <value>org.akaza.openclinica.domain.datamap.StudySubject</value>
                 <value>org.akaza.openclinica.domain.datamap.Subject</value>
                 <value>org.akaza.openclinica.domain.datamap.StudySubjectDetail</value>
+                <value>org.akaza.openclinica.domain.datamap.JobDetail</value>
 
                 <!-- the following were not tested, to be remain commented as of now -->
                 <!--         <value>org.akaza.openclinica.domain.datamap.AuditEvent    </value>       -->
@@ -257,6 +258,8 @@
     <bean id="studyUserRoleDao" class="org.akaza.openclinica.dao.hibernate.StudyUserRoleDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="subjectDao" class="org.akaza.openclinica.dao.hibernate.SubjectDao" parent="abstractDomainDao" autowire="byName" />
     <bean id="SchemaServiceDao" class="org.akaza.openclinica.dao.hibernate.SchemaServiceDao" autowire="byName" />
+
+    <bean id="jobDetailDao" class="org.akaza.openclinica.dao.hibernate.JobDetailDao" parent="abstractDomainDao" autowire="byName" />
 
     <bean id="viewNotesDao" class="org.akaza.openclinica.dao.managestudy.ViewNotesDaoImpl">
         <property name="dataSource" ref="dataSource"/>

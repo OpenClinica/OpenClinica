@@ -2,6 +2,7 @@ package org.akaza.openclinica.dao.hibernate;
 
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.hibernate.query.Query;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -20,6 +21,7 @@ public class UserAccountDao extends AbstractDomainDao<UserAccount> {
         return (UserAccount) q.uniqueResult();
     }
 
+    @Transactional
     public UserAccount findByUserId(Integer userId) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where do.userId = :user_id";
