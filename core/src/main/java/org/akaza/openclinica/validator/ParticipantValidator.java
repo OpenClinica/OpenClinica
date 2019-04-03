@@ -44,7 +44,6 @@ public class ParticipantValidator extends SubjectTransferValidator {
 	@Autowired
     private Configuration freemarkerConfiguration;
 
-
 	
 	
 	public ParticipantValidator(DataSource dataSource) {
@@ -161,7 +160,8 @@ public class ParticipantValidator extends SubjectTransferValidator {
     
 	 public void validate(Object obj, Errors e) {
 	        SubjectTransferBean subjectTransferBean = (SubjectTransferBean) obj;
-	        currentStudy = subjectTransferBean.getStudy();	        
+	        currentStudy = subjectTransferBean.getStudy();
+
 	        
 	        if (currentStudy == null) {
 	        	currentStudy = getStudyDAO().findByPublicOid(subjectTransferBean.getStudyOid());
@@ -257,11 +257,6 @@ public class ParticipantValidator extends SubjectTransferValidator {
 			 * in study level
 			 */
 	        StudyBean checkStudy = currentStudy;
-	        
-	        if(getStudySubjectDao().findByLabelAndStudy(subjectTransferBean.getPersonId(), checkStudy).getId() != 0) {
-	        	 e.reject("errorCode.participantIDNotUnique", "Participant ID " + subjectTransferBean.getPersonId() + " already exists with that ID, please use different ID");
-		         return;				
-			}
         	        
 	        StudyParameterValueBean studyParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectPersonIdRequired");
 	        String personId = subjectTransferBean.getPersonId();

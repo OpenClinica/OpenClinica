@@ -131,7 +131,7 @@ public class ImportHelper {
                     // a string's size could be more than 255, which is more
                     // than
                     // the db field length
-                    v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 255);
+                    v.addValidation(inputName, Validator.LENGTH_NUMERIC_COMPARISON, NumericComparisonOperator.LESS_THAN_OR_EQUAL_TO, 2000);
 
                 } else if (idt.equals(ItemDataType.INTEGER)) {
                     // hard edit check, will comment out for now, tbh 05/2008
@@ -140,7 +140,7 @@ public class ImportHelper {
 
                 } else if (idt.equals(ItemDataType.REAL)) {
                     // hard edit check, will comment out for now, tbh 05/08
-                    // v.addValidation(inputName, Validator.IS_A_NUMBER);
+                     v.addValidation(inputName, Validator.IS_A_NUMBER);
                     // v.alwaysExecuteLastValidation(inputName);
                 } else if (idt.equals(ItemDataType.BL)) {
                     // there is no validation here since this data type is

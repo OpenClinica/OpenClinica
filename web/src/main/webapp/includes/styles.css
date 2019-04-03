@@ -30,7 +30,9 @@ input[type="text"].navSearch, input[type="password"].navSearch {
 input.navSearch::placeholder {
   color: #999;
 }
-
+#advsearch-link {
+  margin-left: 10px;
+}
 
 input[type="submit"], input[type="button"] {
   -webkit-appearance: none; }
@@ -60,9 +62,12 @@ input[type="submit"], input[type="button"] {
   border: 0;
   min-height: 30px;
   font-size: 1em;
-  padding-left: .75em; }
-  .navSearchButton:hover {
-    background: #20354a; }
+  padding-left: .75em;
+  padding-right: .75em;
+}
+.navSearchButton:hover {
+  background: #20354a;
+}
 
 body {
   font-size: 100%;
@@ -898,4 +903,8 @@ form#searchByStudySubjectId {
 #bt_Home td.oc-menu-bar ul li a {
   display: block;
   padding: .5em;
+}
+
+.main_BG .tour-backdrop {
+  opacity: 1
 }

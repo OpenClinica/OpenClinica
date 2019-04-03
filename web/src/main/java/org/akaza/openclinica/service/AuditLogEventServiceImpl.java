@@ -82,11 +82,4 @@ public class AuditLogEventServiceImpl implements AuditLogEventService {
         return auditLogEvent;
     }
 
-    public RestfulServiceHelper getRestfulServiceHelper() {
-        if (restfulServiceHelper == null) {
-            restfulServiceHelper = new RestfulServiceHelper(this.dataSource);
-        }
-        return restfulServiceHelper;
-    }
-
 }

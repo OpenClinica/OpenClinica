@@ -15,6 +15,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
 import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -102,50 +103,21 @@ public class ODMClinicaDataResource {
                                      @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
                                      @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
                                      @Context HttpServletRequest request,
-                                     @DefaultValue("y") @QueryParam("clinicaldata") String clinicaldata,
-                                     @DefaultValue("y") @QueryParam("metadata") String metadata,
+                                     @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
+                                     @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
                                      @QueryParam("showArchived") String showArchived ,
                                      @DefaultValue("n") @QueryParam("crossFormLogic") String crossFormLogic ) {
         LOGGER.debug("Requesting clinical data resource");
-        boolean includeDN = false;
-        boolean includeAudit = false;
-        boolean crossForm = false;
-        boolean archived = false;
-        boolean meta = true;
-        boolean clinical = true;
 
-        if (showArchived != null && (showArchived.equalsIgnoreCase("no") || showArchived.equalsIgnoreCase("n")))
-            archived = false;
-        if (showArchived != null && (showArchived.equalsIgnoreCase("yes") || showArchived.equalsIgnoreCase("y")))
-            archived = true;
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData);
 
-        if (crossFormLogic.equalsIgnoreCase("no") || crossFormLogic.equalsIgnoreCase("n"))
-            crossForm = false;
-        if (crossFormLogic.equalsIgnoreCase("yes") || crossFormLogic.equalsIgnoreCase("y"))
-            crossForm = true;
-        if (metadata.equalsIgnoreCase("no") || metadata.equalsIgnoreCase("n"))
-            meta = false;
-        if (metadata.equalsIgnoreCase("yes") || metadata.equalsIgnoreCase("y"))
-            meta = true;
-        if (clinicaldata.equalsIgnoreCase("no") || clinicaldata.equalsIgnoreCase("n"))
-            clinical = false;
-        if (clinicaldata.equalsIgnoreCase("yes") || clinicaldata.equalsIgnoreCase("y"))
-            clinical = true;
-        if (includeDns.equalsIgnoreCase("no") || includeDns.equalsIgnoreCase("n"))
-            includeDN = false;
-        if (includeAudits.equalsIgnoreCase("no") || includeAudits.equalsIgnoreCase("n"))
-            includeAudit = false;
-        if (includeDns.equalsIgnoreCase("yes") || includeDns.equalsIgnoreCase("y"))
-            includeDN = true;
-        if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
-            includeAudit = true;
         UserAccountBean userAccountBean = ((UserAccountBean) request.getSession().getAttribute("userBean"));
         StudyDAO sdao = new StudyDAO(getDataSource());
         StudyBean studyBean = sdao.findByOid(studyOID);
         String permissionTagsString = "";
         String[] permissionTagsStringArray;
 
-        if (crossForm) {
+        if (odmFilter.isCrossForm()) {
             permissionTagsString = loadPermissionTagsString();
             permissionTagsStringArray = loadPermissionTagsStringArray();
         } else {
@@ -156,31 +128,22 @@ public class ODMClinicaDataResource {
 
         LinkedHashMap<String,OdmClinicalDataBean> clinicalDataBeans;
 
-        if (clinical) {
+        if (odmFilter.includeClinical()) {
             clinicalDataBeans = getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                    formVersionOID, includeDN, includeAudit, request.getLocale(), userAccountBean.getId(), crossForm);
+                    formVersionOID, request.getLocale(), userAccountBean.getId(), odmFilter);
         } else {
             clinicalDataBeans = null;
         }
 
         XMLSerializer xmlSerializer = new XMLSerializer();
-             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,clinicalDataBeans, archived, permissionTagsString,meta);
-/*            if (report.getClinicalDataMap() == null)
-                return null;*/
+             report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
-
-        report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray,meta,clinical,crossForm);
-        // xmlSerializer.setForceTopLevelObject(true);
+        report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray,odmFilter.includeMetadata(), odmFilter.includeClinical(), odmFilter.isCrossForm());
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
 
         JSONClinicalDataPostProcessor processor = new JSONClinicalDataPostProcessor(request.getLocale());
         processor.process((JSONObject) json);
-
-        // JSONClinicalDataPostProcessor processor = new
-        // JSONClinicalDataPostProcessor(LocaleResolver.getLocale(request));
-        // processor.process(json);
-
 
         return json.toString(INDENT_LEVEL);
     }
@@ -248,21 +211,12 @@ public class ODMClinicaDataResource {
                                  @Context HttpServletRequest request, String userAccountID,
                                  @DefaultValue("y") @QueryParam("clinicaldata") String clinicaldata,
                                  @DefaultValue("y") @QueryParam("metadata") String metadata,
+                                 @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
                                  @QueryParam("showArchived") String showArchived ,
                                  @DefaultValue("n")@QueryParam("crossFormLogic") String crossFormLogic ) {
         LOGGER.debug("Requesting clinical data resource");
-        boolean includeDN = false;
-        boolean includeAudit = false;
-        boolean crossForm = false;
-        boolean archived = false;
-        boolean meta = true;
-        boolean clinical = true;
 
-
-        if (showArchived != null && (showArchived.equalsIgnoreCase("no") || showArchived.equalsIgnoreCase("n")))
-            archived = false;
-        if (showArchived != null && (showArchived.equalsIgnoreCase("yes") || showArchived.equalsIgnoreCase("y")))
-            archived = true;
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, metadata, clinicalData);
 
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -273,31 +227,11 @@ public class ODMClinicaDataResource {
             userBean = (UserAccountBean) new UserAccountDAO(dataSource).findByPK(userId);
         }
 
-        if (crossFormLogic.equalsIgnoreCase("no") || crossFormLogic.equalsIgnoreCase("n"))
-            crossForm = false;
-        if (crossFormLogic.equalsIgnoreCase("yes") || crossFormLogic.equalsIgnoreCase("y"))
-            crossForm = true;
-        if (metadata.equalsIgnoreCase("no") || metadata.equalsIgnoreCase("n"))
-            meta = false;
-        if (metadata.equalsIgnoreCase("yes") || metadata.equalsIgnoreCase("y"))
-            meta = true;
-        if (clinicaldata.equalsIgnoreCase("no") || clinicaldata.equalsIgnoreCase("n"))
-            clinical = false;
-        if (clinicaldata.equalsIgnoreCase("yes") || clinicaldata.equalsIgnoreCase("y"))
-            clinical = true;
-        if (includeDns.equalsIgnoreCase("no") || includeDns.equalsIgnoreCase("n"))
-            includeDN = false;
-        if (includeAudits.equalsIgnoreCase("no") || includeAudits.equalsIgnoreCase("n"))
-            includeAudit = false;
-        if (includeDns.equalsIgnoreCase("yes") || includeDns.equalsIgnoreCase("y"))
-            includeDN = true;
-        if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
-            includeAudit = true;
         StudyDAO sdao = new StudyDAO(getDataSource());
         StudyBean studyBean = sdao.findByOid(studyOID);
         String permissionTagsString = "";
         String[] permissionTagsStringArray;
-        if (crossForm) {
+        if (odmFilter.isCrossForm()) {
             permissionTagsString = loadPermissionTagsString();
             permissionTagsStringArray = loadPermissionTagsStringArray();
         } else {
@@ -309,16 +243,16 @@ public class ODMClinicaDataResource {
 
         LinkedHashMap<String,OdmClinicalDataBean> clinicalDataBeans;
 
-        if (clinical) {
+        if (odmFilter.includeClinical()) {
             clinicalDataBeans = getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                    formVersionOID, includeDN, includeAudit, request.getLocale(), userId, crossForm);
+                    formVersionOID, request.getLocale(), userId, odmFilter);
         } else {
             clinicalDataBeans = null;
         }
 
-        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, archived, permissionTagsString, meta);
+        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
-        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,meta,clinical,crossForm);
+        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray, odmFilter.includeMetadata(), odmFilter.includeClinical(), odmFilter.isCrossForm());
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();
@@ -328,44 +262,13 @@ public class ODMClinicaDataResource {
                                    @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
                                    @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
                                    @Context HttpServletRequest request,
-                                   @DefaultValue("y") @QueryParam("clinicaldata") String clinicaldata,
-                                   @DefaultValue("y") @QueryParam("metadata") String metadata,
+                                   @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
+                                    @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
                                    @QueryParam("showArchived") String showArchived ,
                                    @DefaultValue("n")@QueryParam("crossFormLogic") String crossFormLogic ) {
 
         LOGGER.debug("Requesting clinical data resource");
-        boolean includeDN = false;
-        boolean includeAudit = false;
-        boolean crossForm = false;
-        boolean archived = false;
-        boolean meta = true;
-        boolean clinical = true;
-
-        if (showArchived != null && (showArchived.equalsIgnoreCase("no") || showArchived.equalsIgnoreCase("n")))
-            archived = false;
-        if (showArchived != null && (showArchived.equalsIgnoreCase("yes") || showArchived.equalsIgnoreCase("y")))
-            archived = true;
-
-        if (crossFormLogic.equalsIgnoreCase("no") || crossFormLogic.equalsIgnoreCase("n"))
-            crossForm = false;
-        if (crossFormLogic.equalsIgnoreCase("yes") || crossFormLogic.equalsIgnoreCase("y"))
-            crossForm = true;
-        if (metadata.equalsIgnoreCase("no") || metadata.equalsIgnoreCase("n"))
-            meta = false;
-        if (metadata.equalsIgnoreCase("yes") || metadata.equalsIgnoreCase("y"))
-            meta = true;
-        if (clinicaldata.equalsIgnoreCase("no") || clinicaldata.equalsIgnoreCase("n"))
-            clinical = false;
-        if (clinicaldata.equalsIgnoreCase("yes") || clinicaldata.equalsIgnoreCase("y"))
-            clinical = true;
-        if (includeDns.equalsIgnoreCase("no") || includeDns.equalsIgnoreCase("n"))
-            includeDN = false;
-        if (includeAudits.equalsIgnoreCase("no") || includeAudits.equalsIgnoreCase("n"))
-            includeAudit = false;
-        if (includeDns.equalsIgnoreCase("yes") || includeDns.equalsIgnoreCase("y"))
-            includeDN = true;
-        if (includeAudits.equalsIgnoreCase("yes") || includeAudits.equalsIgnoreCase("y"))
-            includeAudit = true;
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData);
 
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -380,7 +283,7 @@ public class ODMClinicaDataResource {
         String permissionTagsString = "";
         String[] permissionTagsStringArray;
 
-        if (crossForm) {
+        if (odmFilter.isCrossForm()) {
             permissionTagsString = loadPermissionTagsString();
             permissionTagsStringArray = loadPermissionTagsStringArray();
         } else {
@@ -391,18 +294,18 @@ public class ODMClinicaDataResource {
 
         LinkedHashMap<String,OdmClinicalDataBean> clinicalDataBeans;
 
-        if (clinical) {
+        if (odmFilter.includeClinical()) {
             clinicalDataBeans = getClinicalDataCollectorResource().generateClinicalData(studyOID, getStudySubjectOID(studySubjectIdentifier, studyOID), studyEventOID,
-                    formVersionOID, includeDN, includeAudit, request.getLocale(), userId, crossForm);
+                    formVersionOID, request.getLocale(), userId, odmFilter);
         } else {
             clinicalDataBeans = null;
         }
-        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, archived, permissionTagsString,meta);
+        report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
         if (report.getClinicalDataMap() == null)
             return null;
 
-        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,meta,clinical,crossForm);
+        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,odmFilter.includeMetadata(), odmFilter.includeClinical(), odmFilter.isCrossForm());
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();

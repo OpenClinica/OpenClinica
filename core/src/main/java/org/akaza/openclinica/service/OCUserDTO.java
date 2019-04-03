@@ -12,6 +12,8 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
 
     private String uuid;
 
+    private int viewStudySubjectId;
+
     @NotNull
     private String firstName;
 
@@ -38,6 +40,10 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
     private UserStatus status;
 
     private Instant lastSuccessfulLogin;
+
+    private String identifier;
+
+    private String participantId;
 
     public String getUuid() {
         return uuid;
@@ -133,6 +139,14 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
         this.inviteParticipant = inviteParticipant;
     }
 
+    public String getParticipantId() {
+        return participantId;
+    }
+
+    public void setParticipantId(String participantId) {
+        this.participantId = participantId;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) {
@@ -147,6 +161,14 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
         if ( ! Objects.equals(uuid, oCUserDTO.uuid)) { return false; }
 
         return true;
+    }
+
+    public int getViewStudySubjectId() {
+        return viewStudySubjectId;
+    }
+
+    public void setViewStudySubjectId(int viewStudySubjectId) {
+        this.viewStudySubjectId = viewStudySubjectId;
     }
 
     @Override
@@ -168,5 +190,13 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
                 ", status='" + getStatus() + "'" +
                 ", lastSuccessfulLogin='" + getLastSuccessfulLogin() + "'" +
                 "}";
+    }
+
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
     }
 }

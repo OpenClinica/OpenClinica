@@ -31,4 +31,6 @@ public interface UserService {
 
     ParticipantAccessDTO getAccessInfo(String accessToken,String studyOid, String ssid,String customerUuid);
 
-	}
+	List<OCUserDTO> searchParticipantsByFields(String studyOid, String accessToken,String participantId,String firstName,String lastName,String identifier,UserAccountBean userAccountBean);
+
+}

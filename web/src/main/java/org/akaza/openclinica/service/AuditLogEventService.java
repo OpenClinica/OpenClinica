@@ -25,6 +25,5 @@ public interface AuditLogEventService {
 	 */
 	 AuditLogEvent saveAuditLogEvent(AuditLogEventDTO auditLogEventDTO,UserAccountBean ub);
 
-	public RestfulServiceHelper getRestfulServiceHelper();
 
 	}

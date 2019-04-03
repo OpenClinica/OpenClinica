@@ -11,19 +11,22 @@ import java.util.Objects;
 public class OCParticipantDTO extends AbstractAuditingDTO implements Serializable {
 
     private String firstName;
+    private String lastName;
 
     private String email;
 
     private boolean inviteParticipant;
 
-    private String mobilePhone;
+    private String phoneNumber;
 
-    public String getMobilePhone() {
-        return mobilePhone;
+    private String identifier;
+
+    public String getPhoneNumber() {
+        return phoneNumber;
     }
 
-    public void setMobilePhone(String mobilePhone) {
-        this.mobilePhone = mobilePhone;
+    public void setPhoneNumber(String phoneNumber) {
+        this.phoneNumber = phoneNumber;
     }
 
     public String getFirstName() {
@@ -34,6 +37,13 @@ public class OCParticipantDTO extends AbstractAuditingDTO implements Serializabl
         this.firstName = firstName;
     }
 
+    public String getLastName() {
+        return lastName;
+    }
+
+    public void setLastName(String lastName) {
+        this.lastName = lastName;
+    }
 
     public String getEmail() {
         return email;
@@ -51,4 +61,11 @@ public class OCParticipantDTO extends AbstractAuditingDTO implements Serializabl
         this.inviteParticipant = inviteParticipant;
     }
 
+    public String getIdentifier() {
+        return identifier;
+    }
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+    }
 }

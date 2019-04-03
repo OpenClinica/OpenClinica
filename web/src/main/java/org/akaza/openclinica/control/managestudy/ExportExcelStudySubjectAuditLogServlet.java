@@ -20,6 +20,7 @@ import java.util.stream.Collectors;
 import org.akaza.openclinica.bean.admin.AuditBean;
 import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.admin.DeletedEventCRFBean;
+import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
 import org.akaza.openclinica.bean.core.Utils;
 import org.akaza.openclinica.bean.managestudy.*;
@@ -160,11 +161,17 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
             Collection studySubjectAuditEvents = adao.findStudySubjectAuditEvents(studySubject.getId());
             // Text values will be shown on the page for the corresponding
             // integer values.
+            Role role = currentRole.getRole();
+
             for (Iterator iterator = studySubjectAuditEvents.iterator(); iterator.hasNext();) {
                 AuditBean auditBean = (AuditBean) iterator.next();
                 if (auditBean.getAuditEventTypeId() == 3) {
                     auditBean.setOldValue(Status.get(Integer.parseInt(auditBean.getOldValue())).getName());
                     auditBean.setNewValue(Status.get(Integer.parseInt(auditBean.getNewValue())).getName());
+                }
+                if (getAuditLogEventTypes().contains(auditBean.getAuditEventTypeId())) {
+                        auditBean.setOldValue("<Masked>");
+                        auditBean.setNewValue("<Masked>");
                 }
             }
             studySubjectAudits.addAll(studySubjectAuditEvents);
@@ -643,5 +650,18 @@ public class ExportExcelStudySubjectAuditLogServlet extends SecureController {
             sheet.setColumnView(x, cell);
         }
     }
-
+    private List<Integer> getAuditLogEventTypes() {
+        List<Integer> auditLogEventTypes = new ArrayList<>();
+        auditLogEventTypes.add(43);
+        auditLogEventTypes.add(44);
+        auditLogEventTypes.add(46);
+        auditLogEventTypes.add(47);
+        auditLogEventTypes.add(49);
+        auditLogEventTypes.add(50);
+        auditLogEventTypes.add(52);
+        auditLogEventTypes.add(53);
+        auditLogEventTypes.add(55);
+        auditLogEventTypes.add(56);
+        return auditLogEventTypes;
+    }
 }

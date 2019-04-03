@@ -43,14 +43,15 @@ public class ODMClinicalDataController {
                                                     @PathVariable("studyEventOID") String studyEventOID, @PathVariable("studySubjectIdentifier") String studySubjectIdentifier,
                                                     @RequestParam(value = "includeDNs", defaultValue = "n", required = false) String includeDns,
                                                     @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request,
-                                                    @RequestParam(value = "clinicalData", defaultValue = "y", required = false) String clinicalData,
-                                                    @RequestParam(value = "showArchived", defaultValue = "n", required = false) String showArchived) throws Exception {
+                                                    @RequestParam(value = "showArchived", defaultValue = "n", required = false) String showArchived,
+                                               @RequestParam(value = "clinicaldata", defaultValue = "y", required = false) String clinical,
+                                                    @RequestParam(value = "includeMetadata", defaultValue = "y", required = false) String includeMetadata) throws Exception {
         getRestfulServiceHelper().setSchema(studyOID, request);
 
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
         Object result = odmClinicaDataResource.getODMClinicaldata(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
-                request, clinicalData,"yes", showArchived,"no");
+                request, includeMetadata, clinical, showArchived,"no");
 
         ResponseEntity<Object> response = null;
         if (result != null) {
@@ -66,14 +67,15 @@ public class ODMClinicalDataController {
                                            @PathVariable("studyEventOID") String studyEventOID, @PathVariable("studySubjectIdentifier") String studySubjectIdentifier,
                                            @RequestParam(value = "includeDNs", defaultValue = "n", required = false) String includeDns,
                                            @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request,
-                                           @RequestParam(value = "clinicalData", defaultValue = "y", required = false) String clinicalData,
-                                           @RequestParam(value = "showArchived", defaultValue = "n", required = false) String showArchived) throws Exception {
+                                           @RequestParam(value = "showArchived", defaultValue = "n", required = false) String showArchived,
+                                              @RequestParam(value = "clinicaldata", defaultValue = "y", required = false) String clinical,
+                                           @RequestParam(value = "includeMetadata", defaultValue = "y", required = false) String includeMetadata) throws Exception {
         getRestfulServiceHelper().setSchema(studyOID, request);
 
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
         Object result = odmClinicaDataResource.getODMXMLData(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
-                request, clinicalData,"yes" , showArchived,"no");
+                request, includeMetadata, clinical, showArchived,"no");
 
         ResponseEntity<Object> response = null;
         if (result != null) {

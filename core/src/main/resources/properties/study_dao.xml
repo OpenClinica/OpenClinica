@@ -107,6 +107,13 @@
                 site.oc_oid = ?
          </sql>
     </query>
+    <query>
+        <name>findStudyByOid</name>
+        <sql>SELECT s.* FROM study s
+			WHERE s.parent_study_id is null 
+			and s.OC_OID =?
+         </sql>
+    </query>
 	<query>
 		<name>updateStepOne</name>
 		<sql>UPDATE STUDY SET PARENT_STUDY_ID=?, NAME=?, official_title=?, UNIQUE_IDENTIFIER=?,

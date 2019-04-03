@@ -15,9 +15,13 @@ public class StudySubjectDetail extends DataMapDomainObject {
     private Integer id;
     private StudySubject studySubject;
     private String firstName;
+    private String firstNameForSearchUse;
     private String lastName;
+    private String lastNameForSearchUse;
     private String email;
     private String phone;
+    private String identifier;
+    private String identifierForSearchUse;
 
 
     public StudySubjectDetail() {
@@ -54,6 +58,7 @@ public class StudySubjectDetail extends DataMapDomainObject {
 
     public void setFirstName(String firstName) {
         this.firstName = firstName;
+        setFirstNameForSearchUse(getFirstName() == null ? "" : getFirstName().toLowerCase());
     }
 
     @Convert(converter = CryptoConverter.class)
@@ -64,6 +69,7 @@ public class StudySubjectDetail extends DataMapDomainObject {
 
     public void setLastName(String lastName) {
         this.lastName = lastName;
+        setLastNameForSearchUse(getLastName() == null ? "" : getLastName().toLowerCase());
     }
 
     @Convert(converter = CryptoConverter.class)
@@ -84,5 +90,51 @@ public class StudySubjectDetail extends DataMapDomainObject {
 
     public void setPhone(String phone) {
         this.phone = phone;
+    }
+
+
+    @Convert(converter = CryptoConverter.class)
+    @Column(name = "identifier")
+    public String getIdentifier() {
+        return identifier;
+    }
+
+
+    public void setIdentifier(String identifier) {
+        this.identifier = identifier;
+        setIdentifierForSearchUse(getIdentifier() == null ? "" : getIdentifier().toLowerCase());
+    }
+
+    @Convert(converter = CryptoConverter.class)
+    @Column(name = "first_name_for_search_use")
+    public String getFirstNameForSearchUse() {
+        return firstNameForSearchUse;
+    }
+
+
+    public void setFirstNameForSearchUse(String firstNameForSearchUse) {
+        this.firstNameForSearchUse = firstNameForSearchUse;
+    }
+
+    @Convert(converter = CryptoConverter.class)
+    @Column(name = "last_name_for_search_use")
+    public String getLastNameForSearchUse() {
+        return lastNameForSearchUse;
+    }
+
+
+    public void setLastNameForSearchUse(String lastNameForSearchUse) {
+        this.lastNameForSearchUse = lastNameForSearchUse;
+    }
+
+    @Convert(converter = CryptoConverter.class)
+    @Column(name = "identifier_for_search_use")
+    public String getIdentifierForSearchUse() {
+        return identifierForSearchUse;
+    }
+
+
+    public void setIdentifierForSearchUse(String identifierForSearchUse) {
+        this.identifierForSearchUse = identifierForSearchUse;
     }
 }

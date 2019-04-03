@@ -19,6 +19,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.participant.ParticipantService;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.validator.ParticipantValidator;
@@ -58,6 +59,9 @@ public class StudyParticipantController {
 		@Autowired
 		private ParticipantService participantService;
 
+        @Autowired
+        private UtilService utilService;
+
 		private StudyDAO studyDao;
 		private StudySubjectDAO ssDao;
 		private UserAccountDAO userAccountDao;
@@ -67,9 +71,24 @@ public class StudyParticipantController {
 		protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 		
 		@ApiOperation(value = "To create a participant at study level",  notes = "Will read the subjectKey value provided by the user if the study participant ID is configured to be Manually generated  ")
-		@ApiResponses(value = {
-		        @ApiResponse(code = 200, message = "Successful operation"),
-		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list")})
+        @ApiResponses(value = {
+                @ApiResponse(code = 200, message = "Successful operation"),
+                @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
+                        + "<br />Error Code                                            Descriptions"
+                        + "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
+                        + "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
+                        + "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
+                        + "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
+                        + "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
+                        + "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
+                        + "<br />participantIDNotUnique                        : Participant ID already exists."
+                        + "<br />studyHasSystemGeneratedIdEnabled              : Study is set to have system-generated ID, hence no new participant can be added."
+						+ "<br />firstName                                     : First Name length should not exceed 35 characters."
+						+ "<br />lastName                                      : Last Name length should not exceed 35 characters."
+						+ "<br />identifier                                    : Identifier Name length should not exceed 35 characters."
+						+ "<br />emailAddress                                  : Email Address length should not exceed 255 characters."
+						+ "<br />phoneNumber                                   : Phone number length should not exceed 15 characters."
+                        + "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 		@RequestMapping(value = "/{studyOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
@@ -77,7 +96,12 @@ public class StudyParticipantController {
 			String subjectKeyVal = participantRestfulRequestDTO.getSubjectKey();
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("subjectKey", subjectKeyVal);
-			
+			map.put("firstName", participantRestfulRequestDTO.getFirstName());
+			map.put("emailAddress", participantRestfulRequestDTO.getEmailAddress());
+			map.put("phoneNumber", participantRestfulRequestDTO.getPhoneNumber());
+			map.put("lastName", participantRestfulRequestDTO.getLastName());
+			map.put("identifier", participantRestfulRequestDTO.getIdentifier());
+
 			ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
 							
 			try {
@@ -94,15 +118,37 @@ public class StudyParticipantController {
 		}
 		
 		@ApiOperation(value = "To create a participant at study site level",  notes = "Will read the subjectKey")
-		@RequestMapping(value = "/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
+        @ApiResponses(value = {
+                @ApiResponse(code = 200, message = "Successful operation"),
+                @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
+                        + "<br />Error Code                                            Descriptions"
+                        + "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
+                        + "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
+                        + "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
+                        + "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
+                        + "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
+                        + "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
+                        + "<br />participantIDNotUnique                        : Participant ID already exists."
+                        + "<br />studyHasSystemGeneratedIdEnabled              : Study is set to have system-generated ID, hence no new participant can be added."
+						+ "<br />firstName                                     : First Name length should not exceed 35 characters."
+						+ "<br />lastName                                      : Last Name length should not exceed 35 characters."
+						+ "<br />identifier                                    : Identifier Name length should not exceed 35 characters."
+						+ "<br />emailAddress                                  : Email Address length should not exceed 255 characters."
+						+ "<br />phoneNumber                                   : Phone number length should not exceed 15 characters."
+						+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
+        @RequestMapping(value = "/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request, 
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
 				@PathVariable("studyOID") String studyOID,
 				@PathVariable("siteOID") String siteOID) throws Exception {
-			String subjectKeyVal = participantRestfulRequestDTO.getSubjectKey();
 			HashMap<String, Object> map = new HashMap<>();
-			map.put("subjectKey", subjectKeyVal);
-			
+			map.put("subjectKey", participantRestfulRequestDTO.getSubjectKey());
+			map.put("firstName", participantRestfulRequestDTO.getFirstName());
+			map.put("emailAddress", participantRestfulRequestDTO.getEmailAddress());
+			map.put("phoneNumber", participantRestfulRequestDTO.getPhoneNumber());
+			map.put("lastName", participantRestfulRequestDTO.getLastName());
+			map.put("identifier", participantRestfulRequestDTO.getIdentifier());
+
 			ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
 			
 			try {
@@ -229,7 +275,9 @@ public class StudyParticipantController {
 				@RequestBody HashMap<String, Object> map,
 				 String studyOID,
 				String siteOID) throws Exception {
-			
+
+
+
 			ArrayList<String> errorMessages = new ArrayList<String>();
 			ErrorObject errorOBject = null;
 			ResponseEntity<Object> response = null;
@@ -247,8 +295,10 @@ public class StudyParticipantController {
 					
 			subjectTransferBean.setOwner(this.participantService.getUserAccount(request));
 			
-			StudyBean study = this.getRestfulServiceHelper().setSchema(studyOID, request);
-			subjectTransferBean.setStudy(study);
+			StudyBean tenantstudy = this.getRestfulServiceHelper().setSchema(studyOID, request);
+
+
+			subjectTransferBean.setStudy(tenantstudy);
 			
 			if(siteOID != null) {
 				StudyBean siteStudy = getStudyDao().findSiteByOid(subjectTransferBean.getStudyOid(), siteOID);
@@ -260,8 +310,31 @@ public class StudyParticipantController {
 	        
 	        DataBinder dataBinder = new DataBinder(subjectTransferBean);
 	        errors = dataBinder.getBindingResult();
-	        participantValidator.validate(subjectTransferBean, errors);
-	        
+            if (utilService.isParticipantIDSystemGenerated(tenantstudy)){
+                errors.reject("errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");
+            }
+
+            if (subjectTransferBean.getFirstName().length()>35){
+				errors.reject("errorCode.firsName","First name length should not exceed 35 characters");
+			}
+			if (subjectTransferBean.getLastName().length()>35){
+				errors.reject("errorCode.lastName","Last name length should not exceed 35 characters");
+			}
+			if (subjectTransferBean.getIdentifier().length()>35){
+				errors.reject("errorCode.identifier","Identifier length should not exceed 35 characters");
+			}
+			if (subjectTransferBean.getEmailAddress().length()>255){
+				errors.reject("errorCode.emailAddress","Email Address length should not exceed 255 characters");
+			}
+			if (subjectTransferBean.getPhoneNumber().length()>15){
+				errors.reject("errorCode.phoneNumber","Phone number length should not exceed 15 characters");
+			}
+
+
+
+			participantValidator.validate(subjectTransferBean, errors);
+
+
 	        if(errors.hasErrors()) {
 	        	ArrayList validerrors = new ArrayList(errors.getAllErrors());
 	        	Iterator errorIt = validerrors.iterator();
@@ -288,7 +361,7 @@ public class StudyParticipantController {
 	    		
 	    		response = new ResponseEntity(responseFailure, org.springframework.http.HttpStatus.BAD_REQUEST);
 	        } else {        				
-			  	String label = create(subjectTransferBean,study);	           
+			  	String label = create(subjectTransferBean,tenantstudy,request);
 			  	studyParticipantDTO.setSubjectKey(label);
 
 				StudySubjectBean subject = this.getStudySubjectDAO().findByLabel(label);
@@ -330,7 +403,8 @@ public class StudyParticipantController {
 			StudyBean study = this.getRestfulServiceHelper().setSchema(studyOID, request);
 			StudyBean studyBean = null;
 			studyBean = this.participantService.validateRequestAndReturnStudy(studyOID, siteOID,request);			
-        	if(this.participantService.isSystemGenerating(studyBean)) {
+        	if(utilService.isParticipantIDSystemGenerated(studyBean)) {
+
 				 throw new OpenClinicaSystemException("errorCode.bulkUploadNotSupportSystemGeneratedSetting","This study has set up participant ID to be System-generated, bulk upload is not supported at this time ");
 			 }
         	
@@ -393,7 +467,7 @@ public class StudyParticipantController {
 		        	failureCount++;
 		        	responseStudyParticipantsBulkDTO.getFailedParticipants().add(e);
 		        } else {        				
-				  	String label = create(subjectTransferBean,study);
+				  	String label = create(subjectTransferBean,study,request);
 				  	ResponseSuccessStudyParticipantDTO e = new ResponseSuccessStudyParticipantDTO();
 				  	e.setSubjectKey(studyParticipantDTO.getSubjectKey());
 				  	e.setStatus("Available");
@@ -547,9 +621,11 @@ public class StudyParticipantController {
 	     * @return String
 		 * @throws OpenClinicaException 
 	     */
-	    private String create(SubjectTransferBean subjectTransferBean,StudyBean currentStudy) throws OpenClinicaException {
+	    private String create(SubjectTransferBean subjectTransferBean,StudyBean currentStudy, HttpServletRequest request) throws Exception {
 	          logger.debug("creating subject transfer");
-	          return this.participantService.createParticipant(subjectTransferBean,currentStudy);    
+	          String accessToken = utilService.getAccessTokenFromRequest(request);
+
+	          return this.participantService.createParticipant(subjectTransferBean,currentStudy,accessToken);
 	    }
 	    
 	   
@@ -599,19 +675,32 @@ public class StudyParticipantController {
 		 * @throws ParseException
 		 * @throws Exception
 		 */
-		 private SubjectTransferBean transferToSubject(HashMap<String, Object> map) throws ParseException, Exception {
-		 	   			
-			    String personId = (String) map.get("subjectKey");
-			   
-			    
-			    SubjectTransferBean subjectTransferBean = new SubjectTransferBean();		       
-		        	
-		        subjectTransferBean.setPersonId(personId);
-		        subjectTransferBean.setStudySubjectId(personId);
-		        
-		        return subjectTransferBean;
-			 
-		 }
+		private SubjectTransferBean transferToSubject(HashMap<String, Object> map) throws ParseException, Exception {
+
+			String personId = (String) map.get("subjectKey");
+			String firstName = (String) map.get("firstName");
+			String lastName = (String) map.get("lastName");
+			String identifier = (String) map.get("identifier");
+
+			String emailAddress = (String) map.get("emailAddress");
+			String phoneNumber = (String) map.get("phoneNumber");
+
+
+			SubjectTransferBean subjectTransferBean = new SubjectTransferBean();
+
+			subjectTransferBean.setPersonId(personId);
+			subjectTransferBean.setStudySubjectId(personId);
+			subjectTransferBean.setFirstName(firstName);
+			subjectTransferBean.setLastName(lastName);
+			subjectTransferBean.setIdentifier(identifier);
+
+			subjectTransferBean.setEmailAddress(emailAddress);
+			subjectTransferBean.setPhoneNumber(phoneNumber);
+
+
+			return subjectTransferBean;
+
+		}
 		 
 		 /**
 		  * 

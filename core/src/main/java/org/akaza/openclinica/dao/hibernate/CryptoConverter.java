@@ -21,7 +21,7 @@ public class CryptoConverter implements AttributeConverter<String, String> {
 
         // do some encryption
         String encryptedData = null;
-        if (ccNumber != null) {
+        if (ccNumber != null && !ccNumber.equals("")) {
             Key key = new SecretKeySpec(KEY, "AES");
             try {
                 Cipher c = Cipher.getInstance(ALGORITHM);
