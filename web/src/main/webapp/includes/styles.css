@@ -905,6 +905,11 @@ form#searchByStudySubjectId {
   padding: .5em;
 }
 
+.popover.pid {
+  width: 430px;
+  max-width: 500px;
+}
+
 .main_BG .tour-backdrop {
   opacity: 1
 }
