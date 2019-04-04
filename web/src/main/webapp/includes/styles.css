@@ -74,11 +74,11 @@ body {
   font-family: 'Open Sans', Helvetica, Arial, sans-serif;
   margin: 0;
   width: 100% !important;
-  overflow: auto; 
+  overflow: auto;
   }
   body > table {
     margin: 0 auto;
-    min-width: 1024px; 
+    min-width: 1024px;
   }
 
 p, ul, ol, td, th {
@@ -908,8 +908,18 @@ form#searchByStudySubjectId {
 .popover.pid {
   width: 430px;
   max-width: 500px;
+  height: 230px;
+}
+
+.popover.pid .popover-title {
+  padding: 15px 14px;
+}
+
+.popover.pid .arrow {
+  display: none;
 }
 
 .main_BG .tour-backdrop {
-  opacity: 1
+  opacity: 1;
+  background: #fff;
 }
