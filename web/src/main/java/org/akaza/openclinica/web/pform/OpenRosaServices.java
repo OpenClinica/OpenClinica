@@ -436,7 +436,7 @@ public class OpenRosaServices {
                 // Encrypt the form layout media id so we don't expose database ids to users
                 String encryptedFormLayoutMediaId = EncryptionUtil.encryptValue(formLayoutMediaId, databaseIdEncryptionKey);
                 mediaFile.setDownloadUrl(
-                        urlBase + "/rest2/openrosa/" + studyOID + "/downloadMedia?ecid=" + ecid + "&formLayoutMediaId=" + encryptedFormLayoutMediaId);
+                        urlBase + "/rest2/openrosa/" + studyOID + "/downloadMediaEncrypted?ecid=" + ecid + "&formLayoutMediaId=" + encryptedFormLayoutMediaId);
                 manifest.add(mediaFile);
             }
         }
@@ -595,7 +595,7 @@ public class OpenRosaServices {
     }
 
     /**
-     * @api {get} /rest2/openrosa/:studyOID/downloadMedia Download media
+     * @api {get} /rest2/openrosa/:studyOID/downloadMediaEncrypted Download media
      * @apiName getMediaFile
      * @apiPermission admin
      * @apiVersion 3.8.0
@@ -605,7 +605,7 @@ public class OpenRosaServices {
      */
 
     @GET
-    @Path("/{studyOID}/downloadMedia")
+    @Path("/{studyOID}/downloadMediaEncrypted")
     public Response getMediaFile(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formLayoutMediaId") String formLayoutMediaId, @QueryParam(FORM_CONTEXT) String ecid,
             @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
