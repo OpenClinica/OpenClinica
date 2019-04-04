@@ -10,16 +10,20 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.odmbeans.OdmClinicalDataBean;
 import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfPermissionTagDao;
+import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.datamap.EventDefinitionCrfPermissionTag;
+import org.akaza.openclinica.domain.datamap.ResponseType;
 import org.akaza.openclinica.service.PermissionService;
 import org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Scope;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Component;
 
 import javax.servlet.http.HttpServletRequest;
@@ -57,6 +61,8 @@ public class ODMClinicaDataResource {
     private DataSource dataSource;
     @Autowired
     private PermissionService permissionService;
+    @Autowired
+    private StudyEventDao studyEventDao;
 
     public MetadataCollectorResource getMetadataCollectorResource() {
         return metadataCollectorResource;
@@ -146,6 +152,34 @@ public class ODMClinicaDataResource {
         processor.process((JSONObject) json);
 
         return json.toString(INDENT_LEVEL);
+    }
+
+    /**
+     * @api {get} /rest/clinicaldata/json/stats/:study/:subject/:event Retrieve stats on this study subject event
+     * @apiVersion 3.8.0
+     * @apiName getODMClinicalStats
+     * @apiGroup Subject
+     * @apiPermission user
+     * @apiDescription Returns statistics on study events that have been started. Use asterisks in place of OIDs as wildcards.
+     * @apiParam {String} study Study or Site OID.
+     * @apiParam {String} subject Subject OID.
+     * @apiParam {String} event Study Event Definition OID. Use '*' for all.
+     * @apiError NoAccessRight Only authenticated users can access the data.
+     * @apiError NotFound The resource was not found.
+     */
+    @GET
+    @Path("/json/stats/{studyOID}/{studySubjectIdentifier}/{studyEventOID}")
+    @Produces(MediaType.APPLICATION_JSON)
+    public ResponseEntity<JSONObject> getODMClinicalStats(@PathParam("studyOID") String studyOID,
+                                                      @PathParam("studyEventOID") String studyEventOID, @PathParam("studySubjectIdentifier") String studySubjectIdentifier,
+                                                      @Context HttpServletRequest request) {
+
+        int count = studyEventDao.fetchCountOfInitiatedSEs(studyEventOID, studySubjectIdentifier);
+
+        JSONObject jsonObject = new JSONObject();
+        jsonObject.put("matchingForms", count);
+
+        return new ResponseEntity<JSONObject>(jsonObject, HttpStatus.OK);
     }
 
     /**
