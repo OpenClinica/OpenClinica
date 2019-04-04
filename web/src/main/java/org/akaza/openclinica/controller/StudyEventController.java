@@ -417,7 +417,13 @@ public class StudyEventController {
 	         *  response
 	         */
 	    	if(responseDTO.getErrors().size() > 0) {
-	    		String errorMsg = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " Failed.";
+	    		StringBuffer errorMsg = new StringBuffer();
+	    		for(String errorMessage:responseDTO.getErrors()) {
+	    			String errorCode = errorMessage.substring(0, errorMessage.indexOf(":"));
+	    			errorMsg.append(errorCode);
+	    			errorMsg.append(" ");
+	    		}
+	    		
 	 	      
                 HashMap<String, String> map = new HashMap<>();
                 map.put("studyOID", studyOID);
@@ -439,7 +445,7 @@ public class StudyEventController {
                	map.put("startDate", startDate);
                
                 
-    			ParameterizedErrorVM responseDTOerror =new ParameterizedErrorVM(errorMsg, map);
+    			ParameterizedErrorVM responseDTOerror =new ParameterizedErrorVM(errorMsg.toString(), map);
     			
         		response = new ResponseEntity(responseDTOerror, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
         		
