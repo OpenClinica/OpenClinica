@@ -73,7 +73,9 @@
   </span>
 </h1>
 <br>
-<fmt:message key="jobs_description" bundle="${resword}"/>
+<div>
+  <fmt:message key="jobs_description" bundle="${resword}"/>
+</div>
 <br>
 <b>
   <fmt:message key="jobs_log" bundle="${resword}"/>
@@ -115,6 +117,18 @@ $('#tbl-jobs').DataTable({
     infoEmpty: '<fmt:message key="results_zero_of_zero" bundle="${resword}"/>',
     infoFiltered: '<span class="info-filtered"><fmt:message key="results_filtered" bundle="${resword}"/></span>',
     lengthMenu: '<fmt:message key="results_pagesize" bundle="${resword}"/>'
+  }
+});
+
+var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${study.oid}/jobs';
+jQuery.ajax({
+  type: 'get',
+  url: url + params,
+  success: function(data) {
+    console.log(arguments);
+  },
+  error: function() {
+    console.log(arguments);
   }
 });
 </script>
