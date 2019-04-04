@@ -23,14 +23,14 @@ jQuery(document).ready(function() {
             [{
                 element: "#" + jQuery(this)[0].id,
                 title: "<span class='addNewSubjectTitle'>Verify Participant ID</span>",
-                content: "<table border='0' cellpadding='0' align='center' style='cursor:default; width: 100%'> \
+                content: "<table border='0' cellpadding='0' align='center' style='cursor:default; width: 100%; margin-top: 20px;'> \
                             <tr> \
                                 <td> \
                                     <table border='0' cellpadding='0' cellspacing='0' class='full-width'> \
                                         <tr> \
                                             <td colspan='2'> \
-                                                <div style='margin-top: 5px;margin-bottom: 5px'>\
-                                                    <div id='pidv-err' style='display: none;     text-align: center; background: #ff9528; color: white; font-weight: 600;' class='alert small'> \
+                                                <div style='margin-top: 10px;margin-bottom: 5px'>\
+                                                    <div id='pidv-err' style='opacity: 0; text-align: center; background: #ff9528; color: white; font-weight: 600; margin-top: -33px;' class='alert small'> \
                                                         <p style='margin: 0;'>The Participant ID entered does not match what you selected.</p> \
                                                         Please check and re-enter, or select a different participant. \
                                                     </div> \
@@ -39,7 +39,7 @@ jQuery(document).ready(function() {
                                         </tr> \
                                         <tr> \
                                             <td valign='top'> \
-                                                <div class='formfieldXL_BG'> \
+                                                <div class='formfieldXL_BG' style='padding-top: 5px;'> \
                                                     Enter Participant ID  \
                                                 </div> \
                                             </td> \
@@ -53,8 +53,8 @@ jQuery(document).ready(function() {
                                 </td> \
                             </tr> \
                             <tr> \
-                                <td colspan='2' style='text-align: center;'> \
-                                    <div style='margin-top: 10px;'> \
+                                <td colspan='2' style='text-align: right;'> \
+                                    <div style='margin-top: 45px;'> \
                                         <input type='button' value='Cancel' onclick='clearPIDVerificationForm()'/> \
                                         &nbsp; \
                                         <input type='button' value='Continue' onclick='validatePIDVerificationForm()'/> \
@@ -115,14 +115,14 @@ jQuery(document).ready(function() {
 function clearPIDVerificationForm() {
     tourElement.end();
     jQuery("#step-0").find('input#retype_pid').val("");
-    jQuery("#step-0").find('#pidv-err').css({'display':'none'});
+    jQuery("#step-0").find('#pidv-err').css({'opacity':0});
 }
 
 function validatePIDVerificationForm() {
     if (jQuery("#step-0").find('input').val() === currentPLabel) {
-        jQuery("#step-0").find('#pidv-err').css({'display':'none'});
+        jQuery("#step-0").find('#pidv-err').css({'opacity':0});
         window.location = window.location.origin + "/OpenClinica/ViewStudySubject?id=" + currentPID;
     } else {
-        jQuery("#step-0").find('#pidv-err').css({'display':'block'});
+        jQuery("#step-0").find('#pidv-err').css({'opacity':1});
     }
 }
