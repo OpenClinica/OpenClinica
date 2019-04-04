@@ -29,6 +29,7 @@ import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLRequest;
@@ -282,7 +283,7 @@ public class UserController {
         Study site = studyDao.findByOcOID(siteOid);
         Study study = studyDao.findByOcOID(studyOid);
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
-        JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount);
+        JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount, JobType.ACCESS_CODE,null);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
             userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean,schema,jobDetail);
             return null;

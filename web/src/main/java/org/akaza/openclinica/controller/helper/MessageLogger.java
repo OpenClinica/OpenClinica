@@ -107,35 +107,35 @@ public class MessageLogger {
 	   	    
 	} 
     
- public void writeToLog(String subDir,String orginalFileName, String headerLine,String msg,UserAccountBean userBean) throws OpenClinicaException {
+ public void writeToLog(String subDir,String filePath, String headerLine,String msg,UserAccountBean userBean) throws OpenClinicaException {
 		
     	BufferedWriter bw = null;
 		FileWriter fw = null;
 		boolean isNewFile = false;
 
 	    String logFileName;
-	   
-	    if(orginalFileName == null) {
-	    	logger.info("errorCode.emptyFile -- The file is null ");
-	    }else {
+
+	//    if(filePath == null) {
+	//    	logger.info("errorCode.emptyFile -- The file is null ");
+	//    }else {
 	    	 try {
 	             int count =1;	    	
 	 	    		    	
 	 	    	File logFile;
 	 	    	String importFileDir = this.getPersonalLogFileDir(userBean,subDir);
 	     	    
-	 	    	logFileName = importFileDir + orginalFileName;
-	 			logFile = new File(logFileName);
+	 	    //	logFileName = importFileDir + orginalFileName;
+	 			logFile = new File(filePath);
 	 			
 	 			/**
 	 			 *  create new file and add headerLine as first line
 	 			 *  example :
 	 			 *  RowNo | ParticipantID | Status | Message
 	 			 */
-	 			if(!logFile.exists()) {
-	 				logFile.createNewFile();
-	 				isNewFile = true;				
-	 			}
+	 		//	if(!logFile.exists()) {
+	 		//		logFile.createNewFile();
+	 		//		isNewFile = true;
+	 	//		}
 	 			
 	 			// true = append file
 	 			fw = new FileWriter(logFile.getAbsoluteFile(), true);
@@ -168,7 +168,7 @@ public class MessageLogger {
 	 				throw new OpenClinicaException("Write to log file error", ErrorConstants.ERR_LOG_FILE);
 	 			}
 	 		}
-	    }
+	//    }
 	    
 	   	    
 	} 
