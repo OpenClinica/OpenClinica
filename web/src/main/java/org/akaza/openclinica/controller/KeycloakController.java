@@ -120,6 +120,11 @@ public class KeycloakController {
 
         UserAccountHelper userAccountHelper;
         UserAccountBean prevUser = (UserAccountBean) req.getSession().getAttribute(USER_BEAN_NAME);
+        if (ocUserUuid != null) {
+           if (prevUser != null && prevUser.getUserUuid().equals(ocUserUuid))
+                return ocUserUuid;
+        }
+
         if (prevUser == null || StringUtils.isEmpty(prevUser.getName())) {
             logger.info("Setting firstLoginCheck to true");
             req.getSession().setAttribute("firstLoginCheck", "true");

@@ -396,6 +396,8 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         this.request = request;
         this.response = response;
         request.setCharacterEncoding("UTF-8");
+        // OC-10389
+        request.setAttribute("participantIDVerification", CoreResources.getField("participantIDVerification.enabled"));
 //        checkPermissions();
         session = request.getSession();
         // BWP >> 1/8/2008

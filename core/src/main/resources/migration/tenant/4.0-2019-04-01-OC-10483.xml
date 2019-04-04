@@ -1,0 +1,69 @@
+<?xml version="1.0" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+                   xmlns="http://www.liquibase.org/xml/ns/dbchangelog/1.9"
+                   xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog/1.9 http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-1.9.xsd">
+
+    <changeSet author="jkeremian" id="2019-04-01-OC-10483-01">
+        <comment>Create jobDetail detail table</comment>
+        <createTable tableName="job_detail">
+            <column autoIncrement="true" name="job_detail_id" type="SERIAL">
+                <constraints primaryKey="true" primaryKeyName="pk_job_detail"/>
+            </column>
+            <column name="uuid" type="VARCHAR(255)"/>
+            <column name="status" type="VARCHAR(255)"/>
+            <column name="type" type="VARCHAR(255)"/>
+
+            <column name="created_by_id" type="int"/>
+            <column name="updated_by_id" type="int"/>
+            <column name="site_id" type="int"/>
+            <column name="study_id" type="int"/>
+
+            <column name="date_created" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="date_updated" type="TIMESTAMP WITH TIME ZONE"/>
+            <column name="date_completed" type="TIMESTAMP WITH TIME ZONE"/>
+
+            <column name="log_path" type="VARCHAR(255)"/>
+            <column name="source_file_name" type="VARCHAR(255)"/>
+
+
+        </createTable>
+    </changeSet>
+
+    <changeSet author="jkeremian" id="2019-04-01-OC-10483-02">
+        <addForeignKeyConstraint baseColumnNames="created_by_id"
+                                 baseTableName="job_detail" constraintName="job_detail_created_by_id_fk"
+                                 deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="user_id"
+                                 referencedTableName="user_account" referencedTableSchemaName="public"/>
+    </changeSet>
+
+    <changeSet author="jkeremian" id="2019-04-01-OC-10483-03">
+        <addForeignKeyConstraint baseColumnNames="updated_by_id"
+                                 baseTableName="job_detail" constraintName="job_detail_updated_by_id_fk"
+                                 deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="user_id"
+                                 referencedTableName="user_account" referencedTableSchemaName="public"/>
+    </changeSet>
+
+    <changeSet author="jkeremian" id="2019-04-01-OC-10483-04">
+        <addForeignKeyConstraint baseColumnNames="study_id"
+                                 baseTableName="job_detail" constraintName="job_detail_study_id_fk"
+                                 deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="study_id"
+                                 referencedTableName="study"/>
+    </changeSet>
+    <changeSet author="jkeremian" id="2019-04-01-OC-10483-05">
+        <addForeignKeyConstraint baseColumnNames="site_id"
+                                 baseTableName="job_detail" constraintName="job_detail_site_id_fk"
+                                 deferrable="false" initiallyDeferred="false"
+                                 referencedColumnNames="study_id"
+                                 referencedTableName="study"/>
+    </changeSet>
+
+
+    <changeSet author="jkeremian" id="2019-04-01-OC-10483-06">
+        <addUniqueConstraint columnNames="uuid" constraintName="uniq_uuid" tableName="job_detail"/>
+    </changeSet>
+
+
+</databaseChangeLog>

@@ -22,28 +22,31 @@ jQuery(document).ready(function() {
             steps:
             [{
                 element: "#" + jQuery(this)[0].id,
-                title: "<span class='addNewSubjectTitle'>Participant ID Verification</span>",
-                content: "<table border='0' cellpadding='0' align='center' style='cursor:default;'> \
+                title: "<span class='addNewSubjectTitle'>Verify Participant ID</span>",
+                content: "<table border='0' cellpadding='0' align='center' style='cursor:default; width: 100%'> \
                             <tr> \
                                 <td> \
                                     <table border='0' cellpadding='0' cellspacing='0' class='full-width'> \
                                         <tr> \
-                                            <td valign='top'> \
-                                                <div class='formfieldXL_BG' style='width: 250px;'> \
-                                                    <input type='text' name='label' id='retype_pid' width='30' class='formfieldXL form-control'> \
-                                                </div> \
+                                            <td colspan='2'> \
+                                                <div style='margin-top: 5px;margin-bottom: 5px'>\
+                                                    <div id='pidv-err' style='display: none;     text-align: center; background: #ff9528; color: white; font-weight: 600;' class='alert small'> \
+                                                        <p style='margin: 0;'>The Participant ID entered does not match what you selected.</p> \
+                                                        Please check and re-enter, or select a different participant. \
+                                                    </div> \
+                                                </div>\
                                             </td> \
                                         </tr> \
                                         <tr> \
-                                            <td> \
-                                                <div style='margin-top: 5px;margin-bottom: 5px'>\
-                                                    <div id='pidv-err' style='display: none;' class='alert small'> \
-                                                        Participant ID does not match \
-                                                    </div> \
-                                                    <div id='pidv-match' style='display: none; color: #0cb924;' class='alert small'> \
-                                                        Participant ID match. Please wait ... \
-                                                    </div> \
-                                                </div>\
+                                            <td valign='top'> \
+                                                <div class='formfieldXL_BG'> \
+                                                    Enter Participant ID  \
+                                                </div> \
+                                            </td> \
+                                            <td valign='top'> \
+                                                <div class='formfieldXL_BG'> \
+                                                    <input type='text' name='label' id='retype_pid' width='30' class='formfieldXL form-control' autofocus> \
+                                                </div> \
                                             </td> \
                                         </tr> \
                                     </table> \
@@ -51,14 +54,16 @@ jQuery(document).ready(function() {
                             </tr> \
                             <tr> \
                                 <td colspan='2' style='text-align: center;'> \
+                                    <div style='margin-top: 10px;'> \
                                         <input type='button' value='Cancel' onclick='clearPIDVerificationForm()'/> \
                                         &nbsp; \
-                                        <input type='button' value='Checking' onclick='validatePIDVerificationForm()'/> \
+                                        <input type='button' value='Continue' onclick='validatePIDVerificationForm()'/> \
+                                    </div> \
                                 </td> \
                             </tr> \
                         </table>"
             }],
-            template: "<div class='popover tour'> \
+            template: "<div class='popover tour pid'> \
                         <div class='arrow'></div> \
                         <h3 class='popover-title'></h3> \
                         <div class='popover-content'></div> \
@@ -82,10 +87,16 @@ jQuery(document).ready(function() {
                 jQuery("#step-0").find('#retype_pid').bind('cut copy paste', function (e) {
                     e.preventDefault();
                 });
-                // trigger checking when enter
+                // trigger continue when enter
                 jQuery("#step-0").find('#retype_pid').on('keypress',function(e) {
-                    if(e.which == 13) {
+                    if (e.which == 13) {
                         validatePIDVerificationForm();
+                    }
+                });
+                // trigger cancel when esc
+                jQuery(document).on('keyup',function(e) {
+                    if (e.keyCode === 27) {
+                        clearPIDVerificationForm();
                     }
                 });
             }
@@ -105,16 +116,13 @@ function clearPIDVerificationForm() {
     tourElement.end();
     jQuery("#step-0").find('input#retype_pid').val("");
     jQuery("#step-0").find('#pidv-err').css({'display':'none'});
-    jQuery("#step-0").find('#pidv-match').css({'display':'none'});
 }
 
 function validatePIDVerificationForm() {
     if (jQuery("#step-0").find('input').val() === currentPLabel) {
         jQuery("#step-0").find('#pidv-err').css({'display':'none'});
-        jQuery("#step-0").find('#pidv-match').css({'display':'block'});
         window.location = window.location.origin + "/OpenClinica/ViewStudySubject?id=" + currentPID;
     } else {
         jQuery("#step-0").find('#pidv-err').css({'display':'block'});
-        jQuery("#step-0").find('#pidv-match').css({'display':'none'});
     }
 }

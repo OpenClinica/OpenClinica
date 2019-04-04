@@ -20,6 +20,7 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
     }
 
     @SuppressWarnings("unchecked")
+    @Transactional
     public List<StudySubject> findAllByStudy(Integer studyId) {
         String query = "from " + getDomainClassName() + " do where do.study.studyId = :studyid";
         org.hibernate.Query q = getCurrentSession().createQuery(query);
@@ -100,7 +101,7 @@ public class StudySubjectDao extends AbstractDomainDao<StudySubject> {
         return (ArrayList<StudySubject>) q.list();
     }
 
-
+    @Transactional
     public StudySubject findByLabelAndStudyOrParentStudy(String embeddedStudySubjectId, Study study) {
         getSessionFactory().getStatistics().logSummary();
         String query = "from " + getDomainClassName() + " do  where (do.study.studyId = :studyid or do.study.study.studyId = :studyid) and do.label = :label";
