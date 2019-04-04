@@ -336,9 +336,6 @@ public class ODMClinicaDataResource {
         }
         report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
-        if (report.getClinicalDataMap() == null)
-            return null;
-
         report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,odmFilter.includeMetadata(), odmFilter.includeClinical(), odmFilter.isCrossForm());
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
