@@ -279,7 +279,8 @@ a:hover {
 
 .taskLeftColumn,
 .taskRightColumn {
-  width: 50%; }
+  width: 50%;
+}
 
 /* layout */
 .aka_revised_content table[width="525"] {
@@ -357,7 +358,9 @@ a:hover {
   display: inline-block;
   margin: 0;
   padding: 0.25em 0.25em 0.75em 0.25em;
-  width: 49.5%; }
+  width: 49.5%;
+  vertical-align: top;
+}
 
 #subnav_Tasks {
   font-size: .8em;
