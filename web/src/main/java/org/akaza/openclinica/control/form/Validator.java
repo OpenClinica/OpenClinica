@@ -1222,11 +1222,12 @@ break;
             return true;
         }
         try {
-        	//OC-10549
-        	if(fieldValue.toLowerCase().endsWith("d") || fieldValue.toLowerCase().endsWith("f") || fieldValue.toLowerCase().indexOf("e") > 0) {
+        	
+            float f = Float.parseFloat(fieldValue);
+          //OC-10549
+           if(fieldValue.toLowerCase().endsWith("d") || fieldValue.toLowerCase().endsWith("f") || fieldValue.toLowerCase().endsWith("l") || fieldValue.toLowerCase().indexOf("e") > 0) {
         		return false;
         	}
-            float f = Float.parseFloat(fieldValue);
         } catch (Exception e) {
             return false;
         }
