@@ -65,7 +65,11 @@ public class ErrorConstants {
     public static final String ERR_EVENT_NOT_ACTIVE = "errorCode.notActive";
     public static final String ERR_LOG_FILE = "errorCode.logFile";
     public static final String ERR_DATA_MISSING_PIPE = "errorCode.dataRowMissingPipe";
-    
-    
+    public static final String ERR_STUDY_NOT_Valid_OID = "errorCode.studyNotValidOid";
+    public static final String ERR_SITE_NOT_Valid_OID = "errorCode.siteNotValidOid";
+    public static final String ERR_STUDY_TO_SITE_NOT_Valid_OID = "errorCode.studyTositeNotValidOid";
+    public static final String ERR_PARTICIPATE_INACTIVE = "errorCode.participateInActive";
+
+
 
 }
