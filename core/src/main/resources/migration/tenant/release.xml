@@ -26,5 +26,6 @@
        <include file="migration/tenant/4.0-2019-02-14-OC-10324.xml"/>
        <include file="migration/tenant/4.0-2019-03-26-OC-10529.xml"/>
        <include file="migration/tenant/4.0-2019-04-01-OC-10483.xml"/>
+       <include file="migration/tenant/4.0-2019-04-05-OC-10127.xml"/>
 
 </databaseChangeLog>
