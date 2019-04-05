@@ -260,6 +260,8 @@
   #access-code-input {
     width: 150px;
     padding-right: 40px;
+    font-family: 'Courier Prime Code';
+    font-style: italic;
   }
   #eye {
     position: absolute;
@@ -1564,7 +1566,7 @@
                   <span><fmt:message key="access_code" bundle="${resword}"/></span>
                 </td>
                 <td valign="top" id="access-code-td">
-                  <input id="access-code-input" readonly onfocus="this.select()" type="password" value="" size="45" class="formfield form-control">
+                  <input id="access-code-input" onfocus="this.select()" type="password" readonly="readonly" value="" size="45" class="formfield form-control">
                   <i id="eye" class="fa fa-eye"></i>
                 </td>
                 <td valign="top" class="grayed-out" style="padding-top:4px;">
