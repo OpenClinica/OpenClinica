@@ -8,16 +8,21 @@ import java.io.Reader;
 import java.io.StringWriter;
 import java.io.UnsupportedEncodingException;
 import java.sql.Timestamp;
+import java.text.MessageFormat;
 import java.text.SimpleDateFormat;
 import java.util.ArrayList;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Iterator;
+import java.util.List;
+import java.util.Locale;
+import java.util.ResourceBundle;
 import java.util.Scanner;
 import java.util.StringTokenizer;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
 
+import javax.sql.DataSource;
 import javax.xml.parsers.DocumentBuilder;
 import javax.xml.parsers.DocumentBuilderFactory;
 import javax.xml.parsers.ParserConfigurationException;
@@ -28,7 +33,34 @@ import javax.xml.transform.TransformerFactory;
 import javax.xml.transform.dom.DOMSource;
 import javax.xml.transform.stream.StreamResult;
 
+import org.akaza.openclinica.bean.admin.CRFBean;
+import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventBean;
+import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
+import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
+import org.akaza.openclinica.bean.submit.FormLayoutBean;
+import org.akaza.openclinica.bean.submit.ItemBean;
+import org.akaza.openclinica.bean.submit.ItemGroupBean;
+import org.akaza.openclinica.bean.submit.crfdata.FormDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ImportItemGroupDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
+import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
+import org.akaza.openclinica.dao.admin.CRFDAO;
+import org.akaza.openclinica.dao.core.CoreResources;
+import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
+import org.akaza.openclinica.dao.managestudy.StudyDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
+import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
+import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
+import org.akaza.openclinica.dao.submit.FormLayoutDAO;
+import org.akaza.openclinica.dao.submit.ItemDAO;
+import org.akaza.openclinica.dao.submit.ItemGroupDAO;
+import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -36,10 +68,15 @@ import org.w3c.dom.Element;
 
 public class PipeDelimitedDataHelper extends ImportDataHelper {
 
+	private final DataSource ds;
 
 	private String[] columnNms;
 	private HashMap  mappedValues;
 
+	public PipeDelimitedDataHelper(DataSource ds) {
+		super();
+		this.ds = ds;
+	}
 	/**
 	 * 
 	 * @param mappingFile
@@ -707,9 +744,15 @@ public String readFileToString(File file) throws IOException{
     	boolean foundStudyOID=false;
     	boolean foundStudyEventOID=false;
     	
+    	String formOIDValue = null;
+    	String formVersionValue = null;
+    	String studyOIDValue = null;
+    	String studyEventOIDValue = null;
+    	
     	String errorMsg = null;
     	ArrayList<String> errorMsgs = new ArrayList<>();
-    			
+    	ArrayList<ImportItemGroupDTO> importItemGroupDTOs = new ArrayList<ImportItemGroupDTO>();
+    	
         try(Scanner sc = new Scanner(file)){
        	
          String currentLine;
@@ -725,12 +768,16 @@ public String readFileToString(File file) throws IOException{
 	       			 String keyWord = mappingRow[0];
 	           		 String value = mappingRow[1];
 	           		 if(keyWord != null && keyWord.trim().startsWith("FormOID") && value != null && value.trim().length() >0) {
+	           			formOIDValue = value;
 	           			foundFormOID=true;
 	           		 }else if(keyWord != null && keyWord.trim().startsWith("FormVersion") && value != null && value.trim().length() >0) {
+	           			formVersionValue = value;
 	           			foundFormVersion=true;
 	                 }else if(keyWord != null && keyWord.trim().startsWith("StudyOID") && value != null && value.trim().length() >0) {
+	                	 studyOIDValue = value;
 	           			foundStudyOID=true;
 	            	 }else if(keyWord != null && keyWord.trim().startsWith("StudyEventOID") && value != null && value.trim().length() >0) {
+	            		 studyEventOIDValue = value;
 	           			foundStudyEventOID=true;
 	            	 } else if(keyWord != null && (keyWord.trim().startsWith("SkipMatchCriteria") ||  keyWord.trim().indexOf("SkipMatchCriteria") ==1 ) ) {
 	            		//check SkipMatchCriteria format
@@ -748,6 +795,11 @@ public String readFileToString(File file) throws IOException{
 	             		if(errorMsg != null) {
 	             			errorMsgs.add(errorMsg);
 	             		}
+	             		
+	             		ImportItemGroupDTO  importItemGroupDTO = this.convertToImportItemGroupDTO(mappingRow);
+	             		
+	             		addToItemGroupDTOList(importItemGroupDTOs, importItemGroupDTO);
+	             		
 	             	 }
 	       		 }
 	       	 }
@@ -775,8 +827,40 @@ public String readFileToString(File file) throws IOException{
         	throw new OpenClinicaSystemException("errorCode.missingItemOrItemGroupOID", errorMsgs.toString());
         }
         
-    	
+        // check against current system/DB
+        errorMsgs.clear();
+        errorMsgs = this.validateStudyMetadata(formOIDValue, formVersionValue, studyOIDValue, studyEventOIDValue, importItemGroupDTOs, null);
+        if(errorMsgs.size() >0) {
+        	throw new OpenClinicaSystemException("errorCode.ItemOrItemGroupOIDValidationFailed", errorMsgs.toString());
+        }
+        
 	 }
+    /**
+     * 
+     * @param importItemGroupDTOs
+     * @param importItemGroupDTO
+     */
+	private void addToItemGroupDTOList(ArrayList<ImportItemGroupDTO> importItemGroupDTOs,
+			ImportItemGroupDTO importItemGroupDTO) {
+		
+		boolean found = false;
+		if(importItemGroupDTOs.isEmpty()) {
+			importItemGroupDTOs.add(importItemGroupDTO);
+		}else {
+			for(ImportItemGroupDTO  itemGroupDTO : importItemGroupDTOs) {
+				String itemGroupOID = itemGroupDTO.getItemGroupOID();
+				if(itemGroupOID != null && itemGroupOID.equals(importItemGroupDTO.getItemGroupOID()) ) {
+					found = true;
+					itemGroupDTO.getItemOIDs().addAll(importItemGroupDTO.getItemOIDs());
+				}
+				
+			}
+			
+			if(!found) {
+				importItemGroupDTOs.add(importItemGroupDTO);
+			}
+		}
+	}
  
  /**
   * Height Units=IG_VITAL_GROUP1.HeightUnitsOID   
@@ -817,6 +901,37 @@ private  String  validateItemFormat(String[] keyValueStr) {
 	     }
 	     
 	    return errorMsg;
+	}
+
+
+/**
+ * Height Units=IG_VITAL_GROUP1.HeightUnitsOID   
+ * @param itemStr
+ * @return
+ */
+private  ImportItemGroupDTO  convertToImportItemGroupDTO(String[] keyValueStr) {		
+	
+	    ImportItemGroupDTO importItemGroupDTO = null;	
+		String key;
+		String val;
+	
+	    if(keyValueStr.length < 2) {
+	    	 ;
+	    }else {
+	    	key = keyValueStr[0].trim();
+		    val =  keyValueStr[1].trim().replaceAll("/n|||/r", "");	
+                       
+            String[] itemMappingvalue = toArray(val,".");
+                     
+			String itemGroupOID = itemMappingvalue[0]; 
+			String itemOID = itemMappingvalue[1];
+			 
+			importItemGroupDTO = new ImportItemGroupDTO();
+			importItemGroupDTO.setItemGroupOID(itemGroupOID);
+			importItemGroupDTO.getItemOIDs().add(itemOID);			 				        
+	     }
+	     
+	    return importItemGroupDTO;
 	}
 
 private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {		
@@ -861,6 +976,141 @@ private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {
     return errorMsg;
 
 }
+
+
+public ArrayList<String> validateStudyMetadata(String formOIDValue,
+										  String formVersionValue,
+										  String studyOIDValue,
+										  String studyEventOIDValue,
+										  ArrayList<ImportItemGroupDTO> importItemGroupDTOs,
+										  Locale newLocale) {
+  
+	ArrayList<String> errors = new ArrayList<String>();
+    Locale locale;
+    if(newLocale !=null) {
+    	locale = newLocale;
+    }else {
+    	locale = Locale.US;
+    }
+    ResourceBundleProvider.updateLocale(locale);
+    ResourceBundle respage = ResourceBundleProvider.getPageMessagesBundle(locale);
+    MessageFormat mf = new MessageFormat("");
+    
+    try {
+    	// check 1: study
+        StudyDAO studyDAO = new StudyDAO(ds);
+        String studyOid = studyOIDValue;
+        StudyBean studyBean = studyDAO.findByOid(studyOid);
+        if (studyBean == null) {
+            mf.applyPattern(respage.getString("your_study_oid_does_not_reference_an_existing"));
+            Object[] arguments = { studyOid };
+            errors.add(mf.format(arguments)); 
+            
+        } else if (!CoreResources.isPublicStudySameAsTenantStudy(studyBean, studyOid, ds)) {
+            mf.applyPattern(respage.getString("your_current_study_is_not_the_same_as"));
+            Object[] arguments = { studyBean.getName() };           
+            errors.add(mf.format(arguments));
+        }
+      
+        // check 2:study event
+        StudyEventDefinitionDAO studyEventDefinitionDAO = new StudyEventDefinitionDAO(ds);
+        StudyEventDAO studyEventDAO = new StudyEventDAO(ds);
+        FormLayoutDAO formLayoutDAO = new FormLayoutDAO(ds);
+        ItemGroupDAO itemGroupDAO = new ItemGroupDAO(ds);
+        ItemDAO itemDAO = new ItemDAO(ds);
+        CRFDAO crfDAO = new CRFDAO(ds);
+        EventDefinitionCRFDAO edcDAO = new EventDefinitionCRFDAO(ds);
+   
+        String sedOid = studyEventOIDValue;
+        StudyEventDefinitionBean studyEventDefintionBean = studyEventDefinitionDAO.findByOidAndStudy(sedOid, studyBean.getId(),
+                    studyBean.getParentStudyId());          
+
+        if (studyEventDefintionBean == null) {
+            mf.applyPattern(respage.getString("your_study_event_oid_for_study_oid"));
+            Object[] arguments = { sedOid, studyOid };
+            errors.add(mf.format(arguments));        
+        }
+
+                       
+        // check Form              
+        String formOid = formOIDValue;
+        String formLayoutName = formVersionValue;
+        CRFBean crfBean = crfDAO.findByOid(formOid);
+        if (crfBean != null && studyEventDefintionBean != null) {
+            EventDefinitionCRFBean edcBean = edcDAO.findByStudyEventDefinitionIdAndCRFId(studyEventDefintionBean.getId(),
+                    crfBean.getId());
+            if (edcBean == null || edcBean.getId() == 0) {
+                mf.applyPattern(respage.getString("your_form_oid_for_study_event_oid"));
+                Object[] arguments = { formOid, sedOid };
+                errors.add(mf.format(arguments));
+            }
+        }
+
+        if (crfBean != null) {
+            FormLayoutBean formLayoutBean = (FormLayoutBean) formLayoutDAO.findByFullName(formLayoutName, crfBean.getName());
+            if (formLayoutBean == null || formLayoutBean.getId() == 0) {
+                mf.applyPattern(respage.getString("your_form_layout_oid_for_form_oid"));
+                Object[] arguments = { formLayoutName, formOid };
+                errors.add(mf.format(arguments));
+            }
+        } else {
+            mf.applyPattern(respage.getString("your_form_oid_did_not_generate"));
+            Object[] arguments = { formOid };
+            errors.add(mf.format(arguments));
+        }
+
+        // check item group and Item OID                       
+        if (importItemGroupDTOs != null) {
+            for (ImportItemGroupDTO importItemGroupDTO : importItemGroupDTOs) {
+                String itemGroupOID = importItemGroupDTO.getItemGroupOID();
+                ItemGroupBean itemGroupBean = itemGroupDAO.findByOid(itemGroupOID);
+                if (itemGroupBean != null && crfBean != null) {
+                    itemGroupBean = itemGroupDAO.findByOidAndCrf(itemGroupOID, crfBean.getId());
+                    if (itemGroupBean == null) {
+                        mf.applyPattern(respage.getString("your_item_group_oid_for_form_oid"));
+                        Object[] arguments = { itemGroupOID, formOid };
+                        errors.add(mf.format(arguments));
+                    }
+                } else if (itemGroupBean == null) {
+                    mf.applyPattern(respage.getString("the_item_group_oid_did_not"));
+                    Object[] arguments = { itemGroupOID };
+                    errors.add(mf.format(arguments));
+                }
+
+                ArrayList<String> itemOIDs = importItemGroupDTO.getItemOIDs();
+                if (itemOIDs != null) {
+                    for (String itemOID : itemOIDs) {
+                     
+                        List<ItemBean> itemBeans = (List<ItemBean>) itemDAO.findByOid(itemOID);
+                        if (itemBeans.size() != 0 && itemGroupBean != null) {
+                            ItemBean itemBean = itemDAO.findItemByGroupIdandItemOid(itemGroupBean.getId(), itemOID);
+                            if (itemBean == null) {
+                                mf.applyPattern(respage.getString("your_item_oid_for_item_group_oid"));
+                                Object[] arguments = { itemOID, itemGroupOID };
+                                errors.add(mf.format(arguments));
+                            }
+                        } else if (itemBeans.size() == 0) {
+                            mf.applyPattern(respage.getString("the_item_oid_did_not"));
+                            Object[] arguments = { itemOID };
+                            errors.add(mf.format(arguments));
+                        }
+                    } // itemOID
+                } // if (itemOIDs != null)
+            } // importItemGroupDTOs
+        } // if (importItemGroupDTOs != null)
+    
+                   
+               
+           
+       
+  
+    } catch (NullPointerException npe) {
+        logger.debug("found a nullpointer here");
+    }
+    // if errors == null you pass, if not you fail
+    return errors;
+}
+
 
 
 public String getParticipantID(File mappingFile,File rawItemDataFile) throws OpenClinicaSystemException, IOException{
@@ -942,6 +1192,7 @@ public String getParticipantID(String rawMappingStr,String rawItemData) throws O
 	
 	return "";
  }
+
 
 
 }

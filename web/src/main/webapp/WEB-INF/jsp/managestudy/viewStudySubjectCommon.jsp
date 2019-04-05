@@ -235,7 +235,7 @@ $(function() {
     var items = {};
     var codes = {};
     var columns = {};
-    
+
     $.when(
         $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n', function(data){
             odm = data;
@@ -277,7 +277,7 @@ $(function() {
                     return itemGroups[ref['@ItemGroupOID']];
                 });
                 forms[form['@OID']] = form;
-            });        
+            });
         }),
 
         $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(pageJson){
@@ -289,7 +289,24 @@ $(function() {
     ).then(function() {
         collection(metadata.StudyEventDef).forEach(function(studyEvent) {
             studyEvents[studyEvent['@OID']] = studyEvent;
-            studyEvent.showMe = studyEvent['@OpenClinica:EventType'] === 'Common';
+            if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent['@OpenClinica:Status'] !== 'DELETED'){
+              studyEvent.showMe = true;}
+              else if (studyEvent['@OpenClinica:EventType'] === 'Common'){
+                studyEventOid = studyEvent['@OID'];
+                $.ajax({
+                  type: "GET",
+                  url: 'rest/clinicaldata/json/stats/${study.oid}/${studySub.oid}/' + studyEventOid,
+                  async: false,
+                  success: function(statData)
+                  {
+                      var stats = statData;
+                      if (stats.body.matchingForms > 0){
+                        studyEvent.showMe = true;
+                      }
+                      }
+                    });
+              }
+
             studyEvent.forms = {};
 
             collection(studyEvent.FormRef).forEach(function(ref) {
@@ -367,7 +384,7 @@ $(function() {
             $('#subjectEvents').removeClass('hide');
         }
 
-        $.fn.dataTable.moment('DD-MMM-YYYY');        
+        $.fn.dataTable.moment('DD-MMM-YYYY');
         function datatablefy($tables) {
             $tables.each(function(i) {
                 var table = $(this);
@@ -446,9 +463,9 @@ $(function() {
         }).on('uncollapse', '.section', function() {
             var sectionDiv = $(this);
             var studyEventOid = sectionDiv.data('section-oid');
-            $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&metadata=n', function(data){
+            $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n', function(data){
                 var odm = data;
-                
+
                 var studyEvent = studyEvents[studyEventOid];
                 for (var formOid in studyEvent.forms) {
                     var form = studyEvent.forms[formOid];

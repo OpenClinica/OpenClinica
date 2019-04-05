@@ -368,10 +368,21 @@ public class DataController {
                 List<DisplayItemBeanWrapper> displayItemBeanWrappers = new ArrayList<DisplayItemBeanWrapper>();
                 HashMap<Integer, String> importedCRFStatuses = new HashMap<Integer, String>();
 
-                List<String> errorMessagesFromValidation = dataImportService.validateMetaData(odmContainer, dataSource, coreResources, studyBean, userBean,
-                        displayItemBeanWrappers, importedCRFStatuses);
+                /**
+                 *  for pipe delimited import, already validate meta data immediately after upload the mapping file
+                 *  so will skip at this stage
+                 */
+                List<String> errorMessagesFromValidation = null;
+                String comeFromPipe = (String) request.getHeader("PIPETEXT");
+            	if(comeFromPipe!=null && comeFromPipe.equals("PIPETEXT")) {
+            		;
+            	}else {
+            		 errorMessagesFromValidation = dataImportService.validateMetaData(odmContainer, dataSource, coreResources, studyBean, userBean,
+                             displayItemBeanWrappers, importedCRFStatuses);
 
-                if (errorMessagesFromValidation.size() > 0) {
+            	}
+               
+                if (errorMessagesFromValidation != null && errorMessagesFromValidation.size() > 0) {
                     String err_msg = convertToErrorString(errorMessagesFromValidation);
 
                     ErrorMessage errorOBject = createErrorMessage("errorCode.ValidationFailed", err_msg);

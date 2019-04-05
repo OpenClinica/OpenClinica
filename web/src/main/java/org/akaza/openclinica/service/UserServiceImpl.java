@@ -590,21 +590,21 @@ public class UserServiceImpl implements UserService {
     private String writeToTextFile(List<OCUserDTO> userDTOS) {
 
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("Participant Id");
+        stringBuffer.append("ParticipantId");
         stringBuffer.append(SEPERATOR);
         stringBuffer.append("First Name");
         stringBuffer.append(SEPERATOR);
         stringBuffer.append("Last Name");
         stringBuffer.append(SEPERATOR);
-        stringBuffer.append("Email Address");
+        stringBuffer.append("Email");
         stringBuffer.append(SEPERATOR);
-        stringBuffer.append("Phone Number");
+        stringBuffer.append("Mobile");
         stringBuffer.append(SEPERATOR);
         stringBuffer.append("Identifier");
         stringBuffer.append(SEPERATOR);
         stringBuffer.append("Access Code");
         stringBuffer.append(SEPERATOR);
-        stringBuffer.append("Participant Status");
+        stringBuffer.append("Participate Status");
         stringBuffer.append('\n');
         for (OCUserDTO userDTO : userDTOS) {
             stringBuffer.append(userDTO.getParticipantId() != null ? userDTO.getParticipantId() : "");

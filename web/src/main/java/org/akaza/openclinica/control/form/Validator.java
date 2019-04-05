@@ -1222,7 +1222,12 @@ break;
             return true;
         }
         try {
+        	
             float f = Float.parseFloat(fieldValue);
+          //OC-10549
+           if(fieldValue.toLowerCase().endsWith("d") || fieldValue.toLowerCase().endsWith("f") || fieldValue.toLowerCase().endsWith("l") || fieldValue.toLowerCase().indexOf("e") > 0) {
+        		return false;
+        	}
         } catch (Exception e) {
             return false;
         }
