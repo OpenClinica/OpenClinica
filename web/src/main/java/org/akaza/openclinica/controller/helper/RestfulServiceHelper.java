@@ -966,7 +966,7 @@ public class RestfulServiceHelper {
 
 	    public PipeDelimitedDataHelper getImportDataHelper() {
 			if(importDataHelper == null) {
-				importDataHelper = new PipeDelimitedDataHelper();
+				importDataHelper = new PipeDelimitedDataHelper(this.dataSource);
 			}
 			return importDataHelper;
 		}

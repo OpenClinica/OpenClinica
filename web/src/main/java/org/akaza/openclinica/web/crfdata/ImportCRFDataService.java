@@ -2346,7 +2346,7 @@ public class ImportCRFDataService {
 
 	public PipeDelimitedDataHelper getPipeDelimitedDataHelper() {
 		if(pipeDelimitedDataHelper == null) {
-			pipeDelimitedDataHelper = new PipeDelimitedDataHelper();
+			pipeDelimitedDataHelper = new PipeDelimitedDataHelper(this.ds);
 		}
 		return pipeDelimitedDataHelper;
 	}
