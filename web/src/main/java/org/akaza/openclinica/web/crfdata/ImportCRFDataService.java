@@ -1115,6 +1115,7 @@ public class ImportCRFDataService {
                             // assuming that this will be put back in to the core
                             // method's hashmap, updating statically, tbh 06/2008
                             logger.debug("+++ adding " + errorKey.toString());
+                            throw new OpenClinicaException(validationErrors.toString(),"");
                         }
                         logger.debug("-- hard validation checks: --");
                         for (Object errorKey : hardValidator.keySet()) {
@@ -2024,6 +2025,7 @@ public class ImportCRFDataService {
                             // assuming that this will be put back in to the core
                             // method's hashmap, updating statically, tbh 06/2008
                             logger.debug("+++ adding " + errorKey.toString());
+                            throw new OpenClinicaException(validationErrors.toString(),"");
                         }
                         logger.debug("-- hard validation checks: --");
                         for (Object errorKey : hardValidator.keySet()) {
