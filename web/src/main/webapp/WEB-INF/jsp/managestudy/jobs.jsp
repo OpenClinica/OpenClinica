@@ -14,7 +14,6 @@
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery.blockUI.js"></script>
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
-<script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/handlebars.js/4.0.11/handlebars.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
@@ -62,8 +61,11 @@
     text-align: center;
   }
   .dataTables_length {
-      padding-top: 0.75em;
-      padding-left: 1.5em;
+    padding-top: 0.75em;
+    padding-left: 1.5em;
+  }
+  .icon {
+    cursor: pointer;
   }
 </style>
 
@@ -96,7 +98,7 @@
 </table>
 
 <script>
-$('#tbl-jobs').DataTable({
+var datatable = $('#tbl-jobs').DataTable({
   dom: 'frtilp',
   searching: true,
   paging: true,
@@ -120,12 +122,28 @@ $('#tbl-jobs').DataTable({
   }
 });
 
-var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${study.oid}/jobs';
+if (${atSiteLevel}) {
+  var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oid}/sites/${theSite.oid}/jobs';  
+}
+else {
+  var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oid}/jobs';  
+}
 jQuery.ajax({
   type: 'get',
-  url: url + params,
+  url: url,
   success: function(data) {
-    console.log(arguments);
+    datatable.rows.add(data.map(function (logEntry) {
+      return [
+        logEntry.sourceFileName,
+        logEntry.type,
+        logEntry.dateCreated,
+        logEntry.createdByUsername,
+        logEntry.dateCompleted,
+        '<span class="icon icon-download" data-uuid="' + logEntry.uuid + '"></span> ' + 
+        '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>'
+      ];
+    }));
+    datatable.draw();
   },
   error: function() {
     console.log(arguments);
