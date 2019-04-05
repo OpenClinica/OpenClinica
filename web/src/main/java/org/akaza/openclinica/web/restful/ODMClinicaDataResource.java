@@ -334,6 +334,10 @@ public class ODMClinicaDataResource {
         } else {
             clinicalDataBeans = null;
         }
+
+        if (report.getClinicalDataMap() == null){
+            LOGGER.info("ClinicalData Map is returning null in ODMClinicalDataResource");
+        }
         report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
         report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,odmFilter.includeMetadata(), odmFilter.includeClinical(), odmFilter.isCrossForm());
