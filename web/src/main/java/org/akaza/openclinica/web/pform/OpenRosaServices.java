@@ -76,6 +76,8 @@ import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
 
+import static org.akaza.openclinica.service.crfdata.xform.EnketoAPI.DATABASE_ID_ENCRYPTION_KEY_PROPERTY;
+
 @Path("/openrosa")
 @Component
 public class OpenRosaServices {
@@ -131,7 +133,6 @@ public class OpenRosaServices {
     public static final String NO_FLAVOR = "";
     public static final String SVG = ".svg";
     public static final String DASH = "-";
-    private static final String DATABASE_ID_ENCRYPTION_KEY_PROPERTY = "databaseIdEncryptionKey";
 
     public static final String FORM_CONTEXT = "ecid";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
