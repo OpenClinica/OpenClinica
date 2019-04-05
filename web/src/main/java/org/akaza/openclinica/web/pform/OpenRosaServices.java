@@ -10,6 +10,7 @@ import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.CRFVersionBean;
 import org.akaza.openclinica.controller.openrosa.OpenRosaSubmissionController;
+import org.akaza.openclinica.core.util.EncryptionUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
@@ -74,6 +75,8 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 import java.util.concurrent.ConcurrentMap;
 import java.util.function.Function;
+
+import static org.akaza.openclinica.service.crfdata.xform.EnketoAPI.DATABASE_ID_ENCRYPTION_KEY_PROPERTY;
 
 @Path("/openrosa")
 @Component
@@ -422,6 +425,7 @@ public class OpenRosaServices {
         List<FormLayoutMedia> mediaList = formLayoutMediaDao.findByFormLayoutIdForNoteTypeMedia(formLayout.getFormLayoutId());
 
         String urlBase = getCoreResources().getDataInfo().getProperty("sysURL").split("/MainMenu")[0];
+        String databaseIdEncryptionKey = getCoreResources().getDataInfo().getProperty(DATABASE_ID_ENCRYPTION_KEY_PROPERTY);
         if (mediaList != null && mediaList.size() > 0) {
             for (FormLayoutMedia media : mediaList) {
 
@@ -429,8 +433,11 @@ public class OpenRosaServices {
                 mediaFile.setFilename(media.getName());
                 File image = new File(Utils.getFilePath() + media.getPath() + media.getName());
                 mediaFile.setHash(DigestUtils.md5Hex(media.getName()) + Double.toString(image.length()));
+                String formLayoutMediaId = String.valueOf(media.getFormLayoutMediaId());
+                // Encrypt the form layout media id so we don't expose database ids to users
+                String encryptedFormLayoutMediaId = EncryptionUtil.encryptValue(formLayoutMediaId, databaseIdEncryptionKey);
                 mediaFile.setDownloadUrl(
-                        urlBase + "/rest2/openrosa/" + studyOID + "/downloadMedia?ecid=" + ecid + "&formLayoutMediaId=" + media.getFormLayoutMediaId());
+                        urlBase + "/rest2/openrosa/" + studyOID + "/downloadMediaEncrypted?ecid=" + ecid + "&formLayoutMediaId=" + encryptedFormLayoutMediaId);
                 manifest.add(mediaFile);
             }
         }
@@ -589,7 +596,7 @@ public class OpenRosaServices {
     }
 
     /**
-     * @api {get} /rest2/openrosa/:studyOID/downloadMedia Download media
+     * @api {get} /rest2/openrosa/:studyOID/downloadMediaEncrypted Download media
      * @apiName getMediaFile
      * @apiPermission admin
      * @apiVersion 3.8.0
@@ -599,7 +606,7 @@ public class OpenRosaServices {
      */
 
     @GET
-    @Path("/{studyOID}/downloadMedia")
+    @Path("/{studyOID}/downloadMediaEncrypted")
     public Response getMediaFile(@Context HttpServletRequest request, @Context HttpServletResponse response, @PathParam("studyOID") String studyOID,
             @QueryParam("formLayoutMediaId") String formLayoutMediaId, @QueryParam(FORM_CONTEXT) String ecid,
             @RequestHeader("Authorization") String authorization, @Context ServletContext context) throws Exception {
@@ -607,8 +614,10 @@ public class OpenRosaServices {
             return null;
         StudyBean publicStudy = getPublicStudy(studyOID);
         CoreResources.setRequestSchema(publicStudy.getSchemaName());
-
-        FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutMediaId(Integer.valueOf(formLayoutMediaId));
+        // Decrypt the encrypted form layout media id
+        String encryptionKey = getCoreResources().getDataInfo().getProperty(DATABASE_ID_ENCRYPTION_KEY_PROPERTY);
+        String decryptedFormLayoutMediaId = EncryptionUtil.decryptValue(formLayoutMediaId, encryptionKey);
+        FormLayoutMedia media = formLayoutMediaDao.findByFormLayoutMediaId(Integer.valueOf(decryptedFormLayoutMediaId));
 
         File image = new File(Utils.getFilePath() + media.getPath() + media.getName());
         FileInputStream fis = new FileInputStream(image);
