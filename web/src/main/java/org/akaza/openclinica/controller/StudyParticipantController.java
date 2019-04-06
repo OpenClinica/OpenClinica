@@ -590,6 +590,7 @@ public class StudyParticipantController {
 		        for(StudySubjectBean studySubject:studySubjects) {
 		        	StudyParticipantDTO spDTO= new StudyParticipantDTO();
 		        	        			        			        	
+		        	spDTO.setSubjectOid(studySubject.getOid());
 		        	spDTO.setSubjectKey(studySubject.getLabel());
 		        	spDTO.setStatus(studySubject.getStatus().getName());
 		        	if(studySubject.getOwner()!=null) {
