@@ -9,6 +9,7 @@ import org.akaza.openclinica.dao.hibernate.JobDetailDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.JobService;
 import org.akaza.openclinica.service.UserService;
@@ -166,7 +167,7 @@ public class JobController {
         }
         InputStream inputStream = null;
         try {
-            String logFileName = getFilePath() + File.separator + jobDetail.getLogPath();
+            String logFileName = getFilePath(jobDetail.getType()) + File.separator + jobDetail.getLogPath();
             File fileToDownload = new File(logFileName);
             inputStream = new FileInputStream(fileToDownload);
             response.setContentType("application/force-download");
@@ -191,8 +192,8 @@ public class JobController {
 
     }
 
-    private String getFilePath() {
-        return CoreResources.getField("filePath") + userService.BULK_JOBS;
+    private String getFilePath(JobType jobType) {
+        return CoreResources.getField("filePath") + userService.BULK_JOBS + File.separator+jobType.toString().toLowerCase();
     }
 
 

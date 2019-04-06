@@ -37,25 +37,16 @@ import org.akaza.openclinica.controller.dto.StudyEventScheduleDTO;
 import org.akaza.openclinica.controller.dto.StudyEventScheduleRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.EventCrfDao;
-import org.akaza.openclinica.dao.hibernate.EventDefinitionCrfDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDao;
-import org.akaza.openclinica.dao.hibernate.StudyEventDefinitionDao;
-import org.akaza.openclinica.dao.hibernate.StudyParameterValueDao;
-import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
+import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.bean.core.Status;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import org.akaza.openclinica.domain.datamap.Study;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudyEventDefinition;
-import org.akaza.openclinica.domain.datamap.StudyParameterValue;
-import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.enumsupport.JobType;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
@@ -64,6 +55,7 @@ import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.service.CustomRuntimeException;
 import org.akaza.openclinica.service.ParticipateService;
 import org.akaza.openclinica.service.StudyEventService;
+import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
@@ -77,6 +69,7 @@ import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.format.annotation.DateTimeFormat;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Controller;
+import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestBody;
@@ -85,7 +78,6 @@ import org.springframework.web.bind.annotation.RequestMethod;
 import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.http.ResponseEntity;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.web.multipart.MultipartFile;
@@ -112,6 +104,12 @@ public class StudyEventController {
     @Autowired
     private StudySubjectDao studySubjectDao;
 
+	@Autowired
+	private UserAccountDao userAccountDao;
+
+	@Autowired
+	private StudyDao studyDao;
+
     @Autowired
     private StudyEventDefinitionDao studyEventDefinitionDao;
 
@@ -121,11 +119,16 @@ public class StudyEventController {
 
     @Autowired
 	private StudyEventService studyEventService;
-	
+
+	@Autowired
+	private UserService userService;
+
     PassiveExpiringMap<String, Future<ResponseEntity<Object>>> expiringMap =
             new PassiveExpiringMap<>(24, TimeUnit.HOURS);
     
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
+	public static final String DASH = "-";
+	public static final String SCHEDULE_EVENT = "_Schedule Event";
 
     /**
      * @api {put} /pages/auth/api/v1/studyevent/studysubject/{studySubjectOid}/studyevent/{studyEventDefOid}/ordinal/{ordinal}/complete Complete a Participant Event
@@ -262,19 +265,22 @@ public class StudyEventController {
 	        @ApiResponse(code = 200, message = "Successful operation"),
 	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
 	@RequestMapping(value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/events/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
-    @Async
 	public ResponseEntity<Object> scheduleBulkEventAtSiteLevel(HttpServletRequest request,
 			MultipartFile file,
 			@PathVariable("studyOID") String studyOID,
 			@PathVariable("siteOID") String siteOID) throws Exception {
-		
+		UserAccountBean ub = getUserAccount(request);
+
+		Study site = studyDao.findByOcOID(siteOID);
+		Study study = studyDao.findByOcOID(studyOID);
+		UserAccount userAccount = userAccountDao.findById(ub.getId());
+		JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount, JobType.SCHEDULE_EVENT,file.getOriginalFilename());
+
     	 CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
-    		 UserAccountBean ub = getUserAccount(request);    		
-    		 return scheduleEvent(request,file, studyOID, siteOID,ub);
+    		 return scheduleEvent(request,file, study, siteOID,ub,jobDetail);
     	 });
-    	 
-    	  String uuid = UUID.randomUUID().toString();
-          System.out.println(uuid);
+
+		String uuid = jobDetail.getUuid();
           synchronized (expiringMap) {
               expiringMap.put(uuid, future);
           }
@@ -293,17 +299,20 @@ public class StudyEventController {
 	        @ApiResponse(code = 200, message = "Successful operation"),
 	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
 	@RequestMapping(value = "clinicaldata/studies/{studyOID}/events/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
-    @Async
-	public ResponseEntity<Object> scheduleBulkEventAtStudyLevel(HttpServletRequest request, 
+	public ResponseEntity<Object> scheduleBulkEventAtStudyLevel(HttpServletRequest request,
 			MultipartFile file,
 			@PathVariable("studyOID") String studyOID) throws Exception {
-		
+		UserAccountBean ub = getUserAccount(request);
+
+		Study study = studyDao.findByOcOID(studyOID);
+		UserAccount userAccount = userAccountDao.findById(ub.getId());
+		JobDetail jobDetail= userService.persistJobCreated(study, null, userAccount, JobType.SCHEDULE_EVENT,file.getOriginalFilename());
+
     	 CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
-    		 UserAccountBean ub = getUserAccount(request);    		 
-    		 return scheduleEvent(request,file, studyOID, null, ub);
+    		 return scheduleEvent(request,file, study, null, ub,jobDetail);
     	 });
     	 
-    	 String uuid = UUID.randomUUID().toString();
+    	 String uuid = jobDetail.getUuid();
          
          synchronized (expiringMap) {
               expiringMap.put(uuid, future);
@@ -319,14 +328,16 @@ public class StudyEventController {
 		
     	
 	}
-    
 
 
-	private ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, String studyOID, String siteOID,UserAccountBean ub) {
+	@Transactional
+	private ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, Study study, String siteOID,UserAccountBean ub,JobDetail jobDetail) {
 			
 		ResponseEntity response = null;
 		String logFileName = null;
-		
+		String fileName = study.getUniqueIdentifier()+ DASH+study.getEnvType()+ SCHEDULE_EVENT + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
+		String filePath = userService.getFilePath(JobType.SCHEDULE_EVENT) + File.separator + fileName;
+
 		if (!file.isEmpty()) {
 			 String fileNm = file.getOriginalFilename();
 			 
@@ -337,7 +348,8 @@ public class StudyEventController {
 	
 			 int endIndex = fileNm.indexOf(".csv"); 
 			 String originalFileNm =  fileNm.substring(0, endIndex);
-			 logFileName = this.getRestfulServiceHelper().getMessageLogger().getLogfileNamewithTimeStamp(originalFileNm);
+
+	//		logFileName = this.getRestfulServiceHelper().getMessageLogger().getLogfileNamewithTimeStamp(originalFileNm);
 			
 		}else {
 			logger.info("errorCode.emptyFile -- The file is empty ");
@@ -347,7 +359,7 @@ public class StudyEventController {
 		try {
 			 
 				// read csv file
-				 ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = RestfulServiceHelper.readStudyEventScheduleBulkCSVFile(file, studyOID, siteOID);
+				 ArrayList<StudyEventScheduleDTO> studyEventScheduleDTOList = RestfulServiceHelper.readStudyEventScheduleBulkCSVFile(file, study.getOc_oid(), siteOID);
 				 
 				 //schedule events
 				 for(StudyEventScheduleDTO studyEventScheduleDTO:studyEventScheduleDTOList) {
@@ -362,7 +374,7 @@ public class StudyEventController {
 				     String status="";
 				     String message="";
 				     	
-				     responseTempDTO = studyEventService.scheduleStudyEvent(ub, studyOID, siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
+				     responseTempDTO = studyEventService.scheduleStudyEvent(ub, study.getOc_oid(), siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
 				    
 				     /**
 			         *  response
@@ -387,7 +399,7 @@ public class StudyEventController {
                 	String msg = null;
                 	msg = rowNum + "|" + participantId + "|" + studyEventOID +"|"+ sampleOrdinalStr +"|" + status + "|"+message;
                 	String subDir = "study-event-schedule";
-    	    		this.getRestfulServiceHelper().getMessageLogger().writeToLog(subDir,logFileName, headerLine, msg, ub);
+    	    		this.getRestfulServiceHelper().getMessageLogger().writeToLog(subDir,filePath, headerLine, msg, ub);
     	    		
     	    		
 				 }
@@ -395,6 +407,7 @@ public class StudyEventController {
 			
 			
 		} catch (Exception e) {
+			userService.persistJobFailed(jobDetail,fileName);
 			logger.error("Error " + e.getMessage());
 		}
 		
@@ -402,7 +415,8 @@ public class StudyEventController {
 		String finalMsg = "Please check detail schedule information in log file:" + logFileName;
 		responseDTO.setMessage(finalMsg);
 		response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.OK);
-		
+		userService.persistJobCompleted(jobDetail,fileName);
+
 		return response;
 	}
 	public ResponseEntity<Object> scheduleEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId,String sampleOrdinalStr, String startDate,String endDate){

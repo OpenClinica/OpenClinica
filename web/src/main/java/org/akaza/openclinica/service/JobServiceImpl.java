@@ -8,6 +8,7 @@ import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.enumsupport.JobStatus;
+import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.slf4j.Logger;
@@ -109,13 +110,13 @@ public class JobServiceImpl implements JobService {
         jobDetail.setDateUpdated(new Date());
         logger.debug("Request to delete Job : {}", jobDetail.getUuid());
         jobDetailDao.saveOrUpdate(jobDetail);
-        String fileLocationPath = getFileLocationPath(jobDetail.getLogPath());
+        String fileLocationPath = getFileLocationPath(jobDetail.getLogPath(),jobDetail.getType());
         deleteFile(fileLocationPath);
     }
 
 
-    private String getFileLocationPath(String fileName) {
-        String fileLocation = getFilePath() + File.separator + fileName;
+    private String getFileLocationPath(String fileName, JobType jobType) {
+        String fileLocation = getFilePath() + File.separator +jobType.toString().toLowerCase()+ File.separator + fileName;
         return fileLocation;
     }
 
