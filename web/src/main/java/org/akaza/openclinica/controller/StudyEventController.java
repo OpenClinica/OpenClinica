@@ -464,7 +464,7 @@ public class StudyEventController {
         		response = new ResponseEntity(responseDTOerror, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
         		
 	    	}else{
-	    		message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " sucessfully.";
+	    		message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " successfully.";
 	 	        responseDTO.setMessage(message);
 
 	 			response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.OK);

@@ -376,7 +376,7 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
  		//System.out.println("Response Code : " + responseCode);
 
  		if(responseCode == 200) {
- 			 addPageMessage("Upload and import file sucessfully!");
+ 			 addPageMessage("Upload and import file successfully!");
  		}else {
  			addPageMessage(con.getResponseMessage());
  		}
