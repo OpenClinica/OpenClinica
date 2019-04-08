@@ -314,19 +314,19 @@ public class StudyParticipantController {
                 errors.reject("errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");
             }
 
-            if (subjectTransferBean.getFirstName().length()>35){
+            if (subjectTransferBean.getFirstName()!=null && subjectTransferBean.getFirstName().length()>35){
 				errors.reject("errorCode.firsName","First name length should not exceed 35 characters");
 			}
-			if (subjectTransferBean.getLastName().length()>35){
+			if (subjectTransferBean.getLastName()!=null && subjectTransferBean.getLastName().length()>35){
 				errors.reject("errorCode.lastName","Last name length should not exceed 35 characters");
 			}
-			if (subjectTransferBean.getIdentifier().length()>35){
+			if (subjectTransferBean.getIdentifier()!=null && subjectTransferBean.getIdentifier().length()>35){
 				errors.reject("errorCode.identifier","Identifier length should not exceed 35 characters");
 			}
-			if (subjectTransferBean.getEmailAddress().length()>255){
+			if (subjectTransferBean.getEmailAddress()!=null &&  subjectTransferBean.getEmailAddress().length()>255){
 				errors.reject("errorCode.emailAddress","Email Address length should not exceed 255 characters");
 			}
-			if (subjectTransferBean.getPhoneNumber().length()>15){
+			if (subjectTransferBean.getPhoneNumber()!=null && subjectTransferBean.getPhoneNumber().length()>15){
 				errors.reject("errorCode.phoneNumber","Phone number length should not exceed 15 characters");
 			}
 
