@@ -15,6 +15,7 @@
 <script type="text/javascript" language="JavaScript" src="includes/jmesa/jquery-migrate-1.4.1.js"></script>
 <link rel="stylesheet" type="text/css" href="https://cdn.datatables.net/1.10.16/css/jquery.dataTables.min.css"/>
 <script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/moment.js/2.8.4/moment.min.js"></script>
+<script type="text/JavaScript" language="JavaScript" src="//cdnjs.cloudflare.com/ajax/libs/moment-timezone/0.5.23/moment-timezone-with-data-2012-2022.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/1.10.16/js/jquery.dataTables.min.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/plug-ins/1.10.16/sorting/datetime-moment.js"></script>
 <script type="text/JavaScript" language="JavaScript" src="//cdn.datatables.net/plug-ins/1.10.16/api/fnSortNeutral.js"></script>
@@ -64,6 +65,9 @@
     padding-top: 0.75em;
     padding-left: 1.5em;
   }
+  #tbl-jobs_filter {
+    margin-bottom: 3px;
+  }
   .icon {
     cursor: pointer;
   }
@@ -79,9 +83,6 @@
   <fmt:message key="jobs_description" bundle="${resword}"/>
 </div>
 <br>
-<b>
-  <fmt:message key="jobs_log" bundle="${resword}"/>
-</b>
 <table id="tbl-jobs" class="datatable">
   <thead>
     <tr>
@@ -98,6 +99,12 @@
 </table>
 
 <script>
+$('#jobs-doc').attr('href', '${pageContext.request.contextPath}/pages/swagger-ui.html#/job-controller');
+var dateFormat = 'DD-MMM-YYYY HH:mm:ss Z';
+function formatDate(date) {
+  return moment(date).format(dateFormat);
+}
+$.fn.dataTable.moment(dateFormat);
 var datatable = $('#tbl-jobs').DataTable({
   dom: 'frtilp',
   searching: true,
@@ -121,13 +128,13 @@ var datatable = $('#tbl-jobs').DataTable({
     lengthMenu: '<fmt:message key="results_pagesize" bundle="${resword}"/>'
   }
 });
+$('#tbl-jobs_wrapper').prepend('<b><fmt:message key="jobs_log" bundle="${resword}"/></b>');
 
-if (${atSiteLevel}) {
-  var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oid}/sites/${theSite.oid}/jobs';  
-}
-else {
-  var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oid}/jobs';  
-}
+var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oid}';
+var siteOid = '${atSiteLevel ? theSite.oid : null}';
+if (siteOid)
+  url += '/sites/' + siteOid;
+url += '/jobs';
 jQuery.ajax({
   type: 'get',
   url: url,
@@ -136,10 +143,10 @@ jQuery.ajax({
       return [
         logEntry.sourceFileName,
         logEntry.type,
-        logEntry.dateCreated,
+        formatDate(logEntry.dateCreated),
         logEntry.createdByUsername,
-        logEntry.dateCompleted,
-        '<span class="icon icon-download" data-uuid="' + logEntry.uuid + '"></span> ' + 
+        formatDate(logEntry.dateCompleted),
+        '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ' + 
         '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>'
       ];
     }));
@@ -147,6 +154,23 @@ jQuery.ajax({
   },
   error: function() {
     console.log(arguments);
+  }
+});
+
+$('#tbl-jobs').on('click', '.icon-trash', function() {
+  if(confirm('<fmt:message key="jobs_del_confirm" bundle="${resword}"/>')) {
+    var uuid = $(this).data('uuid');
+    var url = '${pageContext.request.contextPath}/pages/auth/api/jobs/' + uuid;
+    jQuery.ajax({
+      type: 'delete',
+      url: url,
+      success: function() {
+        window.location.reload();
+      },
+      error: function() {
+        alert('<fmt:message key="jobs_del_failed" bundle="${resword}"/>');
+      }
+    });
   }
 });
 </script>
