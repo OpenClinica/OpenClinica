@@ -75,6 +75,8 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     private SchemaServiceDao schemaServiceDao;
     @Autowired
     private UserAccountDao userAccountDao;
+    @Autowired
+    private UtilService utilService;
 
     @Autowired
     private RestfulServiceHelper serviceHelper;
@@ -435,6 +437,7 @@ public class StudyBuildServiceImpl implements StudyBuildService {
     }
 
     public void updateParticipateModuleStatusInOC(String accessToken, String studyOid) {
+        utilService.setSchemaFromStudyOid(studyOid);
         Study study = studyDao.findByOcOID(studyOid);
         if (study.getStudy() != null)
             study = study.getStudy();
