@@ -454,6 +454,26 @@ public class StudySubjectDAO<K extends String, V extends ArrayList> extends Audi
         return answer;
     }
 
+  
+    public StudySubjectBean findByLabelAndOnlyByStudy(String label, StudyBean study) {
+        StudySubjectBean answer = new StudySubjectBean();
+        this.setTypesExpected();
+
+        HashMap variables = new HashMap();
+        variables.put(new Integer(1), label);
+        variables.put(new Integer(2), new Integer(study.getId()));      
+
+        String sql = digester.getQuery("findByLabelAndOnlyByStudy");
+
+        ArrayList alist = this.select(sql, variables);
+        Iterator it = alist.iterator();
+
+        if (it.hasNext()) {
+            answer = (StudySubjectBean) this.getEntityFromHashMap((HashMap) it.next());
+        }
+
+        return answer;
+    }
     /**
      * Finds a study subject which has the same label provided in the same study
      *

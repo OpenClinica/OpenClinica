@@ -158,6 +158,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, siteOID);
 	    	}else {
 	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, null);
+	    			    		    		
 	    	}
 	    	
 	        if (errMsg != null) {  
@@ -169,8 +170,8 @@ public class StudyEventServiceImpl implements StudyEventService {
 	         *  Step 3: check Subject/Participant              	
 	         */
 	        StudySubjectDAO sdao = this.getMsStudySubjectDAO();       
-	     
-	        studySubject = (StudySubjectBean) sdao.findByLabelAndStudy(participantId, currentStudy);
+	    	//OC-10575 check participant level-- study or site
+	        studySubject = (StudySubjectBean) sdao.findByLabelAndOnlyByStudy(participantId, currentStudy);
 	        if(studySubject == null || (studySubject.getId() == 0 && studySubject.getLabel().trim().length() == 0)) {
 	        	errMsg = "The study subject {" + studySubjectKey +"} can not be found in the system.";
 	        	logger.info(errMsg);

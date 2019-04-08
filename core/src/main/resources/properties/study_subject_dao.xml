@@ -206,6 +206,16 @@
 		</sql>
 	</query>
 	<query>
+		<name>findByLabelAndOnlyByStudy</name>
+		<sql>
+			SELECT ss.*
+			FROM study_subject ss, study st
+			WHERE ss.label=?
+				AND ss.study_id=st.study_id
+				AND st.study_id=?
+		</sql>
+	</query>
+	<query>
 		<name>findByLabel</name>
 		<sql>
 			SELECT ss.*
