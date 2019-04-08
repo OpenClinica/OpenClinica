@@ -383,32 +383,18 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
 
     private StudySubject saveOrUpdateStudySubjectDetails(StudySubjectBean studySubjectBean, SubjectTransferBean subjectTransfer, String accessToken, String studyOid , UserAccountBean userAccountBean) {
         StudySubject studySubject = studySubjectHibDao.findById(studySubjectBean.getId());
-        String firstNameOldValue = "";
-        String lastNameOldValue = "";
-        String emailOldValue = "";
-        String phoneOldValue = "";
-        String identifierOldValue = "";
-
 
         StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
 
-
         if (studySubjectDetail == null) {
             studySubjectDetail = new StudySubjectDetail();
-        } else {
-            firstNameOldValue = studySubjectDetail.getFirstName();
-            lastNameOldValue = studySubjectDetail.getLastName();
-            emailOldValue = studySubjectDetail.getEmail();
-            phoneOldValue = studySubjectDetail.getPhone();
-            identifierOldValue = studySubjectDetail.getIdentifier();
         }
 
-
-        studySubjectDetail.setFirstName(subjectTransfer.getFirstName());
-        studySubjectDetail.setLastName(subjectTransfer.getLastName());
-        studySubjectDetail.setIdentifier(subjectTransfer.getIdentifier());
-        studySubjectDetail.setEmail(subjectTransfer.getEmailAddress());
-        studySubjectDetail.setPhone(subjectTransfer.getPhoneNumber());
+        studySubjectDetail.setFirstName(subjectTransfer.getFirstName()!=null? subjectTransfer.getFirstName():"");
+        studySubjectDetail.setLastName(subjectTransfer.getLastName()!=null? subjectTransfer.getLastName():"");
+        studySubjectDetail.setEmail(subjectTransfer.getEmailAddress()!=null? subjectTransfer.getEmailAddress():"");
+        studySubjectDetail.setPhone(subjectTransfer.getPhoneNumber()!=null? subjectTransfer.getPhoneNumber():"");
+        studySubjectDetail.setIdentifier(subjectTransfer.getIdentifier()!=null? subjectTransfer.getIdentifier():"");
 
         studySubject.setStudySubjectDetail(studySubjectDetail);
 
