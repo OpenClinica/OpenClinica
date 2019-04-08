@@ -289,6 +289,8 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 if (iGroup != null) {
                     saveOrUpdateRepeatCount(container, itemName, itemValue);
                 }
+                logger.error("Field Submission failed ");
+                throw new Exception(" Field Submission failed due to Item '"+itemName+ "' does not exist in form");
             }
         }
     }

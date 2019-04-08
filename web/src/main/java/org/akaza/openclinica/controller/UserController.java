@@ -29,10 +29,13 @@ import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudyEnvEnum;
 import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLRequest;
-import org.akaza.openclinica.web.util.ErrorConstants;
+import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.akaza.openclinica.web.util.HeaderUtil;
 import org.apache.commons.codec.binary.Base64;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -195,49 +198,51 @@ public class UserController {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
         Study tenantSite = getTenantStudy(siteOid);
-
-
-        if (!validateService.isStudyOidValid(studyOid)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_STUDY_OID, "InValid StudyOID. The StudyOID is invalid or does not exist")).body(null);
-        }
-        if (!validateService.isStudyOidValidStudyLevelOid(studyOid)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_STUDY_OID_AS_STUDY, "InValid StudyOID. The StudyOID should have a Study Level Oid")).body(null);
-        }
-        if (!validateService.isSiteOidValid(siteOid)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_SITE_OID, "InValid SiteOID. The SiteOID is invalid or does not exist")).body(null);
-        }
-        if (!validateService.isSiteOidValidSiteLevelOid(siteOid)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INVALID_SITE_OID_AS_SITE, "InValid SiteOID. The SiteOID should have a Site Level Oid")).body(null);
-        }
-        if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_MISMATCH_STUDY_OID_AND_SITE_OID, "Mismatch StudyOID and SiteOID. The StudyOID and SiteOID relation is invalid")).body(null);
-        }
-
+        ResponseEntity<Object> response = null;
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
-        if (!validateService.isUserHasCrcOrInvestigaterRole(userRoles)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INCORRECT_USER_ROLE, "Incorrect User Role. The user role should be either a CRC or an Investigator")).body(null);
-        }
-
-        if (!validateService.isUserRoleHasAccessToSite(userRoles, siteOid)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_MISMATCH_USER_ROLE_AND_SITE, "Mismatch User Role and Site. The user role does not have permission to access this site")).body(null);
-        }
-
-
-        if (!validateService.isParticipateActive(tenantStudy)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_PARTICIAPTE_INACTIVE, "Participate is Inactive. Participate module for the study is inactive")).body(null);
+        try {
+            if (!validateService.isStudyOidValid(studyOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
+            }
+            if (!validateService.isStudyOidValidStudyLevelOid(studyOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
+            }
+            if (!validateService.isSiteOidValid(siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
+            }
+            if (!validateService.isSiteOidValidSiteLevelOid(siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
+            }
+            if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
+            }
+            if (!validateService.isUserHasCrcOrInvestigaterRole(userRoles)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+            }
+            if (!validateService.isUserRoleHasAccessToSite(userRoles, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+            }
+            if (!validateService.isParticipateActive(tenantStudy)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
+            }
+        } catch (OpenClinicaSystemException e) {
+            String errorMsg = e.getErrorCode();
+            HashMap<String, String> map = new HashMap<>();
+            map.put("studyOid", studyOid);
+            map.put("siteOid", siteOid);
+            org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM responseDTO = new ParameterizedErrorVM(errorMsg, map);
+            response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+            return response;
         }
 
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
       String uuid= startExtractJob( studyOid,  siteOid,  accessToken,  customerUuid,  userAccountBean);
-         if(uuid==null){
-             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_JOB_FAILED, "Job Failed. Job did not complete")).body(null);
-         }
 
-        logger.info("REST request to POST OCUserDTO ");
+        logger.info("REST request to Extract Participants info ");
         return new ResponseEntity<Object>("job uuid: "+uuid,HttpStatus.OK);
     }
 
@@ -282,7 +287,7 @@ public class UserController {
         Study site = studyDao.findByOcOID(siteOid);
         Study study = studyDao.findByOcOID(studyOid);
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
-        JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount);
+        JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount, JobType.ACCESS_CODE,null);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
             userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean,schema,jobDetail);
             return null;

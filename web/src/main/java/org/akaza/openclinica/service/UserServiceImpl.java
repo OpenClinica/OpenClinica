@@ -227,8 +227,8 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    @Transactional(propagation = Propagation.REQUIRES_NEW)
-    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean,String schema,JobDetail jobDetail) {
+    @Transactional
+    public void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail) {
 
         CoreResources.setRequestSchema(schema);
 
@@ -241,28 +241,32 @@ public class UserServiceImpl implements UserService {
         // Get all list of StudySubjects by studyId
         List<StudySubject> studySubjects = studySubjectDao.findAllByStudy(site.getStudyId());
         List<OCUserDTO> userDTOS = new ArrayList<>();
+        String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
 
-        for (StudySubject studySubject : studySubjects) {
-            // subject is not removed or auto-removed
-            if (!studySubject.getStatus().equals(Status.DELETED)
-                    && !studySubject.getStatus().equals(Status.AUTO_DELETED)) {
+        try {
+            for (StudySubject studySubject : studySubjects) {
+                // subject is not removed or auto-removed
+                if (!studySubject.getStatus().equals(Status.DELETED)
+                        && !studySubject.getStatus().equals(Status.AUTO_DELETED)) {
 
-                OCUserDTO userDTO = buildOcUserDTO(studySubject);
-                //Get accessToken from Keycloak
+                    OCUserDTO userDTO = buildOcUserDTO(studySubject);
+                    //Get accessToken from Keycloak
 
 
-                ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean);
-                if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null) {
-                    userDTO.setAccessCode(participantAccessDTO.getAccessCode());
+                    ParticipantAccessDTO participantAccessDTO = getAccessInfo(accessToken, siteOid, studySubject.getLabel(), customerUuid, userAccountBean);
+                    if (participantAccessDTO != null && participantAccessDTO.getAccessCode() != null) {
+                        userDTO.setAccessCode(participantAccessDTO.getAccessCode());
+                    }
+                    userDTOS.add(userDTO);
                 }
-                userDTOS.add(userDTO);
             }
+            // add a new method to write this object into text file
+            writeToFile(userDTOS, studyOid, fileName);
+        } catch (Exception e) {
+            persistJobFailed(jobDetail, fileName);
+            logger.error(" Access code Job Creation Failed ");
         }
-        // add a new method to write this object into text file
-        String fileName = study.getUniqueIdentifier()+ DASH+study.getEnvType()+ PARTICIPANT_ACCESS_CODE + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
-        writeToFile(userDTOS, studyOid, fileName);
-
-        persistJobCompleted(jobDetail,fileName);
+        persistJobCompleted(jobDetail, fileName);
     }
 
     public OCUserDTO getParticipantAccount(String studyOid, String ssid, String accessToken) {
@@ -540,8 +544,7 @@ public class UserServiceImpl implements UserService {
 
 
     private void writeToFile(List<OCUserDTO> userDTOs, String studyOid, String fileName) {
-        String filePath = getFilePath() + File.separator + fileName;
-
+        String filePath = getFilePath(JobType.ACCESS_CODE) + File.separator + fileName;
 
         File file = new File(filePath);
 
@@ -562,18 +565,15 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private String getFileLocation(String fileName) {
-        String fileLocation = getFilePath() + File.separator + fileName;
-        return fileLocation;
-    }
 
-    private String getFilePath() {
-      String path= CoreResources.getField("filePath") + BULK_JOBS;
-      File file = new File(path);
-        if (!file.exists()) {
-            file.mkdir();
+
+    public String getFilePath(JobType jobType) {
+      String dirPath= CoreResources.getField("filePath") + BULK_JOBS+ File.separator+ jobType.toString().toLowerCase();
+      File directory = new File(dirPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
         }
-        return path;
+        return dirPath;
     }
 
     private PrintWriter openFile(File file) throws FileNotFoundException, UnsupportedEncodingException {
@@ -590,21 +590,21 @@ public class UserServiceImpl implements UserService {
     private String writeToTextFile(List<OCUserDTO> userDTOS) {
 
         StringBuffer stringBuffer = new StringBuffer();
-        stringBuffer.append("Participant Id");
+        stringBuffer.append("ParticipantId");
         stringBuffer.append(SEPERATOR);
         stringBuffer.append("First Name");
         stringBuffer.append(SEPERATOR);
         stringBuffer.append("Last Name");
         stringBuffer.append(SEPERATOR);
-        stringBuffer.append("Email Address");
+        stringBuffer.append("Email");
         stringBuffer.append(SEPERATOR);
-        stringBuffer.append("Phone Number");
+        stringBuffer.append("Mobile");
         stringBuffer.append(SEPERATOR);
         stringBuffer.append("Identifier");
         stringBuffer.append(SEPERATOR);
         stringBuffer.append("Access Code");
         stringBuffer.append(SEPERATOR);
-        stringBuffer.append("Participant Status");
+        stringBuffer.append("Participate Status");
         stringBuffer.append('\n');
         for (OCUserDTO userDTO : userDTOS) {
             stringBuffer.append(userDTO.getParticipantId() != null ? userDTO.getParticipantId() : "");
@@ -641,27 +641,33 @@ public class UserServiceImpl implements UserService {
         return auditLogEventDTO;
     }
 
-    public JobDetail persistJobCreated(Study study, Study site, UserAccount createdBy) {
+    public JobDetail persistJobCreated(Study study, Study site, UserAccount createdBy,JobType jobType,String sourceFileName) {
         JobDetail jobDetail = new JobDetail();
         jobDetail.setCreatedBy(createdBy);
         jobDetail.setDateCreated(new Date());
         jobDetail.setSite(site);
         jobDetail.setStudy(study);
         jobDetail.setStatus(JobStatus.IN_PROGRESS);
-        jobDetail.setType(JobType.ACCESS_CODE);
+        jobDetail.setType(jobType);
         jobDetail.setUuid(UUID.randomUUID().toString());
+        jobDetail.setSourceFileName(sourceFileName);
         return jobService.saveOrUpdateJob(jobDetail);
     }
 
 
-    private void persistJobCompleted(JobDetail jobDetail, String fileName) {
+    public void persistJobCompleted(JobDetail jobDetail, String fileName) {
         jobDetail.setLogPath(fileName);
         jobDetail.setDateCompleted(new Date());
         jobDetail.setStatus(JobStatus.COMPLETED);
         jobDetail =jobService.saveOrUpdateJob(jobDetail);
     }
 
-
+    public void persistJobFailed(JobDetail jobDetail,String fileName) {
+        jobDetail.setLogPath(fileName);
+        jobDetail.setDateCompleted(new Date());
+        jobDetail.setStatus(JobStatus.FAILED);
+        jobDetail =jobService.saveOrUpdateJob(jobDetail);
+    }
 
 
 

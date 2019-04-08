@@ -8,6 +8,7 @@ import java.util.List;
 
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.SubjectEventStatus;
+import org.akaza.openclinica.core.util.EncryptionUtil;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.EventCrf;
@@ -87,6 +88,7 @@ public class EnketoAPI {
 
     public static final String SURVEY_WRITABLE_PARTICIPATE = "/oc/api/v1/survey/collect/participant";
     public static final String INSTANCE_WRITABLE_PARTICIPATE = "/oc/api/v1/instance/edit/participant";
+    public static final String DATABASE_ID_ENCRYPTION_KEY_PROPERTY = "databaseIdEncryptionKey";
 
     private String userPasswdCombo;
 
@@ -610,11 +612,15 @@ public class EnketoAPI {
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));
 
             InstanceAttachment attachment = new InstanceAttachment();
+            String databaseIdEncryptionKey = CoreResources.getField(DATABASE_ID_ENCRYPTION_KEY_PROPERTY);
 
             for (FormLayoutMedia media : mediaList) {
                 String fileName = media.getName();
                 String baseUrl = CoreResources.getField("sysURL.base") + "rest2/openrosa/" + studyOid;
-                String downLoadUrl = baseUrl + "/downloadMedia?formLayoutMediaId=" + media.getFormLayoutMediaId();
+                int formLayoutMediaId = media.getFormLayoutMediaId();
+                // Encrypt the form layout media id so we don't expose database ids to users
+                String encryptedFormLayoutMediaId = EncryptionUtil.encryptValue(Integer.toString(formLayoutMediaId), databaseIdEncryptionKey);
+                String downLoadUrl = baseUrl + "/downloadMediaEncrypted?formLayoutMediaId=" + encryptedFormLayoutMediaId;
                 attachment.setAdditionalProperty(fileName, downLoadUrl);
             }
 
@@ -645,5 +651,4 @@ public class EnketoAPI {
         EnketoFormResponse enketoFormResponse = new EnketoFormResponse(urlResponse, lockOn);
         return enketoFormResponse;
     }
-
 }

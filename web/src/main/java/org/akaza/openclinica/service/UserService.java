@@ -9,6 +9,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.cdisc.ns.odm.v130.ODM;
 import org.springframework.http.HttpMethod;
@@ -38,9 +39,14 @@ public interface UserService {
 
     List<OCUserDTO> searchParticipantsByFields(String studyOid, String accessToken, String participantId, String firstName, String lastName, String identifier, UserAccountBean userAccountBean);
 
-    void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean,String schema,JobDetail jobDetail);
+    void extractParticipantsInfo(String studyOid, String siteOid, String accessToken, String customerUuid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail);
 
-    JobDetail persistJobCreated(Study study, Study site, UserAccount createdBy);
+    JobDetail persistJobCreated(Study study, Study site, UserAccount createdBy, JobType jobType, String sourceFileName);
 
+    void persistJobCompleted(JobDetail jobDetail, String fileName);
+
+    void persistJobFailed(JobDetail jobDetail,String fileName);
+
+    String getFilePath(JobType jobType);
 
 }

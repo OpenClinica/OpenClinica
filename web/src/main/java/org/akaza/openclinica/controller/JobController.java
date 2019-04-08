@@ -9,6 +9,8 @@ import org.akaza.openclinica.dao.hibernate.JobDetailDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.enumsupport.JobType;
+import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.JobService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.UtilService;
@@ -155,14 +157,17 @@ public class JobController {
     @ApiOperation( value = "To download job files ", notes = "Will download job file" )
     @RequestMapping( value = "/jobs/{uuid}/downloadFile", method = RequestMethod.GET )
     public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable( "uuid" ) String uuid, HttpServletResponse response) throws Exception {
+        UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
+         Study publicStudy = studyDao.findPublicStudyById(userAccountBean.getActiveStudyId());
+         utilService.setSchemaFromStudyOid(publicStudy.getOc_oid());
+
         JobDetail jobDetail=jobDetailDao.findByUuid(uuid);
-        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         if (jobDetail.getCreatedBy().getUserId() != userAccountBean.getId()) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INCORRECT_USER, "Incorrect User. The user is not the owner of this log file")).body(null);
         }
         InputStream inputStream = null;
         try {
-            String logFileName = getFilePath() + File.separator + jobDetail.getLogPath();
+            String logFileName = getFilePath(jobDetail.getType()) + File.separator + jobDetail.getLogPath();
             File fileToDownload = new File(logFileName);
             inputStream = new FileInputStream(fileToDownload);
             response.setContentType("application/force-download");
@@ -187,8 +192,8 @@ public class JobController {
 
     }
 
-    private String getFilePath() {
-        return CoreResources.getField("filePath") + userService.BULK_JOBS;
+    private String getFilePath(JobType jobType) {
+        return CoreResources.getField("filePath") + userService.BULK_JOBS + File.separator+jobType.toString().toLowerCase();
     }
 
 
@@ -202,6 +207,9 @@ public class JobController {
     public ResponseEntity<Void> deleteJob(HttpServletRequest request, @PathVariable String uuid) {
         logger.debug("REST request to delete Job : {}", uuid);
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+        Study publicStudy = studyDao.findPublicStudyById(userAccountBean.getActiveStudyId());
+        utilService.setSchemaFromStudyOid(publicStudy.getOc_oid());
+
         JobDetail jobDetail = jobDetailDao.findByUuid(uuid);
         if (jobDetail.getCreatedBy().getUserId() != userAccountBean.getId()) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INCORRECT_USER, "Incorrect User. The user is not the owner of this log file")).body(null);
