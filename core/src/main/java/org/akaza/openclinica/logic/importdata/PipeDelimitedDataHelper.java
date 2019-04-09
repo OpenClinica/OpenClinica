@@ -929,8 +929,8 @@ private  ImportItemGroupDTO  convertToImportItemGroupDTO(String[] keyValueStr) {
 			String itemOID = itemMappingvalue[1];
 			 
 			importItemGroupDTO = new ImportItemGroupDTO();
-			importItemGroupDTO.setItemGroupOID(itemGroupOID);
-			importItemGroupDTO.getItemOIDs().add(itemOID);			 				        
+			importItemGroupDTO.setItemGroupOID(itemGroupOID.trim());
+			importItemGroupDTO.getItemOIDs().add(itemOID.trim());			 				        
 	     }
 	     
 	    return importItemGroupDTO;
