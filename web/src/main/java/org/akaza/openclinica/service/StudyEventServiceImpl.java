@@ -271,7 +271,7 @@ public class StudyEventServiceImpl implements StudyEventService {
         /**
          *  no any error, reply successful response
          */	           	            
-        message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " sucessfully.";
+        message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " successfully.";
         responseDTO.setMessage(message);
 
         return responseDTO;
@@ -497,7 +497,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
         /**
          *  no any error, reply successful response
          */	           	            
-        message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " sucessfully.";
+        message = "Scheduled event " + studyEventOID + " for participant "+ participantId + " in study " + studyOID + " successfully.";
         responseDTO.setMessage(message);
 
         return responseDTO;

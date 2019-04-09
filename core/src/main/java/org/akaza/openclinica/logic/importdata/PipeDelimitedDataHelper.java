@@ -61,6 +61,8 @@ import org.akaza.openclinica.dao.submit.ItemGroupDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.service.crfdata.ErrorObj;
+import org.akaza.openclinica.service.rest.errors.ErrorConstants;
 import org.springframework.web.multipart.MultipartFile;
 import org.w3c.dom.Attr;
 import org.w3c.dom.Document;
@@ -768,16 +770,16 @@ public String readFileToString(File file) throws IOException{
 	       			 String keyWord = mappingRow[0];
 	           		 String value = mappingRow[1];
 	           		 if(keyWord != null && keyWord.trim().startsWith("FormOID") && value != null && value.trim().length() >0) {
-	           			formOIDValue = value;
+	           			formOIDValue = value.trim();
 	           			foundFormOID=true;
 	           		 }else if(keyWord != null && keyWord.trim().startsWith("FormVersion") && value != null && value.trim().length() >0) {
-	           			formVersionValue = value;
+	           			formVersionValue = value.trim();
 	           			foundFormVersion=true;
 	                 }else if(keyWord != null && keyWord.trim().startsWith("StudyOID") && value != null && value.trim().length() >0) {
-	                	 studyOIDValue = value;
+	                	 studyOIDValue = value.trim();
 	           			foundStudyOID=true;
 	            	 }else if(keyWord != null && keyWord.trim().startsWith("StudyEventOID") && value != null && value.trim().length() >0) {
-	            		 studyEventOIDValue = value;
+	            		 studyEventOIDValue = value.trim();
 	           			foundStudyEventOID=true;
 	            	 } else if(keyWord != null && (keyWord.trim().startsWith("SkipMatchCriteria") ||  keyWord.trim().indexOf("SkipMatchCriteria") ==1 ) ) {
 	            		//check SkipMatchCriteria format
@@ -829,9 +831,9 @@ public String readFileToString(File file) throws IOException{
         
         // check against current system/DB
         errorMsgs.clear();
-        errorMsgs = this.validateStudyMetadata(formOIDValue, formVersionValue, studyOIDValue, studyEventOIDValue, importItemGroupDTOs, null);
-        if(errorMsgs.size() >0) {
-        	throw new OpenClinicaSystemException("errorCode.ItemOrItemGroupOIDValidationFailed", errorMsgs.toString());
+        ArrayList<ErrorObj> errors = this.validateStudyMetadata(formOIDValue, formVersionValue, studyOIDValue, studyEventOIDValue, importItemGroupDTOs, null);
+        if(errors.size() >0) {
+        	throw new OpenClinicaSystemException(errors.get(0).getCode(), errors.get(0).getMessage());
         }
         
 	 }
@@ -927,8 +929,8 @@ private  ImportItemGroupDTO  convertToImportItemGroupDTO(String[] keyValueStr) {
 			String itemOID = itemMappingvalue[1];
 			 
 			importItemGroupDTO = new ImportItemGroupDTO();
-			importItemGroupDTO.setItemGroupOID(itemGroupOID);
-			importItemGroupDTO.getItemOIDs().add(itemOID);			 				        
+			importItemGroupDTO.setItemGroupOID(itemGroupOID.trim());
+			importItemGroupDTO.getItemOIDs().add(itemOID.trim());			 				        
 	     }
 	     
 	    return importItemGroupDTO;
@@ -978,15 +980,16 @@ private String validateSkipMatchCriteriaFormat(String[] keyValueStr) {
 }
 
 
-public ArrayList<String> validateStudyMetadata(String formOIDValue,
+public ArrayList<ErrorObj> validateStudyMetadata(String formOIDValue,
 										  String formVersionValue,
 										  String studyOIDValue,
 										  String studyEventOIDValue,
 										  ArrayList<ImportItemGroupDTO> importItemGroupDTOs,
 										  Locale newLocale) {
   
-	ArrayList<String> errors = new ArrayList<String>();
+	ArrayList<ErrorObj> errors = new ArrayList<ErrorObj>();
     Locale locale;
+    ErrorObj eo;
     if(newLocale !=null) {
     	locale = newLocale;
     }else {
@@ -1004,12 +1007,14 @@ public ArrayList<String> validateStudyMetadata(String formOIDValue,
         if (studyBean == null) {
             mf.applyPattern(respage.getString("your_study_oid_does_not_reference_an_existing"));
             Object[] arguments = { studyOid };
-            errors.add(mf.format(arguments)); 
+            eo = new ErrorObj(ErrorConstants.ERR_STUDY_NOT_EXIST,mf.format(arguments));
+            errors.add(eo); 
             
         } else if (!CoreResources.isPublicStudySameAsTenantStudy(studyBean, studyOid, ds)) {
             mf.applyPattern(respage.getString("your_current_study_is_not_the_same_as"));
             Object[] arguments = { studyBean.getName() };           
-            errors.add(mf.format(arguments));
+            eo = new ErrorObj(ErrorConstants.ERR_STUDY_NOT_EXIST,mf.format(arguments));
+            errors.add(eo); 
         }
       
         // check 2:study event
@@ -1028,7 +1033,8 @@ public ArrayList<String> validateStudyMetadata(String formOIDValue,
         if (studyEventDefintionBean == null) {
             mf.applyPattern(respage.getString("your_study_event_oid_for_study_oid"));
             Object[] arguments = { sedOid, studyOid };
-            errors.add(mf.format(arguments));        
+            eo = new ErrorObj(ErrorConstants.ERR_EVENT_NOT_EXIST,mf.format(arguments));
+            errors.add(eo);         
         }
 
                        
@@ -1042,7 +1048,8 @@ public ArrayList<String> validateStudyMetadata(String formOIDValue,
             if (edcBean == null || edcBean.getId() == 0) {
                 mf.applyPattern(respage.getString("your_form_oid_for_study_event_oid"));
                 Object[] arguments = { formOid, sedOid };
-                errors.add(mf.format(arguments));
+                eo = new ErrorObj(ErrorConstants.ERR_EVENT_NOT_EXIST,mf.format(arguments));
+                errors.add(eo); 
             }
         }
 
@@ -1051,12 +1058,14 @@ public ArrayList<String> validateStudyMetadata(String formOIDValue,
             if (formLayoutBean == null || formLayoutBean.getId() == 0) {
                 mf.applyPattern(respage.getString("your_form_layout_oid_for_form_oid"));
                 Object[] arguments = { formLayoutName, formOid };
-                errors.add(mf.format(arguments));
+                eo = new ErrorObj(ErrorConstants.ERR_FORM_LAYOUT,mf.format(arguments));
+                errors.add(eo); 
             }
         } else {
             mf.applyPattern(respage.getString("your_form_oid_did_not_generate"));
             Object[] arguments = { formOid };
-            errors.add(mf.format(arguments));
+            eo = new ErrorObj(ErrorConstants.ERR_FORM,mf.format(arguments));
+            errors.add(eo);
         }
 
         // check item group and Item OID                       
@@ -1069,12 +1078,14 @@ public ArrayList<String> validateStudyMetadata(String formOIDValue,
                     if (itemGroupBean == null) {
                         mf.applyPattern(respage.getString("your_item_group_oid_for_form_oid"));
                         Object[] arguments = { itemGroupOID, formOid };
-                        errors.add(mf.format(arguments));
+                        eo = new ErrorObj(ErrorConstants.ERR_ITEM_GROUP_OID,mf.format(arguments));
+                        errors.add(eo);
                     }
                 } else if (itemGroupBean == null) {
                     mf.applyPattern(respage.getString("the_item_group_oid_did_not"));
                     Object[] arguments = { itemGroupOID };
-                    errors.add(mf.format(arguments));
+                    eo = new ErrorObj(ErrorConstants.ERR_ITEM_GROUP_OID,mf.format(arguments));
+                    errors.add(eo);
                 }
 
                 ArrayList<String> itemOIDs = importItemGroupDTO.getItemOIDs();
@@ -1087,12 +1098,14 @@ public ArrayList<String> validateStudyMetadata(String formOIDValue,
                             if (itemBean == null) {
                                 mf.applyPattern(respage.getString("your_item_oid_for_item_group_oid"));
                                 Object[] arguments = { itemOID, itemGroupOID };
-                                errors.add(mf.format(arguments));
+                                eo = new ErrorObj(ErrorConstants.ERR_ITEM_OID,mf.format(arguments));
+                                errors.add(eo);
                             }
                         } else if (itemBeans.size() == 0) {
                             mf.applyPattern(respage.getString("the_item_oid_did_not"));
                             Object[] arguments = { itemOID };
-                            errors.add(mf.format(arguments));
+                            eo = new ErrorObj(ErrorConstants.ERR_ITEM_OID,mf.format(arguments));
+                            errors.add(eo);
                         }
                     } // itemOID
                 } // if (itemOIDs != null)
