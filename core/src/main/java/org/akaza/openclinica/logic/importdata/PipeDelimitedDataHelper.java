@@ -770,16 +770,16 @@ public String readFileToString(File file) throws IOException{
 	       			 String keyWord = mappingRow[0];
 	           		 String value = mappingRow[1];
 	           		 if(keyWord != null && keyWord.trim().startsWith("FormOID") && value != null && value.trim().length() >0) {
-	           			formOIDValue = value;
+	           			formOIDValue = value.trim();
 	           			foundFormOID=true;
 	           		 }else if(keyWord != null && keyWord.trim().startsWith("FormVersion") && value != null && value.trim().length() >0) {
-	           			formVersionValue = value;
+	           			formVersionValue = value.trim();
 	           			foundFormVersion=true;
 	                 }else if(keyWord != null && keyWord.trim().startsWith("StudyOID") && value != null && value.trim().length() >0) {
-	                	 studyOIDValue = value;
+	                	 studyOIDValue = value.trim();
 	           			foundStudyOID=true;
 	            	 }else if(keyWord != null && keyWord.trim().startsWith("StudyEventOID") && value != null && value.trim().length() >0) {
-	            		 studyEventOIDValue = value;
+	            		 studyEventOIDValue = value.trim();
 	           			foundStudyEventOID=true;
 	            	 } else if(keyWord != null && (keyWord.trim().startsWith("SkipMatchCriteria") ||  keyWord.trim().indexOf("SkipMatchCriteria") ==1 ) ) {
 	            		//check SkipMatchCriteria format
