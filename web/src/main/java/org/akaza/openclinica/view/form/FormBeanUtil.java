@@ -128,11 +128,12 @@ public class FormBeanUtil {
             if (meta.getSectionId() == sectionId) {
                 displayBean.setItem(iBean);
                 ItemDataBean itemDataBean = itemDataDAO.findByItemIdAndEventCRFId(iBean.getId(), eventCrfBean.getId());//findByItemIdAndEventCRFIdAndOrdinal(iBean.getId(), eventCrfBean.getId(), ordinal)
+                ItemDataBean itemDataBeanCopyForForm = createItemDataBeanCopyForForm(itemDataBean);
                 // null values is set by adding the event def. crf bean, but
                 // here we have taken a different approach, tbh
                 // displayBean.setEventDefinitionCRF();
                 displayBean.setMetadata(runDynamicsCheck(meta, eventCrfBean, itemDataBean, context));
-                displayBean.setData(itemDataBean);
+                displayBean.setData(itemDataBeanCopyForForm);
                 displayBean.setDbData(itemDataBean);
                 // System.out.println("just set: " + itemDataBean.getValue() + " from " + itemDataBean.getItemId());
 
@@ -173,7 +174,32 @@ public class FormBeanUtil {
         return disBeans;
     }
 
-    
+	private static ItemDataBean createItemDataBeanCopyForForm(ItemDataBean original) {
+		ItemDataBean copy = new ItemDataBean();
+
+		// copy the values from AuditableEntityBean
+		copy.setCreatedDate(original.getCreatedDate());
+		copy.setUpdatedDate(original.getUpdatedDate());
+		copy.setOwnerId(original.getOwnerId());
+		copy.setOwner(original.getOwner());
+		copy.setUpdaterId(original.getUpdaterId());
+		copy.setUpdater(original.getUpdater());
+		copy.setStatus(original.getStatus());
+
+		// copy the values from EntityBean
+		copy.setName(original.getName());
+		copy.setActive(original.isActive());
+
+		// copy values from ItemDataBean
+		copy.setItemId(original.getItemId());
+		copy.setEventCRFId(original.getEventCRFId());
+		copy.setAuditLog(original.isAuditLog());
+		copy.setSelected(original.isSelected());
+		copy.setOrdinal(original.getOrdinal());
+		copy.setValue(original.getValue());
+
+		return copy;
+    }
     
     public static List<DisplayItemBean> getDisplayBeansFromItemsForPrint(List<ItemBean> itemBeans, 
             DataSource dataSource, 
