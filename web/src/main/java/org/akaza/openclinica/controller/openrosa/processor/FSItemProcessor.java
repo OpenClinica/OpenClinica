@@ -285,13 +285,14 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 ItemGroup iGroup = null;
                 if(lastIndexOf!=-1) {
                     iGroup = itemGroupDao.findByCrfAndGroupLayout(formLayout.getCrf(), itemName.substring(0, lastIndexOf));
+                    if (iGroup != null) {
+                        saveOrUpdateRepeatCount(container, itemName, itemValue);
+                    }
+                }else {
+                    logger.error("Field Submission failed ");
+                    throw new Exception(" Field Submission failed due to Item '" + itemName + "' does not exist in form");
                 }
-                if (iGroup != null) {
-                    saveOrUpdateRepeatCount(container, itemName, itemValue);
                 }
-                logger.error("Field Submission failed ");
-                throw new Exception(" Field Submission failed due to Item '"+itemName+ "' does not exist in form");
-            }
         }
     }
 
