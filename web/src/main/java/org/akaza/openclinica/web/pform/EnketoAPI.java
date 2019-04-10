@@ -12,7 +12,7 @@ import org.springframework.http.HttpEntity;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 import org.springframework.web.client.RestTemplate;
 
 public class EnketoAPI {
@@ -101,8 +101,8 @@ public class EnketoAPI {
             Calendar cal = Calendar.getInstance();
             cal.setTime(new Date());
             String hashString = ecid + "." + String.valueOf(cal.getTimeInMillis());
-            ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
-            String instanceId = encoder.encodePassword(hashString,null);
+            MessageDigestPasswordEncoder encoder = new MessageDigestPasswordEncoder("SHA-256");
+            String instanceId = encoder.encode(hashString);
 
             URL eURL = new URL(enketoURL + "/api/v1/instance/iframe");
             String userPasswdCombo = new String(Base64.encodeBase64((token + ":").getBytes()));

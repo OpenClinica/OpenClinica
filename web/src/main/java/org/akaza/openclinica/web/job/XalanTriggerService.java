@@ -1,9 +1,11 @@
 package org.akaza.openclinica.web.job;
 
-import org.quartz.JobDataMap;
-import org.quartz.SimpleTrigger;
+import static org.quartz.SimpleScheduleBuilder.simpleSchedule;
+import static org.quartz.TriggerBuilder.newTrigger;
 
 import java.util.Date;
+
+import org.quartz.SimpleTrigger;
 
 public class XalanTriggerService {
     public XalanTriggerService() {
@@ -22,26 +24,23 @@ public class XalanTriggerService {
     public SimpleTrigger generateXalanTrigger(String xslFile, String xmlFile, String sqlFile, int datasetId) {
         Date startDateTime = new Date(System.currentTimeMillis());
         String jobName = xmlFile + datasetId;
-        SimpleTrigger trigger = new SimpleTrigger(jobName, TRIGGER_GROUP_NAME, 1, 1);
         
-        trigger.setStartTime(startDateTime);
-        trigger.setName(jobName);// + datasetId);
-        trigger.setGroup(TRIGGER_GROUP_NAME);// + datasetId);
-        trigger.setMisfireInstruction(SimpleTrigger.MISFIRE_INSTRUCTION_RESCHEDULE_NEXT_WITH_EXISTING_COUNT);
+        SimpleTrigger simpleTrigger = (SimpleTrigger) newTrigger()
+                .forJob(jobName, TRIGGER_GROUP_NAME)
+                .startAt(startDateTime)
+                .withSchedule(simpleSchedule().withRepeatCount(1).withIntervalInSeconds(100)
+                .withMisfireHandlingInstructionNextWithExistingCount());
+        
         // set job data map
-        JobDataMap jobDataMap = new JobDataMap();
 
-        // jobDataMap.put(EMAIL, email);
-        // jobDataMap.put(USER_ID, userAccount.getId());
-        jobDataMap.put(XSL_FILE_PATH, xslFile);
-        jobDataMap.put(XML_FILE_PATH, xmlFile);
-        jobDataMap.put(SQL_FILE_PATH, sqlFile);
-        // jobDataMap.put(DIRECTORY, directory);
-        // jobDataMap.put(ExampleSpringJob.LOCALE, locale);
+        // simpleTrigger.getJobDataMap().put(EMAIL, email);
+        // simpleTrigger.getJobDataMap().put(USER_ID, userAccount.getId());
+        simpleTrigger.getJobDataMap().put(XSL_FILE_PATH, xslFile);
+        simpleTrigger.getJobDataMap().put(XML_FILE_PATH, xmlFile);
+        simpleTrigger.getJobDataMap().put(SQL_FILE_PATH, sqlFile);
+        // simpleTrigger.getJobDataMap().put(DIRECTORY, directory);
+        // simpleTrigger.getJobDataMap().put(ExampleSpringJob.LOCALE, locale);
         
-        trigger.setJobDataMap(jobDataMap);
-        trigger.setVolatility(false);
-        
-        return trigger;
+        return simpleTrigger;
     }
 }

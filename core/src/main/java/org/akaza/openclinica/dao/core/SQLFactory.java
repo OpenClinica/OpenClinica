@@ -18,7 +18,6 @@ import java.util.Set;
 
 import net.sf.ehcache.CacheException;
 import net.sf.ehcache.CacheManager;
-import net.sf.ehcache.hibernate.EhCacheProvider;
 
 import org.akaza.openclinica.dao.cache.EhCacheWrapper;
 import org.springframework.core.io.ResourceLoader;

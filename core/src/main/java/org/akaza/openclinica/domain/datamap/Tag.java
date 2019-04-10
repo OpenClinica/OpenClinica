@@ -21,7 +21,7 @@ import org.hibernate.annotations.Parameter;
 @Entity
 @Table(name = "tag")
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "tag_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "tag_id_seq") })
 public class Tag extends DataMapDomainObject {
 
     private Integer id;

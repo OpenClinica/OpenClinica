@@ -24,7 +24,7 @@ import org.hibernate.annotations.Parameter;
 
 @Entity
 @Table(name = "rule_action_run")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "rule_action_run_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "rule_action_run_id_seq") })
 public class RuleActionRunBean extends AbstractMutableDomainObject implements Serializable{
 
     Boolean administrativeDataEntry;

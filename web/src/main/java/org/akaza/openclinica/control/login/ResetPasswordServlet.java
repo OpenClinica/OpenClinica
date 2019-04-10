@@ -91,7 +91,7 @@ public class ResetPasswordServlet extends SecureController {
         request.setAttribute("userBean1", ubForm);
         
         SecurityManager sm = ((SecurityManager) SpringServletAccess.getApplicationContext(context).getBean("securityManager"));
- if (!sm.isPasswordValid(ub.getPasswd(), oldPwd, getUserDetails())) {         
+ if (!sm.verifyPassword(oldPwd, getUserDetails())) {         
 		 Validator.addError(errors, "oldPasswd", resexception.getString("wrong_old_password"));
             request.setAttribute("formMessages", errors);
            
