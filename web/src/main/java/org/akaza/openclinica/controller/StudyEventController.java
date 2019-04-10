@@ -56,6 +56,7 @@ import org.akaza.openclinica.service.CustomRuntimeException;
 import org.akaza.openclinica.service.ParticipateService;
 import org.akaza.openclinica.service.StudyEventService;
 import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
@@ -123,6 +124,9 @@ public class StudyEventController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+    private UtilService utilService;
 
     PassiveExpiringMap<String, Future<ResponseEntity<Object>>> expiringMap =
             new PassiveExpiringMap<>(24, TimeUnit.HOURS);
@@ -272,7 +276,9 @@ public class StudyEventController {
 			@PathVariable("siteOID") String siteOID) throws Exception {
 		
     	ResponseEntity response = null;
-    	
+    	utilService.setSchemaFromStudyOid(studyOID);
+        String schema = CoreResources.getRequestSchema();
+         
     	response= checkFileFormat(file);
     	if(response != null) {
     		return response;
@@ -286,7 +292,7 @@ public class StudyEventController {
 		JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount, JobType.SCHEDULE_EVENT,file.getOriginalFilename());
 
     	 CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
-    		 return scheduleEvent(request,file, study, siteOID,ub,jobDetail);
+    		 return scheduleEvent(request,file, study, siteOID,ub,jobDetail,schema);
     	 });
 
 		String uuid = jobDetail.getUuid();
@@ -338,6 +344,8 @@ public class StudyEventController {
 			@PathVariable("studyOID") String studyOID) throws Exception {
     	
         ResponseEntity response = null;
+        utilService.setSchemaFromStudyOid(studyOID);
+        String schema = CoreResources.getRequestSchema();
     	
     	response= checkFileFormat(file);
     	if(response != null) {
@@ -351,7 +359,7 @@ public class StudyEventController {
 		JobDetail jobDetail= userService.persistJobCreated(study, null, userAccount, JobType.SCHEDULE_EVENT,file.getOriginalFilename());
 
     	 CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
-    		 return scheduleEvent(request,file, study, null, ub,jobDetail);
+    		 return scheduleEvent(request,file, study, null, ub,jobDetail,schema);
     	 });
     	 
     	 String uuid = jobDetail.getUuid();
@@ -372,12 +380,15 @@ public class StudyEventController {
 
 
 	@Transactional
-	private ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, Study study, String siteOID,UserAccountBean ub,JobDetail jobDetail) {
+	private ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, Study study, String siteOID,UserAccountBean ub,JobDetail jobDetail,String schema) {
 			
 		ResponseEntity response = null;
 		String logFileName = null;
+		CoreResources.setRequestSchema(schema);
+		 
 		String fileName = study.getUniqueIdentifier()+ DASH+study.getEnvType()+ SCHEDULE_EVENT + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
 		String filePath = userService.getFilePath(JobType.SCHEDULE_EVENT) + File.separator + fileName;
+		jobDetail.setLogPath(filePath);
 		
 		try {
 			 
@@ -420,9 +431,8 @@ public class StudyEventController {
                 	String recordNum = null;
                 	String headerLine = "Row|ParticipantID|StudyEventOID|Ordinal|Status|ErrorMessage";
                 	String msg = null;
-                	msg = rowNum + "|" + participantId + "|" + studyEventOID +"|"+ sampleOrdinalStr +"|" + status + "|"+message;
-                	String subDir = "study-event-schedule";
-    	    		this.getRestfulServiceHelper().getMessageLogger().writeToLog(subDir,filePath, headerLine, msg, ub);
+                	msg = rowNum + "|" + participantId + "|" + studyEventOID +"|"+ sampleOrdinalStr +"|" + status + "|"+message;                	
+    	    		this.getRestfulServiceHelper().getMessageLogger().writeToLog(filePath, headerLine, msg, ub);
     	    		
     	    		
 				 }
