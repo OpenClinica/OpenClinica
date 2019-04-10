@@ -56,9 +56,11 @@ import org.akaza.openclinica.service.CustomRuntimeException;
 import org.akaza.openclinica.service.ParticipateService;
 import org.akaza.openclinica.service.StudyEventService;
 import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.collections4.map.PassiveExpiringMap;
@@ -122,6 +124,9 @@ public class StudyEventController {
 
 	@Autowired
 	private UserService userService;
+	
+	@Autowired
+    private UtilService utilService;
 
     PassiveExpiringMap<String, Future<ResponseEntity<Object>>> expiringMap =
             new PassiveExpiringMap<>(24, TimeUnit.HOURS);
@@ -269,7 +274,17 @@ public class StudyEventController {
 			MultipartFile file,
 			@PathVariable("studyOID") String studyOID,
 			@PathVariable("siteOID") String siteOID) throws Exception {
-		UserAccountBean ub = getUserAccount(request);
+		
+    	ResponseEntity response = null;
+    	utilService.setSchemaFromStudyOid(studyOID);
+        String schema = CoreResources.getRequestSchema();
+         
+    	response= checkFileFormat(file);
+    	if(response != null) {
+    		return response;
+    	}    	
+    	
+    	UserAccountBean ub = getUserAccount(request);
 
 		Study site = studyDao.findByOcOID(siteOID);
 		Study study = studyDao.findByOcOID(studyOID);
@@ -277,14 +292,14 @@ public class StudyEventController {
 		JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount, JobType.SCHEDULE_EVENT,file.getOriginalFilename());
 
     	 CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
-    		 return scheduleEvent(request,file, study, siteOID,ub,jobDetail);
+    		 return scheduleEvent(request,file, study, siteOID,ub,jobDetail,schema);
     	 });
 
 		String uuid = jobDetail.getUuid();
           synchronized (expiringMap) {
               expiringMap.put(uuid, future);
           }
-          ResponseEntity response = null;
+          
           RestReponseDTO responseDTO = new RestReponseDTO();
     		String finalMsg = "The schedule job is running, here is the schedule job ID:" + uuid;
     		responseDTO.setMessage(finalMsg);
@@ -292,6 +307,31 @@ public class StudyEventController {
     		
     		return response;
     	
+	}
+    
+	private ResponseEntity checkFileFormat(MultipartFile file) {
+		ResponseEntity response = null;
+		RestReponseDTO responseDTO = new RestReponseDTO();
+		String finalMsg = null;
+		
+		//only support csv file
+        if (file !=null && file.getSize() > 0) {
+      	  String fileNm = file.getOriginalFilename();
+      	  
+      	  if (fileNm!=null && fileNm.endsWith(".csv")) {
+      		   ;	
+      	  }else {     		      		             
+       		 finalMsg = ErrorConstants.ERR_NOT_CSV_FILE+ ":The file format is not supported, please use correct CSV file, like *.csv ";
+       	 	 responseDTO.setMessage(finalMsg);
+       		 response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);      		       		
+      	  }     	      	 
+        }else {
+        	 finalMsg = ErrorConstants.ERR_BLANK_FILE+ ":The file null or blank";
+       	 	 responseDTO.setMessage(finalMsg);
+       		 response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);       		       		
+        }
+        
+		return response;
 	}
     
     @ApiOperation(value = "To schedule an event for participants at study level in bulk",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
@@ -302,6 +342,16 @@ public class StudyEventController {
 	public ResponseEntity<Object> scheduleBulkEventAtStudyLevel(HttpServletRequest request,
 			MultipartFile file,
 			@PathVariable("studyOID") String studyOID) throws Exception {
+    	
+        ResponseEntity response = null;
+        utilService.setSchemaFromStudyOid(studyOID);
+        String schema = CoreResources.getRequestSchema();
+    	
+    	response= checkFileFormat(file);
+    	if(response != null) {
+    		return response;
+    	}
+    	
 		UserAccountBean ub = getUserAccount(request);
 
 		Study study = studyDao.findByOcOID(studyOID);
@@ -309,7 +359,7 @@ public class StudyEventController {
 		JobDetail jobDetail= userService.persistJobCreated(study, null, userAccount, JobType.SCHEDULE_EVENT,file.getOriginalFilename());
 
     	 CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
-    		 return scheduleEvent(request,file, study, null, ub,jobDetail);
+    		 return scheduleEvent(request,file, study, null, ub,jobDetail,schema);
     	 });
     	 
     	 String uuid = jobDetail.getUuid();
@@ -317,8 +367,7 @@ public class StudyEventController {
          synchronized (expiringMap) {
               expiringMap.put(uuid, future);
           }
-        
-        ResponseEntity response = null;
+                
         RestReponseDTO responseDTO = new RestReponseDTO();
   		String finalMsg = "The schedule job is running, here is the schedule job ID:" + uuid;
   		responseDTO.setMessage(finalMsg);
@@ -331,30 +380,15 @@ public class StudyEventController {
 
 
 	@Transactional
-	private ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, Study study, String siteOID,UserAccountBean ub,JobDetail jobDetail) {
+	private ResponseEntity<Object> scheduleEvent(HttpServletRequest request,MultipartFile file, Study study, String siteOID,UserAccountBean ub,JobDetail jobDetail,String schema) {
 			
 		ResponseEntity response = null;
 		String logFileName = null;
+		CoreResources.setRequestSchema(schema);
+		 
 		String fileName = study.getUniqueIdentifier()+ DASH+study.getEnvType()+ SCHEDULE_EVENT + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
 		String filePath = userService.getFilePath(JobType.SCHEDULE_EVENT) + File.separator + fileName;
-
-		if (!file.isEmpty()) {
-			 String fileNm = file.getOriginalFilename();
-			 
-			 //only support CSV file
-			 if(!(fileNm.endsWith(".csv")) ){
-				 throw new OpenClinicaSystemException("errorCode.notSupportedFileFormat","The file format is not supported at this time, please send CSV file, like *.csv ");
-			 }
-	
-			 int endIndex = fileNm.indexOf(".csv"); 
-			 String originalFileNm =  fileNm.substring(0, endIndex);
-
-	//		logFileName = this.getRestfulServiceHelper().getMessageLogger().getLogfileNamewithTimeStamp(originalFileNm);
-			
-		}else {
-			logger.info("errorCode.emptyFile -- The file is empty ");
-			throw new OpenClinicaSystemException("errorCode.emptyFile","The file is empty ");
-		}
+		jobDetail.setLogPath(filePath);
 		
 		try {
 			 
@@ -397,9 +431,8 @@ public class StudyEventController {
                 	String recordNum = null;
                 	String headerLine = "Row|ParticipantID|StudyEventOID|Ordinal|Status|ErrorMessage";
                 	String msg = null;
-                	msg = rowNum + "|" + participantId + "|" + studyEventOID +"|"+ sampleOrdinalStr +"|" + status + "|"+message;
-                	String subDir = "study-event-schedule";
-    	    		this.getRestfulServiceHelper().getMessageLogger().writeToLog(subDir,filePath, headerLine, msg, ub);
+                	msg = rowNum + "|" + participantId + "|" + studyEventOID +"|"+ sampleOrdinalStr +"|" + status + "|"+message;                	
+    	    		this.getRestfulServiceHelper().getMessageLogger().writeToLog(filePath, headerLine, msg, ub);
     	    		
     	    		
 				 }

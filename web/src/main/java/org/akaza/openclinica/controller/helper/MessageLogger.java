@@ -107,69 +107,58 @@ public class MessageLogger {
 	   	    
 	} 
     
- public void writeToLog(String subDir,String filePath, String headerLine,String msg,UserAccountBean userBean) throws OpenClinicaException {
+ public void writeToLog(String filePath, String headerLine,String msg,UserAccountBean userBean) throws OpenClinicaException {
 		
     	BufferedWriter bw = null;
 		FileWriter fw = null;
 		boolean isNewFile = false;
 
-	    String logFileName;
-
-	//    if(filePath == null) {
-	//    	logger.info("errorCode.emptyFile -- The file is null ");
-	//    }else {
-	    	 try {
-	             int count =1;	    	
-	 	    		    	
-	 	    	File logFile;
-	 	    	String importFileDir = this.getPersonalLogFileDir(userBean,subDir);
-	     	    
-	 	    //	logFileName = importFileDir + orginalFileName;
-	 			logFile = new File(filePath);
-	 			
-	 			/**
-	 			 *  create new file and add headerLine as first line
-	 			 *  example :
-	 			 *  RowNo | ParticipantID | Status | Message
-	 			 */
-	 		//	if(!logFile.exists()) {
-	 		//		logFile.createNewFile();
-	 		//		isNewFile = true;
-	 	//		}
-	 			
-	 			// true = append file
-	 			fw = new FileWriter(logFile.getAbsoluteFile(), true);
-	 			bw = new BufferedWriter(fw);
-	            
-	 			// create new file and prepare header line
-	 			if(isNewFile) {				
-	 				bw.write(headerLine);	
-	 				bw.write("\n");
-	 			}
-	 			
-	 			if(msg != null) {
-	 				bw.write(msg);	
-	 				bw.write("\n");
-	 			}	
-	 			
-	 			bw.close();						
-	 	       
-	 	    } catch (Exception e) {
-	 	    	logger.error("Log File error " + e.getMessage());
-	 	    	throw new OpenClinicaException("Write to log file error", ErrorConstants.ERR_LOG_FILE);
-	 	    }finally {
-	 			try {
-	 				if (bw != null)
-	 					bw.close();
-	 				if (fw != null)
-	 					fw.close();
-	 			} catch (IOException ex) {
-	 				logger.error("Log File error " + ex.getMessage());
-	 				throw new OpenClinicaException("Write to log file error", ErrorConstants.ERR_LOG_FILE);
-	 			}
-	 		}
-	//    }
-	    
+	    try {
+            File logFile;
+ 	    	
+ 			logFile = new File(filePath);
+ 			
+ 			/**
+ 			 *  create new file and add headerLine as first line
+ 			 *  example :
+ 			 *  RowNo | ParticipantID | Status | Message
+ 			 */
+ 			if(!logFile.exists()) {
+ 				logFile.createNewFile();
+ 				isNewFile = true;
+ 			}
+ 			
+ 			// true = append file
+ 			fw = new FileWriter(logFile.getAbsoluteFile(), true);
+ 			bw = new BufferedWriter(fw);
+            
+ 			// create new file and prepare header line
+ 			if(isNewFile) {				
+ 				bw.write(headerLine);	
+ 				bw.write("\n");
+ 			}
+ 			
+ 			if(msg != null) {
+ 				bw.write(msg);	
+ 				bw.write("\n");
+ 			}	
+ 			
+ 			bw.close();						
+ 	       
+	 	} catch (Exception e) {
+ 	    	logger.error("Log File error " + e.getMessage());
+ 	    	throw new OpenClinicaException("Write to log file error", ErrorConstants.ERR_LOG_FILE);
+	 	}finally {
+ 			try {
+ 				if (bw != null)
+ 					bw.close();
+ 				if (fw != null)
+ 					fw.close();
+ 			} catch (IOException ex) {
+ 				logger.error("Log File error " + ex.getMessage());
+ 				throw new OpenClinicaException("Write to log file error", ErrorConstants.ERR_LOG_FILE);
+ 			}
+ 		}
 	   	    
 	} 
     /**

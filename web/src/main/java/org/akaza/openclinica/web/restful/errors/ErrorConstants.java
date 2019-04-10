@@ -32,6 +32,7 @@ public class ErrorConstants {
      *  this is new for RunTime
      */
     public static final String ERR_NOT_XML_FILE = "errorCode.notXMLfile";
+    public static final String ERR_NOT_CSV_FILE = "errorCode.notCSVfile";
     public static final String ERR_BLANK_FILE = "errorCode.blankFile";
     public static final String ERR_NO_MAPPING_FILE = "errorCode.noMappingfile";
     public static final String ERR_NOT_SUPPORTED_FILE_FORMAT = "errorCode.notSupportedFileFormat";
