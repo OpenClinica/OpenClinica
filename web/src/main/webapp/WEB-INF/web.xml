@@ -2311,4 +2311,14 @@
         <url-pattern>/ParticipantSearch</url-pattern>
     </servlet-mapping>
 
+    <servlet>
+        <display-name>Jobs</display-name>
+        <servlet-name>JobsServlet</servlet-name>
+        <servlet-class>org.akaza.openclinica.control.managestudy.JobsServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>JobsServlet</servlet-name>
+        <url-pattern>/Jobs</url-pattern>
+    </servlet-mapping>
+
 </web-app>
