@@ -335,27 +335,8 @@
 		<!-- LIQUIBASE -->
 		<dependency>
 			<groupId>org.liquibase</groupId>
-			<artifactId>liquibase-plugin</artifactId>
-			<version>1.9.5.0</version>
-			<exclusions>
-				<exclusion>
-					<groupId>org.apache.maven</groupId>
-					<artifactId>maven-plugin-api</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.maven</groupId>
-					<artifactId>maven-project</artifactId>
-				</exclusion>
-				<exclusion>
-					<groupId>org.apache.maven</groupId>
-					<artifactId>maven-project</artifactId>
-				</exclusion>
-			</exclusions>
-		</dependency>
-		<dependency>
-			<groupId>org.liquibase</groupId>
 			<artifactId>liquibase-core</artifactId>
-			<version>1.9.5</version>
+			<version>3.6.3</version>
 		</dependency>
 		<!-- Explicitly defining dependencies versions for Maven 3 -->
 		<dependency>
