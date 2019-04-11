@@ -244,13 +244,13 @@ public class ODMClinicaDataResource {
                                  @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
                                  @Context HttpServletRequest request, String userAccountID,
                                  @DefaultValue("y") @QueryParam("clinicaldata") String clinicaldata,
-                                 @DefaultValue("y") @QueryParam("metadata") String metadata,
+                                 @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
                                  @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
                                  @QueryParam("showArchived") String showArchived ,
                                  @DefaultValue("n")@QueryParam("crossFormLogic") String crossFormLogic ) {
         LOGGER.debug("Requesting clinical data resource");
 
-        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, metadata, clinicalData);
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData);
 
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
