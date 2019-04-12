@@ -219,7 +219,7 @@ public class UserController {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
             }
             if (!validateService.isUserHasCrcOrInvestigaterRole(userRoles)) {
-                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
             }
             if (!validateService.isUserRoleHasAccessToSite(userRoles, siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
