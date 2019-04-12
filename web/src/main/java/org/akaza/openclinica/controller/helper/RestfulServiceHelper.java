@@ -219,13 +219,13 @@ public class RestfulServiceHelper {
 						 studyEventScheduleDTO.setStudyEventOID(lineVal[StudyEventOID_index].trim());
 					 }
 					 
-					 if(lineVal[Ordinal_index] != null) {
+					 if(lineVal[Ordinal_index] != null && lineVal[Ordinal_index].trim().length() > 0) {
 						 studyEventScheduleDTO.setOrdinal(lineVal[Ordinal_index].trim());	 
 					 }
 					 if(lineVal[StartDate_index] != null) {
 						 studyEventScheduleDTO.setStartDate(lineVal[StartDate_index].trim());
 					 }
-					 if(lineVal[EndDate_index] != null) {
+					 if(lineVal[EndDate_index] != null && lineVal[EndDate_index].trim().length()>0) {
 						 studyEventScheduleDTO.setEndDate(lineVal[EndDate_index].trim());
 					 }
 					 

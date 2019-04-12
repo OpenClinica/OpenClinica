@@ -245,13 +245,12 @@ public class StudyEventController {
             @PathVariable("studyOID") String studyOID,
             @PathVariable("siteOID") String siteOID) throws Exception {
         
-        String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();
-        String ordinal = studyEventScheduleRequestDTO.getOrdinal();
+        String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();      
         String startDate = studyEventScheduleRequestDTO.getStartDate();
         String endDate = studyEventScheduleRequestDTO.getEndDate();
         
     	
-    	return scheduleEvent(request, studyOID, siteOID,studyEventOID,subjectKey,ordinal,startDate,endDate);
+    	return scheduleEvent(request, studyOID, siteOID,studyEventOID,subjectKey,startDate,endDate);
 	}
     
     @ApiOperation(value = "To schedule an event for participant at study level",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
@@ -264,12 +263,11 @@ public class StudyEventController {
    			@PathVariable("subjectKey") String subjectKey,									
    			@PathVariable("studyOID") String studyOID) throws Exception {
    		
-       	String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();
-       	String ordinal = studyEventScheduleRequestDTO.getOrdinal();
+       	String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();       
        	String startDate = studyEventScheduleRequestDTO.getStartDate();
        	String endDate = studyEventScheduleRequestDTO.getEndDate();
 		
-    	return scheduleEvent(request, studyOID, null,studyEventOID,subjectKey,ordinal,startDate,endDate);
+    	return scheduleEvent(request, studyOID, null,studyEventOID,subjectKey,startDate,endDate);
 	}
     
     @ApiOperation(value = "To schedule an event for participants at site level in bulk",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
@@ -457,7 +455,7 @@ public class StudyEventController {
 				     String status="";
 				     String message="";
 				     	
-				     responseTempDTO = studyEventService.scheduleStudyEvent(ub, study.getOc_oid(), siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
+				     responseTempDTO = studyEventService.scheduleStudyEvent(ub, study.getOc_oid(), siteOID, studyEventOID, participantId, startDate, endDate);
 				    
 				     /**
 			         *  response
@@ -501,13 +499,13 @@ public class StudyEventController {
 
 		return response;
 	}
-	public ResponseEntity<Object> scheduleEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId,String sampleOrdinalStr, String startDate,String endDate){
+	public ResponseEntity<Object> scheduleEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId, String startDate,String endDate){
 	    	ResponseEntity response = null;
 	    	RestReponseDTO responseDTO = null;	    	    	
 	    	String message="";
 	    	
 	    	
-	    	responseDTO = studyEventService.scheduleStudyEvent(request, studyOID, siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
+	    	responseDTO = studyEventService.scheduleStudyEvent(request, studyOID, siteOID, studyEventOID, participantId,  startDate, endDate);
 	    	
 	    	/**
 	         *  response
@@ -530,10 +528,7 @@ public class StudyEventController {
                
                	map.put("studyEventOID", studyEventOID);                              
                	map.put("subjectKey", participantId);
-                
-               	if(sampleOrdinalStr !=null && sampleOrdinalStr.trim().length() > 0) {
-                	map.put("ordinal", sampleOrdinalStr);
-                }
+                              
                 if(endDate !=null && endDate.trim().length() > 0) {
                 	map.put("endDate", endDate);
                 }
