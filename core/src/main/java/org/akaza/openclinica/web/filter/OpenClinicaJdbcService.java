@@ -1,20 +1,25 @@
 package org.akaza.openclinica.web.filter;
 
-import org.springframework.jdbc.core.SqlParameter;
-import org.springframework.jdbc.object.MappingSqlQuery;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.GrantedAuthorityImpl;
-import org.springframework.security.core.userdetails.User;
-import org.springframework.security.core.userdetails.UserDetails;
-import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
-
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Types;
+import java.util.Arrays;
+import java.util.LinkedList;
 import java.util.List;
 
 import javax.sql.DataSource;
 
+import org.springframework.jdbc.core.SqlParameter;
+import org.springframework.jdbc.object.MappingSqlQuery;
+import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.authority.SimpleGrantedAuthority;
+import org.springframework.security.core.userdetails.User;
+import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.userdetails.jdbc.JdbcDaoImpl;
+
+/*
+ * TODO this class also exist in web and ws
+ */
 public class OpenClinicaJdbcService extends JdbcDaoImpl {
 
     private MappingSqlQuery ocUsersByUsernameMapping;
@@ -47,8 +52,9 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
             returnUsername = username;
         }
 
+        List<GrantedAuthority> grantedAuthorities = Arrays.asList(combinedAuthorities);
         return new User(returnUsername, userFromUserQuery.getPassword(), userFromUserQuery.isEnabled(), true, true, userFromUserQuery.isAccountNonLocked(),
-                combinedAuthorities);
+        		grantedAuthorities);
     }
 
     /**
@@ -67,7 +73,8 @@ public class OpenClinicaJdbcService extends JdbcDaoImpl {
             String password = rs.getString(2);
             boolean enabled = rs.getBoolean(3);
             boolean nonLocked = rs.getBoolean(4);
-            UserDetails user = new User(username, password, enabled, true, true, nonLocked, new GrantedAuthority[] { new GrantedAuthorityImpl("HOLDER") });
+            List<SimpleGrantedAuthority> grantedAuthorities = Arrays.asList(new SimpleGrantedAuthority("HOLDER"));
+            UserDetails user = new User(username, password, enabled, true, true, nonLocked, grantedAuthorities);
 
             return user;
         }

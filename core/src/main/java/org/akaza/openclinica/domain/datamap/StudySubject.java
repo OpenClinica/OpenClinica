@@ -32,7 +32,7 @@ import org.hibernate.annotations.Type;
  */
 @Entity
 @Table(name = "study_subject", uniqueConstraints = @UniqueConstraint(columnNames = "oc_oid"))
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "study_subject_study_subject_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "study_subject_study_subject_id_seq") })
 @Cache(usage = CacheConcurrencyStrategy.READ_WRITE)
 public class StudySubject  extends DataMapDomainObject {
 

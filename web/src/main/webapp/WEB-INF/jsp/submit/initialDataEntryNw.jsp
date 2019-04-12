@@ -737,11 +737,12 @@ but the custom tag uses that, not this jstl code--%>
 
 <c:forEach var="bodyItemGroup" items="${displayItem.itemGroups}"  varStatus="status">
 <c:set var="columnNum"  value="1"/>
+<c:set var="editFlag" value="${bodyItemGroup.editFlag}"/>
 <!-- hasError is set to true when validation error happens-->
 
 <!-- JN: So, the cross button should not be displayed for the items which are present in the  -->
 <!--  not the last row -->
-<tr repeat="0" />
+<tr repeat="${uniqueId}" />
 <c:set var="columnNum"  value="1"/>
 	<c:set var="isButtonRemShow" value="true"/>
 <c:forEach var="bodyItem" items="${bodyItemGroup.items}">
@@ -798,6 +799,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
+			 <c:param name="editFlag" value="${editFlag}"/>
                     </c:import>
                 </td>
             </c:forEach>
@@ -825,6 +827,7 @@ but the custom tag uses that, not this jstl code--%>
                     <c:param name="tabNum" value="${itemNum}"/>
                     <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                     <c:param name="originJSP" value="initialDataEntry"/>
+		     <c:param name="editFlag" value="${editFlag}"/>
                 </c:import>
                 <c:import url="../submit/generateGroupItemTxt.jsp">
                     <c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -931,7 +934,7 @@ but the custom tag uses that, not this jstl code--%>
                             <c:param name="isHorizontal" value="${isHorizontalCellLevel}"/>
                             <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                             <c:param name="originJSP" value="initialDataEntry"/>
-
+			     <c:param name="editFlag" value="${editFlag}"/>
                         </c:import>
                     </td>
                 </c:forEach>
@@ -960,6 +963,7 @@ but the custom tag uses that, not this jstl code--%>
                         <c:param name="tabNum" value="${itemNum}"/>
                         <c:param name="defaultValue" value="${bodyItem.metadata.defaultValue}"/>
                         <c:param name="originJSP" value="initialDataEntry"/>
+			 <c:param name="editFlag" value="${editFlag}"/>
                     </c:import>
                     <c:import url="../submit/generateGroupItemTxt.jsp">
                         <c:param name="itemId" value="${bodyItem.item.id}"/>
@@ -983,7 +987,7 @@ but the custom tag uses that, not this jstl code--%>
     <c:if test="${displayItem.itemGroup.groupMetaBean.repeatingGroup}">
     
                 <td class="aka_padding_norm aka_cellBorders">
-                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
+                    <input type="hidden" name="<c:out value="${repeatParentId}"/>_manual[<c:out value="${repeatParentId}"/>].newRow" value="yes" />
 
                 <button stype="remove" type="button" template="<c:out value="${repeatParentId}"/>" class="button_remove" style="display:block;"></button>
                </td>

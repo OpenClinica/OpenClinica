@@ -1,17 +1,24 @@
 package org.akaza.openclinica.dao.hibernate;
 
 import java.io.Serializable;
+import java.sql.SQLException;
 import java.util.ArrayList;
 
+import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.domain.DomainObject;
+import org.apache.commons.lang.StringUtils;
 import org.hibernate.Session;
 import org.hibernate.SessionFactory;
-import org.springframework.orm.hibernate3.HibernateTemplate;
+import org.hibernate.internal.SessionImpl;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.orm.hibernate5.HibernateTemplate;
 import org.springframework.transaction.annotation.Transactional;
 
 
 public abstract class AbstractDomainDao<T extends DomainObject> {
 
+    protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
     private HibernateTemplate hibernateTemplate;
 
     abstract Class<T> domainClass();
@@ -85,6 +92,24 @@ public abstract class AbstractDomainDao<T extends DomainObject> {
      */
     public Session getCurrentSession() {
         return getSessionFactory().getCurrentSession();
+    }
+
+    public Session getCurrentSession(String schema) {
+        Session session = getSessionFactory().getCurrentSession();
+
+        if (StringUtils.isNotEmpty(schema)) {
+            SessionImpl sessionImpl = (SessionImpl) session;
+            try {
+                String currentSchema = sessionImpl.connection().getSchema();
+                if (!schema.equals(currentSchema)) {
+                    sessionImpl.connection().setSchema(schema);
+                    CoreResources.tenantSchema.set(schema);
+                    //CoreResources.setSchema(sessionImpl.connection());
+                }
+            } catch (SQLException e) {
+                logger.error(e.getMessage(), e);            }
+        }
+        return session;
     }
 
     public HibernateTemplate getHibernateTemplate() {

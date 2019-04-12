@@ -11,7 +11,7 @@ import javax.persistence.Table;
 
 @Entity
 @Table(name = "dyn_item_group_metadata")
-@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence", value = "dyn_item_group_metadata_id_seq") })
+@GenericGenerator(name = "id-generator", strategy = "native", parameters = { @Parameter(name = "sequence_name", value = "dyn_item_group_metadata_id_seq") })
 public class DynamicsItemGroupMetadataBean extends AbstractMutableDomainObject {
 
     private boolean showGroup;

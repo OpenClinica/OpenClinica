@@ -4,7 +4,7 @@ import java.util.HashMap;
 
 import javax.servlet.ServletContext;
 
-import org.springframework.security.authentication.encoding.ShaPasswordEncoder;
+import org.springframework.security.crypto.password.MessageDigestPasswordEncoder;
 
 public class PFormCache {
     
@@ -100,8 +100,8 @@ public class PFormCache {
         contextMap.put("crfVersionOID", crfVersionOID);
         
         String hashString = studySubjectOID + "." + studyEventDefinitionID + "." + studyEventOrdinal + "." + crfVersionOID;
-        ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
-        String hashOutput = encoder.encodePassword(hashString,null);
+        MessageDigestPasswordEncoder encoder = new MessageDigestPasswordEncoder("SHA-256");
+        String hashOutput = encoder.encode(hashString);
         subjectContextCache.put(hashOutput, contextMap);
         return hashOutput;
     }
@@ -115,8 +115,8 @@ public class PFormCache {
         contextMap.put("studyEventOrdinal", "1");
         
         String hashString = studyOID + "." + crfVersionOID;
-        ShaPasswordEncoder encoder = new ShaPasswordEncoder(256);
-        String hashOutput = encoder.encodePassword(hashString,null);
+        MessageDigestPasswordEncoder encoder = new MessageDigestPasswordEncoder("SHA-256");
+        String hashOutput = encoder.encode(hashString);
         subjectContextCache.put(hashOutput, contextMap);
         return hashOutput;
     }

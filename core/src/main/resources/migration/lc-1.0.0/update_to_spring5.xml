@@ -1,0 +1,70 @@
+<?xml version="1.1" encoding="UTF-8" standalone="no"?>
+<databaseChangeLog xmlns="http://www.liquibase.org/xml/ns/dbchangelog" xmlns:ext="http://www.liquibase.org/xml/ns/dbchangelog-ext" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://www.liquibase.org/xml/ns/dbchangelog-ext http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-ext.xsd http://www.liquibase.org/xml/ns/dbchangelog http://www.liquibase.org/xml/ns/dbchangelog/dbchangelog-3.6.xsd">
+    <changeSet author="cha" id="1555001321719-1">
+        <addColumn tableName="oc_qrtz_locks">
+            <column defaultValue="TestScheduler" name="sched_name" type="varchar(120 BYTE)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-2">
+        <dropPrimaryKey tableName="oc_qrtz_locks"/>
+        <addPrimaryKey columnNames="lock_name, sched_name" constraintName="oc_qrtz_locks_pkey" tableName="oc_qrtz_locks"/>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-3">
+        <addColumn tableName="oc_qrtz_paused_trigger_grps">
+            <column defaultValue="TestScheduler" name="sched_name" type="varchar(120 BYTE)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-4">
+        <addColumn tableName="oc_qrtz_calendars">
+            <column defaultValue="TestScheduler" name="sched_name" type="varchar(120 BYTE)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-5">
+        <addColumn tableName="oc_qrtz_scheduler_state">
+            <column defaultValue="TestScheduler" name="sched_name" type="varchar(120 BYTE)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-6">
+        <addColumn tableName="oc_qrtz_cron_triggers">
+            <column defaultValue="TestScheduler" name="sched_name" type="varchar(120 BYTE)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-7">
+        <addColumn tableName="oc_qrtz_simple_triggers">
+            <column defaultValue="TestScheduler" name="sched_name" type="varchar(120 BYTE)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-8">
+        <addColumn tableName="oc_qrtz_job_details">
+            <column defaultValue="TestScheduler" name="sched_name" type="varchar(120 BYTE)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-9">
+        <addColumn tableName="oc_qrtz_fired_triggers">
+            <column defaultValue="TestScheduler" name="sched_name" type="varchar(120 BYTE)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-10">
+        <addColumn tableName="oc_qrtz_triggers">
+            <column defaultValue="TestScheduler" name="sched_name" type="varchar(120 BYTE)">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+</databaseChangeLog>

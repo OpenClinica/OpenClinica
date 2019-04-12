@@ -312,7 +312,7 @@
     <changeSet author="pgawade (generated)" id="1235684743487-409">
         <createTable tableName="oc_qrtz_locks">
             <column name="lock_name" type="VARCHAR(40)">
-                <constraints nullable="false" primaryKey="true"/>
+                <constraints nullable="false" primaryKey="true" primaryKeyName="pk_oc_qrtz_locks"/>
             </column>
         </createTable>
     </changeSet>
