@@ -1729,7 +1729,7 @@
             var totalLength = ccLength + phoneLength;
             if (totalLength > maxLength) {
                 var extraLength = totalLength - maxLength;
-                $('#phone-input').val($('#phone-input').val().substring(0, phoneLength - 1));
+                $('#phone-input').val($('#phone-input').val().substring(0, phoneLength - extraLength));
             }
         }
 
