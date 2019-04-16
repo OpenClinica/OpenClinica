@@ -499,7 +499,6 @@ public class ItemGroupDAO<K extends String, V extends ArrayList> extends Auditab
 
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
