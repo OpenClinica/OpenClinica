@@ -86,7 +86,7 @@ public class ValidateServiceImpl implements ValidateService {
 
     public boolean isStudyOidValidStudyLevelOid(String studyOid) {
         Study publicStudy = getPublicStudy(studyOid);
-        if (publicStudy.getStudy() == null) {
+        if (publicStudy!=null && publicStudy.getStudy() == null) {
             return true;
         }
         return false;
@@ -102,7 +102,7 @@ public class ValidateServiceImpl implements ValidateService {
 
     public boolean isSiteOidValidSiteLevelOid(String siteOid) {
         Study publicSite = getPublicStudy(siteOid);
-        if (publicSite.getStudy() != null) {
+        if (publicSite!=null && publicSite.getStudy() != null) {
             return true;
         }
         return false;
@@ -112,7 +112,7 @@ public class ValidateServiceImpl implements ValidateService {
     public boolean isStudyToSiteRelationValid(String studyOid, String siteOid) {
         Study publicStudy = getPublicStudy(studyOid);
         Study publicSite = getPublicStudy(siteOid);
-        if (publicSite.getStudy().getStudyId() == publicStudy.getStudyId()) {
+        if (publicStudy!=null && publicSite!=null && publicSite.getStudy().getStudyId() == publicStudy.getStudyId()) {
             return true;
         }
         return false;
@@ -136,8 +136,10 @@ public class ValidateServiceImpl implements ValidateService {
 
     public boolean isUserRoleHasAccessToSite(ArrayList<StudyUserRoleBean> userRoles, String siteOid) {
         Study publicSite = getPublicStudy(siteOid);
+        if(publicSite==null)
+            return false;
         for (StudyUserRoleBean userRole : userRoles) {
-            if (userRole.getStudyId() == publicSite.getStudyId())
+            if ((userRole.getStudyId() == publicSite.getStudyId()) || (userRole.getStudyId()==publicSite.getStudy().getStudyId()))
                 return true;
         }
         return false;

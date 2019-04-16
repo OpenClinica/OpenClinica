@@ -73,7 +73,8 @@ public class ParticipantServiceImpl implements ParticipantService {
 	@Autowired
 	private UserAccountDAO userAccountDao;
 
-
+    @Autowired
+    private UserAccountDao userAccountHibDao;
 
     @Autowired
     private StudySubjectDao studySubjectHibDao;
@@ -129,8 +130,6 @@ if(studySubjectBean==null || !studySubjectBean.isActive()) {
     studySubjectBean.setOwner(subjectTransfer.getOwner());
     Date now = new Date();
     studySubjectBean.setCreatedDate(now);
-    studySubjectBean.setUpdater(subjectTransfer.getOwner());
-    studySubjectBean.setUpdatedDate(now);
     studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
 
 }
@@ -385,16 +384,24 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
         StudySubject studySubject = studySubjectHibDao.findById(studySubjectBean.getId());
 
         StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
+        UserAccount userAccount = userAccountHibDao.findById(userAccountBean.getId());
+        studySubject.setUpdateId(userAccount.getUserId());
+        studySubject.setDateUpdated(new Date());
 
         if (studySubjectDetail == null) {
             studySubjectDetail = new StudySubjectDetail();
         }
 
-        studySubjectDetail.setFirstName(subjectTransfer.getFirstName()!=null? subjectTransfer.getFirstName():"");
-        studySubjectDetail.setLastName(subjectTransfer.getLastName()!=null? subjectTransfer.getLastName():"");
-        studySubjectDetail.setEmail(subjectTransfer.getEmailAddress()!=null? subjectTransfer.getEmailAddress():"");
-        studySubjectDetail.setPhone(subjectTransfer.getPhoneNumber()!=null? subjectTransfer.getPhoneNumber():"");
-        studySubjectDetail.setIdentifier(subjectTransfer.getIdentifier()!=null? subjectTransfer.getIdentifier():"");
+        if (subjectTransfer.getFirstName() != null)
+            studySubjectDetail.setFirstName(subjectTransfer.getFirstName() != null ? subjectTransfer.getFirstName() : "");
+        if (subjectTransfer.getLastName() != null)
+            studySubjectDetail.setLastName(subjectTransfer.getLastName() != null ? subjectTransfer.getLastName() : "");
+        if (subjectTransfer.getEmailAddress() != null)
+            studySubjectDetail.setEmail(subjectTransfer.getEmailAddress() != null ? subjectTransfer.getEmailAddress() : "");
+        if (subjectTransfer.getPhoneNumber() != null)
+            studySubjectDetail.setPhone(subjectTransfer.getPhoneNumber() != null ? subjectTransfer.getPhoneNumber() : "");
+        if (subjectTransfer.getIdentifier() != null)
+            studySubjectDetail.setIdentifier(subjectTransfer.getIdentifier() != null ? subjectTransfer.getIdentifier() : "");
 
         studySubject.setStudySubjectDetail(studySubjectDetail);
 

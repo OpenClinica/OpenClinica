@@ -20,7 +20,9 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.UtilService;
+import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.service.participant.ParticipantService;
+import org.akaza.openclinica.service.rest.errors.ErrorConstants;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.validator.ParticipantValidator;
 import org.slf4j.Logger;
@@ -62,7 +64,10 @@ public class StudyParticipantController {
         @Autowired
         private UtilService utilService;
 
-		private StudyDAO studyDao;
+        @Autowired
+		private ValidateService validateService;
+
+        private StudyDAO studyDao;
 		private StudySubjectDAO ssDao;
 		private UserAccountDAO userAccountDao;
 		
@@ -93,6 +98,8 @@ public class StudyParticipantController {
 		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
 				@PathVariable("studyOID") String studyOID) throws Exception {
+			utilService.setSchemaFromStudyOid(studyOID);
+			UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
 			String subjectKeyVal = participantRestfulRequestDTO.getSubjectKey();
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("subjectKey", subjectKeyVal);
@@ -105,7 +112,7 @@ public class StudyParticipantController {
 			ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
 							
 			try {
-				return this.createNewStudySubject(request, map, studyOID, null);
+				return this.createNewStudySubject(request, map, studyOID, null,userAccountBean);
 			} catch (Exception e) {
 			    System.err.println(e.getMessage()); 
 			    
@@ -141,6 +148,9 @@ public class StudyParticipantController {
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
 				@PathVariable("studyOID") String studyOID,
 				@PathVariable("siteOID") String siteOID) throws Exception {
+
+			utilService.setSchemaFromStudyOid(studyOID);
+			UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
 			HashMap<String, Object> map = new HashMap<>();
 			map.put("subjectKey", participantRestfulRequestDTO.getSubjectKey());
 			map.put("firstName", participantRestfulRequestDTO.getFirstName());
@@ -152,7 +162,7 @@ public class StudyParticipantController {
 			ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
 			
 			try {
-				return this.createNewStudySubject(request, map, studyOID, siteOID);
+				return this.createNewStudySubject(request, map, studyOID, siteOID,userAccountBean);
 			} catch (Exception e) {
 			    System.err.println(e.getMessage()); 
 			    
@@ -274,9 +284,9 @@ public class StudyParticipantController {
 		public ResponseEntity<Object> createNewStudySubject(HttpServletRequest request, 
 				@RequestBody HashMap<String, Object> map,
 				 String studyOID,
-				String siteOID) throws Exception {
+				String siteOID,UserAccountBean userAccountBean) throws Exception {
 
-
+			ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
 			ArrayList<String> errorMessages = new ArrayList<String>();
 			ErrorObject errorOBject = null;
@@ -290,7 +300,7 @@ public class StudyParticipantController {
 			if(uri.indexOf("/sites/") >  0) {
 				subjectTransferBean.setSiteIdentifier(siteOID);
 			}
-			
+
 			StudyParticipantDTO studyParticipantDTO = this.buildStudyParticipantDTO(map);
 					
 			subjectTransferBean.setOwner(this.participantService.getUserAccount(request));
@@ -307,14 +317,36 @@ public class StudyParticipantController {
 			
 			ParticipantValidator participantValidator = new ParticipantValidator(dataSource);
 	        Errors errors = null;
-	        
+
 	        DataBinder dataBinder = new DataBinder(subjectTransferBean);
 	        errors = dataBinder.getBindingResult();
-            if (utilService.isParticipantIDSystemGenerated(tenantstudy)){
-                errors.reject("errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");
-            }
 
-            if (subjectTransferBean.getFirstName()!=null && subjectTransferBean.getFirstName().length()>35){
+			if (!validateService.isStudyOidValid(studyOID)) {
+				errors.reject(ErrorConstants.ERR_STUDY_NOT_EXIST, "The study identifier you provided is not valid.");
+			}
+			if (!validateService.isStudyOidValidStudyLevelOid(studyOID)) {
+				errors.reject(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
+			}
+			if (!validateService.isSiteOidValid(siteOID)) {
+				errors.reject(ErrorConstants.ERR_SITE_NOT_EXIST);
+			}
+			if (!validateService.isSiteOidValidSiteLevelOid(siteOID)) {
+				errors.reject(ErrorConstants.ERR_SITE_NOT_Valid_OID);
+			}
+			if (!validateService.isStudyToSiteRelationValid(studyOID, siteOID)) {
+				errors.reject(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
+			}
+			if (!validateService.isUserHasCrcOrInvestigaterRole(userRoles) ){
+				errors.reject(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES );
+			}
+			if ( !validateService.isUserRoleHasAccessToSite(userRoles,siteOID)){
+				errors.reject(ErrorConstants.ERR_NO_ROLE_SETUP);
+			}
+			if (utilService.isParticipantIDSystemGenerated(tenantstudy)){
+				errors.reject( "errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");
+			}
+
+			if (subjectTransferBean.getFirstName()!=null && subjectTransferBean.getFirstName().length()>35){
 				errors.reject("errorCode.firsName","First name length should not exceed 35 characters");
 			}
 			if (subjectTransferBean.getLastName()!=null && subjectTransferBean.getLastName().length()>35){
@@ -771,7 +803,8 @@ public class StudyParticipantController {
 		 * @return
 		 */
 		 public StudyDAO getStudyDao() {
-	        studyDao = studyDao != null ? studyDao : new StudyDAO(dataSource);
+	        studyDao = studyDao
+					!= null ? studyDao : new StudyDAO(dataSource);
 	        return studyDao;
 	    }
 		 
