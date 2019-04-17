@@ -1305,7 +1305,7 @@
                       }
                     </style>
                     <div id="phone-widget">
-                      <input id="phone-input" type="text" class="formfield form-control invite-input" onfocus="this.select()" maxlength="15"> 
+                      <input id="phone-input" type="text" class="formfield form-control invite-input" onfocus="this.select()"> 
                       <div id="country-select">
                         <div id="country-flag" class="down-arrow">&nbsp;</div> 
                         <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
@@ -1721,18 +1721,29 @@
             }
             enableDisableControls();
         });
-        jQuery('#phone-input').on('input blur', function() {
+
+        function checkPhoneMaxLength() {
+            var maxLength = 15;
+            var ccLength = $('#country-code').text().replace(/ |-|\+/g, '').length;
+            var phoneLength = $('#phone-input').val().replace(/ |-|\+/g, '').length;
+            var totalLength = ccLength + phoneLength;
+            if (totalLength > maxLength) {
+                var extraLength = totalLength - maxLength;
+                $('#phone-input').val($('#phone-input').val().substring(0, phoneLength - extraLength));
+            }
+        }
+
+        jQuery('#phone-input').on('input blur paste', function() {
+            checkPhoneMaxLength();
             var phonePattern = /^[0-9 -]*$/;
-            var input = $(this).val();
-            var length = input.replace(/ |-/g, '').length;
-            var isValid = phonePattern.test(input) && length <= 12;
+            var isValid = phonePattern.test($(this).val());
             if (isValid) {
                 $('#phone-input-error').hide();
             }
             else {
                 $('#phone-input-error').show();
             }
-            enableDisableControls();
+            enableDisableControls();            
         });
 
         jQuery('#contactInformation, #partid-edit').click(function() {
