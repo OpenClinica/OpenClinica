@@ -206,13 +206,29 @@ public class RestfulServiceHelper {
 				 }else {
 					 StudyEventScheduleDTO studyEventScheduleDTO = new StudyEventScheduleDTO();
 					 
-					 studyEventScheduleDTO.setStudyOID(studyOID);
-					 studyEventScheduleDTO.setSiteOID(siteOID);
-					 studyEventScheduleDTO.setSubjectKey(lineVal[ParticipantID_index]);
-					 studyEventScheduleDTO.setStudyEventOID(lineVal[StudyEventOID_index]);
-					 studyEventScheduleDTO.setOrdinal(lineVal[Ordinal_index]);
-					 studyEventScheduleDTO.setStartDate(lineVal[StartDate_index]);
-					 studyEventScheduleDTO.setEndDate(lineVal[EndDate_index]);
+					 studyEventScheduleDTO.setStudyOID(studyOID.trim());
+					 if(siteOID != null) {
+						 studyEventScheduleDTO.setSiteOID(siteOID.trim());	 
+					 }
+					 
+					 if(lineVal[ParticipantID_index] != null) {
+						 studyEventScheduleDTO.setSubjectKey(lineVal[ParticipantID_index].trim());	 
+					 }
+					 
+					 if(lineVal[StudyEventOID_index] != null) {
+						 studyEventScheduleDTO.setStudyEventOID(lineVal[StudyEventOID_index].trim());
+					 }
+					 
+					 if(lineVal[Ordinal_index] != null && lineVal[Ordinal_index].trim().length() > 0) {
+						 studyEventScheduleDTO.setOrdinal(lineVal[Ordinal_index].trim());	 
+					 }
+					 if(lineVal[StartDate_index] != null) {
+						 studyEventScheduleDTO.setStartDate(lineVal[StartDate_index].trim());
+					 }
+					 if(lineVal[EndDate_index] != null && lineVal[EndDate_index].trim().length()>0) {
+						 studyEventScheduleDTO.setEndDate(lineVal[EndDate_index].trim());
+					 }
+					 
 					 studyEventScheduleDTO.setRowNum(lineNm - 1);
 					 
 					 studyEventScheduleDTOList.add(studyEventScheduleDTO);

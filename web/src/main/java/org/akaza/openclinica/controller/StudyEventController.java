@@ -1,6 +1,10 @@
 package org.akaza.openclinica.controller;
 
+import java.io.BufferedReader;
 import java.io.File;
+import java.io.IOException;
+import java.io.InputStream;
+import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
 import java.util.ArrayList;
@@ -64,6 +68,8 @@ import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.exception.ExceptionUtils;
 import org.apache.commons.collections4.map.PassiveExpiringMap;
+import org.apache.commons.csv.CSVFormat;
+import org.apache.commons.csv.CSVParser;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -134,6 +140,7 @@ public class StudyEventController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 	public static final String DASH = "-";
 	public static final String SCHEDULE_EVENT = "_Schedule Event";
+	public static final String FILE_HEADER_MAPPING = "ParticipantID, StudyEventOID, Ordinal, StartDate, EndDate";
 
     /**
      * @api {put} /pages/auth/api/v1/studyevent/studysubject/{studySubjectOid}/studyevent/{studyEventDefOid}/ordinal/{ordinal}/complete Complete a Participant Event
@@ -238,13 +245,12 @@ public class StudyEventController {
             @PathVariable("studyOID") String studyOID,
             @PathVariable("siteOID") String siteOID) throws Exception {
         
-        String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();
-        String ordinal = studyEventScheduleRequestDTO.getOrdinal();
+        String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();      
         String startDate = studyEventScheduleRequestDTO.getStartDate();
         String endDate = studyEventScheduleRequestDTO.getEndDate();
         
     	
-    	return scheduleEvent(request, studyOID, siteOID,studyEventOID,subjectKey,ordinal,startDate,endDate);
+    	return scheduleEvent(request, studyOID, siteOID,studyEventOID,subjectKey,startDate,endDate);
 	}
     
     @ApiOperation(value = "To schedule an event for participant at study level",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
@@ -257,12 +263,11 @@ public class StudyEventController {
    			@PathVariable("subjectKey") String subjectKey,									
    			@PathVariable("studyOID") String studyOID) throws Exception {
    		
-       	String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();
-       	String ordinal = studyEventScheduleRequestDTO.getOrdinal();
+       	String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();       
        	String startDate = studyEventScheduleRequestDTO.getStartDate();
        	String endDate = studyEventScheduleRequestDTO.getEndDate();
 		
-    	return scheduleEvent(request, studyOID, null,studyEventOID,subjectKey,ordinal,startDate,endDate);
+    	return scheduleEvent(request, studyOID, null,studyEventOID,subjectKey,startDate,endDate);
 	}
     
     @ApiOperation(value = "To schedule an event for participants at site level in bulk",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
@@ -286,8 +291,14 @@ public class StudyEventController {
     	
     	UserAccountBean ub = getUserAccount(request);
 
-		Study site = studyDao.findByOcOID(siteOID);
-		Study study = studyDao.findByOcOID(studyOID);
+		Study site = studyDao.findByOcOID(siteOID.trim());
+		Study study = studyDao.findByOcOID(studyOID.trim());
+		
+		response= checkStudy(study);
+    	if(response != null) {
+    		return response;
+    	}   
+    	
 		UserAccount userAccount = userAccountDao.findById(ub.getId());
 		JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount, JobType.SCHEDULE_EVENT,file.getOriginalFilename());
 
@@ -319,12 +330,29 @@ public class StudyEventController {
       	  String fileNm = file.getOriginalFilename();
       	  
       	  if (fileNm!=null && fileNm.endsWith(".csv")) {
-      		   ;	
+      		 String line;
+      		 BufferedReader reader;
+			 InputStream is;
+			try {
+				 is = file.getInputStream();			
+				 reader = new BufferedReader(new InputStreamReader(is));					 
+				 CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(FILE_HEADER_MAPPING).withFirstRecordAsHeader().withTrim();
+	
+		         CSVParser csvParser = new CSVParser(reader, csvFileFormat);
+		         csvParser.parse(reader, csvFileFormat);
+			} catch (Exception e) {
+				finalMsg = ErrorConstants.ERR_NOT_CSV_FILE+ ":The file format is not supported, please use correct CSV file, like *.csv ";
+	       	 	responseDTO.setMessage(finalMsg);
+	       		response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
+			}
+			
       	  }else {     		      		             
        		 finalMsg = ErrorConstants.ERR_NOT_CSV_FILE+ ":The file format is not supported, please use correct CSV file, like *.csv ";
        	 	 responseDTO.setMessage(finalMsg);
        		 response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);      		       		
-      	  }     	      	 
+      	  } 
+      	  
+      	  
         }else {
         	 finalMsg = ErrorConstants.ERR_BLANK_FILE+ ":The file null or blank";
        	 	 responseDTO.setMessage(finalMsg);
@@ -334,6 +362,20 @@ public class StudyEventController {
 		return response;
 	}
     
+	private ResponseEntity checkStudy(Study study) {
+		ResponseEntity response = null;
+		RestReponseDTO responseDTO = new RestReponseDTO();
+		String finalMsg = null;
+		
+        if (study == null) {
+        	 finalMsg = ErrorConstants.ERR_STUDY_NOT_EXIST+ ":please use correct studyOID";
+       	 	 responseDTO.setMessage(finalMsg);
+       		 response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.BAD_REQUEST);       		       		
+        }
+        
+		return response;
+	}
+	
     @ApiOperation(value = "To schedule an event for participants at study level in bulk",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
 	@ApiResponses(value = {
 	        @ApiResponse(code = 200, message = "Successful operation"),
@@ -354,7 +396,12 @@ public class StudyEventController {
     	
 		UserAccountBean ub = getUserAccount(request);
 
-		Study study = studyDao.findByOcOID(studyOID);
+		Study study = studyDao.findByOcOID(studyOID.trim());
+		response= checkStudy(study);
+    	if(response != null) {
+    		return response;
+    	}   
+    	
 		UserAccount userAccount = userAccountDao.findById(ub.getId());
 		JobDetail jobDetail= userService.persistJobCreated(study, null, userAccount, JobType.SCHEDULE_EVENT,file.getOriginalFilename());
 
@@ -408,7 +455,7 @@ public class StudyEventController {
 				     String status="";
 				     String message="";
 				     	
-				     responseTempDTO = studyEventService.scheduleStudyEvent(ub, study.getOc_oid(), siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
+				     responseTempDTO = studyEventService.scheduleStudyEvent(ub, study.getOc_oid(), siteOID, studyEventOID, participantId, startDate, endDate);
 				    
 				     /**
 			         *  response
@@ -452,13 +499,13 @@ public class StudyEventController {
 
 		return response;
 	}
-	public ResponseEntity<Object> scheduleEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId,String sampleOrdinalStr, String startDate,String endDate){
+	public ResponseEntity<Object> scheduleEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId, String startDate,String endDate){
 	    	ResponseEntity response = null;
 	    	RestReponseDTO responseDTO = null;	    	    	
 	    	String message="";
 	    	
 	    	
-	    	responseDTO = studyEventService.scheduleStudyEvent(request, studyOID, siteOID, studyEventOID, participantId, sampleOrdinalStr, startDate, endDate);
+	    	responseDTO = studyEventService.scheduleStudyEvent(request, studyOID, siteOID, studyEventOID, participantId,  startDate, endDate);
 	    	
 	    	/**
 	         *  response
@@ -481,10 +528,7 @@ public class StudyEventController {
                
                	map.put("studyEventOID", studyEventOID);                              
                	map.put("subjectKey", participantId);
-                
-               	if(sampleOrdinalStr !=null && sampleOrdinalStr.trim().length() > 0) {
-                	map.put("ordinal", sampleOrdinalStr);
-                }
+                              
                 if(endDate !=null && endDate.trim().length() > 0) {
                 	map.put("endDate", endDate);
                 }
