@@ -456,19 +456,19 @@
                                   <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
                                       <tr>
-                                        <td class="table_header_column_top">
+                                        <td class="table_header_column_top" width="25%">
                                           <fmt:message key="first_name" bundle="${resword}"/>
                                         </td>
-                                        <td class="table_cell_top" id="info-fname">
+                                        <td class="table_cell_top" id="info-fname" width="25%">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
 
                                         <c:choose>
                                           <c:when test="${advsearchStatus=='enabled'}">
-                                            <td class="table_header_column_top">
+                                            <td class="table_header_column_top" width="25%">
                                               <fmt:message key="last_name" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top" id="info-lname">
+                                            <td class="table_cell_top" id="info-lname" width="25%">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
@@ -482,10 +482,10 @@
                                           </c:when>
                                         </c:choose>
 
-                                        <td class="table_header_column">
+                                        <td class="table_header_column" width="25%">
                                           Mobile Number
                                         </td>
-                                        <td class="table_cell" id="info-phone-number">
+                                        <td class="table_cell" id="info-phone-number" width="25%">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
                                       </tr>
