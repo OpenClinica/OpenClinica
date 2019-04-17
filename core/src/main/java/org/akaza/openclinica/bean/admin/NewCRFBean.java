@@ -214,7 +214,6 @@ public class NewCRFBean extends Object implements java.io.Serializable {
 
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 throw new OpenClinicaException("Con is closed: NewCRFBean", "");
@@ -266,7 +265,6 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         logger.debug("crf id: *******" + crfId);
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 throw new OpenClinicaException("Con is closed: NewCRFBean", "");
@@ -317,7 +315,6 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         String sql = digester.getQuery("findItemGroupNamesByCRF");
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 throw new OpenClinicaException("Con is closed: NewCRFBean", "");
@@ -372,7 +369,6 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         try {
 
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 String msg = "The connection to the database is not open.";
@@ -517,7 +513,6 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         try {
 
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 String msg = "The connection to the database is not open.";
@@ -627,7 +622,6 @@ public class NewCRFBean extends Object implements java.io.Serializable {
         String cur_query=null;
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
             	 error.add("The connection to the database is not open.");

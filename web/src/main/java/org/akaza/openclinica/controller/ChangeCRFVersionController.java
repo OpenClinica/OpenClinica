@@ -547,7 +547,6 @@ public class ChangeCRFVersionController {
                     return null;
             }
             Connection con = dataSource.getConnection();
-            CoreResources.setSchema(con);
             con.setAutoCommit(false);
             eventCRFDAO.updateFormLayoutID(eventCRFId, newFormLayoutId, getCurrentUser(request).getId(), con);
 

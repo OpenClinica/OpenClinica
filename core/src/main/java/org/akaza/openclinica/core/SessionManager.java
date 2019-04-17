@@ -141,7 +141,6 @@ public class SessionManager implements Serializable {
 
     public Connection getConnection() throws SQLException {
         Connection conn =ds.getConnection();
-        CoreResources.setSchema(conn);
         return conn;
     }
 
