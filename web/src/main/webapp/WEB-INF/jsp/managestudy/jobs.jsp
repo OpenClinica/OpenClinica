@@ -88,6 +88,7 @@
     <tr>
       <th><fmt:message key="log_file" bundle="${resword}"/></th>
       <th><fmt:message key="job_type" bundle="${resword}"/></th>
+      <th><fmt:message key="job_status" bundle="${resword}"/></th>
       <th><fmt:message key="created_on" bundle="${resword}"/></th>
       <th><fmt:message key="created_by" bundle="${resword}"/></th>
       <th><fmt:message key="completed_on" bundle="${resword}"/></th>
@@ -100,7 +101,7 @@
 
 <script>
 $('#jobs-doc').attr('href', '${pageContext.request.contextPath}/pages/swagger-ui.html#/job-controller');
-var dateFormat = 'DD-MMM-YYYY HH:mm:ss Z';
+var dateFormat = 'hh:mma MMM DD YYYY';
 function formatDate(date) {
   return moment(date).format(dateFormat);
 }
@@ -128,7 +129,7 @@ var datatable = $('#tbl-jobs').DataTable({
     lengthMenu: '<fmt:message key="results_pagesize" bundle="${resword}"/>'
   }
 });
-$('#tbl-jobs_wrapper').prepend('<b><fmt:message key="jobs_log" bundle="${resword}"/></b>');
+$('#tbl-jobs_wrapper').prepend('<b><fmt:message key="jobs_source_filename" bundle="${resword}"/></b>');
 
 var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oid}';
 var siteOid = '${atSiteLevel ? theSite.oid : null}';
@@ -140,14 +141,19 @@ jQuery.ajax({
   url: url,
   success: function(data) {
     datatable.rows.add(data.map(function (logEntry) {
+      var actionDownload = '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ';
+      var actionDelete = '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>';
+      if (logEntry.status === 'IN_PROGRESS') {
+        actionDownload = actionDelete = '';
+      }
       return [
         logEntry.sourceFileName,
         logEntry.type,
+        logEntry.status,
         formatDate(logEntry.dateCreated),
         logEntry.createdByUsername,
         formatDate(logEntry.dateCompleted),
-        '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ' + 
-        '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>'
+        actionDownload + actionDelete
       ];
     }));
     datatable.draw();
