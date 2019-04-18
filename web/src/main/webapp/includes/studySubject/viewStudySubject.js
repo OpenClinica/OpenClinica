@@ -7,8 +7,13 @@ function buildCasebookUrl() {
     var casebookType = $("[name='casebookType']:checked").val();
 
     var casebookParams = [];
-    $("[name='casebookParam']:checked").each(function() {
-        casebookParams.push($(this).val());
+    $("[name='casebookParam']").each(function() {
+        if ($(this).is(":checked")) {
+            casebookParams.push($(this).val());
+        }
+        else if ($(this).attr("anti-value")) {
+            casebookParams.push($(this).attr("anti-value"));
+        }
     });
 
     var baseUrl = window.location.href;
