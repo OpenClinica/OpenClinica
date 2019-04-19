@@ -456,19 +456,19 @@
                                   <table width="100%" border="0" cellpadding="0" cellspacing="0">
                                     <tbody>
                                       <tr>
-                                        <td class="table_header_column_top">
+                                        <td class="table_header_column_top" width="25%">
                                           <fmt:message key="first_name" bundle="${resword}"/>
                                         </td>
-                                        <td class="table_cell_top" id="info-fname">
+                                        <td class="table_cell_top" id="info-fname" width="25%">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
 
                                         <c:choose>
                                           <c:when test="${advsearchStatus=='enabled'}">
-                                            <td class="table_header_column_top">
+                                            <td class="table_header_column_top" width="25%">
                                               <fmt:message key="last_name" bundle="${resword}"/>
                                             </td>
-                                            <td class="table_cell_top" id="info-lname">
+                                            <td class="table_cell_top" id="info-lname" width="25%">
                                               &emsp;&emsp;&emsp;&emsp;
                                             </td>
                                           </tr>
@@ -482,10 +482,10 @@
                                           </c:when>
                                         </c:choose>
 
-                                        <td class="table_header_column">
+                                        <td class="table_header_column" width="25%">
                                           Mobile Number
                                         </td>
-                                        <td class="table_cell" id="info-phone-number">
+                                        <td class="table_cell" id="info-phone-number" width="25%">
                                           &emsp;&emsp;&emsp;&emsp;
                                         </td>
                                       </tr>
@@ -1305,7 +1305,7 @@
                       }
                     </style>
                     <div id="phone-widget">
-                      <input id="phone-input" type="text" class="formfield form-control invite-input" onfocus="this.select()" maxlength="15"> 
+                      <input id="phone-input" type="text" class="formfield form-control invite-input" onfocus="this.select()"> 
                       <div id="country-select">
                         <div id="country-flag" class="down-arrow">&nbsp;</div> 
                         <div id="country-select-down-arrow" class="down-arrow">&nbsp;</div> 
@@ -1721,18 +1721,29 @@
             }
             enableDisableControls();
         });
-        jQuery('#phone-input').on('input blur', function() {
+
+        function checkPhoneMaxLength() {
+            var maxLength = 15;
+            var ccLength = $('#country-code').text().replace(/ |-|\+/g, '').length;
+            var phoneLength = $('#phone-input').val().replace(/ |-|\+/g, '').length;
+            var totalLength = ccLength + phoneLength;
+            if (totalLength > maxLength) {
+                var extraLength = totalLength - maxLength;
+                $('#phone-input').val($('#phone-input').val().substring(0, phoneLength - extraLength));
+            }
+        }
+
+        jQuery('#phone-input').on('input blur paste', function() {
+            checkPhoneMaxLength();
             var phonePattern = /^[0-9 -]*$/;
-            var input = $(this).val();
-            var length = input.replace(/ |-/g, '').length;
-            var isValid = phonePattern.test(input) && length <= 12;
+            var isValid = phonePattern.test($(this).val());
             if (isValid) {
                 $('#phone-input-error').hide();
             }
             else {
                 $('#phone-input-error').show();
             }
-            enableDisableControls();
+            enableDisableControls();            
         });
 
         jQuery('#contactInformation, #partid-edit').click(function() {

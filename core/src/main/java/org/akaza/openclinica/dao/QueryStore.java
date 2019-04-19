@@ -81,7 +81,6 @@ public class QueryStore implements Serializable, ResourceLoaderAware {
     protected String resolveDbFolder() {
         try {
             Connection conn = dataSource.getConnection();
-            CoreResources.setSchema(conn);
 
             String url = conn.getMetaData().getURL();
             if (url.startsWith("jdbc:postgresql")) {

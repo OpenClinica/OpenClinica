@@ -1096,7 +1096,6 @@ public class ItemFormMetadataDAO<K extends String, V extends ArrayList> extends 
 
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())

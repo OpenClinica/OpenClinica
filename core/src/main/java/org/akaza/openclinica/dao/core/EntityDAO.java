@@ -166,7 +166,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         logger.debug("query???" + query);
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
                     logger.warn("Connection is closed: GenericDAO.select!");
@@ -210,7 +209,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
@@ -297,7 +295,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
 
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
@@ -364,7 +361,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         try {
             if (!isTrasactional) {
                 con = ds.getConnection();
-                CoreResources.setSchema(con);
             }
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
@@ -413,7 +409,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         try {
             if (!isTrasactional) {
                 con = ds.getConnection();
-                CoreResources.setSchema(con);
             }
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
@@ -464,7 +459,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         try {
             if (!isTrasactional) {
                 con = ds.getConnection();
-                CoreResources.setSchema(con);
             }
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
@@ -513,7 +507,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         PreparedStatementFactory psf = new PreparedStatementFactory(variables, nullVars);
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
@@ -1027,7 +1020,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         Statement ps = null;
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             con.setAutoCommit(false);
             if (con.isClosed()) {
@@ -1321,7 +1313,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         Statement ps = null;
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             con.setAutoCommit(false);
             if (con.isClosed()) {
@@ -1383,7 +1374,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         Statement ps = null;
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             con.setAutoCommit(false);
             if (con.isClosed()) {
@@ -2424,7 +2414,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         Statement ps = null;
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
@@ -2547,7 +2536,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         Statement ps = null;
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
@@ -2737,7 +2725,6 @@ public abstract class EntityDAO<K extends String, V extends ArrayList> implement
         Statement ps = null;
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())

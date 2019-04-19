@@ -51,7 +51,7 @@ public class StudyEventServiceImpl implements StudyEventService {
     
 	
 	    
-	public RestReponseDTO scheduleStudyEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId,String sampleOrdinalStr, String startDate,String endDate){
+	public RestReponseDTO scheduleStudyEvent(HttpServletRequest request, String studyOID, String siteOID,String studyEventOID,String participantId,String startDate,String endDate){
 		
 		RestReponseDTO responseDTO = new RestReponseDTO();		    	
     	ArrayList<String>  errors = new ArrayList<String>();
@@ -102,23 +102,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	    	}	
 	        
 	    	/**
-	    	 *  basic check 2: sampleOrdinal                         
-	    	 */
-	    	int sampleOrdinal = -999;
-	    	try {
-	    		if(sampleOrdinalStr != null && sampleOrdinalStr.trim().length() > 0) {
-		    		sampleOrdinal = Integer.parseInt(sampleOrdinalStr);			
-		    	}else {
-		    		sampleOrdinal = 1;
-		    	}
-	    	}catch(NumberFormatException e) {
-	    		errMsg = "The inputted ordinal is not an integer";
-	    		logger.error(errMsg);
-	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NOT_INTEGER);
-	    	}
-	    	
-	    	/**
-	    	 * Step 1: check study
+	    	 * Step 2: check study
 	    	 */
 	    	StudyDAO studyDao = this.getMsStudyDao();
 	    	
@@ -149,24 +133,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	    		currentStudy = currentSiteStudy;
 	    	}
 	    	
-	    	/**
-	    	 *  step 2: permission check                        
-	    	 */
-	    	UserAccountBean  ub = this.getRestfulServiceHelper().getUserAccount(request);  
-	    	String userName = ub.getName();
-	    	if(studyOID != null && siteOID != null) {
-	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, siteOID);
-	    	}else {
-	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, null);
-	    			    		    		
-	    	}
-	    	
-	        if (errMsg != null) {  
-	        	logger.info(errMsg);
-	             throw new OpenClinicaException(errMsg, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-	        }  
-	    	    
-	        /**
+	    	 /**
 	         *  Step 3: check Subject/Participant              	
 	         */
 	        StudySubjectDAO sdao = this.getMsStudySubjectDAO();       
@@ -183,15 +150,13 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_SUBJECT_REMOVED);
 	        }
-	      
-	       
+	        
 	        /**
 	         *  Step 4: check study event                    
 	         */
 	        StudyEventDefinitionDAO seddao = this.getSedDao();
 	        definition = seddao.findByOidAndStudy(studyEventOID,
 	        		currentStudy.getId(), currentStudy.getParentStudyId());
-	        
 	        StudyBean studyWithEventDefinitions = currentStudy;
 	        if (currentStudy.getParentStudyId() > 0) {
 	            studyWithEventDefinitions = new StudyBean();
@@ -202,7 +167,15 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        	errMsg ="The definition of event(" + studyEventOID + ") can not be found in the study(" + studyOID + ").";
 	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_EVENT_NOT_EXIST);
-	        }else if (definition.getType().equals(COMMON)) {
+	        }
+	        
+	    	/**
+	    	 *  step 5 basic check: sampleOrdinal                         
+	    	 */	       
+	    	StudyEventDAO sed = this.getSeDao();
+		    int sampleOrdinal = sed.getMaxSampleOrdinal(definition, studySubject) + 1;
+		
+		    if (definition.getType().equals(COMMON)) {
 	        	errMsg ="The type of event(" + studyEventOID + ") in the study(" + studyOID + ") is not a visit based event.";
 	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_WRONG_EVENT_TYPE);
@@ -215,7 +188,24 @@ public class StudyEventServiceImpl implements StudyEventService {
 	        }else{
 	        	// repeating visited based event
 	        }
-	        
+	    	
+	    	/**
+	    	 *  step 6: permission check                        
+	    	 */
+	    	UserAccountBean  ub = this.getRestfulServiceHelper().getUserAccount(request);  
+	    	String userName = ub.getName();
+	    	if(studyOID != null && siteOID != null) {
+	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, siteOID);
+	    	}else {
+	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, null);
+	    			    		    		
+	    	}
+	    	
+	        if (errMsg != null) {  
+	        	logger.info(errMsg);
+	             throw new OpenClinicaException(errMsg, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+	        }  
+	    	   
 	            
 	        if (!subjectMayReceiveStudyEvent(dataSource, definition, studySubject,sampleOrdinal)) {
 	        	errMsg ="The event is NON repeating, and an event of this type already exists for the specified participant.";
@@ -226,15 +216,7 @@ public class StudyEventServiceImpl implements StudyEventService {
 	      
 	       /**
 	        * At this stage, it has passed all validation check
-	        */
-	        StudyEventDAO sed = this.getSeDao();
-	        int maxSampleOrdinal = sed.getMaxSampleOrdinal(definition, studySubject) + 1;
-	        if(sampleOrdinal > maxSampleOrdinal) {
-	        	errMsg ="The ordinal is out of sequential scope,the current ordinal can't be greater than " + maxSampleOrdinal;
-	        	logger.info(errMsg);
-	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_GREATER_THAN_MAX_ORDINAL);
-	        }
-	        	        
+	        */	       	        	        
 	        StudyEventBean studyEvent = new StudyEventBean();
 	        Date today = new Date();
 	        studyEvent.setCreatedDate(today);
@@ -279,7 +261,7 @@ public class StudyEventServiceImpl implements StudyEventService {
     
     }
 	
-public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, String siteOID,String studyEventOID,String participantId,String sampleOrdinalStr, String startDate,String endDate){
+public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, String siteOID,String studyEventOID,String participantId, String startDate,String endDate){
 		
 		RestReponseDTO responseDTO = new RestReponseDTO();		    	
     	ArrayList<String>  errors = new ArrayList<String>();
@@ -330,23 +312,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	    	}	
 	        
 	    	/**
-	    	 *  basic check 2: sampleOrdinal                         
-	    	 */
-	    	int sampleOrdinal = -999;
-	    	try {
-	    		if(sampleOrdinalStr != null && sampleOrdinalStr.trim().length() > 0) {
-		    		sampleOrdinal = Integer.parseInt(sampleOrdinalStr);			
-		    	}else {
-		    		sampleOrdinal = 1;
-		    	}
-	    	}catch(NumberFormatException e) {
-	    		errMsg = "The inputted ordinal is not an integer";
-	    		logger.error(errMsg);
-	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_NOT_INTEGER);
-	    	}
-	    	
-	    	/**
-	    	 * Step 1: check study
+	    	 * Step 2: check study
 	    	 */
 	    	StudyDAO studyDao = this.getMsStudyDao();
 	    	
@@ -377,22 +343,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	    		currentStudy = currentSiteStudy;
 	    	}
 	    	
-	    	/**
-	    	 *  step 2: permission check                        
-	    	 */	    	  
-	    	String userName = ub.getName();
-	    	if(studyOID != null && siteOID != null) {
-	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, siteOID);
-	    	}else {
-	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, null);
-	    	}
-	    	
-	        if (errMsg != null) { 
-	        	logger.info(errMsg);
-	             throw new OpenClinicaException(errMsg, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
-	        }  
-	    	    
-	        /**
+	    	 /**
 	         *  Step 3: check Subject/Participant              	
 	         */
 	        StudySubjectDAO sdao = this.getMsStudySubjectDAO();       
@@ -409,15 +360,14 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_SUBJECT_REMOVED);
 	        }
-	      
-	       
+	        
 	        /**
 	         *  Step 4: check study event                    
-	         */
+	         */	
 	        StudyEventDefinitionDAO seddao = this.getSedDao();
 	        definition = seddao.findByOidAndStudy(studyEventOID,
 	        		currentStudy.getId(), currentStudy.getParentStudyId());
-	        
+	       
 	        StudyBean studyWithEventDefinitions = currentStudy;
 	        if (currentStudy.getParentStudyId() > 0) {
 	            studyWithEventDefinitions = new StudyBean();
@@ -428,20 +378,44 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	        	errMsg ="The definition of event(" + studyEventOID + ") can not be found in the study(" + studyOID + ").";
 	        	logger.info(errMsg);
 	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_EVENT_NOT_EXIST);
-	        }else if (definition.getType().equals(COMMON)) {
-	        	errMsg ="The type of event(" + studyEventOID + ") in the study(" + studyOID + ") is not a visit based event.";
-	        	logger.info(errMsg);
-	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_WRONG_EVENT_TYPE);
-	        }else if(!(definition.isRepeating())) {
-	        	if(sampleOrdinal != 1) {
-	        		errMsg ="The type of event(" + studyEventOID + ") in the study(" + studyOID + ") is a visit based NON repeating event,so ordinal must be 1.";
-	        		logger.info(errMsg);
-		        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_ORDINAL_NOT_ONE_FOR_NONREPEATING);
-	        	}
-	        }else{
-	        	// repeating visited based event
 	        }
-	        
+	      
+	    	/**
+	    	 *  Step 5 basic check : get sampleOrdinal                         
+	    	 */	        
+	    	 StudyEventDAO sed = this.getSeDao();
+		     int sampleOrdinal = sed.getMaxSampleOrdinal(definition, studySubject) + 1;
+		  
+		     if (definition.getType().equals(COMMON)) {
+		        	errMsg ="The type of event(" + studyEventOID + ") in the study(" + studyOID + ") is not a visit based event.";
+		        	logger.info(errMsg);
+		        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_WRONG_EVENT_TYPE);
+		        }else if(!(definition.isRepeating())) {
+		        	if(sampleOrdinal != 1) {
+		        		errMsg ="The type of event(" + studyEventOID + ") in the study(" + studyOID + ") is a visit based NON repeating event,so ordinal must be 1.";
+		        		logger.info(errMsg);
+			        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_ORDINAL_NOT_ONE_FOR_NONREPEATING);
+		        	}
+		        }else{
+		        	// repeating visited based event
+		        }
+	    	
+	    	
+	    	/**
+	    	 *  step 6: permission check                        
+	    	 */	    	  
+	    	String userName = ub.getName();
+	    	if(studyOID != null && siteOID != null) {
+	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, siteOID);
+	    	}else {
+	    		errMsg = this.getRestfulServiceHelper().verifyRole(userName, studyOID, null);
+	    	}
+	    	
+	        if (errMsg != null) { 
+	        	logger.info(errMsg);
+	             throw new OpenClinicaException(errMsg, ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+	        }  
+	    	    
 	            
 	        if (!subjectMayReceiveStudyEvent(dataSource, definition, studySubject,sampleOrdinal)) {
 	        	errMsg ="The event is NON repeating, and an event of this type already exists for the specified participant.";
@@ -452,15 +426,7 @@ public RestReponseDTO scheduleStudyEvent(UserAccountBean ub, String studyOID, St
 	      
 	       /**
 	        * At this stage, it has passed all validation check
-	        */
-	        StudyEventDAO sed = this.getSeDao();
-	        int maxSampleOrdinal = sed.getMaxSampleOrdinal(definition, studySubject) + 1;
-	        if(sampleOrdinal > maxSampleOrdinal) {
-	        	errMsg ="The ordinal is out of sequential scope,the current ordinal can't be greater than " + maxSampleOrdinal;
-	        	logger.info(errMsg);
-	        	throw new OpenClinicaException(errMsg,ErrorConstants.ERR_GREATER_THAN_MAX_ORDINAL);
-	        }
-	        	        
+	        */	       	        	        
 	        StudyEventBean studyEvent = new StudyEventBean();
 	        Date today = new Date();
 	        studyEvent.setCreatedDate(today);

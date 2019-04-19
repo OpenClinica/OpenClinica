@@ -5,18 +5,10 @@ import io.swagger.annotations.ApiModelProperty;
 public class StudyEventScheduleRequestDTO {
 
 	private String endDate;
-	private String startDate;
-	private String ordinal;
+	private String startDate;	
 	private String studyEventOID;
 				
-	@ApiModelProperty(value = "ordinal",allowableValues = "1")
-	public String getOrdinal() {
-		return ordinal;
-	}
-	public void setOrdinal(String ordinal) {
-		this.ordinal = ordinal;
-	}
-	
+		
 	@ApiModelProperty(required=true)
 	public String getStudyEventOID() {
 		return studyEventOID;

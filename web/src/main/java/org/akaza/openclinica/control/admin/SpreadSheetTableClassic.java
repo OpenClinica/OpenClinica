@@ -1302,7 +1302,6 @@ public class SpreadSheetTableClassic implements SpreadSheetTable {// extends
                         int nextCRFId;
                         try {
                             con = ds.getConnection();
-                            CoreResources.setSchema(con);
 
                             /*
                              * We are selecting the crf id which will be used to

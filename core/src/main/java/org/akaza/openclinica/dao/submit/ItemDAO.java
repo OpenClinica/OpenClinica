@@ -568,7 +568,6 @@ public class ItemDAO<K extends String, V extends ArrayList> extends AuditableEnt
 
         try {
             con = ds.getConnection();
-            CoreResources.setSchema(con);
 
             if (con.isClosed()) {
                 if (logger.isWarnEnabled())
