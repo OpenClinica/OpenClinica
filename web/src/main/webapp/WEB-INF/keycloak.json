@@ -1,10 +1,10 @@
 {
-  "realm": "${keycloak.realm}",
-  "auth-server-url": "${keycloak.auth-server-url}",
+  "realm": "shivav-aws-dev",
+  "auth-server-url": "https://auth.openclinica-dev.io/auth",
   "ssl-required": "external",
   "resource": "bridge",
   "credentials": {
-    "secret": "${keycloak.client.secret}"
+    "secret": "ff180326-249b-4838-a339-3ddf9410e2fa"
   },
   "confidential-port": 0
 }
