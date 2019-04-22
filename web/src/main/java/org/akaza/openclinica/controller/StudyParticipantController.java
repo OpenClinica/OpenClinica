@@ -45,7 +45,7 @@ import java.util.*;
 
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
-@RequestMapping(value ="/auth/api/clinicaldata/studies")
+@RequestMapping(value ="/auth/api/clinicaldata")
 public class StudyParticipantController {
 	
 		@Autowired
@@ -74,57 +74,9 @@ public class StudyParticipantController {
 		private RestfulServiceHelper serviceHelper;
 		private String dateFormat;	 
 		protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-		
-		@ApiOperation(value = "To create a participant at study level",  notes = "Will read the subjectKey value provided by the user if the study participant ID is configured to be Manually generated  ")
-        @ApiResponses(value = {
-                @ApiResponse(code = 200, message = "Successful operation"),
-                @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
-                        + "<br />Error Code                                            Descriptions"
-                        + "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
-                        + "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
-                        + "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
-                        + "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
-                        + "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
-                        + "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
-                        + "<br />participantIDNotUnique                        : Participant ID already exists."
-                        + "<br />studyHasSystemGeneratedIdEnabled              : Study is set to have system-generated ID, hence no new participant can be added."
-						+ "<br />firstName                                     : First Name length should not exceed 35 characters."
-						+ "<br />lastName                                      : Last Name length should not exceed 35 characters."
-						+ "<br />identifier                                    : Identifier Name length should not exceed 35 characters."
-						+ "<br />emailAddress                                  : Email Address length should not exceed 255 characters."
-						+ "<br />phoneNumber                                   : Phone number length should not exceed 15 characters."
-                        + "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
-		@RequestMapping(value = "/{studyOID}/participants", method = RequestMethod.POST)
-		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
-				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
-				@PathVariable("studyOID") String studyOID) throws Exception {
-			utilService.setSchemaFromStudyOid(studyOID);
-			UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
-			String subjectKeyVal = participantRestfulRequestDTO.getSubjectKey();
-			HashMap<String, Object> map = new HashMap<>();
-			map.put("subjectKey", subjectKeyVal);
-			map.put("firstName", participantRestfulRequestDTO.getFirstName());
-			map.put("emailAddress", participantRestfulRequestDTO.getEmailAddress());
-			map.put("phoneNumber", participantRestfulRequestDTO.getPhoneNumber());
-			map.put("lastName", participantRestfulRequestDTO.getLastName());
-			map.put("identifier", participantRestfulRequestDTO.getIdentifier());
 
-			ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
-							
-			try {
-				return this.createNewStudySubject(request, map, studyOID, null,userAccountBean);
-			} catch (Exception e) {
-			    System.err.println(e.getMessage()); 
-			    
-				String validation_failed_message = e.getMessage();
-			    responseFailureStudyParticipantSingleDTO.getMessage().add(validation_failed_message);
-			    ResponseEntity response = new ResponseEntity(responseFailureStudyParticipantSingleDTO, org.springframework.http.HttpStatus.BAD_REQUEST);
-				return response;
-			  }
 		
-		}
-		
-		@ApiOperation(value = "To create a participant at study site level",  notes = "Will read the subjectKey")
+		@ApiOperation(value = "To create a participant at site level",  notes = "Will read the subjectKey")
         @ApiResponses(value = {
                 @ApiResponse(code = 200, message = "Successful operation"),
                 @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
@@ -143,7 +95,7 @@ public class StudyParticipantController {
 						+ "<br />emailAddress                                  : Email Address length should not exceed 255 characters."
 						+ "<br />phoneNumber                                   : Phone number length should not exceed 15 characters."
 						+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
-        @RequestMapping(value = "/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
+        @RequestMapping(value = "/studies/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request, 
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
 				@PathVariable("studyOID") String studyOID,
@@ -173,31 +125,9 @@ public class StudyParticipantController {
 			  }
 		}
 		
-		@ApiOperation(value = "To create participants at study level in bulk",  notes = "Will read the subjectKeys in CSV file")
-		@ApiResponses(value = {
-		        @ApiResponse(code = 200, message = "Successful operation"),
-		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
-		        		+ "<br />Error Code                                            Descriptions"
-		        		+ "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
-		        		+ "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
-		        		+ "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
-		        		+ "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
-		        		+ "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
-		        		+ "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
-		        		+ "<br />participantIDNotUnique                        : Participant ID already exists."
-		        		+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
-		@RequestMapping(value = "/{studyOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
-		public ResponseEntity<Object> createNewStudyParticipantAtStudyLevel(HttpServletRequest request, 
-				@RequestParam("file") MultipartFile file,
-				//will implement this JsonPojo class  when we decide to pass additional parameters
-				//@RequestPart("json") Optional<JsonPojo> map,								
-				@PathVariable("studyOID") String studyOID) throws Exception {
-						 
-			 return createNewStudyParticipantsInBulk(request, file, studyOID, null);
-			
-		}
+
 		
-		@ApiOperation(value = "To create participants at study site level in bulk",  notes = "Will read the subjectKeys in CSV file")
+		@ApiOperation(value = "To create participants at site level in bulk",  notes = "Will read the subjectKeys in CSV file")
 		@ApiResponses(value = {
 		        @ApiResponse(code = 200, message = "Successful operation"),
 		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
@@ -210,7 +140,7 @@ public class StudyParticipantController {
 		        		+ "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
 		        		+ "<br />participantIDNotUnique                        : Participant ID already exists."
 		        		+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
-		@RequestMapping(value = "/{studyOID}/sites/{siteOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
+		@RequestMapping(value = "/studies/{studyOID}/sites/{siteOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request,
 				@RequestParam("file") MultipartFile file,
 				//@RequestParam("size") Integer size,				
@@ -539,14 +469,14 @@ public class StudyParticipantController {
 		
 		
 		@ApiOperation(value = "To get all participants at study level",  notes = "only work for authorized users with the right acecss permission")
-		@RequestMapping(value = "/{studyOID}/participants", method = RequestMethod.GET)
+		@RequestMapping(value = "/studies/{studyOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudy(@PathVariable("studyOID") String studyOid,HttpServletRequest request) throws Exception {
 			
 			return listStudySubjects(studyOid, null, request);
 		}
 
-		@ApiOperation(value = "To get all participants at study site level",  notes = "only work for authorized users with the right acecss permission ")
-		@RequestMapping(value = "/{studyOID}/sites/{sitesOID}/participants", method = RequestMethod.GET)
+		@ApiOperation(value = "To get all participants at site level",  notes = "only work for authorized users with the right acecss permission ")
+		@RequestMapping(value = "/studies/{studyOID}/sites/{sitesOID}/participants", method = RequestMethod.GET)
 		public ResponseEntity<Object> listStudySubjectsInStudySite(@PathVariable("studyOID") String studyOid,@PathVariable("sitesOID") String siteOid,HttpServletRequest request) throws Exception {
 			
 			return listStudySubjects(studyOid, siteOid, request);
