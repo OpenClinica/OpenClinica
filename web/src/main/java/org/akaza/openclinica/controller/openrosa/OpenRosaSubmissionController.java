@@ -260,7 +260,8 @@ public class OpenRosaSubmissionController {
         List<EventDefinitionCrf> eventDefinitionCrfs = eventDefinitionCrfDao.findAvailableByStudyEventDefStudy(sed.getStudyEventDefinitionId(),
                 study.getStudyId());
         boolean statusChanged=false;
-
+        studyEvent.setUpdateId(userAccount.getUserId());
+        studyEvent.setDateUpdated(new Date());
         if (studyEvent.getSubjectEventStatusId() != SubjectEventStatus.SIGNED.getCode()) {
             int count = 0;
             for (EventCrf evCrf : eventCrfs) {
