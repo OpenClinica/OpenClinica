@@ -36,12 +36,15 @@ import org.springframework.validation.Errors;
 import org.springframework.validation.ObjectError;
 import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
+import org.apache.commons.validator.routines.EmailValidator;
 
+import javax.mail.internet.InternetAddress;
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
 import java.text.ParseException;
 import java.text.SimpleDateFormat;
 import java.util.*;
+import java.util.regex.Pattern;
 
 @Controller
 @Api(value = "Participant", tags = { "Participant" }, description = "REST API for Study Participant")
@@ -92,8 +95,10 @@ public class StudyParticipantController {
 						+ "<br />firstName                                     : First Name length should not exceed 35 characters."
 						+ "<br />lastName                                      : Last Name length should not exceed 35 characters."
 						+ "<br />identifier                                    : Identifier Name length should not exceed 35 characters."
-						+ "<br />emailAddress                                  : Email Address length should not exceed 255 characters."
-						+ "<br />phoneNumber                                   : Phone number length should not exceed 15 characters."
+						+ "<br />invalidEmailAddressLength                     : Email Address length should not exceed 255 characters."
+						+ "<br />invalidEmailAddress                            : Email Address contains invalid characters or format."
+						+ "<br />invalidPhoneNumberLength                       : Phone number length should not exceed 15 characters."
+						+ "<br />invalidPhoneNumber                             : Phone number should not contain alphabetic characters."
 						+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
         @RequestMapping(value = "/studies/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request, 
@@ -286,13 +291,20 @@ public class StudyParticipantController {
 				errors.reject("errorCode.identifier","Identifier length should not exceed 35 characters");
 			}
 			if (subjectTransferBean.getEmailAddress()!=null &&  subjectTransferBean.getEmailAddress().length()>255){
-				errors.reject("errorCode.emailAddress","Email Address length should not exceed 255 characters");
+				errors.reject("errorCode.invalidEmailAddressLength","Email Address length should not exceed 255 characters");
 			}
+
+			if (subjectTransferBean.getEmailAddress()!=null &&  ! EmailValidator.getInstance().isValid(subjectTransferBean.getEmailAddress())){
+				errors.reject("errorCode.invalidEmailAddress","Email Address contains invalid characters or format");
+			}
+
 			if (subjectTransferBean.getPhoneNumber()!=null && subjectTransferBean.getPhoneNumber().length()>15){
-				errors.reject("errorCode.phoneNumber","Phone number length should not exceed 15 characters");
+				errors.reject("errorCode.invalidPhoneNumberLength","Phone number length should not exceed 15 characters");
 			}
 
-
+			if (subjectTransferBean.getPhoneNumber()!=null && !onlyContainsNumbers(subjectTransferBean.getPhoneNumber())) {
+				errors.reject("errorCode.invalidPhoneNumber","Phone number should not containe alphabetic characters");
+			}
 
 			participantValidator.validate(subjectTransferBean, errors);
 
@@ -756,7 +768,15 @@ public class StudyParticipantController {
 				serviceHelper = serviceHelper != null ? serviceHelper : new RestfulServiceHelper(dataSource);
 		        return serviceHelper;
 		}
-		 
-		 
-		
+
+	private boolean onlyContainsNumbers(String text) {
+		try {
+			Long.parseLong(text);
+			return true;
+		} catch (NumberFormatException ex) {
+			return false;
+		}
+	}
+
+
 }
