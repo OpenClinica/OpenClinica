@@ -500,8 +500,12 @@ public class StudyParticipantController {
 		        	responseStudyParticipantsBulkDTO.getFailedParticipants().add(e);
 		        } else {        				
 				  	String label = create(subjectTransferBean,study,request);
+					StudySubjectBean subject = this.getStudySubjectDAO().findByLabel(label);
+					studyParticipantDTO.setSubjectOid(subject.getOid());
+
 				  	ResponseSuccessStudyParticipantDTO e = new ResponseSuccessStudyParticipantDTO();
 				  	e.setSubjectKey(studyParticipantDTO.getSubjectKey());
+				  	e.setSubjectOid(studyParticipantDTO.getSubjectOid());
 				  	e.setStatus("Available");
 				  	responseStudyParticipantsBulkDTO.getParticipants().add(e);
 		           
