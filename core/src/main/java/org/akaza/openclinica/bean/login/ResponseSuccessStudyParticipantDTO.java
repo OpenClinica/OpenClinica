@@ -5,6 +5,7 @@ public class ResponseSuccessStudyParticipantDTO {
 	private String subjectKey;
 	private String subjectOid;
 	private String status;
+	private String participateStatus;
 	
 	public String getSubjectKey() {
 		return subjectKey;
@@ -21,7 +22,14 @@ public class ResponseSuccessStudyParticipantDTO {
 	}
 	public void setStatus(String status) {
 		this.status = status;
-	}	
-	
+	}
+
+	public String getParticipateStatus() {
+		return participateStatus;
+	}
+
+	public void setParticipateStatus(String participateStatus) {
+		this.participateStatus = participateStatus;
+	}
 }
 

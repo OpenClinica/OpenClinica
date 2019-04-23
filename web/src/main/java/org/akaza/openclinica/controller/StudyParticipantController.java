@@ -19,6 +19,8 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.service.OCParticipantDTO;
+import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.service.participant.ParticipantService;
@@ -70,6 +72,12 @@ public class StudyParticipantController {
         @Autowired
 		private ValidateService validateService;
 
+        @Autowired
+        private UserService userService;
+
+	    @Autowired
+	    private StudyDao studyHibDao;
+
         private StudyDAO studyDao;
 		private StudySubjectDAO ssDao;
 		private UserAccountDAO userAccountDao;
@@ -92,19 +100,22 @@ public class StudyParticipantController {
                         + "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
                         + "<br />participantIDNotUnique                        : Participant ID already exists."
                         + "<br />studyHasSystemGeneratedIdEnabled              : Study is set to have system-generated ID, hence no new participant can be added."
-						+ "<br />firstName                                     : First Name length should not exceed 35 characters."
-						+ "<br />lastName                                      : Last Name length should not exceed 35 characters."
-						+ "<br />identifier                                    : Identifier Name length should not exceed 35 characters."
-						+ "<br />invalidEmailAddressLength                     : Email Address length should not exceed 255 characters."
-						+ "<br />invalidEmailAddress                            : Email Address contains invalid characters or format."
-						+ "<br />invalidPhoneNumberLength                       : Phone number length should not exceed 15 characters."
-						+ "<br />invalidPhoneNumber                             : Phone number should not contain alphabetic characters."
+						+ "<br />firstNameTooLong                              : First Name length should not exceed 35 characters."
+						+ "<br />lastNameTooLong                               : Last Name length should not exceed 35 characters."
+						+ "<br />identifierTooLong                             : Identifier Name length should not exceed 35 characters."
+						+ "<br />emailAddressTooLong                           : Email Address length should not exceed 255 characters."
+						+ "<br />invalidEmailAddress                           : Email Address contains invalid characters or format."
+						+ "<br />phoneNumberTooLong                            : Phone number length should not exceed 15 characters."
+						+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
+						+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
 						+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
         @RequestMapping(value = "/studies/{studyOID}/sites/{siteOID}/participants", method = RequestMethod.POST)
-		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request, 
+		public ResponseEntity<Object> createNewStudyParticipantAtSiteLevel(HttpServletRequest request,
 				@RequestBody ParticipantRestfulRequestDTO participantRestfulRequestDTO,
 				@PathVariable("studyOID") String studyOID,
-				@PathVariable("siteOID") String siteOID) throws Exception {
+				@PathVariable("siteOID") String siteOID,
+				@RequestParam( value = "register", defaultValue = "n", required = false ) String register) throws Exception {
+
 
 			utilService.setSchemaFromStudyOid(studyOID);
 			UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
@@ -115,7 +126,7 @@ public class StudyParticipantController {
 			map.put("phoneNumber", participantRestfulRequestDTO.getPhoneNumber());
 			map.put("lastName", participantRestfulRequestDTO.getLastName());
 			map.put("identifier", participantRestfulRequestDTO.getIdentifier());
-
+			map.put("register", register);
 			ResponseFailureStudyParticipantSingleDTO responseFailureStudyParticipantSingleDTO = new ResponseFailureStudyParticipantSingleDTO();
 			
 			try {
@@ -136,15 +147,24 @@ public class StudyParticipantController {
 		@ApiResponses(value = {
 		        @ApiResponse(code = 200, message = "Successful operation"),
 		        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> "
-		        		+ "<br />Error Code                                            Descriptions"
-		        		+ "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
-		        		+ "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
-		        		+ "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
-		        		+ "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
-		        		+ "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
-		        		+ "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
-		        		+ "<br />participantIDNotUnique                        : Participant ID already exists."
-		        		+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
+						+ "<br />Error Code                                            Descriptions"
+						+ "<br />bulkUploadNotSupportSystemGeneratedSetting    : Bulk particpant ID upload is not supproted when participant ID setting is set to System-generated."
+						+ "<br />notSupportedFileFormat                        : File format is not supported. Only CSV file please."
+						+ "<br />noSufficientPrivileges                        : User does not have sufficient privileges to perform this operation."
+						+ "<br />noRoleSetUp                                   : User has no roles setup under the given Study/Site."
+						+ "<br />participantIDContainsUnsupportedHTMLCharacter : Participant ID contains unsupported characters."
+						+ "<br />participantIDLongerThan30Characters	       : Participant ID exceeds 30 characters limit."
+						+ "<br />participantIDNotUnique                        : Participant ID already exists."
+						+ "<br />studyHasSystemGeneratedIdEnabled              : Study is set to have system-generated ID, hence no new participant can be added."
+						+ "<br />firstNameTooLong                              : First Name length should not exceed 35 characters."
+						+ "<br />lastNameTooLong                               : Last Name length should not exceed 35 characters."
+						+ "<br />identifierTooLong                             : Identifier Name length should not exceed 35 characters."
+						+ "<br />emailAddressTooLong                           : Email Address length should not exceed 255 characters."
+						+ "<br />invalidEmailAddress                           : Email Address contains invalid characters or format."
+						+ "<br />phoneNumberTooLong                            : Phone number length should not exceed 15 characters."
+						+ "<br />invalidPhoneNumber                            : Phone number should not contain alphabetic characters."
+						+ "<br />participateModuleNotActive                    : Participant Module is Not Active."
+						+ "<br />participantsEnrollmentCapReached              : Participant Enrollment List has reached. No new participants can be added.")})
 		@RequestMapping(value = "/studies/{studyOID}/sites/{siteOID}/participants/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
 		public ResponseEntity<Object> createNewStudyParticipantAtSiteyLevel(HttpServletRequest request,
 				@RequestParam("file") MultipartFile file,
@@ -240,10 +260,10 @@ public class StudyParticipantController {
 					
 			subjectTransferBean.setOwner(this.participantService.getUserAccount(request));
 			
-			StudyBean tenantstudy = this.getRestfulServiceHelper().setSchema(studyOID, request);
+			StudyBean tenantstudyBean = this.getRestfulServiceHelper().setSchema(studyOID, request);
 
 
-			subjectTransferBean.setStudy(tenantstudy);
+			subjectTransferBean.setStudy(tenantstudyBean);
 			
 			if(siteOID != null) {
 				StudyBean siteStudy = getStudyDao().findSiteByOid(subjectTransferBean.getStudyOid(), siteOID);
@@ -271,27 +291,25 @@ public class StudyParticipantController {
 			if (!validateService.isStudyToSiteRelationValid(studyOID, siteOID)) {
 				errors.reject(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
 			}
-			if (!validateService.isUserHasCrcOrInvestigaterRole(userRoles) ){
-				errors.reject(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES );
+			if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role_And_AccessToSite(userRoles,siteOID) ){
+				errors.reject(ErrorConstants.ERR_NO_ROLE_SETUP );
 			}
-			if ( !validateService.isUserRoleHasAccessToSite(userRoles,siteOID)){
-				errors.reject(ErrorConstants.ERR_NO_ROLE_SETUP);
-			}
-			if (utilService.isParticipantIDSystemGenerated(tenantstudy)){
+
+			if (utilService.isParticipantIDSystemGenerated(tenantstudyBean)){
 				errors.reject( "errorCode.studyHasSystemGeneratedIdEnabled","Study is set to have system-generated ID, hence no new participant can be added");
 			}
 
 			if (subjectTransferBean.getFirstName()!=null && subjectTransferBean.getFirstName().length()>35){
-				errors.reject("errorCode.firsName","First name length should not exceed 35 characters");
+				errors.reject("errorCode.firsNameTooLong","First name length should not exceed 35 characters");
 			}
 			if (subjectTransferBean.getLastName()!=null && subjectTransferBean.getLastName().length()>35){
-				errors.reject("errorCode.lastName","Last name length should not exceed 35 characters");
+				errors.reject("errorCode.lastNameTooLong","Last name length should not exceed 35 characters");
 			}
 			if (subjectTransferBean.getIdentifier()!=null && subjectTransferBean.getIdentifier().length()>35){
-				errors.reject("errorCode.identifier","Identifier length should not exceed 35 characters");
+				errors.reject("errorCode.identifierTooLong","Identifier length should not exceed 35 characters");
 			}
 			if (subjectTransferBean.getEmailAddress()!=null &&  subjectTransferBean.getEmailAddress().length()>255){
-				errors.reject("errorCode.invalidEmailAddressLength","Email Address length should not exceed 255 characters");
+				errors.reject("errorCode.emailAddressTooLong","Email Address length should not exceed 255 characters");
 			}
 
 			if (subjectTransferBean.getEmailAddress()!=null &&  ! EmailValidator.getInstance().isValid(subjectTransferBean.getEmailAddress())){
@@ -299,11 +317,16 @@ public class StudyParticipantController {
 			}
 
 			if (subjectTransferBean.getPhoneNumber()!=null && subjectTransferBean.getPhoneNumber().length()>15){
-				errors.reject("errorCode.invalidPhoneNumberLength","Phone number length should not exceed 15 characters");
+				errors.reject("errorCode.phoneNumberTooLong","Phone number length should not exceed 15 characters");
 			}
 
 			if (subjectTransferBean.getPhoneNumber()!=null && !onlyContainsNumbers(subjectTransferBean.getPhoneNumber())) {
 				errors.reject("errorCode.invalidPhoneNumber","Phone number should not containe alphabetic characters");
+			}
+
+			Study tenantstudy = studyHibDao.findById(tenantstudyBean.getId());
+			if(subjectTransferBean.isRegister() && !validateService.isParticipateActive(tenantstudy)) {
+				errors.reject("errorCode.participateModuleNotActive", "Participate Module is not Active");
 			}
 
 			participantValidator.validate(subjectTransferBean, errors);
@@ -335,7 +358,7 @@ public class StudyParticipantController {
 	    		
 	    		response = new ResponseEntity(responseFailure, org.springframework.http.HttpStatus.BAD_REQUEST);
 	        } else {        				
-			  	String label = create(subjectTransferBean,tenantstudy,request);
+			  	String label = create(subjectTransferBean,tenantstudyBean,request);
 			  	studyParticipantDTO.setSubjectKey(label);
 
 				StudySubjectBean subject = this.getStudySubjectDAO().findByLabel(label);
@@ -347,6 +370,7 @@ public class StudyParticipantController {
 	            responseSuccess.setSubjectKey(studyParticipantDTO.getSubjectKey());
 	            responseSuccess.setSubjectOid(studyParticipantDTO.getSubjectOid());
 	            responseSuccess.setStatus("Available");
+				responseSuccess.setParticipateStatus(subject.getUserStatus()!=null?subject.getUserStatus().getValue():"");
 
 				response = new ResponseEntity(responseSuccess, org.springframework.http.HttpStatus.OK);
 	        }
@@ -603,8 +627,20 @@ public class StudyParticipantController {
 	    private String create(SubjectTransferBean subjectTransferBean,StudyBean currentStudy, HttpServletRequest request) throws Exception {
 	          logger.debug("creating subject transfer");
 	          String accessToken = utilService.getAccessTokenFromRequest(request);
+			String customerUuid= utilService.getCustomerUuidFromRequest(request);
+			UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
+			OCParticipantDTO oCParticipantDTO = new OCParticipantDTO();
+			oCParticipantDTO.setFirstName(subjectTransferBean.getFirstName());
+			oCParticipantDTO.setLastName(subjectTransferBean.getLastName());
+			oCParticipantDTO.setEmail(subjectTransferBean.getEmailAddress());
+			oCParticipantDTO.setPhoneNumber(subjectTransferBean.getPhoneNumber());
+			oCParticipantDTO.setIdentifier(subjectTransferBean.getIdentifier());
+			String label =this.participantService.createParticipant(subjectTransferBean,currentStudy,accessToken);
 
-	          return this.participantService.createParticipant(subjectTransferBean,currentStudy,accessToken);
+			if(subjectTransferBean.isRegister())
+				userService.connectParticipant(currentStudy.getOid(),subjectTransferBean.getPersonId(),oCParticipantDTO,accessToken,userAccountBean,customerUuid);
+
+			return label;
 	    }
 	    
 	   
@@ -663,7 +699,7 @@ public class StudyParticipantController {
 
 			String emailAddress = (String) map.get("emailAddress");
 			String phoneNumber = (String) map.get("phoneNumber");
-
+			String register = (String) map.get("register");
 
 			SubjectTransferBean subjectTransferBean = new SubjectTransferBean();
 
@@ -676,6 +712,8 @@ public class StudyParticipantController {
 			subjectTransferBean.setEmailAddress(emailAddress);
 			subjectTransferBean.setPhoneNumber(phoneNumber);
 
+			if(register.equalsIgnoreCase("Y")|| register.equalsIgnoreCase("YES"))
+				subjectTransferBean.setRegister(true);
 
 			return subjectTransferBean;
 
