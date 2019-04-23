@@ -36,6 +36,7 @@ public class SubjectTransferBean extends EntityBean {
     private String identifier;
     private String emailAddress;
     private String phoneNumber;
+    private boolean register=false;
 
     UserAccountBean owner;
 
@@ -203,5 +204,13 @@ public class SubjectTransferBean extends EntityBean {
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public boolean isRegister() {
+        return register;
+    }
+
+    public void setRegister(boolean register) {
+        this.register = register;
     }
 }

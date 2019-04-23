@@ -86,7 +86,7 @@ public class ValidateServiceImpl implements ValidateService {
 
     public boolean isStudyOidValidStudyLevelOid(String studyOid) {
         Study publicStudy = getPublicStudy(studyOid);
-        if (publicStudy!=null && publicStudy.getStudy() == null) {
+        if (publicStudy != null && publicStudy.getStudy() == null) {
             return true;
         }
         return false;
@@ -102,7 +102,7 @@ public class ValidateServiceImpl implements ValidateService {
 
     public boolean isSiteOidValidSiteLevelOid(String siteOid) {
         Study publicSite = getPublicStudy(siteOid);
-        if (publicSite!=null && publicSite.getStudy() != null) {
+        if (publicSite != null && publicSite.getStudy() != null) {
             return true;
         }
         return false;
@@ -112,36 +112,41 @@ public class ValidateServiceImpl implements ValidateService {
     public boolean isStudyToSiteRelationValid(String studyOid, String siteOid) {
         Study publicStudy = getPublicStudy(studyOid);
         Study publicSite = getPublicStudy(siteOid);
-        if (publicStudy!=null && publicSite!=null && publicSite.getStudy().getStudyId() == publicStudy.getStudyId()) {
+        if (publicStudy != null && publicSite != null && publicSite.getStudy().getStudyId() == publicStudy.getStudyId()) {
             return true;
         }
         return false;
     }
 
 
-    public boolean isUserHasCrcOrInvestigaterRole(List<StudyUserRoleBean> userRoles) {
+    public boolean isUserHasCRC_INV_Role_And_AccessToSite(List<StudyUserRoleBean> userRoles, String siteOid) {
+        Study publicSite = getPublicStudy(siteOid);
+        if (publicSite == null)
+            return false;
         for (StudyUserRoleBean userRole : userRoles) {
-            if (userRole.getRole().equals(Role.RESEARCHASSISTANT) || userRole.getRole().equals(Role.INVESTIGATOR)) {
+            if (check_CRC_INV_RoleByStudyUserRole(userRole) && checkUserHasAccessToSite(userRole, publicSite)) {
                 return true;
             }
         }
         return false;
     }
-    public boolean isUserHasTechAdminRole(UserAccount userAccount){
-        if(userAccount.getUserType().getUserTypeId()== UserType.TECHADMIN.getId())
-            return true;
+
+
+    public boolean isUserHasCRC_INV_DM_DEP_DS_Role_And_AccessToSite(List<StudyUserRoleBean> userRoles, String siteOid) {
+        Study publicSite = getPublicStudy(siteOid);
+        if (publicSite == null)
+            return false;
+        for (StudyUserRoleBean userRole : userRoles) {
+            if (check_CRC_INV_DM_DEP_DS_RoleByStudyUserRole(userRole) && checkUserHasAccessToSite(userRole, publicSite)) {
+                return true;
+            }
+        }
         return false;
     }
 
-
-    public boolean isUserRoleHasAccessToSite(ArrayList<StudyUserRoleBean> userRoles, String siteOid) {
-        Study publicSite = getPublicStudy(siteOid);
-        if(publicSite==null)
-            return false;
-        for (StudyUserRoleBean userRole : userRoles) {
-            if ((userRole.getStudyId() == publicSite.getStudyId()) || (userRole.getStudyId()==publicSite.getStudy().getStudyId()))
-                return true;
-        }
+    public boolean isUserHasTechAdminRole(UserAccount userAccount) {
+        if (userAccount.getUserType().getUserTypeId() == UserType.TECHADMIN.getId())
+            return true;
         return false;
     }
 
@@ -155,7 +160,7 @@ public class ValidateServiceImpl implements ValidateService {
     }
 
     public boolean isAdvanceSearchEnabled(Study tenantStudy) {
-        StudyParameterValue spv = studyParameterValueDao.findByStudyIdParameter(tenantStudy.getStudy()==null?tenantStudy.getStudyId():tenantStudy.getStudy().getStudyId() , ADVANCE_SEARCH);
+        StudyParameterValue spv = studyParameterValueDao.findByStudyIdParameter(tenantStudy.getStudy() == null ? tenantStudy.getStudyId() : tenantStudy.getStudy().getStudyId(), ADVANCE_SEARCH);
 
         if (spv != null && spv.getValue().equals(ENABLED))
             return true;
@@ -168,8 +173,32 @@ public class ValidateServiceImpl implements ValidateService {
         return studyDao.findPublicStudy(studyOid);
     }
 
+    private boolean check_CRC_INV_RoleByStudyUserRole(StudyUserRoleBean userRole) {
+        if (userRole.getRole().equals(Role.RESEARCHASSISTANT)
+                || userRole.getRole().equals(Role.INVESTIGATOR)
+        ) {
+            return true;
+        }
+        return false;
+    }
 
+    private boolean check_CRC_INV_DM_DEP_DS_RoleByStudyUserRole(StudyUserRoleBean userRole) {
+        if (userRole.getRole().equals(Role.RESEARCHASSISTANT)
+                || userRole.getRole().equals(Role.INVESTIGATOR)
+                || userRole.getRole().equals(Role.STUDY_INVESTIGATOR)
+                || userRole.getRole().equals(Role.STUDY_RESEARCHASSISTANT)
+                || userRole.getRole().equals(Role.COORDINATOR)
+        ) {
+            return true;
+        }
+        return false;
+    }
 
-
+    private boolean checkUserHasAccessToSite(StudyUserRoleBean userRole, Study publicSite) {
+        if ((userRole.getStudyId() == publicSite.getStudyId()) || (userRole.getStudyId() == publicSite.getStudy().getStudyId())) {
+            return true;
+        }
+        return false;
+    }
 
 }

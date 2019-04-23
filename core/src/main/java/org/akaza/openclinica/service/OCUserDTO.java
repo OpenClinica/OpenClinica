@@ -48,6 +48,8 @@ public class OCUserDTO extends AbstractAuditingDTO implements Serializable {
     private String accessCode;
 
 
+    public OCUserDTO() {
+    }
 
     public String getUuid() {
         return uuid;
