@@ -5,7 +5,16 @@
 
 
 
-	<changeSet author="jkeremian" id="4.0-2019-04-10-OC-10430-1">
+	<changeSet author="jkeremian" id="2019-04-10-OC-10430-1">
+		<sql>
+			UPDATE audit_log_event
+			SET user_id='1' WHERE user_id ='0' or user_id is Null;
+		</sql>
+	</changeSet>
+
+
+
+	<changeSet author="jkeremian" id="2019-04-10-OC-10430-2">
 		<addForeignKeyConstraint baseColumnNames="user_id"
 								 baseTableName="audit_log_event" constraintName="audit_log_event_user_by_id_fk"
 								 deferrable="false" initiallyDeferred="false"
@@ -16,7 +25,7 @@
 
 
 
-	<changeSet author="jkeremian" id="4.0-2019-04-10-OC-10430-2">
+	<changeSet author="jkeremian" id="2019-04-10-OC-10430-3">
 		<addNotNullConstraint columnName="user_id"
 							  tableName="audit_log_event"/>
 	</changeSet>
