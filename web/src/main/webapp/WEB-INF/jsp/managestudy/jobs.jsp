@@ -49,14 +49,12 @@
     border: 1px solid #ccc;
     border-bottom-color: #ccc !important;
   }
-  .datatable thead td {
-    border-color: white !important;
-  }
   .datatable thead th {
     background-color: #ccc;
     font-weight: normal !important;
     padding: 3px;
     border-bottom: none !important;
+    border: 1px solid white;
   }
   .datatable tbody td:last-child {
     text-align: center;
@@ -68,8 +66,16 @@
   #tbl-jobs_filter {
     margin-bottom: 3px;
   }
+  #tbl-jobs_wrapper {
+    margin-top: 30px;
+  }
   .icon {
     cursor: pointer;
+  }
+  input[type=search] {
+    border: 1px solid #ccc;
+    border-radius: 5px;
+    margin-bottom: 6px;
   }
 </style>
 
@@ -86,7 +92,7 @@
 <table id="tbl-jobs" class="datatable">
   <thead>
     <tr>
-      <th><fmt:message key="log_file" bundle="${resword}"/></th>
+      <th><fmt:message key="jobs_source_filename" bundle="${resword}"/></th>
       <th><fmt:message key="job_type" bundle="${resword}"/></th>
       <th><fmt:message key="job_status" bundle="${resword}"/></th>
       <th><fmt:message key="created_on" bundle="${resword}"/></th>
@@ -129,7 +135,7 @@ var datatable = $('#tbl-jobs').DataTable({
     lengthMenu: '<fmt:message key="results_pagesize" bundle="${resword}"/>'
   }
 });
-$('#tbl-jobs_wrapper').prepend('<b><fmt:message key="jobs_source_filename" bundle="${resword}"/></b>');
+$('#tbl-jobs_wrapper').prepend('<b><fmt:message key="jobs_log" bundle="${resword}"/></b>');
 
 var url = '${pageContext.request.contextPath}/pages/auth/api/studies/${theStudy.oid}';
 var siteOid = '${atSiteLevel ? theSite.oid : null}';
