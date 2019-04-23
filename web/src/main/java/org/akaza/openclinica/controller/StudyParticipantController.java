@@ -635,7 +635,7 @@ public class StudyParticipantController {
 			oCParticipantDTO.setEmail(subjectTransferBean.getEmailAddress());
 			oCParticipantDTO.setPhoneNumber(subjectTransferBean.getPhoneNumber());
 			oCParticipantDTO.setIdentifier(subjectTransferBean.getIdentifier());
-			String label =this.participantService.createParticipant(subjectTransferBean,currentStudy,accessToken);
+			String label =this.participantService.createParticipant(subjectTransferBean,currentStudy,accessToken,userAccountBean);
 
 			if(subjectTransferBean.isRegister())
 				userService.connectParticipant(currentStudy.getOid(),subjectTransferBean.getPersonId(),oCParticipantDTO,accessToken,userAccountBean,customerUuid);
