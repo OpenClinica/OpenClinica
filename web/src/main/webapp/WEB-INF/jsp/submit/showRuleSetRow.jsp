@@ -41,11 +41,6 @@
         <c:choose>
           <c:when test="${currRow.bean.status.name eq 'AVAILABLE' }">
             <c:if test="${userBean.sysAdmin || (userRole.manageStudy)}">
-              <td><a href="RunRuleSet?ruleSetId=<c:out value="${currRow.bean.id}"/>"
-                   onMouseDown="javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');"
-                   onMouseUp="javascript:setImage('bt_Run1','images/bt_ExexuteRules.gif');"><span
-                  name="bt_Edit1" class="icon icon-pencil-squared" border="0" alt="<fmt:message key="rule_run" bundle="${resword}"/>" title="<fmt:message key="rule_run" bundle="${resword}"/>" align="left" hspace="6"></a>
-              </td>
               <c:if test="${ readOnly != 'true' }">
               <td><a href="RemoveRuleSet?action=confirm&ruleSetId=<c:out value="${currRow.bean.id}"/>"
                      onMouseDown="javascript:setImage('bt_Remove1','images/bt_Remove_d.gif');"
