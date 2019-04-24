@@ -530,7 +530,7 @@ public class ChangeCRFVersionController {
 	                 studySubBean.setUpdater(getCurrentUser(request));
 	                 studySubDao.update(studySubBean, con);
 	        	 }
-	        	 st_event_bean.setUpdater(getCurrentUser(request));
+	        	// st_event_bean.setUpdater(getCurrentUser(request));
             	 st_event_bean.setUpdatedDate(new Date());
         		
             	status_before_update = auditDao.findLastStatus("study_event",  st_event_bean.getId(), "8");
