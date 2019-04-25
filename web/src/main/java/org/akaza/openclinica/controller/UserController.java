@@ -192,8 +192,8 @@ public class UserController {
         return new ResponseEntity<List<OCUserDTO>>(userDTOs, HttpStatus.OK);
     }
 
-    @ApiOperation( value = "To extract participants info", notes = "Will extract the data in a text file" )
-    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.GET )
+    @ApiOperation( value = "create job to extract participants info", notes = "Will extract the data in a text file" )
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.POST )
     public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
