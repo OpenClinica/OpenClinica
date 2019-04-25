@@ -1237,15 +1237,15 @@
                 </tr>
                 <tr valign="top">
                   <td></td>
-                  <td valign="top" id="invite-via-email">
+                  <td valign="top" id="invite_via_email">
                     <span style="margin-right:15px;">
                       <fmt:message key="invite_via_email" bundle="${resword}"/>
                     </span>
-                    <label><input type="radio" name="invite-via-email" value="true">
+                    <label><input type="radio" name="invite_via_email" value="true">
                       <fmt:message key="invite_yes" bundle="${resword}"/>
                     </label>
                     &emsp;
-                    <label><input type="radio" name="invite-via-email" value="false" checked="checked">
+                    <label><input type="radio" name="invite_via_email" value="false" checked="checked">
                       <fmt:message key="invite_no" bundle="${resword}"/>
                     </label>
                   </td>
@@ -1528,15 +1528,15 @@
                 </tr>
                 <tr valign="top">
                   <td></td>
-                  <td valign="top" id="invite-via-sms">
+                  <td valign="top" id="invite_via_sms">
                     <span style="margin-right:15px;">
                       <fmt:message key="invite_via_email" bundle="${resword}"/>
                     </span>
-                    <label><input type="radio" name="invite-via-sms" value="true">
+                    <label><input type="radio" name="invite_via_sms" value="true">
                       <fmt:message key="invite_yes" bundle="${resword}"/>
                     </label>
                     &emsp;
-                    <label><input type="radio" name="invite-via-sms" value="false" checked="checked">
+                    <label><input type="radio" name="invite_via_sms" value="false" checked="checked">
                       <fmt:message key="invite_no" bundle="${resword}"/>
                     </label>
                   </td>
@@ -1655,19 +1655,19 @@
         var hasEmail = !!$('#email-input').val().trim();
         var validEmail = $('#email-input-error').is(':hidden');
         if (hasEmail && validEmail) {
-            $('#invite-via-email input').removeAttr("disabled");
+            $('#invite_via_email input').removeAttr("disabled");
         }
         else {
-            $('#invite-via-email input').attr("disabled", "disabled");
+            $('#invite_via_email input').attr("disabled", "disabled");
         }
 
         var hasPhone = !!$('#phone-input').val().trim();
         var validPhone = $('#phone-input-error').is(':hidden');
         if (hasPhone && validPhone) {
-            $('#invite-via-sms input').removeAttr("disabled");
+            $('#invite_via_sms input').removeAttr("disabled");
         }
         else {
-            $('#invite-via-sms input').attr("disabled", "disabled");
+            $('#invite_via_sms input').attr("disabled", "disabled");
         }
 
         if (validEmail && validPhone)
@@ -1710,7 +1710,7 @@
                 lastName: $('#lname-input').val(),
                 email: $('#email-input').val(),
                 phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
-                inviteParticipant: $('#invite-via-email input:checked').val(),
+                inviteParticipant: $('#invite_via_email input:checked').val(),
                 identifier: $('#secid-input').val()
             };
             jQuery.ajax({
@@ -1783,7 +1783,7 @@
 
             $('#email-input-error').hide();
             $('#phone-input-error').hide();
-            $('#invite-via-email input[value=' + participateInfo.inviteParticipant + ']').click();
+            $('#invite_via_email input[value=' + participateInfo.inviteParticipant + ']').click();
 
             enableDisableControls();
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });
