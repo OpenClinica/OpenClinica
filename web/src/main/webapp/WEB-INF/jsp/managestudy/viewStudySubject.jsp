@@ -1721,6 +1721,22 @@
                 success: updateParticipateInfo,
                 error: logDump
             });
+
+            if ($('#invite_via_sms input:checked').val() == "true") {
+                jQuery.ajax({
+                    type: 'post',
+                    url: '${pageContext.request.contextPath}/message-service/api/messages/text',
+                    contentType: 'application/json',
+                    data: JSON.stringify({
+                        receiverPhone: data.phoneNumber,
+                        message: 'test',
+                        customerName: data.firstName + ' ' + data.lastName
+                    }),
+                    success: logDump,
+                    error: logDump
+                });
+            }
+
             jQuery.unblockUI();
             return false;
         });
