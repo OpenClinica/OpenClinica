@@ -242,6 +242,10 @@
   .error {
     color: red;
   }
+  .yes-no-question {
+    display: inline-block;
+    width: 140px;
+  }
   .invite-input {
     width: 250px;
   }
@@ -1225,7 +1229,7 @@
                   </td>
                   <td valign="top">
                     <input id="email-input" onfocus="this.select()" type="text" value="" size="45" maxlength="255" class="formfield form-control invite-input">
-                    <div id="email-input-info" class="grayed-out">
+                    <div id="email-input-info" class="invisible">
                       <fmt:message key="invite_required" bundle="${resword}"/>
                       <br>
                       <fmt:message key="invite_required_line2" bundle="${resword}"/>
@@ -1238,7 +1242,7 @@
                 <tr valign="top">
                   <td></td>
                   <td valign="top" id="invite_via_email">
-                    <span style="margin-right:15px;">
+                    <span class="yes-no-question">
                       <fmt:message key="invite_via_email" bundle="${resword}"/>
                     </span>
                     <label><input type="radio" name="invite_via_email" value="true">
@@ -1529,7 +1533,7 @@
                 <tr valign="top">
                   <td></td>
                   <td valign="top" id="invite_via_sms">
-                    <span style="margin-right:15px;">
+                    <span class="yes-no-question">
                       <fmt:message key="invite_via_sms" bundle="${resword}"/>
                     </span>
                     <label><input type="radio" name="invite_via_sms" value="true">
