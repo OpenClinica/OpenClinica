@@ -1530,7 +1530,7 @@
                   <td></td>
                   <td valign="top" id="invite_via_sms">
                     <span style="margin-right:15px;">
-                      <fmt:message key="invite_via_email" bundle="${resword}"/>
+                      <fmt:message key="invite_via_sms" bundle="${resword}"/>
                     </span>
                     <label><input type="radio" name="invite_via_sms" value="true">
                       <fmt:message key="invite_yes" bundle="${resword}"/>
