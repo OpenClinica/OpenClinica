@@ -362,7 +362,7 @@
               </c:if>
               <c:if test="${participateStatus!='enabled' && advsearchStatus=='enabled'}">
                 <a href="javascript:;" id="partid-edit">
-                  <fmt:message key="partid_edit" bundle="${resword}"/>
+                  <fmt:message key="edit" bundle="${resword}"/>
                 </a>
               </c:if>
             </c:if>
