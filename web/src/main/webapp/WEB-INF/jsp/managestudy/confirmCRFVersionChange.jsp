@@ -168,13 +168,13 @@
 
 <table border="0" colspan="2"><tr><td>
 <form method="POST" action="${pageContext.request.contextPath}/pages/managestudy/changeCRFVersion" >
-<input type="hidden" name="newCRFVersionId" value="${fn:escapeXml(selectedVersionId})">
+<input type="hidden" name="newCRFVersionId" value="${fn:escapeXml(selectedVersionId)}">
 
-<input type="hidden" name="studySubjectId" value="${fn:escapeXml(studySubjectId})">
-<input type="hidden" name="eventDefinitionCRFId" value="${fn:escapeXml(eventDefinitionCRFId})">
-<input type="hidden" name="studySubjectLabel" value="${fn:escapeXml(studySubjectLabel})">
-<input type="hidden" name="crfversionId" value="${fn:escapeXml(crfversionId})">
-<input type="hidden" name="crfId" value="${fn:escapeXml(crfId})">
+<input type="hidden" name="studySubjectId" value="${fn:escapeXml(studySubjectId)}">
+<input type="hidden" name="eventDefinitionCRFId" value="${fn:escapeXml(eventDefinitionCRFId)}">
+<input type="hidden" name="studySubjectLabel" value="${fn:escapeXml(studySubjectLabel)}">
+<input type="hidden" name="crfversionId" value="${fn:escapeXml(crfversionId)}">
+<input type="hidden" name="crfId" value="${fn:escapeXml(crfId)}">
 <input type="hidden" name="crfName" value="${fn:escapeXml(crfName)}">
 <input type="hidden" name="crfVersionName" value="${fn:escapeXml(crfVersionName)}">
 <input type="hidden" name="eventCRFId" value="${fn:escapeXml(eventCRFId)}">
