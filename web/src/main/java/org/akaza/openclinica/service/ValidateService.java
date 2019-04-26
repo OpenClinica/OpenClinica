@@ -28,14 +28,16 @@ public interface ValidateService {
 
     boolean isStudyToSiteRelationValid(String studyOid, String siteOid);
 
-    boolean isUserHasCRC_INV_Role_And_AccessToSite(List<StudyUserRoleBean> userRoles, String siteOid);
+    boolean isUserHasCRC_INV_Role(List<StudyUserRoleBean> userRoles);
 
-    boolean isUserHasCRC_INV_DM_DEP_DS_Role_And_AccessToSite(List<StudyUserRoleBean> userRoles, String siteOid);
+    boolean isUserHasCRC_INV_DM_DEP_DS_Role(List<StudyUserRoleBean> userRoles);
 
     boolean isUserHasTechAdminRole(UserAccount userAccount);
 
     boolean isParticipateActive(Study tenantStudy);
 
     boolean isAdvanceSearchEnabled(Study tenantStudy);
+
+    boolean isUserHasAccessToStudy(List<StudyUserRoleBean> userRoles, String studyOid);
 
 }

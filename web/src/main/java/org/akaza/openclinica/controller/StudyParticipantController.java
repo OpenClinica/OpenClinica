@@ -291,8 +291,10 @@ public class StudyParticipantController {
 			if (!validateService.isStudyToSiteRelationValid(studyOID, siteOID)) {
 				errors.reject(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
 			}
-			if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role_And_AccessToSite(userRoles,siteOID) ){
-				errors.reject(ErrorConstants.ERR_NO_ROLE_SETUP );
+			if (!validateService.isUserHasAccessToStudy(userRoles,studyOID) && !validateService.isUserHasAccessToStudy(userRoles,siteOID)) {
+				errors.reject(ErrorConstants.ERR_NO_ROLE_SETUP);
+			}else if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role(userRoles)  ){
+				errors.reject(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES );
 			}
 
 			if (utilService.isParticipantIDSystemGenerated(tenantstudyBean)){

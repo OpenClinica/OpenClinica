@@ -193,7 +193,7 @@ public class UserController {
     }
 
     @ApiOperation( value = "To extract participants info", notes = "Will extract the data in a text file" )
-    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.GET )
+    @RequestMapping( value = "/clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/extractPartcipantsInfo", method = RequestMethod.POST )
     public ResponseEntity<Object> extractPartcipantsInfo(HttpServletRequest request, @PathVariable( "studyOID" ) String studyOid, @PathVariable( "siteOID" ) String siteOid) throws InterruptedException {
         utilService.setSchemaFromStudyOid(studyOid);
         Study tenantStudy = getTenantStudy(studyOid);
@@ -219,8 +219,10 @@ public class UserController {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
             }
 
-            if (!validateService.isUserHasCRC_INV_Role_And_AccessToSite(userRoles,siteOid)) {
+            if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) && !validateService.isUserHasAccessToStudy(userRoles,siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+            }else if (!validateService.isUserHasCRC_INV_Role(userRoles)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
             }
 
             if (!validateService.isParticipateActive(tenantStudy)) {
