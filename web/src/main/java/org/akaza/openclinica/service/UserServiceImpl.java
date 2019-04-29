@@ -212,16 +212,21 @@ public class UserServiceImpl implements UserService {
             StudySubjectDetail studySubjectDetail = new StudySubjectDetail();
             studySubject.setStudySubjectDetail(studySubjectDetail);
         }
-        studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName());
+        if (participantDTO.getFirstName() != null)
+        studySubject.getStudySubjectDetail().setFirstName(participantDTO.getFirstName() != null ? participantDTO.getFirstName() : "");
 
         if (validateService.isParticipateActive(tenantStudy)) {
-            studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail());
-            studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber());
+            if (participantDTO.getEmail() != null)
+                studySubject.getStudySubjectDetail().setEmail(participantDTO.getEmail() != null ? participantDTO.getEmail() : "");
+            if (participantDTO.getPhoneNumber() != null)
+            studySubject.getStudySubjectDetail().setPhone(participantDTO.getPhoneNumber() != null ? participantDTO.getPhoneNumber() : "");
         }
 
         if (validateService.isAdvanceSearchEnabled(tenantStudy)) {
-            studySubject.getStudySubjectDetail().setLastName(participantDTO.getLastName());
-            studySubject.getStudySubjectDetail().setIdentifier(participantDTO.getIdentifier());
+            if (participantDTO.getLastName() != null)
+                studySubject.getStudySubjectDetail().setLastName(participantDTO.getLastName() != null ? participantDTO.getLastName() : "");
+            if (participantDTO.getIdentifier() != null)
+                studySubject.getStudySubjectDetail().setIdentifier(participantDTO.getIdentifier() != null ? participantDTO.getIdentifier() : "");
         }
         return studySubjectDao.saveOrUpdate(studySubject);
 
