@@ -15,8 +15,13 @@ public final class ErrorConstants {
     public static final String ERR_MISMATCH_STUDY_OID_AND_SITE_OID = "error.mismatchStudyOidAndSiteOid";
 
     public static final String ERR_PARTICIAPTE_INACTIVE = "error.participateInactive";
-    public static final String ERR_JOB_FAILED = "error.jobfailed";
+    public static final String ERR_JOB_FAILED = "error.jobFailed";
     public static final String ERR_INCORRECT_USER = "error.incorrectUser";
+    public static final String ERR_JOB_IN_PROGRESS = "error.jobInProgress";
+    public static final String ERR_JOB_DELETED = "error.jobDeleted";
+    public static final String ERR_NO_LOG_FILE_FOUND = "error.noLogFileFound";
+    public static final String ERR_INVALID_UUID = "error.invalidUuid";
+    public static final String ERR_NO_SUFFICIENT_PRIVILEGES = "errorCode.noSufficientPrivileges";
 
 
     private ErrorConstants() {
