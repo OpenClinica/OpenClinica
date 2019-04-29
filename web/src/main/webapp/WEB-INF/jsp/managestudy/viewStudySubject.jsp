@@ -1715,6 +1715,7 @@
                 email: $('#email-input').val(),
                 phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
                 inviteParticipant: $('#invite_via_email input:checked').val(),
+                inviteViaSms: $('#invite_via_sms input:checked').val(),
                 identifier: $('#secid-input').val()
             };
             jQuery.ajax({
