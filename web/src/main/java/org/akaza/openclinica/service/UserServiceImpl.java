@@ -22,6 +22,7 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.RandomStringUtils;
+import org.apache.commons.lang3.StringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -34,6 +35,8 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.util.LinkedMultiValueMap;
+import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
 import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
@@ -142,7 +145,6 @@ public class UserServiceImpl implements UserService {
     public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken, UserAccountBean userAccountBean, String customerUuid) {
         OCUserDTO ocUserDTO = null;
         Study tenantStudy = getStudy(studyOid);
-
         String oid = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getOc_oid() : tenantStudy.getOc_oid());
 
         StudySubject studySubject = getStudySubject(ssid, tenantStudy);
@@ -182,14 +184,20 @@ public class UserServiceImpl implements UserService {
         } else {
             logger.info("Participant does not exists or not added yet in OC ");
         }
-        if (participantDTO.isInviteParticipant()) {
+        if (participantDTO.isInviteParticipant() || participantDTO.isInviteViaSms()) {
 
             ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean);
 
-            sendEmailToParticipant(studySubject, tenantStudy, accessDTO);
-            studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null, tenantStudy, userAccount);
+            if (participantDTO.isInviteViaSms()) {
+                sendSMSToParticipant(accessToken, participantDTO, tenantStudy, accessDTO);
+            }
 
+            if (participantDTO.isInviteParticipant()) {
+                sendEmailToParticipant(studySubject, tenantStudy, accessDTO);
+                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null, tenantStudy, userAccount);
+            }
         }
+
         ocUserDTO = buildOcUserDTO(studySubject);
 
         return ocUserDTO;
@@ -375,6 +383,35 @@ public class UserServiceImpl implements UserService {
             return userResponse.getBody();
         }
 
+    }
+
+    private void sendSMSToParticipant (String accessToken, OCParticipantDTO participantDTO, Study tenantStudy, ParticipantAccessDTO accessDTO) {
+        String studyName = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getName() : tenantStudy.getName());
+
+        StringBuffer buffer = new StringBuffer("Hi ").append(participantDTO.getFirstName())
+                .append(", Thanks for participating in ").append(studyName).append("! ")
+        .append("Follow the link below to get started. For future reference, your access code is ").append(accessDTO.getAccessCode())
+        .append(System.lineSeparator()).append(accessDTO.getAccessLink());
+
+
+        //String uri = StringUtils.substringBefore(sbsUrl, "//") + "//" + StringUtils.substringBetween(sbsUrl, "//", "/") + "/message-service/api/messages/text";
+        String uri = "http://localhost:8088/api/messages/text";
+
+        RestTemplate restTemplate = new RestTemplate();
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        ObjectMapper objectMapper = new ObjectMapper();
+        objectMapper.registerModule(new JavaTimeModule());
+        headers.add("Authorization", "Bearer " + accessToken);
+        headers.add("Accept-Charset", "UTF-8");
+        OCMessageDTO messageDTO = new OCMessageDTO();
+        messageDTO.setReceiverPhone(StringUtils.remove(participantDTO.getPhoneNumber(), " "));
+        messageDTO.setMessage(buffer.toString());
+        HttpEntity<OCMessageDTO> request = new HttpEntity<>(messageDTO, headers);
+
+        ResponseEntity<String> result = restTemplate.postForEntity(uri, request, String.class);
+
+        System.out.println("comes here");
     }
 
     private void sendEmailToParticipant(StudySubject studySubject, Study tenantStudy, ParticipantAccessDTO accessDTO) {
