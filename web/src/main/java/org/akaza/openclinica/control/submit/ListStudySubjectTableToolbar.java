@@ -128,8 +128,9 @@ public class ListStudySubjectTableToolbar extends DefaultToolbar {
         @Override
         public String enabled() {
             String js =
-                "var selectedValue = document.getElementById('sedDropDown').options[document.getElementById('sedDropDown').selectedIndex].value;  "
-                    + " if (selectedValue != null  ) { " + "window.location='ListEventsForSubjects?module=submit&defId=' + selectedValue;" + " } ";
+                "var selectedValue = document.getElementById('sedDropDown').options[document.getElementById('sedDropDown').selectedIndex].value; "
+                    + " var maxrows = $('select[name=maxRows]').val();"
+                    + " if (selectedValue != null  ) { " + "window.location='ListEventsForSubjects?module=submit&defId=' + selectedValue + '&maxRows=' + maxrows;" + " } ";
             HtmlBuilder html = new HtmlBuilder();
             html.select().id("sedDropDown").onchange(js).close();
             html.option().close().append(reswords.getString("select_an_event")).optionEnd();
