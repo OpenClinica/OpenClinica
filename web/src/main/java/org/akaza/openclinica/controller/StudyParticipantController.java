@@ -314,7 +314,7 @@ public class StudyParticipantController {
 				errors.reject("errorCode.emailAddressTooLong","Email Address length should not exceed 255 characters");
 			}
 
-			if (subjectTransferBean.getEmailAddress()!=null &&  ! EmailValidator.getInstance().isValid(subjectTransferBean.getEmailAddress())){
+			if (subjectTransferBean.getEmailAddress()!=null &&  ! EmailValidator.getInstance().isValid(subjectTransferBean.getEmailAddress())&& subjectTransferBean.getEmailAddress().length()!=0){
 				errors.reject("errorCode.invalidEmailAddress","Email Address contains invalid characters or format");
 			}
 
@@ -322,7 +322,7 @@ public class StudyParticipantController {
 				errors.reject("errorCode.phoneNumberTooLong","Phone number length should not exceed 15 characters");
 			}
 
-			if (subjectTransferBean.getPhoneNumber()!=null && !onlyContainsNumbers(subjectTransferBean.getPhoneNumber())) {
+			if (subjectTransferBean.getPhoneNumber()!=null && !onlyContainsNumbers(subjectTransferBean.getPhoneNumber()) && subjectTransferBean.getPhoneNumber().length()!=0) {
 				errors.reject("errorCode.invalidPhoneNumber","Phone number should not containe alphabetic characters");
 			}
 
