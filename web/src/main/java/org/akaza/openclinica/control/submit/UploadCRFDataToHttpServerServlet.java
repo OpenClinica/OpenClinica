@@ -17,6 +17,7 @@ import java.util.Scanner;
 import java.util.concurrent.TimeUnit;
 
 import javax.servlet.AsyncContext;
+import javax.servlet.RequestDispatcher;
 import javax.servlet.http.HttpServletRequest;
 
 import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
@@ -266,10 +267,21 @@ public class UploadCRFDataToHttpServerServlet extends SecureController {
             String fileName= request.getParameter("fileId");
             File tempFile = this.getRestfulServiceHelper().getImportDataHelper().getImportFileByStudyIDParentNm(studyID, parentNm, fileName);
            
-        	if(tempFile.exists()) {
+        	if(tempFile!=null && tempFile.exists()) {
         		tempFile.delete();
         	}
-            forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
+        	
+        	String fromUrl = request.getParameter("fromUrl");
+        	if(fromUrl.equals("UploadCRFData")) {
+        		forwardPage(Page.UPLOAD_CRF_DATA_TO_MIRTH);
+        	}else if(fromUrl.equals("listLog")) {
+        		RequestDispatcher dis = request.getRequestDispatcher("/pages/Log/listFiles");
+                dis.forward(request, response);
+        	}else {
+        		RequestDispatcher dis = request.getRequestDispatcher("/pages/Log/listFiles");
+                dis.forward(request, response);
+        	}
+            
         }
         
         
