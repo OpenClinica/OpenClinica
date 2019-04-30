@@ -1,9 +1,6 @@
 package org.akaza.openclinica.service;
 
-import javax.validation.constraints.NotNull;
 import java.io.Serializable;
-import java.time.Instant;
-import java.util.Objects;
 
 /**
  * A DTO for the OCUser entity.
@@ -16,6 +13,8 @@ public class OCParticipantDTO extends AbstractAuditingDTO implements Serializabl
     private String email;
 
     private boolean inviteParticipant;
+
+    private boolean inviteViaSms;
 
     private String phoneNumber;
 
@@ -67,5 +66,13 @@ public class OCParticipantDTO extends AbstractAuditingDTO implements Serializabl
 
     public void setIdentifier(String identifier) {
         this.identifier = identifier;
+    }
+
+    public boolean isInviteViaSms() {
+        return inviteViaSms;
+    }
+
+    public void setInviteViaSms(boolean inviteViaSms) {
+        this.inviteViaSms = inviteViaSms;
     }
 }
