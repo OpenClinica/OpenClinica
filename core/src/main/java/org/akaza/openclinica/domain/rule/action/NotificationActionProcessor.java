@@ -2,100 +2,54 @@ package org.akaza.openclinica.domain.rule.action;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
-import org.akaza.openclinica.bean.admin.CRFBean;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.EventDefinitionCRFBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
 import org.akaza.openclinica.bean.submit.ItemDataBean;
 import org.akaza.openclinica.core.EmailEngine;
-import org.akaza.openclinica.core.form.StringUtil;
-import org.akaza.openclinica.dao.admin.CRFDAO;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.*;
+import org.akaza.openclinica.dao.hibernate.RuleSetDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
-import org.akaza.openclinica.dao.managestudy.EventDefinitionCRFDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.domain.datamap.EventDefinitionCrf;
-import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.rule.RuleSetBean;
 import org.akaza.openclinica.domain.rule.RuleSetRuleBean;
-import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.logic.rulerunner.ExecutionMode;
-import org.akaza.openclinica.logic.rulerunner.RuleSetBulkRuleRunner;
 import org.akaza.openclinica.logic.rulerunner.RuleRunner.RuleRunnerMode;
-import org.akaza.openclinica.patterns.ocobserver.OnStudyEventUpdated;
-import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.service.*;
-import org.akaza.openclinica.service.crfdata.xform.EnketoAccountRequest;
-import org.akaza.openclinica.service.crfdata.xform.EnketoAccountResponse;
-import org.akaza.openclinica.service.dto.CustomerDTO;
-import org.akaza.openclinica.service.dto.ModuleConfigAttributeDTO;
-import org.akaza.openclinica.service.dto.ModuleConfigDTO;
-import org.akaza.openclinica.service.dto.StudyEnvironmentDTO;
-import org.akaza.openclinica.service.participant.ParticipantServiceImpl;
-import org.akaza.openclinica.service.pmanage.Authorization;
 import org.akaza.openclinica.service.rule.RuleSetService;
-import org.akaza.openclinica.service.rule.expression.ExpressionService;
-import org.apache.commons.lang.StringUtils;
-import org.keycloak.admin.client.Keycloak;
-import org.keycloak.admin.client.resource.UserResource;
+import org.apache.commons.lang3.StringUtils;
 import org.keycloak.authorization.client.AuthzClient;
 import org.keycloak.authorization.client.Configuration;
 import org.keycloak.representations.AccessTokenResponse;
-import org.keycloak.representations.idm.UserRepresentation;
 import org.keycloak.util.JsonSerialization;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.context.ApplicationContext;
-import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.core.io.ClassPathResource;
 import org.springframework.http.*;
-import org.springframework.http.client.ClientHttpRequestFactory;
-import org.springframework.http.client.HttpComponentsClientHttpRequestFactory;
-import org.springframework.http.converter.HttpMessageConverter;
-import org.springframework.http.converter.StringHttpMessageConverter;
 import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.mail.javamail.MimeMessagePreparator;
-import org.springframework.security.config.authentication.UserServiceBeanDefinitionParser;
-import org.springframework.stereotype.Service;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.springframework.http.converter.json.MappingJackson2HttpMessageConverter;
-import org.springframework.http.converter.xml.MarshallingHttpMessageConverter;
-import org.springframework.web.context.request.RequestContextHolder;
-import org.springframework.web.context.request.ServletRequestAttributes;
-
-import java.io.IOException;
-import java.io.InputStream;
-import java.text.MessageFormat;
-import java.util.*;
 
 import javax.mail.MessagingException;
-import javax.mail.internet.InternetAddress;
 import javax.mail.internet.MimeMessage;
-import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+import java.io.IOException;
+import java.io.InputStream;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
 
 public class NotificationActionProcessor implements ActionProcessor, Runnable {
 
@@ -124,6 +78,11 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	NotificationService notificationService;
 	String userUuid;
 
+
+	public static String sbsUrl = CoreResources.getField("SBSUrl");
+	public static String messageServiceUri = StringUtils.substringBefore(sbsUrl, "//")
+			+ "//" + StringUtils.substringBetween(sbsUrl, "//", "/") + "/message-service/api/messages/text";
+	public static String subDomain = sbsUrl.substring(sbsUrl.indexOf("//")  + 2,  sbsUrl.indexOf("."));
 
 
 	public NotificationActionProcessor() {
@@ -311,20 +270,47 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
             pDTO.setOrigMessage(message);
             pDTO.setOrigEmailSubject(emailSubject);
 		}
+		String smsPhone = null;
 
 		for (String email : listOfEmails) {
-			    if (email.trim().equals("${participant}")){
+			smsPhone = null;
+			if (email.trim().equals("${participant}")) {
 				email = pDTO.getParticipantEmailAccount();
-			    }
+				smsPhone = pDTO.getPhone();
+			}
 
-				// Send Email thru Local Mail Server
+			// Send Email thru Local Mail Server
 			if(email!=null) {
 				execute(ExecutionMode.SAVE, ruleActionBean, pDTO, email.trim());
 				logger.info(pDTO.getMessage() + "  (Email sent to email address from OC Mail Server :  " + email + ")");
 			}else{
 				logger.info(pDTO.getMessage() + "  (No Email address available to be forwarded)");
 			}
+			if (StringUtils.isNotEmpty(smsPhone)) {
+				sendMessage(message);
+			}
 		}
+	}
+
+	public void sendMessage(String message) {
+		RestTemplate restTemplate = new RestTemplate();
+		HttpHeaders headers = new HttpHeaders();
+		headers.setContentType(MediaType.APPLICATION_JSON);
+		ObjectMapper objectMapper = new ObjectMapper();
+		objectMapper.registerModule(new JavaTimeModule());
+		headers.add("Authorization", "Bearer " + accessToken);
+		headers.add("Accept-Charset", "UTF-8");
+		OCMessageDTO messageDTO = new OCMessageDTO();
+		messageDTO.setReceiverPhone(StringUtils.remove(pDTO.getPhone(), " "));
+		messageDTO.setMessage(message);
+		messageDTO.setSubdomain(subDomain);
+		HttpEntity<OCMessageDTO> request = new HttpEntity<>(messageDTO, headers);
+
+		ResponseEntity<String> result = restTemplate.postForEntity(messageServiceUri, request, String.class);
+		if (result.getStatusCode() != HttpStatus.CREATED) {
+			logger.error("sendMessage failed with :" + result.getStatusCode());
+		}
+
 	}
 
 	public ParticipantDTO buildNewPDTO() {

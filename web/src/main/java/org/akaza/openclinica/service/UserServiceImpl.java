@@ -5,7 +5,8 @@ import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.*;
+import org.akaza.openclinica.bean.managestudy.StudyBean;
+import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
 import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
@@ -17,6 +18,7 @@ import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.enumsupport.JobStatus;
 import org.akaza.openclinica.domain.enumsupport.JobType;
+import org.akaza.openclinica.domain.rule.action.NotificationActionProcessor;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
@@ -33,13 +35,9 @@ import org.springframework.mail.MailException;
 import org.springframework.mail.javamail.JavaMailSenderImpl;
 import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
-import org.springframework.util.LinkedMultiValueMap;
-import org.springframework.util.MultiValueMap;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
@@ -48,10 +46,14 @@ import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
-import java.nio.file.Files;
 import java.text.SimpleDateFormat;
-import java.util.*;
-import java.util.concurrent.CompletableFuture;
+import java.util.ArrayList;
+import java.util.Date;
+import java.util.List;
+import java.util.UUID;
+
+import static org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.messageServiceUri;
+import static org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.sbsUrl;
 
 /**
  * This Service class is used with View Study Subject Page
@@ -129,7 +131,6 @@ public class UserServiceImpl implements UserService {
 
     private String urlBase = CoreResources.getField("sysURL").split("/MainMenu")[0];
 
-    private static String sbsUrl = CoreResources.getField("SBSUrl");
 
     StudyDAO sdao;
 
@@ -390,12 +391,10 @@ public class UserServiceImpl implements UserService {
 
         StringBuffer buffer = new StringBuffer("Hi ").append(participantDTO.getFirstName())
                 .append(", Thanks for participating in ").append(studyName).append("! ")
-        .append("Follow the link below to get started. For future reference, your access code is ").append(accessDTO.getAccessCode())
+        .append("Please follow the link below to get started. ").append(System.lineSeparator())
+        .append("For future reference, your access code is ").append(accessDTO.getAccessCode())
         .append(System.lineSeparator()).append(accessDTO.getAccessLink());
 
-
-        //String uri = StringUtils.substringBefore(sbsUrl, "//") + "//" + StringUtils.substringBetween(sbsUrl, "//", "/") + "/message-service/api/messages/text";
-        String uri = "http://localhost:8088/api/messages/text";
 
         RestTemplate restTemplate = new RestTemplate();
         HttpHeaders headers = new HttpHeaders();
@@ -409,9 +408,10 @@ public class UserServiceImpl implements UserService {
         messageDTO.setMessage(buffer.toString());
         HttpEntity<OCMessageDTO> request = new HttpEntity<>(messageDTO, headers);
 
-        ResponseEntity<String> result = restTemplate.postForEntity(uri, request, String.class);
-
-        System.out.println("comes here");
+        ResponseEntity<String> result = restTemplate.postForEntity(messageServiceUri, request, String.class);
+        if (result.getStatusCode() != HttpStatus.CREATED) {
+            logger.error("sendMessage failed with :" + result.getStatusCode());
+        }
     }
 
     private void sendEmailToParticipant(StudySubject studySubject, Study tenantStudy, ParticipantAccessDTO accessDTO) {
