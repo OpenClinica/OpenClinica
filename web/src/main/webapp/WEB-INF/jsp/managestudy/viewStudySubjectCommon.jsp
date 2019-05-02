@@ -163,7 +163,7 @@
                         {{form.[@Name]}}
                     {{else}}
                         (Form)
-                    {{/if}}}}
+                    {{/if}}
                 </h3>
                 <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
                     {{#if form.addNew}}
