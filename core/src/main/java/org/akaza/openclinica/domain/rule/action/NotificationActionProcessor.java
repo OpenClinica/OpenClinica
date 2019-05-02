@@ -307,7 +307,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		HttpEntity<OCMessageDTO> request = new HttpEntity<>(messageDTO, headers);
 
 		ResponseEntity<String> result = restTemplate.postForEntity(messageServiceUri, request, String.class);
-		if (result.getStatusCode() != HttpStatus.CREATED) {
+		if (result.getStatusCode() != HttpStatus.OK) {
 			logger.error("sendMessage failed with :" + result.getStatusCode());
 		}
 

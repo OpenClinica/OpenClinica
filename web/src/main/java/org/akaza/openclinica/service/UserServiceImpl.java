@@ -2,6 +2,8 @@ package org.akaza.openclinica.service;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
+import org.akaza.openclinica.ParticipateInviteEnum;
+import org.akaza.openclinica.ParticipateInviteStatusEnum;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.UserAccountBean;
@@ -188,15 +190,49 @@ public class UserServiceImpl implements UserService {
         if (participantDTO.isInviteParticipant() || participantDTO.isInviteViaSms()) {
 
             ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean);
+            boolean updateUserStatus = false;
+            ParticipateInviteEnum inviteEnum = ParticipateInviteEnum.NO_INVITE;
+            ParticipateInviteStatusEnum inviteStatusEnum = ParticipateInviteStatusEnum.NO_OP;
+            if (participantDTO.isInviteViaSms())
+                inviteEnum = ParticipateInviteEnum.SMS_INVITE;
+            if (participantDTO.isInviteParticipant())
+                inviteEnum = ParticipateInviteEnum.EMAIL_INVITE;
+            if (participantDTO.isInviteViaSms() && participantDTO.isInviteParticipant())
+                inviteEnum = ParticipateInviteEnum.BOTH_INVITE;
 
+            boolean smsToParticipant = false;
             if (participantDTO.isInviteViaSms()) {
-                sendSMSToParticipant(accessToken, participantDTO, tenantStudy, accessDTO);
+                smsToParticipant = sendSMSToParticipant(accessToken, participantDTO, tenantStudy, accessDTO);
             }
-
+            boolean emailToParticipant = false;
             if (participantDTO.isInviteParticipant()) {
-                sendEmailToParticipant(studySubject, tenantStudy, accessDTO);
-                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null, tenantStudy, userAccount);
+                emailToParticipant = sendEmailToParticipant(studySubject, tenantStudy, accessDTO);
             }
+            if (inviteEnum == ParticipateInviteEnum.BOTH_INVITE) {
+                if (emailToParticipant)
+                    inviteStatusEnum = ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS;
+                else
+                    inviteStatusEnum = ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL;
+
+                if (smsToParticipant) {
+                    if (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS)
+                        inviteStatusEnum = ParticipateInviteStatusEnum.BOTH_INVITE_SUCCESS;
+                } else {
+                    if (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL)
+                        inviteStatusEnum = ParticipateInviteStatusEnum.BOTH_INVITE_FAIL;
+                    else
+                        inviteStatusEnum = ParticipateInviteStatusEnum.SMS_INVITE_FAIL;
+                }
+            } else if (inviteEnum == ParticipateInviteEnum.SMS_INVITE) {
+                inviteStatusEnum = smsToParticipant ? ParticipateInviteStatusEnum.SMS_INVITE_SUCCESS : ParticipateInviteStatusEnum.SMS_INVITE_FAIL;
+            } else if (inviteEnum == ParticipateInviteEnum.SMS_INVITE) {
+                inviteStatusEnum = smsToParticipant ? ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS : ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL;
+            }
+            if ((inviteEnum != ParticipateInviteEnum.NO_INVITE) &&
+                    ((inviteStatusEnum == ParticipateInviteStatusEnum.BOTH_INVITE_SUCCESS)
+                            || (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS)
+                            || (inviteStatusEnum == ParticipateInviteStatusEnum.SMS_INVITE_SUCCESS)))
+                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null, tenantStudy, userAccount);
         }
 
         ocUserDTO = buildOcUserDTO(studySubject);
@@ -386,7 +422,7 @@ public class UserServiceImpl implements UserService {
 
     }
 
-    private void sendSMSToParticipant (String accessToken, OCParticipantDTO participantDTO, Study tenantStudy, ParticipantAccessDTO accessDTO) {
+    private boolean sendSMSToParticipant (String accessToken, OCParticipantDTO participantDTO, Study tenantStudy, ParticipantAccessDTO accessDTO) {
         String studyName = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getName() : tenantStudy.getName());
 
         StringBuffer buffer = new StringBuffer("Hi ").append(participantDTO.getFirstName())
@@ -409,12 +445,14 @@ public class UserServiceImpl implements UserService {
         HttpEntity<OCMessageDTO> request = new HttpEntity<>(messageDTO, headers);
 
         ResponseEntity<String> result = restTemplate.postForEntity(messageServiceUri, request, String.class);
-        if (result.getStatusCode() != HttpStatus.CREATED) {
+        if (result.getStatusCode() != HttpStatus.OK) {
             logger.error("sendMessage failed with :" + result.getStatusCode());
+            return false;
         }
+        return true;
     }
 
-    private void sendEmailToParticipant(StudySubject studySubject, Study tenantStudy, ParticipantAccessDTO accessDTO) {
+    private boolean sendEmailToParticipant(StudySubject studySubject, Study tenantStudy, ParticipantAccessDTO accessDTO) {
         ParticipantDTO pDTO = new ParticipantDTO();
         pDTO.setEmailAccount(studySubject.getStudySubjectDetail().getEmail());
         pDTO.setEmailSubject("You've been connected! We're looking forward to your participation.");
@@ -464,11 +502,11 @@ public class UserServiceImpl implements UserService {
 
         pDTO.setMessage(sb.toString());
 
-        sendEmailToParticipant(pDTO);
+        return sendEmailToParticipant(pDTO);
 
     }
 
-    private void sendEmailToParticipant(ParticipantDTO pDTO) throws OpenClinicaSystemException {
+    private boolean sendEmailToParticipant(ParticipantDTO pDTO) throws OpenClinicaSystemException {
 
         logger.info("Sending email...");
         try {
@@ -481,13 +519,13 @@ public class UserServiceImpl implements UserService {
 
             mailSender.send(mimeMessage);
             logger.debug("Email sent successfully on {}", new Date());
+            return true;
         } catch (MailException me) {
-            logger.error("Email could not be sent");
-            throw new OpenClinicaSystemException(me.getMessage());
+            logger.error("Email could not be sent:" + me.getMessage());
         } catch (MessagingException me) {
-            logger.error("Email could not be sent");
-            throw new OpenClinicaSystemException(me.getMessage());
+            logger.error("Email could not be sent:" + me.getMessage());
         }
+        return false;
     }
 
 
