@@ -247,7 +247,6 @@ $(function() {
     var columns = {};
 
     $.when(
-        console.log('1');
         $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n', function(data) {
             odm = data;
             for (var i=0, studies=collection(odm.Study); i<studies.length; i++) {
