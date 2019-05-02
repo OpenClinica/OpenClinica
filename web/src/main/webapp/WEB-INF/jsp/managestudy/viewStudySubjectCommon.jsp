@@ -142,7 +142,11 @@
 <script id="section-tmpl" type="text/x-handlebars-template">
     <div class="section {{collapseOrExpand}}" data-section-number="{{sectionNumber}}" data-section-oid="{{studyEvent.[@OID]}}">
         <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
-            {{studyEvent.[@Name]}}
+            {{#if studyEvent}}
+                {{studyEvent.[@Name]}}
+            {{else}}
+                (Event)
+            {{/if}}
         </div>
         <div class="section-body">
             Loading...<br><br>
@@ -154,7 +158,13 @@
     {{#if form.showMe}}
         <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
             <div class="subsection-header">
-                <h3 class="form-name">{{form.[@Name]}}</h3>
+                <h3 class="form-name">
+                    {{#if form}}
+                        {{form.[@Name]}}
+                    {{else}}
+                        (Form)
+                    {{/if}}
+                </h3>
                 <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
                     {{#if form.addNew}}
                         data-url="{{form.addNew}}"
@@ -237,7 +247,7 @@ $(function() {
     var columns = {};
 
     $.when(
-        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n', function(data){
+        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n', function(data) {
             odm = data;
             for (var i=0, studies=collection(odm.Study); i<studies.length; i++) {
                 if (studies[i]['@OID'] === '${study.oid}') {
@@ -289,23 +299,23 @@ $(function() {
     ).then(function() {
         collection(metadata.StudyEventDef).forEach(function(studyEvent) {
             studyEvents[studyEvent['@OID']] = studyEvent;
-            if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent['@OpenClinica:Status'] !== 'DELETED'){
-              studyEvent.showMe = true;}
-              else if (studyEvent['@OpenClinica:EventType'] === 'Common'){
+            if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent['@OpenClinica:Status'] !== 'DELETED') {
+                studyEvent.showMe = true;
+            }
+            else if (studyEvent['@OpenClinica:EventType'] === 'Common') {
                 studyEventOid = studyEvent['@OID'];
                 $.ajax({
-                  type: "GET",
-                  url: 'rest/clinicaldata/json/stats/${study.oid}/${studySub.oid}/' + studyEventOid,
-                  async: false,
-                  success: function(statData)
-                  {
-                      var stats = statData;
-                      if (stats.body.matchingForms > 0){
-                        studyEvent.showMe = true;
-                      }
-                      }
-                    });
-              }
+                    type: "GET",
+                    url: 'rest/clinicaldata/json/stats/${study.oid}/${studySub.oid}/' + studyEventOid,
+                    async: false,
+                    success: function(statData) {
+                        var stats = statData;
+                        if (stats.body.matchingForms > 0) {
+                            studyEvent.showMe = true;
+                        }
+                    }
+                });
+            }
 
             studyEvent.forms = {};
 
@@ -321,7 +331,14 @@ $(function() {
                 var components = columns[componentOid];
                 collection(components).forEach(function(col) {
                     var item = items[col];
-                    columnTitles.push((item && item.Question) ? item.Question.TranslatedText : item['@Name']);
+                    if (item) {
+                        if (item.Question)
+                            columnTitles.push(item.Question.TranslatedText);
+                        else
+                            columnTitles.push(item['@Name']);
+                    }
+                    else
+                        columnTitles.push('?');
                     submissionFields[col] = [];
                 });
 
@@ -465,7 +482,6 @@ $(function() {
             var studyEventOid = sectionDiv.data('section-oid');
             $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n', function(data){
                 var odm = data;
-
                 var studyEvent = studyEvents[studyEventOid];
                 for (var formOid in studyEvent.forms) {
                     var form = studyEvent.forms[formOid];
