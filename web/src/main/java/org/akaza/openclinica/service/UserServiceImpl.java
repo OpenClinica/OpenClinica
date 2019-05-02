@@ -231,8 +231,11 @@ public class UserServiceImpl implements UserService {
             if ((inviteEnum != ParticipateInviteEnum.NO_INVITE) &&
                     ((inviteStatusEnum == ParticipateInviteStatusEnum.BOTH_INVITE_SUCCESS)
                             || (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS)
-                            || (inviteStatusEnum == ParticipateInviteStatusEnum.SMS_INVITE_SUCCESS)))
-                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, UserStatus.INVITED, null, tenantStudy, userAccount);
+                            || (inviteStatusEnum == ParticipateInviteStatusEnum.SMS_INVITE_SUCCESS))) {
+                // change status only if it was CREATED
+                UserStatus newStatus = (studySubject.getUserStatus() == UserStatus.CREATED) ? UserStatus.INVITED : studySubject.getUserStatus();
+                studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, newStatus, null, tenantStudy, userAccount);
+            }
         }
 
         ocUserDTO = buildOcUserDTO(studySubject);
