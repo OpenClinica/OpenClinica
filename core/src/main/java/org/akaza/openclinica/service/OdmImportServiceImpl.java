@@ -379,6 +379,7 @@ public class OdmImportServiceImpl implements OdmImportService {
 					// restore study event defn
 					logger.info("Restoring study event {}",studyEventDefinition.getName());
 					eventService.restoreStudyEventDefn(studyEventDefinition.getStudyEventDefinitionId(), userAccount.getUserId());
+					studyEventDefinition.setStatus(Status.AVAILABLE);
 					logger.info("Completed Restoring study event {}",studyEventDefinition.getName());
 				}
 				studyEventDefinition = getStudyEventDefDao().saveOrUpdate(updateEventDef(odmStudyEventDef, userAccount, studyEventDefinition, study, errors));
