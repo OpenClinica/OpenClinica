@@ -179,7 +179,7 @@
             <xsl:choose>
                 <xsl:when test="$itemdef/@DataType='text' and $itemdef/@Length &gt; 255">
                     <xsl:element name="LENGTH">
-                        <xsl:value-of select="255"/>
+                        <xsl:value-of select="$itemdef/@Length"/>
                     </xsl:element>
                 </xsl:when>
                 <xsl:when test="$itemdef/@DataType='text' and $itemdef/@Length &lt; 256">

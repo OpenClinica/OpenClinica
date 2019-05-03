@@ -139,7 +139,7 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         tableFacade.setColumnProperties(columnNames);
         Row row = tableFacade.getTable().getRow();
         int index = 0;
-        configureColumn(row.getColumn(columnNames[index]), resword.getString("study_subject_ID"), null, null);
+        configureColumn(row.getColumn(columnNames[index]), resword.getString("study_subject_ID"), new SubjectEditor(), null);
         ++index;
         configureColumn(row.getColumn(columnNames[index]), resword.getString("subject_status"), new StatusCellEditor(), new StatusDroplistFilterEditor());
         ++index;
@@ -596,6 +596,8 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
             return studySubject.getStatus().getName();
         }
     }
+    
+    
 
     private class StatusDroplistFilterEditor extends DroplistFilterEditor {
         @Override
@@ -1414,5 +1416,18 @@ public class ListStudySubjectTableFactory extends AbstractTableFactory {
         String format = resformat.getString("date_format_string");
         SimpleDateFormat sdf = new SimpleDateFormat(format);
         return sdf.format(date);
+    }
+    
+    private class SubjectEditor implements CellEditor {
+        public Object getValue(Object item, String property, int rowcount) {
+            StudySubjectBean studySubjectBean = (StudySubjectBean) new BasicCellEditor().getValue(item, "studySubject", rowcount);
+            
+            HtmlBuilder subjectLink = new HtmlBuilder();
+            subjectLink.a().href("ViewStudySubject?id=" + studySubjectBean.getId());
+            subjectLink.close();
+            subjectLink.append(studySubjectBean.getLabel()).aEnd();          
+           
+            return  subjectLink.toString();
+        }
     }
 }
