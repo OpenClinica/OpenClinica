@@ -287,7 +287,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 				logger.info(pDTO.getMessage() + "  (No Email address available to be forwarded)");
 			}
 			if (StringUtils.isNotEmpty(smsPhone)) {
-				sendMessage(message);
+				sendMessage(pDTO.getMessage());
 			}
 		}
 	}
