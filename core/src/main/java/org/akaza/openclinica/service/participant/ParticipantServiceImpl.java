@@ -96,7 +96,7 @@ public class ParticipantServiceImpl implements ParticipantService {
     * @return
     * @throws OpenClinicaException
     */
-    public String createParticipant(SubjectTransferBean subjectTransfer,StudyBean currentStudy,String accessToken) throws Exception {
+    public String createParticipant(SubjectTransferBean subjectTransfer,StudyBean currentStudy,String accessToken,UserAccountBean userAccountBean) throws Exception {
    	   // create subject
         StudyBean siteStudy = subjectTransfer.getSiteStudy();
         String siteOid = subjectTransfer.getSiteIdentifier();
@@ -133,7 +133,7 @@ if(studySubjectBean==null || !studySubjectBean.isActive()) {
     studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
 
 }
-        studySubject=saveOrUpdateStudySubjectDetails( studySubjectBean,  subjectTransfer,accessToken,currentStudy.getOid(),subjectTransfer.getOwner());
+        studySubject=saveOrUpdateStudySubjectDetails( studySubjectBean,  subjectTransfer,accessToken,currentStudy.getOid(),userAccountBean);
 
         if (!studySubjectBean.isActive() || studySubject==null) {
             throw new OpenClinicaException("Could not create study subject", "4");

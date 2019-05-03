@@ -18,24 +18,26 @@ import java.util.List;
 public interface ValidateService {
 
 
-	boolean isStudyOidValid(String studyOid);
+    boolean isStudyOidValid(String studyOid);
 
-	boolean isStudyOidValidStudyLevelOid(String studyOid);
+    boolean isStudyOidValidStudyLevelOid(String studyOid);
 
-	boolean isSiteOidValid(String siteOid);
+    boolean isSiteOidValid(String siteOid);
 
-	boolean isSiteOidValidSiteLevelOid(String siteOid);
+    boolean isSiteOidValidSiteLevelOid(String siteOid);
 
-	boolean isStudyToSiteRelationValid(String studyOid, String siteOid);
+    boolean isStudyToSiteRelationValid(String studyOid, String siteOid);
 
-	boolean isUserHasCrcOrInvestigaterRole(List<StudyUserRoleBean> userRoles);
+    boolean isUserHasCRC_INV_Role(List<StudyUserRoleBean> userRoles);
 
-	boolean isUserHasTechAdminRole(UserAccount userAccount);
+    boolean isUserHasCRC_INV_DM_DEP_DS_Role(List<StudyUserRoleBean> userRoles);
 
-	boolean isUserRoleHasAccessToSite(ArrayList<StudyUserRoleBean> userRoles, String siteOid);
+    boolean isUserHasTechAdminRole(UserAccount userAccount);
 
-	boolean isParticipateActive(Study tenantStudy);
+    boolean isParticipateActive(Study tenantStudy);
 
-	boolean isAdvanceSearchEnabled(Study tenantStudy);
+    boolean isAdvanceSearchEnabled(Study tenantStudy);
 
-	}
+    boolean isUserHasAccessToStudy(List<StudyUserRoleBean> userRoles, String studyOid);
+
+}

@@ -242,6 +242,10 @@
   .error {
     color: red;
   }
+  .yes-no-question {
+    display: inline-block;
+    width: 140px;
+  }
   .invite-input {
     width: 250px;
   }
@@ -358,7 +362,7 @@
               </c:if>
               <c:if test="${participateStatus!='enabled' && advsearchStatus=='enabled'}">
                 <a href="javascript:;" id="partid-edit">
-                  <fmt:message key="partid_edit" bundle="${resword}"/>
+                  <fmt:message key="edit" bundle="${resword}"/>
                 </a>
               </c:if>
             </c:if>
@@ -1225,7 +1229,7 @@
                   </td>
                   <td valign="top">
                     <input id="email-input" onfocus="this.select()" type="text" value="" size="45" maxlength="255" class="formfield form-control invite-input">
-                    <div id="email-input-info" class="grayed-out">
+                    <div id="email-input-info" class="invisible">
                       <fmt:message key="invite_required" bundle="${resword}"/>
                       <br>
                       <fmt:message key="invite_required_line2" bundle="${resword}"/>
@@ -1237,15 +1241,15 @@
                 </tr>
                 <tr valign="top">
                   <td></td>
-                  <td valign="top" id="invite-option">
-                    <span style="margin-right:15px;">
+                  <td valign="top" id="invite_via_email">
+                    <span class="yes-no-question">
                       <fmt:message key="invite_via_email" bundle="${resword}"/>
                     </span>
-                    <label><input type="radio" name="invite-option" value="true">
+                    <label><input type="radio" name="invite_via_email" value="true">
                       <fmt:message key="invite_yes" bundle="${resword}"/>
                     </label>
                     &emsp;
-                    <label><input type="radio" name="invite-option" value="false" checked="checked">
+                    <label><input type="radio" name="invite_via_email" value="false" checked="checked">
                       <fmt:message key="invite_no" bundle="${resword}"/>
                     </label>
                   </td>
@@ -1526,6 +1530,21 @@
                     </div>
                   </td>
                 </tr>
+                <tr valign="top">
+                  <td></td>
+                  <td valign="top" id="invite_via_sms">
+                    <span class="yes-no-question">
+                      <fmt:message key="invite_via_sms" bundle="${resword}"/>
+                    </span>
+                    <label><input type="radio" name="invite_via_sms" value="true">
+                      <fmt:message key="invite_yes" bundle="${resword}"/>
+                    </label>
+                    &emsp;
+                    <label><input type="radio" name="invite_via_sms" value="false" checked="checked">
+                      <fmt:message key="invite_no" bundle="${resword}"/>
+                    </label>
+                  </td>
+                </tr>
               </c:when>
             </c:choose>
           </table>
@@ -1640,13 +1659,21 @@
         var hasEmail = !!$('#email-input').val().trim();
         var validEmail = $('#email-input-error').is(':hidden');
         if (hasEmail && validEmail) {
-            $('#invite-option input').removeAttr("disabled");
+            $('#invite_via_email input').removeAttr("disabled");
         }
         else {
-            $('#invite-option input').attr("disabled", "disabled");
+            $('#invite_via_email input').attr("disabled", "disabled");
         }
 
+        var hasPhone = !!$('#phone-input').val().trim();
         var validPhone = $('#phone-input-error').is(':hidden');
+        if (hasPhone && validPhone) {
+            $('#invite_via_sms input').removeAttr("disabled");
+        }
+        else {
+            $('#invite_via_sms input').attr("disabled", "disabled");
+        }
+
         if (validEmail && validPhone)
             $('#connect-button').removeAttr('disabled');
         else
@@ -1687,7 +1714,8 @@
                 lastName: $('#lname-input').val(),
                 email: $('#email-input').val(),
                 phoneNumber: $('#country-code').text() + ' ' + $('#phone-input').val(),
-                inviteParticipant: $('#invite-option input:checked').val(),
+                inviteParticipant: $('#invite_via_email input:checked').val(),
+                inviteViaSms: $('#invite_via_sms input:checked').val(),
                 identifier: $('#secid-input').val()
             };
             jQuery.ajax({
@@ -1760,7 +1788,7 @@
 
             $('#email-input-error').hide();
             $('#phone-input-error').hide();
-            $('#invite-option input[value=' + participateInfo.inviteParticipant + ']').click();
+            $('#invite_via_email input[value=' + participateInfo.inviteParticipant + ']').click();
 
             enableDisableControls();
             jQuery.blockUI({ message: jQuery('#contactInformationForm'), css:{left: "300px", top:"10px" } });

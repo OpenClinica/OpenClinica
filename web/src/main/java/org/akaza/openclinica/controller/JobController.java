@@ -9,6 +9,7 @@ import org.akaza.openclinica.dao.hibernate.JobDetailDao;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
+import org.akaza.openclinica.domain.enumsupport.JobStatus;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.service.JobService;
@@ -162,9 +163,16 @@ public class JobController {
          utilService.setSchemaFromStudyOid(publicStudy.getOc_oid());
 
         JobDetail jobDetail=jobDetailDao.findByUuid(uuid);
-        if (jobDetail.getCreatedBy().getUserId() != userAccountBean.getId()) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_INCORRECT_USER, "Incorrect User. The user is not the owner of this log file")).body(null);
-        }
+        if (jobDetail==null) {
+            return new ResponseEntity(ErrorConstants.ERR_INVALID_UUID, org.springframework.http.HttpStatus.NOT_FOUND);
+        }else if (jobDetail.getCreatedBy().getUserId() != userAccountBean.getId()) {
+            return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, org.springframework.http.HttpStatus.OK);
+        }else if(jobDetail.getStatus().equals(JobStatus.DELETED)){
+            return new ResponseEntity(ErrorConstants.ERR_INVALID_UUID, HttpStatus.NOT_FOUND);
+        }else if(jobDetail.getStatus().equals(JobStatus.IN_PROGRESS)){
+            return new ResponseEntity(ErrorConstants.ERR_JOB_IN_PROGRESS, org.springframework.http.HttpStatus.OK);
+        }else {
+
         InputStream inputStream = null;
         try {
             String logFileName = getFilePath(jobDetail.getType()) + File.separator + jobDetail.getLogPath();
@@ -177,7 +185,7 @@ public class JobController {
         } catch (Exception e) {
             logger.debug("Request could not be completed at this moment. Please try again.");
             logger.debug(e.getStackTrace().toString());
-            throw e;
+            return new ResponseEntity(ErrorConstants.ERR_NO_LOG_FILE_FOUND, org.springframework.http.HttpStatus.OK);
         } finally {
             if (inputStream != null) {
                 try {
@@ -187,8 +195,9 @@ public class JobController {
                     throw e;
                 }
             }
+           }
         }
-        return ResponseEntity.ok().headers(HeaderUtil.downloadFileAlert(ENTITY_NAME, String.valueOf(uuid))).build();
+        return new ResponseEntity(org.springframework.http.HttpStatus.OK);
 
     }
 

@@ -1,54 +1,20 @@
 package org.akaza.openclinica.service;
 
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.UserType;
-import org.akaza.openclinica.bean.login.ParticipantDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
-import org.akaza.openclinica.bean.login.UserAccountBean;
-import org.akaza.openclinica.bean.managestudy.StudyBean;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
-import org.akaza.openclinica.controller.dto.AuditLogEventDTO;
-import org.akaza.openclinica.controller.dto.ModuleConfigAttributeDTO;
-import org.akaza.openclinica.controller.dto.ModuleConfigDTO;
-import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
-import org.akaza.openclinica.core.EmailEngine;
-import org.akaza.openclinica.core.OpenClinicaMailSender;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
-import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
-import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.dbcp2.BasicDataSource;
-import org.apache.commons.lang.RandomStringUtils;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
-import org.springframework.mail.MailException;
-import org.springframework.mail.javamail.JavaMailSenderImpl;
-import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
 
-import javax.mail.MessagingException;
-import javax.mail.internet.MimeMessage;
-import javax.servlet.ServletContext;
-import java.io.File;
-import java.io.FileNotFoundException;
-import java.io.PrintWriter;
-import java.io.UnsupportedEncodingException;
-import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
 import java.util.List;
 
 /**
@@ -86,7 +52,7 @@ public class ValidateServiceImpl implements ValidateService {
 
     public boolean isStudyOidValidStudyLevelOid(String studyOid) {
         Study publicStudy = getPublicStudy(studyOid);
-        if (publicStudy!=null && publicStudy.getStudy() == null) {
+        if (publicStudy != null && publicStudy.getStudy() == null) {
             return true;
         }
         return false;
@@ -102,7 +68,7 @@ public class ValidateServiceImpl implements ValidateService {
 
     public boolean isSiteOidValidSiteLevelOid(String siteOid) {
         Study publicSite = getPublicStudy(siteOid);
-        if (publicSite!=null && publicSite.getStudy() != null) {
+        if (publicSite != null && publicSite.getStudy() != null) {
             return true;
         }
         return false;
@@ -112,36 +78,44 @@ public class ValidateServiceImpl implements ValidateService {
     public boolean isStudyToSiteRelationValid(String studyOid, String siteOid) {
         Study publicStudy = getPublicStudy(studyOid);
         Study publicSite = getPublicStudy(siteOid);
-        if (publicStudy!=null && publicSite!=null && publicSite.getStudy().getStudyId() == publicStudy.getStudyId()) {
+        if (publicStudy != null && publicSite != null && publicSite.getStudy().getStudyId() == publicStudy.getStudyId()) {
             return true;
         }
         return false;
     }
 
+    public boolean isUserHasAccessToStudy(List<StudyUserRoleBean> userRoles, String studyOid) {
 
-    public boolean isUserHasCrcOrInvestigaterRole(List<StudyUserRoleBean> userRoles) {
         for (StudyUserRoleBean userRole : userRoles) {
-            if (userRole.getRole().equals(Role.RESEARCHASSISTANT) || userRole.getRole().equals(Role.INVESTIGATOR)) {
+            if (checkUserHasAccessToStudy(userRole, studyOid)) {
                 return true;
             }
         }
         return false;
     }
-    public boolean isUserHasTechAdminRole(UserAccount userAccount){
-        if(userAccount.getUserType().getUserTypeId()== UserType.TECHADMIN.getId())
-            return true;
+
+    public boolean isUserHasCRC_INV_Role(List<StudyUserRoleBean> userRoles ) {
+        for (StudyUserRoleBean userRole : userRoles) {
+            if (check_CRC_INV_RoleByUserRole(userRole)) {
+                return true;
+            }
+        }
         return false;
     }
 
 
-    public boolean isUserRoleHasAccessToSite(ArrayList<StudyUserRoleBean> userRoles, String siteOid) {
-        Study publicSite = getPublicStudy(siteOid);
-        if(publicSite==null)
-            return false;
+    public boolean isUserHasCRC_INV_DM_DEP_DS_Role(List<StudyUserRoleBean> userRoles) {
         for (StudyUserRoleBean userRole : userRoles) {
-            if ((userRole.getStudyId() == publicSite.getStudyId()) || (userRole.getStudyId()==publicSite.getStudy().getStudyId()))
+            if (check_CRC_INV_DM_DEP_DS_RoleByUserRole(userRole)) {
                 return true;
+            }
         }
+        return false;
+    }
+
+    public boolean isUserHasTechAdminRole(UserAccount userAccount) {
+        if (userAccount.getUserType().getUserTypeId() == UserType.TECHADMIN.getId())
+            return true;
         return false;
     }
 
@@ -155,7 +129,7 @@ public class ValidateServiceImpl implements ValidateService {
     }
 
     public boolean isAdvanceSearchEnabled(Study tenantStudy) {
-        StudyParameterValue spv = studyParameterValueDao.findByStudyIdParameter(tenantStudy.getStudy()==null?tenantStudy.getStudyId():tenantStudy.getStudy().getStudyId() , ADVANCE_SEARCH);
+        StudyParameterValue spv = studyParameterValueDao.findByStudyIdParameter(tenantStudy.getStudy() == null ? tenantStudy.getStudyId() : tenantStudy.getStudy().getStudyId(), ADVANCE_SEARCH);
 
         if (spv != null && spv.getValue().equals(ENABLED))
             return true;
@@ -168,8 +142,36 @@ public class ValidateServiceImpl implements ValidateService {
         return studyDao.findPublicStudy(studyOid);
     }
 
+    private boolean check_CRC_INV_RoleByUserRole(StudyUserRoleBean userRole) {
+        if ((userRole.getRole().equals(Role.RESEARCHASSISTANT) && userRole.getRole().getPlainDescription().equals("site_Data_Entry_Person"))
+                || (userRole.getRole().equals(Role.INVESTIGATOR)&& userRole.getRole().getPlainDescription().equals("site_investigator"))
+        ) {
+            return true;
+        }
+        return false;
+    }
+
+    private boolean check_CRC_INV_DM_DEP_DS_RoleByUserRole(StudyUserRoleBean userRole) {
+        if ((userRole.getRole().equals(Role.RESEARCHASSISTANT) && (userRole.getRole().getPlainDescription().equals("site_Data_Entry_Person") || userRole.getRole().getPlainDescription().equals("Data_Entry_Person")))
+                || (userRole.getRole().equals(Role.INVESTIGATOR) && (userRole.getRole().getPlainDescription().equals("site_investigator") || userRole.getRole().getPlainDescription().equals("Investigator")))
+                || (userRole.getRole().equals(Role.COORDINATOR) && userRole.getRole().getPlainDescription().equals("Study_Coordinator"))
+        )
 
 
+        {
+            return true;
+        }
+        return false;
+    }
 
+    private boolean checkUserHasAccessToStudy(StudyUserRoleBean userRole, String  studyOid) {
+        Study publicStudy = getPublicStudy(studyOid);
+        if (publicStudy == null)
+            return false;
+        if ((userRole.getStudyId() == publicStudy.getStudyId()) ||   (publicStudy.getStudy()!=null?  userRole.getStudyId() == publicStudy.getStudy().getStudyId():false)) {
+            return true;
+        }
+        return false;
+    }
 
 }
