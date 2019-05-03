@@ -39,6 +39,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.mail.MessagingException;
@@ -220,13 +221,11 @@ public class UserServiceImpl implements UserService {
                 } else {
                     if (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL)
                         inviteStatusEnum = ParticipateInviteStatusEnum.BOTH_INVITE_FAIL;
-                    else
-                        inviteStatusEnum = ParticipateInviteStatusEnum.SMS_INVITE_FAIL;
                 }
             } else if (inviteEnum == ParticipateInviteEnum.SMS_INVITE) {
                 inviteStatusEnum = smsToParticipant ? ParticipateInviteStatusEnum.SMS_INVITE_SUCCESS : ParticipateInviteStatusEnum.SMS_INVITE_FAIL;
-            } else if (inviteEnum == ParticipateInviteEnum.SMS_INVITE) {
-                inviteStatusEnum = smsToParticipant ? ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS : ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL;
+            } else if (inviteEnum == ParticipateInviteEnum.EMAIL_INVITE) {
+                inviteStatusEnum = emailToParticipant ? ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS : ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL;
             }
             if ((inviteEnum != ParticipateInviteEnum.NO_INVITE) &&
                     ((inviteStatusEnum == ParticipateInviteStatusEnum.BOTH_INVITE_SUCCESS)
@@ -447,7 +446,13 @@ public class UserServiceImpl implements UserService {
         messageDTO.setMessage(buffer.toString());
         HttpEntity<OCMessageDTO> request = new HttpEntity<>(messageDTO, headers);
 
-        ResponseEntity<String> result = restTemplate.postForEntity(messageServiceUri, request, String.class);
+        ResponseEntity<String> result = null;
+        try {
+            result = restTemplate.postForEntity(messageServiceUri, request, String.class);
+        } catch (RestClientException e) {
+            logger.error("sendMessage failed with :" + e);
+            return false;
+        }
         if (result.getStatusCode() != HttpStatus.OK) {
             logger.error("sendMessage failed with :" + result.getStatusCode());
             return false;
