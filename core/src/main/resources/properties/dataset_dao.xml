@@ -45,7 +45,7 @@
 		  SHOW_GROUP_INFO,SHOW_DISC_INFO,
 		  odm_metadataversion_name, odm_metadataversion_oid,
 		  odm_prior_study_oid, odm_prior_metadataversion_oid, show_secondary_id, dataset_item_status_id)
-		  VALUES (?,?,?,?,?,?,NOW(),NOW(),?,NOW(),'2005-11-15',
+		  VALUES (?,?,?,?,?,?,NOW(),NOW(),?,NOW(),'2100-12-31',
 		  ?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?,?)
 		</sql>
 	</query>
