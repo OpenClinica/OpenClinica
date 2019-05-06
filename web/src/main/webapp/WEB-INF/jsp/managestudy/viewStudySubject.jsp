@@ -1786,6 +1786,16 @@
             $('#country-code').text(countryCode || '+1');
             $('#phone-input').val(phoneNumber);
 
+            var shownFlag = $('#country-flag').css('background-position');
+            var shownCountryCode = $('#country-options tr.country-option').filter(function() {
+              return $('div.the-flag', this).css('background-position') === shownFlag;
+            }).find('span.the-country-code').text();
+            if (shownCountryCode !== countryCode) {
+              $('#country-options span.the-country-code').filter(function() {
+                return $(this).text() === countryCode;
+              }).click();
+            }
+
             $('#email-input-error').hide();
             $('#phone-input-error').hide();
             $('#invite_via_email input[value=' + participateInfo.inviteParticipant + ']').click();
