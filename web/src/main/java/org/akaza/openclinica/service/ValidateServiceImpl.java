@@ -143,24 +143,18 @@ public class ValidateServiceImpl implements ValidateService {
     }
 
     private boolean check_CRC_INV_RoleByUserRole(StudyUserRoleBean userRole) {
-        if ((userRole.getRole().equals(Role.RESEARCHASSISTANT) && userRole.getRole().getPlainDescription().equals("site_Data_Entry_Person"))
-                || (userRole.getRole().equals(Role.INVESTIGATOR)&& userRole.getRole().getPlainDescription().equals("site_investigator"))
-        ) {
+        if (isSiteRole(userRole) && (userRole.getRole().equals(Role.RESEARCHASSISTANT) ) || (userRole.getRole().equals(Role.INVESTIGATOR) ))
             return true;
-        }
+
         return false;
     }
 
     private boolean check_CRC_INV_DM_DEP_DS_RoleByUserRole(StudyUserRoleBean userRole) {
-        if ((userRole.getRole().equals(Role.RESEARCHASSISTANT) && (userRole.getRole().getPlainDescription().equals("site_Data_Entry_Person") || userRole.getRole().getPlainDescription().equals("Data_Entry_Person")))
-                || (userRole.getRole().equals(Role.INVESTIGATOR) && (userRole.getRole().getPlainDescription().equals("site_investigator") || userRole.getRole().getPlainDescription().equals("Investigator")))
-                || (userRole.getRole().equals(Role.COORDINATOR) && userRole.getRole().getPlainDescription().equals("Study_Coordinator"))
-        )
-
-
-        {
+        if (userRole.getRole().equals(Role.RESEARCHASSISTANT)
+                || userRole.getRole().equals(Role.INVESTIGATOR)
+                || userRole.getRole().equals(Role.COORDINATOR) )
             return true;
-        }
+
         return false;
     }
 
@@ -173,5 +167,14 @@ public class ValidateServiceImpl implements ValidateService {
         }
         return false;
     }
+
+    private boolean isSiteRole(StudyUserRoleBean userRole){
+        int studyId= userRole.getStudyId();
+        Study study= studyDao.findById(studyId);
+        if (study.getStudy()!=null)
+            return true;
+        return false;
+    }
+
 
 }
