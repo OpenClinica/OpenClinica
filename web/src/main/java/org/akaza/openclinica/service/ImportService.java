@@ -20,7 +20,7 @@ import java.util.List;
 
 public interface ImportService {
 
-     ErrorObj validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail, boolean process);
+     void validateAndProcessDataImport(ODMContainer odmContainer, String studyOid, String siteOid, UserAccountBean userAccountBean, String schema, JobDetail jobDetail);
 
 
 }

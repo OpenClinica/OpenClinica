@@ -2,19 +2,21 @@ package org.akaza.openclinica.controller.dto;
 
 public class DataImportReport {
     private String SubjectKey;
+    private String StudySubjectID;
     private String StudyEventOID;
-    private Integer StudyEventRepeatKey;
+    private String StudyEventRepeatKey;
     private String FormOID;
     private String FormLayoutOID;
     private String itemGroupOID;
-    private Integer itemGroupRepeatKey;
+    private String itemGroupRepeatKey;
     private String itemOID;
-    private String FormStatus;
     private String Status;
     private String Message;
 
-    public DataImportReport(String subjectKey, String studyEventOID, int studyEventRepeatKey, String formOID, String formLayoutOID, String itemGroupOID, int itemGroupRepeatKey, String itemOID, String formStatus, String status, String message) {
+
+    public DataImportReport(String subjectKey, String studySubjectID, String studyEventOID, String studyEventRepeatKey, String formOID, String formLayoutOID, String itemGroupOID, String itemGroupRepeatKey, String itemOID, String status, String message) {
         SubjectKey = subjectKey;
+        StudySubjectID = studySubjectID;
         StudyEventOID = studyEventOID;
         StudyEventRepeatKey = studyEventRepeatKey;
         FormOID = formOID;
@@ -22,7 +24,6 @@ public class DataImportReport {
         this.itemGroupOID = itemGroupOID;
         this.itemGroupRepeatKey = itemGroupRepeatKey;
         this.itemOID = itemOID;
-        FormStatus = formStatus;
         Status = status;
         Message = message;
     }
@@ -59,14 +60,6 @@ public class DataImportReport {
         FormLayoutOID = formLayoutOID;
     }
 
-    public String getFormStatus() {
-        return FormStatus;
-    }
-
-    public void setFormStatus(String formStatus) {
-        FormStatus = formStatus;
-    }
-
     public String getStatus() {
         return Status;
     }
@@ -99,19 +92,27 @@ public class DataImportReport {
         this.itemOID = itemOID;
     }
 
-    public Integer getStudyEventRepeatKey() {
+    public String getStudyEventRepeatKey() {
         return StudyEventRepeatKey;
     }
 
-    public void setStudyEventRepeatKey(Integer studyEventRepeatKey) {
+    public void setStudyEventRepeatKey(String studyEventRepeatKey) {
         StudyEventRepeatKey = studyEventRepeatKey;
     }
 
-    public Integer getItemGroupRepeatKey() {
+    public String getItemGroupRepeatKey() {
         return itemGroupRepeatKey;
     }
 
-    public void setItemGroupRepeatKey(Integer itemGroupRepeatKey) {
+    public void setItemGroupRepeatKey(String itemGroupRepeatKey) {
         this.itemGroupRepeatKey = itemGroupRepeatKey;
+    }
+
+    public String getStudySubjectID() {
+        return StudySubjectID;
+    }
+
+    public void setStudySubjectID(String studySubjectID) {
+        StudySubjectID = studySubjectID;
     }
 }

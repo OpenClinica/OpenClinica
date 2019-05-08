@@ -189,11 +189,6 @@ public class ImportController {
 
         String schema = CoreResources.getRequestSchema();
 
-        ErrorObj errorObj = importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, null, false);
-        if (errorObj != null)
-            return new ResponseEntity(errorObj.getCode() + " \n " + errorObj.getMessage(), HttpStatus.NOT_FOUND);
-
-
         String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean);
 
         logger.info("REST request to Import Job info ");
@@ -213,7 +208,7 @@ public class ImportController {
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
         JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.XML_IMPORT, null);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
-            importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail, true);
+            importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail);
             return null;
         });
         return jobDetail.getUuid();
