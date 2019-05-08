@@ -39,6 +39,7 @@ import org.springframework.mail.javamail.MimeMessageHelper;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.RestClientException;
 import org.springframework.web.client.RestTemplate;
 
 import javax.mail.MessagingException;
@@ -217,21 +218,26 @@ public class UserServiceImpl implements UserService {
                 if (smsToParticipant) {
                     if (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS)
                         inviteStatusEnum = ParticipateInviteStatusEnum.BOTH_INVITE_SUCCESS;
+                    else if (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL)
+                        inviteStatusEnum = ParticipateInviteStatusEnum.EMAIL_FAIL_SMS_SUCCESS;
                 } else {
                     if (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL)
                         inviteStatusEnum = ParticipateInviteStatusEnum.BOTH_INVITE_FAIL;
                     else
-                        inviteStatusEnum = ParticipateInviteStatusEnum.SMS_INVITE_FAIL;
+                        inviteStatusEnum = ParticipateInviteStatusEnum.EMAIL_SUCCESS_SMS_FAIL;
                 }
             } else if (inviteEnum == ParticipateInviteEnum.SMS_INVITE) {
                 inviteStatusEnum = smsToParticipant ? ParticipateInviteStatusEnum.SMS_INVITE_SUCCESS : ParticipateInviteStatusEnum.SMS_INVITE_FAIL;
-            } else if (inviteEnum == ParticipateInviteEnum.SMS_INVITE) {
-                inviteStatusEnum = smsToParticipant ? ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS : ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL;
+            } else if (inviteEnum == ParticipateInviteEnum.EMAIL_INVITE) {
+                inviteStatusEnum = emailToParticipant ? ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS : ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL;
             }
+            String popupMessage = getErrorMessage(inviteEnum, inviteStatusEnum);
             if ((inviteEnum != ParticipateInviteEnum.NO_INVITE) &&
                     ((inviteStatusEnum == ParticipateInviteStatusEnum.BOTH_INVITE_SUCCESS)
                             || (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS)
-                            || (inviteStatusEnum == ParticipateInviteStatusEnum.SMS_INVITE_SUCCESS))) {
+                            || (inviteStatusEnum == ParticipateInviteStatusEnum.SMS_INVITE_SUCCESS)
+                            || (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_SUCCESS_SMS_FAIL)
+                            || (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_FAIL_SMS_SUCCESS))) {
                 // change status only if it was CREATED
                 UserStatus newStatus = (studySubject.getUserStatus() == UserStatus.CREATED) ? UserStatus.INVITED : studySubject.getUserStatus();
                 studySubject = saveOrUpdateStudySubject(studySubject, participantDTO, newStatus, null, tenantStudy, userAccount);
@@ -243,6 +249,34 @@ public class UserServiceImpl implements UserService {
         return ocUserDTO;
     }
 
+    private String getErrorMessage(ParticipateInviteEnum inviteEnum, ParticipateInviteStatusEnum inviteStatusEnum) {
+        String message = null;
+        if (inviteEnum == ParticipateInviteEnum.NO_INVITE)
+            return message;
+        switch(inviteStatusEnum) {
+            case EMAIL_INVITE_SUCCESS:
+                message = "Email Invite Succeeded";
+                break;
+            case SMS_INVITE_SUCCESS:
+                message = "SMS Invite Succeeded";
+                break;
+            case EMAIL_SUCCESS_SMS_FAIL:
+                message = "Email Invite Succeeded SMS Invite Failed";
+                break;
+            case EMAIL_FAIL_SMS_SUCCESS:
+                message = "Email Invite Failed SMS Invite Succeeded";
+                break;
+            case BOTH_INVITE_FAIL:
+                message = "Email and SMS Invite Failed";
+                break;
+            case BOTH_INVITE_SUCCESS:
+                message = "Email and SMS Invite Succeeded";
+                break;
+            default:
+                break;
+        }
+        return message;
+    }
     private StudySubject saveOrUpdateStudySubject(StudySubject studySubject, OCParticipantDTO participantDTO,
                                                   UserStatus userStatus, Integer userId, Study tenantStudy, UserAccount userAccount) {
 
@@ -447,7 +481,13 @@ public class UserServiceImpl implements UserService {
         messageDTO.setMessage(buffer.toString());
         HttpEntity<OCMessageDTO> request = new HttpEntity<>(messageDTO, headers);
 
-        ResponseEntity<String> result = restTemplate.postForEntity(messageServiceUri, request, String.class);
+        ResponseEntity<String> result = null;
+        try {
+            result = restTemplate.postForEntity(messageServiceUri, request, String.class);
+        } catch (RestClientException e) {
+            logger.error("sendMessage failed with :" + e);
+            return false;
+        }
         if (result.getStatusCode() != HttpStatus.OK) {
             logger.error("sendMessage failed with :" + result.getStatusCode());
             return false;
