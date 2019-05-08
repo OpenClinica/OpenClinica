@@ -244,7 +244,13 @@ public class ExpressionService {
         if (subjectId == null)
             return null;
         StudySubjectBean ssBean = (StudySubjectBean) getStudySubjectDao().findByPK(subjectId);
-        return ssBean.getTime_zone().trim();
+        try {
+        	return ssBean.getTime_zone().trim();	
+        }catch(NullPointerException e) {
+        	  logger.error("NullPointerException was thrown subjectId:   " + subjectId);
+              return null;
+        }
+        
     }
 
     public HashMap<String, String> getSSDate(String ssZoneId, String serverZoneId) {
