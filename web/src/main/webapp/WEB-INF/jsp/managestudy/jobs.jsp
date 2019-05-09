@@ -94,6 +94,7 @@
     <tr>
       <th><fmt:message key="jobs_source_filename" bundle="${resword}"/></th>
       <th><fmt:message key="job_type" bundle="${resword}"/></th>
+      <th><fmt:message key="site_name" bundle="${resword}"/></th>
       <th><fmt:message key="job_status" bundle="${resword}"/></th>
       <th><fmt:message key="created_on" bundle="${resword}"/></th>
       <th><fmt:message key="created_by" bundle="${resword}"/></th>
@@ -155,6 +156,7 @@ jQuery.ajax({
       return [
         logEntry.sourceFileName,
         logEntry.type,
+        logEntry.siteOid && (logEntry.siteOid != logEntry.studyOid) ? logEntry.siteOid : logEntry.studyOid,
         logEntry.status,
         formatDate(logEntry.dateCreated),
         logEntry.createdByUsername,
