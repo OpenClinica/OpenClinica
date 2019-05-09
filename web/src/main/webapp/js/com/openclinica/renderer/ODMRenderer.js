@@ -6,6 +6,6 @@ function ODMRenderer(json) {
   this.fileType = json["@FileType"];
   this.odmVersion = json["@ODMVersion"];
   this.studyRenderer = new StudyRenderer(json); 
-  this.renderPrintableStudy= function() { return this.studyRenderer.renderPrintableStudy(renderMode); }
+  this.renderPrintableStudy= function() { return this.studyRenderer.renderPrintableStudyWrapper(renderMode); }
   this.renderStudy = function() { return this.studyRenderer.renderStudy(); }
 }
