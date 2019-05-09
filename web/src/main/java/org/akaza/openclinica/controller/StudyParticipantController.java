@@ -294,7 +294,7 @@ public class StudyParticipantController {
 			}
 			if (!validateService.isUserHasAccessToStudy(userRoles,studyOID) && !validateService.isUserHasAccessToStudy(userRoles,siteOID)) {
 				errors.reject(ErrorConstants.ERR_NO_ROLE_SETUP);
-			}else if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role(userRoles)  ){
+			}else if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role(userRoles,studyOID,siteOID)  ){
 				errors.reject(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES );
 			}
 
