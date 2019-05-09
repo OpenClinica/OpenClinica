@@ -290,7 +290,7 @@ public class ImportServiceImpl implements ImportService {
                         }
                         ErrorObj startDateErrorObj = validateForDate(studyEventDataBean.getStartDate());
                         if (startDateErrorObj != null) {
-                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, startDateErrorObj.getMessage());
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.eventNotScheduled.invalidStartDate");
                             dataImportReports.add(dataImportReport);
                             continue;
                         }
@@ -301,7 +301,7 @@ public class ImportServiceImpl implements ImportService {
 
                         // repeat key present,not scheduled, visit event Repeating ,start date null , Can't schedule
                     } else if (studyEvent == null && studyEventDefinition.getType().equals(UNSCHEDULED) && studyEventDefinition.getRepeating() && studyEventDataBean.getStartDate() == null) {
-                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.startDateIsNull-Can't Schedule ");
+                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.eventNotScheduled.startDateMissing");
                         dataImportReports.add(dataImportReport);
                         continue;
 
@@ -317,7 +317,7 @@ public class ImportServiceImpl implements ImportService {
 
                         ErrorObj startDateErrorObj = validateForDate(studyEventDataBean.getStartDate());
                         if (startDateErrorObj != null) {
-                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, startDateErrorObj.getMessage());
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.eventNotScheduled.invalidStartDate");
                             dataImportReports.add(dataImportReport);
                             continue;
                         }
@@ -327,7 +327,7 @@ public class ImportServiceImpl implements ImportService {
 
                         // repeat key present,not scheduled, visit event Non Repeating ,start date null , Can't schedule
                     } else if (studyEvent == null && studyEventDefinition.getType().equals(UNSCHEDULED) && !studyEventDefinition.getRepeating() && studyEventDataBean.getStartDate() == null) {
-                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.startDateIsNull-Can't Schedule ");
+                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.eventNotScheduled.startDateMissing");
                         dataImportReports.add(dataImportReport);
                         continue;
 
@@ -342,11 +342,11 @@ public class ImportServiceImpl implements ImportService {
                         studyEvent = createStudyEvent(studySubject, studyEventDefinition, maxSeOrdinal + 1, userAccount, null);
                         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
                         logger.debug("Scheduling new Common Event");
-                        // Repeat Key missing, not scheduled,visit event Repeating, start data not null,validate start date , assign repeat, schedule
+                        // Repeat Key missing, not scheduled,visit event Repeating, start date not null,validate start date , assign repeat, schedule
                     } else if (studyEvent == null && studyEventDefinition.getType().equals(UNSCHEDULED) && studyEventDefinition.getRepeating() && studyEventDataBean.getStartDate() != null) {
                         ErrorObj startDateErrorObj = validateForDate(studyEventDataBean.getStartDate());
                         if (startDateErrorObj != null) {
-                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, startDateErrorObj.getMessage());
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.eventNotScheduled.invalidStartDate");
                             dataImportReports.add(dataImportReport);
                             continue;
                         }
@@ -357,7 +357,7 @@ public class ImportServiceImpl implements ImportService {
 
                         // Repeat Key missing, not scheduled,visit event Repeating, start date  null, reject
                     } else if (studyEvent == null && studyEventDefinition.getType().equals(UNSCHEDULED) && studyEventDefinition.getRepeating() && studyEventDataBean.getStartDate() == null) {
-                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.startDateIsNull-Can't Schedule ");
+                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.eventNotScheduled.startDateMissing");
                         dataImportReports.add(dataImportReport);
                         continue;
                     }
@@ -373,7 +373,7 @@ public class ImportServiceImpl implements ImportService {
                         if (studyEvent == null && studyEventDataBean.getStartDate() != null) {
                             ErrorObj startDateErrorObj = validateForDate(studyEventDataBean.getStartDate());
                             if (startDateErrorObj != null) {
-                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, startDateErrorObj.getMessage());
+                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.eventNotScheduled.invalidStartDate");
                                 dataImportReports.add(dataImportReport);
                                 continue;
                             }
@@ -384,7 +384,7 @@ public class ImportServiceImpl implements ImportService {
 
                             // Repeat Key missing,not scheduled, visit event Non Repeating, start date  null, reject
                         } else if (studyEvent == null && studyEventDataBean.getStartDate() == null) {
-                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.startDateIsNull-Can't Schedule ");
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.eventNotScheduled.startDateMissing");
                             dataImportReports.add(dataImportReport);
                             continue;
                         }
