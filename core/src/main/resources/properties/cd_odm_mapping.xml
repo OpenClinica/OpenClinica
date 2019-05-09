@@ -81,7 +81,12 @@
                type="java.lang.String">
             <bind-xml name="StudyEventRepeatKey" node="attribute"/>
        </field>
-       
+
+        <field name="StartDate"
+               type="java.lang.String">
+            <bind-xml name="OpenClinica:StartDate" node="attribute"/>
+        </field>
+
        <field name="FormData"
        		type="org.akaza.openclinica.bean.submit.crfdata.FormDataBean"
        		collection="arraylist">
