@@ -10,11 +10,12 @@ public class DataImportReport {
     private String itemGroupOID;
     private String itemGroupRepeatKey;
     private String itemOID;
+    private String value;
     private String Status;
     private String Message;
 
 
-    public DataImportReport(String subjectKey, String studySubjectID, String studyEventOID, String studyEventRepeatKey, String formOID, String formLayoutOID, String itemGroupOID, String itemGroupRepeatKey, String itemOID, String status, String message) {
+    public DataImportReport(String subjectKey, String studySubjectID, String studyEventOID, String studyEventRepeatKey, String formOID, String formLayoutOID, String itemGroupOID, String itemGroupRepeatKey, String itemOID,String value ,String status, String message) {
         SubjectKey = subjectKey;
         StudySubjectID = studySubjectID;
         StudyEventOID = studyEventOID;
@@ -24,6 +25,7 @@ public class DataImportReport {
         this.itemGroupOID = itemGroupOID;
         this.itemGroupRepeatKey = itemGroupRepeatKey;
         this.itemOID = itemOID;
+        this.value = value;
         Status = status;
         Message = message;
     }
@@ -114,5 +116,13 @@ public class DataImportReport {
 
     public void setStudySubjectID(String studySubjectID) {
         StudySubjectID = studySubjectID;
+    }
+
+    public String getValue() {
+        return value;
+    }
+
+    public void setValue(String value) {
+        this.value = value;
     }
 }
