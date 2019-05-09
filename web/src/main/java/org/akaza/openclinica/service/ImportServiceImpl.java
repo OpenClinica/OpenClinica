@@ -254,7 +254,7 @@ public class ImportServiceImpl implements ImportService {
 
                 // Study Event Repeat key is not an int number
                 try {
-                     Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey());
+                    Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey());
                 } catch (NumberFormatException nfe) {
                     nfe.getStackTrace();
                     logger.debug("StudyEventRepeatKey {} for SubjectKey {} and StudyEventOID {} is not Valid", studyEventDataBean.getStudyEventRepeatKey(), subjectDataBean.getSubjectOID(), studyEventDataBean.getStudyEventOID());
@@ -467,6 +467,11 @@ public class ImportServiceImpl implements ImportService {
                     if (eventCrf == null) {
                         eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
                         eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+                        logger.debug("*********CREATED EVENT CRF");
+
+                        studyEvent = updateStudyEvent(studyEvent, userAccount);
+                        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+                        logger.debug("*********Update Study EVENT Status");
                     }
 
                     ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
@@ -798,8 +803,6 @@ public class ImportServiceImpl implements ImportService {
         eventCrf.setValidatorId(0);
         eventCrf.setOldStatusId(0);
         eventCrf.setSdvUpdateId(0);
-        eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
-        logger.debug("*********CREATED EVENT CRF");
         return eventCrf;
     }
 
@@ -834,10 +837,15 @@ public class ImportServiceImpl implements ImportService {
         }
         studyEvent.setStartTimeFlag(false);
         studyEvent.setEndTimeFlag(false);
-        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
         return studyEvent;
     }
 
+    private StudyEvent updateStudyEvent(StudyEvent studyEvent, UserAccount userAccount) {
+        studyEvent.setDateUpdated(new Date());
+        studyEvent.setUpdateId(userAccount.getUserId());
+        studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
+        return studyEvent;
+    }
 
     private ErrorObj createErrorObj(String code, String message) {
         ErrorObj errorObj = new ErrorObj();
