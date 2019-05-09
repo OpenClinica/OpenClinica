@@ -18,6 +18,7 @@ import java.util.concurrent.TimeUnit;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.sql.DataSource;
+import javax.ws.rs.HEAD;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
@@ -52,10 +53,7 @@ import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
-import org.akaza.openclinica.service.CustomRuntimeException;
-import org.akaza.openclinica.service.ParticipateService;
-import org.akaza.openclinica.service.StudyEventService;
-import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.ErrorObj;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
@@ -122,6 +120,9 @@ public class StudyEventController {
 
 	@Autowired
 	private UserService userService;
+
+	@Autowired
+	private UtilService utilService;
 
     PassiveExpiringMap<String, Future<ResponseEntity<Object>>> expiringMap =
             new PassiveExpiringMap<>(24, TimeUnit.HOURS);
@@ -232,9 +233,11 @@ public class StudyEventController {
             @PathVariable("subjectKey") String subjectKey,
             @PathVariable("studyOID") String studyOID,
             @PathVariable("siteOID") String siteOID) throws Exception {
-        
-        String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();
-        String ordinal = studyEventScheduleRequestDTO.getOrdinal();
+
+		utilService.setSchemaFromStudyOid(studyOID);
+		String ordinal = studyEventScheduleRequestDTO.getOrdinal();
+
+		String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();
         String startDate = studyEventScheduleRequestDTO.getStartDate();
         String endDate = studyEventScheduleRequestDTO.getEndDate();
         
