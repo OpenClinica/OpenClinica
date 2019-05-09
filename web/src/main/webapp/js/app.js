@@ -60,7 +60,6 @@ var app_thisClinicalData = undefined;
 var app_thisStudyEvent = undefined;
 var app_thisStudyEventDataMap = undefined;
 var app_thisSubjectsData = undefined;
-var app_allSubjectsData = undefined;
 var app_thisFormData = undefined;
 var app_studyEventDefMap = {};
 var app_renderMode=undefined;
@@ -72,8 +71,6 @@ var app_formDefMap = {};
 var app_thisStudyEventRepeatKeyForSingleEvents=undefined;
 var app_formDefMap={};
 var app_attributes = undefined;
-var app_studyName;
-var app_protocolName;
 app_attributes = util_ensureArray(app_attributes);	
 
 /***********      @JQUERY INIT    *******************/
@@ -138,14 +135,13 @@ function setRenderMode() {
 else{
 	 if (app_studyOID != "*" && app_eventOID == "*" && app_formVersionOID == "*" && app_studySubjectOID !="*") {
 		    renderMode = 'STUDY_SUBJECT_CASE_BOOK';
-		  }	 	 
+		  }
+	 
+	 
 		  
 	 else if (app_studyOID != "*" && app_eventOID != "*" && app_formVersionOID != "*" && app_studySubjectOID !="*") {
 		    renderMode = 'POPULATED_FORM_CRF';
 		  }
-	 else if (app_studyOID != "*" && app_eventOID == "*" && app_formVersionOID == "*" && app_studySubjectOID =="*") {
-		    renderMode = 'STUDY_ALL_SUBJECT_CASE_BOOK';
-	  }	
 }
   
 }

@@ -188,12 +188,9 @@ function StudyDataLoader(study, json) {
   this.loadStudyEventDefs = function() {
     debug("loading study events", util_logDebug );
     app_studyEventDefs = this.study["MetaDataVersion"]["StudyEventDef"];
-    if (app_studyEventDefs == undefined) { 
+    if (app_studyEventDefs[0] == undefined) { 
       app_studyEventDefs = new Array();
-      if(this.study["MetaDataVersion"]["StudyEventDef"]){
-    	  app_studyEventDefs.push(this.study["MetaDataVersion"]["StudyEventDef"]);
-      }
-      
+      app_studyEventDefs.push(this.study["MetaDataVersion"]["StudyEventDef"]);
      
     }
     for (var i=0;i< app_studyEventDefs.length;i++) {
@@ -210,7 +207,7 @@ function StudyDataLoader(study, json) {
   this.loadItemDefs = function() {
     debug("loading item items", util_logDebug );
     app_itemDefs = this.study["MetaDataVersion"]["ItemDef"];
-    if (app_itemDefs == undefined) { 
+    if (app_itemDefs[0] == undefined) { 
       app_itemDefs = new Array();
       app_itemDefs.push(this.study["MetaDataVersion"]["ItemDef"]);
     }
@@ -225,12 +222,9 @@ function StudyDataLoader(study, json) {
     // app_formDefs = this.study["MetaDataVersion"]["FormDef"];
 	  app_formDefs  = util_ensureArray(this.study["MetaDataVersion"]["FormDef"]);
 
-    if (app_formDefs == undefined) { 
+    if (app_formDefs[0] == undefined) { 
       app_formDefs = new Array();
-      if(this.study["MetaDataVersion"]["FormDef"]){
-    	  app_formDefs.push(this.study["MetaDataVersion"]["FormDef"]);
-      }
-     
+      app_formDefs.push(this.study["MetaDataVersion"]["FormDef"]);
     }
     for(var i=0;i<app_formDefs.length;i++){
     	var formDefOid = app_formDefs[i]["@OID"];
@@ -280,27 +274,14 @@ function StudyDataLoader(study, json) {
     var clinicalData = this.json["ClinicalData"];
     var subjectsData = util_ensureArray(clinicalData["SubjectData"]);
     
-    if(app_studySubjectOID =='*'){
-    	if(!subjectsData){
-			var subjectsData = [];
-    		for (var i=0;i<clinicalData.length;i++) {
-				subjectsData.push(clinicalData[i]["SubjectData"]);
-			}	
-    	}
-    	
-    	subjectData = subjectsData;    	
-    	
-    }else{
-    	for (var i=0;i<subjectsData.length;i++) {
-		  if(subjectsData[i]["@SubjectKey"] == app_studySubjectOID) { 
-			subjectData = subjectsData[i];
-			break;
-		  }
-		}	
+    for (var i=0;i<subjectsData.length;i++) {
+      if(subjectsData[i]["@SubjectKey"] == app_studySubjectOID) { 
+        subjectData = subjectsData[i];
+        break;
+      }
     }
     app_thisClinicalData = clinicalData;
     app_thisSubjectsData = subjectData;
-    app_allSubjectsData = subjectData;
     //app_studySubjectDOB = subjectData["@OpenClinica:DateOfBirth"];
     
     var studyEventsData = util_ensureArray(subjectData["StudyEventData"]);
