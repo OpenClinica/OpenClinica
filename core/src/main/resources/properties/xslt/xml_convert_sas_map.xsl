@@ -177,16 +177,11 @@
             </xsl:element>
             <xsl:copy-of copy-namespaces="no" select="$typemap/row[@oc=$itemdef/@DataType]/*"/>
             <xsl:choose>
-                <xsl:when test="$itemdef/@DataType='text' and $itemdef/@Length &gt; 255">
-                    <xsl:element name="LENGTH">
-                        <xsl:value-of select="255"/>
-                    </xsl:element>
-                </xsl:when>
-                <xsl:when test="$itemdef/@DataType='text' and $itemdef/@Length &lt; 256">
+                <xsl:when test="$itemdef/@DataType='text'">
                     <xsl:element name="LENGTH">
                         <xsl:value-of select="$itemdef/@Length"/>
                     </xsl:element>
-                </xsl:when>
+                 </xsl:when>
             </xsl:choose>
         </xsl:element>
     </xsl:template>
