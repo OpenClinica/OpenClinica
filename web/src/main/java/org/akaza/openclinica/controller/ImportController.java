@@ -183,7 +183,7 @@ public class ImportController {
 
         if (!validateService.isUserHasAccessToStudy(userRoles, studyOid) && (siteOid != null && !validateService.isUserHasAccessToStudy(userRoles, siteOid))) {
             return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
-        } else if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role(userRoles)) {
+        } else if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role(userRoles,studyOID,siteOid)) {
             return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
         }
 

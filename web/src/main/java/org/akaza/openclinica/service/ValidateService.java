@@ -28,9 +28,9 @@ public interface ValidateService {
 
     boolean isStudyToSiteRelationValid(String studyOid, String siteOid);
 
-    boolean isUserHasCRC_INV_Role(List<StudyUserRoleBean> userRoles);
+    boolean isUserHasCRC_INV_Role(List<StudyUserRoleBean> userRoles ,String siteOid);
 
-    boolean isUserHasCRC_INV_DM_DEP_DS_Role(List<StudyUserRoleBean> userRoles);
+    boolean isUserHasCRC_INV_DM_DEP_DS_Role(List<StudyUserRoleBean> userRoles,String studyOid, String siteOid);
 
     boolean isUserHasTechAdminRole(UserAccount userAccount);
 

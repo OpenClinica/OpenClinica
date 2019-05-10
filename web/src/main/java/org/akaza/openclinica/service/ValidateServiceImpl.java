@@ -85,7 +85,6 @@ public class ValidateServiceImpl implements ValidateService {
     }
 
     public boolean isUserHasAccessToStudy(List<StudyUserRoleBean> userRoles, String studyOid) {
-
         for (StudyUserRoleBean userRole : userRoles) {
             if (checkUserHasAccessToStudy(userRole, studyOid)) {
                 return true;
@@ -94,9 +93,9 @@ public class ValidateServiceImpl implements ValidateService {
         return false;
     }
 
-    public boolean isUserHasCRC_INV_Role(List<StudyUserRoleBean> userRoles ) {
+    public boolean isUserHasCRC_INV_Role(List<StudyUserRoleBean> userRoles, String siteOid) {
         for (StudyUserRoleBean userRole : userRoles) {
-            if (check_CRC_INV_RoleByUserRole(userRole)) {
+            if (check_CRC_INV_RoleByUserRole(userRole, siteOid)) {
                 return true;
             }
         }
@@ -104,9 +103,9 @@ public class ValidateServiceImpl implements ValidateService {
     }
 
 
-    public boolean isUserHasCRC_INV_DM_DEP_DS_Role(List<StudyUserRoleBean> userRoles) {
+    public boolean isUserHasCRC_INV_DM_DEP_DS_Role(List<StudyUserRoleBean> userRoles, String studyOid, String siteOid) {
         for (StudyUserRoleBean userRole : userRoles) {
-            if (check_CRC_INV_DM_DEP_DS_RoleByUserRole(userRole)) {
+            if (check_CRC_INV_DM_DEP_DS_RoleByUserRole(userRole, studyOid, siteOid)) {
                 return true;
             }
         }
@@ -142,36 +141,43 @@ public class ValidateServiceImpl implements ValidateService {
         return studyDao.findPublicStudy(studyOid);
     }
 
-    private boolean check_CRC_INV_RoleByUserRole(StudyUserRoleBean userRole) {
-        if (isSiteRole(userRole) && (userRole.getRole().equals(Role.RESEARCHASSISTANT) ) || (userRole.getRole().equals(Role.INVESTIGATOR) ))
+    private boolean check_CRC_INV_RoleByUserRole(StudyUserRoleBean userRole, String siteOid) {
+        Study publicSite = getPublicStudy(siteOid);
+        if ((userRole.getRole().equals(Role.RESEARCHASSISTANT) && publicSite.getStudyId() == userRole.getStudyId())
+                || (userRole.getRole().equals(Role.INVESTIGATOR) && publicSite.getStudyId() == userRole.getStudyId()))
             return true;
 
         return false;
     }
 
-    private boolean check_CRC_INV_DM_DEP_DS_RoleByUserRole(StudyUserRoleBean userRole) {
-        if (userRole.getRole().equals(Role.RESEARCHASSISTANT)
-                || userRole.getRole().equals(Role.INVESTIGATOR)
-                || userRole.getRole().equals(Role.COORDINATOR) )
+    private boolean check_CRC_INV_DM_DEP_DS_RoleByUserRole(StudyUserRoleBean userRole, String studyOid, String siteOid) {
+        Study publicStudy = getPublicStudy(studyOid);
+        Study publicSite = getPublicStudy(siteOid);
+        if ((userRole.getRole().equals(Role.RESEARCHASSISTANT) && publicSite.getStudyId() == userRole.getStudyId())
+                || (userRole.getRole().equals(Role.RESEARCHASSISTANT) && publicStudy.getStudyId() == userRole.getStudyId())
+                || (userRole.getRole().equals(Role.INVESTIGATOR) && publicSite.getStudyId() == userRole.getStudyId())
+                || (userRole.getRole().equals(Role.INVESTIGATOR) && publicStudy.getStudyId() == userRole.getStudyId())
+                || (userRole.getRole().equals(Role.COORDINATOR) && publicStudy.getStudyId() == userRole.getStudyId()))
             return true;
 
         return false;
     }
 
-    private boolean checkUserHasAccessToStudy(StudyUserRoleBean userRole, String  studyOid) {
+    private boolean checkUserHasAccessToStudy(StudyUserRoleBean userRole, String studyOid) {
         Study publicStudy = getPublicStudy(studyOid);
         if (publicStudy == null)
             return false;
-        if ((userRole.getStudyId() == publicStudy.getStudyId()) ||   (publicStudy.getStudy()!=null?  userRole.getStudyId() == publicStudy.getStudy().getStudyId():false)) {
+        if ((userRole.getStudyId() == publicStudy.getStudyId())) {
             return true;
         }
         return false;
     }
 
-    private boolean isSiteRole(StudyUserRoleBean userRole){
-        int studyId= userRole.getStudyId();
-        Study study= studyDao.findById(studyId);
-        if (study.getStudy()!=null)
+
+    private boolean isSiteRole(StudyUserRoleBean userRole, String siteOid) {
+        int studyId = userRole.getStudyId();
+        Study study = studyDao.findByOcOID(siteOid);
+        if (study != null && study.getStudyId() == studyId)
             return true;
         return false;
     }

@@ -221,7 +221,7 @@ public class UserController {
 
             if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) && !validateService.isUserHasAccessToStudy(userRoles,siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-            }else if (!validateService.isUserHasCRC_INV_Role(userRoles)) {
+            }else if (!validateService.isUserHasCRC_INV_Role(userRoles,siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
             }
 
