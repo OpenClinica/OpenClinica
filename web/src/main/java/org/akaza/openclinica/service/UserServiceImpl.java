@@ -136,7 +136,6 @@ public class UserServiceImpl implements UserService {
 
     StudyDAO sdao;
 
-    public static ResourceBundle restext;
 
     public StudySubject getStudySubject(String ssid, Study study) {
         return studySubjectDao.findByLabelAndStudyOrParentStudy(ssid, study);
@@ -146,13 +145,9 @@ public class UserServiceImpl implements UserService {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public static void setRestext(HttpServletRequest request) {
-        Locale locale = LocaleResolver.getLocale(request);
-        restext = ResourceBundleProvider.getTextsBundle(locale);
-    }
 
-    public OCUserDTO connectParticipant(HttpServletRequest request, String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken, UserAccountBean userAccountBean, String customerUuid) {
-        setRestext(request);
+    public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken,
+                                        UserAccountBean userAccountBean, String customerUuid, ResourceBundle restext) {
         OCUserDTO ocUserDTO = null;
         Study tenantStudy = getStudy(studyOid);
         String oid = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getOc_oid() : tenantStudy.getOc_oid());
@@ -251,12 +246,12 @@ public class UserServiceImpl implements UserService {
         }
 
         ocUserDTO = buildOcUserDTO(studySubject);
-        ocUserDTO.setErrorMessage(getErrorMessage(inviteEnum, inviteStatusEnum));
+        ocUserDTO.setErrorMessage(getErrorMessage(inviteEnum, inviteStatusEnum, restext));
 
         return ocUserDTO;
     }
 
-    private String getErrorMessage(ParticipateInviteEnum inviteEnum, ParticipateInviteStatusEnum inviteStatusEnum) {
+    private String getErrorMessage(ParticipateInviteEnum inviteEnum, ParticipateInviteStatusEnum inviteStatusEnum, ResourceBundle restext) {
         String message = null;
         if (inviteEnum == ParticipateInviteEnum.NO_INVITE)
             return message;

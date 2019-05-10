@@ -32,6 +32,8 @@ import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLRequest;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
@@ -127,8 +129,9 @@ public class UserController {
         String accessToken = utilService.getAccessTokenFromRequest(request);
         UserAccountBean ownerUserAccountBean = utilService.getUserAccountFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
+        ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(LocaleResolver.getLocale(request));
 
-        OCUserDTO ocUserDTO = userService.connectParticipant(request, studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid);
+        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid, textsBundle);
         logger.info("REST request to POST OCUserDTO : {}", ocUserDTO);
         return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.OK);
     }

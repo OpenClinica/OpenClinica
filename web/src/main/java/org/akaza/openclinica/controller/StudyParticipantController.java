@@ -1,5 +1,6 @@
 package org.akaza.openclinica.controller;
 
+import com.sun.corba.se.spi.resolver.LocalResolver;
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
 import io.swagger.annotations.ApiResponse;
@@ -19,6 +20,8 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.OCParticipantDTO;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.UtilService;
@@ -640,8 +643,10 @@ public class StudyParticipantController {
 			oCParticipantDTO.setIdentifier(subjectTransferBean.getIdentifier());
 			String label =this.participantService.createParticipant(subjectTransferBean,currentStudy,accessToken,userAccountBean);
 
-			if(subjectTransferBean.isRegister())
-				userService.connectParticipant(request, currentStudy.getOid(),subjectTransferBean.getPersonId(),oCParticipantDTO,accessToken,userAccountBean,customerUuid);
+			if(subjectTransferBean.isRegister()) {
+				ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(LocaleResolver.getLocale(request));
+				userService.connectParticipant(currentStudy.getOid(), subjectTransferBean.getPersonId(), oCParticipantDTO, accessToken, userAccountBean, customerUuid, textsBundle);
+			}
 
 			return label;
 	    }
