@@ -174,13 +174,5 @@ public class ValidateServiceImpl implements ValidateService {
     }
 
 
-    private boolean isSiteRole(StudyUserRoleBean userRole, String siteOid) {
-        int studyId = userRole.getStudyId();
-        Study study = studyDao.findByOcOID(siteOid);
-        if (study != null && study.getStudyId() == studyId)
-            return true;
-        return false;
-    }
-
 
 }
