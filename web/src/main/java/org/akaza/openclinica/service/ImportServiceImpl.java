@@ -254,16 +254,17 @@ public class ImportServiceImpl implements ImportService {
 
 
                 // Study Event Repeat key is not an int number
-                try {
-                    Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey());
-                } catch (NumberFormatException nfe) {
-                    nfe.getStackTrace();
-                    logger.debug("StudyEventRepeatKey {} for SubjectKey {} and StudyEventOID {} is not Valid", studyEventDataBean.getStudyEventRepeatKey(), subjectDataBean.getSubjectOID(), studyEventDataBean.getStudyEventOID());
-                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), studySubject.getLabel(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.repeatKeyNotValid ");
-                    dataImportReports.add(dataImportReport);
-                    continue;
+                if(studyEventDataBean.getStudyEventRepeatKey()!=null) {
+                    try {
+                        Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey());
+                    } catch (NumberFormatException nfe) {
+                        nfe.getStackTrace();
+                        logger.debug("StudyEventRepeatKey {} for SubjectKey {} and StudyEventOID {} is not Valid", studyEventDataBean.getStudyEventRepeatKey(), subjectDataBean.getSubjectOID(), studyEventDataBean.getStudyEventOID());
+                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), studySubject.getLabel(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, null, null, FAILED, "errorCode.repeatKeyNotValid ");
+                        dataImportReports.add(dataImportReport);
+                        continue;
+                    }
                 }
-
                 int maxSeOrdinal = studyEventDao.findMaxOrdinalByStudySubjectStudyEventDefinition(studySubject.getStudySubjectId(), studyEventDefinition.getStudyEventDefinitionId());
 
                 StudyEvent studyEvent = null;
