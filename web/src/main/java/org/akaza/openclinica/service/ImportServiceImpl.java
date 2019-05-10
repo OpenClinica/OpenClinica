@@ -54,7 +54,6 @@ import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 import org.springframework.web.client.HttpClientErrorException;
 import org.springframework.web.client.RestTemplate;
-import sun.misc.FormattedFloatingDecimal;
 
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
