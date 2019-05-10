@@ -47,6 +47,7 @@ import org.springframework.web.client.RestTemplate;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
@@ -145,7 +146,13 @@ public class UserServiceImpl implements UserService {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken, UserAccountBean userAccountBean, String customerUuid) {
+    public static void setRestext(HttpServletRequest request) {
+        Locale locale = LocaleResolver.getLocale(request);
+        restext = ResourceBundleProvider.getTextsBundle(locale);
+    }
+
+    public OCUserDTO connectParticipant(HttpServletRequest request, String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken, UserAccountBean userAccountBean, String customerUuid) {
+        setRestext(request);
         OCUserDTO ocUserDTO = null;
         Study tenantStudy = getStudy(studyOid);
         String oid = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getOc_oid() : tenantStudy.getOc_oid());
@@ -187,12 +194,13 @@ public class UserServiceImpl implements UserService {
         } else {
             logger.info("Participant does not exists or not added yet in OC ");
         }
+        ParticipateInviteEnum inviteEnum = ParticipateInviteEnum.NO_INVITE;
+        ParticipateInviteStatusEnum inviteStatusEnum = ParticipateInviteStatusEnum.NO_OP;
         if (participantDTO.isInviteParticipant() || participantDTO.isInviteViaSms()) {
 
             ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean);
             boolean updateUserStatus = false;
-            ParticipateInviteEnum inviteEnum = ParticipateInviteEnum.NO_INVITE;
-            ParticipateInviteStatusEnum inviteStatusEnum = ParticipateInviteStatusEnum.NO_OP;
+
             if (participantDTO.isInviteViaSms())
                 inviteEnum = ParticipateInviteEnum.SMS_INVITE;
             if (participantDTO.isInviteParticipant())
@@ -230,7 +238,6 @@ public class UserServiceImpl implements UserService {
             } else if (inviteEnum == ParticipateInviteEnum.EMAIL_INVITE) {
                 inviteStatusEnum = emailToParticipant ? ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS : ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL;
             }
-            String popupMessage = getErrorMessage(inviteEnum, inviteStatusEnum);
             if ((inviteEnum != ParticipateInviteEnum.NO_INVITE) &&
                     ((inviteStatusEnum == ParticipateInviteStatusEnum.BOTH_INVITE_SUCCESS)
                             || (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS)
@@ -244,6 +251,7 @@ public class UserServiceImpl implements UserService {
         }
 
         ocUserDTO = buildOcUserDTO(studySubject);
+        ocUserDTO.setErrorMessage(getErrorMessage(inviteEnum, inviteStatusEnum));
 
         return ocUserDTO;
     }
@@ -254,10 +262,16 @@ public class UserServiceImpl implements UserService {
             return message;
         switch(inviteStatusEnum) {
             case EMAIL_INVITE_SUCCESS:
-                message = restext.getString("mail_invite_success");
+                message = restext.getString("email_invite_success");
                 break;
             case SMS_INVITE_SUCCESS:
                 message = restext.getString("sms_invite_success");
+                break;
+            case EMAIL_INVITE_FAIL:
+                message = restext.getString("email_invite_fail");
+                break;
+            case SMS_INVITE_FAIL:
+                message = restext.getString("sms_invite_fail");
                 break;
             case EMAIL_SUCCESS_SMS_FAIL:
                 message = restext.getString("email_success_sms_fail");

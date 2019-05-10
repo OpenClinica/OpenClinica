@@ -29,7 +29,7 @@ public interface UserService {
 
     public static final String BULK_JOBS = "bulk_jobs";
 
-    OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken, UserAccountBean ownerUserAccountBean, String customerUuid);
+    OCUserDTO connectParticipant(HttpServletRequest request, String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken, UserAccountBean ownerUserAccountBean, String customerUuid);
 
     OCUserDTO getParticipantAccount(String studyOid, String ssid, String accessToken);
 

@@ -128,7 +128,7 @@ public class UserController {
         UserAccountBean ownerUserAccountBean = utilService.getUserAccountFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
 
-        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid);
+        OCUserDTO ocUserDTO = userService.connectParticipant(request, studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid);
         logger.info("REST request to POST OCUserDTO : {}", ocUserDTO);
         return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.OK);
     }
