@@ -105,9 +105,6 @@ public class JobController {
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
 
-        if (!validateService.isParticipateActive(tenantStudy)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_PARTICIAPTE_INACTIVE, "Participate is Inactive. Participate module for the study is inactive")).body(null);
-        }
 
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
@@ -159,9 +156,15 @@ public class JobController {
     @ApiOperation( value = "To download job files ", notes = "Will download job file" )
     @RequestMapping( value = "/jobs/{uuid}/downloadFile", method = RequestMethod.GET )
     public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable( "uuid" ) String uuid, @RequestParam(required = false) String open, HttpServletResponse response) throws Exception {
-        UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
-         Study publicStudy = studyDao.findPublicStudyById(userAccountBean.getActiveStudyId());
-         utilService.setSchemaFromStudyOid(publicStudy.getOc_oid());
+        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+        Study publicStudy = studyDao.findPublicStudyById(userAccountBean.getActiveStudyId());
+        String studyOid;
+        if (publicStudy.getStudy() == null) {
+            studyOid = publicStudy.getOc_oid();
+        } else{
+            studyOid = publicStudy.getStudy().getOc_oid();
+         }
+         utilService.setSchemaFromStudyOid(studyOid);
 
         JobDetail jobDetail=jobDetailDao.findByUuid(uuid);
         if (jobDetail==null) {

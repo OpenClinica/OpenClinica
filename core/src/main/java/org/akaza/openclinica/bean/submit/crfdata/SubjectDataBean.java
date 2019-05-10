@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
 import org.akaza.openclinica.bean.odmbeans.DiscrepancyNotesBean;
 
 public class SubjectDataBean {
+    private String studySubjectID;
     private ArrayList<StudyEventDataBean> studyEventData;
     private String subjectOID;
     private AuditLogsBean auditLogs;
@@ -47,5 +48,13 @@ public class SubjectDataBean {
 
     public void setDiscrepancyNotes(DiscrepancyNotesBean discrepancyNotes) {
         this.discrepancyNotes = discrepancyNotes;
+    }
+
+    public String getStudySubjectID() {
+        return studySubjectID;
+    }
+
+    public void setStudySubjectID(String studySubjectID) {
+        this.studySubjectID = studySubjectID;
     }
 }

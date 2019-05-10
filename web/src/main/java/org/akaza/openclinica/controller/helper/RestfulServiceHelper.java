@@ -1,7 +1,6 @@
 package org.akaza.openclinica.controller.helper;
 
 import org.akaza.openclinica.bean.core.Role;
-import org.akaza.openclinica.bean.core.UserType;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
@@ -13,15 +12,12 @@ import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.i18n.util.I18nFormatUtil;
-import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
-import org.akaza.openclinica.logic.importdata.ImportDataHelper;
 import org.akaza.openclinica.logic.importdata.PipeDelimitedDataHelper;
-import org.akaza.openclinica.service.UserStatus;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.csv.CSVFormat;
 import org.apache.commons.csv.CSVParser;
 import org.apache.commons.csv.CSVRecord;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.http.HttpEntity;
 import org.apache.http.HttpResponse;
 import org.apache.http.client.methods.HttpPost;
@@ -33,48 +29,29 @@ import org.apache.http.impl.client.CloseableHttpClient;
 import org.apache.http.impl.client.HttpClients;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.mock.web.MockHttpServletRequest;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
+import org.springframework.util.CollectionUtils;
 import org.springframework.validation.Errors;
 import org.springframework.web.multipart.MultipartFile;
-
-import liquibase.util.StringUtils;
-
-import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
-
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.File;
-import java.io.FileOutputStream;
-import java.io.FileReader;
-import java.io.IOException;
-import java.io.InputStream;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-import java.io.Reader;
-import java.nio.file.Files;
-import java.nio.file.Paths;
-import java.sql.Connection;
-import java.sql.SQLException;
-import java.text.DateFormat;
-import java.text.ParseException;
-import java.text.SimpleDateFormat;
-import java.time.LocalDate;
-import java.time.ZoneId;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
-import java.time.format.ResolverStyle;
-import java.util.*;
-import java.util.concurrent.TimeUnit;
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import javax.sql.DataSource;
+import java.io.*;
+import java.sql.Connection;
+import java.time.LocalDate;
+import java.time.ZoneId;
+import java.time.format.DateTimeFormatter;
+import java.time.format.DateTimeParseException;
+import java.util.*;
+
+import static org.akaza.openclinica.control.core.SecureController.USER_BEAN_NAME;
+import static org.akaza.openclinica.service.rest.errors.ErrorConstants.PARTICIPANT_ID_MISSING_PARTICIPANT_ID_DATA;
+import static org.akaza.openclinica.service.rest.errors.ErrorConstants.PARTICIPANT_ID_MULTIPLE_PARTICIPANT_ID_HEADERS;
 @Service("serviceHelper")
 public class RestfulServiceHelper {
 	
@@ -90,7 +67,7 @@ public class RestfulServiceHelper {
 	private static final String Ordinal_header = "Ordinal";
 	private static final String StartDate_header = "StartDate";
 	private static final String EndDate_header = "EndDate";
-	
+
 	private DataSource dataSource;	
 	private StudyDAO studyDao; 
 	private UserAccountDAO userAccountDAO;
@@ -120,10 +97,24 @@ public class RestfulServiceHelper {
 			 reader = new BufferedReader(new InputStreamReader(is));
 			 
 			//Create the CSVFormat object with the header mapping		 
-			 CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader(FILE_HEADER_MAPPING).withFirstRecordAsHeader().withTrim();
+			CSVFormat csvFileFormat = CSVFormat.DEFAULT.withHeader().withTrim();
+			CSVParser csvParser = null;
+			try {
+				csvParser = new CSVParser(reader, csvFileFormat);
+			} catch (IllegalArgumentException e) {
+				throw new Exception(PARTICIPANT_ID_MULTIPLE_PARTICIPANT_ID_HEADERS);
+			}
+			Map<String, Integer> headerMap = csvParser.getHeaderMap();
+			if (CollectionUtils.isEmpty(headerMap))
+				throw new Exception(PARTICIPANT_ID_MISSING_PARTICIPANT_ID_DATA);
+			final long participantIDCount = headerMap.entrySet().stream().filter(x -> x.getKey().equals(ParticipantID_header)).count();
 
-	         CSVParser csvParser = new CSVParser(reader, csvFileFormat);
-	       
+			if (participantIDCount == 0) {
+				throw new Exception(PARTICIPANT_ID_MISSING_PARTICIPANT_ID_DATA);
+			} else if (participantIDCount > 1) {
+				throw new Exception(PARTICIPANT_ID_MULTIPLE_PARTICIPANT_ID_HEADERS);
+			}
+
 	         try {
 	        	//Get a list of CSV file records              	         
 		         for (CSVRecord csvRecord : csvParser) {		      	
@@ -142,7 +133,10 @@ public class RestfulServiceHelper {
 	         }
 	         
 		}catch (Exception e) {
-			throw new Exception(" This CSV format is not supported ");
+			String message = " This CSV format is not supported ";
+			if (StringUtils.isNotEmpty(e.getMessage()))
+				message = e.getMessage();
+			throw new Exception(message);
 	    }
 		
         

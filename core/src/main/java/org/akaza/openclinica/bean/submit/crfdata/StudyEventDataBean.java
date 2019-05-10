@@ -1,6 +1,7 @@
 package org.akaza.openclinica.bean.submit.crfdata;
 
 import java.util.ArrayList;
+import java.util.Date;
 
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.odmbeans.AuditLogsBean;
@@ -14,6 +15,7 @@ public class StudyEventDataBean {
     private AuditLogsBean auditLogs;
     private DiscrepancyNotesBean discrepancyNotes;
     private StudyEventDefinition studyEventDefinition;
+    private String startDate;
 
     public StudyEventDataBean() {
         formData = new ArrayList<FormDataBean>();
@@ -69,5 +71,11 @@ public class StudyEventDataBean {
 	this.studyEventDefinition = studyEventDefinition;
 }
 
+    public String getStartDate() {
+        return startDate;
+    }
 
+    public void setStartDate(String startDate) {
+        this.startDate = startDate;
+    }
 }
