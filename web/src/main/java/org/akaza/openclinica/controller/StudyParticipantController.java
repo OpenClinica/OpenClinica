@@ -641,7 +641,7 @@ public class StudyParticipantController {
 			String label =this.participantService.createParticipant(subjectTransferBean,currentStudy,accessToken,userAccountBean);
 
 			if(subjectTransferBean.isRegister())
-				userService.connectParticipant(currentStudy.getOid(),subjectTransferBean.getPersonId(),oCParticipantDTO,accessToken,userAccountBean,customerUuid);
+				userService.connectParticipant(request, currentStudy.getOid(),subjectTransferBean.getPersonId(),oCParticipantDTO,accessToken,userAccountBean,customerUuid);
 
 			return label;
 	    }
