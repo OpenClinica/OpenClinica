@@ -23,6 +23,8 @@ import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.rule.action.NotificationActionProcessor;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.RandomStringUtils;
@@ -50,10 +52,7 @@ import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.messageServiceUri;
 import static org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.sbsUrl;
@@ -134,9 +133,9 @@ public class UserServiceImpl implements UserService {
 
     private String urlBase = CoreResources.getField("sysURL").split("/MainMenu")[0];
 
-
     StudyDAO sdao;
 
+    public static ResourceBundle restext;
 
     public StudySubject getStudySubject(String ssid, Study study) {
         return studySubjectDao.findByLabelAndStudyOrParentStudy(ssid, study);
@@ -255,22 +254,22 @@ public class UserServiceImpl implements UserService {
             return message;
         switch(inviteStatusEnum) {
             case EMAIL_INVITE_SUCCESS:
-                message = "Email Invite Succeeded";
+                message = restext.getString("mail_invite_success");
                 break;
             case SMS_INVITE_SUCCESS:
-                message = "SMS Invite Succeeded";
+                message = restext.getString("sms_invite_success");
                 break;
             case EMAIL_SUCCESS_SMS_FAIL:
-                message = "Email Invite Succeeded SMS Invite Failed";
+                message = restext.getString("email_success_sms_fail");
                 break;
             case EMAIL_FAIL_SMS_SUCCESS:
-                message = "Email Invite Failed SMS Invite Succeeded";
+                message = restext.getString("email_fail_sms_success");
                 break;
             case BOTH_INVITE_FAIL:
-                message = "Email and SMS Invite Failed";
+                message = restext.getString("both_invite_fail");
                 break;
             case BOTH_INVITE_SUCCESS:
-                message = "Email and SMS Invite Succeeded";
+                message = restext.getString("both_invite_success");
                 break;
             default:
                 break;

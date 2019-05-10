@@ -20,6 +20,8 @@ public class OCParticipantDTO extends AbstractAuditingDTO implements Serializabl
 
     private String identifier;
 
+    private String errorMessage;
+
     public String getPhoneNumber() {
         return phoneNumber;
     }
@@ -72,7 +74,17 @@ public class OCParticipantDTO extends AbstractAuditingDTO implements Serializabl
         return inviteViaSms;
     }
 
+    public String getErrorMessage() {
+        return errorMessage;
+    }
+
+    public void setErrorMessage(String errorMessage) {
+        this.errorMessage = errorMessage;
+    }
+
     public void setInviteViaSms(boolean inviteViaSms) {
         this.inviteViaSms = inviteViaSms;
     }
+
+
 }
