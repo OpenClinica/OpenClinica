@@ -148,10 +148,11 @@ jQuery.ajax({
   url: url,
   success: function(data) {
     datatable.rows.add(data.map(function (logEntry) {
+      var actionView = '<a target="_blank" href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile?open=true"><span class="icon icon-search"></span></a> ';
       var actionDownload = '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ';
       var actionDelete = '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>';
       if (logEntry.status === 'IN_PROGRESS') {
-        actionDownload = actionDelete = '';
+        actionView = actionDownload = actionDelete = '';
       }
       return [
         logEntry.sourceFileName,
@@ -161,7 +162,7 @@ jQuery.ajax({
         formatDate(logEntry.dateCreated),
         logEntry.createdByUsername,
         formatDate(logEntry.dateCompleted),
-        actionDownload + actionDelete
+        actionView + actionDownload + actionDelete
       ];
     }));
     datatable.draw();

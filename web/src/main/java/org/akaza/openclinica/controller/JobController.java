@@ -32,6 +32,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -154,7 +155,7 @@ public class JobController {
 
     @ApiOperation( value = "To download job files ", notes = "Will download job file" )
     @RequestMapping( value = "/jobs/{uuid}/downloadFile", method = RequestMethod.GET )
-    public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable( "uuid" ) String uuid, HttpServletResponse response) throws Exception {
+    public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable( "uuid" ) String uuid, @RequestParam(required = false) String open, HttpServletResponse response) throws Exception {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         Study publicStudy = studyDao.findPublicStudyById(userAccountBean.getActiveStudyId());
         String studyOid;
@@ -164,7 +165,6 @@ public class JobController {
             studyOid = publicStudy.getStudy().getOc_oid();
          }
          utilService.setSchemaFromStudyOid(studyOid);
-
 
         JobDetail jobDetail=jobDetailDao.findByUuid(uuid);
         if (jobDetail==null) {
@@ -182,8 +182,10 @@ public class JobController {
             String logFileName = getFilePath(jobDetail.getType()) + File.separator + jobDetail.getLogPath();
             File fileToDownload = new File(logFileName);
             inputStream = new FileInputStream(fileToDownload);
-            response.setContentType("application/force-download");
-            response.setHeader("Content-Disposition", "attachment; filename=" + jobDetail.getLogPath());
+            if (!"true".equals(open)) {
+                response.setContentType("application/force-download");
+                response.setHeader("Content-Disposition", "attachment; filename=" + jobDetail.getLogPath());                
+            }
             IOUtils.copy(inputStream, response.getOutputStream());
             response.flushBuffer();
         } catch (Exception e) {
