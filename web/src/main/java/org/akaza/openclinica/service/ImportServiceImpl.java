@@ -200,7 +200,9 @@ public class ImportServiceImpl implements ImportService {
                 continue;
             } else if (subjectDataBean.getSubjectOID() != null && subjectDataBean.getStudySubjectID() == null) {
                 studySubject = studySubjectDao.findByOcOID(subjectDataBean.getSubjectOID());
-                if (studySubject == null || (studySubject != null && studySubject.getStudy().getStudyId() != tenantStudy.getStudyId())) {
+                if (studySubject == null
+                        || (studySubject != null && studySubject.getStudy().getStudyId() != tenantStudy.getStudyId()
+                        || (studySubject != null && studySubject.getStudy().getStudy() != null && studySubject.getStudy().getStudy().getStudyId() != tenantStudy.getStudyId()))) {
                     logger.debug("SubjectKey {} Not Found", subjectDataBean.getSubjectOID());
                     dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, "errorCode.participantNotFound ");
                     dataImportReports.add(dataImportReport);
@@ -209,7 +211,10 @@ public class ImportServiceImpl implements ImportService {
             } else if (subjectDataBean.getSubjectOID() == null && subjectDataBean.getStudySubjectID() != null) {
                 try {
                     studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy);
-                    if (studySubject == null || (studySubject != null && studySubject.getStudy().getStudyId() != tenantStudy.getStudyId())) {
+                    if (studySubject == null)
+                        studySubject = (studySubjectDao.findByLabelAndParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy)).get(0);
+
+                    if (studySubject == null) {
                         logger.debug("SubjectKey {} Not Found", subjectDataBean.getSubjectOID());
                         dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, "errorCode.participantNotFound ");
                         dataImportReports.add(dataImportReport);
@@ -227,6 +232,8 @@ public class ImportServiceImpl implements ImportService {
             } else if (subjectDataBean.getSubjectOID() != null && subjectDataBean.getStudySubjectID() != null) {
                 studySubject = studySubjectDao.findByOcOID(subjectDataBean.getSubjectOID());
                 studySubject02 = studySubjectDao.findByLabelAndStudyOrParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy);
+                if (studySubject02 == null)
+                    studySubject02 = (studySubjectDao.findByLabelAndParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy)).get(0);
 
                 if (studySubject == null || studySubject02 == null || (studySubject != null && studySubject02 != null && studySubject.getStudySubjectId() != studySubject02.getStudySubjectId())) {
                     dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, "errorCode.participantIdentiersMismatch ");
@@ -258,6 +265,15 @@ public class ImportServiceImpl implements ImportService {
                     continue;
                 }
 
+                if (studyEventDataBean.getEndDate() != null) {
+                    ErrorObj endDateErrorObj = validateForDate(studyEventDataBean.getEndDate());
+                    if (endDateErrorObj != null) {
+                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, FAILED, "errorCode.eventNotScheduled.invalidEndDate");
+                        dataImportReports.add(dataImportReport);
+                        continue;
+                    }
+                }
+
 
                 // Study Event Repeat key is not an int number
                 if (studyEventDataBean.getStudyEventRepeatKey() != null) {
@@ -285,7 +301,7 @@ public class ImportServiceImpl implements ImportService {
                             continue;
                         }
 
-                        studyEvent = createStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, null);
+                        studyEvent = createStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, null, null);
                         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
                         logger.debug("Scheduling new Common Event");
                         // repeat key present,not scheduled, visit event Repeating ,start date present , verify key too Large ,verify startdate valid ,schedule
@@ -303,7 +319,7 @@ public class ImportServiceImpl implements ImportService {
                             continue;
                         }
 
-                        studyEvent = createStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, studyEventDataBean.getStartDate());
+                        studyEvent = createStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
                         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
                         logger.debug("Scheduling new Visit Base Repeating Event");
 
@@ -329,7 +345,8 @@ public class ImportServiceImpl implements ImportService {
                             dataImportReports.add(dataImportReport);
                             continue;
                         }
-                        studyEvent = createStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, studyEventDataBean.getStartDate());
+
+                        studyEvent = createStudyEvent(studySubject, studyEventDefinition, Integer.parseInt(studyEventDataBean.getStudyEventRepeatKey()), userAccount, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
                         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
                         logger.debug("Scheduling new Visit Base Non Repeating Event");
 
@@ -346,12 +363,15 @@ public class ImportServiceImpl implements ImportService {
                 } else { // Repeat Key is missing
                     // Repeat Key missing,not scheduled, common event , assign repeat, schedule
                     if (studyEvent == null && studyEventDefinition.getType().equals(COMMON)) {
+                        studyEventDataBean.setStudyEventRepeatKey(String.valueOf(maxSeOrdinal + 1));
+
                         // assign new repeat Key
-                        studyEvent = createStudyEvent(studySubject, studyEventDefinition, maxSeOrdinal + 1, userAccount, null);
+                        studyEvent = createStudyEvent(studySubject, studyEventDefinition, maxSeOrdinal + 1, userAccount, null, null);
                         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
                         logger.debug("Scheduling new Common Event");
                         // Repeat Key missing, not scheduled,visit event Repeating, start date not null,validate start date , assign repeat, schedule
                     } else if (studyEvent == null && studyEventDefinition.getType().equals(UNSCHEDULED) && studyEventDefinition.getRepeating() && studyEventDataBean.getStartDate() != null) {
+                        studyEventDataBean.setStudyEventRepeatKey(String.valueOf(maxSeOrdinal + 1));
                         ErrorObj startDateErrorObj = validateForDate(studyEventDataBean.getStartDate());
                         if (startDateErrorObj != null) {
                             dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, FAILED, "errorCode.eventNotScheduled.invalidStartDate");
@@ -359,7 +379,7 @@ public class ImportServiceImpl implements ImportService {
                             continue;
                         }
 
-                        studyEvent = createStudyEvent(studySubject, studyEventDefinition, maxSeOrdinal + 1, userAccount, studyEventDataBean.getStartDate());
+                        studyEvent = createStudyEvent(studySubject, studyEventDefinition, maxSeOrdinal + 1, userAccount, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
                         studyEvent = studyEventDao.saveOrUpdate(studyEvent);
                         logger.debug("Scheduling new Visit Base Repeating Event");
 
@@ -386,7 +406,8 @@ public class ImportServiceImpl implements ImportService {
                                 continue;
                             }
 
-                            studyEvent = createStudyEvent(studySubject, studyEventDefinition, 1, userAccount, studyEventDataBean.getStartDate());
+
+                            studyEvent = createStudyEvent(studySubject, studyEventDefinition, 1, userAccount, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
                             studyEvent = studyEventDao.saveOrUpdate(studyEvent);
                             logger.debug("Scheduling new Visit Base Repeating Event");
 
@@ -661,7 +682,7 @@ public class ImportServiceImpl implements ImportService {
                         // Update Event Crf Status into Complete
                         eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE);
                         // check if all Forms within this Event is Complete
-                        openRosaSubmissionController.updateStudyEventStatus(tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
+                        openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
 
                     } else if (itemInsertedUpdatedCountInFrom > 0) {                         // update eventcrf status into data entry status
                         // Update Event Crf Status into Initial Data Entry
@@ -830,7 +851,7 @@ public class ImportServiceImpl implements ImportService {
 
 
     private StudyEvent createStudyEvent(StudySubject studySubject, StudyEventDefinition studyEventDefinition, int ordinal,
-                                        UserAccount userAccount, String startDate) {
+                                        UserAccount userAccount, String startDate, String endDate) {
 
         StudyEvent studyEvent = new StudyEvent();
         studyEvent.setStudyEventDefinition(studyEventDefinition);
@@ -841,12 +862,21 @@ public class ImportServiceImpl implements ImportService {
         studyEvent.setDateCreated(new Date());
         studyEvent.setUserAccount(userAccount);
         studyEvent.setDateStart(null);
+        studyEvent.setDateEnd(null);
 
         if (startDate != null) {
             DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
             LocalDate localDate = LocalDate.parse(startDate, formatter);
             Date date = java.sql.Date.valueOf(localDate);
             studyEvent.setDateStart(date);
+        }
+        if (endDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+            LocalDate localDate = LocalDate.parse(endDate, formatter);
+            Date date = java.sql.Date.valueOf(localDate);
+            studyEvent.setDateEnd(date);
+
+
         }
         studyEvent.setStartTimeFlag(false);
         studyEvent.setEndTimeFlag(false);

@@ -87,10 +87,10 @@ public class ImportController {
     @ApiOperation( value = "To import data in an .xml file", notes = "Will import the data in a xml file " )
     @RequestMapping( value = "/clinicaldata/import", method = RequestMethod.POST )
     public ResponseEntity<Object> importDataXMLFile(HttpServletRequest request, MultipartFile file) throws Exception {
-        String fileNm="";
+        String fileNm = "";
         String importXml = null;
         if (file != null) {
-             fileNm = file.getOriginalFilename();
+            fileNm = file.getOriginalFilename();
             if (fileNm != null && fileNm.endsWith(".xml")) {
                 importXml = RestfulServiceHelper.readFileToString(file);
             } else {
@@ -182,15 +182,22 @@ public class ImportController {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID, HttpStatus.NOT_FOUND);
         }
 
-        if (!validateService.isUserHasAccessToStudy(userRoles, studyOid) && (siteOid != null && !validateService.isUserHasAccessToStudy(userRoles, siteOid))) {
-            return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
-        } else if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role(userRoles, studyOid, siteOid)) {
-            return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+        if (siteOid != null) {
+            if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
+                return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
+            } else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+                return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+            }
+        } else {
+            if (!validateService.isUserHasAccessToStudy(userRoles, studyOid)) {
+                return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
+            } else if (!validateService.isUserHas_DM_DEP_DS_RoleInStudy(userRoles, studyOid)) {
+                return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+            }
         }
-
         String schema = CoreResources.getRequestSchema();
 
-        String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean,fileNm);
+        String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm);
 
         logger.info("REST request to Import Job info ");
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -201,7 +208,7 @@ public class ImportController {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean,String fileNm) {
+    public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean, String fileNm) {
         utilService.setSchemaFromStudyOid(studyOid);
 
         Study site = studyDao.findByOcOID(siteOid);

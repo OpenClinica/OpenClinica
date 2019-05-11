@@ -292,9 +292,9 @@ public class StudyParticipantController {
 			if (!validateService.isStudyToSiteRelationValid(studyOID, siteOID)) {
 				errors.reject(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
 			}
-			if (!validateService.isUserHasAccessToStudy(userRoles,studyOID) && !validateService.isUserHasAccessToStudy(userRoles,siteOID)) {
+			if (!validateService.isUserHasAccessToStudy(userRoles,studyOID) && !validateService.isUserHasAccessToSite(userRoles,siteOID)) {
 				errors.reject(ErrorConstants.ERR_NO_ROLE_SETUP);
-			}else if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role(userRoles,studyOID,siteOID)  ){
+			}else if (!validateService.isUserHas_DM_DEP_DS_RoleInStudy(userRoles,studyOID)&&!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles,siteOID)  ){
 				errors.reject(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES );
 			}
 
