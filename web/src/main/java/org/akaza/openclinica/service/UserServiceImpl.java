@@ -773,7 +773,9 @@ public class UserServiceImpl implements UserService {
         jobDetail.setType(jobType);
         jobDetail.setUuid(UUID.randomUUID().toString());
         jobDetail.setSourceFileName(sourceFileName);
-        return jobService.saveOrUpdateJob(jobDetail);
+        jobDetail =jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has started",jobDetail.getJobDetailId());
+        return jobDetail;
     }
 
 
@@ -782,6 +784,7 @@ public class UserServiceImpl implements UserService {
         jobDetail.setDateCompleted(new Date());
         jobDetail.setStatus(JobStatus.COMPLETED);
         jobDetail =jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has completed",jobDetail.getJobDetailId());
     }
 
     public void persistJobFailed(JobDetail jobDetail,String fileName) {
@@ -789,6 +792,7 @@ public class UserServiceImpl implements UserService {
         jobDetail.setDateCompleted(new Date());
         jobDetail.setStatus(JobStatus.FAILED);
         jobDetail =jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has failed",jobDetail.getJobDetailId());
     }
 
 
