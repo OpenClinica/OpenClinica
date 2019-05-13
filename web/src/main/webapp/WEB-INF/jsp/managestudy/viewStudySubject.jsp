@@ -1759,7 +1759,7 @@
                 success: function(data) {
                     updateParticipateInfo(data);
                     if (data.errorMessage !== '') {
-                        $('#inviteResultMessage').text(data.errorMessage || 'invite_result_unknown');
+                        $('#inviteResultMessage').html(data.errorMessage || 'invite_result_unknown');
                         jQuery.blockUI({message: jQuery('#inviteResultAlert'), css:{left: "300px", top:"100px" }});
                     }
                 },
