@@ -117,16 +117,16 @@ public class ImportController {
         Unmarshaller um1 = new Unmarshaller(myMap);
         boolean fail = false;
         ODMContainer odmContainer = new ODMContainer();
-        InputStream inputStream=null;
+        InputStream inputStream = null;
         try {
             // unmarshal xml to java
-             inputStream = new ByteArrayInputStream(importXml.getBytes());
+            inputStream = new ByteArrayInputStream(importXml.getBytes());
             String defaultEncoding = "UTF-8";
 
-                BOMInputStream bOMInputStream = new BOMInputStream(inputStream);
-                ByteOrderMark bom = bOMInputStream.getBOM();
-                String charsetName = bom == null ? defaultEncoding : bom.getCharsetName();
-                InputStreamReader reader = new InputStreamReader(new BufferedInputStream(bOMInputStream), charsetName);
+            BOMInputStream bOMInputStream = new BOMInputStream(inputStream);
+            ByteOrderMark bom = bOMInputStream.getBOM();
+            String charsetName = bom == null ? defaultEncoding : bom.getCharsetName();
+            InputStreamReader reader = new InputStreamReader(new BufferedInputStream(bOMInputStream), charsetName);
 
             odmContainer = (ODMContainer) um1.unmarshal(reader);
 
@@ -135,12 +135,13 @@ public class ImportController {
             logger.info("found exception with xml transform");
             return new ResponseEntity(ErrorConstants.ERR_INVALID_XML_FILE + "\n" + me1.getMessage(), HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 
-        }finally{
-        inputStream.close();
-    }
+        } finally {
+            inputStream.close();
+        }
 
 
         String studyOID = odmContainer.getCrfDataPostImportContainer().getStudyOID();
+        studyOID = studyOID.toUpperCase();
         Study publicStudy = studyDao.findPublicStudy(studyOID);
         if (publicStudy == null) {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.NOT_FOUND);
@@ -183,7 +184,7 @@ public class ImportController {
 
         if (!validateService.isUserHasAccessToStudy(userRoles, studyOid) && (siteOid != null && !validateService.isUserHasAccessToStudy(userRoles, siteOid))) {
             return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
-        } else if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role(userRoles,studyOID,siteOid)) {
+        } else if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role(userRoles, studyOid, siteOid)) {
             return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
         }
 
