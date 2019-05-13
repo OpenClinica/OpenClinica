@@ -19,6 +19,8 @@
                 |
                 <a href="javascript:openDocWindow('https://docs.openclinica.com')"><fmt:message key="help" bundle="${resword}"/></a>
                 |
+                <a href="javascript:openDocWindow('https://openclinica.com/openclinica-privacy-policy/may-2018/')"><fmt:message key="privacy" bundle="${resword}"/></a>
+                |
            <%-->     <a href="${pageContext.request.contextPath}Contact"><fmt:message key="contact" bundle="${resword}"/></a>--%>
              <a href="${pageContext.request.contextPath}/Contact"><fmt:message key="contact" bundle="${resword}"/></a>
 
