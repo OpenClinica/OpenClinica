@@ -16,6 +16,7 @@ public class StudyEventDataBean {
     private DiscrepancyNotesBean discrepancyNotes;
     private StudyEventDefinition studyEventDefinition;
     private String startDate;
+    private String endDate;
 
     public StudyEventDataBean() {
         formData = new ArrayList<FormDataBean>();
@@ -77,5 +78,13 @@ public class StudyEventDataBean {
 
     public void setStartDate(String startDate) {
         this.startDate = startDate;
+    }
+
+    public String getEndDate() {
+        return endDate;
+    }
+
+    public void setEndDate(String endDate) {
+        this.endDate = endDate;
     }
 }

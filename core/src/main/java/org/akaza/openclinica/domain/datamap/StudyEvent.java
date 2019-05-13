@@ -278,5 +278,5 @@ public class StudyEvent extends DataMapDomainObject  {
 	}
 */
 
-	
+
 }
