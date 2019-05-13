@@ -122,8 +122,7 @@ public class ImportController {
             odmContainer = (ODMContainer) um1.unmarshal(reader);
 
         } catch (Exception e) {
-            e.printStackTrace();
-            logger.error("found exception with xml transform {}",e.getMessage() );
+            logger.error("found exception with xml transform {}", e );
             return new ResponseEntity(ErrorConstants.ERR_INVALID_XML_FILE + "\n" + e.getMessage(), HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 
         } finally {
@@ -210,8 +209,7 @@ public class ImportController {
             try {
                 importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail);
             } catch (Exception e){
-                e.printStackTrace();
-                logger.error("Exeception is thrown while processing dataImport: " + e.getMessage());
+                logger.error("Exeception is thrown while processing dataImport: " + e);
             }
             return null;
 

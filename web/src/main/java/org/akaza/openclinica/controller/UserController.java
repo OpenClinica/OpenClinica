@@ -293,8 +293,7 @@ public class UserController {
             try {
                 userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail);
             }catch(Exception e) {
-                e.printStackTrace();
-                logger.error("Exeception is thrown while extracting job : " + e.getMessage());
+                logger.error("Exeception is thrown while extracting job : " + e);
             }
             return null;
         });
