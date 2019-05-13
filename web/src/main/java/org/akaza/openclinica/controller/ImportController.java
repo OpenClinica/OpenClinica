@@ -87,10 +87,10 @@ public class ImportController {
     @ApiOperation( value = "To import data in an .xml file", notes = "Will import the data in a xml file " )
     @RequestMapping( value = "/clinicaldata/import", method = RequestMethod.POST )
     public ResponseEntity<Object> importDataXMLFile(HttpServletRequest request, MultipartFile file) throws Exception {
-
+        String fileNm="";
         String importXml = null;
         if (file != null) {
-            String fileNm = file.getOriginalFilename();
+             fileNm = file.getOriginalFilename();
             if (fileNm != null && fileNm.endsWith(".xml")) {
                 importXml = RestfulServiceHelper.readFileToString(file);
             } else {
@@ -190,7 +190,7 @@ public class ImportController {
 
         String schema = CoreResources.getRequestSchema();
 
-        String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean);
+        String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean,fileNm);
 
         logger.info("REST request to Import Job info ");
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
@@ -201,13 +201,13 @@ public class ImportController {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean) {
+    public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean,String fileNm) {
         utilService.setSchemaFromStudyOid(studyOid);
 
         Study site = studyDao.findByOcOID(siteOid);
         Study study = studyDao.findByOcOID(studyOid);
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
-        JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.XML_IMPORT, null);
+        JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.XML_IMPORT, fileNm);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
             importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail);
             return null;

@@ -6,26 +6,22 @@ public class DataImportReport {
     private String StudyEventOID;
     private String StudyEventRepeatKey;
     private String FormOID;
-    private String FormLayoutOID;
     private String itemGroupOID;
     private String itemGroupRepeatKey;
     private String itemOID;
-    private String value;
     private String Status;
     private String Message;
 
 
-    public DataImportReport(String subjectKey, String studySubjectID, String studyEventOID, String studyEventRepeatKey, String formOID, String formLayoutOID, String itemGroupOID, String itemGroupRepeatKey, String itemOID,String value ,String status, String message) {
+    public DataImportReport(String subjectKey, String studySubjectID, String studyEventOID, String studyEventRepeatKey, String formOID, String itemGroupOID, String itemGroupRepeatKey, String itemOID,String status, String message) {
         SubjectKey = subjectKey;
         StudySubjectID = studySubjectID;
         StudyEventOID = studyEventOID;
         StudyEventRepeatKey = studyEventRepeatKey;
         FormOID = formOID;
-        FormLayoutOID = formLayoutOID;
         this.itemGroupOID = itemGroupOID;
         this.itemGroupRepeatKey = itemGroupRepeatKey;
         this.itemOID = itemOID;
-        this.value = value;
         Status = status;
         Message = message;
     }
@@ -52,14 +48,6 @@ public class DataImportReport {
 
     public void setFormOID(String formOID) {
         FormOID = formOID;
-    }
-
-    public String getFormLayoutOID() {
-        return FormLayoutOID;
-    }
-
-    public void setFormLayoutOID(String formLayoutOID) {
-        FormLayoutOID = formLayoutOID;
     }
 
     public String getStatus() {
@@ -118,11 +106,4 @@ public class DataImportReport {
         StudySubjectID = studySubjectID;
     }
 
-    public String getValue() {
-        return value;
-    }
-
-    public void setValue(String value) {
-        this.value = value;
-    }
 }
