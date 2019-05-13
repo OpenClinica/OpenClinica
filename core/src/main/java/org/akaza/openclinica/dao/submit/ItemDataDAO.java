@@ -908,6 +908,11 @@ public class ItemDataDAO extends AuditableEntityDAO {
         	currentStudyEventId = studyEventId;
         	
         }
+
+        // Capture the last hash map.
+        if (rowhm != null){
+            matchCriterias.add(rowhm);
+        }
         
         return matchCriterias;
     }
