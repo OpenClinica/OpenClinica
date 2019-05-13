@@ -215,7 +215,9 @@ public class ImportServiceImpl implements ImportService {
                     if (studySubject == null)
                         studySubject = (studySubjectDao.findByLabelAndParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy)).get(0);
 
-                    if (studySubject == null) {
+                    if (studySubject == null
+                            || (studySubject != null && studySubject.getStudy().getStudyId() != tenantStudy.getStudyId()
+                            || (studySubject != null && studySubject.getStudy().getStudy() != null && studySubject.getStudy().getStudy().getStudyId() != tenantStudy.getStudyId()))) {
                         dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, "errorCode.participantNotFound ");
                         dataImportReports.add(dataImportReport);
                         logger.error("Participant StudySubjectID {} Not Found", subjectDataBean.getStudySubjectID());
