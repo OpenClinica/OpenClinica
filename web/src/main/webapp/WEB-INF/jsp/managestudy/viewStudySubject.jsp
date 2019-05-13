@@ -278,6 +278,9 @@
   .grayed-out {
     color: #999;
   }
+  #inviteResultAlert > table {
+    width: 600px;
+  }
 </style>
 <!-- then instructions-->
 <tr id="sidebar_Instructions_open" style="display: none">
@@ -1623,6 +1626,36 @@
   </form>
 </div>
 
+<div id="inviteResultAlert" class="hide">
+  <table border="0" cellpadding="0" align="center" style="cursor:default;">
+    <tr style="height:10px;">
+      <td class="formlabel" align="left">
+        <h3>
+          <fmt:message key="update_and_invite" bundle="${resword}"/>
+        </h3>
+      </td>
+    </tr>
+    <tr>
+      <td><div class="lines"></div></td>
+    </tr>
+    <tr>
+      <td>
+        <div id="inviteResultMessage">
+        </div>
+        <br>
+      </td>
+    </tr>
+    <tr>
+      <td><div class="lines"></div></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align: center;">
+        <input type="button" class="cancel right" value='<fmt:message key="close" bundle="${resword}"/>'/>
+      </td>
+    </tr>
+  </table>
+</div>
+
 <script type="text/javascript">
 
     var jsAtt = '${showOverlay}';
@@ -1723,7 +1756,13 @@
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                success: updateParticipateInfo,
+                success: function(data) {
+                    updateParticipateInfo(data);
+                    if (data.errorMessage !== '') {
+                        $('#inviteResultMessage').text(data.errorMessage || 'invite_result_unknown');
+                        jQuery.blockUI({message: jQuery('#inviteResultAlert'), css:{left: "300px", top:"100px" }});
+                    }
+                },
                 error: logDump
             });
             jQuery.unblockUI();
