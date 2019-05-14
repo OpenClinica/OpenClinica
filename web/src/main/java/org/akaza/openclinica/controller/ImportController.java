@@ -2,7 +2,6 @@ package org.akaza.openclinica.controller;
 
 import io.swagger.annotations.Api;
 import io.swagger.annotations.ApiOperation;
-import org.akaza.openclinica.bean.login.ErrorMessage;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
@@ -16,38 +15,30 @@ import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
-import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.service.*;
-import org.akaza.openclinica.service.crfdata.ErrorObj;
-import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
+import org.akaza.openclinica.service.ImportService;
+import org.akaza.openclinica.service.UserService;
+import org.akaza.openclinica.service.UtilService;
+import org.akaza.openclinica.service.ValidateService;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
-import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
+import org.exolab.castor.mapping.Mapping;
+import org.exolab.castor.xml.Unmarshaller;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.stereotype.Controller;
-import org.springframework.ui.ModelMap;
-import org.springframework.web.bind.annotation.*;
+import org.springframework.web.bind.annotation.RequestMapping;
+import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RestController;
 import org.springframework.web.multipart.MultipartFile;
-import org.exolab.castor.mapping.Mapping;
-import org.exolab.castor.xml.Unmarshaller;
-
 
 import javax.servlet.ServletContext;
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
-import javax.ws.rs.PathParam;
 import java.io.*;
-import java.text.MessageFormat;
 import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Scanner;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -87,14 +78,14 @@ public class ImportController {
     @ApiOperation( value = "To import data in an .xml file", notes = "Will import the data in a xml file " )
     @RequestMapping( value = "/clinicaldata/import", method = RequestMethod.POST )
     public ResponseEntity<Object> importDataXMLFile(HttpServletRequest request, MultipartFile file) throws Exception {
-
+        String fileNm = "";
         String importXml = null;
         if (file != null) {
-            String fileNm = file.getOriginalFilename();
+            fileNm = file.getOriginalFilename();
             if (fileNm != null && fileNm.endsWith(".xml")) {
                 importXml = RestfulServiceHelper.readFileToString(file);
             } else {
-                logger.info("file is not an xml extension file");
+                logger.error("file is not an xml extension file");
                 return new ResponseEntity(ErrorConstants.ERR_FILE_FORMAT_NOT_SUPPORTED, HttpStatus.UNSUPPORTED_MEDIA_TYPE);
             }
         } else {
@@ -130,10 +121,9 @@ public class ImportController {
 
             odmContainer = (ODMContainer) um1.unmarshal(reader);
 
-        } catch (Exception me1) {
-            me1.printStackTrace();
-            logger.info("found exception with xml transform");
-            return new ResponseEntity(ErrorConstants.ERR_INVALID_XML_FILE + "\n" + me1.getMessage(), HttpStatus.UNSUPPORTED_MEDIA_TYPE);
+        } catch (Exception e) {
+            logger.error("found exception with xml transform {}", e );
+            return new ResponseEntity(ErrorConstants.ERR_INVALID_XML_FILE + "\n" + e.getMessage(), HttpStatus.UNSUPPORTED_MEDIA_TYPE);
 
         } finally {
             inputStream.close();
@@ -182,17 +172,24 @@ public class ImportController {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID, HttpStatus.NOT_FOUND);
         }
 
-        if (!validateService.isUserHasAccessToStudy(userRoles, studyOid) && (siteOid != null && !validateService.isUserHasAccessToStudy(userRoles, siteOid))) {
-            return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
-        } else if (!validateService.isUserHasCRC_INV_DM_DEP_DS_Role(userRoles, studyOid, siteOid)) {
-            return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+        if (siteOid != null) {
+            if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
+                return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
+            } else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles, siteOid)) {
+                return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+            }
+        } else {
+            if (!validateService.isUserHasAccessToStudy(userRoles, studyOid)) {
+                return new ResponseEntity(ErrorConstants.ERR_NO_ROLE_SETUP, HttpStatus.OK);
+            } else if (!validateService.isUserHas_DM_DEP_DS_RoleInStudy(userRoles, studyOid)) {
+                return new ResponseEntity(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES, HttpStatus.OK);
+            }
         }
-
         String schema = CoreResources.getRequestSchema();
 
-        String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean);
+        String uuid = startImportJob(odmContainer, schema, studyOid, siteOid, userAccountBean, fileNm);
 
-        logger.info("REST request to Import Job info ");
+        logger.info("REST request to Import Job uuid {} ",uuid);
         return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
     }
 
@@ -201,16 +198,21 @@ public class ImportController {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean) {
+    public String startImportJob(ODMContainer odmContainer, String schema, String studyOid, String siteOid, UserAccountBean userAccountBean, String fileNm) {
         utilService.setSchemaFromStudyOid(studyOid);
 
         Study site = studyDao.findByOcOID(siteOid);
         Study study = studyDao.findByOcOID(studyOid);
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
-        JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.XML_IMPORT, null);
+        JobDetail jobDetail = userService.persistJobCreated(study, site, userAccount, JobType.XML_IMPORT, fileNm);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
-            importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail);
+            try {
+                importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail);
+            } catch (Exception e){
+                logger.error("Exeception is thrown while processing dataImport: " + e);
+            }
             return null;
+
         });
         return jobDetail.getUuid();
     }
