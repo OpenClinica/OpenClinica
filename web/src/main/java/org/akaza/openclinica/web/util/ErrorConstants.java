@@ -22,6 +22,7 @@ public final class ErrorConstants {
     public static final String ERR_NO_LOG_FILE_FOUND = "error.noLogFileFound";
     public static final String ERR_INVALID_UUID = "error.invalidUuid";
     public static final String ERR_NO_SUFFICIENT_PRIVILEGES = "errorCode.noSufficientPrivileges";
+    public static final String ERR_NO_ROLE_SETUP = "errorCode.noRoleSetUp";
 
 
     private ErrorConstants() {
