@@ -13,6 +13,12 @@
   font-weight: normal;
   font-style: italic;
 }
+@font-face {
+  font-family: 'view-query-within';
+  src:  url('fonts/view-query-within.ttf') format('truetype');
+  font-weight: normal;
+  font-style: normal;
+}
 
 html {
   box-sizing: border-box; }
@@ -181,9 +187,9 @@ a:hover {
   background-size: contain; }
 
 .icon-view-within:before {
-  content: url("../images/view_query_in_form_icon.svg");
-  background: rgba(0, 0, 0, 0.075);
-  background-size: contain; }
+  font-family: 'view-query-within' !important;
+  content: '\e900';
+}
 
 .disabled {
   opacity: .4; }
