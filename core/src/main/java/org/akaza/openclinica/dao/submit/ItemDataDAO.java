@@ -869,14 +869,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
         	return null;
         }
         
-        ArrayList alist = this.select(sqlStr);
-        int listSize = alist.size();
+        ArrayList matchingItemDataQueryResults = this.select(sqlStr);
+        int listSize = matchingItemDataQueryResults.size();
         int i = 0;
         
-        Iterator it = alist.iterator();       
+        Iterator it = matchingItemDataQueryResults.iterator();
         
         Integer currentStudyEventId = null;
-        HashMap rowhm = new HashMap();
+        HashMap skipMatchGroup = new HashMap();
         while (it.hasNext()) {
         	HashMap hm = (HashMap) it.next();
         	i++;
@@ -884,34 +884,33 @@ public class ItemDataDAO extends AuditableEntityDAO {
         	studyEventId = (Integer) hm.get("study_event_id");
         	itemOID = (String) hm.get("oc_oid");
         	itemValue = (String) hm.get("value");
-        	// build  row  hash map to match data file line
+        	// build row hash map to match data file line
         	if(currentStudyEventId == null) {
-        		rowhm.put(itemOID, itemValue);
+        		skipMatchGroup.put(itemOID, itemValue);
         		
         		if(i == listSize) {
-        			matchCriterias.add(rowhm);
+        			matchCriterias.add(skipMatchGroup);
         		}
         	}else if(currentStudyEventId.intValue()==studyEventId.intValue()) {
-        		rowhm.put(itemOID, itemValue);
+        		skipMatchGroup.put(itemOID, itemValue);
         		
         		if(i == listSize) {
-        			matchCriterias.add(rowhm);
+        			matchCriterias.add(skipMatchGroup);
         		}
         	}else {
-        		matchCriterias.add(rowhm);
+        		matchCriterias.add(skipMatchGroup);
         		
-        		rowhm = new HashMap();
-        		rowhm.put(itemOID, itemValue);
+        		skipMatchGroup = new HashMap();
+        		skipMatchGroup.put(itemOID, itemValue);
         	}
-        	
-        	
+
         	currentStudyEventId = studyEventId;
         	
         }
 
         // Capture the last hash map.
-        if (rowhm != null){
-            matchCriterias.add(rowhm);
+        if (!skipMatchGroup.isEmpty()){
+            matchCriterias.add(skipMatchGroup);
         }
         
         return matchCriterias;
