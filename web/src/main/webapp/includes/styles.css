@@ -180,6 +180,11 @@ a:hover {
   background: rgba(0, 0, 0, 0.075);
   background-size: contain; }
 
+.icon-view-within:before {
+  content: url("../images/view_query_in_form_icon.svg");
+  background: rgba(0, 0, 0, 0.075);
+  background-size: contain; }
+
 .disabled {
   opacity: .4; }
 
