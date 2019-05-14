@@ -123,6 +123,16 @@
                 <artifactId>jackson-databind</artifactId>
                 <version>2.9.8</version>
             </dependency>
+			<dependency>
+				<groupId>net.sf.saxon</groupId>
+				<artifactId>saxon</artifactId>
+				<version>8.7</version>
+			</dependency>
+			<dependency>
+				<groupId>net.sf.saxon</groupId>
+				<artifactId>saxon-dom</artifactId>
+				<version>8.7</version>
+			</dependency>
 		</dependencies>
 	</dependencyManagement>
 
@@ -366,25 +376,25 @@
 			<version>1.8.3</version>
 		</dependency>
 		<dependency>
-	<groupId>io.dropwizard.metrics</groupId>
-	<artifactId>metrics-core</artifactId>
-	<version>3.1.2</version>
-</dependency>
-<dependency>
-	<groupId>io.dropwizard.metrics</groupId>
-	<artifactId>metrics-healthchecks</artifactId>
-	<version>3.1.0</version>
-</dependency>
-<dependency>
-	<groupId>io.dropwizard.metrics</groupId>
-	<artifactId>metrics-jvm</artifactId>
-	<version>3.1.2</version>
-</dependency>
-	<dependency>
-    	<groupId>org.apache.httpcomponents</groupId>
-    	<artifactId>httpclient</artifactId>
-    	<version>4.5.7</version>
-	</dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-core</artifactId>
+			<version>3.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-healthchecks</artifactId>
+			<version>3.1.0</version>
+		</dependency>
+		<dependency>
+			<groupId>io.dropwizard.metrics</groupId>
+			<artifactId>metrics-jvm</artifactId>
+			<version>3.1.2</version>
+		</dependency>
+		<dependency>
+			<groupId>org.apache.httpcomponents</groupId>
+			<artifactId>httpclient</artifactId>
+			<version>4.5.7</version>
+		</dependency>
 	</dependencies>
 	<build>
 		<pluginManagement>
