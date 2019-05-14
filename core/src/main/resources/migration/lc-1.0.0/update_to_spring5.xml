@@ -67,4 +67,51 @@
             </column>
         </addColumn>
     </changeSet>
+    <changeSet author="cha" id="1555001321719-11">
+        <addColumn tableName="oc_qrtz_job_details">
+            <column name="is_nonconcurrent" type="boolean"></column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-12">
+        <addColumn tableName="oc_qrtz_job_details">
+            <column name="is_update_data" type="boolean"></column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-13">
+        <addColumn tableName="oc_qrtz_fired_triggers">
+            <column name="is_nonconcurrent" type="boolean"></column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-14">
+        <addColumn tableName="oc_qrtz_fired_triggers">
+            <column name="is_update_data" type="boolean"></column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-15">
+        <addColumn tableName="oc_qrtz_fired_triggers">
+            <column name="sched_time" type="BIGINT">
+                <constraints nullable="false"/>
+            </column>
+        </addColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-16">
+    	<dropColumn tableName="oc_qrtz_job_details">
+            <column name="is_volatile"/>
+        </dropColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-17">
+    	<dropColumn tableName="oc_qrtz_job_details">
+            <column name="is_stateful"/>
+        </dropColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-18">
+    	<dropColumn tableName="oc_qrtz_fired_triggers">
+            <column name="is_volatile"/>
+        </dropColumn>
+    </changeSet>
+    <changeSet author="cha" id="1555001321719-19">
+    	<dropColumn tableName="oc_qrtz_triggers">
+            <column name="is_volatile"/>
+        </dropColumn>
+    </changeSet>
 </databaseChangeLog>
