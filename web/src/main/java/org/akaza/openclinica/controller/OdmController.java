@@ -238,7 +238,7 @@ public class OdmController {
             studySubjectDAO.update(studySubject);
         }
 
-        return ResponseEntity.ok(json.toString(INDENT_LEVEL));
+        return ResponseEntity.ok(json);
 
     }
     public RestfulServiceHelper getRestfulServiceHelper() {
