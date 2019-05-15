@@ -244,7 +244,7 @@
   }
   .yes-no-question {
     display: inline-block;
-    width: 140px;
+    width: 165px;
   }
   .invite-input {
     width: 250px;
