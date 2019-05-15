@@ -597,8 +597,8 @@ public class NewCRFBean extends Object implements java.io.Serializable {
                     s.close();
                 if (rs != null)
                     rs.close();
-                if (rs2 != null)
-                    rs2.close();
+                /*if (rs2 != null)
+                    rs2.close();*/
             } catch (SQLException e) {
                 e.printStackTrace();
                 throw new OpenClinicaException(e.getMessage(), "1");
