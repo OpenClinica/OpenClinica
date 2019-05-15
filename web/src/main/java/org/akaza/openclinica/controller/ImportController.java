@@ -157,20 +157,6 @@ public class ImportController {
         if (!validateService.isStudyOidValid(studyOid)) {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.NOT_FOUND);
         }
-        if (!validateService.isStudyOidValidStudyLevelOid(studyOid)) {
-            return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_Valid_OID, HttpStatus.NOT_FOUND);
-        }
-        if (siteOid != null && !validateService.isSiteOidValid(siteOid)) {
-            return new ResponseEntity(ErrorConstants.ERR_SITE_NOT_EXIST, HttpStatus.NOT_FOUND);
-
-        }
-        if (siteOid != null && !validateService.isSiteOidValidSiteLevelOid(siteOid)) {
-            return new ResponseEntity(ErrorConstants.ERR_SITE_NOT_Valid_OID, HttpStatus.NOT_FOUND);
-
-        }
-        if (siteOid != null && !validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
-            return new ResponseEntity(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID, HttpStatus.NOT_FOUND);
-        }
 
         if (siteOid != null) {
             if (!validateService.isUserHasAccessToSite(userRoles, siteOid)) {
