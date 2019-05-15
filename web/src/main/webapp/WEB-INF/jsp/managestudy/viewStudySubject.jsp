@@ -387,17 +387,17 @@
                               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tbody>
                                   <tr>
-                                    <td class="table_header_column_top">
+                                    <td class="table_header_column_top" width="25%">
                                       <fmt:message key="study_subject_ID" bundle="${resword}"/>
                                     </td>
-                                    <td class="table_cell_top">
+                                    <td class="table_cell_top" width="25%">
                                       <c:out value="${studySub.label}"/>
                                     </td>
 
-                                    <td class="table_header_column">
+                                    <td class="table_header_column" width="25%">
                                       <fmt:message key="status" bundle="${resword}"/>
                                     </td>
-                                    <td class="table_cell">
+                                    <td class="table_cell" width="25%">
                                       <c:out value="${studySub.status.name}"/>
                                     </td>
                                   </tr>
