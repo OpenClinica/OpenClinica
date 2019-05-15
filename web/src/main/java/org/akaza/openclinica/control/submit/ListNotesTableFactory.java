@@ -448,16 +448,6 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             // for "view" as action
             // This createNoteURL uses the same method as in ResolveDiscrepancyServlet
             if (dnb.getEntityType().equals(DiscrepancyNoteBean.ITEM_DATA)) {
-                builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + SINGLE_ITEM_FLAVOR);
-            } else {
-                String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
-                builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
-            }
-            builder.close();
-            builder.append("<span title='" + resword.getString("View_Query_Only") + "' border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
-            builder.append("&nbsp;");
-            builder.aEnd();
-            if (dnb.getEntityType().equals(DiscrepancyNoteBean.ITEM_DATA)) {
                 builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + QUERY_FLAVOR);
             } else if (dnb.getEntityType().equals(DiscrepancyNoteBean.STUDY_EVENT)) {
                 builder.a().href("EnterDataForStudyEvent?eventId=" + dnb.getEntityId());
@@ -468,8 +458,21 @@ public class ListNotesTableFactory extends AbstractTableFactory {
             } else if (!dnb.getEntityType().equals(DiscrepancyNoteBean.SUBJECT) && !dnb.getEntityType().equals(DiscrepancyNoteBean.ITEM_DATA) && !dnb.getEntityType().equals(DiscrepancyNoteBean.STUDY_EVENT) && !dnb.getEntityType().equals(DiscrepancyNoteBean.EVENT_CRF)){
                builder.a().href("ViewStudySubject?id=" + studySubjectId); 
             }
+            builder.close();
             builder.append("<span title='" + resword.getString("View_Query_Within_Record")
-                    + "' border=\"0\" align=\"left\" class=\"icon icon-icon-reassign3\" hspace=\"6\"/>");
+                    + "' border=\"0\" align=\"left\" class=\"icon icon-view-within\" hspace=\"6\"/>");
+            builder.append("&nbsp;");
+            builder.aEnd();
+
+            if (dnb.getEntityType().equals(DiscrepancyNoteBean.ITEM_DATA)) {
+                builder.a().href("ResolveDiscrepancy?noteId=" + dnb.getId() + "&flavor=" + SINGLE_ITEM_FLAVOR);
+            } else {
+                String createNoteURL = CreateDiscrepancyNoteServlet.getAddChildURL(dnb, ResolutionStatus.CLOSED, true);
+                builder.a().href("javascript:openDNWindow('" + createNoteURL + "&viewAction=1" + "');");
+            }
+            builder.close();
+            builder.append("<span title='" + resword.getString("View_Query_Only") + "' border=\"0\" align=\"left\" class=\"icon icon-search\" hspace=\"6\"/>");
+            builder.append("&nbsp;");
             builder.aEnd();
 
             return builder.toString();
