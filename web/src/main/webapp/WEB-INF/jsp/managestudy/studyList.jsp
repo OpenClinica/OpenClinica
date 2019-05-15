@@ -84,8 +84,9 @@
             <br>
        
 
-       <a href="CreateStudy"><input type="button" class="button_medium" value="Continue in OC3" /></a>       
-       <a href="https://openclinica.com/upgrade" target="_blank">   <input type="button" class="button_long" value="Tell me more about OC4" /></a>       
+       <a href="CreateStudy" style="color: rgba(120, 158, 197, 1); background: #ffc;PADDING-LEFT: 1px;border: 1px solid blue;">Continue in OC3</a>       
+       <a href="https://openclinica.com/upgrade" target="_blank" style="color: rgba(120, 158, 197, 1); background: #ffc;PADDING-LEFT: 1px;border: 1px solid blue;">Tell me more about OC4</a>       
+             
            </form>
     </div>
 
