@@ -244,7 +244,7 @@
   }
   .yes-no-question {
     display: inline-block;
-    width: 140px;
+    width: 165px;
   }
   .invite-input {
     width: 250px;
@@ -1559,7 +1559,10 @@
     </tr>
     <tr>
       <td colspan="2" style="text-align: right;">
-        <input type="button" class="cancel" value="Cancel"/>
+        <span id="inviting" class="left hide">
+          <img src='images/loading.gif'> Inviting...
+        </span>
+        <input type="button" id="cancel-button" class="cancel" value="Cancel"/>
         <input type="button" id="connect-button" value="Update"/>
       </td>
     </tr>
@@ -1751,6 +1754,21 @@
                 inviteViaSms: $('#invite_via_sms input:checked').val(),
                 identifier: $('#secid-input').val()
             };
+            if (data.inviteParticipant === 'true' || data.inviteViaSms === 'true') {
+                $('#inviting').show();
+                $('#connect-button, #cancel-button').attr('disabled', 'disabled');
+            }
+            else {
+                jQuery.unblockUI();
+            }
+            function doneInviting(result) {
+                if ($('#inviting').is(':hidden'))
+                    return;
+                $('#inviting').hide();
+                $('#connect-button, #cancel-button').removeAttr('disabled');
+                $('#inviteResultMessage').html(result);
+                jQuery.blockUI({message: jQuery('#inviteResultAlert'), css:{left: "300px", top:"100px" }});
+            }
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
@@ -1758,14 +1776,12 @@
                 data: JSON.stringify(data),
                 success: function(data) {
                     updateParticipateInfo(data);
-                    if (data.errorMessage !== '') {
-                        $('#inviteResultMessage').html(data.errorMessage || 'invite_result_unknown');
-                        jQuery.blockUI({message: jQuery('#inviteResultAlert'), css:{left: "300px", top:"100px" }});
-                    }
+                    doneInviting(data.errorMessage || '<fmt:message key="invite_result_unknown" bundle="${resword}"/>');
                 },
-                error: logDump
+                error: function() {
+                    doneInviting('<fmt:message key="invite_result_error" bundle="${resword}"/>: ' + arguments[2]);
+                }
             });
-            jQuery.unblockUI();
             return false;
         });
 
