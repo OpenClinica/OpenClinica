@@ -12,6 +12,7 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.enumsupport.JobStatus;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.JobService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.UtilService;
@@ -104,7 +105,11 @@ public class JobController {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
-
+        if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) && !validateService.isUserHasAccessToSite(userRoles,siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+        }else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles,siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+        }
 
         String accessToken = utilService.getAccessTokenFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
@@ -133,6 +138,11 @@ public class JobController {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
+        if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) ) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+        }else if (!validateService.isUserHas_DM_DEP_DS_RoleInStudy(userRoles,studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+        }
 
         if (!validateService.isParticipateActive(tenantStudy)) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_PARTICIAPTE_INACTIVE, "Participate is Inactive. Participate module for the study is inactive")).body(null);
