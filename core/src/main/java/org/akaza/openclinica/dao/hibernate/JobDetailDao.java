@@ -32,7 +32,7 @@ public class JobDetailDao extends AbstractDomainDao<JobDetail> {
 
 
     public List<JobDetail> findAllNonDeletedJobsByStudy(int studyId,int userId) {
-        String query = "from " + getDomainClassName() + "   where  ( study.studyId=:studyId or study.study.studyId=:studyId ) "+
+        String query = "from " + getDomainClassName() + "   where   study.studyId=:studyId  "+
         "and status !=:jobDeletedStatus and createdBy.userId =:userId";
         Query q = getCurrentSession().createQuery(query);
         q.setParameter("studyId", studyId);
