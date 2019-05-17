@@ -486,11 +486,19 @@ $(function() {
                         return;
 
                     var oids = link['@tag'].split('.');
-                    var studyEvent = studyEvents[oids[0]];
-                    var form = studyEvent.forms[oids[1]];
-                    if (form) {
+                    var studyEventOid = oids[0];
+                    var formOid = oids[1];
+                    var studyEvent = studyEvents[studyEventOid];
+                    var form = studyEvent.forms[formOid];
+                    if (form && studyEvent) {
                         form.addNew = link['@href'];
                         form.showMe = studyEvent.showMe = true;                        
+                    }
+                    else {
+                        if (!form)
+                            console.log('Missing Form: ' + formOid);
+                        if (!studyEvent)
+                            console.log('Missing Study Event: ' + studyEventOid);
                     }
                 });
 
