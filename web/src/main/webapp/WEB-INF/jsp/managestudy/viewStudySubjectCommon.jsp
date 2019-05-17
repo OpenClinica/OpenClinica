@@ -142,11 +142,7 @@
 <script id="section-tmpl" type="text/x-handlebars-template">
     <div class="section {{collapseOrExpand}}" data-section-number="{{sectionNumber}}" data-section-oid="{{studyEvent.[@OID]}}">
         <div class="section-header" title='<fmt:message key="collapse_section" bundle="${resword}"/>'>
-            {{#if studyEvent}}
-                {{studyEvent.[@Name]}}
-            {{else}}
-                (Event)
-            {{/if}}
+            {{studyEvent.[@Name]}}
         </div>
         <div class="section-body">
             Loading...<br><br>
@@ -159,20 +155,15 @@
         <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
             <div class="subsection-header">
                 <h3 class="form-name">
-                    {{#if form}}
-                        {{form.[@Name]}}
-                    {{else}}
-                        (Form)
-                    {{/if}}
+                    {{form.[@Name]}}
                 </h3>
                 <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
-                    {{#if form}}        
-                        {{#if form.addNew}}
-                            data-url="{{form.addNew}}"
-                        {{else}}
-                            disabled="disabled"
-                        {{/if}}>
-                    {{/if}}>
+                    {{#if form.addNew}}
+                        data-url="{{form.addNew}}"
+                    {{else}}
+                        disabled="disabled"
+                    {{/if}}
+                >
             </div>
             <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
             <thead>
