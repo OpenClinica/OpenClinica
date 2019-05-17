@@ -156,8 +156,9 @@ public class ImportServiceImpl implements ImportService {
             } else if (subjectDataBean.getSubjectOID() != null && subjectDataBean.getStudySubjectID() == null) {
                 studySubject = studySubjectDao.findByOcOID(subjectDataBean.getSubjectOID());
                 if (studySubject == null
-                        || (studySubject != null && studySubject.getStudy().getStudyId() != tenantStudy.getStudyId()
-                        || (studySubject != null && studySubject.getStudy().getStudy() != null && studySubject.getStudy().getStudy().getStudyId() != tenantStudy.getStudyId()))) {
+                        || (studySubject != null && tenantStudy.getStudy() != null && studySubject.getStudy().getStudyId() != tenantStudy.getStudyId())
+                        || (studySubject != null && tenantStudy.getStudy() == null && studySubject.getStudy().getStudy() != null && studySubject.getStudy().getStudy().getStudyId() != tenantStudy.getStudyId())) {
+
                     dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, "errorCode.participantNotFound ");
                     dataImportReports.add(dataImportReport);
                     logger.error("Participant SubjectKey {} Not Found", subjectDataBean.getSubjectOID());
@@ -166,12 +167,12 @@ public class ImportServiceImpl implements ImportService {
             } else if (subjectDataBean.getSubjectOID() == null && subjectDataBean.getStudySubjectID() != null) {
                 try {
                     studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy);
-                    if (studySubject == null)
-                        studySubject = (studySubjectDao.findByLabelAndParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy)).get(0);
-
-                    if (studySubject == null
-                            || (studySubject != null && studySubject.getStudy().getStudyId() != tenantStudy.getStudyId()
-                            || (studySubject != null && studySubject.getStudy().getStudy() != null && studySubject.getStudy().getStudy().getStudyId() != tenantStudy.getStudyId()))) {
+                    if (studySubject == null) {
+                        List<StudySubject> studySubjects = (studySubjectDao.findByLabelAndParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy));
+                        if (studySubjects != null && studySubjects.size() > 0)
+                            studySubject = studySubjects.get(0);
+                    }
+                    if (studySubject == null) {
                         dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, "errorCode.participantNotFound ");
                         dataImportReports.add(dataImportReport);
                         logger.error("Participant StudySubjectID {} Not Found", subjectDataBean.getStudySubjectID());
@@ -189,10 +190,20 @@ public class ImportServiceImpl implements ImportService {
             } else if (subjectDataBean.getSubjectOID() != null && subjectDataBean.getStudySubjectID() != null) {
                 studySubject = studySubjectDao.findByOcOID(subjectDataBean.getSubjectOID());
                 studySubject02 = studySubjectDao.findByLabelAndStudyOrParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy);
-                if (studySubject02 == null)
-                    studySubject02 = (studySubjectDao.findByLabelAndParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy)).get(0);
+                if (studySubject02 == null) {
+                    List<StudySubject> studySubjects = (studySubjectDao.findByLabelAndParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy));
+                    if (studySubjects != null && studySubjects.size() > 0)
+                        studySubject02 = studySubjects.get(0);
+                }
 
-                if (studySubject == null || studySubject02 == null || (studySubject != null && studySubject02 != null && studySubject.getStudySubjectId() != studySubject02.getStudySubjectId())) {
+                if (studySubject == null || studySubject02 == null) {
+                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, "errorCode.participantNotFound ");
+                    dataImportReports.add(dataImportReport);
+                    logger.error("Participant Identifiers {} {} mismatch", subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID());
+                    continue;
+                }
+
+                if (studySubject != null && studySubject02 != null && studySubject.getStudySubjectId() != studySubject02.getStudySubjectId()) {
                     dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, "errorCode.participantIdentiersMismatch ");
                     dataImportReports.add(dataImportReport);
                     logger.error("Participant Identifiers {} {} mismatch", subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID());
@@ -265,7 +276,7 @@ public class ImportServiceImpl implements ImportService {
                                 if (eventCrf != null) {
                                     dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), null, null, null, null, FAILED, "errorCode.eventNotScheduled.nonRepeatingCommonEventCrfExist");
                                     dataImportReports.add(dataImportReport);
-                                    logger.debug("Scheduling new Repeating Common Event not Scheduled");
+                                    logger.debug("event not scheduled");
                                     continue;
                                 } else {
                                     //schedule
