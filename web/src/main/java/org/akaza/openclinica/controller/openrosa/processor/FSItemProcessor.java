@@ -31,32 +31,17 @@ import org.akaza.openclinica.dao.hibernate.RepeatCountDao;
 import org.akaza.openclinica.dao.hibernate.StudyEventDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
 import org.akaza.openclinica.domain.Status;
-import org.akaza.openclinica.domain.datamap.AuditLogEvent;
-import org.akaza.openclinica.domain.datamap.AuditLogEventType;
-import org.akaza.openclinica.domain.datamap.CrfVersion;
-import org.akaza.openclinica.domain.datamap.EventCrf;
-import org.akaza.openclinica.domain.datamap.FormLayout;
-import org.akaza.openclinica.domain.datamap.FormLayoutMedia;
-import org.akaza.openclinica.domain.datamap.Item;
-import org.akaza.openclinica.domain.datamap.ItemData;
-import org.akaza.openclinica.domain.datamap.ItemFormMetadata;
-import org.akaza.openclinica.domain.datamap.ItemGroup;
-import org.akaza.openclinica.domain.datamap.ItemGroupMetadata;
-import org.akaza.openclinica.domain.datamap.RepeatCount;
-import org.akaza.openclinica.domain.datamap.StudyEvent;
-import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.apache.xerces.dom.AttributeMap;
+import org.apache.xerces.dom.DeferredAttrImpl;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.stereotype.Component;
 import org.springframework.validation.Errors;
-import org.w3c.dom.Document;
-import org.w3c.dom.Element;
-import org.w3c.dom.NamedNodeMap;
-import org.w3c.dom.Node;
-import org.w3c.dom.NodeList;
+import org.w3c.dom.*;
 import org.xml.sax.InputSource;
 
 @Component
@@ -96,6 +81,17 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
     public static final String STUDYEVENT = "study_event";
     public static final String STUDYSUBJECT = "study_subject";
     public static final String REPEATCOUNT = "_count";
+
+    public static final String OC_CONTACTDATA = "oc:contactdata";
+    public static final String FIRSTNAME = "firstname";
+    public static final String LASTNAME = "lastname";
+    public static final String SECONDARYID = "secondaryid";
+    public static final String EMAIL = "email";
+    public static final String MOBILENUMBER = "mobilenumber";
+
+
+
+
 
     public ProcessorEnum process(SubmissionContainer container) throws Exception {
 
@@ -143,6 +139,15 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
                 itemNodeSet = xformParserHelper.instanceItemNodes(instanceNode, itemNodeSet);
                 if (itemNodeSet.size() != 0) {
                     itemNode = itemNodeSet.iterator().next();
+
+                    for (int j = 0; j < itemNode.getAttributes().getLength(); j++) {
+                        Attr attr = (Attr) itemNode.getAttributes().item(j);
+                        if (attr.getNodeName().equals(OC_CONTACTDATA)) {
+                            saveContactData(attr.getNodeValue(),itemNode.getTextContent(), container);
+                            return ProcessorEnum.PROCEED;
+                        }
+                    }
+
                     processFieldSubmissionGroupItems(listOfUploadFilePaths, repeatNode, itemNode, container, itemGroup);
                 }
             }
@@ -377,5 +382,37 @@ public class FSItemProcessor extends AbstractItemProcessor implements Processor 
             repeatCountDao.saveOrUpdate(repeatCount);
         }
     }
+
+    private void saveContactData(String attrValue, String itemValue,SubmissionContainer container) {
+        StudySubject studySubject= container.getSubject();
+        setStudySubjectDetail(studySubject);
+        studySubject.setUpdateId(container.getUser().getUserId());
+        studySubject.setDateUpdated(new Date());
+        if (attrValue.equals(FIRSTNAME)) {
+            studySubject.getStudySubjectDetail().setFirstName(itemValue);
+            studySubjectDao.saveOrUpdate(studySubject);
+        } else if (attrValue.equals(LASTNAME)) {
+            studySubject.getStudySubjectDetail().setLastName(itemValue);
+            studySubjectDao.saveOrUpdate(studySubject);
+        } else if (attrValue.equals(SECONDARYID)) {
+            studySubject.getStudySubjectDetail().setIdentifier(itemValue);
+            studySubjectDao.saveOrUpdate(studySubject);
+        } else if (attrValue.equals(EMAIL)) {
+            studySubject.getStudySubjectDetail().setEmail(itemValue);
+            studySubjectDao.saveOrUpdate(studySubject);
+        } else if (attrValue.equals(MOBILENUMBER)) {
+            studySubject.getStudySubjectDetail().setPhone(itemValue);
+            studySubjectDao.saveOrUpdate(studySubject);
+        }
+    }
+
+    private void setStudySubjectDetail(StudySubject studySubject) {
+        if (studySubject.getStudySubjectDetail() == null) {
+            StudySubjectDetail studySubjectDetail = new StudySubjectDetail();
+            studySubject.setStudySubjectDetail(studySubjectDetail);
+        }
+
+    }
+
 
 }
