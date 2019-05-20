@@ -1,69 +1,71 @@
 package org.akaza.openclinica.controller.dto;
 
 public class DataImportReport {
-    private String SubjectKey;
-    private String StudySubjectID;
-    private String StudyEventOID;
-    private String StudyEventRepeatKey;
-    private String FormOID;
+    private String subjectKey;
+    private String studySubjectID;
+    private String studyEventOID;
+    private String studyEventRepeatKey;
+    private String formOID;
     private String itemGroupOID;
     private String itemGroupRepeatKey;
     private String itemOID;
-    private String Status;
-    private String Message;
+    private String status;
+    private String timeStamp;
+    private String message;
 
 
-    public DataImportReport(String subjectKey, String studySubjectID, String studyEventOID, String studyEventRepeatKey, String formOID, String itemGroupOID, String itemGroupRepeatKey, String itemOID,String status, String message) {
-        SubjectKey = subjectKey;
-        StudySubjectID = studySubjectID;
-        StudyEventOID = studyEventOID;
-        StudyEventRepeatKey = studyEventRepeatKey;
-        FormOID = formOID;
+    public DataImportReport(String subjectKey, String studySubjectID, String studyEventOID, String studyEventRepeatKey, String formOID, String itemGroupOID, String itemGroupRepeatKey, String itemOID, String status, String timeStamp, String message) {
+        this.subjectKey = subjectKey;
+        this.studySubjectID = studySubjectID;
+        this.studyEventOID = studyEventOID;
+        this.studyEventRepeatKey = studyEventRepeatKey;
+        this.formOID = formOID;
         this.itemGroupOID = itemGroupOID;
         this.itemGroupRepeatKey = itemGroupRepeatKey;
         this.itemOID = itemOID;
-        Status = status;
-        Message = message;
+        this.status = status;
+        this.timeStamp = timeStamp;
+        this.message = message;
     }
 
     public String getSubjectKey() {
-        return SubjectKey;
+        return subjectKey;
     }
 
     public void setSubjectKey(String subjectKey) {
-        SubjectKey = subjectKey;
+        this.subjectKey = subjectKey;
+    }
+
+    public String getStudySubjectID() {
+        return studySubjectID;
+    }
+
+    public void setStudySubjectID(String studySubjectID) {
+        this.studySubjectID = studySubjectID;
     }
 
     public String getStudyEventOID() {
-        return StudyEventOID;
+        return studyEventOID;
     }
 
     public void setStudyEventOID(String studyEventOID) {
-        StudyEventOID = studyEventOID;
+        this.studyEventOID = studyEventOID;
+    }
+
+    public String getStudyEventRepeatKey() {
+        return studyEventRepeatKey;
+    }
+
+    public void setStudyEventRepeatKey(String studyEventRepeatKey) {
+        this.studyEventRepeatKey = studyEventRepeatKey;
     }
 
     public String getFormOID() {
-        return FormOID;
+        return formOID;
     }
 
     public void setFormOID(String formOID) {
-        FormOID = formOID;
-    }
-
-    public String getStatus() {
-        return Status;
-    }
-
-    public void setStatus(String status) {
-        Status = status;
-    }
-
-    public String getMessage() {
-        return Message;
-    }
-
-    public void setMessage(String message) {
-        Message = message;
+        this.formOID = formOID;
     }
 
     public String getItemGroupOID() {
@@ -74,22 +76,6 @@ public class DataImportReport {
         this.itemGroupOID = itemGroupOID;
     }
 
-    public String getItemOID() {
-        return itemOID;
-    }
-
-    public void setItemOID(String itemOID) {
-        this.itemOID = itemOID;
-    }
-
-    public String getStudyEventRepeatKey() {
-        return StudyEventRepeatKey;
-    }
-
-    public void setStudyEventRepeatKey(String studyEventRepeatKey) {
-        StudyEventRepeatKey = studyEventRepeatKey;
-    }
-
     public String getItemGroupRepeatKey() {
         return itemGroupRepeatKey;
     }
@@ -98,12 +84,35 @@ public class DataImportReport {
         this.itemGroupRepeatKey = itemGroupRepeatKey;
     }
 
-    public String getStudySubjectID() {
-        return StudySubjectID;
+    public String getItemOID() {
+        return itemOID;
     }
 
-    public void setStudySubjectID(String studySubjectID) {
-        StudySubjectID = studySubjectID;
+    public void setItemOID(String itemOID) {
+        this.itemOID = itemOID;
     }
 
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
+    }
+
+    public String getTimeStamp() {
+        return timeStamp;
+    }
+
+    public void setTimeStamp(String timeStamp) {
+        this.timeStamp = timeStamp;
+    }
+
+    public String getMessage() {
+        return message;
+    }
+
+    public void setMessage(String message) {
+        this.message = message;
+    }
 }
