@@ -473,9 +473,9 @@ $(function() {
         }).on('uncollapse', '.section', function() {
             var sectionDiv = $(this);
             var studyEventOid = sectionDiv.data('section-oid');
+            var studyEvent = studyEvents[studyEventOid];
             $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n', function(data){
                 var odm = data;
-                var studyEvent = studyEvents[studyEventOid];
                 for (var formOid in studyEvent.forms) {
                     var form = studyEvent.forms[formOid];
                     form.submissions = [];
@@ -485,20 +485,23 @@ $(function() {
                     if (link['@rel'] !== 'common-add-new')
                         return;
 
-                    var oids = link['@tag'].split('.');
-                    var studyEventOid = oids[0];
-                    var formOid = oids[1];
-                    var studyEvent = studyEvents[studyEventOid];
-                    if (!studyEvent) {
-                        studyEvent = studyEvents[studyEventOid] = {
-                            forms: {}
+                    var refs = link['@tag'].split('.');
+                    var studyEventRef = refs[0];
+                    var formRef = refs[1];
+
+                    if (studyEventRef !== studyEventOid)
+                        return;
+
+                    var form = studyEvent.forms[formRef];
+                    if (form) {
+                        form.addNew = link['@href'];
+                    }
+                    else {
+                        form = studyEvent.forms[formRef] = {
+                            '@OID': formRef,
+                            '@Name': 'MISSINGFORM: ' + formRef
                         };
                     }
-                    var form = studyEvent.forms[formOid];
-                    if (!form) {
-                        form = studyEvent.forms[formOid] = {};
-                    }
-                    form.addNew = link['@href'];
                     form.showMe = studyEvent.showMe = true;                        
                 });
 
@@ -551,7 +554,7 @@ $(function() {
                 });
 
                 var sectionBody = $(sectionBodyTmpl({
-                    studyEvent: studyEvents[studyEventOid]
+                    studyEvent: studyEvent
                 }));
                 sectionDiv.children('.section-body').empty().append(sectionBody);
                 setTimeout(function() {
