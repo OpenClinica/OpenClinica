@@ -7,14 +7,7 @@ import java.io.InputStream;
 import java.io.InputStreamReader;
 import java.text.SimpleDateFormat;
 import java.time.LocalDateTime;
-import java.util.ArrayList;
-import java.util.Collections;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Locale;
-import java.util.Map;
-import java.util.UUID;
+import java.util.*;
 import java.util.concurrent.CompletableFuture;
 import java.util.concurrent.ExecutionException;
 import java.util.concurrent.Future;
@@ -141,6 +134,9 @@ public class StudyEventController {
 	public static final String DASH = "-";
 	public static final String SCHEDULE_EVENT = "_Schedule Event";
 	public static final String FILE_HEADER_MAPPING = "ParticipantID, StudyEventOID, Ordinal, StartDate, EndDate";
+	public static final String SEPERATOR = ",";
+	SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
+
 
     /**
      * @api {put} /pages/auth/api/v1/studyevent/studysubject/{studySubjectOid}/studyevent/{studyEventDefOid}/ordinal/{ordinal}/complete Complete a Participant Event
@@ -434,7 +430,10 @@ public class StudyEventController {
 		String logFileName = null;
 		CoreResources.setRequestSchema(schema);
 		 
-		String fileName = study.getUniqueIdentifier()+ DASH+study.getEnvType()+ SCHEDULE_EVENT + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
+		sdf_fileName.setTimeZone(TimeZone.getTimeZone("GMT"));
+		String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + SCHEDULE_EVENT +"_"+ sdf_fileName.format(new Date())+".csv";
+
+
 		String filePath = userService.getFilePath(JobType.SCHEDULE_EVENT) + File.separator + fileName;
 		jobDetail.setLogPath(filePath);
 		
@@ -477,9 +476,9 @@ public class StudyEventController {
 			         * Row, ParticipantID, StudyEventOID, Ordinal, Status, ErrorMessage
 			         */ 
                 	String recordNum = null;
-                	String headerLine = "Row|ParticipantID|StudyEventOID|Ordinal|Status|ErrorMessage";
+                	String headerLine = "Row"+SEPERATOR+"ParticipantID"+SEPERATOR+"StudyEventOID"+SEPERATOR+"Ordinal"+SEPERATOR+"Status"+SEPERATOR+"ErrorMessage";
                 	String msg = null;
-                	msg = rowNum + "|" + participantId + "|" + studyEventOID +"|"+ sampleOrdinalStr +"|" + status + "|"+message;                	
+                	msg = rowNum + SEPERATOR + participantId + SEPERATOR + studyEventOID +SEPERATOR+ sampleOrdinalStr +SEPERATOR + status + SEPERATOR+message;
     	    		this.getRestfulServiceHelper().getMessageLogger().writeToLog(filePath, headerLine, msg, ub);
     	    		
     	    		
