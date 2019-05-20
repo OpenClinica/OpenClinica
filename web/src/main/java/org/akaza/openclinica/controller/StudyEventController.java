@@ -250,22 +250,7 @@ public class StudyEventController {
     	return scheduleEvent(request, studyOID, siteOID,studyEventOID,subjectKey,startDate,endDate);
 	}
     
-    @ApiOperation(value = "To schedule an event for participant at study level",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
-   	@ApiResponses(value = {
-   	        @ApiResponse(code = 200, message = "Successful operation"),
-   	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
-   	@RequestMapping(value = "clinicaldata/studies/{studyOID}/participants/{subjectKey}/events", method = RequestMethod.POST)
-   	public ResponseEntity<Object> scheduleEventAtStudyLevel(HttpServletRequest request,
-   			@RequestBody StudyEventScheduleRequestDTO studyEventScheduleRequestDTO,
-   			@PathVariable("subjectKey") String subjectKey,									
-   			@PathVariable("studyOID") String studyOID) throws Exception {
-   		
-       	String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();       
-       	String startDate = studyEventScheduleRequestDTO.getStartDate();
-       	String endDate = studyEventScheduleRequestDTO.getEndDate();
-		
-    	return scheduleEvent(request, studyOID, null,studyEventOID,subjectKey,startDate,endDate);
-	}
+
     
     @ApiOperation(value = "To schedule an event for participants at site level in bulk",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
 	@ApiResponses(value = {
@@ -371,55 +356,6 @@ public class StudyEventController {
         }
         
 		return response;
-	}
-	
-    @ApiOperation(value = "To schedule an event for participants at study level in bulk",  notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date")
-	@ApiResponses(value = {
-	        @ApiResponse(code = 200, message = "Successful operation"),
-	        @ApiResponse(code = 400, message = "Bad Request -- Normally means Found validation errors, for detail please see the error list: <br /> ")})
-	@RequestMapping(value = "clinicaldata/studies/{studyOID}/events/bulk", method = RequestMethod.POST,consumes = {"multipart/form-data"})
-	public ResponseEntity<Object> scheduleBulkEventAtStudyLevel(HttpServletRequest request,
-			MultipartFile file,
-			@PathVariable("studyOID") String studyOID) throws Exception {
-    	
-        ResponseEntity response = null;
-        utilService.setSchemaFromStudyOid(studyOID);
-        String schema = CoreResources.getRequestSchema();
-    	
-    	response= checkFileFormat(file);
-    	if(response != null) {
-    		return response;
-    	}
-    	
-		UserAccountBean ub = getUserAccount(request);
-
-		Study study = studyDao.findByOcOID(studyOID.trim());
-		response= checkStudy(study);
-    	if(response != null) {
-    		return response;
-    	}   
-    	
-		UserAccount userAccount = userAccountDao.findById(ub.getId());
-		JobDetail jobDetail= userService.persistJobCreated(study, null, userAccount, JobType.SCHEDULE_EVENT,file.getOriginalFilename());
-
-    	 CompletableFuture<ResponseEntity<Object>> future = CompletableFuture.supplyAsync(() -> {
-    		 return scheduleEvent(request,file, study, null, ub,jobDetail,schema);
-    	 });
-    	 
-    	 String uuid = jobDetail.getUuid();
-         
-         synchronized (expiringMap) {
-              expiringMap.put(uuid, future);
-          }
-                
-        RestReponseDTO responseDTO = new RestReponseDTO();
-  		String finalMsg = "The schedule job is running, here is the schedule job ID:" + uuid;
-  		responseDTO.setMessage(finalMsg);
-  		response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.OK);
-  		
-  		return response;
-		
-    	
 	}
 
 
