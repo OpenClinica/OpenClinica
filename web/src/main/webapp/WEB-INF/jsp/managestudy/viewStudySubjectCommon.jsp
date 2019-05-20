@@ -489,17 +489,17 @@ $(function() {
                     var studyEventOid = oids[0];
                     var formOid = oids[1];
                     var studyEvent = studyEvents[studyEventOid];
+                    if (!studyEvent) {
+                        studyEvent = studyEvents[studyEventOid] = {
+                            forms: {}
+                        };
+                    }
                     var form = studyEvent.forms[formOid];
-                    if (form && studyEvent) {
-                        form.addNew = link['@href'];
-                        form.showMe = studyEvent.showMe = true;                        
+                    if (!form) {
+                        form = studyEvent.forms[formOid] = {};
                     }
-                    else {
-                        if (!form)
-                            console.log('Missing Form: ' + formOid);
-                        if (!studyEvent)
-                            console.log('Missing Study Event: ' + studyEventOid);
-                    }
+                    form.addNew = link['@href'];
+                    form.showMe = studyEvent.showMe = true;                        
                 });
 
                 collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
