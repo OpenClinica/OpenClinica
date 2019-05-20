@@ -331,7 +331,7 @@ $(function() {
                             columnTitles.push(item['@Name']);
                     }
                     else
-                        columnTitles.push('?');
+                        columnTitles.push('(!)MISSING: ' + col);
                     submissionFields[col] = [];
                 });
 
@@ -499,7 +499,7 @@ $(function() {
                     else {
                         form = studyEvent.forms[formRef] = {
                             '@OID': formRef,
-                            '@Name': 'MISSINGFORM: ' + formRef
+                            '@Name': '(!)MISSINGFORM: ' + formRef
                         };
                     }
                     form.showMe = studyEvent.showMe = true;                        
