@@ -152,6 +152,13 @@
     section.toggleClass('collapsed expanded');
   }
 
+  function showSection(position, selector) {
+    var $el = $(selector);
+    if (store.data.collapseSections[position])
+      $el.toggleClass('expanded collapsed').children('.section-body').hide();
+    $el.removeClass('hide');
+  }
+
   function clickAllSections(selector) {
     $(selector).children('.section-header').each(showHide);
   };
@@ -565,9 +572,7 @@
   </div>
 </div>
 <script>
-  if (store.data.collapseSections[0])
-    $('#studySubjectRecord').toggleClass('expanded collapsed').children('.section-body').hide();
-  $('#studySubjectRecord').removeClass('hide');
+  showSection(0, '#studySubjectRecord');
 </script>
 <div id="loading"><br> &nbsp; Loading...</div>
 <c:choose>
@@ -599,9 +604,7 @@
 </div>
 <script>
   if ($('#subjectEvents td.table_cell_left').length) {
-      if (store.data.collapseSections[1])
-          $('#subjectEvents').toggleClass('expanded collapsed').children('.section-body').hide();
-      $('#subjectEvents').removeClass('hide');
+    showSection(1, '#subjectEvents');
   }
 </script>
 <jsp:include page="viewStudySubjectCommon.jsp"/>
