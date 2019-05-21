@@ -150,6 +150,14 @@
     </div>
 </script>
 <script id="section-body-tmpl" type="text/x-handlebars-template">
+    {{#if sectionErrors}}
+        <div>ERROR</div>
+        <ul>
+            {{#each sectionErrors as |err|}}
+                <li>{{err}}</li>
+            {{/each}}
+        </ul>
+    {{/if}}
     {{#each studyEvent.forms as |form|}}
     {{#if form.showMe}}
         <div class="subsection" id="common.{{../studyEvent.[@OID]}}.{{form.[@OID]}}">
@@ -474,6 +482,7 @@ $(function() {
             var sectionDiv = $(this);
             var studyEventOid = sectionDiv.data('section-oid');
             var studyEvent = studyEvents[studyEventOid];
+            var sectionErrors = [];
             $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n', function(data){
                 var odm = data;
                 for (var formOid in studyEvent.forms) {
@@ -495,15 +504,11 @@ $(function() {
                     var form = studyEvent.forms[formRef];
                     if (form) {
                         form.addNew = link['@href'];
+                        form.showMe = studyEvent.showMe = true;                        
                     }
                     else {
-                        form = studyEvent.forms[formRef] = {
-                            '@OID': formRef,
-                            '@Name': '!?' + formRef
-                        };
-                        errors.push('Unable to reference Common Event Form: ' + formRef);
+                        sectionErrors.push('Unable to reference Common Event Form: ' + formRef);
                     }
-                    form.showMe = studyEvent.showMe = true;                        
                 });
 
                 collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
@@ -555,7 +560,8 @@ $(function() {
                 });
 
                 var sectionBody = $(sectionBodyTmpl({
-                    studyEvent: studyEvent
+                    studyEvent: studyEvent,
+                    sectionErrors: sectionErrors
                 }));
                 sectionDiv.children('.section-body').empty().append(sectionBody);
                 setTimeout(function() {
@@ -565,11 +571,17 @@ $(function() {
         }).children('.expanded').trigger('uncollapse');
 
         $('div.section.collapsed').children('.section-body').hide();
-        $('#loading').remove();
-    }, function() {
-        $('#loading').html('<h1>ERROR</h1><ul>' + errors.map(function(err) {
-            return '<li>' + err + '</li>'
-        }) + '</ul>');
+    })
+    .always(function() {
+        if (errors.length) {
+            $('#loading').html('<h1>ERROR</h1><ul>' + errors.map(function(err) {
+                return '<li>' + err + '</li>'
+            }) + '</ul>').show();
+        }
+        else {
+            $('#loading').hide();
+        }
+
     });
 });
 </script>
