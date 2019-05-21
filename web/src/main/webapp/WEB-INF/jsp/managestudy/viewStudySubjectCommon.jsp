@@ -238,6 +238,7 @@ $(function() {
     var items = {};
     var codes = {};
     var columns = {};
+    var errors = [];
 
     $.when(
         $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n', function(data) {
@@ -281,12 +282,18 @@ $(function() {
                 });
                 forms[form['@OID']] = form;
             });
+        })
+        .error(function() {
+            errors.push('Unable to load any Common Events');
         }),
 
-        $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(pageJson){
+        $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(pageJson) {
             collection(pageJson.components).forEach(function(component) {
                 columns[component.name] = component.columns;
             });
+        })
+        .error(function() {
+            errors.push('Unable to load Components data');
         })
 
     ).then(function() {
@@ -557,7 +564,9 @@ $(function() {
         $('div.section.collapsed').children('.section-body').hide();
         $('#loading').remove();
     }, function() {
-        $('#loading').text("Can't Load View Participant Page");
+        $('#loading').html('<h1>ERROR</h1><ul>' + errors.map(function(err) {
+            return '<li>' + err + '</li>'
+        }) + '</ul>');
     });
 });
 </script>
