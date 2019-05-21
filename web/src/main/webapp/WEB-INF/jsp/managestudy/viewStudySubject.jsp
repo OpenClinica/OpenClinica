@@ -597,6 +597,13 @@
     </c:import>
   </div>
 </div>
+<script>
+  if ($('#subjectEvents td.table_cell_left').length) {
+      if (store.data.collapseSections[1])
+          $('#subjectEvents').toggleClass('expanded collapsed').children('.section-body').hide();
+      $('#subjectEvents').removeClass('hide');
+  }
+</script>
 <jsp:include page="viewStudySubjectCommon.jsp"/>
 <div style="width: 250px">
 <c:choose>

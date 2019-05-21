@@ -364,7 +364,6 @@ $(function() {
             });
         }).change();
 
-        var numVisitBaseds = 0;
         var hideStatus = $('#oc-status-hide').val();
         var sectionTmpl = Handlebars.compile($('#section-tmpl').html());
         var sectionBodyTmpl = Handlebars.compile($('#section-body-tmpl').html());
@@ -384,14 +383,6 @@ $(function() {
                     sectionIndex++;
                 }
             }
-            else { // event type != common event
-                numVisitBaseds++;
-            }
-        }
-        if (numVisitBaseds) {
-            if (store.data.collapseSections[1])
-                $('#subjectEvents').toggleClass('expanded collapsed').children('.section-body').hide();
-            $('#subjectEvents').removeClass('hide');
         }
 
         $.fn.dataTable.moment('DD-MMM-YYYY');
