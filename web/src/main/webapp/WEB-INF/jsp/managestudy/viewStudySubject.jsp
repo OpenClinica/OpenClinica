@@ -574,7 +574,6 @@
 <script>
   showSection(0, '#studySubjectRecord');
 </script>
-<div id="loading"><br> &nbsp; Loading...</div>
 <c:choose>
   <c:when test="${isAdminServlet == 'admin' && userBean.sysAdmin && module=='admin'}">
     <div class="table_title_Admin">
@@ -607,6 +606,7 @@
     showSection(1, '#subjectEvents');
   }
 </script>
+<div id="loading"><br> &nbsp; Loading...</div>
 <jsp:include page="viewStudySubjectCommon.jsp"/>
 <div style="width: 250px">
 <c:choose>

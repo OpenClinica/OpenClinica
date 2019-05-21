@@ -337,8 +337,10 @@ $(function() {
                         else
                             columnTitles.push(item['@Name']);
                     }
-                    else
-                        columnTitles.push('(!)MISSING: ' + col);
+                    else {
+                        columnTitles.push('!?' + col);
+                        errors.push('Unable to reference Common Event Form Item: ' + col);
+                    }
                     submissionFields[col] = [];
                 });
 
@@ -497,8 +499,9 @@ $(function() {
                     else {
                         form = studyEvent.forms[formRef] = {
                             '@OID': formRef,
-                            '@Name': '(!)MISSINGFORM: ' + formRef
+                            '@Name': '!?' + formRef
                         };
+                        errors.push('Unable to reference Common Event Form: ' + formRef);
                     }
                     form.showMe = studyEvent.showMe = true;                        
                 });
