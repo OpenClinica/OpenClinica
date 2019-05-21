@@ -249,7 +249,7 @@ $(function() {
     var columns = {};
 
     $.when(
-        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n', function(data) {
+        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n&links=y', function(data) {
             odm = data;
             for (var i=0, studies=collection(odm.Study); i<studies.length; i++) {
                 if (studies[i]['@OID'] === '${study.oid}') {
@@ -482,7 +482,7 @@ $(function() {
         }).on('uncollapse', '.section', function() {
             var sectionDiv = $(this);
             var studyEventOid = sectionDiv.data('section-oid');
-            $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n', function(data){
+            $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n&links=y', function(data){
                 var odm = data;
                 var studyEvent = studyEvents[studyEventOid];
                 for (var formOid in studyEvent.forms) {

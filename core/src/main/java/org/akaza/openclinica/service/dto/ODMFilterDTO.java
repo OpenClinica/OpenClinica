@@ -8,8 +8,19 @@ public class ODMFilterDTO {
     boolean archived = false;
     boolean metadata = true;
     boolean clinical = true;
+    boolean links = false;
 
-    public ODMFilterDTO(String includeDns, String includeAudits, String crossFormLogic, String showArchived, String metadata, String clinicalData) {
+    public ODMFilterDTO() {
+        includeDN = false;
+        includeAudit = false;
+        crossForm = false;
+        archived = false;
+        metadata = true;
+        clinical = true;
+        links = false;
+    }
+
+    public ODMFilterDTO(String includeDns, String includeAudits, String crossFormLogic, String showArchived, String metadata, String clinicalData, String links) {
 
         if (showArchived != null && (showArchived.equalsIgnoreCase("yes") || showArchived.equalsIgnoreCase("y")))
             setArchived(true);
@@ -23,6 +34,8 @@ public class ODMFilterDTO {
             setIncludeAudit(true);
         if (clinicalData.equalsIgnoreCase("no") ||  clinicalData.equalsIgnoreCase("n"))
             setClinical(false);
+        if (links.equalsIgnoreCase("yes") ||  links.equalsIgnoreCase("y"))
+            setLinks(true);
     }
 
     public boolean isIncludeDN() {
@@ -63,5 +76,12 @@ public class ODMFilterDTO {
     }
     public void setClinical(boolean clinical) {
         this.clinical = clinical;
+    }
+
+    public boolean includeLinks() {
+        return links;
+    }
+    public void setLinks(boolean links) {
+        this.links = links;
     }
 }
