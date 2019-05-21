@@ -5,7 +5,7 @@
         <validCheckSum>30d56b8377711e93debdac333aa217d</validCheckSum>
         <preConditions onFail="MARK_RAN">
             <dbms type="postgresql" />
-            <sqlCheck expectedResult="t"> <![CDATA[select substring(replace((string_to_array(version(), ' '))[2],'.','')from 1 for 2)::integer < 90 ]]></sqlCheck>
+            <sqlCheck expectedResult="t"> <![CDATA[select current_setting('server_version_num')::integer < 90000 ]]></sqlCheck>
         </preConditions>
         <sql splitStatements="false">
             DROP LANGUAGE IF EXISTS plpgsql;
