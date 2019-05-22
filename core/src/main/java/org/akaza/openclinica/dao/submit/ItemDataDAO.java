@@ -853,7 +853,7 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 	}
 	
-	public ArrayList findSkipMatchCriterias(String sqlStr) {
+	public ArrayList findSkipMatchCriterias(String sqlStr,ArrayList<String> skipMatchCriteriaOids) {
         setTypesExpected();
 
         ArrayList matchCriterias = new ArrayList<>();
@@ -869,14 +869,20 @@ public class ItemDataDAO extends AuditableEntityDAO {
         	return null;
         }
         
-        ArrayList alist = this.select(sqlStr);
-        int listSize = alist.size();
+        ArrayList matchingItemDataQueryResults = this.select(sqlStr);
+        int listSize = skipMatchCriteriaOids.size();
         int i = 0;
         
-        Iterator it = alist.iterator();       
+        Iterator it = matchingItemDataQueryResults.iterator();
         
         Integer currentStudyEventId = null;
-        HashMap rowhm = new HashMap();
+    	//OC-10832
+        //initialize  HashMap skipMatchGroup 
+        HashMap skipMatchGroup = new HashMap();
+        for (String itemOid : skipMatchCriteriaOids) {
+        	skipMatchGroup.put(itemOid, null);
+        }
+       
         while (it.hasNext()) {
         	HashMap hm = (HashMap) it.next();
         	i++;
@@ -884,29 +890,49 @@ public class ItemDataDAO extends AuditableEntityDAO {
         	studyEventId = (Integer) hm.get("study_event_id");
         	itemOID = (String) hm.get("oc_oid");
         	itemValue = (String) hm.get("value");
-        	// build  row  hash map to match data file line
+        	// build row hash map to match data file line
         	if(currentStudyEventId == null) {
-        		rowhm.put(itemOID, itemValue);
+        		skipMatchGroup.put(itemOID, itemValue);
         		
         		if(i == listSize) {
-        			matchCriterias.add(rowhm);
+        		
+        			matchCriterias.add(skipMatchGroup);
+        			i = 0;
         		}
         	}else if(currentStudyEventId.intValue()==studyEventId.intValue()) {
-        		rowhm.put(itemOID, itemValue);
+        		skipMatchGroup.put(itemOID, itemValue);
         		
+        		// here added FULL skipMatchGroup --  all skip ItemOID has matched value
         		if(i == listSize) {
-        			matchCriterias.add(rowhm);
+        			matchCriterias.add(skipMatchGroup);
+        			//after added, clear the skipMatchGroup
+        			i = 0;
+        			skipMatchGroup = null;
+        			
         		}
         	}else {
-        		matchCriterias.add(rowhm);
+        		// added previous skipMatchGroup
+        		if(skipMatchGroup !=null) {
+        			matchCriterias.add(skipMatchGroup);
+            		i = 0;	
+        		}
+        		        		
+        		// after added previous,start new skipMatch row
+        		skipMatchGroup = new HashMap();        		
+        		for (String itemOid : skipMatchCriteriaOids) {
+        	        	skipMatchGroup.put(itemOid, null);
+        	     }
         		
-        		rowhm = new HashMap();
-        		rowhm.put(itemOID, itemValue);
+        		skipMatchGroup.put(itemOID, itemValue);
         	}
-        	
-        	
+
         	currentStudyEventId = studyEventId;
         	
+        }
+
+        // Capture the last hash map.
+        if (skipMatchGroup != null && !skipMatchGroup.isEmpty()){
+            matchCriterias.add(skipMatchGroup);
         }
         
         return matchCriterias;

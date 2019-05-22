@@ -23,6 +23,8 @@ import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.rule.action.NotificationActionProcessor;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.rest.client.auth.impl.KeycloakClientImpl;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.RandomStringUtils;
@@ -45,15 +47,13 @@ import org.springframework.web.client.RestTemplate;
 import javax.mail.MessagingException;
 import javax.mail.internet.MimeMessage;
 import javax.servlet.ServletContext;
+import javax.servlet.http.HttpServletRequest;
 import java.io.File;
 import java.io.FileNotFoundException;
 import java.io.PrintWriter;
 import java.io.UnsupportedEncodingException;
 import java.text.SimpleDateFormat;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.List;
-import java.util.UUID;
+import java.util.*;
 
 import static org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.messageServiceUri;
 import static org.akaza.openclinica.domain.rule.action.NotificationActionProcessor.sbsUrl;
@@ -134,7 +134,6 @@ public class UserServiceImpl implements UserService {
 
     private String urlBase = CoreResources.getField("sysURL").split("/MainMenu")[0];
 
-
     StudyDAO sdao;
 
 
@@ -146,7 +145,9 @@ public class UserServiceImpl implements UserService {
         return studyDao.findByOcOID(studyOid);
     }
 
-    public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken, UserAccountBean userAccountBean, String customerUuid) {
+
+    public OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken,
+                                        UserAccountBean userAccountBean, String customerUuid, ResourceBundle restext) {
         OCUserDTO ocUserDTO = null;
         Study tenantStudy = getStudy(studyOid);
         String oid = (tenantStudy.getStudy() != null ? tenantStudy.getStudy().getOc_oid() : tenantStudy.getOc_oid());
@@ -188,12 +189,13 @@ public class UserServiceImpl implements UserService {
         } else {
             logger.info("Participant does not exists or not added yet in OC ");
         }
+        ParticipateInviteEnum inviteEnum = ParticipateInviteEnum.NO_INVITE;
+        ParticipateInviteStatusEnum inviteStatusEnum = ParticipateInviteStatusEnum.NO_OP;
         if (participantDTO.isInviteParticipant() || participantDTO.isInviteViaSms()) {
 
             ParticipantAccessDTO accessDTO = getAccessInfo(accessToken, studyOid, ssid, customerUuid, userAccountBean);
             boolean updateUserStatus = false;
-            ParticipateInviteEnum inviteEnum = ParticipateInviteEnum.NO_INVITE;
-            ParticipateInviteStatusEnum inviteStatusEnum = ParticipateInviteStatusEnum.NO_OP;
+
             if (participantDTO.isInviteViaSms())
                 inviteEnum = ParticipateInviteEnum.SMS_INVITE;
             if (participantDTO.isInviteParticipant())
@@ -231,7 +233,6 @@ public class UserServiceImpl implements UserService {
             } else if (inviteEnum == ParticipateInviteEnum.EMAIL_INVITE) {
                 inviteStatusEnum = emailToParticipant ? ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS : ParticipateInviteStatusEnum.EMAIL_INVITE_FAIL;
             }
-            String popupMessage = getErrorMessage(inviteEnum, inviteStatusEnum);
             if ((inviteEnum != ParticipateInviteEnum.NO_INVITE) &&
                     ((inviteStatusEnum == ParticipateInviteStatusEnum.BOTH_INVITE_SUCCESS)
                             || (inviteStatusEnum == ParticipateInviteStatusEnum.EMAIL_INVITE_SUCCESS)
@@ -245,32 +246,39 @@ public class UserServiceImpl implements UserService {
         }
 
         ocUserDTO = buildOcUserDTO(studySubject);
+        ocUserDTO.setErrorMessage(getErrorMessage(inviteEnum, inviteStatusEnum, restext));
 
         return ocUserDTO;
     }
 
-    private String getErrorMessage(ParticipateInviteEnum inviteEnum, ParticipateInviteStatusEnum inviteStatusEnum) {
+    private String getErrorMessage(ParticipateInviteEnum inviteEnum, ParticipateInviteStatusEnum inviteStatusEnum, ResourceBundle restext) {
         String message = null;
         if (inviteEnum == ParticipateInviteEnum.NO_INVITE)
             return message;
         switch(inviteStatusEnum) {
             case EMAIL_INVITE_SUCCESS:
-                message = "Email Invite Succeeded";
+                message = restext.getString("email_invite_success");
                 break;
             case SMS_INVITE_SUCCESS:
-                message = "SMS Invite Succeeded";
+                message = restext.getString("sms_invite_success");
+                break;
+            case EMAIL_INVITE_FAIL:
+                message = restext.getString("email_invite_fail");
+                break;
+            case SMS_INVITE_FAIL:
+                message = restext.getString("sms_invite_fail");
                 break;
             case EMAIL_SUCCESS_SMS_FAIL:
-                message = "Email Invite Succeeded SMS Invite Failed";
+                message = restext.getString("email_success_sms_fail");
                 break;
             case EMAIL_FAIL_SMS_SUCCESS:
-                message = "Email Invite Failed SMS Invite Succeeded";
+                message = restext.getString("email_fail_sms_success");
                 break;
             case BOTH_INVITE_FAIL:
-                message = "Email and SMS Invite Failed";
+                message = restext.getString("both_invite_fail");
                 break;
             case BOTH_INVITE_SUCCESS:
-                message = "Email and SMS Invite Succeeded";
+                message = restext.getString("both_invite_success");
                 break;
             default:
                 break;
@@ -774,7 +782,9 @@ public class UserServiceImpl implements UserService {
         jobDetail.setType(jobType);
         jobDetail.setUuid(UUID.randomUUID().toString());
         jobDetail.setSourceFileName(sourceFileName);
-        return jobService.saveOrUpdateJob(jobDetail);
+        jobDetail =jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has started",jobDetail.getJobDetailId());
+        return jobDetail;
     }
 
 
@@ -783,6 +793,7 @@ public class UserServiceImpl implements UserService {
         jobDetail.setDateCompleted(new Date());
         jobDetail.setStatus(JobStatus.COMPLETED);
         jobDetail =jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has completed",jobDetail.getJobDetailId());
     }
 
     public void persistJobFailed(JobDetail jobDetail,String fileName) {
@@ -790,6 +801,7 @@ public class UserServiceImpl implements UserService {
         jobDetail.setDateCompleted(new Date());
         jobDetail.setStatus(JobStatus.FAILED);
         jobDetail =jobService.saveOrUpdateJob(jobDetail);
+        logger.debug("Job Id {} has failed",jobDetail.getJobDetailId());
     }
 
 

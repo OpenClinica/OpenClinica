@@ -166,10 +166,12 @@
                     {{/if}}
                 </h3>
                 <input class="add-new" type="button" value='<fmt:message key="add_new" bundle="${resword}"/>'
-                    {{#if form.addNew}}
-                        data-url="{{form.addNew}}"
-                    {{else}}
-                        disabled="disabled"
+                    {{#if form}}        
+                        {{#if form.addNew}}
+                            data-url="{{form.addNew}}"
+                        {{else}}
+                            disabled="disabled"
+                        {{/if}}>
                     {{/if}}>
             </div>
             <table class="datatable" data-repeating="{{../studyEvent.[@Repeating]}}">
@@ -493,10 +495,20 @@ $(function() {
                         return;
 
                     var oids = link['@tag'].split('.');
-                    var studyEvent = studyEvents[oids[0]];
-                    var form = studyEvent.forms[oids[1]];
-                    form.addNew = link['@href'];
-                    form.showMe = studyEvent.showMe = true;
+                    var studyEventOid = oids[0];
+                    var formOid = oids[1];
+                    var studyEvent = studyEvents[studyEventOid];
+                    var form = studyEvent.forms[formOid];
+                    if (form && studyEvent) {
+                        form.addNew = link['@href'];
+                        form.showMe = studyEvent.showMe = true;                        
+                    }
+                    else {
+                        if (!form)
+                            console.log('Missing Form: ' + formOid);
+                        if (!studyEvent)
+                            console.log('Missing Study Event: ' + studyEventOid);
+                    }
                 });
 
                 collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {

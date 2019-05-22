@@ -83,7 +83,7 @@ public class JobServiceImpl implements JobService {
     private JobDetailDTO convertEntityToDTO(JobDetail jobDetail) {
         JobDetailDTO jobDetailDTO = new JobDetailDTO();
         jobDetailDTO.setUuid(jobDetail.getUuid());
-        jobDetailDTO.setSiteOid(jobDetail.getSite().getOc_oid());
+        jobDetailDTO.setSiteOid(jobDetail.getSite()!=null? jobDetail.getSite().getOc_oid():"");
         jobDetailDTO.setStudyOid(jobDetail.getStudy().getOc_oid());
         jobDetailDTO.setCreatedByUsername(jobDetail.getCreatedBy()!=null?  jobDetail.getCreatedBy().getUserName():null);
         jobDetailDTO.setUpdatedByUsername(jobDetail.getUpdatedBy()!=null?  jobDetail.getUpdatedBy().getUserName():null);

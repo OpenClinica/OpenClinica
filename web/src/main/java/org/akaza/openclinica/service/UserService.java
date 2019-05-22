@@ -19,6 +19,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import javax.servlet.http.HttpServletRequest;
 import java.util.List;
+import java.util.ResourceBundle;
 
 /**
  * @author joekeremian
@@ -29,7 +30,8 @@ public interface UserService {
 
     public static final String BULK_JOBS = "bulk_jobs";
 
-    OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken, UserAccountBean ownerUserAccountBean, String customerUuid);
+    OCUserDTO connectParticipant(String studyOid, String ssid, OCParticipantDTO participantDTO, String accessToken,
+                                 UserAccountBean ownerUserAccountBean, String customerUuid, ResourceBundle restext);
 
     OCUserDTO getParticipantAccount(String studyOid, String ssid, String accessToken);
 

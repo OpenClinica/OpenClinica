@@ -244,8 +244,9 @@ public class StudyEventController {
             @PathVariable("subjectKey") String subjectKey,
             @PathVariable("studyOID") String studyOID,
             @PathVariable("siteOID") String siteOID) throws Exception {
-        
-        String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();      
+		utilService.setSchemaFromStudyOid(studyOID);
+
+		String studyEventOID = studyEventScheduleRequestDTO.getStudyEventOID();
         String startDate = studyEventScheduleRequestDTO.getStartDate();
         String endDate = studyEventScheduleRequestDTO.getEndDate();
         

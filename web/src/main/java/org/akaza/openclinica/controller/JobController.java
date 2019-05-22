@@ -12,6 +12,7 @@ import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.enumsupport.JobStatus;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.JobService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.UtilService;
@@ -32,6 +33,7 @@ import org.springframework.web.bind.annotation.DeleteMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.bind.annotation.RequestParam;
 
 import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpServletResponse;
@@ -103,9 +105,10 @@ public class JobController {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
-
-        if (!validateService.isParticipateActive(tenantStudy)) {
-            return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_PARTICIAPTE_INACTIVE, "Participate is Inactive. Participate module for the study is inactive")).body(null);
+        if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) && !validateService.isUserHasAccessToSite(userRoles,siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+        }else if (!validateService.isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(userRoles,siteOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
         }
 
         String accessToken = utilService.getAccessTokenFromRequest(request);
@@ -135,6 +138,11 @@ public class JobController {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
+        if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) ) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+        }else if (!validateService.isUserHas_DM_DEP_DS_RoleInStudy(userRoles,studyOid)) {
+            throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+        }
 
         if (!validateService.isParticipateActive(tenantStudy)) {
             return ResponseEntity.badRequest().headers(HeaderUtil.createFailureAlert(ENTITY_NAME, ErrorConstants.ERR_PARTICIAPTE_INACTIVE, "Participate is Inactive. Participate module for the study is inactive")).body(null);
@@ -157,10 +165,16 @@ public class JobController {
 
     @ApiOperation( value = "To download job files ", notes = "Will download job file" )
     @RequestMapping( value = "/jobs/{uuid}/downloadFile", method = RequestMethod.GET )
-    public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable( "uuid" ) String uuid, HttpServletResponse response) throws Exception {
-        UserAccountBean userAccountBean= utilService.getUserAccountFromRequest(request);
-         Study publicStudy = studyDao.findPublicStudyById(userAccountBean.getActiveStudyId());
-         utilService.setSchemaFromStudyOid(publicStudy.getOc_oid());
+    public ResponseEntity<Object> downloadLogFile(HttpServletRequest request, @PathVariable( "uuid" ) String uuid, @RequestParam(required = false) String open, HttpServletResponse response) throws Exception {
+        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+        Study publicStudy = studyDao.findPublicStudyById(userAccountBean.getActiveStudyId());
+        String studyOid;
+        if (publicStudy.getStudy() == null) {
+            studyOid = publicStudy.getOc_oid();
+        } else{
+            studyOid = publicStudy.getStudy().getOc_oid();
+         }
+         utilService.setSchemaFromStudyOid(studyOid);
 
         JobDetail jobDetail=jobDetailDao.findByUuid(uuid);
         if (jobDetail==null) {
@@ -178,8 +192,10 @@ public class JobController {
             String logFileName = getFilePath(jobDetail.getType()) + File.separator + jobDetail.getLogPath();
             File fileToDownload = new File(logFileName);
             inputStream = new FileInputStream(fileToDownload);
-            response.setContentType("application/force-download");
-            response.setHeader("Content-Disposition", "attachment; filename=" + jobDetail.getLogPath());
+            if (!"true".equals(open)) {
+                response.setContentType("application/force-download");
+                response.setHeader("Content-Disposition", "attachment; filename=" + jobDetail.getLogPath());                
+            }
             IOUtils.copy(inputStream, response.getOutputStream());
             response.flushBuffer();
         } catch (Exception e) {

@@ -244,7 +244,7 @@
   }
   .yes-no-question {
     display: inline-block;
-    width: 140px;
+    width: 165px;
   }
   .invite-input {
     width: 250px;
@@ -277,6 +277,9 @@
   }
   .grayed-out {
     color: #999;
+  }
+  #inviteResultAlert > table {
+    width: 600px;
   }
 </style>
 <!-- then instructions-->
@@ -384,17 +387,17 @@
                               <table border="0" cellpadding="0" cellspacing="0" width="100%">
                                 <tbody>
                                   <tr>
-                                    <td class="table_header_column_top">
+                                    <td class="table_header_column_top" width="25%">
                                       <fmt:message key="study_subject_ID" bundle="${resword}"/>
                                     </td>
-                                    <td class="table_cell_top">
+                                    <td class="table_cell_top" width="25%">
                                       <c:out value="${studySub.label}"/>
                                     </td>
 
-                                    <td class="table_header_column">
+                                    <td class="table_header_column" width="25%">
                                       <fmt:message key="status" bundle="${resword}"/>
                                     </td>
-                                    <td class="table_cell">
+                                    <td class="table_cell" width="25%">
                                       <c:out value="${studySub.status.name}"/>
                                     </td>
                                   </tr>
@@ -1556,7 +1559,10 @@
     </tr>
     <tr>
       <td colspan="2" style="text-align: right;">
-        <input type="button" class="cancel" value="Cancel"/>
+        <span id="inviting" class="left hide">
+          <img src='images/loading.gif'> Inviting...
+        </span>
+        <input type="button" id="cancel-button" class="cancel" value="Cancel"/>
         <input type="button" id="connect-button" value="Update"/>
       </td>
     </tr>
@@ -1621,6 +1627,36 @@
       </tr>
     </table>
   </form>
+</div>
+
+<div id="inviteResultAlert" class="hide">
+  <table border="0" cellpadding="0" align="center" style="cursor:default;">
+    <tr style="height:10px;">
+      <td class="formlabel" align="left">
+        <h3>
+          <fmt:message key="update_and_invite" bundle="${resword}"/>
+        </h3>
+      </td>
+    </tr>
+    <tr>
+      <td><div class="lines"></div></td>
+    </tr>
+    <tr>
+      <td>
+        <div id="inviteResultMessage">
+        </div>
+        <br>
+      </td>
+    </tr>
+    <tr>
+      <td><div class="lines"></div></td>
+    </tr>
+    <tr>
+      <td colspan="2" style="text-align: center;">
+        <input type="button" class="cancel right" value='<fmt:message key="close" bundle="${resword}"/>'/>
+      </td>
+    </tr>
+  </table>
 </div>
 
 <script type="text/javascript">
@@ -1718,15 +1754,34 @@
                 inviteViaSms: $('#invite_via_sms input:checked').val(),
                 identifier: $('#secid-input').val()
             };
+            if (data.inviteParticipant === 'true' || data.inviteViaSms === 'true') {
+                $('#inviting').show();
+                $('#connect-button, #cancel-button').attr('disabled', 'disabled');
+            }
+            else {
+                jQuery.unblockUI();
+            }
+            function doneInviting(result) {
+                if ($('#inviting').is(':hidden'))
+                    return;
+                $('#inviting').hide();
+                $('#connect-button, #cancel-button').removeAttr('disabled');
+                $('#inviteResultMessage').html(result);
+                jQuery.blockUI({message: jQuery('#inviteResultAlert'), css:{left: "300px", top:"100px" }});
+            }
             jQuery.ajax({
                 type: 'post',
                 url: '${pageContext.request.contextPath}/pages/auth/api/clinicaldata/studies/${study.oid}/participants/${esc.escapeJavaScript(studySub.label)}/connect',
                 contentType: 'application/json',
                 data: JSON.stringify(data),
-                success: updateParticipateInfo,
-                error: logDump
+                success: function(data) {
+                    updateParticipateInfo(data);
+                    doneInviting(data.errorMessage || '<fmt:message key="invite_result_unknown" bundle="${resword}"/>');
+                },
+                error: function() {
+                    doneInviting('<fmt:message key="invite_result_error" bundle="${resword}"/>: ' + arguments[2]);
+                }
             });
-            jQuery.unblockUI();
             return false;
         });
 

@@ -94,6 +94,7 @@
     <tr>
       <th><fmt:message key="jobs_source_filename" bundle="${resword}"/></th>
       <th><fmt:message key="job_type" bundle="${resword}"/></th>
+      <th><fmt:message key="site_name" bundle="${resword}"/></th>
       <th><fmt:message key="job_status" bundle="${resword}"/></th>
       <th><fmt:message key="created_on" bundle="${resword}"/></th>
       <th><fmt:message key="created_by" bundle="${resword}"/></th>
@@ -147,19 +148,21 @@ jQuery.ajax({
   url: url,
   success: function(data) {
     datatable.rows.add(data.map(function (logEntry) {
+      var actionView = '<a target="_blank" href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile?open=true"><span class="icon icon-search"></span></a> ';
       var actionDownload = '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ';
       var actionDelete = '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>';
       if (logEntry.status === 'IN_PROGRESS') {
-        actionDownload = actionDelete = '';
+        actionView = actionDownload = actionDelete = '';
       }
       return [
         logEntry.sourceFileName,
         logEntry.type,
+        logEntry.siteOid && (logEntry.siteOid != logEntry.studyOid) ? logEntry.siteOid : logEntry.studyOid,
         logEntry.status,
         formatDate(logEntry.dateCreated),
         logEntry.createdByUsername,
         formatDate(logEntry.dateCompleted),
-        actionDownload + actionDelete
+        actionView + actionDownload + actionDelete
       ];
     }));
     datatable.draw();

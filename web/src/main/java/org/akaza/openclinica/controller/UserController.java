@@ -32,6 +32,8 @@ import org.akaza.openclinica.domain.datamap.StudySubject;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.*;
 import org.akaza.openclinica.service.crfdata.xform.EnketoURLRequest;
 import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
@@ -127,8 +129,9 @@ public class UserController {
         String accessToken = utilService.getAccessTokenFromRequest(request);
         UserAccountBean ownerUserAccountBean = utilService.getUserAccountFromRequest(request);
         String customerUuid = utilService.getCustomerUuidFromRequest(request);
+        ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(LocaleResolver.getLocale(request));
 
-        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid);
+        OCUserDTO ocUserDTO = userService.connectParticipant(studyOid, ssid, participantDTO, accessToken, ownerUserAccountBean, customerUuid, textsBundle);
         logger.info("REST request to POST OCUserDTO : {}", ocUserDTO);
         return new ResponseEntity<OCUserDTO>(ocUserDTO, HttpStatus.OK);
     }
@@ -219,9 +222,9 @@ public class UserController {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
             }
 
-            if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) && !validateService.isUserHasAccessToStudy(userRoles,siteOid)) {
+            if (!validateService.isUserHasAccessToStudy(userRoles,studyOid) && !validateService.isUserHasAccessToSite(userRoles,siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
-            }else if (!validateService.isUserHasCRC_INV_Role(userRoles)) {
+            }else if (!validateService.isUserHas_CRC_INV_RoleInSite(userRoles,siteOid)) {
                 throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
             }
 
@@ -290,7 +293,11 @@ public class UserController {
         UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
         JobDetail jobDetail= userService.persistJobCreated(study, site, userAccount, JobType.ACCESS_CODE,null);
         CompletableFuture<Object> future = CompletableFuture.supplyAsync(() -> {
-            userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean,schema,jobDetail);
+            try {
+                userService.extractParticipantsInfo(studyOid, siteOid, accessToken, customerUuid, userAccountBean, schema, jobDetail);
+            }catch(Exception e) {
+                logger.error("Exeception is thrown while extracting job : " + e);
+            }
             return null;
         });
         return jobDetail.getUuid();

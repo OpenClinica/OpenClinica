@@ -28,6 +28,8 @@ public class ErrorConstants {
     public static final String SITE_NAME_ALREADY_EXISTS = "errorCode.siteNameAlreadyExists";
     public static final String START_DATE_AFTER_END_DATE = "errorCode.startDateAfterEndDate";
     public static final String PARTICIPANT_ID_TEMPLATE_TOO_LONG = "errorCode.participantIdTemplateTooLong";
+    public static final String PARTICIPANT_ID_MISSING_PARTICIPANT_ID_DATA = "errorCode.missingParticipantIdData";
+    public static final String PARTICIPANT_ID_MULTIPLE_PARTICIPANT_ID_HEADERS = "errorCode.multipleParticipantIdHeaders";
 
     /**
      *  this is new for RunTime

@@ -28,9 +28,7 @@ public interface ValidateService {
 
     boolean isStudyToSiteRelationValid(String studyOid, String siteOid);
 
-    boolean isUserHasCRC_INV_Role(List<StudyUserRoleBean> userRoles);
-
-    boolean isUserHasCRC_INV_DM_DEP_DS_Role(List<StudyUserRoleBean> userRoles);
+    boolean isUserHas_CRC_INV_RoleInSite(List<StudyUserRoleBean> userRoles, String siteOid);
 
     boolean isUserHasTechAdminRole(UserAccount userAccount);
 
@@ -39,5 +37,12 @@ public interface ValidateService {
     boolean isAdvanceSearchEnabled(Study tenantStudy);
 
     boolean isUserHasAccessToStudy(List<StudyUserRoleBean> userRoles, String studyOid);
+
+    boolean isUserHasAccessToSite(List<StudyUserRoleBean> userRoles, String siteOid);
+
+
+    boolean isUserHas_CRC_INV_DM_DEP_DS_RoleInSite(List<StudyUserRoleBean> userRoles, String siteOid);
+
+    boolean isUserHas_DM_DEP_DS_RoleInStudy(List<StudyUserRoleBean> userRoles, String studyOid);
 
 }
