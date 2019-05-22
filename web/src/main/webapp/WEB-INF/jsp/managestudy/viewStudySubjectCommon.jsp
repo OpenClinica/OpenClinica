@@ -221,6 +221,32 @@ $(function() {
         return [];
     }
 
+    function foreach(items, action, errors) {
+        collection(items).forEach(function(item) {
+            try {
+                action(item);
+            }
+            catch (e) {
+                console.log('Unable to process', item, e);
+                errors.push('Unable to process ' + item + '. See console log.');
+            }
+        });
+    }
+
+    function findone(items, condition, errors) {
+        for (var i=0, items=collection(items); i<items.length; i++) {
+            var item = items[i];
+            try {
+                if (condition(item))
+                    return item;                
+            }
+            catch (e) {
+                console.log('Unable to process', item, e);
+                errors.push('Unable to process ' + item + '. See console log.');
+            }
+        }
+    }
+
     var linksOrder = ['edit', 'view', 'remove', 'restore', 'reassign', 'sign', 'lock'];
     function collectLinks(studyEventData, formData) {
         var links = [];
@@ -251,61 +277,69 @@ $(function() {
     $.when(
         $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n', function(data) {
             odm = data;
-            for (var i=0, studies=collection(odm.Study); i<studies.length; i++) {
-                if (studies[i]['@OID'] === '${study.oid}') {
-                    metadata = studies[i].MetaDataVersion;
-                    break;
-                }
+            var study = findone(odm.Study, function(study) {
+                return study['@OID'] === '${study.oid}';
+            }, errors);
+
+            if (study && study.MetaDataVersion) {
+                metadata = study.MetaDataVersion;
             }
-            collection(metadata.CodeList).forEach(function(codelist) {
+            else {
+                return errors.push('Unable to fetch metadata for study: ${study.oid}');
+            }
+
+            foreach(metadata.CodeList, function(codelist) {
                 var code = {};
-                collection(codelist.CodeListItem).forEach(function(item) {
+                foreach(codelist.CodeListItem, function(item) {
                     code[item['@CodedValue']] = item.Decode.TranslatedText;
-                });
+                }, errors);
                 codes[codelist['@OID']] = code;
-            });
-            collection(metadata['OpenClinica:MultiSelectList']).forEach(function(multiselect) {
+            }, errors);
+            foreach(metadata['OpenClinica:MultiSelectList'], function(multiselect) {
                 var code = {};
-                collection(multiselect['OpenClinica:MultiSelectListItem']).forEach(function(item) {
+                foreach(multiselect['OpenClinica:MultiSelectListItem'], function(item) {
                     code[item['@CodedOptionValue']] = item.Decode.TranslatedText;
-                });
+                }, errors);
                 codes[multiselect['@ID']] = code;
-            });
-            collection(metadata.ItemDef).forEach(function(item) {
+            }, errors);
+            foreach(metadata.ItemDef, function(item) {
                 items[item['@OID']] = item;
                 if (item.CodeListRef)
                     item.codes = codes[item.CodeListRef['@CodeListOID']]
                 if (item['OpenClinica:MultiSelectListRef'])
                     item.codes = codes[item['OpenClinica:MultiSelectListRef']['@MultiSelectListID']]
-            });
-            collection(metadata.ItemGroupDef).forEach(function(itemGroup) {
+            }, errors);
+            foreach(metadata.ItemGroupDef, function(itemGroup) {
                 itemGroup.items = collection(itemGroup.ItemRef).map(function(ref) {
                     return items[ref['@ItemOID']];
                 });
                 itemGroups[itemGroup['@OID']] = itemGroup;
-            });
-            collection(metadata.FormDef).forEach(function(form) {
+            }, errors);
+            foreach(metadata.FormDef, function(form) {
                 form.itemGroups = collection(form.ItemGroupRef).map(function(ref) {
                     return itemGroups[ref['@ItemGroupOID']];
                 });
                 forms[form['@OID']] = form;
-            });
+            }, errors);
         })
         .error(function() {
             errors.push('Unable to load any Common Events');
         }),
 
         $.get('pages/api/studies/${study.oid}/pages/view%20subject', function(pageJson) {
-            collection(pageJson.components).forEach(function(component) {
+            foreach(pageJson.components, function(component) {
                 columns[component.name] = component.columns;
-            });
+            }, errors);
         })
         .error(function() {
             errors.push('Unable to load Components data');
         })
 
     ).then(function() {
-        collection(metadata.StudyEventDef).forEach(function(studyEvent) {
+        if (!metadata)
+            return;
+
+        foreach(metadata.StudyEventDef, function(studyEvent) {
             studyEvents[studyEvent['@OID']] = studyEvent;
             if (studyEvent['@OpenClinica:EventType'] === 'Common' && studyEvent['@OpenClinica:Status'] !== 'DELETED') {
                 studyEvent.showMe = true;
@@ -327,7 +361,7 @@ $(function() {
 
             studyEvent.forms = {};
 
-            collection(studyEvent.FormRef).forEach(function(ref) {
+            foreach(studyEvent.FormRef, function(ref) {
                 var studyEventOid = studyEvent['@OID'];
                 var formOid = ref['@FormOID'];
                 var form = forms[formOid];
@@ -337,7 +371,7 @@ $(function() {
                 var submissionFields = {};
                 var componentOid = studyEventOid + '.' + formOid;
                 var components = columns[componentOid];
-                collection(components).forEach(function(col) {
+                foreach(components, function(col) {
                     var item = items[col];
                     if (item) {
                         if (item.Question)
@@ -350,7 +384,7 @@ $(function() {
                         errors.push('Unable to reference Common Event Form Item: ' + col);
                     }
                     submissionFields[col] = [];
-                });
+                }, errors);
 
                 studyEvent.forms[formOid] = $.extend({
                     columnTitles: columnTitles,
@@ -359,8 +393,8 @@ $(function() {
                     addNew: false,
                     showMe: false
                 }, form);
-            });
-        });
+            }, errors);
+        }, errors);
 
         var hideClass = 'oc-status-removed';
         $.fn.DataTable.ext.search.push(
@@ -490,7 +524,7 @@ $(function() {
                     form.submissions = [];
                 }
 
-                collection(odm.ClinicalData.SubjectData['OpenClinica:Links']['OpenClinica:Link']).forEach(function(link) {
+                foreach(odm.ClinicalData.SubjectData['OpenClinica:Links']['OpenClinica:Link'], function(link) {
                     if (link['@rel'] !== 'common-add-new')
                         return;
 
@@ -509,9 +543,9 @@ $(function() {
                     else {
                         sectionErrors.push('Unable to reference Common Event Form: ' + formRef);
                     }
-                });
+                }, sectionErrors);
 
-                collection(odm.ClinicalData.SubjectData.StudyEventData).forEach(function(studyEventData) {
+                foreach(odm.ClinicalData.SubjectData.StudyEventData, function(studyEventData) {
                     var studyEventOid = studyEventData['@StudyEventOID'];
                     var studyEvent = studyEvents[studyEventOid];
                     if (!studyEvent)
@@ -537,8 +571,8 @@ $(function() {
                         fields: copyObject(form.submissionFields),
                         links: collectLinks(studyEventData, formData)
                     };
-                    collection(formData.ItemGroupData).forEach(function(igd) {
-                        collection(igd.ItemData).forEach(function(itemData) {
+                    foreach(formData.ItemGroupData, function(igd) {
+                        foreach(igd.ItemData, function(itemData) {
                             var itemOid = itemData['@ItemOID'];
                             var data = submission.fields[itemOid];
                             if (data) {
@@ -551,13 +585,13 @@ $(function() {
                                 }
                                 data.push(value);
                             }
-                        });
-                    });
+                        }, sectionErrors);
+                    }, sectionErrors);
 
                     form.submissions.push(submission);
                     form.showMe = true;
                     studyEvent.showMe = true;
-                });
+                }, sectionErrors);
 
                 var sectionBody = $(sectionBodyTmpl({
                     studyEvent: studyEvent,
@@ -575,8 +609,8 @@ $(function() {
     .always(function() {
         if (errors.length) {
             $('#loading').html('<h1>ERROR</h1><ul>' + errors.map(function(err) {
-                return '<li>' + err + '</li>'
-            }) + '</ul>').show();
+                return '<li>' + err + '</li>';
+            }).join('') + '</ul>').show();
         }
         else {
             $('#loading').hide();
