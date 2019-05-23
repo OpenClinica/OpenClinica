@@ -14,17 +14,20 @@ import org.json.JSONObject;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RequestMethod;
+import org.springframework.web.client.RestTemplate;
 
 import javax.servlet.http.HttpServletRequest;
-import java.io.*;
-import java.net.HttpURLConnection;
-import java.net.URL;
+import java.io.File;
+import java.io.FileOutputStream;
+import java.io.IOException;
 import java.text.SimpleDateFormat;
 import java.util.Date;
 import java.util.HashMap;
@@ -58,10 +61,11 @@ public class InsightReportController {
     protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
 
     @RequestMapping( value = "/insight/report/studies/{studyOID}/participantID/{participantLabel}/create", method = RequestMethod.POST )
-    public ResponseEntity connectParticipant(HttpServletRequest request,
+    public ResponseEntity createReport(HttpServletRequest request,
                                              @PathVariable( "studyOID" ) String studyOid,
                                              @PathVariable( "participantLabel" ) String participantLabel) throws Exception {
 
+        logger.info("REST request to POST Insight Report");
         String insightURL = CoreResources.getField("insight.URL");
         reportName = CoreResources.getField("insight.report.name");
         replicaSubstring = CoreResources.getField("insight.report.replica.substring");
@@ -74,40 +78,51 @@ public class InsightReportController {
         HashMap<String, String> headers = new HashMap<String, String>();
         headers.put("Content-Type", "application/json; charset=UTF-8");
         String jsonCredential = "{\"username\":\"" + username + "\",\"password\":\"" + password + "\"}";
-        String strSession = doPost(insightURL + "/api/session", "POST", headers,
-                jsonCredential);
+        String strSession = doPost(insightURL + "/api/session", headers,
+                jsonCredential, null);
+
+        if (strSession == null) {
+            return new ResponseEntity(HttpStatus.BAD_GATEWAY);
+        }
+
         JSONObject session = new JSONObject(strSession);
 
         // get content from insight
         headers = new HashMap<String, String>();
         headers.put("X-Metabase-Session", session.get("id").toString());
 
-        String parameter = "parameters=[{\"type\":\"category\"," +
+        String origin = "{\"type\":\"category\"," +
                 "\"target\":[\"dimension\",[\"template-tag\",\"original_id\"]]," +
-                "\"value\":[\"" + participantLabels[0] + "\"]}," +
-                "{\"type\":\"category\"," +
+                "\"value\":[\"" + participantLabels[0] + "\"]}";
+        String replica = "{\"type\":\"category\"," +
                 "\"target\":[\"dimension\",[\"template-tag\",\"replicate_id\"]]," +
-                "\"value\":[\"" + participantLabels[1] + "\"]}]";
-        String response = doPost(insightURL + "/api/card/" + reportID + "/query/csv?" + parameter, "POST", headers,
-                null);
+                "\"value\":[\"" + participantLabels[1] + "\"]}";
 
-        Study site = studyDao.findByOcOID(studyOid);
-        if (site != null) {
-            Study parentStd = site.getStudy();
-            if (parentStd != null) {
-                utilService.setSchemaFromStudyOid(studyOid);
-                UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
-                UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
+        HashMap<String, String> params = new HashMap<String, String>();
+        params.put("origin", origin);
+        params.put("replica", replica);
 
-                String fileName = saveToFile(response.toString(), participantLabel);
-                if (fileName != null) {
-                    JobDetail jobDetail= userService.persistJobCreated(parentStd, site, userAccount, JobType.INSIGHT_REPORT, fileName);
-                    userService.persistJobCompleted(jobDetail, fileName);
+        String url = insightURL + "/api/card/" + reportID + "/query/csv?parameters=[{origin},{replica}]";
+        String response = doPost(url, headers, null, params);
+
+        if (response != null) {
+            Study site = studyDao.findByOcOID(studyOid);
+            if (site != null) {
+                Study parentStd = site.getStudy();
+                if (parentStd != null) {
+                    utilService.setSchemaFromStudyOid(studyOid);
+                    UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+                    UserAccount userAccount = userAccountDao.findById(userAccountBean.getId());
+
+                    String fileName = saveToFile(response.toString(), participantLabel);
+                    if (fileName != null) {
+                        JobDetail jobDetail= userService.persistJobCreated(parentStd, site, userAccount, JobType.INSIGHT_REPORT, fileName);
+                        userService.persistJobCompleted(jobDetail, fileName);
+                    }
                 }
             }
         }
 
-        logger.info("REST request to POST Insight Report");
         return new ResponseEntity(HttpStatus.OK);
     }
 
@@ -125,37 +140,33 @@ public class InsightReportController {
         return labels;
     }
 
-    public String doPost(String api, String method, HashMap<String, String> headers,
-                         String body) throws Exception {
-        URL url = new URL(api);
-        HttpURLConnection conn = (HttpURLConnection) url.openConnection();
-        conn.setRequestMethod(method);
+    public String doPost(String api, HashMap<String, String> mapHeaders,
+                         String body, HashMap<String, String> queries) {
+        try {
+            HttpHeaders headers = new HttpHeaders();
+            for (String i : mapHeaders.keySet()) {
+                headers.add(i, mapHeaders.get(i).toString());
+            }
 
-        for (String i : headers.keySet()) {
-            conn.setRequestProperty(i, headers.get(i).toString());
+            HttpEntity<String> request;
+            if (body != null) {
+                request = new HttpEntity<>(body, headers);
+            } else {
+                request = new HttpEntity<String>(headers);
+            }
+            RestTemplate rest = new RestTemplate();
+            ResponseEntity<String> response;
+            if (queries != null) {
+                response = rest.postForEntity(api, request, String.class, queries);
+            } else {
+                response = rest.postForEntity(api, request, String.class);
+            }
+            return response.getBody();
+        } catch (Exception e) {
+            logger.error("Error sending request : ", e);
+            return null;
         }
-        String parameter = body;
 
-        // Send post request
-        conn.setDoOutput(true);
-        if (parameter != null) {
-            DataOutputStream wr = new DataOutputStream(conn.getOutputStream());
-            wr.writeBytes(parameter);
-            wr.flush();
-            wr.close();
-        }
-
-        BufferedReader bf = new BufferedReader(new InputStreamReader(conn.getInputStream()));
-        String inputLine;
-        StringBuffer response = new StringBuffer();
-
-        while ((inputLine = bf.readLine()) != null) {
-            response.append(inputLine);
-        }
-        bf.close();
-        conn.disconnect();
-
-        return response.toString();
     }
 
     public String getFilePath(String label) {
@@ -187,15 +198,14 @@ public class InsightReportController {
             fop.close();
 
         } catch (IOException e) {
-            System.out.println("=== Error create file : " + e.getMessage());
-            e.printStackTrace();
+            logger.error("Error creating file : ", e);
         } finally {
             try {
                 if (fop != null) {
                     fop.close();
                 }
             } catch (IOException e) {
-                e.printStackTrace();
+                logger.error("Error closing output stream : ", e);
             }
             return fileName;
         }
