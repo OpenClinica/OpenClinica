@@ -55,6 +55,9 @@
         if (params.get('addNewSubject')) {
             jQuery('#addSubject').click();
         }
+
+        sessionStorage.setItem("pageContextPath", "<c:out value='${pageContext.request.contextPath}' />");
+        sessionStorage.setItem("studyOid", "<c:out value='${study.oid}' />");
     });
 
     window.onload = function() {

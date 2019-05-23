@@ -933,9 +933,9 @@ form#searchByStudySubjectId {
 }
 
 .popover.pid {
-  width: 430px;
-  max-width: 500px;
-  height: 230px;
+  width: 500px;
+  max-width: 600px;
+  height: 325px;
 }
 
 .popover.pid .popover-title {

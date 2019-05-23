@@ -49,6 +49,35 @@ jQuery(document).ready(function() {
                                                 </div> \
                                             </td> \
                                         </tr> \
+                                        <tr> \
+                                            <td valign='top'> \
+                                            </td> \
+                                            <td valign='top'> \
+                                                <div class='formfieldXL_BG'> \
+                                                    <table style='width: 310px; margin-left: -5px;'> \
+                                                        <tr> \
+                                                            <td style='padding: 7px 0 5px;' > \
+                                                                <span> \
+                                                                    <input type='checkbox' name='checkboxReport' id='cbReport' value='true'/> \
+                                                                </span> \
+                                                            </td> \
+                                                            <td style='padding: 5px 0;'> \
+                                                                <span> \
+                                                                    <span style='font-size: 16px; font-weight: 600;'>Run data reconciliation report</span>\
+                                                                </span> \
+                                                            </td> \
+                                                        </tr> \
+                                                        <tr> \
+                                                            <td></td> \
+                                                            <td> \
+                                                                <span style='font-style: italic; color: #555555;'>Finished report can be accessed in <a href='Jobs'>jobs page</a>.<br></span> \
+                                                                <span style='font-style: italic; color: #555555;'>Please allow some time and refresh the page to see the report.</span> \
+                                                            </td> \
+                                                        </tr> \
+                                                    </table> \
+                                                </div> \
+                                            </td> \
+                                        </tr> \
                                     </table> \
                                 </td> \
                             </tr> \
@@ -121,8 +150,18 @@ function clearPIDVerificationForm() {
 function validatePIDVerificationForm() {
     if (jQuery("#step-0").find('input').val() === currentPLabel) {
         jQuery("#step-0").find('#pidv-err').css({'opacity':0});
-        window.location = window.location.origin + "/OpenClinica/ViewStudySubject?id=" + currentPID;
+        if (document.getElementById("cbReport").checked) {
+            createReport();
+        }
+        window.location = window.location.origin + sessionStorage.getItem("pageContextPath") + "/ViewStudySubject?id=" + currentPID;
     } else {
         jQuery("#step-0").find('#pidv-err').css({'opacity':1});
     }
+}
+
+function createReport() {
+    jQuery.ajax({
+        type: 'POST',
+        url: sessionStorage.getItem("pageContextPath") + '/pages/api/insight/report/studies/' + sessionStorage.getItem("studyOid") + '/participantID/' + currentPLabel + '/create',
+    });
 }
