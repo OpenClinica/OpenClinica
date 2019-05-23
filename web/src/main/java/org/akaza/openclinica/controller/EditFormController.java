@@ -108,7 +108,7 @@ public class EditFormController {
         FormLayout formLayout = formLayoutDao.findByOcOID(subjectContext.getFormLayoutOid());
         Role role = Role.RESEARCHASSISTANT;
         String mode = PFormCache.PARTICIPATE_MODE;
-        editURL = urlService.getActionUrl(formContext, subjectContext, studyOID, formLayout, PARTICIPATE_FLAVOR, null, role, mode, null, false);
+        editURL = urlService.getActionUrl(formContext, subjectContext, studyOID, formLayout, PARTICIPATE_FLAVOR, null, role, mode, null, false,null,null);
         logger.debug("Generating Enketo edit url for form: " + editURL);
 
         return new ResponseEntity<String>(editURL.getFormUrl(), org.springframework.http.HttpStatus.ACCEPTED);
