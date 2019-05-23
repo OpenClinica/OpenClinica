@@ -72,9 +72,6 @@ public class PipeDelimitedDataHelper extends ImportDataHelper {
 
 	private final DataSource ds;
 
-	private String[] columnNms;
-	private HashMap  mappedValues;
-
 	public PipeDelimitedDataHelper(DataSource ds) {
 		super();
 		this.ds = ds;
@@ -141,7 +138,9 @@ public String readFileToString(File file) throws IOException{
 		ArrayList itemDataValues;
 		String fileNm;
 		boolean foundItemData = false;
-		
+
+		String[] columnNms = getDataColumnNames(rawItemData);
+		HashMap mappedValues = getDataMappedValues(rawMappingStr, columnNms);
 		
 
 	     /**
@@ -164,7 +163,7 @@ public String readFileToString(File file) throws IOException{
 			
 			columnNms = getDataColumnNames(rawItemData);	
 			
-			if(this.hasParticipantIDColumn()) {
+			if(this.hasParticipantIDColumn(columnNms)) {
 				;
 			}else {
 				return "errorCode.noParticipantIDinDataFile";
@@ -455,7 +454,7 @@ public String readFileToString(File file) throws IOException{
 	/**
 	 * @param rawItemData
 	 */
-	private static String[]  getDataColumnNames(String rawItemData) {
+	private static String[] getDataColumnNames(String rawItemData) {
 		
 		//System.out.println("getDataColumnNames==========================" + rawItemData);
 		ArrayList columnNmsList= new ArrayList();
@@ -511,7 +510,7 @@ public String readFileToString(File file) throws IOException{
      * return HashMap
      *         
      */
-	private static HashMap  getDataMappedValues(String rawMappingStr,String[] columnNms) {
+	private static HashMap getDataMappedValues(String rawMappingStr, String[] columnNms) {
 		
 		HashMap mappedValues = new HashMap<>();
 		ArrayList itemGroupOIDList = new ArrayList<>();
@@ -613,12 +612,12 @@ public String readFileToString(File file) throws IOException{
 		return matcher.matches();
 	}
 	
-	public  boolean hasParticipantIDColumn() {
-		
+	public boolean hasParticipantIDColumn(String[] columnNms) {
+
 		boolean found = false;
 		String textStr;
 		
-		for(int i=0; i < this.columnNms.length; i++) {
+		for(int i=0; i < columnNms.length; i++) {
 			//System.out.println("columnNms==========================" + columnNms[i]);
 			if(columnNms[i].trim().equals("ParticipantID")) {
 				found = true;
@@ -638,20 +637,6 @@ public String readFileToString(File file) throws IOException{
 		
 		return found;
 	}
-	
-    public  String getSkipMatchCriteria() {			
-    	
-		return (String) this.mappedValues.get("SkipMatchCriteria");
-	}
-    
-    public  String getSkipMatchCriteria(String rawItemData, String rawMappingStr ) {		
-		if(mappedValues == null) {
-			columnNms = getDataColumnNames(rawItemData);								
-			mappedValues = getDataMappedValues(rawMappingStr,columnNms);
-		}
-    	
-		return (String) this.mappedValues.get("SkipMatchCriteria");
-	}
 
     /**
      * 
@@ -659,10 +644,16 @@ public String readFileToString(File file) throws IOException{
      * @param mappingFile
      * @return
      */
-    public  String getSkipMatchCriteria(File rawItemDataFile, File mappingFile ) {		
+    public String getSkipMatchCriteria(File rawItemDataFile, File mappingFile) throws OpenClinicaSystemException, IOException {
+
+		String rawMappingStr = this.readFileToString(mappingFile);
+		String rawItemData = this.readFileToString(rawItemDataFile);
+		String[] columnNms = getDataColumnNames(rawItemData);
+		HashMap mappedValues = getDataMappedValues(rawMappingStr, columnNms);
+
 		if(mappedValues == null) {
-			 String rawMappingStr = null;
-			 String rawItemData = null;
+			 rawMappingStr = null;
+			 rawItemData = null;
 			
 			try {
 				rawMappingStr = this.readFileToString(mappingFile);
@@ -676,7 +667,7 @@ public String readFileToString(File file) throws IOException{
 			mappedValues = getDataMappedValues(rawMappingStr,columnNms);
 		}
     	
-		return (String) this.mappedValues.get("SkipMatchCriteria");
+		return (String) mappedValues.get("SkipMatchCriteria");
 	}
    
     /**
@@ -1159,6 +1150,9 @@ public String getParticipantID(String rawMappingStr,String rawItemData) throws O
      * Hold all ItemGroupOIDs coming from mapping file
      */
 	Object[] mappingItemGroupOIDs;
+
+	String[] columnNms = getDataColumnNames(rawItemData);
+	HashMap mappedValues = getDataMappedValues(rawMappingStr, columnNms);
      
 	try {
 		
