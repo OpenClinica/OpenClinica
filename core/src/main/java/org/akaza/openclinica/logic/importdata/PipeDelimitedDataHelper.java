@@ -642,8 +642,8 @@ public String readFileToString(File file) throws IOException{
      */
     public String getSkipMatchCriteria(File rawItemDataFile, File mappingFile) throws OpenClinicaSystemException, IOException {
 
-		String rawMappingStr = this.readFileToString(mappingFile);
-		String rawItemData = this.readFileToString(rawItemDataFile);
+		String rawMappingStr = readFileToString(mappingFile);
+		String rawItemData = readFileToString(rawItemDataFile);
 		String[] columnNms = getDataColumnNames(rawItemData);
 		HashMap mappedValues = getDataMappedValues(rawMappingStr, columnNms);
     	
