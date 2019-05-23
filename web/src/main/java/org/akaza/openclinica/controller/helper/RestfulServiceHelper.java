@@ -587,8 +587,8 @@ public class RestfulServiceHelper {
 	 			
 	 	  		i++;
 	 		}
-	  
-	 		this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
+	 		 // not save original data
+	 		//this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
 			
 	 		return importCRFInfoSummary;
 	  }
@@ -735,8 +735,8 @@ public class RestfulServiceHelper {
 	 			
 	 	  		i++;
 	 		}
-	  
-	 		this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
+	 		 // not save original data
+	 		//this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
 			
 	 		return importCRFInfoSummary;
 	  }
@@ -893,8 +893,8 @@ public class RestfulServiceHelper {
 	 			
 	 	  		i++;
 	 		}
-	  
-	 		this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
+	        // not save original data
+	 		//this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
 			
 	 		return importCRFInfoSummary;
 	  }

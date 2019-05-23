@@ -88,6 +88,8 @@ import java.io.*;
 import java.net.MalformedURLException;
 import java.net.URL;
 import java.net.URLEncoder;
+import java.nio.file.Files;
+import java.nio.file.Paths;
 import java.text.SimpleDateFormat;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -169,6 +171,10 @@ public abstract class SecureController extends HttpServlet implements SingleThre
     private static String SCHEDULER = "schedulerFactoryBean";
     public static final String ENABLED = "enabled";
     public static final String DISABLED = "disabled";
+    public static final String QUERY_SUFFIX = "form-queries.xml";
+    public static final String BIND_OC_EXTERNAL = "bind::oc:external";
+    public static final String OC_CONTACTDATA = "oc:contactdata";
+    public static final String CONTACTDATA = "contactdata";
 
     protected UserService userService;
 
@@ -1668,5 +1674,21 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         } else {
             return false;
         }
+    }
+
+    public String getXformOutput(String studyOID, int studyFilePath, String crfOID, String formLayoutOID) throws IOException {
+        String xformOutput = "";
+        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, studyFilePath, crfOID, formLayoutOID);
+        File dir = new File(directoryPath);
+        File[] directoryListing = dir.listFiles();
+        if (directoryListing != null) {
+            for (File child : directoryListing) {
+                if (child.getName().endsWith(QUERY_SUFFIX)) {
+                    xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
+                    break;
+                }
+            }
+        }
+        return xformOutput;
     }
 }

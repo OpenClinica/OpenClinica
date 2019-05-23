@@ -334,19 +334,15 @@ public String readFileToString(File file) throws IOException{
 						
 												 //ignore item which has no item value or blank value
 												 if(itemDataValue != null && itemDataValue.trim().length() > 0) {
-													;
-												 }else {
-													 itemDataValue="";
-												 }
-												 
-												 Element itemData = document.createElement("ItemData");	
-												 itemData.setAttribute("ItemOID", mappingItemOID);						
-												 itemData.setAttribute("Value", itemDataValue);
-																	              	
-												 itemGroupData.appendChild(itemData); 
-												 foundItemData = true;
-												 // if found, then skip the rest													 								 
-												 break;
+													 Element itemData = document.createElement("ItemData");	
+													 itemData.setAttribute("ItemOID", mappingItemOID);						
+													 itemData.setAttribute("Value", itemDataValue);
+																		              	
+													 itemGroupData.appendChild(itemData); 
+													 foundItemData = true;
+													 // if found, then skip the rest													 								 
+													 break;
+												 }												 												
 												 
 											} else{
 												//logger.info(k+"----mappingItemName:"+ mappingItemName + "----itemName:"+ itemName);
