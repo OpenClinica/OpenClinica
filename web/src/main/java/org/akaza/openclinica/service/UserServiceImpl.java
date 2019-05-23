@@ -299,6 +299,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (studySubject.getStudySubjectDetail() == null) {
+            studySubjectDao.saveOrUpdate(studySubject);
             StudySubjectDetail studySubjectDetail = new StudySubjectDetail();
             studySubject.setStudySubjectDetail(studySubjectDetail);
         }

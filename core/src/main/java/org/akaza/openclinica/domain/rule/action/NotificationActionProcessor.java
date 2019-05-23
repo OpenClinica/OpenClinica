@@ -58,6 +58,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 	EmailEngine emailEngine;
 	JavaMailSenderImpl mailSender;
 	RuleSetRuleBean ruleSetRule;
+	StudyDAO sdao;
 	StudySubjectDAO ssdao;
 	UserAccountDAO udao;
 	StudyParameterValueDAO spvdao;
@@ -195,16 +196,33 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		if (eventOrdinal != 1)
 			eventName = eventName + "(" + eventOrdinal + ")";
 
-		String studyName = getStudyBean(studyId).getName();
+		StudyBean studyBean = getStudyBean(studyId);
+		StudyBean siteBean=null;
+		if(studyBean.getParentStudyId()!=0) {    // it is a site level study
+			siteBean = studyBean;
+			sdao = new StudyDAO(ds);
+			studyBean = (StudyBean) sdao.findByPK  (siteBean.getParentStudyId());
+		}
+
 		if (message==null) message="";
         if (emailSubject==null) emailSubject="";
 		message = message.replaceAll("\\$\\{event.name}", eventName);
-		message = message.replaceAll("\\$\\{study.name}", studyName);
+
+		message = message.replaceAll("\\$\\{study.name}",studyBean.getName());
+		message = message.replaceAll("\\$\\{study.id}", studyBean.getIdentifier());
+
+		message = message.replaceAll("\\$\\{site.name}", siteBean!=null ?siteBean.getName():"");
+		message = message.replaceAll("\\$\\{site.id}", siteBean !=null?siteBean.getIdentifier():"");
+
 		emailSubject = emailSubject.replaceAll("\\$\\{event.name}", eventName);
-		emailSubject = emailSubject.replaceAll("\\$\\{study.name}", studyName);
+
+		emailSubject = emailSubject.replaceAll("\\$\\{study.name}", studyBean.getName());
+		emailSubject = emailSubject.replaceAll("\\$\\{study.id}", studyBean.getIdentifier());
+
+		emailSubject = emailSubject.replaceAll("\\$\\{site.name}", siteBean!=null?siteBean.getName():"");
+		emailSubject = emailSubject.replaceAll("\\$\\{site.id}", siteBean!=null?siteBean.getIdentifier():"");
 
 		ParticipantDTO pDTO = null;
-		StudyBean studyBean = getStudyBean(studyId);
 		String[] listOfEmails = emailList.split(",");
 		StudyBean parentStudyBean = getParentStudy(ds, studyBean);
         OCUserDTO userDTO=null;
@@ -240,17 +258,20 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
             String pDTOurl=(pDTO.getUrl()!=null)?pDTO.getUrl():"";
             String pDTOloginUrl=(pDTO.getLoginUrl()!=null)?pDTO.getLoginUrl():"";
             String pDTOfName=(pDTO.getfName()!=null)?pDTO.getfName():"";
+			String pDTOId=(pDTO.getParticipantId()!=null)?pDTO.getParticipantId():"";
 
             msg = message.replaceAll("\\$\\{participant.accessCode}", pDTOaccessCode);
 			msg = msg.replaceAll("\\$\\{participant.firstname}", pDTOfName);
 			msg = msg.replaceAll("\\$\\{participant.url}", pDTOurl);
 			msg = msg.replaceAll("\\$\\{participant.loginurl}", pDTOloginUrl);
+			msg = msg.replaceAll("\\$\\{participant.id}", pDTOId);
 
 			eSubject = emailSubject.replaceAll("\\$\\{participant.accessCode}", pDTOaccessCode);
 			eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", pDTOfName);
 			eSubject = eSubject.replaceAll("\\$\\{participant.url}",pDTOurl);
 			eSubject = eSubject.replaceAll("\\$\\{participant.url}",pDTOurl);
 			eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", pDTOloginUrl);
+			eSubject = eSubject.replaceAll("\\$\\{participant.id}", pDTOId);
 
 			msg = msg.replaceAll("\\\\n", "\n");
 			eSubject = eSubject.replaceAll("\\\\n", "\n");
@@ -320,6 +341,8 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		msg = msg.replaceAll("\\$\\{participant.firstname}", "");
 		msg = msg.replaceAll("\\$\\{participant.loginurl}", "");
 		msg = msg.replaceAll("\\$\\{participant.url}", "");
+		msg = msg.replaceAll("\\$\\{participant.id}", "");
+
 		msg = msg.replaceAll("\\\\n", "\n");
 		pDTO.setMessage(msg);
 		String eSubject = null;
@@ -327,6 +350,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		eSubject = eSubject.replaceAll("\\$\\{participant.firstname}", "");
 		eSubject = eSubject.replaceAll("\\$\\{participant.loginurl}", "");
 		eSubject = eSubject.replaceAll("\\$\\{participant.url}", "");
+		eSubject = eSubject.replaceAll("\\$\\{participant.id}", "");
 		eSubject = eSubject.replaceAll("\\\\n", "\n");
 		pDTO.setEmailSubject(eSubject);
 
@@ -337,6 +361,7 @@ public class NotificationActionProcessor implements ActionProcessor, Runnable {
 		ParticipantDTO pDTO = null;
 		if (studySubject != null && studySubject.getUserId()!=null ) {
 			pDTO = new ParticipantDTO();
+			pDTO.setParticipantId(studySubject.getLabel());
 			pDTO.setfName(studySubject.getStudySubjectDetail().getFirstName());
             pDTO.setParticipantEmailAccount(studySubject.getStudySubjectDetail().getEmail());
             pDTO.setPhone(studySubject.getStudySubjectDetail().getPhone());

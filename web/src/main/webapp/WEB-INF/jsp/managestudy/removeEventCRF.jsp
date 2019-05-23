@@ -85,7 +85,7 @@
 	 </tr> 
 	<tr>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.crf.name}" /></td>
-		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.crfVersion.name}" /></td>
+		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.formLayout.name}" /></td>
 		<td class="table_cell"><fmt:formatDate value="${displayEventCRF.eventCRF.dateInterviewed}" pattern="${dteFormat}"/>&nbsp;</td>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.interviewerName}"/>&nbsp;</td>
 		<td class="table_cell"><c:out value="${displayEventCRF.eventCRF.owner.name}" /></td>
