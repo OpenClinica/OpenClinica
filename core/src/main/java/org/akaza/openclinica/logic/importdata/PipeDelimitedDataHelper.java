@@ -646,22 +646,6 @@ public String readFileToString(File file) throws IOException{
 		String rawItemData = this.readFileToString(rawItemDataFile);
 		String[] columnNms = getDataColumnNames(rawItemData);
 		HashMap mappedValues = getDataMappedValues(rawMappingStr, columnNms);
-
-		if(mappedValues == null) {
-			 rawMappingStr = null;
-			 rawItemData = null;
-			
-			try {
-				rawMappingStr = this.readFileToString(mappingFile);
-				rawItemData = this.readFileToString(rawItemDataFile);
-			} catch (IOException e) {
-				// TODO Auto-generated catch block
-				e.printStackTrace();
-			}
-			
-			columnNms = getDataColumnNames(rawItemData);								
-			mappedValues = getDataMappedValues(rawMappingStr,columnNms);
-		}
     	
 		return (String) mappedValues.get("SkipMatchCriteria");
 	}
