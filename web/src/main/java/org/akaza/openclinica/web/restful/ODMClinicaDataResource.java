@@ -1,6 +1,8 @@
 package org.akaza.openclinica.web.restful;
 
 import com.sun.jersey.api.view.Viewable;
+import io.swagger.annotations.ApiModelProperty;
+import io.swagger.annotations.ApiParam;
 import net.sf.json.JSON;
 import net.sf.json.JSONObject;
 import net.sf.json.xml.XMLSerializer;
@@ -111,11 +113,12 @@ public class ODMClinicaDataResource {
                                      @Context HttpServletRequest request,
                                      @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
                                      @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
-                                     @QueryParam("showArchived") String showArchived ,
-                                     @DefaultValue("n") @QueryParam("crossFormLogic") String crossFormLogic ) {
+                                     @QueryParam("showArchived") String showArchived,
+                                     @DefaultValue("n") @QueryParam("crossFormLogic") String crossFormLogic,
+                                     @DefaultValue("n") @QueryParam("links")String links) {
         LOGGER.debug("Requesting clinical data resource");
 
-        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData);
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData, links);
 
         UserAccountBean userAccountBean = ((UserAccountBean) request.getSession().getAttribute("userBean"));
         StudyDAO sdao = new StudyDAO(getDataSource());
@@ -144,7 +147,7 @@ public class ODMClinicaDataResource {
         XMLSerializer xmlSerializer = new XMLSerializer();
              report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID,clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
-        report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray,odmFilter.includeMetadata(), odmFilter.includeClinical(), odmFilter.isCrossForm());
+        report.createOdmXml(true, getDataSource(), userAccountBean, permissionTagsStringArray, odmFilter);
         xmlSerializer.setTypeHintsEnabled(true);
         JSON json = xmlSerializer.read(report.getXmlOutput().toString().trim());
 
@@ -247,10 +250,11 @@ public class ODMClinicaDataResource {
                                  @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
                                  @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
                                  @QueryParam("showArchived") String showArchived ,
-                                 @DefaultValue("n")@QueryParam("crossFormLogic") String crossFormLogic ) {
+                                 @DefaultValue("n")@QueryParam("crossFormLogic") String crossFormLogic,
+                                 @DefaultValue("n") @QueryParam("links")String links) {
         LOGGER.debug("Requesting clinical data resource");
 
-        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData);
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData, links);
 
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -286,7 +290,7 @@ public class ODMClinicaDataResource {
 
         report = getMetadataCollectorResource().collectODMMetadataForClinicalData(studyOID, formVersionOID, clinicalDataBeans, odmFilter.showArchived(), permissionTagsString, odmFilter.includeMetadata());
 
-        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray, odmFilter.includeMetadata(), odmFilter.includeClinical(), odmFilter.isCrossForm());
+        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray, odmFilter);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();
@@ -297,12 +301,13 @@ public class ODMClinicaDataResource {
                                    @DefaultValue("n") @QueryParam("includeDNs") String includeDns, @DefaultValue("n") @QueryParam("includeAudits") String includeAudits,
                                    @Context HttpServletRequest request,
                                    @DefaultValue("y") @QueryParam("includeMetadata") String includeMetadata,
-                                    @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
-                                   @QueryParam("showArchived") String showArchived ,
-                                   @DefaultValue("n")@QueryParam("crossFormLogic") String crossFormLogic ) {
+                                   @DefaultValue("y") @QueryParam("clinicaldata") String clinicalData,
+                                   @QueryParam("showArchived") String showArchived,
+                                   @DefaultValue("n")@QueryParam("crossFormLogic") String crossFormLogic,
+                                   @DefaultValue("n") @QueryParam("links")String links) {
 
         LOGGER.debug("Requesting clinical data resource");
-        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData);
+        ODMFilterDTO odmFilter = new ODMFilterDTO(includeDns, includeAudits, crossFormLogic, showArchived, includeMetadata, clinicalData, links);
 
         int userId = 0;
         UserAccountBean userBean = (UserAccountBean) request.getSession().getAttribute("userBean");
@@ -341,7 +346,7 @@ public class ODMClinicaDataResource {
             LOGGER.info("ClinicalData Map is returning null in ODMClinicalDataResource");
         }
 
-        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray,odmFilter.includeMetadata(), odmFilter.includeClinical(), odmFilter.isCrossForm());
+        report.createOdmXml(true, getDataSource(), userBean, permissionTagsStringArray, odmFilter);
         LOGGER.debug(report.getXmlOutput().toString().trim());
 
         return report.getXmlOutput().toString().trim();

@@ -29,6 +29,7 @@ import org.akaza.openclinica.job.JobExecutionExceptionListener;
 import org.akaza.openclinica.job.JobTriggerListener;
 import org.akaza.openclinica.job.OpenClinicaSchedulerFactoryBean;
 import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.akaza.openclinica.service.extract.ExtractUtils;
 import org.akaza.openclinica.service.extract.XsltTriggerService;
 import org.akaza.openclinica.web.SQLInitServlet;
@@ -188,12 +189,14 @@ public class ExtractController {
         String permissionTagsString =permissionService.getPermissionTagsString((StudyBean)request.getSession().getAttribute("study"),request);
         String[] permissionTagsStringArray =permissionService.getPermissionTagsStringArray((StudyBean)request.getSession().getAttribute("study"),request);
         List<String> permissionTagsList =permissionService.getPermissionTagsList((StudyBean)request.getSession().getAttribute("study"),request);
+        ODMFilterDTO odmFilter = new ODMFilterDTO();
 
 
         try {
             jobScheduler.getContext().put("permissionTagsString",permissionTagsString);
             jobScheduler.getContext().put("permissionTagsStringArray",permissionTagsStringArray);
             jobScheduler.getContext().put("permissionTagsList",permissionTagsList);
+            jobScheduler.getContext().put("odmFilter", odmFilter);
         } catch (SchedulerException e) {
             e.printStackTrace();
         }
