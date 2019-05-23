@@ -116,7 +116,7 @@ public class MainMenuServlet extends SecureController {
             // "Forge" a password change date for LDAP user
             lastPwdChangeDate = new Date();
         }
-System.out.println("is ub a ldapuser??"+ub.isLdapUser());
+    	logger.debug("is ub a ldapuser??"+ub.isLdapUser());
 
 
         //@pgawade 18-Sep-2012: fix for issue #14506 (https://issuetracker.openclinica.com/view.php?id=14506#c58197)
