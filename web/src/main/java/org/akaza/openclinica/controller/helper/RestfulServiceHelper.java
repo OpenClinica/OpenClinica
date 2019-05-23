@@ -781,6 +781,7 @@ public class RestfulServiceHelper {
 	 				Iterator dataFilesIt = dataFileList.iterator();
 	 				
 	 				File rowFile = null;
+					String skipMatchCriteria = null;
 	 				while(dataFilesIt.hasNext()) {
 	 					try {
 	 						rowFile = (File) dataFilesIt.next();
@@ -793,10 +794,11 @@ public class RestfulServiceHelper {
 		 	 	 	  		post.setHeader("OCBasePath", basePath);
 		 	 	 	  	    //PIPETEXT
 		 	 	 	  		post.setHeader("PIPETEXT", "PIPETEXT");
-
 		 	 	 	  		
 		 	 	 	  		//SkipMatchCriteria
-		 	 	 	  		String skipMatchCriteria = this.getImportDataHelper().getSkipMatchCriteria(rowFile, mappingFile); 
+							if (skipMatchCriteria == null){
+								skipMatchCriteria = this.getImportDataHelper().getSkipMatchCriteria(rowFile, mappingFile);
+							}
 		 	 	 	  	    post.setHeader("SkipMatchCriteria", skipMatchCriteria);
 		 	 	 	  	
 		 	 	 	 		post.setHeader("Accept", 
