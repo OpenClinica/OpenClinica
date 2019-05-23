@@ -2,6 +2,7 @@ package org.akaza.openclinica.bean.login;
 
 public class ParticipantDTO {
 
+	    private String participantId;
 		private String fName;
 		private String accessCode;
 		private String studyName;
@@ -121,5 +122,13 @@ public class ParticipantDTO {
 
 	public void setIdentifier(String identifier) {
 		this.identifier = identifier;
+	}
+
+	public String getParticipantId() {
+		return participantId;
+	}
+
+	public void setParticipantId(String participantId) {
+		this.participantId = participantId;
 	}
 }
