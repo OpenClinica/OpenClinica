@@ -148,7 +148,7 @@ jQuery.ajax({
   url: url,
   success: function(data) {
     datatable.rows.add(data.map(function (logEntry) {
-      var actionView = '<a target="_blank" href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile?open=true"><span class="icon icon-search"></span></a> ';
+      var actionView = '<a href="Jobs?uuid=' + logEntry.uuid + '"><span class="icon icon-search"></span></a> ';
       var actionDownload = '<a href="${pageContext.request.contextPath}/pages/auth/api/jobs/' + logEntry.uuid + '/downloadFile"><span class="icon icon-download"></span></a> ';
       var actionDelete = '<span class="icon icon-trash red" data-uuid="' + logEntry.uuid + '"></span>';
       if (logEntry.status === 'IN_PROGRESS') {
@@ -172,20 +172,22 @@ jQuery.ajax({
   }
 });
 
-$('#tbl-jobs').on('click', '.icon-trash', function() {
-  if(confirm('<fmt:message key="jobs_del_confirm" bundle="${resword}"/>')) {
-    var uuid = $(this).data('uuid');
-    var url = '${pageContext.request.contextPath}/pages/auth/api/jobs/' + uuid;
-    jQuery.ajax({
-      type: 'delete',
-      url: url,
-      success: function() {
-        window.location.reload();
-      },
-      error: function() {
-        alert('<fmt:message key="jobs_del_failed" bundle="${resword}"/>');
-      }
-    });
-  }
-});
+$('#tbl-jobs')
+  .on('click', '.icon-trash', function() {
+    if(confirm('<fmt:message key="jobs_del_confirm" bundle="${resword}"/>')) {
+      var uuid = $(this).data('uuid');
+      var url = '${pageContext.request.contextPath}/pages/auth/api/jobs/' + uuid;
+      jQuery.ajax({
+        type: 'delete',
+        url: url,
+        success: function() {
+          window.location.reload();
+        },
+        error: function() {
+          alert('<fmt:message key="jobs_del_failed" bundle="${resword}"/>');
+        }
+      });
+    }
+  });
+
 </script>
