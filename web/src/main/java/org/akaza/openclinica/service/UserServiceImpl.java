@@ -128,7 +128,7 @@ public class UserServiceImpl implements UserService {
     public static final String ACCESS_LINK = "accessLink";
     public static final String ACCESS_LINK_PART_URL = "?accessCode=";
     public static final String ENABLED = "enabled";
-    public static final String SEPERATOR = "|";
+    public static final String SEPERATOR = ",";
     public static final String PARTICIPANT_ACCESS_CODE = "_Participant Access Code";
 
 

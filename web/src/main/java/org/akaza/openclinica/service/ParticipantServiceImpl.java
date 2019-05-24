@@ -1,76 +1,75 @@
-package org.akaza.openclinica.service.participant;
+package org.akaza.openclinica.service;
 
-import java.io.IOException;
-import java.io.StringReader;
-import java.io.StringWriter;
-import java.util.ArrayList;
-import java.util.Date;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-
-import javax.servlet.http.HttpServletRequest;
-import javax.sql.DataSource;
-
-import com.fasterxml.jackson.databind.ObjectMapper;
-import com.fasterxml.jackson.datatype.jsr310.JavaTimeModule;
 import org.akaza.openclinica.bean.core.Role;
 import org.akaza.openclinica.bean.core.Status;
+import org.akaza.openclinica.bean.login.StudyParticipantDTO;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
 import org.akaza.openclinica.bean.managestudy.StudyType;
 import org.akaza.openclinica.bean.managestudy.SubjectTransferBean;
-import org.akaza.openclinica.bean.oid.OidGenerator;
-import org.akaza.openclinica.bean.service.StudyParameterValueBean;
 import org.akaza.openclinica.bean.submit.SubjectBean;
-import org.akaza.openclinica.core.SessionManager;
 import org.akaza.openclinica.dao.core.CoreResources;
-import org.akaza.openclinica.dao.hibernate.StudyDao;
 import org.akaza.openclinica.dao.hibernate.StudySubjectDao;
-import org.akaza.openclinica.dao.hibernate.SubjectDao;
 import org.akaza.openclinica.dao.hibernate.UserAccountDao;
 import org.akaza.openclinica.dao.login.UserAccountDAO;
 import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.SubjectDAO;
-import org.akaza.openclinica.domain.datamap.*;
+import org.akaza.openclinica.domain.datamap.JobDetail;
+import org.akaza.openclinica.domain.datamap.StudySubject;
+import org.akaza.openclinica.domain.datamap.StudySubjectDetail;
+import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.akaza.openclinica.exception.OpenClinicaException;
 import org.akaza.openclinica.exception.OpenClinicaSystemException;
-import org.akaza.openclinica.service.dto.AuditLogEventDTO;
+import org.akaza.openclinica.i18n.core.LocaleResolver;
+import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
+import org.akaza.openclinica.validator.ParticipantValidator;
+import org.apache.commons.validator.routines.EmailValidator;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Qualifier;
-import org.springframework.core.ParameterizedTypeReference;
-import org.springframework.http.*;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Isolation;
 import org.springframework.transaction.annotation.Propagation;
 import org.springframework.transaction.annotation.Transactional;
+import org.springframework.validation.DataBinder;
+import org.springframework.validation.Errors;
+import org.springframework.validation.ObjectError;
+import org.springframework.web.multipart.MultipartFile;
 
-import freemarker.template.Configuration;
-import freemarker.template.Template;
-import freemarker.template.TemplateException;
-import org.springframework.web.client.HttpClientErrorException;
-import org.springframework.web.client.RestTemplate;
+import javax.servlet.http.HttpServletRequest;
+import javax.sql.DataSource;
+import java.io.File;
+import java.io.FileNotFoundException;
+import java.io.PrintWriter;
+import java.io.UnsupportedEncodingException;
+import java.text.SimpleDateFormat;
+import java.util.*;
+
+import static org.akaza.openclinica.service.UserService.BULK_JOBS;
+import static org.akaza.openclinica.service.UserServiceImpl.SEPERATOR;
 
 @Service("ParticipantService")
 @Transactional(propagation= Propagation.REQUIRED,isolation= Isolation.DEFAULT)
 public class ParticipantServiceImpl implements ParticipantService {
 	protected final Logger logger = LoggerFactory.getLogger(getClass().getName());
-	
-	private SubjectDAO subjectDao;
+    public static final String PARTICIPANT_IMPORT = "_Participant_Import";
+
+    private SubjectDAO subjectDao;
 	private StudyParameterValueDAO studyParameterValueDAO;		
 	private StudySubjectDAO studySubjectDao;
 	private StudyDAO studyDao;
-	
-	@Autowired
+    private StudySubjectDAO ssDao;
+
+
+    @Autowired
 	private UserAccountDAO userAccountDao;
 
     @Autowired
@@ -78,6 +77,12 @@ public class ParticipantServiceImpl implements ParticipantService {
 
     @Autowired
     private StudySubjectDao studySubjectHibDao;
+
+    @Autowired
+    private CSVService csvService;
+
+    @Autowired
+    private UserService userService;
 
     @Autowired
 	@Qualifier("dataSource")
@@ -96,54 +101,46 @@ public class ParticipantServiceImpl implements ParticipantService {
     * @return
     * @throws OpenClinicaException
     */
-    public String createParticipant(SubjectTransferBean subjectTransfer,StudyBean currentStudy,String accessToken,UserAccountBean userAccountBean) throws Exception {
+    public String createParticipant(SubjectTransferBean subjectTransfer,StudyBean currentStudy,String accessToken,
+                                    String customerUuid, UserAccountBean userAccountBean, Locale locale) throws Exception {
    	   // create subject
         StudyBean siteStudy = subjectTransfer.getSiteStudy();
-        String siteOid = subjectTransfer.getSiteIdentifier();
         StudySubject studySubject=null;
-      StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudy(subjectTransfer.getPersonId(), currentStudy);
+        StudySubjectBean studySubjectBean  =getStudySubjectDao().findByLabelAndStudy(subjectTransfer.getPersonId(), currentStudy);
 
-if(studySubjectBean==null || !studySubjectBean.isActive()) {
-// Create New Study Subject
-    SubjectBean subjectBean = new SubjectBean();
-    subjectBean.setStatus(Status.AVAILABLE);
-    subjectBean.setOwner(subjectTransfer.getOwner());
+        if(studySubjectBean==null || !studySubjectBean.isActive()) {
+            // Create New Study Subject
+            SubjectBean subjectBean = new SubjectBean();
+            subjectBean.setStatus(Status.AVAILABLE);
+            subjectBean.setOwner(subjectTransfer.getOwner());
 
-    subjectBean = this.getSubjectDao().create(subjectBean);
-    if (!subjectBean.isActive()) {
-        throw new OpenClinicaException("Could not create subject", "3");
-    }
+            subjectBean = this.getSubjectDao().create(subjectBean);
+            if (!subjectBean.isActive()) {
+                throw new OpenClinicaException("Could not create subject", "3");
+            }
 
+            studySubjectBean = new StudySubjectBean();
+            studySubjectBean.setSubjectId(subjectBean.getId());
+            if (siteStudy != null) {
+                studySubjectBean.setStudyId(siteStudy.getId());
+            } else {
+                studySubjectBean.setStudyId(subjectTransfer.getStudy().getId());
+            }
 
+            studySubjectBean.setLabel(subjectTransfer.getStudySubjectId());
+            studySubjectBean.setStatus(Status.AVAILABLE);
+            studySubjectBean.setOwner(subjectTransfer.getOwner());
+            Date now = new Date();
+            studySubjectBean.setCreatedDate(now);
+            studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
 
-
-     studySubjectBean = new StudySubjectBean();
-    studySubjectBean.setSubjectId(subjectBean.getId());
-    if (siteStudy != null) {
-        studySubjectBean.setStudyId(siteStudy.getId());
-    } else {
-        studySubjectBean.setStudyId(subjectTransfer.getStudy().getId());
-    }
-
-    studySubjectBean.setLabel(subjectTransfer.getStudySubjectId());
-    studySubjectBean.setStatus(Status.AVAILABLE);
-    studySubjectBean.setOwner(subjectTransfer.getOwner());
-    Date now = new Date();
-    studySubjectBean.setCreatedDate(now);
-    studySubjectBean = this.getStudySubjectDao().createWithoutGroup(studySubjectBean);
-
-}
+        }
         studySubject=saveOrUpdateStudySubjectDetails( studySubjectBean,  subjectTransfer,accessToken,currentStudy.getOid(),userAccountBean);
 
         if (!studySubjectBean.isActive() || studySubject==null) {
             throw new OpenClinicaException("Could not create study subject", "4");
         }
 
-
-
-
-
-       
        //update subject account
        if(siteStudy != null) {
     	   //update at site level
@@ -153,9 +150,21 @@ if(studySubjectBean==null || !studySubjectBean.isActive()) {
        }else {
     	   updateStudySubjectSize(currentStudy);
        }
-      
-       
-       return studySubject.getLabel();
+
+
+        if(subjectTransfer.isRegister()) {
+            OCParticipantDTO oCParticipantDTO = new OCParticipantDTO();
+            oCParticipantDTO.setFirstName(subjectTransfer.getFirstName());
+            oCParticipantDTO.setLastName(subjectTransfer.getLastName());
+            oCParticipantDTO.setEmail(subjectTransfer.getEmailAddress());
+            oCParticipantDTO.setPhoneNumber(subjectTransfer.getPhoneNumber());
+            oCParticipantDTO.setIdentifier(subjectTransfer.getIdentifier());
+            ResourceBundle textsBundle = ResourceBundleProvider.getTextsBundle(locale);
+            userService.connectParticipant(currentStudy.getOid(), subjectTransfer.getPersonId(), oCParticipantDTO, accessToken, userAccountBean, customerUuid, textsBundle);
+        }
+
+
+        return studySubject.getLabel();
    }
 
 /**
@@ -169,38 +178,12 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
 	   currentStudy.setType(StudyType.GENETIC);
 	   studydao.update(currentStudy);
 }
-    
-    private StudySubjectBean createStudySubject(SubjectBean subject, StudyBean studyBean, Date enrollmentDate, String secondaryId) {
-        StudySubjectBean studySubject = new StudySubjectBean();
-        studySubject.setSecondaryLabel(secondaryId);
-        studySubject.setOwner(getUserAccount());
-        studySubject.setEnrollmentDate(enrollmentDate);
-        studySubject.setSubjectId(subject.getId());
-        studySubject.setStudyId(studyBean.getId());
-        studySubject.setStatus(Status.AVAILABLE);
-        
-        int handleStudyId = studyBean.getParentStudyId() > 0 ? studyBean.getParentStudyId() : studyBean.getId();
-        StudyParameterValueBean subjectIdGenerationParameter = getStudyParameterValueDAO().findByHandleAndStudy(handleStudyId, "subjectIdGeneration");
-        String idSetting = subjectIdGenerationParameter.getValue();
-        if (idSetting.equals("auto editable") || idSetting.equals("auto non-editable")) {
-        	// Warning: Here we have a race condition. 
-        	// At least, a uniqueness constraint should be set on the database! Better provide an atomic method which stores a new label in the database and returns it.  
-            int nextLabel = getStudySubjectDao().findTheGreatestLabel() + 1;
-            studySubject.setLabel(Integer.toString(nextLabel));
-        } else {
-        	studySubject.setLabel(subject.getLabel());
-        	subject.setLabel(null);
-        }
-        
-        return studySubject;
-
-    }
-
     /**
      * Validate the listStudySubjectsInStudy request.
-     * 
-     * @param studyRef
-     * @return StudyBean
+     * @param studyOid
+     * @param siteOid
+     * @param request
+     * @return
      */
     public StudyBean validateRequestAndReturnStudy(String studyOid, String siteOid,HttpServletRequest request) {
 
@@ -292,21 +275,6 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
     	return userBean;
        
     }
-    public void validateSubjectTransfer(SubjectTransferBean subjectTransferBean) {
-        // TODO: Validate here
-    }
-
-    /**
-     * Getting the first user account from the database. This would be replaced by an authenticated user who is doing the SOAP requests .
-     * 
-     * @return UserAccountBean
-     */
-    private UserAccountBean getUserAccount() {
-
-        UserAccountBean user = new UserAccountBean();
-        user.setId(1);
-        return user;
-    }
 
     /**
      * @return the subjectDao
@@ -352,7 +320,7 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
     }
 
     /**
-     * @param datasource
+     * @param dataSource
      *            the datasource to set
      */
     public void setDatasource(DataSource dataSource) {
@@ -377,8 +345,188 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
     }
 
 
+    /**
+     * Create the Subject object if it is not already in the system.
+     */
+    public void processBulkParticipants(StudyBean study, String studyOid, StudyBean siteStudy, String siteOid,
+                                         UserAccountBean user, String accessToken, String customerUuid, MultipartFile file,
+                                        JobDetail jobDetail, Locale locale, String uri, Map<String, Object> map) throws Exception {
+
+        List<OCParticipateImportDTO> ocParticipateImportDTOs = new ArrayList<>();
+        List<SubjectTransferBean> subjects = csvService.readCSVFile(file);
+        String fileName = study.getIdentifier()
+                + UserServiceImpl.DASH
+                + study.getEnvType()
+                + PARTICIPANT_IMPORT + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
+        ResourceBundleProvider.updateLocale(locale);
+        final boolean siteImport = uri.indexOf("/sites/") > 0 ? true: false;
+
+        try {
+            int index = 1;
+            for (SubjectTransferBean subject: subjects) {
+                ArrayList<String> errorMsgs = new ArrayList<String>();
+                subject.setPersonId((String) subject.getStudySubjectId());
+                subject.setStudyOid(studyOid);
+                subject.setStudy(study);
+                subject.setOwner(user);
+                subject.setSiteStudy(siteStudy);
+                subject.setRegister((boolean) map.get("register"));
+                if (siteImport)
+                    subject.setSiteIdentifier(siteOid);
 
 
+                StudyParticipantDTO studyParticipantDTO = new StudyParticipantDTO();
+                studyParticipantDTO.setSubjectKey(subject.getStudySubjectId());
+
+                ParticipantValidator participantValidator = new ParticipantValidator(dataSource);
+                participantValidator.setBulkMode(true);
+                Errors errors = null;
+
+                DataBinder dataBinder = new DataBinder(subject);
+                errors = dataBinder.getBindingResult();
+                participantValidator.validateBulk(subject, errors);
+
+                if (errors.hasErrors()) {
+                    ArrayList validerrors = new ArrayList(errors.getAllErrors());
+                    Iterator errorIt = validerrors.iterator();
+                    while (errorIt.hasNext()) {
+                        ObjectError oe = (ObjectError) errorIt.next();
+
+                        if (oe.getCode() != null) {
+                            errorMsgs.add(oe.getCode());
+                        } else {
+                            errorMsgs.add(oe.getDefaultMessage());
+                        }
+                    }
+                }
+
+                if (errorMsgs != null && errorMsgs.size() != 0) {
+                    StudySubjectBean byLabelAndStudy = getStudySubjectDao().findByLabelAndStudy(subject.getPersonId(), study);
+
+                    OCParticipateImportDTO p = new OCParticipateImportDTO();
+                    p.setRow(index);
+                    p.setParticipantId(subject.getStudySubjectId());
+
+                    if (byLabelAndStudy != null) {
+                        p.setParticipantOid(byLabelAndStudy.getOid());
+                        p.setParticipateStatus(byLabelAndStudy.getStatus().getName());
+                    }
+                    p.setStatus("Failed");
+
+                    p.setMessage(errorMsgs.get(0));
+                    ocParticipateImportDTOs.add(p);
+                } else {
+                    String label = null;
+                    try {
+                        label = createParticipant(subject, study, accessToken, customerUuid, user, locale);
+                    } catch (Exception e) {
+                        logger.error("Error in createParticipant:" + e);
+                    }
+                    StudySubjectBean subjectBean = this.getStudySubjectDAO().findByLabel(label);
+                    studyParticipantDTO.setSubjectOid(subjectBean.getOid());
+
+                    OCParticipateImportDTO p = new OCParticipateImportDTO();
+                    p.setRow(index);
+                    p.setParticipantId(subjectBean.getLabel());
+                    p.setParticipantOid(subjectBean.getOid());
+                    p.setParticipateStatus(subjectBean.getStatus().getName());
+                    p.setStatus("Success");
+                    p.setMessage("");
+                    ocParticipateImportDTOs.add(p);
+
+                }
+                ++index;
+            }
+            writeToFile(ocParticipateImportDTOs, studyOid, fileName);
+        } catch (Exception e) {
+            userService.persistJobFailed(jobDetail, fileName);
+            logger.error("Bulk Participant Import Job Failed ");
+        }
+        userService.persistJobCompleted(jobDetail, fileName);
+    }
+
+    public StudySubjectDAO getStudySubjectDAO() {
+        ssDao = ssDao != null ? ssDao : new StudySubjectDAO(dataSource);
+        return ssDao;
+    }
+
+    private void writeToFile(List<OCParticipateImportDTO> participateImportDTOS, String studyOid, String fileName) {
+        String filePath = getFilePath(JobType.BULK_ADD_PARTICIPANTS) + File.separator + fileName;
+
+        File file = new File(filePath);
+
+        PrintWriter writer = null;
+        try {
+            writer = openFile(file);
+        } catch (FileNotFoundException | UnsupportedEncodingException e) {
+            e.printStackTrace();
+        } finally {
+            writer.print(writeToTextFile(participateImportDTOS));
+            closeFile(writer);
+        }
+    }
+
+
+
+    public String getFilePath(JobType jobType) {
+        String dirPath= CoreResources.getField("filePath") + BULK_JOBS + File.separator+ jobType.toString().toLowerCase();
+        File directory = new File(dirPath);
+        if (!directory.exists()) {
+            directory.mkdirs();
+        }
+        return dirPath;
+    }
+
+    private PrintWriter openFile(File file) throws FileNotFoundException, UnsupportedEncodingException {
+        PrintWriter writer = new PrintWriter(file.getPath(), "UTF-8");
+        return writer;
+    }
+
+
+    private void closeFile(PrintWriter writer) {
+        writer.close();
+    }
+
+
+    private String writeToTextFile(List<OCParticipateImportDTO> participateImportDTOs) {
+
+        StringBuffer stringBuffer = new StringBuffer();
+        stringBuffer.append("Row");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("ParticipantID");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Participant OID");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Participate Status");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Status");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append("Message");
+        stringBuffer.append(SEPERATOR);
+        stringBuffer.append('\n');
+
+        participateImportDTOs.forEach(p->{
+            stringBuffer.append(p.getRow());
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getParticipantId() != null ? p.getParticipantId() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getParticipantOid() != null ? p.getParticipantOid() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getParticipateStatus() != null ? p.getParticipateStatus() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getStatus() != null ? p.getStatus() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append(p.getMessage() != null ? p.getMessage() : "");
+            stringBuffer.append(SEPERATOR);
+            stringBuffer.append('\n');
+        });
+
+
+        StringBuilder sb = new StringBuilder();
+        sb.append(stringBuffer.toString() + "\n");
+
+        return sb.toString();
+    }
 
     private StudySubject saveOrUpdateStudySubjectDetails(StudySubjectBean studySubjectBean, SubjectTransferBean subjectTransfer, String accessToken, String studyOid , UserAccountBean userAccountBean) {
         StudySubject studySubject = studySubjectHibDao.findById(studySubjectBean.getId());
