@@ -39,6 +39,7 @@ import org.akaza.openclinica.dao.submit.ItemDAO;
 import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -143,10 +144,11 @@ public class GenerateExtractFileService {
 
         String permissionTagsString =permissionService.getPermissionTagsString(currentStudy,request);
         String[] permissionTagsStringArray =permissionService.getPermissionTagsStringArray(currentStudy,request);
+        ODMFilterDTO odmFilter = new ODMFilterDTO();
 
         return new OdmFileCreation().createODMFile(odmVersion, sysTimeBegin, generalFileDir, datasetBean,
                 currentStudy, generalFileDirCopy, eb,
-                currentStudyId, parentStudyId, studySubjectNumber, zipped, saveToDB, deleteOld, odmType, userBean,permissionTagsString,permissionTagsStringArray,null);
+                currentStudyId, parentStudyId, studySubjectNumber, zipped, saveToDB, deleteOld, odmType, userBean, odmFilter, permissionTagsString, permissionTagsStringArray,null);
     }
 
     public List<File> getOldFiles(){

@@ -37,6 +37,7 @@ import org.akaza.openclinica.logic.odmExport.ClinicalDataUnit;
 import org.akaza.openclinica.logic.odmExport.MetaDataCollector;
 import org.akaza.openclinica.logic.odmExport.OdmStudyBase;
 import org.akaza.openclinica.service.PermissionService;
+import org.akaza.openclinica.service.dto.ODMFilterDTO;
 import org.slf4j.Logger;
 import org.slf4j.LoggerFactory;
 
@@ -57,7 +58,7 @@ public class OdmFileCreation {
 
     public HashMap<String, Integer> createODMFile(String odmVersion, long sysTimeBegin, String generalFileDir, DatasetBean datasetBean, StudyBean currentStudy,
                                                   String generalFileDirCopy, ExtractBean eb, Integer currentStudyId, Integer parentStudyId, String studySubjectNumber, boolean zipped,
-                                                  boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean ,String permissionTagsString,String[] permissionTagsStringArray, Set<Integer> edcSet) {
+                                                  boolean saveToDB, boolean deleteOld, String odmType, UserAccountBean userBean, ODMFilterDTO odmFilter, String permissionTagsString, String[] permissionTagsStringArray, Set<Integer> edcSet) {
 
 
 
@@ -201,15 +202,15 @@ public class OdmFileCreation {
                 // report.setOdmStudy(mdc.getOdmStudy());
                 report.setOdmBean(mdc.getODMBean());
                 if (firstIteration && fromIndex >= newRows.size()) {
-                    report.createChunkedOdmXml(Boolean.TRUE, true, true, this.dataSource, userBean,permissionTagsStringArray);
+                    report.createChunkedOdmXml(Boolean.TRUE, true, true, this.dataSource, userBean, odmFilter, permissionTagsStringArray);
                     firstIteration = false;
                 } else if (firstIteration) {
-                    report.createChunkedOdmXml(Boolean.TRUE, true, false, this.dataSource, userBean,permissionTagsStringArray);
+                    report.createChunkedOdmXml(Boolean.TRUE, true, false, this.dataSource, userBean, odmFilter, permissionTagsStringArray);
                     firstIteration = false;
                 } else if (fromIndex >= newRows.size()) {
-                    report.createChunkedOdmXml(Boolean.TRUE, false, true, this.dataSource, userBean,permissionTagsStringArray);
+                    report.createChunkedOdmXml(Boolean.TRUE, false, true, this.dataSource, userBean, odmFilter, permissionTagsStringArray);
                 } else {
-                    report.createChunkedOdmXml(Boolean.TRUE, false, false, this.dataSource, userBean,permissionTagsStringArray);
+                    report.createChunkedOdmXml(Boolean.TRUE, false, false, this.dataSource, userBean, odmFilter, permissionTagsStringArray);
                 }
                 fId = createFileK(ODMXMLFileName, generalFileDir, report.getXmlOutput().toString(), datasetBean, sysTimeEnd, ExportFormatBean.XMLFILE, false,
                         zipped, deleteOld, userBean);

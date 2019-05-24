@@ -2315,43 +2315,77 @@ public class ImportCRFDataService {
 		    	itemValue = (String) rowhm.get(itemOID);
 		    	
 		    	
-		    	for (FormDataBean formDataBean : formDataBeans) {
-		    		
-		    		 ArrayList<ImportItemGroupDataBean> importItemGroupDataBeans= formDataBean.getItemGroupData();
-		    		 for(ImportItemGroupDataBean importItemGroupDataBean:importItemGroupDataBeans) {
-		    			 
-		    			 ArrayList<ImportItemDataBean> importItemDataBeans=importItemGroupDataBean.getItemData();
-		    			 for(ImportItemDataBean importItemDataBean:importItemDataBeans) {
-		    				 itemOIDinODMxml = importItemDataBean.getItemOID();
-		    				 itemValueinODMxml = importItemDataBean.getValue();
-		    				 
-		    				 // find the itemOID first, then compare the value
-		    				 if(itemOID.equals(itemOIDinODMxml) ) {
-		    					 if(itemValue == null && (itemValueinODMxml !=null && itemValueinODMxml.trim().length() ==0)){
-		    						 matchCheck[i] = true;
-		    						 break;
-		    					 }else if(itemValue != null && itemValueinODMxml ==null){
-		    						 matchCheck[i] = false;
-		    					 }else if(itemValue == null && itemValueinODMxml ==null){
-		    						 matchCheck[i] = true;
-		    						 break;
-		    					 }else if(itemValue!= null && itemValue.trim().equals(itemValueinODMxml.trim())){
-		    						 matchCheck[i] = true;
-		    						 break;
-		    					 }else {
-		    						 matchCheck[i] = false;
-		    					 }
-		    				 }
-		    				 
+		    	if(itemValue != null && itemValue.trim().length() > 0) {
+		    		for (FormDataBean formDataBean : formDataBeans) {
+			    		
+			    		 ArrayList<ImportItemGroupDataBean> importItemGroupDataBeans= formDataBean.getItemGroupData();
+			    		 for(ImportItemGroupDataBean importItemGroupDataBean:importItemGroupDataBeans) {
+			    			 
+			    			 ArrayList<ImportItemDataBean> importItemDataBeans=importItemGroupDataBean.getItemData();
+			    			 for(ImportItemDataBean importItemDataBean:importItemDataBeans) {
+			    				 itemOIDinODMxml = importItemDataBean.getItemOID();
+			    				 itemValueinODMxml = importItemDataBean.getValue();
+			    				 
+			    				 // find the itemOID first, then compare the value
+			    				 if(itemOID.equals(itemOIDinODMxml) ) {
+			    					 if(itemValue.trim().equals(itemValueinODMxml.trim())){
+			    						 matchCheck[i] = true;
+			    						 break;
+			    					 }else {
+			    						 matchCheck[i] = false;
+			    					 }
+			    				 }			    				 
+			    			 }	
+			    			 
+			    			 //check status
+			    			 if(matchCheck[i]) {
+			    				 break;
+			    			 }
+			    		 }	
+			    		 
+			    		 //check status
+			    		 if(matchCheck[i]) {
+		    				 break;
 		    			 }
-		    			 
-		    			
-		    		 }
-		    		 
-		    		
-		    	 }
+			    	 }
 		    	
-		    	i++;
+		    	}else {
+		    		
+		    		for (FormDataBean formDataBean : formDataBeans) {
+			    		
+			    		 ArrayList<ImportItemGroupDataBean> importItemGroupDataBeans= formDataBean.getItemGroupData();
+			    		 for(ImportItemGroupDataBean importItemGroupDataBean:importItemGroupDataBeans) {
+			    			 
+			    			 ArrayList<ImportItemDataBean> importItemDataBeans=importItemGroupDataBean.getItemData();
+			    			 for(ImportItemDataBean importItemDataBean:importItemDataBeans) {
+			    				 itemOIDinODMxml = importItemDataBean.getItemOID();
+			    				 itemValueinODMxml = importItemDataBean.getValue();
+			    				 
+			    				 // for null/blank item value, there is no itemOIDinODMxml
+			    				 if(itemOID.equals(itemOIDinODMxml) ) {			    					
+			    						 matchCheck[i] = false;		
+			    						 break;
+			    				 }else {
+			    					 matchCheck[i] = true;
+			    				 }
+			    				 
+			    			 }
+			    			 
+			    			//check status
+				    		 if(matchCheck[i]) {
+			    				 break;
+			    			 }
+			    		 }
+			    		 
+			    		//check status
+			    		 if(matchCheck[i]) {
+		    				 break;
+		    			 }
+			    	 }
+		    	}
+		    	
+		    	 i++;
+		    	 
 		    	
 		    }// inner-while loop
 		    

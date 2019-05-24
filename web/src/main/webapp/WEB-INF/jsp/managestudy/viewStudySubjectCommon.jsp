@@ -275,7 +275,7 @@ $(function() {
     var errors = [];
 
     $.when(
-        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n', function(data) {
+        $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/*/*?showArchived=y&clinicaldata=n&links=y', function(data) {
             odm = data;
             var study = findone(odm.Study, function(study) {
                 return study['@OID'] === '${study.oid}';
@@ -517,7 +517,7 @@ $(function() {
             var studyEventOid = sectionDiv.data('section-oid');
             var studyEvent = studyEvents[studyEventOid];
             var sectionErrors = [];
-            $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n', function(data){
+            $.get('rest/clinicaldata/json/view/${study.oid}/${studySub.oid}/' + studyEventOid + '/*?showArchived=y&includeMetadata=n&links=y', function(data) {
                 var odm = data;
                 for (var formOid in studyEvent.forms) {
                     var form = studyEvent.forms[formOid];
