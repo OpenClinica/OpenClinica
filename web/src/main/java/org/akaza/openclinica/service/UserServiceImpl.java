@@ -130,7 +130,7 @@ public class UserServiceImpl implements UserService {
     public static final String ENABLED = "enabled";
     public static final String SEPERATOR = ",";
     public static final String PARTICIPANT_ACCESS_CODE = "_Participant Access Code";
-
+    SimpleDateFormat sdf_fileName = new SimpleDateFormat("yyyy-MM-dd'-'HHmmssSSS'Z'");
 
     private String urlBase = CoreResources.getField("sysURL").split("/MainMenu")[0];
 
@@ -299,6 +299,7 @@ public class UserServiceImpl implements UserService {
         }
 
         if (studySubject.getStudySubjectDetail() == null) {
+            studySubjectDao.saveOrUpdate(studySubject);
             StudySubjectDetail studySubjectDetail = new StudySubjectDetail();
             studySubject.setStudySubjectDetail(studySubjectDetail);
         }
@@ -336,7 +337,8 @@ public class UserServiceImpl implements UserService {
         // Get all list of StudySubjects by studyId
         List<StudySubject> studySubjects = studySubjectDao.findAllByStudy(site.getStudyId());
         List<OCUserDTO> userDTOS = new ArrayList<>();
-        String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE + new SimpleDateFormat("_yyyy-MM-dd-hhmmssS'.txt'").format(new Date());
+        sdf_fileName.setTimeZone(TimeZone.getTimeZone("GMT"));
+        String fileName = study.getUniqueIdentifier() + DASH + study.getEnvType() + PARTICIPANT_ACCESS_CODE +"_"+ sdf_fileName.format(new Date())+".csv";
 
         try {
             for (StudySubject studySubject : studySubjects) {

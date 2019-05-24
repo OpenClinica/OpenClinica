@@ -2,6 +2,7 @@ package org.akaza.openclinica.controller;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.swagger.annotations.Api;
+import io.swagger.annotations.ApiParam;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.web.restful.ODMClinicaDataResource;
@@ -14,6 +15,7 @@ import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Controller;
 import org.springframework.web.bind.annotation.*;
+import springfox.documentation.annotations.ApiIgnore;
 
 import javax.mail.internet.ContentType;
 import javax.servlet.http.HttpServletRequest;
@@ -44,14 +46,15 @@ public class ODMClinicalDataController {
                                                     @RequestParam(value = "includeDNs", defaultValue = "n", required = false) String includeDns,
                                                     @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request,
                                                     @RequestParam(value = "showArchived", defaultValue = "n", required = false) String showArchived,
-                                               @RequestParam(value = "clinicaldata", defaultValue = "y", required = false) String clinical,
-                                                    @RequestParam(value = "includeMetadata", defaultValue = "y", required = false) String includeMetadata) throws Exception {
+                                                    @RequestParam(value = "clinicaldata", defaultValue = "y", required = false) String clinical,
+                                                    @RequestParam(value = "includeMetadata", defaultValue = "y", required = false) String includeMetadata,
+                                                    @ApiIgnore @RequestParam(value = "links", defaultValue = "n", required = false) String links) throws Exception {
         getRestfulServiceHelper().setSchema(studyOID, request);
-
+//@ApiParam(hidden=true)
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
         Object result = odmClinicaDataResource.getODMClinicaldata(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
-                request, includeMetadata, clinical, showArchived,"no");
+                request, includeMetadata, clinical, showArchived,"no", links);
 
         ResponseEntity<Object> response = null;
         if (result != null) {
@@ -68,14 +71,15 @@ public class ODMClinicalDataController {
                                            @RequestParam(value = "includeDNs", defaultValue = "n", required = false) String includeDns,
                                            @RequestParam(value = "includeAudits", defaultValue = "n", required = false) String includeAudits, HttpServletRequest request,
                                            @RequestParam(value = "showArchived", defaultValue = "n", required = false) String showArchived,
-                                              @RequestParam(value = "clinicaldata", defaultValue = "y", required = false) String clinical,
-                                           @RequestParam(value = "includeMetadata", defaultValue = "y", required = false) String includeMetadata) throws Exception {
+                                           @RequestParam(value = "clinicaldata", defaultValue = "y", required = false) String clinical,
+                                           @RequestParam(value = "includeMetadata", defaultValue = "y", required = false) String includeMetadata,
+                                           @ApiIgnore @RequestParam(value = "links", defaultValue = "n", required = false) String links) throws Exception {
         getRestfulServiceHelper().setSchema(studyOID, request);
 
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 
         Object result = odmClinicaDataResource.getODMXMLData(studyOID, formVersionOID, studyEventOID, studySubjectIdentifier, includeDns, includeAudits,
-                request, includeMetadata, clinical, showArchived,"no");
+                request, includeMetadata, clinical, showArchived,"no", links);
 
         ResponseEntity<Object> response = null;
         if (result != null) {

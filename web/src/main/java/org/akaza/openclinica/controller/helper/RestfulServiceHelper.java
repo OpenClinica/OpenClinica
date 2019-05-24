@@ -50,9 +50,9 @@ public class RestfulServiceHelper {
 	
 	private final static Logger log = LoggerFactory.getLogger("RestfulServiceHelper");
 	
-	//CSV file header	
+	//CSV file header
 	private static final String ParticipantID_header = "ParticipantID";
-	
+
 
 	private DataSource dataSource;	
 	private StudyDAO studyDao; 
@@ -392,8 +392,8 @@ public class RestfulServiceHelper {
 	 			
 	 	  		i++;
 	 		}
-	  
-	 		this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
+	 		 // not save original data
+	 		//this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
 			
 	 		return importCRFInfoSummary;
 	  }
@@ -438,6 +438,7 @@ public class RestfulServiceHelper {
 	 				Iterator dataFilesIt = dataFileList.iterator();
 	 				
 	 				File rowFile = null;
+					String skipMatchCriteria = null;
 	 				while(dataFilesIt.hasNext()) {
 	 					try {
 	 						rowFile = (File) dataFilesIt.next();
@@ -450,10 +451,11 @@ public class RestfulServiceHelper {
 		 	 	 	  		post.setHeader("OCBasePath", basePath);
 		 	 	 	  	    //PIPETEXT
 		 	 	 	  		post.setHeader("PIPETEXT", "PIPETEXT");
-
 		 	 	 	  		
 		 	 	 	  		//SkipMatchCriteria
-		 	 	 	  		String skipMatchCriteria = this.getImportDataHelper().getSkipMatchCriteria(rowFile, mappingFile); 
+							if (skipMatchCriteria == null){
+								skipMatchCriteria = this.getImportDataHelper().getSkipMatchCriteria(rowFile, mappingFile);
+							}
 		 	 	 	  	    post.setHeader("SkipMatchCriteria", skipMatchCriteria);
 		 	 	 	  	
 		 	 	 	 		post.setHeader("Accept", 
@@ -548,8 +550,8 @@ public class RestfulServiceHelper {
 	 			
 	 	  		i++;
 	 		}
-	  
-	 		this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
+	        // not save original data
+	 		//this.getImportDataHelper().saveFileToImportFolder(files,studyOID);
 			
 	 		return importCRFInfoSummary;
 	  }

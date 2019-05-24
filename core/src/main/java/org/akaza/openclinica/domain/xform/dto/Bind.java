@@ -12,6 +12,7 @@ public class Bind {
     private String relevant;
     private String itemGroup;
     private String enkFor;
+    private String ocExternal;
 
     public String getRelevant() {
         return relevant;
@@ -101,4 +102,11 @@ public class Bind {
         this.enkFor = enkFor;
     }
 
+    public String getOcExternal() {
+        return ocExternal;
+    }
+
+    public void setOcExternal(String ocExternal) {
+        this.ocExternal = ocExternal;
+    }
 }

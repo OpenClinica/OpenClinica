@@ -531,12 +531,16 @@ private void updateStudySubjectSize(StudyBean currentStudy) {
     private StudySubject saveOrUpdateStudySubjectDetails(StudySubjectBean studySubjectBean, SubjectTransferBean subjectTransfer, String accessToken, String studyOid , UserAccountBean userAccountBean) {
         StudySubject studySubject = studySubjectHibDao.findById(studySubjectBean.getId());
 
+        studySubjectBean.setUpdater(userAccountBean);
+        studySubjectBean.setUpdatedDate(new Date());
+
         StudySubjectDetail studySubjectDetail = studySubject.getStudySubjectDetail();
         UserAccount userAccount = userAccountHibDao.findById(userAccountBean.getId());
         studySubject.setUpdateId(userAccount.getUserId());
         studySubject.setDateUpdated(new Date());
 
         if (studySubjectDetail == null) {
+            studySubjectDao.update(studySubjectBean);
             studySubjectDetail = new StudySubjectDetail();
         }
 

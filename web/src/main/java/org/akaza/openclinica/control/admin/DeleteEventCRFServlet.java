@@ -22,11 +22,7 @@ import org.akaza.openclinica.bean.managestudy.StudyBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventBean;
 import org.akaza.openclinica.bean.managestudy.StudyEventDefinitionBean;
 import org.akaza.openclinica.bean.managestudy.StudySubjectBean;
-import org.akaza.openclinica.bean.submit.CRFVersionBean;
-import org.akaza.openclinica.bean.submit.DisplayEventCRFBean;
-import org.akaza.openclinica.bean.submit.EventCRFBean;
-import org.akaza.openclinica.bean.submit.ItemDataBean;
-import org.akaza.openclinica.bean.submit.ItemFormMetadataBean;
+import org.akaza.openclinica.bean.submit.*;
 import org.akaza.openclinica.control.SpringServletAccess;
 import org.akaza.openclinica.control.core.SecureController;
 import org.akaza.openclinica.control.form.FormProcessor;
@@ -43,11 +39,7 @@ import org.akaza.openclinica.dao.managestudy.StudyDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDAO;
 import org.akaza.openclinica.dao.managestudy.StudyEventDefinitionDAO;
 import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
-import org.akaza.openclinica.dao.submit.CRFVersionDAO;
-import org.akaza.openclinica.dao.submit.EventCRFDAO;
-import org.akaza.openclinica.dao.submit.ItemDataDAO;
-import org.akaza.openclinica.dao.submit.ItemFormMetadataDAO;
-import org.akaza.openclinica.dao.submit.ItemGroupMetadataDAO;
+import org.akaza.openclinica.dao.submit.*;
 import org.akaza.openclinica.domain.datamap.EventCrf;
 import org.akaza.openclinica.domain.rule.action.RuleActionRunLogBean;
 import org.akaza.openclinica.view.Page;
@@ -121,14 +113,15 @@ public class DeleteEventCRFServlet extends SecureController {
 
             // construct info needed on view event crf page
             CRFDAO cdao = new CRFDAO(sm.getDataSource());
-            CRFVersionDAO cvdao = new CRFVersionDAO(sm.getDataSource());
+            FormLayoutDAO fldao = new FormLayoutDAO(sm.getDataSource());
 
             int crfVersionId = eventCRF.getCRFVersionId();
-            CRFBean cb = cdao.findByVersionId(crfVersionId);
+            int formLayoutId = eventCRF.getFormLayoutId();
+            CRFBean cb = cdao.findByLayoutId(formLayoutId);
             eventCRF.setCrf(cb);
 
-            CRFVersionBean cvb = (CRFVersionBean) cvdao.findByPK(crfVersionId);
-            eventCRF.setCrfVersion(cvb);
+            FormLayoutBean flb = (FormLayoutBean) fldao.findByPK(formLayoutId);
+            eventCRF.setFormLayout(flb);
 
             // then get the definition so we can call
             // DisplayEventCRFBean.setFlags
