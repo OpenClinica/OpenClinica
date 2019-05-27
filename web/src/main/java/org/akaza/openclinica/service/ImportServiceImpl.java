@@ -112,6 +112,13 @@ public class ImportServiceImpl implements ImportService {
     public static final String INITIAL_DATA_ENTRY = "initial data entry";
     public static final String DATA_ENTRY_COMPLETE = "data entry complete";
     public static final String COMPLETE = "complete";
+
+    public static final String DATA_ENTRY_STARTED = "data entry started";
+    public static final String COMPLETED = "completed";
+    public static final String STOPPED = "stopped";
+    public static final String SKIPPED = "skipped";
+    public static final String LOCKED = "locked";
+
     public static final String FAILED = "Failed";
     public static final String INSERTED = "Inserted";
     public static final String UPDATED = "Updated";
@@ -142,358 +149,376 @@ public class ImportServiceImpl implements ImportService {
         String envType = tenantStudy.getStudy() == null ? tenantStudy.getEnvType().toString() : tenantStudy.getStudy().getEnvType().toString();
 
         sdf_fileName.setTimeZone(TimeZone.getTimeZone("GMT"));
-        String fileName = uniqueIdentifier + DASH + envType + UNDERSCORE + JobType.XML_IMPORT  +"_"+ sdf_fileName.format(new Date())+".csv";
+        String fileName = uniqueIdentifier + DASH + envType + UNDERSCORE + JobType.XML_IMPORT + "_" + sdf_fileName.format(new Date()) + ".csv";
 
         logger.debug("Job Filename is : {}", fileName);
 
+
         ArrayList<SubjectDataBean> subjectDataBeans = odmContainer.getCrfDataPostImportContainer().getSubjectData();
-        for (SubjectDataBean subjectDataBean : subjectDataBeans) {
-            if (subjectDataBean.getSubjectOID() != null)
-                subjectDataBean.setSubjectOID(subjectDataBean.getSubjectOID().toUpperCase());
-            StudySubject studySubject = null;
-            StudySubject studySubject02 = null;
+        if (subjectDataBeans != null) {
+            for (SubjectDataBean subjectDataBean : subjectDataBeans) {
+                if (subjectDataBean.getSubjectOID() != null)
+                    subjectDataBean.setSubjectOID(subjectDataBean.getSubjectOID().toUpperCase());
+                StudySubject studySubject = null;
+                StudySubject studySubject02 = null;
 
 
-            if (subjectDataBean.getSubjectOID() == null && subjectDataBean.getStudySubjectID() == null) {
-                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_MISSING_PARTICIPANT_ID);
-                dataImportReports.add(dataImportReport);
-                logger.info("Participant SubjectKey and StudySubjectID are null ");
-                continue;
-            } else if (subjectDataBean.getSubjectOID() != null && subjectDataBean.getStudySubjectID() == null) {
-                studySubject = studySubjectDao.findByOcOID(subjectDataBean.getSubjectOID());
-                if (studySubject == null
-                        || (studySubject != null && tenantStudy.getStudy() != null && studySubject.getStudy().getStudyId() != tenantStudy.getStudyId())
-                        || (studySubject != null && tenantStudy.getStudy() == null && studySubject.getStudy().getStudy() != null && studySubject.getStudy().getStudy().getStudyId() != tenantStudy.getStudyId())) {
-
-                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+                if (subjectDataBean.getSubjectOID() == null && subjectDataBean.getStudySubjectID() == null) {
+                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_MISSING_PARTICIPANT_ID);
                     dataImportReports.add(dataImportReport);
-                    logger.error("Participant SubjectKey {} Not Found", subjectDataBean.getSubjectOID());
+                    logger.info("Participant SubjectKey and StudySubjectID are null ");
                     continue;
-                }
-            } else if (subjectDataBean.getSubjectOID() == null && subjectDataBean.getStudySubjectID() != null) {
-                try {
-                    studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy);
-                    if (studySubject == null) {
-                        List<StudySubject> studySubjects = (studySubjectDao.findByLabelAndParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy));
-                        if (studySubjects != null && studySubjects.size() > 0)
-                            studySubject = studySubjects.get(0);
-                    }
-                    if (studySubject == null) {
+                } else if (subjectDataBean.getSubjectOID() != null && subjectDataBean.getStudySubjectID() == null) {
+                    studySubject = studySubjectDao.findByOcOID(subjectDataBean.getSubjectOID());
+                    if (studySubject == null
+                            || (studySubject != null && tenantStudy.getStudy() != null && studySubject.getStudy().getStudyId() != tenantStudy.getStudyId())
+                            || (studySubject != null && tenantStudy.getStudy() == null && studySubject.getStudy().getStudy() != null && studySubject.getStudy().getStudy().getStudyId() != tenantStudy.getStudyId())) {
+
                         dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
                         dataImportReports.add(dataImportReport);
-                        logger.error("Participant StudySubjectID {} Not Found", subjectDataBean.getStudySubjectID());
+                        logger.error("Participant SubjectKey {} Not Found", subjectDataBean.getSubjectOID());
                         continue;
                     }
-                } catch (Exception e) {
-                    e.printStackTrace();
-                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_MULTIPLE_PARTICIPANTS_FOUND);
-                    dataImportReports.add(dataImportReport);
-                    logger.error("multipleParticipantsFound {}", e.getMessage());
-                    continue;
-                }
-
-            } else if (subjectDataBean.getSubjectOID() != null && subjectDataBean.getStudySubjectID() != null) {
-                studySubject = studySubjectDao.findByOcOID(subjectDataBean.getSubjectOID());
-                studySubject02 = studySubjectDao.findByLabelAndStudyOrParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy);
-                if (studySubject02 == null) {
-                    List<StudySubject> studySubjects = (studySubjectDao.findByLabelAndParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy));
-                    if (studySubjects != null && studySubjects.size() > 0)
-                        studySubject02 = studySubjects.get(0);
-                }
-
-                if (studySubject == null || studySubject02 == null) {
-                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
-                    dataImportReports.add(dataImportReport);
-                    logger.error("Participant Identifiers {} {} mismatch", subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID());
-                    continue;
-                }
-
-                if (studySubject != null && studySubject02 != null && studySubject.getStudySubjectId() != studySubject02.getStudySubjectId()) {
-                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_PARTICIPANT_IDENTIFIERS_MISMATCH);
-                    dataImportReports.add(dataImportReport);
-                    logger.error("Participant Identifiers {} {} mismatch", subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID());
-                    continue;
-                }
-            }
-            subjectDataBean.setSubjectOID(studySubject.getOcOid());
-            subjectDataBean.setStudySubjectID(studySubject.getLabel());
-
-            ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
-            for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
-                if (studyEventDataBean.getStudyEventOID() != null)
-                    studyEventDataBean.setStudyEventOID(studyEventDataBean.getStudyEventOID().toUpperCase());
-                // OID is missing
-                if (studyEventDataBean.getStudyEventOID() == null) {
-                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, FAILED, null, ErrorConstants.ERR_MISSING_STUDYEVENTOID);
-                    dataImportReports.add(dataImportReport);
-                    logger.error("StudEventOID {} is not valid", studyEventDataBean.getStudyEventOID());
-                    continue;
-                }
-
-                // StudyEventDefinition invalid OID and Archived
-                StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByOcOID(studyEventDataBean.getStudyEventOID());
-                if (studyEventDefinition == null || (studyEventDefinition != null && !studyEventDefinition.getStatus().equals(Status.AVAILABLE))) {
-                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, FAILED, null, ErrorConstants.ERR_INVALID_STUDYEVENTOID);
-                    dataImportReports.add(dataImportReport);
-                    logger.error("StudEventOID {} is not valid or Archived", studyEventDataBean.getStudyEventOID());
-                    continue;
-                }
-
-
-                StudyEvent studyEvent = validateStudyEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
-                if (studyEvent == null) {
-                    continue;
-                }
-
-                ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
-                for (FormDataBean formDataBean : formDataBeans) {
-                    if (formDataBean.getFormOID() != null)
-                        formDataBean.setFormOID(formDataBean.getFormOID().toUpperCase());
-                    if (formDataBean.getEventCRFStatus() != null)
-                        formDataBean.setEventCRFStatus(formDataBean.getEventCRFStatus().toLowerCase());
-
-                    if (formDataBean.getFormOID() == null) {
-                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_MISSING_FORMOID);
+                } else if (subjectDataBean.getSubjectOID() == null && subjectDataBean.getStudySubjectID() != null) {
+                    try {
+                        studySubject = studySubjectDao.findByLabelAndStudyOrParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy);
+                        if (studySubject == null) {
+                            List<StudySubject> studySubjects = (studySubjectDao.findByLabelAndParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy));
+                            if (studySubjects != null && studySubjects.size() > 0)
+                                studySubject = studySubjects.get(0);
+                        }
+                        if (studySubject == null) {
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
+                            dataImportReports.add(dataImportReport);
+                            logger.error("Participant StudySubjectID {} Not Found", subjectDataBean.getStudySubjectID());
+                            continue;
+                        }
+                    } catch (Exception e) {
+                        e.printStackTrace();
+                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_MULTIPLE_PARTICIPANTS_FOUND);
                         dataImportReports.add(dataImportReport);
-                        logger.error("FormOid {} for SubjectKey {} and StudyEventOID {} is not Valid", formDataBean.getFormOID(), subjectDataBean.getSubjectOID(), studyEventDataBean.getStudyEventOID());
+                        logger.error("multipleParticipantsFound {}", e.getMessage());
                         continue;
                     }
 
+                } else if (subjectDataBean.getSubjectOID() != null && subjectDataBean.getStudySubjectID() != null) {
+                    studySubject = studySubjectDao.findByOcOID(subjectDataBean.getSubjectOID());
+                    studySubject02 = studySubjectDao.findByLabelAndStudyOrParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy);
+                    if (studySubject02 == null) {
+                        List<StudySubject> studySubjects = (studySubjectDao.findByLabelAndParentStudy(subjectDataBean.getStudySubjectID(), tenantStudy));
+                        if (studySubjects != null && studySubjects.size() > 0)
+                            studySubject02 = studySubjects.get(0);
+                    }
 
-                    // Form Invalid OID and form not Archived
-                    CrfBean crf = crfDao.findByOcOID(formDataBean.getFormOID());
-                    if (crf == null || (crf != null && !crf.getStatus().equals(Status.AVAILABLE))) {
-                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_FORMOID_NOT_FOUND);
+                    if (studySubject == null || studySubject02 == null) {
+                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_PARTICIPANT_NOT_FOUND);
                         dataImportReports.add(dataImportReport);
-                        logger.error("FormOid {} is not Valid or not Found", formDataBean.getFormOID());
+                        logger.error("Participant Identifiers {} {} mismatch", subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID());
                         continue;
                     }
-                    // Form Invalid OID
-                    EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(),
-                            tenantStudy.getStudy() == null ? tenantStudy.getStudyId() : tenantStudy.getStudy().getStudyId());
-                    if (edc == null || (edc != null && !edc.getStatusId().equals(Status.AVAILABLE.getCode()))) {
-                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_FORMOID_NOT_FOUND);
+
+                    if (studySubject != null && studySubject02 != null && studySubject.getStudySubjectId() != studySubject02.getStudySubjectId()) {
+                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_PARTICIPANT_IDENTIFIERS_MISMATCH);
                         dataImportReports.add(dataImportReport);
-                        logger.error("FormOid {} is not Valid or not Found", formDataBean.getFormOID());
+                        logger.error("Participant Identifiers {} {} mismatch", subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID());
                         continue;
-
                     }
+                }
+                subjectDataBean.setSubjectOID(studySubject.getOcOid());
+                subjectDataBean.setStudySubjectID(studySubject.getLabel());
 
-                    if (formDataBean.getFormLayoutName() == null) {
-                        formDataBean.setFormLayoutName(edc.getFormLayout().getName());
-                    }
-
-                    // FormLayout Invalid OID
-                    FormLayout formLayout = formLayoutDao.findByNameCrfId(formDataBean.getFormLayoutName(), crf.getCrfId());
-                    if (formLayout == null || (formLayout != null && !formLayout.getStatus().equals(Status.AVAILABLE))) {
-                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_FORMLAYOUTOID_NOT_FOUND);
+                ArrayList<StudyEventDataBean> studyEventDataBeans = subjectDataBean.getStudyEventData();
+                for (StudyEventDataBean studyEventDataBean : studyEventDataBeans) {
+                    if (studyEventDataBean.getStudyEventOID() != null)
+                        studyEventDataBean.setStudyEventOID(studyEventDataBean.getStudyEventOID().toUpperCase());
+                    // OID is missing
+                    if (studyEventDataBean.getStudyEventOID() == null) {
+                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, FAILED, null, ErrorConstants.ERR_MISSING_STUDYEVENTOID);
                         dataImportReports.add(dataImportReport);
-                        logger.error("FormLayoutOid {} is not Valid or not Found", formDataBean.getFormLayoutName());
+                        logger.error("StudEventOID {} is not valid", studyEventDataBean.getStudyEventOID());
                         continue;
-
                     }
 
-                    // Form Status is null , then Form has Initial Data Entry Status
-                    if (formDataBean.getEventCRFStatus() == null) {
-                        formDataBean.setEventCRFStatus(INITIAL_DATA_ENTRY);
-                    }
-
-                    // Form Status is not acceptable
-                    if (!formDataBean.getEventCRFStatus().equalsIgnoreCase(INITIAL_DATA_ENTRY) &&
-                            !formDataBean.getEventCRFStatus().equalsIgnoreCase(DATA_ENTRY_COMPLETE) &&
-                            !formDataBean.getEventCRFStatus().equalsIgnoreCase(COMPLETE)) {
-                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_FORM_STATUS_NOT_VALID);
+                    // StudyEventDefinition invalid OID and Archived
+                    StudyEventDefinition studyEventDefinition = studyEventDefinitionDao.findByOcOID(studyEventDataBean.getStudyEventOID());
+                    if (studyEventDefinition == null || (studyEventDefinition != null && !studyEventDefinition.getStatus().equals(Status.AVAILABLE))) {
+                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), null, null, null, null, null, FAILED, null, ErrorConstants.ERR_INVALID_STUDYEVENTOID);
                         dataImportReports.add(dataImportReport);
-                        logger.error("Form Status {}  is not Valid", formDataBean.getEventCRFStatus());
-                        continue;
-                    }
-
-                    EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getFormLayoutId());
-
-                    // Event Crf has status complete
-                    if (eventCrf != null && eventCrf.getStatusId().equals(Status.UNAVAILABLE.getCode())) {
-                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_FORM_ALREADY_COMPLETE);
-                        dataImportReports.add(dataImportReport);
-                        logger.debug("Form {}  already complete", formDataBean.getFormOID());
+                        logger.error("StudEventOID {} is not valid or Archived", studyEventDataBean.getStudyEventOID());
                         continue;
                     }
 
 
-                    if(eventCrf==null && studyEventDefinition.getType().equals(COMMON) && studyEventDefinition.getRepeating()){
-                        List <EventCrf> eventCrfs= eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(),studySubject.getOcOid());
-                        if(eventCrfs.size()>0){
-                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH);
+                    StudyEvent studyEvent = validateStudyEvent(studyEventDataBean, studySubject, studyEventDefinition, userAccount);
+                    if (studyEvent == null) {
+                        continue;
+                    }
+
+                    ArrayList<FormDataBean> formDataBeans = studyEventDataBean.getFormData();
+                    for (FormDataBean formDataBean : formDataBeans) {
+                        if (formDataBean.getFormOID() != null)
+                            formDataBean.setFormOID(formDataBean.getFormOID().toUpperCase());
+                        if (formDataBean.getEventCRFStatus() != null)
+                            formDataBean.setEventCRFStatus(formDataBean.getEventCRFStatus().toLowerCase());
+
+                        if (formDataBean.getFormOID() == null) {
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_MISSING_FORMOID);
+                            dataImportReports.add(dataImportReport);
+                            logger.error("FormOid {} for SubjectKey {} and StudyEventOID {} is not Valid", formDataBean.getFormOID(), subjectDataBean.getSubjectOID(), studyEventDataBean.getStudyEventOID());
+                            continue;
+                        }
+
+
+                        // Form Invalid OID and form not Archived
+                        CrfBean crf = crfDao.findByOcOID(formDataBean.getFormOID());
+                        if (crf == null || (crf != null && !crf.getStatus().equals(Status.AVAILABLE))) {
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_FORMOID_NOT_FOUND);
+                            dataImportReports.add(dataImportReport);
+                            logger.error("FormOid {} is not Valid or not Found", formDataBean.getFormOID());
+                            continue;
+                        }
+                        // Form Invalid OID
+                        EventDefinitionCrf edc = eventDefinitionCrfDao.findByStudyEventDefinitionIdAndCRFIdAndStudyId(studyEventDefinition.getStudyEventDefinitionId(), crf.getCrfId(),
+                                tenantStudy.getStudy() == null ? tenantStudy.getStudyId() : tenantStudy.getStudy().getStudyId());
+                        if (edc == null || (edc != null && !edc.getStatusId().equals(Status.AVAILABLE.getCode()))) {
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_FORMOID_NOT_FOUND);
+                            dataImportReports.add(dataImportReport);
+                            logger.error("FormOid {} is not Valid or not Found", formDataBean.getFormOID());
+                            continue;
+
+                        }
+
+                        if (formDataBean.getFormLayoutName() == null) {
+                            formDataBean.setFormLayoutName(edc.getFormLayout().getName());
+                        }
+
+                        // FormLayout Invalid OID
+                        FormLayout formLayout = formLayoutDao.findByNameCrfId(formDataBean.getFormLayoutName(), crf.getCrfId());
+                        if (formLayout == null || (formLayout != null && !formLayout.getStatus().equals(Status.AVAILABLE))) {
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_FORMLAYOUTOID_NOT_FOUND);
+                            dataImportReports.add(dataImportReport);
+                            logger.error("FormLayoutOid {} is not Valid or not Found", formDataBean.getFormLayoutName());
+                            continue;
+
+                        }
+
+                        // Form Status is null , then Form has Initial Data Entry Status
+                        if (formDataBean.getEventCRFStatus() == null) {
+                            formDataBean.setEventCRFStatus(INITIAL_DATA_ENTRY);
+                        }
+
+                        // Form Status is not acceptable
+                        if (!formDataBean.getEventCRFStatus().equalsIgnoreCase(INITIAL_DATA_ENTRY) &&
+                                !formDataBean.getEventCRFStatus().equalsIgnoreCase(DATA_ENTRY_COMPLETE) &&
+                                !formDataBean.getEventCRFStatus().equalsIgnoreCase(COMPLETE)) {
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_FORM_STATUS_NOT_VALID);
+                            dataImportReports.add(dataImportReport);
+                            logger.error("Form Status {}  is not Valid", formDataBean.getEventCRFStatus());
+                            continue;
+                        }
+
+                        EventCrf eventCrf = eventCrfDao.findByStudyEventIdStudySubjectIdFormLayoutId(studyEvent.getStudyEventId(), studySubject.getStudySubjectId(), formLayout.getFormLayoutId());
+
+                        // Event Crf has status complete
+                        if (eventCrf != null && eventCrf.getStatusId().equals(Status.UNAVAILABLE.getCode())) {
+                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_FORM_ALREADY_COMPLETE);
                             dataImportReports.add(dataImportReport);
                             logger.debug("Form {}  already complete", formDataBean.getFormOID());
                             continue;
                         }
-                    }
 
-
-                    if (eventCrf == null) {
-                        eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
-                        eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
-                        logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
-
-                        studyEvent = updateStudyEvent(studyEvent, userAccount);
-                        studyEvent = studyEventDao.saveOrUpdate(studyEvent);
-                        logger.debug("Study Event Id {} is updated", studyEvent.getStudyEventId());
-                    }
-
-                    ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
-
-                    int itemCountInFormData = 0;
-                    int itemInsertedUpdatedCountInFrom = 0;
-                    int itemInsertedUpdatedSkippedCountInFrom = 0;
-
-                    for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
-                        itemCountInFormData = itemCountInFormData + itemGroupDataBean.getItemData().size();
-                    }
-
-                    for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
-                        if (itemGroupDataBean.getItemGroupOID() != null)
-                            itemGroupDataBean.setItemGroupOID(itemGroupDataBean.getItemGroupOID().toUpperCase());
-                        if (itemGroupDataBean.getItemGroupOID() == null) {
-                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), null, null, FAILED, null, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
-                            dataImportReports.add(dataImportReport);
-                            logger.error("ItemGroupOid {} is not Valid or not found", itemGroupDataBean.getItemGroupOID());
-                            continue;
+                        if (eventCrf == null && studyEventDefinition.getType().equals(UNSCHEDULED)) {
+                            List<EventCrf> eventCrfs= eventCrfDao.findByStudyEventIdStudySubjectIdCrfId(studyEvent.getStudyEventId(),studySubject.getStudySubjectId(),crf.getCrfId());
+                            if (eventCrfs.size() > 0) {
+                                eventCrf = eventCrfs.get(0);
+                                formDataBean.setFormLayoutName(eventCrf.getFormLayout().getXformName());
+                            }
                         }
 
-                        //Item Group invalid Oid
-                        ItemGroup itemGroup = itemGroupDao.findByOcOID(itemGroupDataBean.getItemGroupOID());
-                        if (itemGroup == null || (itemGroup != null && !itemGroup.getStatus().equals(Status.AVAILABLE))) {
-                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), null, null, FAILED, null, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
-                            dataImportReports.add(dataImportReport);
-                            logger.error("ItemGroupOid {} is not Valid or not found", itemGroupDataBean.getItemGroupOID());
-                            continue;
-                        }
-                        //Item Group invalid Oid in Form
-                        ItemGroup itmGroup = itemGroupDao.findByNameCrfId(itemGroup.getName(), crf);
-                        if (itmGroup == null) {
-                            dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), null, null, FAILED, null, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
-                            dataImportReports.add(dataImportReport);
-                            logger.error("ItemGroupOid {} is not Valid or not found", itemGroupDataBean.getItemGroupOID());
-                            continue;
+                        if (eventCrf == null && studyEventDefinition.getType().equals(COMMON) && studyEventDefinition.getRepeating()) {
+                            List<EventCrf> eventCrfs = eventCrfDao.findByStudyEventIdStudySubjectId(studyEvent.getStudyEventId(), studySubject.getOcOid());
+                            if (eventCrfs.size() > 0) {
+                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), null, null, null, FAILED, null, ErrorConstants.ERR_REPEAT_KEY_AND_FORM_MISMATCH);
+                                dataImportReports.add(dataImportReport);
+                                logger.debug("Form {}  already complete", formDataBean.getFormOID());
+                                continue;
+                            }
                         }
 
 
-                         itemGroup=validateItemGroupRepeat(studySubject,studyEventDataBean,formDataBean,eventCrf,itemGroupDataBean,itemGroup,userAccount);
-                        if (itemGroup == null) {
-                            continue;
+                        if (eventCrf == null) {
+                            eventCrf = createEventCrf(studySubject, studyEvent, formLayout, userAccount);
+                            eventCrf = eventCrfDao.saveOrUpdate(eventCrf);
+                            logger.debug("new EventCrf Id {} is created  ", eventCrf.getEventCrfId());
+
+                            studyEvent = updateStudyEvent(studyEvent, userAccount, SubjectEventStatus.DATA_ENTRY_STARTED, studyEventDataBean.getStartDate(), studyEventDataBean.getEndDate());
+                            studyEvent = studyEventDao.saveOrUpdate(studyEvent);
+                            logger.debug("Study Event Id {} is updated", studyEvent.getStudyEventId());
                         }
 
+                        ArrayList<ImportItemGroupDataBean> itemGroupDataBeans = formDataBean.getItemGroupData();
 
-                        ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
+                        int itemCountInFormData = 0;
+                        int itemInsertedUpdatedCountInFrom = 0;
+                        int itemInsertedUpdatedSkippedCountInFrom = 0;
 
-                        for (ImportItemDataBean itemDataBean : itemDataBeans) {
-                            if (itemDataBean.getItemOID() != null)
-                                itemDataBean.setItemOID(itemDataBean.getItemOID().toUpperCase());
-                            if (itemDataBean.getItemOID() == null) {
-                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, ErrorConstants.ERR_ITEM_NOT_FOUND);
+                        for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
+                            itemCountInFormData = itemCountInFormData + itemGroupDataBean.getItemData().size();
+                        }
+
+                        for (ImportItemGroupDataBean itemGroupDataBean : itemGroupDataBeans) {
+                            if (itemGroupDataBean.getItemGroupOID() != null)
+                                itemGroupDataBean.setItemGroupOID(itemGroupDataBean.getItemGroupOID().toUpperCase());
+                            if (itemGroupDataBean.getItemGroupOID() == null) {
+                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), null, null, FAILED, null, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
                                 dataImportReports.add(dataImportReport);
-                                logger.error("Item {} is not found or invalid", itemDataBean.getItemOID());
+                                logger.error("ItemGroupOid {} is not Valid or not found", itemGroupDataBean.getItemGroupOID());
                                 continue;
                             }
 
-                            Item item = itemDao.findByOcOID(itemDataBean.getItemOID());
-
-                            // ItemOID is not valid
-                            if (item == null || (item != null && !item.getStatus().equals(Status.AVAILABLE))) {
-                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, ErrorConstants.ERR_ITEM_NOT_FOUND);
+                            //Item Group invalid Oid
+                            ItemGroup itemGroup = itemGroupDao.findByOcOID(itemGroupDataBean.getItemGroupOID());
+                            if (itemGroup == null || (itemGroup != null && !itemGroup.getStatus().equals(Status.AVAILABLE))) {
+                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), null, null, FAILED, null, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
                                 dataImportReports.add(dataImportReport);
-                                logger.error("Item {} is not found or invalid", itemDataBean.getItemOID());
+                                logger.error("ItemGroupOid {} is not Valid or not found", itemGroupDataBean.getItemGroupOID());
                                 continue;
                             }
-                            Item itm = itemDao.findByNameCrfId(item.getName(), crf.getCrfId());
-                            // ItemOID is not valid
-                            if (itm == null) {
-                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, ErrorConstants.ERR_ITEM_NOT_FOUND);
+                            //Item Group invalid Oid in Form
+                            ItemGroup itmGroup = itemGroupDao.findByNameCrfId(itemGroup.getName(), crf);
+                            if (itmGroup == null) {
+                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), null, null, FAILED, null, ErrorConstants.ERR_ITEMGROUPOID_NOT_FOUND);
                                 dataImportReports.add(dataImportReport);
-                                logger.error("Item {} is not found or invalid", itemDataBean.getItemOID());
-                                continue;
-                            }
-
-
-                            if (itemDataBean.getValue() == null) {
-                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, ErrorConstants.ERR_MISSING_VALUE);
-                                dataImportReports.add(dataImportReport);
-                                logger.error("Item {} value is missing", itemDataBean.getItemOID());
+                                logger.error("ItemGroupOid {} is not Valid or not found", itemGroupDataBean.getItemGroupOID());
                                 continue;
                             }
 
-                            if (itemDataBean.getValue().length() > 3999) {
-                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, ErrorConstants.ERR_VALUE_TOO_LONG);
-                                dataImportReports.add(dataImportReport);
-                                logger.error("Item {} value too long over 3999", itemDataBean.getItemOID());
+
+                            itemGroup = validateItemGroupRepeat(studySubject, studyEventDataBean, formDataBean, eventCrf, itemGroupDataBean, itemGroup, userAccount);
+                            if (itemGroup == null) {
                                 continue;
                             }
 
-                            if (StringUtils.isNotEmpty(itemDataBean.getValue())) {
-                                ErrorObj itemDataTypeErrorObj = validateItemDataType(item, itemDataBean.getValue());
-                                if (itemDataTypeErrorObj != null) {
-                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, itemDataTypeErrorObj.getMessage());
+
+                            ArrayList<ImportItemDataBean> itemDataBeans = itemGroupDataBean.getItemData();
+                            for (ImportItemDataBean itemDataBean : itemDataBeans) {
+                                if (itemDataBean.getItemOID() != null)
+                                    itemDataBean.setItemOID(itemDataBean.getItemOID().toUpperCase());
+                                if (itemDataBean.getItemOID() == null) {
+                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, ErrorConstants.ERR_ITEM_NOT_FOUND);
                                     dataImportReports.add(dataImportReport);
-                                    logger.error("Item {} data type error. {}", itemDataBean.getItemOID(), itemDataTypeErrorObj.getMessage());
+                                    logger.error("Item {} is not found or invalid", itemDataBean.getItemOID());
                                     continue;
                                 }
 
-                                Set<ItemFormMetadata> ifms = item.getItemFormMetadatas();
-                                ResponseSet responseSet = ifms.iterator().next().getResponseSet();
-                                ErrorObj responseSetErrorObj = validateResponseSets(responseSet, itemDataBean.getValue());
-                                if (responseSetErrorObj != null) {
-                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, responseSetErrorObj.getMessage());
+                                Item item = itemDao.findByOcOID(itemDataBean.getItemOID());
+
+                                // ItemOID is not valid
+                                if (item == null || (item != null && !item.getStatus().equals(Status.AVAILABLE))) {
+                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, ErrorConstants.ERR_ITEM_NOT_FOUND);
                                     dataImportReports.add(dataImportReport);
-                                    logger.error("Item {} response option text error. {}", itemDataBean.getItemOID(), responseSetErrorObj.getMessage());
+                                    logger.error("Item {} is not found or invalid", itemDataBean.getItemOID());
                                     continue;
                                 }
-                            }
-
-                            ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
-
-                            if (itemData != null) {
-                                if (itemData.getValue().equals(itemDataBean.getValue())) {
-                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), NO_CHANGE, null, "");
+                                Item itm = itemDao.findByNameCrfId(item.getName(), crf.getCrfId());
+                                // ItemOID is not valid
+                                if (itm == null) {
+                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, ErrorConstants.ERR_ITEM_NOT_FOUND);
                                     dataImportReports.add(dataImportReport);
-                                    itemInsertedUpdatedSkippedCountInFrom++;
-                                    logger.debug("Item {} value skipped ", itemDataBean.getItemOID());
+                                    logger.error("Item {} is not found or invalid", itemDataBean.getItemOID());
+                                    continue;
+                                }
+                                 if(itm!=null){
+                                     // what version this item belongs to and if that version has status available or it is allowed to import?
+
+
+                                 }
+
+
+                                if (itemDataBean.getValue() == null) {
+                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, ErrorConstants.ERR_MISSING_VALUE);
+                                    dataImportReports.add(dataImportReport);
+                                    logger.error("Item {} value is missing", itemDataBean.getItemOID());
+                                    continue;
+                                }
+
+                                if (itemDataBean.getValue().length() > 3999) {
+                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, ErrorConstants.ERR_VALUE_TOO_LONG);
+                                    dataImportReports.add(dataImportReport);
+                                    logger.error("Item {} value too long over 3999", itemDataBean.getItemOID());
+                                    continue;
+                                }
+
+                                if (StringUtils.isNotEmpty(itemDataBean.getValue())) {
+                                    ErrorObj itemDataTypeErrorObj = validateItemDataType(item, itemDataBean.getValue());
+                                    if (itemDataTypeErrorObj != null) {
+                                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, itemDataTypeErrorObj.getMessage());
+                                        dataImportReports.add(dataImportReport);
+                                        logger.error("Item {} data type error. {}", itemDataBean.getItemOID(), itemDataTypeErrorObj.getMessage());
+                                        continue;
+                                    }
+
+                                    Set<ItemFormMetadata> ifms = item.getItemFormMetadatas();
+                                    ResponseSet responseSet = ifms.iterator().next().getResponseSet();
+                                    ErrorObj responseSetErrorObj = validateResponseSets(responseSet, itemDataBean.getValue());
+                                    if (responseSetErrorObj != null) {
+                                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), FAILED, null, responseSetErrorObj.getMessage());
+                                        dataImportReports.add(dataImportReport);
+                                        logger.error("Item {} response option text error. {}", itemDataBean.getItemOID(), responseSetErrorObj.getMessage());
+                                        continue;
+                                    }
+                                }
+
+                                ItemData itemData = itemDataDao.findByItemEventCrfOrdinal(item.getItemId(), eventCrf.getEventCrfId(), Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
+
+                                if (itemData != null) {
+                                    if (itemData.getValue().equals(itemDataBean.getValue())) {
+                                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), NO_CHANGE, null, "");
+                                        dataImportReports.add(dataImportReport);
+                                        itemInsertedUpdatedSkippedCountInFrom++;
+                                        logger.debug("Item {} value skipped ", itemDataBean.getItemOID());
+                                    } else {
+                                        itemData = updateItemData(itemData, userAccount, itemDataBean.getValue());
+                                        itemData = itemDataDao.saveOrUpdate(itemData);
+                                        dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), UPDATED, sdf_logFile.format(new Date()), "");
+                                        dataImportReports.add(dataImportReport);
+                                        itemInsertedUpdatedCountInFrom++;
+                                        itemInsertedUpdatedSkippedCountInFrom++;
+                                        logger.debug("Item {} value updated ", itemDataBean.getItemOID());
+                                    }
                                 } else {
-                                    itemData = updateItemData(itemData, userAccount, itemDataBean.getValue());
+                                    itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
                                     itemData = itemDataDao.saveOrUpdate(itemData);
-                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), UPDATED, sdf_logFile.format(new Date()), "");
+                                    dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), INSERTED, sdf_logFile.format(new Date()), "");
                                     dataImportReports.add(dataImportReport);
                                     itemInsertedUpdatedCountInFrom++;
                                     itemInsertedUpdatedSkippedCountInFrom++;
-                                    logger.debug("Item {} value updated ", itemDataBean.getItemOID());
+                                    logger.debug("Item {} value inserted ", itemDataBean.getItemOID());
                                 }
-                            } else {
-                                itemData = createItemData(eventCrf, itemDataBean, userAccount, item, Integer.parseInt(itemGroupDataBean.getItemGroupRepeatKey()));
-                                itemData = itemDataDao.saveOrUpdate(itemData);
-                                dataImportReport = new DataImportReport(subjectDataBean.getSubjectOID(), subjectDataBean.getStudySubjectID(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), itemGroupDataBean.getItemGroupOID(), itemGroupDataBean.getItemGroupRepeatKey(), itemDataBean.getItemOID(), INSERTED, sdf_logFile.format(new Date()), "");
-                                dataImportReports.add(dataImportReport);
-                                itemInsertedUpdatedCountInFrom++;
-                                itemInsertedUpdatedSkippedCountInFrom++;
-                                logger.debug("Item {} value inserted ", itemDataBean.getItemOID());
-                            }
-                        }//itemDataBean for loop
-                    } //itemGroupDataBean for loop
+                            }//itemDataBean for loop
 
-                    if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE)) && itemInsertedUpdatedSkippedCountInFrom == itemCountInFormData) {                         // update eventcrf status into Complete
-                        // Update Event Crf Status into Complete
-                        eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE);
-                        // check if all Forms within this Event is Complete
-                        openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
-                        logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
-
-                    } else if (itemInsertedUpdatedCountInFrom > 0) {                         // update eventcrf status into data entry status
-                        // Update Event Crf Status into Initial Data Entry
-                        eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE);
-                    }
+                        } //itemGroupDataBean for loop
 
 
-                } // formDataBean for loop
-            } // StudyEventDataBean for loop
-        } // StudySubjectDataBean for loop
+                        if ((formDataBean.getEventCRFStatus().equals(COMPLETE) || formDataBean.getEventCRFStatus().equals(DATA_ENTRY_COMPLETE)) && itemInsertedUpdatedSkippedCountInFrom == itemCountInFormData) {                         // update eventcrf status into Complete
+                            // Update Event Crf Status into Complete
+                            eventCrf = updateEventCrf(eventCrf, userAccount, Status.UNAVAILABLE);
+                            // check if all Forms within this Event is Complete
+                            openRosaSubmissionController.updateStudyEventStatus(tenantStudy.getStudy() != null ? tenantStudy.getStudy() : tenantStudy, studySubject, studyEventDefinition, studyEvent, userAccount);
+                            logger.debug("Form {} status updated to Complete ", formDataBean.getFormOID());
+
+                        } else if (itemInsertedUpdatedCountInFrom > 0) {                         // update eventcrf status into data entry status
+                            // Update Event Crf Status into Initial Data Entry
+                            eventCrf = updateEventCrf(eventCrf, userAccount, Status.AVAILABLE);
+                        }
+                    } // formDataBean for loop
+                } // StudyEventDataBean for loop
+            } // StudySubjectDataBean for loop
+        } else { // subjectDataBean ==null
+            dataImportReport = new DataImportReport(null, null, null, null, null, null, null, null, FAILED, null, ErrorConstants.ERR_SUBJECT_DATA_MISSING);
+            dataImportReports.add(dataImportReport);
+            logger.info("SubjectData is missing ");
+        }
 
         writeToFile(dataImportReports, studyOid, fileName);
         userService.persistJobCompleted(jobDetail, fileName);
@@ -672,31 +697,49 @@ public class ImportServiceImpl implements ImportService {
         studyEvent.setStudySubject(studySubject);
         studyEvent.setDateCreated(new Date());
         studyEvent.setUserAccount(userAccount);
-        studyEvent.setDateStart(null);
-        studyEvent.setDateEnd(null);
 
-        if (startDate != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
-            LocalDate localDate = LocalDate.parse(startDate, formatter);
-            Date date = java.sql.Date.valueOf(localDate);
-            studyEvent.setDateStart(date);
-        }
-        if (endDate != null) {
-            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
-            LocalDate localDate = LocalDate.parse(endDate, formatter);
-            Date date = java.sql.Date.valueOf(localDate);
-            studyEvent.setDateEnd(date);
-        }
+        setEventStartAndEndDate(studyEvent, startDate, endDate);
+
         studyEvent.setStartTimeFlag(false);
         studyEvent.setEndTimeFlag(false);
         logger.debug("Creating new Study Event");
         return studyEvent;
     }
 
-    private StudyEvent updateStudyEvent(StudyEvent studyEvent, UserAccount userAccount) {
+    private StudyEvent updateStudyEvent(StudyEvent studyEvent, UserAccount userAccount, SubjectEventStatus subjectEventStatus, String startDate, String endDate) {
+        if (studyEvent.getSubjectEventStatusId() != subjectEventStatus.getCode()) {
+            if ((subjectEventStatus.equals(SubjectEventStatus.DATA_ENTRY_STARTED)
+                    && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode()
+                    || studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode()))
+                    ||
+                    (subjectEventStatus.equals(SubjectEventStatus.COMPLETED)
+                            && studyEvent.getSubjectEventStatusId() == SubjectEventStatus.DATA_ENTRY_STARTED.getCode())
+                    ||
+                    (subjectEventStatus.equals(SubjectEventStatus.STOPPED)
+                            && studyEvent.getSubjectEventStatusId() == SubjectEventStatus.DATA_ENTRY_STARTED.getCode())
+                    ||
+                    (subjectEventStatus.equals(SubjectEventStatus.SKIPPED)
+                            && studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SCHEDULED.getCode())
+                    ||
+                    (subjectEventStatus.equals(SubjectEventStatus.LOCKED)
+                            && (studyEvent.getSubjectEventStatusId() == SubjectEventStatus.COMPLETED.getCode()
+                            || studyEvent.getSubjectEventStatusId() == SubjectEventStatus.SKIPPED.getCode()))
+            ) {
+                studyEvent.setSubjectEventStatusId(subjectEventStatus.getCode());
+            } else {
+                // Do not schedule or update
+
+            }
+
+
+        }
+
+
+        setEventStartAndEndDate(studyEvent, startDate, endDate);
+
+
         studyEvent.setDateUpdated(new Date());
         studyEvent.setUpdateId(userAccount.getUserId());
-        studyEvent.setSubjectEventStatusId(SubjectEventStatus.DATA_ENTRY_STARTED.getCode());
         logger.debug("Updating Study Event Id {}", studyEvent.getStudyEventId());
         return studyEvent;
     }
@@ -791,7 +834,7 @@ public class ImportServiceImpl implements ImportService {
             case ("file"):
                 return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
             case ("calculation"):
-                return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
+                return null;
             default:
                 return new ErrorObj(FAILED, ErrorConstants.ERR_ITEM_TYPE_NOT_SUPPORTED);
 
@@ -817,9 +860,6 @@ public class ImportServiceImpl implements ImportService {
         }
         return null;
     }
-
-
-
 
 
     private EventCrf nonRepeatingCommonEventCrf(StudyEventDataBean studyEventDataBean, StudyEventDefinition studyEventDefinition, StudySubject studySubject) {
@@ -850,7 +890,7 @@ public class ImportServiceImpl implements ImportService {
         if (studyEventDefinition.getType().equals(COMMON)) {   // Common Event
 
             if (studyEventDefinition.getRepeating()) {   // Repeating Common Event
-                if (studyEventDataBean.getStudyEventRepeatKey() != null) {   // Repeat Key present
+                if (studyEventDataBean.getStudyEventRepeatKey() != null && !studyEventDataBean.getStudyEventRepeatKey().equals("")) {   // Repeat Key present
                     studyEvent = eventRepeatKeyPresent(studyEventDataBean, studySubject, studyEventDefinition, userAccount, eventOrdinal);
                 } else {   //  Repeat Key missing
                     studyEventDataBean.setStudyEventRepeatKey(String.valueOf(eventOrdinal));
@@ -964,7 +1004,7 @@ public class ImportServiceImpl implements ImportService {
     }
 
 
-    private ItemGroup groupRepeatKeyPresent( StudySubject studySubject,StudyEventDataBean studyEventDataBean,FormDataBean formDataBean,ImportItemGroupDataBean importItemGroupDataBean,ItemGroup itemGroup , UserAccount userAccount, int highestGroupOrdinal) {
+    private ItemGroup groupRepeatKeyPresent(StudySubject studySubject, StudyEventDataBean studyEventDataBean, FormDataBean formDataBean, ImportItemGroupDataBean importItemGroupDataBean, ItemGroup itemGroup, UserAccount userAccount, int highestGroupOrdinal) {
         // Validate Repeat Key is an Integer Value
         try {
             Integer.parseInt(importItemGroupDataBean.getItemGroupRepeatKey());
@@ -976,18 +1016,18 @@ public class ImportServiceImpl implements ImportService {
             return null;
         }
         // verify repeat key too Large
-        if (Integer.parseInt(importItemGroupDataBean.getItemGroupRepeatKey()) > (highestGroupOrdinal+1)) {
+        if (Integer.parseInt(importItemGroupDataBean.getItemGroupRepeatKey()) > (highestGroupOrdinal + 1)) {
             DataImportReport dataImportReport = new DataImportReport(studySubject.getOcOid(), studySubject.getLabel(), studyEventDataBean.getStudyEventOID(), studyEventDataBean.getStudyEventRepeatKey(), formDataBean.getFormOID(), importItemGroupDataBean.getItemGroupOID(), importItemGroupDataBean.getItemGroupRepeatKey(), null, FAILED, null, ErrorConstants.ERR_ITEMGROUP_REPEAT_KEY_TOO_LARGE);
             dataImportReports.add(dataImportReport);
             logger.error("RepeatKey {} too large,  is not next available repeat number", importItemGroupDataBean.getItemGroupRepeatKey());
             return null;
         }
 
-      return itemGroup;
+        return itemGroup;
     }
 
-    private ItemGroup validateItemGroupRepeat(StudySubject studySubject,StudyEventDataBean studyEventDataBean,FormDataBean formDataBean,EventCrf eventCrf,ImportItemGroupDataBean importItemGroupDataBean, ItemGroup itemGroup, UserAccount userAccount) {
-          // find Highest Group Ordinal
+    private ItemGroup validateItemGroupRepeat(StudySubject studySubject, StudyEventDataBean studyEventDataBean, FormDataBean formDataBean, EventCrf eventCrf, ImportItemGroupDataBean importItemGroupDataBean, ItemGroup itemGroup, UserAccount userAccount) {
+        // find Highest Group Ordinal
         int highestGroupOrdinal = 0;
         List<ItemGroupMetadata> igms = itemGroup.getItemGroupMetadatas();
         for (ItemGroupMetadata igm : igms) {
@@ -996,19 +1036,40 @@ public class ImportServiceImpl implements ImportService {
                 highestGroupOrdinal = maxRepeatGroup;
         }
 
-            if (itemGroup.getItemGroupMetadatas().get(0).isRepeatingGroup()) {   // Repeating Item Group
-                if (importItemGroupDataBean.getItemGroupRepeatKey() != null) {   // Repeat Key present
-                    itemGroup= groupRepeatKeyPresent( studySubject, studyEventDataBean,formDataBean,importItemGroupDataBean,itemGroup, userAccount, highestGroupOrdinal);
-                } else {  // Repeat Key missing
-                    importItemGroupDataBean.setItemGroupRepeatKey(String.valueOf(highestGroupOrdinal+1));
-                }
-
-            } else {   // Non Repeat Item Group
-                importItemGroupDataBean.setItemGroupRepeatKey(String.valueOf('1'));
+        if (itemGroup.getItemGroupMetadatas().get(0).isRepeatingGroup()) {   // Repeating Item Group
+            if (importItemGroupDataBean.getItemGroupRepeatKey() != null && !importItemGroupDataBean.getItemGroupRepeatKey().equals("")) {   // Repeat Key present
+                itemGroup = groupRepeatKeyPresent(studySubject, studyEventDataBean, formDataBean, importItemGroupDataBean, itemGroup, userAccount, highestGroupOrdinal);
+            } else {  // Repeat Key missing
+                importItemGroupDataBean.setItemGroupRepeatKey(String.valueOf(highestGroupOrdinal + 1));
             }
+
+        } else {   // Non Repeat Item Group
+            importItemGroupDataBean.setItemGroupRepeatKey(String.valueOf('1'));
+        }
 
         return itemGroup;
 
     }
+
+    private void setEventStartAndEndDate(StudyEvent studyEvent, String startDate, String endDate) {
+        if (startDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+            LocalDate localDate = LocalDate.parse(startDate, formatter);
+            Date date = java.sql.Date.valueOf(localDate);
+            studyEvent.setDateStart(date);
+        } else {
+            studyEvent.setDateStart(null);
+        }
+
+        if (endDate != null) {
+            DateTimeFormatter formatter = DateTimeFormatter.ofPattern("yyyy-MM-dd", Locale.ENGLISH);
+            LocalDate localDate = LocalDate.parse(endDate, formatter);
+            Date date = java.sql.Date.valueOf(localDate);
+            studyEvent.setDateEnd(date);
+        } else {
+            studyEvent.setDateEnd(null);
+        }
+    }
+
 
 }

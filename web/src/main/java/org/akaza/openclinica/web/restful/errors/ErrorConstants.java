@@ -111,4 +111,6 @@ public class ErrorConstants {
     public static final String ERR_INVALID_GROUP_REPEAT_KEY = "errorCode.invalidRepeatKey";
     public static final String ERR_ITEMGROUP_REPEAT_KEY_TOO_LARGE = "errorCode.repeatKeyTooLarge";
 
+    public static final String ERR_SUBJECT_DATA_MISSING = "errorCode.subjectDataMissing";
+
 }
