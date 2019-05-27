@@ -11,6 +11,7 @@ import org.akaza.openclinica.dao.managestudy.StudySubjectDAO;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.service.ParticipateService;
 import org.akaza.openclinica.service.UserStatus;
+import org.akaza.openclinica.service.UtilService;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.cdisc.ns.odm.v130.ODM;
 import org.slf4j.Logger;
@@ -44,6 +45,9 @@ public class OdmController {
 
     @Autowired
     private RuleController ruleController;
+
+    @Autowired
+    private UtilService utilService;
 
     @Autowired
     @Qualifier( "dataSource" )
@@ -193,7 +197,7 @@ public class OdmController {
     ResponseEntity getEvent(HttpServletRequest request) throws Exception {
         ODM odm = null;
         String studyOid=(String)request.getSession().getAttribute("studyOid");
-        UserAccountBean ub =(UserAccountBean) request.getSession().getAttribute("userBean");
+        UserAccountBean ub = utilService.getUserAccountFromRequest(request);
         getRestfulServiceHelper().setSchema(studyOid, request);
         ResourceBundleProvider.updateLocale(new Locale("en_US"));
 

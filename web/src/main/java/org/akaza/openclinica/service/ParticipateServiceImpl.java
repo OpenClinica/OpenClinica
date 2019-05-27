@@ -26,10 +26,12 @@ import org.akaza.openclinica.dao.submit.ItemDataDAO;
 import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.domain.xform.dto.Bind;
 import org.akaza.openclinica.i18n.util.ResourceBundleProvider;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventChangeDetails;
 import org.akaza.openclinica.patterns.ocobserver.StudyEventContainer;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
+import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.web.pform.PFormCache;
 import org.apache.commons.dbcp2.BasicDataSource;
 import org.apache.commons.lang.SerializationUtils;
@@ -91,6 +93,11 @@ public class ParticipateServiceImpl implements ParticipateService {
     @Autowired
     StudyDao studyDao;
 
+    @Autowired
+    OpenRosaServices openRosaServices;
+
+    @Autowired
+    FormLayoutDao formLayoutDao;
 
     public static final String FORM_CONTEXT = "ecid";
     public static final String DASH = "-";
@@ -204,7 +211,9 @@ public class ParticipateServiceImpl implements ParticipateService {
 
                         if (validStatus) {
                             String formUrl = null;
-                            if (!itemDataExists) {
+                            FormLayout fl = formLayoutDao.findById(formLayout.getId());
+                            List<Bind> binds = openRosaServices.getBinds(fl,PARTICIPATE_FLAVOR,studyOID);
+                            if (!itemDataExists && !openRosaServices.isFormContainsContactData(binds)) {
                                 formUrl = createEnketoUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
                             }else {
                                 formUrl = createEditUrl(studyOID, formLayout, nextEvent, ssoid, String.valueOf(ub.getId()));
@@ -287,7 +296,17 @@ public class ParticipateServiceImpl implements ParticipateService {
         OCodmComplexTypeDefinitionLinks odmLinks = new OCodmComplexTypeDefinitionLinks();
 
         OCodmComplexTypeDefinitionLink link = new OCodmComplexTypeDefinitionLink();
-        if(!itemDataExists) {
+
+        FormLayout fl = formLayoutDao.findById(formLayout.getId());
+        Study study = studyDao.findById(crfBean.getStudyId());
+        List<Bind> binds=null;
+        try {
+             binds = openRosaServices.getBinds(fl, PARTICIPATE_FLAVOR, study.getOc_oid());
+        }catch(Exception e){
+            logger.debug(e.getMessage());
+        }
+
+        if (!itemDataExists && !openRosaServices.isFormContainsContactData(binds)) {
             link.setRel(PARTICIPATE_ADD_NEW);
         }else{
             link.setRel(PARTICIPATE_EDIT);
@@ -300,8 +319,9 @@ public class ParticipateServiceImpl implements ParticipateService {
             formData.setStatus("Not Started");
         } else {
             EventCrf eventCrf = eventCrfDao.findById(eventCRFBean.getId());
-            if (!itemDataExists) {
-                formData.setStatus("Not Started");
+            if (!itemDataExists && !openRosaServices.isFormContainsContactData(binds)) {
+                formData.setStatus(DataEntryStage.INITIAL_DATA_ENTRY.getName());
+              //  formData.setStatus("Not Started");
             } else {
                 org.akaza.openclinica.bean.core.Status status = org.akaza.openclinica.bean.core.Status.get(eventCrf.getStatusId());
                 if (status.equals(org.akaza.openclinica.bean.core.Status.AVAILABLE)) {

@@ -1676,19 +1676,5 @@ public abstract class SecureController extends HttpServlet implements SingleThre
         }
     }
 
-    public String getXformOutput(String studyOID, int studyFilePath, String crfOID, String formLayoutOID) throws IOException {
-        String xformOutput = "";
-        String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, studyFilePath, crfOID, formLayoutOID);
-        File dir = new File(directoryPath);
-        File[] directoryListing = dir.listFiles();
-        if (directoryListing != null) {
-            for (File child : directoryListing) {
-                if (child.getName().endsWith(QUERY_SUFFIX)) {
-                    xformOutput = new String(Files.readAllBytes(Paths.get(child.getPath())));
-                    break;
-                }
-            }
-        }
-        return xformOutput;
-    }
+
 }
