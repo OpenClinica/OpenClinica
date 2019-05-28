@@ -133,7 +133,24 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
             request.setAttribute("exitTo", fp.getString("exitTo"));
         }
         int crfVersionId = fp.getInt("crfVersionId", true);
-        int sectionId = fp.getInt("sectionId");
+        int sectionId;
+		{
+			String attrResolveDiscrepancy = String
+					.valueOf(request.getAttribute(ResolveDiscrepancyServlet.ATTR_RESOLVE_DN));
+			boolean resolveDiscrepancy = Boolean.valueOf(attrResolveDiscrepancy);
+			if (resolveDiscrepancy) {
+				/*
+				 * use the modification only when the request comes from the
+				 * resolvediscrepancy page this is necessary to limit the test
+				 * effort to requests send from the resolvediscrepancy page, for
+				 * other requests no tests are needed since there are no side
+				 * effects
+				 */
+				sectionId = fp.getInt("sectionId", true);
+			} else {
+				sectionId = fp.getInt("sectionId");
+			}
+		}
         int eventCRFId = fp.getInt(EVENT_CRF_ID, true);
         int studySubjectId = fp.getInt("studySubjectId", true);
         String action = fp.getString("action");

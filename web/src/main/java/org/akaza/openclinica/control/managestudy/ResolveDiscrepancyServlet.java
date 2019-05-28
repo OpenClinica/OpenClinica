@@ -61,6 +61,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
     private static final String RESOLVING_NOTE = "resolving_note";
     private static final String RETURN_FROM_PROCESS_REQUEST = "returnFromProcess";
+    
+    public static final String ATTR_RESOLVE_DN = "resolveDiscrepancy";
 
     public Page getPageForForwarding(DiscrepancyNoteBean note, boolean isCompleted) {
         String entityType = note.getEntityType().toLowerCase();
@@ -93,9 +95,11 @@ public class ResolveDiscrepancyServlet extends SecureController {
             }
             // UpdateStudyEvent?event_id=12&ss_id=12
         } else if ("itemdata".equalsIgnoreCase(entityType) || "eventcrf".equalsIgnoreCase(entityType)) {
-            if (currentRole.getRole().equals(Role.MONITOR) || !isCompleted) {
+            if (currentRole.getRole().equals(Role.MONITOR)) {
                  return Page.VIEW_SECTION_DATA_ENTRY_SERVLET;
                 // ViewSectionDataEntry?eventDefinitionCRFId=&ecId=1&tabId=1&studySubjectId=1
+            } else if(!isCompleted) {
+            	return Page.INITIAL_DATA_ENTRY_SERVLET;
             } else {
                 return Page.ADMIN_EDIT_SERVLET;
             }
@@ -158,7 +162,9 @@ public class ResolveDiscrepancyServlet extends SecureController {
                 StudyEventBean seb = (StudyEventBean) sedao.findByPK(id);
                 request.setAttribute(EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
                 request.setAttribute(STUDY_SUB_ID, String.valueOf(seb.getStudySubjectId()));
-
+                request.setAttribute(DataEntryServlet.INPUT_EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
+                request.setAttribute(DataEntryServlet.INPUT_SECTION_ID, String.valueOf(ifmb.getSectionId()));
+                
             } else {
                 request.setAttribute(DataEntryServlet.INPUT_EVENT_CRF_ID, String.valueOf(idb.getEventCRFId()));
                 request.setAttribute(DataEntryServlet.INPUT_SECTION_ID, String.valueOf(ifmb.getSectionId()));
@@ -279,6 +285,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
 
         }
 
+        request.setAttribute(ATTR_RESOLVE_DN, true);
         forwardPage(p);
     }
 
