@@ -20,7 +20,9 @@ import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
 import org.akaza.openclinica.dao.submit.CRFVersionDAO;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.domain.xform.XformParser;
 import org.akaza.openclinica.domain.xform.XformParserHelper;
+import org.akaza.openclinica.domain.xform.dto.*;
 import org.akaza.openclinica.service.pmanage.ParticipantPortalRegistrar;
 import org.akaza.openclinica.web.pform.formlist.XForm;
 import org.akaza.openclinica.web.pform.formlist.XFormList;
@@ -124,6 +126,9 @@ public class OpenRosaServices {
     @Autowired
     OpenRosaXMLUtil openRosaXMLUtil;
 
+    @Autowired
+    XformParser xformParser;
+
     public static final String QUERY_SUFFIX = "form-queries.xml";
     public static final String PARTICIPATE_SUFFIX = "form-participate.xml";
     public static final String NO_SUFFIX = "form.xml";
@@ -133,6 +138,7 @@ public class OpenRosaServices {
     public static final String NO_FLAVOR = "";
     public static final String SVG = ".svg";
     public static final String DASH = "-";
+    public static final String CONTACTDATA = "contactdata";
 
     public static final String FORM_CONTEXT = "ecid";
     private static final Logger LOGGER = LoggerFactory.getLogger(OpenRosaServices.class);
@@ -1152,7 +1158,7 @@ public class OpenRosaServices {
         formLayoutDao.saveOrUpdate(formLayout);
     }
 
-    private String getXformOutput(String studyOID, int studyFilePath, String crfOID, String formLayoutOID, String flavor) throws IOException {
+    public String getXformOutput(String studyOID, int studyFilePath, String crfOID, String formLayoutOID, String flavor) throws IOException {
         String xformOutput = "";
         String directoryPath = Utils.getFilePath() + Utils.getCrfMediaPath(studyOID, studyFilePath, crfOID, formLayoutOID);
         File dir = new File(directoryPath);
@@ -1194,5 +1200,37 @@ public class OpenRosaServices {
         builder = builder.header("Content-Type", "text/xml");
         return builder.build();
     }
+
+    public List<Bind> getBinds(FormLayout formLayout, String flavor,String studyOid ) throws Exception {
+        String xformOutput = "";
+        Study study =studyDao.findByOcOID(studyOid);
+        Study parentStudy= study.getStudy()!=null?study.getStudy():study;
+        int studyFilePath = parentStudy.getFilePath();
+        CrfBean crf = formLayout.getCrf();
+
+        do {
+            xformOutput = getXformOutput(parentStudy.getOc_oid(), studyFilePath, crf.getOcOid(), formLayout.getOcOid(), flavor);
+            studyFilePath--;
+        } while (xformOutput.equals("") && studyFilePath > 0);
+        Html html = xformParser.unMarshall(xformOutput);
+        Body body = html.getBody();
+        Head head = html.getHead();
+        Model model = head.getModel();
+
+        List<Bind> binds = model.getBind();
+        return binds;
+    }
+
+    public boolean isFormContainsContactData(List<Bind> binds) {
+        boolean formContainsContactData = false;
+        for (Bind bind : binds) {
+            if (bind.getOcExternal() != null && bind.getOcExternal().startsWith(CONTACTDATA)) {
+                formContainsContactData = true;
+                break;
+            }
+        }
+        return formContainsContactData;
+    }
+
 
 }

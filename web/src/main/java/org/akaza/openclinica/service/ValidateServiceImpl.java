@@ -6,6 +6,7 @@ import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.*;
 import org.akaza.openclinica.dao.service.StudyParameterValueDAO;
+import org.akaza.openclinica.domain.Status;
 import org.akaza.openclinica.domain.datamap.*;
 import org.akaza.openclinica.domain.user.UserAccount;
 import org.apache.commons.dbcp2.BasicDataSource;
@@ -42,6 +43,7 @@ public class ValidateServiceImpl implements ValidateService {
     @Autowired
     StudyParameterValueDao studyParameterValueDao;
 
+
     public boolean isStudyOidValid(String studyOid) {
         Study publicStudy = getPublicStudy(studyOid);
         if (publicStudy != null) {
@@ -49,6 +51,17 @@ public class ValidateServiceImpl implements ValidateService {
         }
         return false;
     }
+
+
+    public boolean isStudyAvailable(String studyOid) {
+        Study publicStudy = getPublicStudy(studyOid);
+        if (publicStudy != null && publicStudy.getStatus().equals(Status.AVAILABLE)) {
+            return true;
+        }
+        return false;
+    }
+
+
 
     public boolean isStudyOidValidStudyLevelOid(String studyOid) {
         Study publicStudy = getPublicStudy(studyOid);

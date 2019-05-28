@@ -5,8 +5,12 @@ import io.swagger.annotations.ApiOperation;
 import org.akaza.openclinica.bean.login.StudyUserRoleBean;
 import org.akaza.openclinica.bean.login.UserAccountBean;
 import org.akaza.openclinica.bean.rule.XmlSchemaValidationHelper;
+import org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer;
 import org.akaza.openclinica.bean.submit.crfdata.ODMContainer;
+import org.akaza.openclinica.bean.submit.crfdata.StudyEventDataBean;
+import org.akaza.openclinica.bean.submit.crfdata.SubjectDataBean;
 import org.akaza.openclinica.control.SpringServletAccess;
+import org.akaza.openclinica.controller.dto.StudyEventScheduleRequestDTO;
 import org.akaza.openclinica.controller.helper.RestfulServiceHelper;
 import org.akaza.openclinica.dao.core.CoreResources;
 import org.akaza.openclinica.dao.hibernate.StudyDao;
@@ -15,10 +19,12 @@ import org.akaza.openclinica.domain.datamap.JobDetail;
 import org.akaza.openclinica.domain.datamap.Study;
 import org.akaza.openclinica.domain.enumsupport.JobType;
 import org.akaza.openclinica.domain.user.UserAccount;
+import org.akaza.openclinica.exception.OpenClinicaSystemException;
 import org.akaza.openclinica.service.ImportService;
 import org.akaza.openclinica.service.UserService;
 import org.akaza.openclinica.service.UtilService;
 import org.akaza.openclinica.service.ValidateService;
+import org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM;
 import org.akaza.openclinica.web.restful.errors.ErrorConstants;
 import org.apache.commons.io.ByteOrderMark;
 import org.apache.commons.io.input.BOMInputStream;
@@ -29,9 +35,7 @@ import org.slf4j.LoggerFactory;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RequestMethod;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 import org.springframework.web.multipart.MultipartFile;
 
 import javax.servlet.ServletContext;
@@ -39,6 +43,7 @@ import javax.servlet.http.HttpServletRequest;
 import javax.servlet.http.HttpSession;
 import java.io.*;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.concurrent.CompletableFuture;
 
 /**
@@ -154,7 +159,12 @@ public class ImportController {
         UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
         ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
 
+
         if (!validateService.isStudyOidValid(studyOid)) {
+            return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.NOT_FOUND);
+        }
+
+        if (!validateService.isStudyAvailable(studyOid)) {
             return new ResponseEntity(ErrorConstants.ERR_STUDY_NOT_EXIST, HttpStatus.NOT_FOUND);
         }
 
@@ -195,7 +205,7 @@ public class ImportController {
             try {
                 importService.validateAndProcessDataImport(odmContainer, studyOid, siteOid, userAccountBean, schema, jobDetail);
             } catch (Exception e){
-                logger.error("Exeception is thrown while processing dataImport: " + e);
+                logger.error("Exception is thrown while processing dataImport: " + e);
             }
             return null;
 
@@ -210,5 +220,86 @@ public class ImportController {
         return new File(SpringServletAccess.getPropertiesDir(context) + fileNm);
     }
 
+    @ApiOperation( value = "To schedule an event for participant at site level", notes = "Will read the information of SudyOID,ParticipantID, StudyEventOID, Ordinal, Start Date, End Date" )
+    @RequestMapping( value = "clinicaldata/studies/{studyOID}/sites/{siteOID}/participants/{subjectKey}/events001", method = RequestMethod.POST )
+    public ResponseEntity<Object> scheduleEventAtSiteLevel(HttpServletRequest request,
+                                                              @RequestBody StudyEventScheduleRequestDTO studyEventScheduleRequestDTO,
+                                                              @PathVariable( "subjectKey" ) String subjectKey,
+                                                              @PathVariable( "studyOID" ) String studyOid,
+                                                              @PathVariable( "siteOID" ) String siteOid) throws Exception {
 
+
+        utilService.setSchemaFromStudyOid(studyOid);
+        Study tenantStudy = getTenantStudy(studyOid);
+        Study tenantSite = getTenantStudy(siteOid);
+        ResponseEntity<Object> response = null;
+        UserAccountBean userAccountBean = utilService.getUserAccountFromRequest(request);
+        ArrayList<StudyUserRoleBean> userRoles = userAccountBean.getRoles();
+
+        try {
+            if (!validateService.isStudyOidValid(studyOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_EXIST);
+            }
+            if (!validateService.isStudyOidValidStudyLevelOid(studyOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_NOT_Valid_OID);
+            }
+            if (!validateService.isSiteOidValid(siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_EXIST);
+            }
+            if (!validateService.isSiteOidValidSiteLevelOid(siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_SITE_NOT_Valid_OID);
+            }
+            if (!validateService.isStudyToSiteRelationValid(studyOid, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_STUDY_TO_SITE_NOT_Valid_OID);
+            }
+
+            if (!validateService.isUserHasAccessToStudy(userRoles, studyOid) && !validateService.isUserHasAccessToSite(userRoles, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_ROLE_SETUP);
+            } else if (!validateService.isUserHas_CRC_INV_RoleInSite(userRoles, siteOid)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_NO_SUFFICIENT_PRIVILEGES);
+            }
+
+            if (!validateService.isParticipateActive(tenantStudy)) {
+                throw new OpenClinicaSystemException(ErrorConstants.ERR_PARTICIPATE_INACTIVE);
+            }
+        } catch (OpenClinicaSystemException e) {
+            String errorMsg = e.getErrorCode();
+            HashMap<String, String> map = new HashMap<>();
+            map.put("studyOid", studyOid);
+            map.put("siteOid", siteOid);
+            org.akaza.openclinica.service.rest.errors.ParameterizedErrorVM responseDTO = new ParameterizedErrorVM(errorMsg, map);
+            response = new ResponseEntity(responseDTO, org.springframework.http.HttpStatus.EXPECTATION_FAILED);
+            return response;
+        }
+
+        String accessToken = utilService.getAccessTokenFromRequest(request);
+        String customerUuid = utilService.getCustomerUuidFromRequest(request);
+
+        ArrayList<StudyEventDataBean> studyEventDataBeans = new ArrayList<>();
+        StudyEventDataBean studyEventDataBean = new StudyEventDataBean();
+        studyEventDataBean.setStudyEventOID(studyEventScheduleRequestDTO.getStudyEventOID());
+        studyEventDataBean.setStartDate(studyEventScheduleRequestDTO.getStartDate());
+        studyEventDataBean.setEndDate(studyEventScheduleRequestDTO.getEndDate());
+        studyEventDataBeans.add(studyEventDataBean);
+
+        ArrayList<SubjectDataBean> subjectDataBeans = new ArrayList<>();
+        SubjectDataBean subjectDataBean = new SubjectDataBean();
+      //  subjectDataBean.setSubjectOID(subjectKey);           //  ????????????????????
+        subjectDataBean.setStudySubjectID(subjectKey);       //  ????????????????????
+        subjectDataBean.setStudyEventData(studyEventDataBeans);
+        subjectDataBeans.add(subjectDataBean);
+
+        CRFDataPostImportContainer importContainer = new CRFDataPostImportContainer();
+        importContainer.setStudyOID(siteOid);
+        importContainer.setSubjectData(subjectDataBeans);
+
+        ODMContainer odmContainer = new ODMContainer();
+        odmContainer.setCrfDataPostImportContainer(importContainer);
+
+        String schema = CoreResources.getRequestSchema();
+        String uuid = startImportJob(odmContainer,schema, studyOid, siteOid, userAccountBean,null );
+
+        logger.info("REST request to Extract Participants info ");
+        return new ResponseEntity<Object>("job uuid: " + uuid, HttpStatus.OK);
+    }
 }

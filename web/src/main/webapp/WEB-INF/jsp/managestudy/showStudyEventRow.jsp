@@ -219,15 +219,14 @@
                 		  </c:when>
                 		  <c:otherwise>
                 		  	 <td class="table_cell" width="80">
-                		         <c:if test="${dedc.eventCRF.updatedDate != null}">
-                		 <fmt:formatDate value="${dedc.eventCRF.updatedDate}" pattern="${dteFormat}"/><br>
-                		</c:if>
+
                 		<c:choose>
-                		  <c:when test="${dedc.eventCRF.updater.name == null}">
-                		    (<c:out value="${dedc.eventCRF.owner.name}"/>)
+                		  <c:when test="${dedc.eventCRF.updatedDate != null}">
+                    		 <fmt:formatDate value="${dedc.eventCRF.updatedDate}" pattern="${dteFormat}"/><br>
+                		    (<c:out value="${dedc.eventCRF.updater.name}"/>)
                 		  </c:when>
                 		  <c:otherwise>
-                		   (<c:out value="${dedc.eventCRF.updater.name}"/>)
+                		   (<c:out value="${dedc.eventCRF.owner.name}"/>)
                 		  </c:otherwise>
                 		 </c:choose>
                 		</td>
@@ -333,15 +332,14 @@
 
 		</td>
 		<td class="table_cell" width="80">
-		<c:if test="${dec.eventCRF.updatedDate != null}">
-		 <fmt:formatDate value="${dec.eventCRF.updatedDate}" pattern="${dteFormat}"/><br>
-		</c:if>
+
 		<c:choose>
-		  <c:when test="${dec.eventCRF.updater.name == null}">
-		    (<c:out value="${dec.eventCRF.owner.name}"/>)
+		  <c:when test="${dec.eventCRF.updatedDate != null}">
+		 <fmt:formatDate value="${dec.eventCRF.updatedDate}" pattern="${dteFormat}"/><br>
+		    (<c:out value="${dec.eventCRF.updater.name}"/>)
 		  </c:when>
 		  <c:otherwise>
-		   (<c:out value="${dec.eventCRF.updater.name}"/>)
+		   (<c:out value="${dec.eventCRF.owner.name}"/>)
 		  </c:otherwise>
 		 </c:choose>
 		</td>
