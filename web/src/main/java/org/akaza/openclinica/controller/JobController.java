@@ -41,6 +41,7 @@ import java.io.File;
 import java.io.FileInputStream;
 import java.io.IOException;
 import java.io.InputStream;
+import java.net.URLEncoder;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -194,7 +195,8 @@ public class JobController {
             inputStream = new FileInputStream(fileToDownload);
             if (!"true".equals(open)) {
                 response.setContentType("application/force-download");
-                response.setHeader("Content-Disposition", "attachment; filename=" + jobDetail.getLogPath());                
+                String fileName=URLEncoder.encode(jobDetail.getLogPath(), "UTF-8");
+                response.setHeader("Content-Disposition", "attachment; filename="+fileName);
             }
             IOUtils.copy(inputStream, response.getOutputStream());
             response.flushBuffer();
