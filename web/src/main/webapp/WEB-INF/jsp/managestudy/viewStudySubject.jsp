@@ -1171,9 +1171,9 @@
             <c:when test="${participateStatus=='enabled'}">
               <fmt:message key="update_and_invite" bundle="${resword}"/>
             </c:when>
-            <c:otherwise>
+            <c:when test="${!userRole.monitor}">
               <fmt:message key="partid_edit" bundle="${resword}"/>
-            </c:otherwise>
+            </c:when>
           </c:choose>
         </h3>
       </td>
