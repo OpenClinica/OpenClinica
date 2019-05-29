@@ -853,10 +853,14 @@ public class ItemDataDAO extends AuditableEntityDAO {
 
 	}
 	
-	public ArrayList findSkipMatchCriterias(String sqlStr,ArrayList<String> skipMatchCriteriaOids) {
+	public HashMap findSkipMatchCriterias(String sqlStr,ArrayList<String> skipMatchCriteriaOids) {
         setTypesExpected();
 
+        HashMap matchCriteriasMap = new HashMap();
         ArrayList matchCriterias = new ArrayList<>();
+        matchCriteriasMap.put("NotFound", false);
+        matchCriteriasMap.put("matchCriterias", matchCriterias);
+        
         this.setTypeExpected(1, TypeNames.INT);
         this.setTypeExpected(2, TypeNames.STRING);
         this.setTypeExpected(3, TypeNames.STRING);
@@ -866,11 +870,18 @@ public class ItemDataDAO extends AuditableEntityDAO {
         String itemValue;
         
         if(sqlStr == null || sqlStr.trim().length()==0) {
-        	return null;
+        	return matchCriteriasMap;
         }
         
         ArrayList matchingItemDataQueryResults = this.select(sqlStr);
         int listSize = skipMatchCriteriaOids.size();
+        
+        
+        if(listSize == 0) {
+        	matchCriteriasMap.put("NotFound", true);
+        	return matchCriteriasMap;
+        }
+        
         int i = 0;
         
         Iterator it = matchingItemDataQueryResults.iterator();
@@ -935,6 +946,8 @@ public class ItemDataDAO extends AuditableEntityDAO {
             matchCriterias.add(skipMatchGroup);
         }
         
-        return matchCriterias;
+        matchCriteriasMap.put("matchCriterias", matchCriterias);
+        
+        return matchCriteriasMap;
     }
 }
