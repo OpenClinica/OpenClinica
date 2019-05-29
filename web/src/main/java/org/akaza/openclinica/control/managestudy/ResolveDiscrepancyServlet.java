@@ -102,6 +102,7 @@ import org.akaza.openclinica.service.crfdata.xform.PFormCacheSubjectContextEntry
 import org.akaza.openclinica.view.Page;
 import org.akaza.openclinica.web.InconsistentStateException;
 import org.akaza.openclinica.web.InsufficientPermissionException;
+import org.akaza.openclinica.web.pform.OpenRosaServices;
 import org.akaza.openclinica.web.pform.PFormCache;
 
 /**
@@ -256,6 +257,8 @@ public class ResolveDiscrepancyServlet extends SecureController {
             EnketoUrlService enketoUrlService = (EnketoUrlService) SpringServletAccess.getApplicationContext(context).getBean("enketoUrlService");
             XformParser xformParser = (XformParser) SpringServletAccess.getApplicationContext(context).getBean("xformParser");
             VersioningMapDao versioningMapDao = (VersioningMapDao) SpringServletAccess.getApplicationContext(context).getBean("versioningMapDao");
+            OpenRosaServices openRosaServices = (OpenRosaServices) SpringServletAccess.getApplicationContext(context).getBean("openRosaServices");
+
             StudyEventBean seb = (StudyEventBean) sedao.findByPK(ecb.getStudyEventId());
             StudyEventDefinitionBean sed = (StudyEventDefinitionBean) seddao.findByPK(seb.getStudyEventDefinitionId());
             // Cache the subject context for use during xform submission
@@ -281,7 +284,7 @@ public class ResolveDiscrepancyServlet extends SecureController {
             int studyFilePath = parentStudyBean.getFilePath();
 
             do {
-                xformOutput = getXformOutput(parentStudyBean.getOid(), studyFilePath, crf.getOid(), formLayout.getOid());
+                xformOutput = openRosaServices.getXformOutput(parentStudyBean.getOid(), studyFilePath, crf.getOid(), formLayout.getOid(),flavor);
                 studyFilePath--;
             } while (xformOutput.equals("") && studyFilePath > 0);
 
@@ -354,25 +357,19 @@ public class ResolveDiscrepancyServlet extends SecureController {
             StudyUserRoleBean currentRole = (StudyUserRoleBean) request.getSession().getAttribute("userRole");
             Role role = currentRole.getRole();
 
-            boolean formContainsContactData = false;
-            for (Bind bind : binds) {
-                if (bind.getOcExternal() != null && bind.getOcExternal().startsWith(CONTACTDATA)) {
-                    formContainsContactData = true;
-                    break;
-                }
-            }
-            if (!formContainsContactData)
-                binds = null;
+            boolean formContainsContactData=false;
+            if(openRosaServices.isFormContainsContactData(binds))
+                formContainsContactData=true;
 
 
             FormUrlObject formUrlObject = null;
             if (ecb.getId() > 0 ||  (ecb.getId() == 0 && formContainsContactData)) {
                 if (isLocked) {
                     formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb, role,
-                            EDIT_MODE, loadWarning, true,binds,ub);
+                            EDIT_MODE, loadWarning, true,formContainsContactData,binds,ub);
                 } else
                     formUrlObject = enketoUrlService.getActionUrl(contextHash, subjectContext, currentStudy.getOid(), null, flavor, idb,
-                            role, EDIT_MODE, loadWarning, false,binds,ub);
+                            role, EDIT_MODE, loadWarning, false,formContainsContactData,binds,ub);
             } else {
                 String hash = formLayout.getXform();
                 formUrlObject = enketoUrlService.getInitialDataEntryUrl(contextHash, subjectContext, currentStudy.getOid(), flavor, role, EDIT_MODE, hash, loadWarning, isLocked);

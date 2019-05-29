@@ -6,7 +6,7 @@
         <map-to xml="ODM"/>
         
         <field name="CrfDataPostImportContainer"
-            type="org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer">
+            type="org.akaza.openclinica.bean.submit.crfdata.CRFDataPostImportContainer" required="true">
             <bind-xml name="ClinicalData"/>
         </field>
     </class>
