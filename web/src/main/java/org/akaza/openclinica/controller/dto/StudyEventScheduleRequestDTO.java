@@ -7,6 +7,7 @@ public class StudyEventScheduleRequestDTO {
 	private String endDate;
 	private String startDate;	
 	private String studyEventOID;
+	private String subjectKey;
 				
 		
 	@ApiModelProperty(required=true)
@@ -25,12 +26,20 @@ public class StudyEventScheduleRequestDTO {
 		this.endDate = endDate;
 	}
 	
-	@ApiModelProperty(value = "Start Date", allowableValues = "yyyy-MM-dd",required=true)
+	@ApiModelProperty(value = "Start Date", allowableValues = "yyyy-MM-dd")
 	public String getStartDate() {
 		return startDate;
 	}
 	public void setStartDate(String startDate) {
 		this.startDate = startDate;
-	}			
+	}
 
+	@ApiModelProperty(required=true)
+	public String getSubjectKey() {
+		return subjectKey;
+	}
+
+	public void setSubjectKey(String subjectKey) {
+		this.subjectKey = subjectKey;
+	}
 }
