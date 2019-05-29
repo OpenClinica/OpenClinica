@@ -1,12 +1,12 @@
 <project xmlns="http://maven.apache.org/POM/4.0.0" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
 	xsi:schemaLocation="http://maven.apache.org/POM/4.0.0 http://maven.apache.org/xsd/maven-4.0.0.xsd">
 	<modelVersion>4.0.0</modelVersion>
-	<groupId>org.akaza.openclinica</groupId>
-	<artifactId>OpenClinica</artifactId>
+	<groupId>org.libreclinica</groupId>
+	<artifactId>LibreClinica</artifactId>
 	<packaging>pom</packaging>
-	<version>3.14</version>
-	<name>OpenClinica</name>
-	<description>OpenClinica</description>
+	<version>0.2.0</version>
+	<name>LibreClinica</name>
+	<description>LibreClinica</description>
 
 	<modules>
 		<module>core</module>
@@ -22,7 +22,7 @@
 		<project.build.sourceEncoding>UTF-8</project.build.sourceEncoding>
 
 		<!-- Project's source control URL -->
-		<git.url>git://github.com/OpenClinica/OpenClinica.git</git.url>
+		<git.url>https://github.com/reliatec-gmbh/LibreClinica.git</git.url>
 
 		<!-- Config file - required by liquibase plugin -->
 		<config.file>src/main/resources/datainfo.properties</config.file>
