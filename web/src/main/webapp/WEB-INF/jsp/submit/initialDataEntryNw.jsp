@@ -56,7 +56,7 @@
     
 	
 </head>
-<body class="aka_bodywidth" onload=" document.getElementById('here').style.display='none'; document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';"  onunload="javascript:clsWin();" >
+<body class="aka_bodywidth" onload="<c:if test='${popUpURL != ""}'>openDNoteWindow('<c:out value="${popUpURL}" />');</c:if> document.getElementById('CRF_infobox_closed').style.display='block';document.getElementById('CRF_infobox_open').style.display='none';"  onunload="javascript:clsWin();" >
 
 <c:import url="../submit/showItemInputToolTipsJS.jsp"></c:import>
 
@@ -387,7 +387,10 @@ function initmb(){
 
 }
 
-window.onload = initmb;
+// this is neccessary since body.onload is overwritten 
+// by window.onload
+oldOnload = document.body.onload;
+window.onload = function(){oldOnload(); initmb();};
 
 //-->
 </script>

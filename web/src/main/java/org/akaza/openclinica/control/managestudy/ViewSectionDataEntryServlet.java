@@ -548,7 +548,11 @@ public class ViewSectionDataEntryServlet extends DataEntryServlet {
 
             int tabNum = 1;
             if ("".equalsIgnoreCase(fp.getString("tabId"))) {
-                tabNum = 1;
+            	if(sb != null && sb.getOrdinal() > 0) {
+            		tabNum = sb.getOrdinal();
+            	} else {
+            		tabNum = 1;
+            	}
             } else {
                 tabNum = fp.getInt("tabId");
             }
