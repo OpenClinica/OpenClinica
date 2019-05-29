@@ -2372,13 +2372,13 @@ public class ImportCRFDataService {
 			    			 }
 			    			 
 			    			//check status
-				    		 if(matchCheck[i]) {
+				    		 if(!matchCheck[i]) {
 			    				 break;
 			    			 }
 			    		 }
 			    		 
 			    		//check status
-			    		 if(matchCheck[i]) {
+			    		 if(!matchCheck[i]) {
 		    				 break;
 		    			 }
 			    	 }
