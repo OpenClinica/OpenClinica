@@ -183,13 +183,21 @@ public class ImportCRFDataService {
                          */
                         String sqlStr;
                         ArrayList matchCriterias;
-                        boolean matchedAndSkip=false;;
+                        boolean matchedAndSkip=false;
     					
 						sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
 						if(sqlStr != null) {
 							ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
-							matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
-    		                matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
+							HashMap matchCriteriasMap  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
+							Boolean notFound = (Boolean) matchCriteriasMap.get("NotFound");
+							matchCriterias = (ArrayList) matchCriteriasMap.get("matchCriterias");
+							
+							if(notFound) {
+								;
+							}else {
+								 matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
+							}
+    		               
 						}
 		                    
 		                if(matchedAndSkip) {
@@ -1769,11 +1777,19 @@ public class ImportCRFDataService {
                 logger.debug("iterating through study event data beans: found " + studyEventDataBean.getStudyEventOID());
                 
                 // test skip
+                ArrayList matchCriterias;
+                boolean matchedAndSkip=false;
                 String sqlStr = this.buildSkipMatchCriteriaSql(request, studyBean.getOid(), studySubjectBean.getOid(),studyEventDataBean.getStudyEventOID());
                 ArrayList<String> skipMatchCriteriaOids = this.getSkipMatchCriteriaItemOIDs(request);
-                ArrayList matchCriterias = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
-                boolean matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
-                
+                HashMap matchCriteriasMap  = this.getItemDataDao().findSkipMatchCriterias(sqlStr,skipMatchCriteriaOids); 
+				Boolean notFound = (Boolean) matchCriteriasMap.get("NotFound");
+				matchCriterias = (ArrayList) matchCriteriasMap.get("matchCriterias");
+				
+				if(notFound) {
+					;
+				}else {
+					 matchedAndSkip = this.needToSkip(matchCriterias, formDataBeans);
+				}
                 
                 if(matchedAndSkip) {
                 	//System.out.println("===============================matchedAndSkip========================");
